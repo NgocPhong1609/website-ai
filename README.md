@@ -139,7 +139,6 @@ curl -X POST http://127.0.0.1:8000/api/ai/generate-roadmap \
 
 ```
 website-ai/
-├── planAI.md                          ← Operating memory cho AI module
 ├── README.md                          ← File này
 └── website-MindNova-AI/               ← Laravel Backend
     ├── app/
@@ -200,20 +199,6 @@ git pull origin main
 git checkout feature/[ten-branch]
 git merge main
 ```
-
----
-
-## ⚠️ Quy tắc làm việc
-
-- ✅ Mỗi thành viên chỉ làm trong module được giao
-- ✅ Không sửa code module người khác
-- ✅ Đọc `planAI.md` trước khi bắt đầu (module AI)
-- ✅ Tạo migration MỚI, không sửa migration cũ
-- ✅ Dùng Eloquent, không viết raw SQL
-- ❌ Không push trực tiếp vào `main`
-- ❌ Không tự thêm package (phải discuss với team)
-
----
 
 ## 📞 Troubleshooting
 
