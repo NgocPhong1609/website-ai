@@ -13,16 +13,15 @@ Route::get('/dashboard', function () {
         : redirect()->route('client.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\ClientDashboardController;
+
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    Route::get('/admin/dashboard', AdminDashboardController::class)->name('admin.dashboard');
 });
 
 Route::middleware(['auth', 'verified', 'client'])->group(function () {
-    Route::get('/client/dashboard', function () {
-        return view('client.dashboard');
-    })->name('client.dashboard');
+    Route::get('/client/dashboard', ClientDashboardController::class)->name('client.dashboard');
 });
 
 Route::middleware('auth')->group(function () {
