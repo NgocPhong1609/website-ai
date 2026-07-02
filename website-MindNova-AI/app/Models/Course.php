@@ -7,17 +7,20 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['author_id', 'title', 'description', 'status', 'is_published', 'published_at', 'metadata'])]
+#[Fillable(['teacher_id', 'category_id', 'title', 'slug', 'description', 'thumbnail', 'price', 'level', 'status'])]
 class Course extends Model
 {
     protected $casts = [
-        'is_published' => 'boolean',
-        'published_at' => 'datetime',
-        'metadata' => 'array',
+        'price' => 'decimal:2',
     ];
 
-    public function author(): BelongsTo
+    public function teacher(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'author_id');
+        return $this->belongsTo(User::class, 'teacher_id');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 }
