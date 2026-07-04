@@ -30,6 +30,17 @@ test('client users are redirected to the client dashboard after login', function
     $response->assertRedirect('/client/dashboard');
 });
 
+test('admin users can access the course management page', function () {
+    $user = User::factory()->create([
+        'role' => 'admin',
+        'email_verified_at' => now(),
+    ]);
+
+    $response = $this->actingAs($user)->get('/admin/courses');
+
+    $response->assertOk();
+});
+
 test('client users cannot access admin pages', function () {
     $user = User::factory()->create([
         'role' => 'user',

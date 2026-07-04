@@ -122,16 +122,19 @@
                         <h3 class="text-lg font-semibold text-gray-900">{{ __('Quick Actions') }}</h3>
                     </div>
                     <div class="p-6 space-y-3">
-                        <a href="#" class="block w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 text-center">
+                        <a href="{{ route('admin.categories.index') }}" class="block w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 text-center">
+                            {{ __('Manage Course Categories') }}
+                        </a>
+                        <a href="{{ route('admin.courses.create') }}" class="block w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 text-center">
                             {{ __('Add New Course') }}
                         </a>
-                        <a href="#" class="block w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 text-center">
+                        <a href="{{ route('admin.users.index') }}" class="block w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 text-center">
                             {{ __('Manage Users') }}
                         </a>
-                        <a href="#" class="block w-full bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 text-center">
+                        <a href="{{ route('admin.reports.index') }}" class="block w-full bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 text-center">
                             {{ __('View Reports') }}
                         </a>
-                        <a href="#" class="block w-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 text-center">
+                        <a href="{{ route('admin.settings.index') }}" class="block w-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 text-center">
                             {{ __('Settings') }}
                         </a>
                     </div>
