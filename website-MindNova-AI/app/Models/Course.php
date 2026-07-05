@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +16,11 @@ class Course extends Model
     public function teacher(): BelongsTo
     {
         return $this->belongsTo(User::class, 'teacher_id');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function category(): BelongsTo
