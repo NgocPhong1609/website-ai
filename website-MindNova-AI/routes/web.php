@@ -2,13 +2,16 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
 Route::get('/dashboard', function () {
-    return auth()->check() && auth()->user()?->isAdmin()
+    $user = Auth::user();
+    return $user instanceof User && $user->isAdmin()
         ? redirect()->route('admin.dashboard')
         : redirect()->route('client.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
