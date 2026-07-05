@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 
 
@@ -37,6 +38,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/update', [UserController::class, 'updateProfile']);
         Route::post('/change-password', [UserController::class, 'changePassword']);
         Route::post('/avatar', [UserController::class, 'uploadAvatar']);
+        // -- Nhóm API Đơn hàng (Orders) --
+        Route::get('/orders', [OrderController::class, 'index']);
+        Route::post('/orders', [OrderController::class, 'store']);
     });
 
     // ==========================================
@@ -57,4 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:teacher,admin')->prefix('teacher')->group(function () {
         // Nơi này sau này bạn sẽ thêm các Route như: tạo khóa học, sửa bài giảng...
     });
+
+
+
 });
