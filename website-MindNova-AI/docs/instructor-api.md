@@ -120,3 +120,67 @@
 - **Endpoint**: `DELETE /courses/{id}`
 - **Description**: Chỉ xóa được khóa học khi status là `draft`.
 - **Response**: 204 No Content
+
+---
+
+## 2. Course Modules & Lessons (Module 1.2)
+
+### 2.1. Quản lý Chương học (Modules)
+
+**Tạo Module mới**
+- **Endpoint**: `POST /courses/{course_id}/modules`
+- **Body**:
+  ```json
+    {
+        "title": "Chương 1: Giới thiệu",
+        "order": 1
+    }
+  ```
+- **Response**: 201 Created
+
+**Cập nhật Module**
+- **Endpoint**: `PUT /modules/{module_id}`
+- **Body**:
+  ```json
+  {
+      "title": "Chương 1: Mở đầu"
+  }
+  ```
+- **Response**: 200 OK
+
+**Xóa Module**
+- **Endpoint**: `DELETE /modules/{module_id}`
+- **Response**: 204 No Content
+
+### 2.2. Quản lý Bài học (Lessons)
+
+**Tạo Bài học mới**
+- **Endpoint**: `POST /modules/{module_id}/lessons`
+- **Body**:
+  ```json
+  {
+      "title": "Bài 1: Cài đặt môi trường",
+      "type": "video", // video, article, quiz_module
+      "content": "Nội dung bài học...",
+      "order": 1,
+      "duration_minutes": 15
+  }
+  ```
+- **Response**: 201 Created
+
+**Cập nhật Bài học**
+- **Endpoint**: `PUT /lessons/{lesson_id}`
+- **Body**: Tương tự như tạo mới
+- **Response**: 200 OK
+
+**Xóa Bài học**
+- **Endpoint**: `DELETE /lessons/{lesson_id}`
+- **Response**: 204 No Content
+
+**Upload Video cho Bài học**
+- **Endpoint**: `POST /lessons/{lesson_id}/video`
+- **Headers**: `Content-Type: multipart/form-data`
+- **Body**:
+  - `video`: File mp4, mov, avi, webm. Max 500MB.
+- **Response**: 200 OK
+

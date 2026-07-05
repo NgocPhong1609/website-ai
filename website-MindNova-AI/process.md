@@ -55,10 +55,10 @@ Request → Middleware (auth + role) → Controller → Service → Model → Re
 | Sub-module | Trạng thái |
 |---|---|
 | 1.1 Quản lý khóa học (CRUD, upload video, giá) | ✅ Hoàn thành |
-| 1.2 Quản lý chương học & bài học | 🔄 Đang thực hiện |
+| 1.2 Quản lý chương học & bài học | ✅ Hoàn thành |
 
 ### Module 2 - Quản lý học viên
-**Status**: ⬜ Chưa bắt đầu
+**Status**: 🔄 Đang thực hiện
 
 | Chức năng | Trạng thái |
 |---|---|
@@ -111,19 +111,19 @@ Request → Middleware (auth + role) → Controller → Service → Model → Re
 
 ### Module 1.2 - Quản lý chương học & bài học
 
-- [ ] Phân tích database
-- [ ] Phân tích nghiệp vụ
-- [ ] Thiết kế API
-- [ ] Validation (Form Requests)
-- [ ] Policy
-- [ ] Controller (Module & Lesson)
-- [ ] Service
-- [ ] Model (CourseModule, Lesson)
-- [ ] Resource
-- [ ] Upload Video (Logic upload và stream)
-- [ ] Route
-- [ ] Test
-- [ ] Documentation
+- [x] Phân tích database
+- [x] Phân tích nghiệp vụ
+- [x] Thiết kế API
+- [x] Validation (Form Requests)
+- [x] Policy
+- [x] Controller (Module & Lesson)
+- [x] Service
+- [x] Model (CourseModule, Lesson)
+- [x] Resource
+- [x] Upload Video (Logic upload và stream)
+- [x] Route
+- [x] Test
+- [x] Documentation
 
 ### Module 2 - Quản lý học viên
 
@@ -328,6 +328,30 @@ courses ──1:N──> order_items <──N:1── orders <──N:1── us
 5. Response: CourseResource (200)
 ```
 
+### 5.2 Module 1.2 - Quản lý chương học & bài học
+
+#### Flow 1: Quản lý Chương học (Modules)
+- **Tạo Module**: `POST /api/instructor/courses/{course}/modules`
+  - Policy: `CoursePolicy@update` (Chỉ chủ khóa học)
+  - Validation: title, order
+  - Service: Tạo module, gán course_id.
+- **Cập nhật Module**: `PUT /api/instructor/modules/{module}`
+  - Policy: Kiểm tra chủ sở hữu thông qua `module->course`.
+  - Validation: title, order.
+- **Xóa Module**: `DELETE /api/instructor/modules/{module}`
+  - Cascade xóa toàn bộ lesson bên trong.
+
+#### Flow 2: Quản lý Bài học (Lessons)
+- **Tạo Lesson**: `POST /api/instructor/modules/{module}/lessons`
+  - Policy: Chủ khóa học
+  - Validation: title, type (video/article/quiz), content, order, duration
+- **Upload Video cho Lesson**: `POST /api/instructor/lessons/{lesson}/video`
+  - Validation: File mp4, webm... max 500MB.
+  - Service: Upload file, lưu storage, tính toán lại thời lượng nếu có thể.
+- **Cập nhật Lesson**: `PUT /api/instructor/lessons/{lesson}`
+- **Xóa Lesson**: `DELETE /api/instructor/lessons/{lesson}`
+
+
 ---
 
 ## 6. API Design
@@ -412,6 +436,31 @@ courses ──1:N──> order_items <──N:1── orders <──N:1── us
 | Policy | `CoursePolicy@update` |
 | Request Body | `{ "price": "required|numeric|min:0|max:9999999.99" }` |
 | Success Response (200) | `{ "success": true, "message": "Price updated.", "data": {...} }` |
+
+### Module 1.2 - Quản lý chương học & bài học
+
+#### API 1: Tạo Chương học (Module)
+- **Endpoint**: `POST /api/instructor/courses/{course}/modules`
+- **Request Body**: `{ "title": "Chương 1", "order": 1 }`
+- **Response (201)**: CourseModuleResource
+
+#### API 2: Cập nhật & Xóa Chương học
+- **PUT** `/api/instructor/modules/{module}`: `{ "title": "Tên mới", "order": 2 }`
+- **DELETE** `/api/instructor/modules/{module}`
+
+#### API 3: Tạo Bài học (Lesson)
+- **Endpoint**: `POST /api/instructor/modules/{module}/lessons`
+- **Request Body**: `{ "title": "Bài 1", "type": "video", "content": "Nội dung text", "order": 1, "duration_minutes": 10 }`
+- **Response (201)**: LessonResource
+
+#### API 4: Cập nhật & Xóa Bài học
+- **PUT** `/api/instructor/lessons/{lesson}`
+- **DELETE** `/api/instructor/lessons/{lesson}`
+
+#### API 5: Upload Video Bài học
+- **Endpoint**: `POST /api/instructor/lessons/{lesson}/video`
+- **Request Body**: multipart `video` file.
+- **Response (200)**: URL video mới cập nhật.
 
 ---
 
@@ -499,3 +548,4 @@ courses ──1:N──> order_items <──N:1── orders <──N:1── us
 | 2026-07-02 | Triển khai code Module 1.1 | Các file Controller, Service, Request, Resource, Model, Policy, Middleware, API routes | ✅ Hoàn thành code | Laravel 11/13 cần thêm api.php thủ công vào bootstrap | Chuẩn bị làm Unit Test cho Module 1.1 |
 | 2026-07-02 | Viết Unit/Feature Test Module 1.1 | `tests/Feature/Instructor/CourseManagementTest.php` | ✅ Đã viết Test | Lỗi thiếu SQLite driver khi chạy php artisan test | Đã tạo test cho Create, Update, Update Status, Update Price, Listing |
 | 2026-07-02 | Tài liệu hóa Module 1.1 | `docs/instructor-api.md` | ✅ Hoàn thành | Không có | Chốt lại 100% Module 1.1, chuẩn bị sang Module 1.2 |
+| 2026-07-05 | Triển khai Module 1.2 | `CourseModule`, `Lesson`, Controller, Service, Request, Policy, Docs, Test | ✅ Hoàn thành | Policy Authorization lồng nhau hơi nhiều | Hoàn tất CRUD Chương học, Bài học, Upload Video. Chuẩn bị sang Module 2. |
