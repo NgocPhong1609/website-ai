@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware
+class ClientMiddleware
 {
     /**
      * Handle an incoming request.
@@ -15,20 +15,15 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $adminSecret = env('ADMIN_SECRET', 'admin-secret');
-        if ($request->header('x-admin-secret') === $adminSecret) {
-            return $next($request);
-        }
-
         $user = $request->user();
-        if ($user?->isAdmin()) {
+        if ($user && ! $user->isAdmin()) {
             return $next($request);
         }
 
         if ($request->expectsJson()) {
-            return response()->json(['message' => 'Unauthorized. Admin access required.'], 403);
+            return response()->json(['message' => 'Unauthorized. Client access required.'], 403);
         }
 
-        return redirect()->route('client.dashboard');
+        return redirect()->route('admin.dashboard');
     }
 }
