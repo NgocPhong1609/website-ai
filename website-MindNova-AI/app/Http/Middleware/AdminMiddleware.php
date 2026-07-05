@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,11 +20,15 @@ class AdminMiddleware
             return $next($request);
         }
 
-        $userId = $request->header('x-user-id');
-        if ($userId && User::find($userId)?->isAdmin()) {
+        $user = $request->user();
+        if ($user?->isAdmin()) {
             return $next($request);
         }
 
-        return response()->json(['message' => 'Unauthorized. Admin access required.'], 401);
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Unauthorized. Admin access required.'], 403);
+        }
+
+        return redirect()->route('client.dashboard');
     }
 }
