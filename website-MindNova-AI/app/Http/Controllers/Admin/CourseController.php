@@ -36,7 +36,7 @@ class CourseController extends Controller
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
-        $validated['author_id'] = auth()->id();
+        $validated['author_id'] = optional($request->user())->id;
 
         Course::create($validated);
 
