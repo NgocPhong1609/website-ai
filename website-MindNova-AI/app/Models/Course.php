@@ -2,26 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['author_id', 'category_id', 'slug', 'title', 'description', 'status', 'is_published', 'published_at', 'metadata'])]
 class Course extends Model
 {
-    protected $casts = [
-        'is_published' => 'boolean',
-        'published_at' => 'datetime',
-        'metadata' => 'array',
+    // Khai báo các cột được phép thêm/sửa vào DB
+    protected $fillable = [
+        'teacher_id',
+        'category_id',
+        'title',
+        'slug',
+        'description',
+        'thumbnail',
+        'price',
+        'level',
+        'status'
     ];
-
-    public function author(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'author_id');
-    }
-
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
-    }
 }
