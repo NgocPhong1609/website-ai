@@ -3,85 +3,59 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminLog;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function index(): JsonResponse
+    // 1. Lấy danh sách toàn bộ người dùng (Có phân trang)
+    public function index(Request $request)
     {
-        $users = User::latest()->get();
+        // Có thể thêm tính năng tìm kiếm theo tên hoặc email
+        $query = User::with(['profile', 'roles']);
 
-        return response()->json(['data' => $users]);
-    }
-
-    public function show(User $user): JsonResponse
-    {
-        return response()->json(['data' => $user]);
-    }
-
-    public function store(Request $request): JsonResponse
-    {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8'],
-            'role' => ['nullable', 'in:user,admin'],
-            'is_locked' => ['nullable', 'boolean'],
-        ]);
-
-        $data['password'] = bcrypt($data['password']);
-        $user = User::create($data);
-
-        $this->logAdminAction($request, 'create_user', $user, 'Created a new user account.');
-
-        return response()->json(['message' => 'User created.', 'data' => $user], 201);
-    }
-
-    public function update(Request $request, User $user): JsonResponse
-    {
-        $data = $request->validate([
-            'name' => ['sometimes', 'string', 'max:255'],
-            'email' => ['sometimes', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'password' => ['sometimes', 'nullable', 'string', 'min:8'],
-            'role' => ['sometimes', 'in:user,admin'],
-            'is_locked' => ['sometimes', 'boolean'],
-        ]);
-
-        if (array_key_exists('password', $data) && $data['password']) {
-            $data['password'] = bcrypt($data['password']);
-        } else {
-            unset($data['password']);
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
         }
 
-        $user->update($data);
-        $this->logAdminAction($request, 'update_user', $user, 'Updated user information.');
+        // Trả về danh sách, mỗi trang 10 người
+        $users = $query->paginate(10);
 
-        return response()->json(['message' => 'User updated.', 'data' => $user]);
+        return response()->json($users, 200);
     }
 
-    public function destroy(Request $request, User $user): JsonResponse
+    // 2. Khóa / Mở khóa tài khoản người dùng
+    public function toggleStatus($id)
     {
-        $user->delete();
-        $this->logAdminAction($request, 'delete_user', $user, 'Deleted a user account.');
+        $user = User::findOrFail($id);
 
-        return response()->json(['message' => 'User deleted.']);
+        // Không cho phép Admin tự khóa chính mình
+        if (Auth::id() == $user->id) {
+            return response()->json(['message' => 'Không thể tự khóa tài khoản của mình!'], 403);
+        }
+
+        $user->status = $user->status === 'active' ? 'banned' : 'active';
+        $user->save();
+
+        return response()->json([
+            'message' => 'Đã thay đổi trạng thái tài khoản thành ' . $user->status,
+            'user' => $user
+        ], 200);
     }
 
-    protected function logAdminAction(Request $request, string $action, User $target, string $details): void
+    // 3. Xóa người dùng (Tùy chọn)
+    public function destroy($id)
     {
-        AdminLog::create([
-            'admin_id' => $request->header('x-admin-user-id'),
-            'action' => $action,
-            'target_type' => User::class,
-            'target_id' => $target->id,
-            'details' => $details,
-            'metadata' => [
-                'ip' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-            ],
-        ]);
+        $user = User::findOrFail($id);
+
+        if (Auth::d() == $user->id) {
+            return response()->json(['message' => 'Không thể tự xóa chính mình!'], 403);
+        }
+
+        $user->delete(); // Sẽ thực hiện Soft Delete vì bạn đã cấu hình trong DB
+
+        return response()->json(['message' => 'Xóa người dùng thành công'], 200);
     }
 }
