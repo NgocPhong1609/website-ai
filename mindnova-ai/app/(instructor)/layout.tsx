@@ -1,5 +1,5 @@
-import { DashboardTopbar } from "@/src/features/dashboard";
-import { Sidebar } from "@/src/features/student/layout";
+import { DashboardTopbar } from "@features/student/dashboard";
+import { Sidebar } from "@features/student/layout";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

@@ -1,8 +1,8 @@
 "use client";
 
 import { twMerge } from "tailwind-merge";
-import { COURSE_DETAIL } from "@features/courses/constants/detail";
-import type { IModule, ILesson } from "@features/courses/types";
+import { COURSE_DETAIL } from "@features/student/courses/constants/detail";
+import type { IModule, ILesson } from "@features/student/courses/types";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -103,9 +103,9 @@ function LessonItem({ lesson }: { lesson: ILesson }) {
 
 function ModuleItem({ mod, moduleIndex }: { mod: IModule; moduleIndex: number }) {
   // Simple heuristic for module status based on lessons
-  const isLocked = mod.lessons.every((l) => l.status === "locked");
-  const isCompleted = mod.lessons.every((l) => l.status === "completed");
-  const isCurrent = mod.lessons.some((l) => l.status === "current");
+  const isLocked = mod.lessons.every((l: ILesson) => l.status === "locked");
+  const isCompleted = mod.lessons.every((l: ILesson) => l.status === "completed");
+  const isCurrent = mod.lessons.some((l: ILesson) => l.status === "current");
 
   return (
     <div className={twMerge(
@@ -149,7 +149,7 @@ function ModuleItem({ mod, moduleIndex }: { mod: IModule; moduleIndex: number })
       {/* Lessons List */}
       {mod.isExpanded && (
         <div className="mt-4 flex flex-col gap-1 border-t border-[#E5E7EB] pt-4">
-          {mod.lessons.map((lesson) => (
+          {mod.lessons.map((lesson: ILesson) => (
             <LessonItem key={lesson.id} lesson={lesson} />
           ))}
         </div>
@@ -167,7 +167,7 @@ export function CurriculumAccordion() {
     <div className="mt-10">
       <h2 className="text-[20px] font-bold text-[#111827] mb-5">Curriculum</h2>
       <div className="flex flex-col">
-        {modules.map((mod, i) => (
+        {modules.map((mod: IModule, i: number) => (
           <ModuleItem key={mod.id} mod={mod} moduleIndex={i} />
         ))}
       </div>

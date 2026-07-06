@@ -1,11 +1,12 @@
 import { twMerge } from "tailwind-merge";
+
 import {
   FOCUS_AREAS,
   OVERALL_PROGRESS,
   RECENT_ACTIVITY,
   STUDY_STREAK,
-} from "@features/dashboard/constants/data";
-import type { IFocusArea, IActivityGroup, FocusActionKind } from "@features/dashboard/types";
+} from "../constants";
+import { FocusActionKind, IActivityGroup, IFocusArea } from "../types";
 
 // ─── Overall Progress ─────────────────────────────────────────────────────────
 
@@ -52,7 +53,9 @@ function StudyStreakCard() {
         <span className="text-[28px] font-bold text-[#4F46E5] leading-none">
           {days} days
         </span>
-        <span className="text-2xl leading-none" role="img" aria-label="fire">🔥</span>
+        <span className="text-2xl leading-none" role="img" aria-label="fire">
+          🔥
+        </span>
       </div>
       <p className="text-xs text-[#6B7280]">{message}</p>
     </div>
@@ -62,12 +65,12 @@ function StudyStreakCard() {
 // ─── Focus Areas ──────────────────────────────────────────────────────────────
 
 const ACTION_STYLES: Record<FocusActionKind, string> = {
-  review:   "bg-[#FEE2E2] text-[#DC2626]",
+  review: "bg-[#FEE2E2] text-[#DC2626]",
   practice: "bg-[#CCFBF1] text-[#0D9488]",
 };
 
 const ACCURACY_TEXT_STYLES: Record<FocusActionKind, string> = {
-  review:   "text-[#DC2626]",
+  review: "text-[#DC2626]",
   practice: "text-[#0D9488]",
 };
 
@@ -75,8 +78,15 @@ function FocusAreaRow({ area }: { area: IFocusArea }) {
   return (
     <div className="flex items-center justify-between gap-2 py-1.5">
       <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-bold text-[#111827] truncate">{area.topic}</p>
-        <p className={twMerge("text-[11px] font-medium", ACCURACY_TEXT_STYLES[area.action])}>
+        <p className="text-[13px] font-bold text-[#111827] truncate">
+          {area.topic}
+        </p>
+        <p
+          className={twMerge(
+            "text-[11px] font-medium",
+            ACCURACY_TEXT_STYLES[area.action],
+          )}
+        >
           {area.accuracy}% Accuracy
         </p>
       </div>
@@ -84,7 +94,7 @@ function FocusAreaRow({ area }: { area: IFocusArea }) {
         type="button"
         className={twMerge(
           "shrink-0 px-3 py-1 rounded-full text-[11px] font-bold capitalize transition-all duration-150 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#4F46E5]/40",
-          ACTION_STYLES[area.action]
+          ACTION_STYLES[area.action],
         )}
       >
         {area.action}
@@ -110,7 +120,13 @@ function FocusAreasCard() {
 
 // ─── Recent Activity ──────────────────────────────────────────────────────────
 
-function ActivityGroup({ group, isLast }: { group: IActivityGroup; isLast: boolean }) {
+function ActivityGroup({
+  group,
+  isLast,
+}: {
+  group: IActivityGroup;
+  isLast: boolean;
+}) {
   const isToday = group.day === "Today";
 
   return (
@@ -119,20 +135,25 @@ function ActivityGroup({ group, isLast }: { group: IActivityGroup; isLast: boole
       {!isLast && (
         <div className="absolute left-[7px] top-6 bottom-[-20px] w-0.5 bg-[#F3F4F6]" />
       )}
-      
+
       {/* Day header */}
       <div className="flex items-center gap-3 mb-3 relative z-10">
-        <div className={twMerge(
-          "w-4 h-4 rounded-full flex items-center justify-center border-2 border-white shadow-sm ring-1 ring-black/5",
-          isToday ? "bg-[#4F46E5]" : "bg-[#D1D5DB]"
-        )} />
+        <div
+          className={twMerge(
+            "w-4 h-4 rounded-full flex items-center justify-center border-2 border-white shadow-sm ring-1 ring-black/5",
+            isToday ? "bg-[#4F46E5]" : "bg-[#D1D5DB]",
+          )}
+        />
         <p className="text-[13px] font-bold text-[#111827]">{group.day}</p>
       </div>
 
       {/* Items list */}
       <ul className="ml-[22px] space-y-2 pb-2">
         {group.items.map((item, i) => (
-          <li key={i} className="flex items-center gap-2.5 text-[13px] text-[#4B5563]">
+          <li
+            key={i}
+            className="flex items-center gap-2.5 text-[13px] text-[#4B5563]"
+          >
             <span className="w-1.5 h-1.5 rounded-full bg-[#0D9488] shrink-0" />
             {item.label}
           </li>
@@ -150,10 +171,10 @@ function RecentActivityCard() {
       </p>
       <div className="flex flex-col gap-4">
         {RECENT_ACTIVITY.map((group, i) => (
-          <ActivityGroup 
-            key={group.day} 
-            group={group} 
-            isLast={i === RECENT_ACTIVITY.length - 1} 
+          <ActivityGroup
+            key={group.day}
+            group={group}
+            isLast={i === RECENT_ACTIVITY.length - 1}
           />
         ))}
       </div>
@@ -165,7 +186,10 @@ function RecentActivityCard() {
 
 export function DashboardStatsPanel() {
   return (
-    <aside className="w-[300px] xl:w-[320px] shrink-0 flex flex-col gap-5" aria-label="Dashboard stats">
+    <aside
+      className="w-[300px] xl:w-[320px] shrink-0 flex flex-col gap-5"
+      aria-label="Dashboard stats"
+    >
       <OverallProgressCard />
       <StudyStreakCard />
       <FocusAreasCard />
