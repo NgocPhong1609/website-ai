@@ -138,6 +138,39 @@
   ```
 - **Response**: 201 Created
 
+**Lấy danh sách Module của Khóa học**
+- **Endpoint**: `GET /courses/{course_id}/modules`
+- **Response**: 200 OK
+  ```json
+  {
+      "success": true,
+      "message": "Modules retrieved successfully.",
+      "data": [
+          {
+              "id": 1,
+              "title": "Chương 1: Giới thiệu",
+              "order": 1,
+              "course_id": 1
+          }
+      ]
+  }
+  ```
+
+**Lấy chi tiết Module**
+- **Endpoint**: `GET /modules/{module_id}`
+- **Response**: 200 OK
+  ```json
+  {
+      "success": true,
+      "data": {
+          "id": 1,
+          "title": "Chương 1: Giới thiệu",
+          "order": 1,
+          "course_id": 1
+      }
+  }
+  ```
+
 **Cập nhật Module**
 - **Endpoint**: `PUT /modules/{module_id}`
 - **Body**:
@@ -167,6 +200,44 @@
   }
   ```
 - **Response**: 201 Created
+
+**Lấy danh sách Bài học của Module**
+- **Endpoint**: `GET /modules/{module_id}/lessons`
+- **Response**: 200 OK
+  ```json
+  {
+      "success": true,
+      "message": "Lessons retrieved successfully.",
+      "data": [
+          {
+              "id": 1,
+              "title": "Bài 1: Cài đặt môi trường",
+              "type": "video",
+              "order": 1,
+              "duration_minutes": 15,
+              "course_module_id": 1
+          }
+      ]
+  }
+  ```
+
+**Lấy chi tiết Bài học**
+- **Endpoint**: `GET /lessons/{lesson_id}`
+- **Response**: 200 OK
+  ```json
+  {
+      "success": true,
+      "data": {
+          "id": 1,
+          "title": "Bài 1: Cài đặt môi trường",
+          "type": "video",
+          "content": "Nội dung bài học...",
+          "order": 1,
+          "duration_minutes": 15,
+          "course_module_id": 1
+      }
+  }
+  ```
 
 **Cập nhật Bài học**
 - **Endpoint**: `PUT /lessons/{lesson_id}`
