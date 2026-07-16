@@ -71,11 +71,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('courses/{course}/price', [CourseController::class, 'updatePrice']);
 
         // Modules
+        Route::get('courses/{course}/modules', [CourseModuleController::class, 'index']);
+        Route::get('modules/{module}', [CourseModuleController::class, 'show']);
         Route::post('courses/{course}/modules', [CourseModuleController::class, 'store']);
         Route::put('modules/{module}', [CourseModuleController::class, 'update']);
         Route::delete('modules/{module}', [CourseModuleController::class, 'destroy']);
 
         // Lessons
+        Route::get('modules/{module}/lessons', [LessonController::class, 'index']);
+        Route::get('lessons/{lesson}', [LessonController::class, 'show']);
         Route::post('modules/{module}/lessons', [LessonController::class, 'store']);
         Route::put('lessons/{lesson}', [LessonController::class, 'update']);
         Route::delete('lessons/{lesson}', [LessonController::class, 'destroy']);
