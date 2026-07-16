@@ -1,30 +1,60 @@
 // ─── InstructorTopbar ─────────────────────────────────────────────────────────
-// Top search + actions bar for the instructor layout.
+// Top navigation bar — brand name + icon actions on the right.
 
 import Link from "next/link";
-import { BellIcon, MessageIcon, SearchIcon, SparklesIcon } from "./icons";
+import { BellIcon } from "./icons";
+
+// ─── Local icons ──────────────────────────────────────────────────────────────
+
+const NAV_SVG = {
+  viewBox: "0 0 24 24",
+  fill: "none" as const,
+  stroke: "currentColor" as const,
+  strokeWidth: 1.8,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+  "aria-hidden": true as const,
+};
+
+function HelpIcon() {
+  return (
+    <svg {...NAV_SVG} width={18} height={18}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <line x1="12" y1="17" x2="12.01" y2="17" />
+    </svg>
+  );
+}
+
+// ─── User Avatar ──────────────────────────────────────────────────────────────
+
+function UserAvatar() {
+  return (
+    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#6B6BFF] to-[#4648D4] flex items-center justify-center text-white text-[13px] font-bold shadow-[0_2px_8px_rgba(107,107,255,0.35)] shrink-0 cursor-pointer hover:shadow-[0_4px_14px_rgba(107,107,255,0.45)] transition-all duration-150">
+      N
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 
 export function InstructorTopbar() {
   return (
-    <header className="h-16 shrink-0 flex items-center gap-4 px-6 bg-white border-b border-[#F0F0F8]">
-      {/* Search */}
-      <div className="flex-1 max-w-sm relative">
-        <div className="absolute inset-y-0 left-3.5 flex items-center text-[#B0B0C8] pointer-events-none">
-          <SearchIcon />
-        </div>
-        <input
-          id="instructor-search"
-          type="search"
-          placeholder="Tìm kiếm khóa học..."
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-[#1A1A2E] placeholder-[#B0B0C8] bg-[#F6F6FB] border border-[#EAEAF4] focus:outline-none focus:border-[#6B6BFF] focus:ring-4 focus:ring-[#6B6BFF]/10 focus:bg-white transition-all duration-200"
-        />
-      </div>
+    <header className="h-14 shrink-0 flex items-center gap-4 px-6 bg-white border-b border-[#F0F0F8]">
+      {/* Brand */}
+      <Link
+        href="/instructor"
+        className="text-[15px] font-extrabold text-[#4648D4] tracking-tight hover:text-[#3D40C0] transition-colors duration-150 shrink-0"
+        aria-label="MindNova AI"
+      >
+        MindNova AI
+      </Link>
 
       {/* Spacer */}
       <div className="flex-1" />
 
       {/* Actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         {/* Bell */}
         <button
           type="button"
@@ -32,30 +62,21 @@ export function InstructorTopbar() {
           className="relative w-9 h-9 rounded-xl flex items-center justify-center text-[#7878A0] hover:bg-[#F4F4FA] hover:text-[#4648D4] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/30"
         >
           <BellIcon />
-          {/* Unread dot */}
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-400 border-2 border-white" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-400 border-2 border-white" />
         </button>
 
-        {/* Message */}
+        {/* Help */}
         <button
           type="button"
-          aria-label="Tin nhắn"
+          aria-label="Trợ giúp"
           className="w-9 h-9 rounded-xl flex items-center justify-center text-[#7878A0] hover:bg-[#F4F4FA] hover:text-[#4648D4] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/30"
         >
-          <MessageIcon />
+          <HelpIcon />
         </button>
 
-        {/* CTA — Tạo khóa học */}
-        <Link
-          id="btn-create-course"
-          href="/instructor/create-course"
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(107,107,255,0.4)] hover:shadow-[0_6px_20px_rgba(107,107,255,0.55)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/40"
-        >
-          <SparklesIcon size={13} />
-          + Tạo khóa học
-        </Link>
+        {/* Avatar */}
+        <UserAvatar />
       </div>
     </header>
   );
 }
-

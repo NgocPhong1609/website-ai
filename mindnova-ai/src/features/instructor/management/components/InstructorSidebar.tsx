@@ -14,6 +14,7 @@ import {
   SettingsNavIcon,
   HelpNavIcon,
   SparklesIcon,
+  DiscussionsNavIcon,
 } from "./icons";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -28,17 +29,27 @@ interface NavItem {
 
 const INSTRUCTOR_NAV: NavItem[] = [
   {
-    label: "Course Management",
+    label: "Dashboard",
     href: "/instructor",
     Icon: CourseManagementNavIcon,
   },
   {
-    label: "Student Management",
-    href: "/instructor/students",
+    label: "My Courses",
+    href: "/instructor/courses",
+    Icon: CourseManagementNavIcon,
+  },
+  {
+    label: "Discussions",
+    href: "/instructor/discussions",
+    Icon: DiscussionsNavIcon,
+  },
+  {
+    label: "Student Analytics",
+    href: "/instructor/analytics",
     Icon: StudentManagementNavIcon,
   },
   {
-    label: "AI Teaching Hub",
+    label: "AI Tools",
     href: "/instructor/ai-teaching",
     Icon: AITeachingNavIcon,
   },
@@ -47,7 +58,7 @@ const INSTRUCTOR_NAV: NavItem[] = [
 
 const BOTTOM_LINKS: NavItem[] = [
   { label: "Settings", href: "/instructor/settings", Icon: SettingsNavIcon },
-  { label: "Help Center", href: "/instructor/help", Icon: HelpNavIcon },
+  { label: "Support", href: "/instructor/help", Icon: HelpNavIcon },
 ];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -147,10 +158,10 @@ export function InstructorSidebar() {
           <LogoMark />
           <div className="flex flex-col leading-tight">
             <span className="text-[14px] font-extrabold text-[#1A1A2E] tracking-tight group-hover:text-[#4648D4] transition-colors duration-150">
-              MindNova AI
+              Instructor Portal
             </span>
             <span className="text-[10px] text-[#9090B0] font-medium tracking-wide">
-              Instructor Admin
+              Professional Suite
             </span>
           </div>
         </Link>
@@ -168,7 +179,21 @@ export function InstructorSidebar() {
         </ul>
       </nav>
 
-      {/* Bottom section */}
+      {/* Create New Course CTA */}
+      <div className="px-3 pb-3">
+        <Link
+          href="/instructor/create-course"
+          id="sidebar-create-course"
+          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-[13px] font-semibold text-[#4648D4] border-2 border-dashed border-[#C5C6FF] hover:bg-[#6B6BFF] hover:text-white hover:border-[#6B6BFF] hover:shadow-[0_4px_14px_rgba(107,107,255,0.35)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/30"
+        >
+          <svg aria-hidden viewBox="0 0 24 24" width={14} height={14} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Create New Course
+        </Link>
+      </div>
+
       <div className="px-3 py-4 border-t border-[#F4F4FA] flex flex-col gap-3">
         {/* Bottom links */}
         <ul className="flex flex-col gap-0.5">

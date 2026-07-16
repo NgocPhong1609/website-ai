@@ -3,9 +3,9 @@ import type { Step } from "../types";
 // ─── Create Course Constants ──────────────────────────────────────────────────
 
 export const STEPS: Step[] = [
-  { id: 1, label: "Thông tin" },
-  { id: 2, label: "Cấu trúc" },
-  { id: 3, label: "Cài đặt" },
+  { id: 1, label: "Thông tin chính" },
+  { id: 2, label: "Nội dung bài học" },
+  { id: 3, label: "Cài đặt & Giá" },
 ];
 
 export const COURSE_FIELDS = [

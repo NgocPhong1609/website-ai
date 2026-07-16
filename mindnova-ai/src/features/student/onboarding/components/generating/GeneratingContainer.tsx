@@ -12,7 +12,7 @@ export default function GeneratingContainer() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push("/");
+      router.push("/onboarding/plan");
     }, 4000);
     return () => clearTimeout(timer);
   }, [router]);

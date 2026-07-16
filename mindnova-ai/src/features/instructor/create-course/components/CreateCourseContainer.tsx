@@ -8,8 +8,11 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import { StepIndicator } from "./StepIndicator";
 import { Step1BasicInfo } from "./Step1BasicInfo";
-import { ArrowRightIcon, SaveIcon, BookOpenIcon, RobotIcon } from "./icons";
+import { Step3SettingsPrice } from "./Step3SettingsPrice";
+import { AIOutlineModal } from "./AIOutlineModal";
+import { ArrowRightIcon, SaveIcon, BookOpenIcon, RobotIcon, SparklesIcon } from "./icons";
 import type { CourseBasicInfo, StepKey } from "../types";
+import type { GeneratedOutline } from "./AIOutlineModal";
 
 // ─── Footer bar ───────────────────────────────────────────────────────────────
 
@@ -53,10 +56,19 @@ function FormFooter({ step, onBack, onNext }: FormFooterProps) {
           id="btn-next-step"
           type="button"
           onClick={onNext}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#4648D4] hover:bg-[#3D40C0] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40"
         >
-          Tiếp theo
-          <ArrowRightIcon size={15} />
+          {step === 3 ? (
+            <>
+              <SparklesIcon size={13} />
+              Hoàn tất & Đăng
+            </>
+          ) : (
+            <>
+              Tiếp theo
+              <ArrowRightIcon size={15} />
+            </>
+          )}
         </button>
       </div>
     </div>
@@ -97,6 +109,12 @@ const INITIAL_DATA: CourseBasicInfo = {
 export function CreateCourseContainer() {
   const [step, setStep] = useState<StepKey>(1);
   const [formData, setFormData] = useState<CourseBasicInfo>(INITIAL_DATA);
+  const [isOutlineOpen, setIsOutlineOpen] = useState(false);
+
+  const handleApplyOutline = useCallback((_outline: GeneratedOutline) => {
+    // In production: convert outline chapters → CourseStructure and merge into form
+    setIsOutlineOpen(false);
+  }, []);
 
   const handleChange = useCallback(
     <K extends keyof CourseBasicInfo>(key: K, value: CourseBasicInfo[K]) => {
@@ -115,41 +133,59 @@ export function CreateCourseContainer() {
 
   const stepLabels: Record<StepKey, string> = {
     1: "Thông tin cơ bản",
-    2: "Cấu trúc",
-    3: "Cài đặt",
+    2: "Nội dung bài học",
+    3: "Cài đặt & Giá: Hoàn tất",
   };
 
   return (
     <div className="min-h-[calc(100vh-60px)] bg-[#F8F8FD] flex flex-col">
       {/* ── Page header ─────────────────────────────────────────────── */}
-      <div className="py-8 px-6">
-        <div className="max-w-3xl mx-auto flex flex-col gap-6">
-          {/* Title area */}
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-[#6B6BFF]">
-              <span className="text-sm">
-                <RobotIcon size={14} />
-              </span>
-              <Link
-                href="/instructor/create-course"
-                className="text-sm font-semibold hover:underline"
+      <div className="py-6 px-6 bg-white border-b border-[#F0F0F8]">
+        <div className="max-w-4xl mx-auto flex flex-col gap-4">
+          {/* Breadcrumb */}
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-[12px] text-[#9090B0]">
+            <Link href="/instructor/courses" className="hover:text-[#4648D4] transition-colors">
+              Khóa học của tôi
+            </Link>
+            <span className="mx-1">/</span>
+            <span className="text-[#464554] font-medium">Tạo khóa học mới</span>
+          </nav>
+
+          {/* Title + CTA row */}
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <h1 className="text-[22px] font-extrabold text-[#1A1A2E] tracking-tight leading-snug">
+              {stepLabels[step]}
+            </h1>
+
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Save draft */}
+              <button
+                type="button"
+                id="btn-save-draft"
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-[#464554] border border-[#DDDDF0] bg-white hover:bg-[#F4F4FA] hover:border-[#C5C6FF] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#EAEAF4]"
               >
-                Tạo nội dung mới
-              </Link>
-            </div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-extrabold text-[#1A1A2E] tracking-tight">
-                Thêm khóa học mới:{" "}
-                <span className="text-[#4648D4]">{stepLabels[step]}</span>
-              </h1>
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#EEF0FF] border border-[#D5D5FF]">
-                <span className="text-[#6B6BFF]">
-                  <RobotIcon size={12} />
-                </span>
-                <span className="text-[11px] text-[#6B6BFF] font-medium">
-                  AI sẽ hỗ trợ bạn sinh nội dung ở các bước tiếp theo
-                </span>
-              </div>
+                Lưu nháp
+              </button>
+
+              {/* Finish & Publish */}
+              <button
+                id="btn-finish-publish"
+                type="button"
+                onClick={handleNext}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40"
+              >
+                {step === 3 ? (
+                  <>
+                    <SparklesIcon size={13} />
+                    Hoàn tất & Đăng
+                  </>
+                ) : (
+                  <>
+                    Tiếp theo
+                    <ArrowRightIcon size={14} />
+                  </>
+                )}
+              </button>
             </div>
           </div>
 
@@ -159,23 +195,33 @@ export function CreateCourseContainer() {
       </div>
 
       {/* ── Form card ───────────────────────────────────────────────── */}
-      <div className="flex-1 px-6 pb-8">
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-white rounded-2xl border border-[#EAEAF4] shadow-[0_2px_20px_rgba(70,72,212,0.06)] p-6 flex flex-col gap-6">
+      <div className="flex-1 px-6 py-6">
+        <div className="max-w-4xl mx-auto">
+          <div className={step === 3 ? "flex flex-col gap-0" : "bg-white rounded-2xl border border-[#EAEAF4] shadow-[0_2px_20px_rgba(70,72,212,0.06)] p-6 flex flex-col gap-6"}>
             {/* Step content */}
             {step === 1 && (
               <Step1BasicInfo data={formData} onChange={handleChange} />
             )}
 
-            {/* Steps 2 & 3 — placeholder */}
-            {step !== 1 && (
+            {/* Step 2 — placeholder */}
+            {step === 2 && (
               <div className="flex items-center justify-center min-h-[300px] text-[#B0B0C8] text-sm">
-                Nội dung bước {step} sẽ hiển thị ở đây...
+                Nội dung bài học sẽ hiển thị ở đây...
               </div>
             )}
 
-            {/* Form footer with CTA */}
-            <FormFooter step={step} onBack={handleBack} onNext={handleNext} />
+            {/* Step 3 */}
+            {step === 3 && (
+              <Step3SettingsPrice
+                courseTitle={formData.title}
+                thumbnailPreview={formData.thumbnailPreview}
+              />
+            )}
+
+            {/* Form footer with CTA (hidden on step 3 — CTAs are in header) */}
+            {step !== 3 && (
+              <FormFooter step={step} onBack={handleBack} onNext={handleNext} />
+            )}
           </div>
 
           {/* Page bottom bar */}
@@ -184,6 +230,13 @@ export function CreateCourseContainer() {
           </div>
         </div>
       </div>
+
+      {/* ── AI Outline Modal ── */}
+      <AIOutlineModal
+        isOpen={isOutlineOpen}
+        onClose={() => setIsOutlineOpen(false)}
+        onApply={handleApplyOutline}
+      />
     </div>
   );
 }
