@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -24,6 +27,38 @@ class UserController extends Controller
         $users = $query->paginate(10);
 
         return response()->json($users, 200);
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8'],
+            'role' => ['nullable', 'string', 'in:student,teacher,admin'],
+            'status' => ['nullable', 'string', 'max:50'],
+            'is_locked' => ['nullable', 'boolean'],
+        ]);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'status' => $data['status'] ?? 'active',
+            'is_locked' => $data['is_locked'] ?? false,
+        ]);
+
+        $roleName = $data['role'] ?? 'student';
+        $role = Role::where('name', $roleName)->first();
+
+        if ($role) {
+            $user->roles()->sync([$role->id]);
+        }
+
+        return response()->json([
+            'message' => 'User created successfully.',
+            'data' => $user,
+        ], 201);
     }
 
     // 2. Khóa / Mở khóa tài khoản người dùng
