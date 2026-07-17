@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 
 
@@ -48,10 +49,16 @@ Route::middleware('auth:sanctum')->group(function () {
     // ==========================================
     Route::middleware('role:admin')->prefix('admin')->group(function () {
 
+        Route::get('/overview', [AdminDashboardController::class, 'overview']);
+
         // Quản lý người dùng
         Route::get('/users', [AdminUserController::class, 'index']);
+        Route::post('/users', [AdminUserController::class, 'store']);
         Route::post('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus']);
         Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
+
+        // Quản lý khóa học
+        Route::post('/courses', [\App\Http\Controllers\Api\Admin\CourseController::class, 'store']);
 
     });
 
