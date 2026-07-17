@@ -20,6 +20,23 @@ class CourseModuleController extends Controller
     {
     }
 
+    public function index(Course $course)
+    {
+        Gate::authorize('view', $course);
+
+        return $this->successResponse(
+            CourseModuleResource::collection($course->modules), 
+            'Modules retrieved successfully.'
+        );
+    }
+
+    public function show(CourseModule $module)
+    {
+        Gate::authorize('manage', $module);
+
+        return $this->successResponse(new CourseModuleResource($module), 'Module retrieved successfully.');
+    }
+
     public function store(StoreCourseModuleRequest $request, Course $course)
     {
         Gate::authorize('update', $course);
