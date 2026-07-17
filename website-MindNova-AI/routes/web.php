@@ -26,7 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', AdminDashboardController::class)->name('admin.dashboard');
 
     Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
@@ -55,7 +55,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     })->name('admin.settings.index');
 });
 
-Route::middleware(['auth', 'verified', 'client'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:client'])->group(function () {
     Route::get('/client/dashboard', ClientDashboardController::class)->name('client.dashboard');
 });
 

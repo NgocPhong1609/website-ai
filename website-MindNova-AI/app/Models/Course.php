@@ -23,4 +23,9 @@ class Course extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function modules(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(CourseModule::class)->orderBy('order');
+    }
 }
