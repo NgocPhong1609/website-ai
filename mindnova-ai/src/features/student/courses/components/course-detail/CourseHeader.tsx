@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { COURSE_DETAIL } from "@features/courses/constants/detail";
+import { COURSE_DETAIL } from "../../constants";
+
 
 function PlayIcon() {
   return (

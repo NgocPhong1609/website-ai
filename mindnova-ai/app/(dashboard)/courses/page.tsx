@@ -1,5 +1,6 @@
+import { CoursesHeader, ExploreMoreCard, MY_COURSES, MyCourseCard } from "@/src/features/student/courses";
 import type { Metadata } from "next";
-import { CoursesHeader, MyCourseCard, ExploreMoreCard, MY_COURSES } from "@features/courses";
+
 
 export const metadata: Metadata = {
   title: "My Courses | MindNova AI",
