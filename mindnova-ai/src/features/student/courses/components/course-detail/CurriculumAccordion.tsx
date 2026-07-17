@@ -1,8 +1,9 @@
 "use client";
 
 import { twMerge } from "tailwind-merge";
-import { COURSE_DETAIL } from "@features/courses/constants/detail";
-import type { IModule, ILesson } from "@features/courses/types";
+import { ILesson, IModule } from "../../types";
+
+
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -161,7 +162,7 @@ function ModuleItem({ mod, moduleIndex }: { mod: IModule; moduleIndex: number })
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function CurriculumAccordion() {
-  const { modules } = COURSE_DETAIL;
+  const { modules } = COURSE_DETAILL;
 
   return (
     <div className="mt-10">

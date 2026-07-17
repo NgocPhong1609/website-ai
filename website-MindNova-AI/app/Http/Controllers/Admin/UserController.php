@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,10 +34,15 @@ class UserController extends Controller
             'is_locked' => ['nullable', 'boolean'],
         ]);
 
+        $roleName = $validated['role'];
+        unset($validated['role']);
+
         $validated['password'] = Hash::make($validated['password']);
         $validated['is_locked'] = (bool) ($validated['is_locked'] ?? false);
 
-        User::create($validated);
+        $user = User::create($validated);
+        $role = Role::where('name', $roleName)->firstOrFail();
+        $user->roles()->sync([$role->id]);
 
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
@@ -56,6 +62,8 @@ class UserController extends Controller
             'is_locked' => ['sometimes', 'boolean'],
         ]);
 
+        $roleName = $validated['role'] ?? null;
+
         if (array_key_exists('password', $validated) && filled($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
@@ -63,6 +71,12 @@ class UserController extends Controller
         }
 
         $validated['is_locked'] = (bool) ($validated['is_locked'] ?? $user->is_locked);
+
+        if ($roleName !== null) {
+            unset($validated['role']);
+            $role = Role::where('name', $roleName)->firstOrFail();
+            $user->roles()->sync([$role->id]);
+        }
 
         $user->update($validated);
 

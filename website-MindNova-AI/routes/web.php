@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ClientDashboardController;
 
+require __DIR__.'/auth.php';
+
 Route::get('/', function () {
     return view('welcome');
 });

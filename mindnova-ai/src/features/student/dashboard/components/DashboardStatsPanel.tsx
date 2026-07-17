@@ -1,11 +1,6 @@
 import { twMerge } from "tailwind-merge";
-import {
-  FOCUS_AREAS,
-  OVERALL_PROGRESS,
-  RECENT_ACTIVITY,
-  STUDY_STREAK,
-} from "@features/dashboard/constants/data";
-import type { IFocusArea, IActivityGroup, FocusActionKind } from "@features/dashboard/types";
+import { FOCUS_AREAS, OVERALL_PROGRESS, RECENT_ACTIVITY, STUDY_STREAK } from "../constants";
+import { FocusActionKind, IActivityGroup, IFocusArea } from "../types";
 
 // ─── Overall Progress ─────────────────────────────────────────────────────────
 

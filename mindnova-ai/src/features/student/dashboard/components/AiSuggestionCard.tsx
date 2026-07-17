@@ -1,6 +1,8 @@
-import { AI_SUGGESTION } from "@features/dashboard/constants/data";
+
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
+
+import { AI_SUGGESTION } from "../constants";
 
 function SparkleIcon() {
   return (
