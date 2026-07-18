@@ -14,6 +14,7 @@ import {
   TrendUpIcon,
   TrendRightIcon,
 } from "./icons";
+import { AdsHourlySection } from "@/features/ads-hourly";
 
 // ─── Topbar ───────────────────────────────────────────────────────────────────
 
@@ -258,6 +259,15 @@ export function SalesReportContainer() {
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-[1200px] mx-auto px-6 lg:px-8 py-8">
           <DatePickerHeader />
+
+          {/* ── 1.1 Metric Cards + 1.2 Hourly Chart ── */}
+          <AdsHourlySection
+            onRangeSelected={(range) => {
+              // TODO: replace with real bid-schedule navigation or modal
+              console.log("[Bid Schedule] Selected range:", range);
+            }}
+          />
+
           <StatCards />
           <RevenueVsRefundsChart />
           <MarketingSourcesTable />
@@ -276,3 +286,4 @@ export function SalesReportContainer() {
     </div>
   );
 }
+// ─── End of SalesReportContainer ─────────────────────────────────────────────

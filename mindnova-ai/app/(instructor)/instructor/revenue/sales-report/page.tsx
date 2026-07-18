@@ -1,4 +1,4 @@
-import { SalesReportContainer } from "@/src/features/instructor/revenue";
+import { SalesReportContainer } from "@/src/features/instructor/revenue/components/SalesReportContainer";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
