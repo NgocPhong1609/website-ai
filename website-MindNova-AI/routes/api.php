@@ -91,6 +91,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('lessons/{lesson}', [LessonController::class, 'update']);
         Route::delete('lessons/{lesson}', [LessonController::class, 'destroy']);
         Route::post('lessons/{lesson}/video', [LessonController::class, 'uploadVideo']);
+
+        // Students (Module 2)
+        Route::get('students', [\App\Http\Controllers\Api\Instructor\StudentController::class, 'index']);
+        Route::get('students/{student}/progress', [\App\Http\Controllers\Api\Instructor\StudentController::class, 'progress']);
+
+        // Discussions (Module 2)
+        Route::get('discussions', [\App\Http\Controllers\Api\Instructor\DiscussionController::class, 'index']);
+        Route::post('discussions/{discussion}/replies', [\App\Http\Controllers\Api\Instructor\DiscussionController::class, 'reply']);
+
+        // Notifications (Module 2)
+        Route::post('notifications', [\App\Http\Controllers\Api\Instructor\NotificationController::class, 'store']);
     });
 
 

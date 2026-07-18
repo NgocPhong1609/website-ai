@@ -28,4 +28,9 @@ class Course extends Model
     {
         return $this->hasMany(CourseModule::class)->orderBy('order');
     }
+
+    public function enrollments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Enrollment::class);
+    }
 }

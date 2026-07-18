@@ -255,3 +255,54 @@
   - `video`: File mp4, mov, avi, webm. Max 500MB.
 - **Response**: 200 OK
 
+---
+
+## 3. Student Management & Q&A (Module 2)
+
+### 3.1. Quản lý Học viên
+
+**Lấy danh sách học viên**
+- **Endpoint**: `GET /students`
+- **Query Params**:
+  - `course_id`: (tùy chọn) lọc theo khóa học.
+  - `search`: (tùy chọn) tìm theo tên hoặc email.
+  - `per_page`: mặc định 15.
+- **Response**: Danh sách học viên (id, name, email, avatar, progress).
+
+**Xem tiến độ học viên**
+- **Endpoint**: `GET /students/{student_id}/progress`
+- **Query Params**: `course_id` (bắt buộc).
+- **Response**: `%` tiến độ và ngày đăng ký.
+
+### 3.2. Quản lý Thảo luận (Q&A)
+
+**Lấy danh sách câu hỏi**
+- **Endpoint**: `GET /discussions`
+- **Query Params**: `status` (open, answered, closed).
+- **Response**: Danh sách các discussion kèm bài học, học viên, và các reply.
+
+**Trả lời thảo luận**
+- **Endpoint**: `POST /discussions/{discussion_id}/replies`
+- **Body**:
+  ```json
+  {
+      "content": "Câu trả lời từ giảng viên..."
+  }
+  ```
+- **Response**: 201 Created. (Trạng thái câu hỏi sẽ tự động thành `answered`).
+
+### 3.3. Gửi Thông Báo
+
+**Gửi thông báo cho học viên**
+- **Endpoint**: `POST /notifications`
+- **Body**:
+  ```json
+  {
+      "course_id": 1,
+      "title": "Cập nhật quan trọng",
+      "message": "Nội dung thông báo...",
+      "student_ids": [1, 2] // Tùy chọn, nếu không gửi thì gửi toàn bộ học viên khóa học
+  }
+  ```
+- **Response**: 201 Created.
+
