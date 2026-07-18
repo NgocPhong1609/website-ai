@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 import {
   AiSuggestionCard,
   ContinueLearning,
   DashboardStatsPanel,
 } from "@/src/features/student/dashboard";
+=======
+import { AiSuggestionCard, ContinueLearning, DashboardStatsPanel } from "@/src/features/student/dashboard";
+
+>>>>>>> main
 
 export default function DashboardPage() {
   return (

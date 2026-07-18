@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,8 +24,8 @@ class Course extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function category(): BelongsTo
+    public function modules(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->belongsTo(Category::class);
+        return $this->hasMany(CourseModule::class)->orderBy('order');
     }
 }

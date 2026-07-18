@@ -20,6 +20,23 @@ class LessonController extends Controller
     {
     }
 
+    public function index(CourseModule $module)
+    {
+        Gate::authorize('manage', $module);
+
+        return $this->successResponse(
+            LessonResource::collection($module->lessons), 
+            'Lessons retrieved successfully.'
+        );
+    }
+
+    public function show(Lesson $lesson)
+    {
+        Gate::authorize('manage', $lesson);
+
+        return $this->successResponse(new LessonResource($lesson), 'Lesson retrieved successfully.');
+    }
+
     public function store(StoreLessonRequest $request, CourseModule $module)
     {
         Gate::authorize('manage', $module);

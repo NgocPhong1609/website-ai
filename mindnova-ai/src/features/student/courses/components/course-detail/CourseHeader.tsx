@@ -1,5 +1,10 @@
 import Link from "next/link";
+<<<<<<< HEAD
 import { COURSE_DETAIL } from "@features/student/courses/constants/detail";
+=======
+import { COURSE_DETAIL } from "../../constants";
+
+>>>>>>> main
 
 function PlayIcon() {
   return (

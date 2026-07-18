@@ -444,7 +444,9 @@ courses ──1:N──> order_items <──N:1── orders <──N:1── us
 - **Request Body**: `{ "title": "Chương 1", "order": 1 }`
 - **Response (201)**: CourseModuleResource
 
-#### API 2: Cập nhật & Xóa Chương học
+#### API 2: Lấy danh sách, chi tiết, Cập nhật & Xóa Chương học
+- **GET** `/api/instructor/courses/{course}/modules`
+- **GET** `/api/instructor/modules/{module}`
 - **PUT** `/api/instructor/modules/{module}`: `{ "title": "Tên mới", "order": 2 }`
 - **DELETE** `/api/instructor/modules/{module}`
 
@@ -453,7 +455,9 @@ courses ──1:N──> order_items <──N:1── orders <──N:1── us
 - **Request Body**: `{ "title": "Bài 1", "type": "video", "content": "Nội dung text", "order": 1, "duration_minutes": 10 }`
 - **Response (201)**: LessonResource
 
-#### API 4: Cập nhật & Xóa Bài học
+#### API 4: Lấy danh sách, chi tiết, Cập nhật & Xóa Bài học
+- **GET** `/api/instructor/modules/{module}/lessons`
+- **GET** `/api/instructor/lessons/{lesson}`
 - **PUT** `/api/instructor/lessons/{lesson}`
 - **DELETE** `/api/instructor/lessons/{lesson}`
 
@@ -549,3 +553,5 @@ courses ──1:N──> order_items <──N:1── orders <──N:1── us
 | 2026-07-02 | Viết Unit/Feature Test Module 1.1 | `tests/Feature/Instructor/CourseManagementTest.php` | ✅ Đã viết Test | Lỗi thiếu SQLite driver khi chạy php artisan test | Đã tạo test cho Create, Update, Update Status, Update Price, Listing |
 | 2026-07-02 | Tài liệu hóa Module 1.1 | `docs/instructor-api.md` | ✅ Hoàn thành | Không có | Chốt lại 100% Module 1.1, chuẩn bị sang Module 1.2 |
 | 2026-07-05 | Triển khai Module 1.2 | `CourseModule`, `Lesson`, Controller, Service, Request, Policy, Docs, Test | ✅ Hoàn thành | Policy Authorization lồng nhau hơi nhiều | Hoàn tất CRUD Chương học, Bài học, Upload Video. Chuẩn bị sang Module 2. |
+| 2026-07-13 | Thêm API Lấy chi tiết Module & Lesson | `CourseModuleController`, `LessonController`, `api.php`, Docs | ✅ Hoàn thành | Bổ sung API `show` | Hoàn thiện GET module & lesson details |
+| 2026-07-16 | Thêm API Lấy danh sách Module & Lesson | `CourseModuleController`, `LessonController`, `Course.php`, `api.php`, Docs | ✅ Hoàn thành | Bổ sung API `index` | Hoàn thiện GET danh sách module theo course và lesson theo module |
