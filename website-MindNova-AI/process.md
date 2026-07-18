@@ -58,17 +58,17 @@ Request → Middleware (auth + role) → Controller → Service → Model → Re
 | 1.2 Quản lý chương học & bài học | ✅ Hoàn thành |
 
 ### Module 2 - Quản lý học viên
-**Status**: 🔄 Đang thực hiện
+**Status**: ✅ Hoàn thành
 
 | Chức năng | Trạng thái |
 |---|---|
-| Xem danh sách học viên | ⬜ Chưa bắt đầu |
-| Trả lời thảo luận | ⬜ Chưa bắt đầu |
-| Theo dõi tiến độ học viên | ⬜ Chưa bắt đầu |
-| Gửi thông báo | ⬜ Chưa bắt đầu |
+| Xem danh sách học viên | ✅ Hoàn thành |
+| Trả lời thảo luận | ✅ Hoàn thành |
+| Theo dõi tiến độ học viên | ✅ Hoàn thành |
+| Gửi thông báo | ✅ Hoàn thành |
 
 ### Module 3 - AI hỗ trợ giảng dạy
-**Status**: ⬜ Chưa bắt đầu
+**Status**: 🔄 Đang thực hiện
 
 | Chức năng | Trạng thái |
 |---|---|
@@ -127,19 +127,19 @@ Request → Middleware (auth + role) → Controller → Service → Model → Re
 
 ### Module 2 - Quản lý học viên
 
-- [ ] Phân tích database (thêm bảng discussions nếu cần)
-- [ ] Phân tích nghiệp vụ (Tiến độ, thảo luận, thông báo)
-- [ ] Thiết kế API
-- [ ] Migration (Bảng discussions, replies)
-- [ ] Validation (Form Requests)
-- [ ] Policy
-- [ ] Model (Discussion, Notification, Enrollment)
-- [ ] Service
-- [ ] Resource
-- [ ] Controller
-- [ ] Route
-- [ ] Test
-- [ ] Documentation
+- [x] Phân tích database (thêm bảng discussions nếu cần)
+- [x] Phân tích nghiệp vụ (Tiến độ, thảo luận, thông báo)
+- [x] Thiết kế API
+- [x] Migration (Bảng discussions, replies)
+- [x] Validation (Form Requests)
+- [x] Policy
+- [x] Model (Discussion, Notification, Enrollment)
+- [x] Service
+- [x] Resource
+- [x] Controller
+- [x] Route
+- [x] Test
+- [x] Documentation
 
 ### Module 3 - AI hỗ trợ giảng dạy
 
@@ -352,6 +352,29 @@ courses ──1:N──> order_items <──N:1── orders <──N:1── us
 - **Xóa Lesson**: `DELETE /api/instructor/lessons/{lesson}`
 
 
+### 5.3 Module 2 - Quản lý học viên
+
+#### Flow 1: Xem danh sách học viên
+- **Lấy danh sách**: `GET /api/instructor/students`
+  - Logic: Join bảng `enrollments`, `courses`, `users` để lấy danh sách học viên đã mua/đăng ký khóa học của giảng viên hiện tại. Có phân trang và filter theo khóa học.
+
+#### Flow 2: Xem tiến độ học viên
+- **Xem tiến độ chi tiết**: `GET /api/instructor/students/{student_id}/progress`
+  - Logic: Lấy % tiến độ hoàn thành từ `enrollments` hoặc `lesson_completions`.
+
+#### Flow 3: Thảo luận (Q&A)
+- **Lấy danh sách câu hỏi**: `GET /api/instructor/discussions`
+  - Logic: Lấy các `discussions` thuộc về bài học nằm trong khóa học của giảng viên.
+- **Trả lời thảo luận**: `POST /api/instructor/discussions/{discussion}/replies`
+  - Logic: Giảng viên post reply cho một câu hỏi.
+  - Sau khi post, cập nhật trạng thái discussion thành "answered".
+
+#### Flow 4: Gửi thông báo
+- **Gửi thông báo**: `POST /api/instructor/notifications`
+  - Logic: Giảng viên gửi thông báo hệ thống cho 1, nhiều, hoặc toàn bộ học viên của 1 khóa học.
+
+
+
 ---
 
 ## 6. API Design
@@ -466,6 +489,27 @@ courses ──1:N──> order_items <──N:1── orders <──N:1── us
 - **Request Body**: multipart `video` file.
 - **Response (200)**: URL video mới cập nhật.
 
+### Module 2 - Quản lý học viên
+
+#### API 1: Danh sách học viên
+- **Endpoint**: `GET /api/instructor/students`
+- **Query Params**: `course_id`, `search`, `page`
+- **Response**: Paginated list of students with progress.
+
+#### API 2: Tiến độ học viên chi tiết
+- **Endpoint**: `GET /api/instructor/students/{student}/progress`
+- **Query Params**: `course_id`
+- **Response**: List of completed lessons/modules.
+
+#### API 3: Quản lý Thảo luận (Q&A)
+- **GET** `/api/instructor/discussions`: Lấy danh sách câu hỏi.
+- **POST** `/api/instructor/discussions/{discussion}/replies`: Gửi câu trả lời.
+
+#### API 4: Gửi thông báo
+- **Endpoint**: `POST /api/instructor/notifications`
+- **Body**: `{ "course_id": 1, "title": "Thông báo mới", "message": "...", "student_ids": [1, 2] }`
+- **Response**: 201 Created.
+
 ---
 
 ## 7. Cấu trúc Source Code
@@ -552,6 +596,6 @@ courses ──1:N──> order_items <──N:1── orders <──N:1── us
 | 2026-07-02 | Triển khai code Module 1.1 | Các file Controller, Service, Request, Resource, Model, Policy, Middleware, API routes | ✅ Hoàn thành code | Laravel 11/13 cần thêm api.php thủ công vào bootstrap | Chuẩn bị làm Unit Test cho Module 1.1 |
 | 2026-07-02 | Viết Unit/Feature Test Module 1.1 | `tests/Feature/Instructor/CourseManagementTest.php` | ✅ Đã viết Test | Lỗi thiếu SQLite driver khi chạy php artisan test | Đã tạo test cho Create, Update, Update Status, Update Price, Listing |
 | 2026-07-02 | Tài liệu hóa Module 1.1 | `docs/instructor-api.md` | ✅ Hoàn thành | Không có | Chốt lại 100% Module 1.1, chuẩn bị sang Module 1.2 |
-| 2026-07-05 | Triển khai Module 1.2 | `CourseModule`, `Lesson`, Controller, Service, Request, Policy, Docs, Test | ✅ Hoàn thành | Policy Authorization lồng nhau hơi nhiều | Hoàn tất CRUD Chương học, Bài học, Upload Video. Chuẩn bị sang Module 2. |
+| 2026-07-18 | Triển khai Module 2 | Migration, Model, Controller, Service, Request, Resource, Route, Test, Docs | ✅ Hoàn thành | Cần chú ý logic phân quyền khi reply thảo luận (phải kiểm tra từ course -> module -> lesson) | Đã hoàn tất CRUD quản lý học viên, Thảo luận (Q&A) và Thông báo. Bắt đầu sang Module 3. |
 | 2026-07-13 | Thêm API Lấy chi tiết Module & Lesson | `CourseModuleController`, `LessonController`, `api.php`, Docs | ✅ Hoàn thành | Bổ sung API `show` | Hoàn thiện GET module & lesson details |
 | 2026-07-16 | Thêm API Lấy danh sách Module & Lesson | `CourseModuleController`, `LessonController`, `Course.php`, `api.php`, Docs | ✅ Hoàn thành | Bổ sung API `index` | Hoàn thiện GET danh sách module theo course và lesson theo module |
