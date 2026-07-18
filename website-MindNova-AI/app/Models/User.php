@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\ActivityLog;
-use App\Models\AdminLog;
 use App\Models\Notification;
 use App\Models\Enrollment;
 use App\Models\Payment;
@@ -26,11 +24,18 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected $fillable = [
+        'name', 'email', 'password', 'google_id', 'avatar_url', 'status', 'last_login_at', 'is_locked'
+    ];
+
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
+
+    protected $appends = [
+        'role',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -75,13 +80,38 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'role_user');
     }
 
-    public function isAdmin(): bool
+    // Quan hệ với bảng Subscriptions (Một - Nhiều)
+    public function subscriptions(): HasMany
     {
-        return $this->roles()->where('name', 'admin')->exists();
+        return $this->hasMany(Subscription::class);
     }
 
-    public function isTeacher(): bool
+    // Quan hệ với bảng Payments (Một - Nhiều)
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    // Quan hệ với bảng Notifications (Một - Nhiều)
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    // Hàm phụ trợ kiểm tra quyền nhanh
+    public function hasRole($roleName)
     {
         return $this->roles()->where('name', 'teacher')->exists();
+    }
+
+    // Kiểm tra xem người dùng có quyền admin không
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    public function getRoleAttribute(): ?string
+    {
+        return $this->roles->pluck('name')->first();
     }
 }

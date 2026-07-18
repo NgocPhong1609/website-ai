@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { IMyCourse } from "@features/courses/types";
+import type { IMyCourse } from "@features/student/courses/types";
 
 function SparkleIcon() {
   return (
