@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\ActivityLog;
 use App\Models\AdminLog;
 use App\Models\Notification;
+use App\Models\Enrollment;
 use App\Models\Payment;
 use App\Models\Subscription;
 
@@ -42,6 +43,11 @@ class User extends Authenticatable
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class);
     }
 
     public function subscriptions(): HasMany
