@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Sidebar } from "@/src/features/student/layout";
 import { DashboardTopbar } from "@/src/features/student/dashboard";
+<<<<<<< HEAD
+=======
 
+>>>>>>> main
 
 export const metadata: Metadata = {
   title: "Dashboard",

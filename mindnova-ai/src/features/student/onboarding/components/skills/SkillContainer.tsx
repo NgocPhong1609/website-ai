@@ -54,7 +54,11 @@ export default function SkillContainer() {
         size="unstyled"
         disabled={selectedId === null}
         onClick={() => router.push("/onboarding/topics")}
-        className="py-6 px-16 rounded-lg bg-[#E2E8F0] text-[#464554]/40 mt-8 disabled:cursor-not-allowed"
+        className= {
+          selectedId !== null
+            ? "py-6 px-16 rounded-lg bg-[#4F46E5] text-white shadow-md hover:bg-[#4338CA] transition-all duration-200 cursor-pointer"
+            : "py-6 px-16 rounded-lg bg-[#E2E8F0] text-[#464554]/40 cursor-not-allowed"
+        }
         rightIcon={<ArrowRightIcon />}
       >
         Continue

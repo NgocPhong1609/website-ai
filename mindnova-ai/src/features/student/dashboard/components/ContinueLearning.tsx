@@ -1,14 +1,29 @@
 import Link from "next/link";
 import Image from "next/image";
+<<<<<<< HEAD
+import { DASHBOARD_COURSES } from "../constants";
+import { ICourse } from "../../courses";
+=======
 import { ICourse } from "../../courses";
 import { DASHBOARD_COURSES } from "../constants";
 
+>>>>>>> main
 
 // ─── Sub-component ────────────────────────────────────────────────────────────
 
 function PlayCircleIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="12" r="10" />
       <polygon points="10 8 16 12 10 16 10 8" />
     </svg>
@@ -32,9 +47,11 @@ function CourseCard({ course }: CourseCardProps) {
             className="object-cover"
           />
         ) : (
-          <div className={`w-full h-full bg-gradient-to-br ${course.thumbnailGradient}`} />
+          <div
+            className={`w-full h-full bg-gradient-to-br ${course.thumbnailGradient}`}
+          />
         )}
-        
+
         {/* Progress badge overlaid */}
         <div className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-md bg-white text-[11px] font-bold text-[#4F46E5] shadow-sm">
           {course.progress}%
@@ -43,7 +60,9 @@ function CourseCard({ course }: CourseCardProps) {
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="text-[15px] font-bold text-[#111827] mb-1.5">{course.title}</h3>
+        <h3 className="text-[15px] font-bold text-[#111827] mb-1.5">
+          {course.title}
+        </h3>
         <p className="flex items-center gap-1.5 text-[13px] text-[#6B7280]">
           <PlayCircleIcon />
           Next: {course.nextLesson}
@@ -77,7 +96,17 @@ export function ContinueLearning() {
           className="text-[13px] font-semibold text-[#4F46E5] hover:text-[#4338CA] transition-colors flex items-center gap-1"
         >
           View All
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </Link>

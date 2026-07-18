@@ -7,6 +7,7 @@ export { default as GoalContainer } from "./components/goal/GoalContainer";
 export { default as SkillContainer } from "./components/skills/SkillContainer";
 export { default as GeneratingContainer } from "./components/generating/GeneratingContainer";
 export { default as TopicsContainer } from "./components/topics/TopicsContainer";
+export { default as PlanContainer } from "./components/plan/PlanContainer";
 
 // Hooks
 export { useOnboarding } from "./hooks";
