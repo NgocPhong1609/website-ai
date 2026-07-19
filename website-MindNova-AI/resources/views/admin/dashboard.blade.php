@@ -103,7 +103,9 @@
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $user->name }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $user->email }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $user->created_at->format('M d, Y') }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                {{ $user->created_at ? $user->created_at->format('M d, Y') : 'N/A' }}
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
@@ -158,7 +160,7 @@
                                     </div>
                                     <div class="text-right">
                                         <p class="font-semibold text-gray-900">${{ number_format($payment->amount, 2) }}</p>
-                                        <span class="inline-block text-xs font-medium px-2.5 py-0.5 rounded-full 
+                                        <span class="inline-block text-xs font-medium px-2.5 py-0.5 rounded-full
                                             @if($payment->status === 'completed') bg-green-100 text-green-800
                                             @elseif($payment->status === 'pending') bg-yellow-100 text-yellow-800
                                             @else bg-red-100 text-red-800

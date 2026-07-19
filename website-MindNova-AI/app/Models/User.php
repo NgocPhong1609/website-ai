@@ -2,22 +2,17 @@
 
 namespace App\Models;
 
-use App\Models\Notification;
-use App\Models\Enrollment;
-use App\Models\Payment;
-use App\Models\Subscription;
-
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'google_id', 'avatar_url', 'status'])]
+#[Fillable(['name', 'email', 'password', 'google_id', 'avatar_url', 'status', 'last_login_at', 'is_locked'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -45,6 +40,7 @@ class User extends Authenticatable
         ];
     }
 
+    // --- Các quan hệ ---
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
@@ -75,22 +71,35 @@ class User extends Authenticatable
         return $this->hasMany(AdminLog::class, 'admin_id');
     }
 
-    public function roles(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class, 'role_user');
+        return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
     }
 
-    // Hàm phụ trợ kiểm tra quyền nhanh
-    public function hasRole($roleName)
+    // --- Hàm phụ trợ ---
+
+    /**
+     * Kiểm tra người dùng có sở hữu vai trò cụ thể không
+     */
+    public function hasRole(string $roleName): bool
     {
-        // Đã sửa từ 'teacher' thành biến $roleName
         return $this->roles()->where('name', $roleName)->exists();
     }
 
-    // Kiểm tra xem người dùng có quyền admin không
+    /**
+     * Kiểm tra người dùng có quyền admin không
+     */
     public function isAdmin(): bool
     {
         return $this->hasRole('admin');
+    }
+
+    /**
+     * Kiểm tra người dùng có quyền teacher không (Phục vụ cho việc chọn giáo viên)
+     */
+    public function isTeacher(): bool
+    {
+        return $this->hasRole('teacher');
     }
 
     public function getRoleAttribute(): ?string
