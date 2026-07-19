@@ -126,9 +126,6 @@ function FormField({ id, label, leftIcon, rightElement, labelRight, ...inputProp
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-const DEFAULT_API_BASE_URL = "http://127.0.0.1:8000/api";
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
-
 export function LoginForm() {
   const emailId   = useId();
   const passwordId = useId();
@@ -141,7 +138,6 @@ export function LoginForm() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const handleChange = useCallback(
     (field: keyof LoginFormValues) =>
@@ -155,41 +151,9 @@ export function LoginForm() {
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setStatusMessage(null);
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password,
-        }),
-      });
-
-      const payload = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        throw new Error(payload?.message ?? "Đăng nhập thất bại.");
-      }
-
-      const token = payload?.access_token;
-
-      if (token) {
-        window.localStorage.setItem("accessToken", token);
-      }
-
-      setStatusMessage("Đăng nhập thành công. Đang chuyển hướng...");
-      window.location.assign("/admin/users");
-    } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : "Đăng nhập thất bại.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [values.email, values.password]);
+    await new Promise((r) => setTimeout(r, 1400));
+    setIsLoading(false);
+  }, []);
 
   const togglePassword = useCallback(() => setShowPassword((v) => !v), []);
 
@@ -223,11 +187,6 @@ export function LoginForm() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-            {statusMessage && (
-              <div className="rounded-xl border border-[#E4E4EF] bg-[#F8F8FC] px-3 py-2 text-sm text-[#1A1A2E]">
-                {statusMessage}
-              </div>
-            )}
 
             {/* Email */}
             <FormField

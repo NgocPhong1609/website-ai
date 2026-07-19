@@ -1,5 +1,5 @@
-import type { ICourse } from "@features/student/courses/types";
-import type { IFocusArea, IActivityGroup } from "@features/student/dashboard/types";
+import type { ICourse } from "@features/courses/types";
+import type { IFocusArea, IActivityGroup } from "@features/dashboard/types";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 // Replace with real API calls when backend is ready.

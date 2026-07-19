@@ -1,13 +1,4 @@
-<<<<<<< HEAD
-import {
-  AiSuggestionCard,
-  ContinueLearning,
-  DashboardStatsPanel,
-} from "@/src/features/student/dashboard";
-=======
-import { AiSuggestionCard, ContinueLearning, DashboardStatsPanel } from "@/src/features/student/dashboard";
-
->>>>>>> main
+import { ContinueLearning, AiSuggestionCard, DashboardStatsPanel } from "@features/dashboard";
 
 export default function DashboardPage() {
   return (

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { Button, ArrowRightIcon } from "@shared/components/ui";
 import { useOnboardingStore } from "@/src/features/student/onboarding/stores/onboardingStore";
 import { ONBOARDING_TOPICS } from "@/src/features/student/onboarding/constants";
@@ -9,15 +8,19 @@ import { TopicsGrid } from "./TopicsGrid";
 import { AiProjectionCard } from "./AiProjectionCard";
 import type { ITopic } from "@/src/features/student/onboarding/types";
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
+// ─── Static Icons ─────────────────────────────────────────────────────────────
 
 function SparkleIcon() {
   return (
     <svg
-      width="14"
-      height="14"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
-      fill="currentColor"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
     >
       <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
@@ -45,6 +48,8 @@ function ShieldCheckIcon() {
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
+
+import { useRouter } from "next/navigation";
 
 /**
  * Encapsulates topic-selection logic and store integration.
@@ -74,7 +79,6 @@ function useTopicsSelection() {
     router.push("/onboarding/generating");
   }, [selectedIds, selectTopics, router]);
 
-
   return {
     selectedIds,
     selectedCount: selectedIds.size,
@@ -88,11 +92,9 @@ function useTopicsSelection() {
 
 function StepBadge() {
   return (
-    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#6B6BFF]/10 to-[#4cd7f6]/10 border border-[#6B6BFF]/20 backdrop-blur-sm">
-      <span className="text-[#6B6BFF]">
-        <SparkleIcon />
-      </span>
-      <span className="text-xs font-bold text-[#6B6BFF] tracking-wider uppercase">
+    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#6B6BFF]/8 border border-[#6B6BFF]/20">
+      <SparkleIcon />
+      <span className="text-xs font-semibold text-[#6B6BFF] tracking-wide">
         Step 3 of 4 — Personalization
       </span>
     </div>
@@ -121,13 +123,13 @@ export default function TopicsContainer() {
 
       {/* Header */}
       <div className="flex flex-col items-center gap-3 text-center max-w-2xl">
-        <h1 className="text-[44px] font-bold text-[#131B2E] leading-tight tracking-tight">
+        <h1 className="text-4xl font-bold text-[#131B2E] leading-tight tracking-tight">
           Which topics spark{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6B6BFF] via-[#818cf8] to-[#4cd7f6]">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6B6BFF] to-[#4cd7f6]">
             your curiosity?
           </span>
         </h1>
-        <p className="text-base text-[#64647A] leading-relaxed max-w-lg">
+        <p className="text-[15px] text-[#64647A] leading-relaxed max-w-lg">
           Select one or more topics below. Our AI will curate a{" "}
           <span className="text-[#4648D4] font-semibold">
             personalized curriculum
@@ -136,13 +138,13 @@ export default function TopicsContainer() {
         </p>
       </div>
 
-      {/* ── Content Layout: Grid + Sidebar ── */}
+      {/* Content: topics grid + AI sidebar */}
       <div className="flex items-start gap-5 w-full max-w-4xl">
         <TopicsGrid selectedIds={selectedIds} onToggle={toggleTopic} />
         <AiProjectionCard selectedCount={selectedCount} />
       </div>
 
-      {/* ── CTA ── */}
+      {/* CTA */}
       <div className="flex flex-col items-center gap-3">
         <Button
           onClick={handleGenerate}
@@ -150,20 +152,13 @@ export default function TopicsContainer() {
           size="unstyled"
           variant="unstyled"
           className={[
-            "relative px-14 py-4 rounded-2xl text-sm font-bold tracking-wide",
+            "relative px-12 py-3.5 rounded-xl text-sm font-semibold text-white",
+            "bg-gradient-to-r from-[#6B6BFF] to-[#4648D4]",
+            "shadow-[0_4px_20px_rgba(107,107,255,0.4)]",
+            "hover:shadow-[0_6px_28px_rgba(107,107,255,0.55)] hover:-translate-y-0.5",
+            "active:translate-y-0 active:shadow-[0_2px_12px_rgba(107,107,255,0.3)]",
             "transition-all duration-200 ease-out",
-            canGenerate
-              ? [
-                  "text-white cursor-pointer",
-                  "bg-gradient-to-r from-[#6B6BFF] to-[#4648D4]",
-                  "shadow-[0_6px_24px_rgba(107,107,255,0.45)]",
-                  "hover:shadow-[0_8px_32px_rgba(107,107,255,0.6)] hover:-translate-y-0.5",
-                  "active:translate-y-0 active:shadow-[0_3px_14px_rgba(107,107,255,0.35)]",
-                ].join(" ")
-              : [
-                  "text-[#ADADC0] cursor-not-allowed",
-                  "bg-[#F0F0F7] border border-[#E2E2EA]",
-                ].join(" "),
+            "disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none",
           ].join(" ")}
           rightIcon={<ArrowRightIcon />}
         >
@@ -174,7 +169,7 @@ export default function TopicsContainer() {
           <ShieldCheckIcon />
           <span>
             Data-driven pathing based on{" "}
-            <span className="text-[#4648D4] font-semibold">
+            <span className="text-[#4648D4] font-medium">
               50,000+ career trajectories
             </span>
           </span>

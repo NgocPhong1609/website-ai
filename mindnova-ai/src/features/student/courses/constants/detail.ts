@@ -1,4 +1,4 @@
-import type { ICourseDetail } from "@features/student/courses/types";
+import type { ICourseDetail } from "@features/courses/types";
 
 export const COURSE_DETAIL: ICourseDetail = {
   id: 1,
