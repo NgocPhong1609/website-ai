@@ -11,6 +11,7 @@ import {
   type KeyboardEvent,
 } from "react";
 import { twMerge } from "tailwind-merge";
+import { CreateLessonEditModal } from "./CreateLessonEditModal";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -20,6 +21,7 @@ export interface Lesson {
   id: string;
   title: string;
   type: LessonType;
+  content?: string;
 }
 
 export interface Chapter {
@@ -230,6 +232,7 @@ interface LessonRowProps {
   chapterId: string;
   index: number;
   onUpdate: (chapterId: string, lessonId: string, title: string) => void;
+  onEdit: (chapterId: string, lessonId: string) => void;
   onDelete: (chapterId: string, lessonId: string) => void;
   onDragStart: (e: DragEvent, chapterId: string, lessonId: string) => void;
   onDrop: (e: DragEvent, chapterId: string, lessonId: string) => void;
@@ -241,6 +244,7 @@ function LessonRow({
   chapterId,
   index,
   onUpdate,
+  onEdit,
   onDelete,
   onDragStart,
   onDrop,
@@ -325,12 +329,21 @@ function LessonRow({
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 relative">
         <button
           type="button"
-          aria-label="Chỉnh sửa bài giảng"
+          aria-label="Soạn thảo bài học"
+          onClick={() => onEdit(chapterId, lesson.id)}
+          className="w-6 h-6 rounded-md flex items-center justify-center text-[#9090B0] hover:text-[#4648D4] hover:bg-[#EEEEFF] transition-all"
+        >
+          <PencilIcon size={13} />
+        </button>
+
+        <button
+          type="button"
+          aria-label="Đổi tên nhanh"
           onClick={() => {
             setEditing(true);
             setTimeout(() => inputRef.current?.focus(), 50);
           }}
-          className="w-6 h-6 rounded-md flex items-center justify-center text-[#9090B0] hover:text-[#4648D4] hover:bg-[#EEEEFF] transition-all"
+          className="w-6 h-6 rounded-md flex items-center justify-center text-[#9090B0] hover:text-[#4648D4] hover:bg-[#EEEEFF] transition-all hidden"
         >
           <PencilIcon size={13} />
         </button>
@@ -498,6 +511,7 @@ interface ChapterCardProps {
   onDeleteChapter: (id: string) => void;
   onAddLesson: (chapterId: string, type: LessonType) => void;
   onUpdateLesson: (chapterId: string, lessonId: string, title: string) => void;
+  onEditLesson: (chapterId: string, lessonId: string) => void;
   onDeleteLesson: (chapterId: string, lessonId: string) => void;
   onDragStartChapter: (e: DragEvent, chapterId: string) => void;
   onDropChapter: (e: DragEvent, chapterId: string) => void;
@@ -515,6 +529,7 @@ function ChapterCard({
   onDeleteChapter,
   onAddLesson,
   onUpdateLesson,
+  onEditLesson,
   onDeleteLesson,
   onDragStartChapter,
   onDropChapter,
@@ -637,6 +652,7 @@ function ChapterCard({
               chapterId={chapter.id}
               index={li}
               onUpdate={onUpdateLesson}
+              onEdit={onEditLesson}
               onDelete={onDeleteLesson}
               onDragStart={onDragStartLesson}
               onDrop={onDropLesson}
@@ -685,6 +701,8 @@ export function Step2CourseStructure({
   data,
   onChange,
 }: Step2CourseStructureProps) {
+  const [editingLesson, setEditingLesson] = useState<{ chapterId: string; lesson: Lesson } | null>(null);
+
   // Drag state
   const dragChapter = useRef<string | null>(null);
   const dragLesson = useRef<{ chapterId: string; lessonId: string } | null>(
@@ -761,6 +779,24 @@ export function Step2CourseStructure({
                 ...c,
                 lessons: c.lessons.map((l) =>
                   l.id === lessonId ? { ...l, title } : l,
+                ),
+              }
+            : c,
+        ),
+      );
+    },
+    [data.chapters, update],
+  );
+
+  const updateLessonContent = useCallback(
+    (chapterId: string, lessonId: string, updates: Partial<Lesson>) => {
+      update(
+        data.chapters.map((c) =>
+          c.id === chapterId
+            ? {
+                ...c,
+                lessons: c.lessons.map((l) =>
+                  l.id === lessonId ? { ...l, ...updates } : l,
                 ),
               }
             : c,
@@ -971,6 +1007,11 @@ export function Step2CourseStructure({
               onDeleteChapter={deleteChapter}
               onAddLesson={addLesson}
               onUpdateLesson={updateLesson}
+              onEditLesson={(chapterId, lessonId) => {
+                const chapter = data.chapters.find((c) => c.id === chapterId);
+                const lesson = chapter?.lessons.find((l) => l.id === lessonId);
+                if (lesson) setEditingLesson({ chapterId, lesson });
+              }}
               onDeleteLesson={deleteLesson}
               onDragStartChapter={handleDragStartChapter}
               onDropChapter={handleDropChapter}
@@ -983,6 +1024,17 @@ export function Step2CourseStructure({
           ))
         )}
       </div>
+
+      {editingLesson && (
+        <CreateLessonEditModal
+          lesson={editingLesson.lesson}
+          onSave={(id, updates) => {
+            updateLessonContent(editingLesson.chapterId, id, updates);
+            setEditingLesson(null);
+          }}
+          onClose={() => setEditingLesson(null)}
+        />
+      )}
     </div>
   );
 }

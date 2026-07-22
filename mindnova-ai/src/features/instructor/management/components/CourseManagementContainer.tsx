@@ -1,3 +1,5 @@
+"use client";
+
 // ─── CourseManagementContainer ────────────────────────────────────────────────
 // Main content area for the instructor course management page.
 // Composes: header, AI banner, revenue card, filter tabs, course grid, pagination.
@@ -8,9 +10,11 @@ import { CourseFilterTabs } from "./CourseFilterTabs";
 import { CourseCard } from "./CourseCard";
 import { CreateCourseCard } from "./CreateCourseCard";
 import { CoursePagination } from "./CoursePagination";
-import { MOCK_COURSES } from "../constants/data";
+import { useInstructorCourses } from "../api/courses";
 
 export function CourseManagementContainer() {
+  const { data: courses, isLoading, isError } = useInstructorCourses();
+
   return (
     <div className="flex flex-col gap-6 p-6 max-w-[1200px] w-full mx-auto">
       {/* ── Page header ─────────────────────────────────────────────── */}
@@ -38,11 +42,23 @@ export function CourseManagementContainer() {
       {/* ── Course grid ──────────────────────────────────────────────── */}
       <section aria-label="Danh sách khóa học">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {MOCK_COURSES.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-          {/* "Create new" placeholder card */}
-          <CreateCourseCard />
+          {isLoading ? (
+            <div className="col-span-full py-12 flex items-center justify-center text-[#9090B0]">
+              Đang tải dữ liệu...
+            </div>
+          ) : isError ? (
+            <div className="col-span-full py-12 flex items-center justify-center text-red-500">
+              Lỗi khi tải danh sách khóa học
+            </div>
+          ) : (
+            <>
+              {courses?.map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+              {/* "Create new" placeholder card */}
+              <CreateCourseCard />
+            </>
+          )}
         </div>
       </section>
 

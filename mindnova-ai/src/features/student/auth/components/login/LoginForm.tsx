@@ -158,12 +158,13 @@ export function LoginForm() {
     setStatusMessage(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/login`, {
+      // Gọi /api/login trên cùng domain — Next.js rewrites sẽ proxy sang Laravel
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({
           email: values.email,
           password: values.password,
@@ -180,6 +181,8 @@ export function LoginForm() {
 
       if (token) {
         window.localStorage.setItem("accessToken", token);
+        // Set cookie cho SSR và middleware
+        document.cookie = `accessToken=${token}; path=/; max-age=2592000; SameSite=Lax`;
       }
 
       setStatusMessage("Đăng nhập thành công. Đang chuyển hướng...");

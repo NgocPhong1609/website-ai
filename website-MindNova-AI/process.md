@@ -56,6 +56,8 @@ Request → Middleware (auth + role) → Controller → Service → Model → Re
 |---|---|
 | 1.1 Quản lý khóa học (CRUD, upload video, giá) | ✅ Hoàn thành |
 | 1.2 Quản lý chương học & bài học | ✅ Hoàn thành |
+| 1.3 CKEditor + Cloudflare R2 Signed URL (Video trong Lesson) | ✅ Hoàn thành |
+| 1.4 Tích hợp FE ↔ BE (Instructor Pages → API) | ⬜ Chưa bắt đầu |
 
 ### Module 2 - Quản lý học viên
 **Status**: ✅ Hoàn thành
@@ -125,7 +127,102 @@ Request → Middleware (auth + role) → Controller → Service → Model → Re
 - [x] Test
 - [x] Documentation
 
-### Module 2 - Quản lý học viên
+### Module 1.3 - CKEditor + Cloudflare R2 Signed URL
+
+**Phần A: CKEditor 5 cho soạn nội dung Lesson**
+- [x] Cài đặt CKEditor 5 packages (FE: `@ckeditor/ckeditor5-react`, `ckeditor5`)
+- [x] Tạo CKEditor wrapper component (FE)
+- [x] Tích hợp CKEditor vào trang tạo lesson (Step 2 Create Course)
+- [x] Tích hợp CKEditor vào trang chỉnh sửa lesson
+- [x] Test render HTML content từ BE
+
+**Phần B: Cloudflare R2 + Signed URL cho Video**
+- [x] Tạo bảng `lesson_media` (Migration) — lưu R2 metadata
+- [x] Config Cloudflare R2 trong `config/filesystems.php` + `.env`
+- [x] Model `LessonMedia` + relationships
+- [x] Refactor `LessonService::uploadVideo()` → upload lên R2
+- [x] Tạo endpoint `GET /api/instructor/lessons/{lesson}/video-url` → trả Signed URL
+- [x] Cập nhật `LessonResource` → trả signed video URL
+- [x] Route mới cho video-url
+- [x] Test upload + playback
+- [x] Documentation
+
+**DB mới: Bảng `lesson_media`**
+> Lý do: Lesson hiện chỉ có 1 trường `video_url`. Cần bảng riêng vì:
+> 1. Một lesson có thể chứa nhiều media (video chính + video/ảnh embed trong CKEditor)
+> 2. Cần lưu metadata R2: `r2_key`, `original_filename`, `file_size`, `mime_type`, `duration_seconds`, `status`
+> 3. Tách concern, dễ mở rộng (ảnh, PDF...)
+
+| Cột | Type | Mô tả |
+|---|---|---|
+| `id` | BIGINT PK AI | Auto increment |
+| `lesson_id` | BIGINT FK → lessons.id | Liên kết lesson |
+| `media_type` | ENUM('video','image') | Loại media |
+| `r2_key` | VARCHAR(500) | Object key trên R2 bucket |
+| `original_filename` | VARCHAR(255) | Tên file gốc |
+| `file_size` | BIGINT | Kích thước bytes |
+| `mime_type` | VARCHAR(100) | MIME type |
+| `duration_seconds` | INT NULL | Thời lượng video (giây) |
+| `status` | ENUM('processing','ready','failed') | Trạng thái xử lý |
+| `created_at` | TIMESTAMP | |
+| `updated_at` | TIMESTAMP | |
+
+### Module 1.4 - Tích hợp FE ↔ BE (Instructor Pages → API)
+
+**Mục tiêu**: Khớp toàn bộ trang FE trong `app/(instructor)` với API backend để chạy thực, thay vì dùng mock data.
+
+- [ ] Fix merge conflict trong `app/(instructor)/instructor/page.tsx`
+- [ ] Tạo API service layer (FE: axios/fetch wrapper với auth token)
+- [ ] Đồng bộ TypeScript types với BE response format
+
+**Trang 1: `/instructor/courses` — Danh sách khóa học**
+- [x] Gọi `GET /api/instructor/courses` thay MOCK_DATA
+- [x] Cập nhật `CourseResource` BE: thêm `modules_count`, `lessons_count`, `total_duration_hours`
+- [ ] Cập nhật FE `Course` type: thêm `archived` status, đổi `id: number`, thêm trường mới
+- [ ] Kết nối filter tabs (status) với query params
+
+**Trang 2: `/instructor/create-course` — Tạo khóa học**
+- [x] Gọi `POST /api/instructor/courses` khi submit
+- [x] Gọi `POST courses/{course}/thumbnail` upload ảnh bìa
+- [ ] Thêm API public `GET /api/categories` (BE) — để FE load danh mục thay hardcode
+- [ ] Refactor FE `field` (text) → `category_id` (number)
+- [ ] Thêm `intermediate` vào FE difficulty options
+- [ ] Build Step 2 "Nội dung bài học": Đồng bộ API `POST /modules` và `POST /lessons` khi thêm cấu trúc.
+
+**Trang 3: `/instructor/courses/[courseId]/lessons` — Quản lý bài học**
+- [x] Gọi `GET courses/{course}/modules` + `GET modules/{module}/lessons`
+- [x] Gọi CRUD APIs khi thêm/sửa/xóa module & lesson
+- [x] Đồng bộ FE `type` enum: `document` → `article`, `quiz` → `quiz_module`
+- [ ] Convert `duration_minutes` (number) ↔ `"MM:SS"` (string)
+- [x] Thêm trường `status` vào bảng `lessons` (Migration BE) — FE cần
+- [x] Cập nhật `LessonResource` + `StoreLessonRequest` cho trường `status`
+
+**Trang 4: `/instructor/students` — Quản lý học viên**
+- [ ] Gọi `GET /api/instructor/students` thay mock data
+- [ ] Đối chiếu FE fields với `StudentResource` response
+
+**Trang 5: `/instructor/discussions` — Thảo luận**
+- [ ] Gọi `GET /api/instructor/discussions` thay mock data
+- [ ] Gọi `POST discussions/{id}/replies` khi trả lời
+- [ ] Đối chiếu FE fields với `DiscussionResource` response
+
+**Trang 6: `/instructor/analytics` — Phân tích học viên**
+- [ ] Gọi `GET /api/instructor/students/{id}/progress?course_id=X`
+- [ ] Xem xét tạo thêm API tổng hợp analytics (BE chỉ trả 1 student/1 course)
+
+**Trang 7: `/instructor/pricing` — Quản lý giá**
+- [ ] Gọi `PATCH courses/{course}/price`
+- [ ] FE có CouponSection → BE chưa có API coupon/discount — báo thiếu
+
+**Trang 8: `/instructor/revenue` — Doanh thu** (3 sub-pages)
+- [ ] ❌ Chưa có BE API — Module 4 chưa phát triển → Đợi
+
+**Trang FE THIẾU — Cần tạo mới:**
+- [ ] Trang chi tiết khóa học `/instructor/courses/[courseId]` (page.tsx) — API `GET courses/{course}` đã có
+- [ ] Trang chỉnh sửa khóa học `/instructor/courses/[courseId]/edit` — API `PUT courses/{course}` đã có
+- [ ] Trang/modal chỉnh sửa bài học (CKEditor) — API `PUT lessons/{lesson}` đã có
+
+
 
 - [x] Phân tích database (thêm bảng discussions nếu cần)
 - [x] Phân tích nghiệp vụ (Tiến độ, thảo luận, thông báo)
@@ -352,7 +449,66 @@ courses ──1:N──> order_items <──N:1── orders <──N:1── us
 - **Xóa Lesson**: `DELETE /api/instructor/lessons/{lesson}`
 
 
-### 5.3 Module 2 - Quản lý học viên
+### 5.3 Module 1.3 - CKEditor + Cloudflare R2 Signed URL
+
+#### Flow 1: Soạn nội dung bài học bằng CKEditor
+```
+1. Instructor mở trang tạo/sửa Lesson
+2. FE render CKEditor 5 với toolbar đầy đủ (heading, bold, italic, list, code, image, video embed)
+3. Instructor soạn nội dung rich text
+4. Khi chèn video:
+   a. Instructor chọn file video → FE gọi POST /api/instructor/lessons/{lesson}/video (upload lên R2)
+   b. BE upload file lên Cloudflare R2, lưu metadata vào bảng lesson_media
+   c. BE trả về signed_url tạm thời
+   d. FE nhúng signed_url vào CKEditor content dưới dạng <video> tag
+5. Khi save lesson:
+   a. FE gọi PUT /api/instructor/lessons/{lesson} với content = HTML từ CKEditor
+   b. BE lưu HTML content vào lessons.content
+```
+
+#### Flow 2: Upload Video lên Cloudflare R2
+```
+1. POST /api/instructor/lessons/{lesson}/video
+2. Policy: Kiểm tra ownership (lesson → module → course → teacher_id)
+3. Validation: video (required, file, mimes:mp4,mov,webm, max:500MB)
+4. Service:
+   a. Upload file lên R2 bucket, key = "lessons/{lesson_id}/videos/{uuid}.{ext}"
+   b. Tạo record trong lesson_media: r2_key, original_filename, file_size, mime_type, status='processing'
+   c. (Async/Queue) Tính duration bằng ffprobe → cập nhật duration_seconds, status='ready'
+5. Response: { media_id, signed_url, status }
+```
+
+#### Flow 3: Lấy Signed URL để phát video
+```
+1. GET /api/instructor/lessons/{lesson}/video-url
+2. Policy: Kiểm tra ownership
+3. Service:
+   a. Tìm lesson_media record (media_type='video', status='ready')
+   b. Tạo Signed URL từ R2 (expire = 1 giờ)
+4. Response: { signed_url, expires_at }
+```
+
+### 5.4 Module 1.4 - Tích hợp FE ↔ BE
+
+#### Flow 1: Thiết lập API Service Layer (FE)
+```
+1. Tạo axios/fetch instance với baseURL = process.env.NEXT_PUBLIC_API_URL
+2. Interceptor: tự động gắn Bearer Token từ localStorage/cookie
+3. Interceptor: xử lý 401 → redirect login, 403 → hiển thị lỗi
+4. Tạo các API functions: courseApi, moduleApi, lessonApi, studentApi, discussionApi...
+```
+
+#### Flow 2: Thay mock data bằng API call cho từng trang
+```
+Quy trình cho mỗi trang:
+1. Tạo custom hook (useInstructorCourses, useInstructorStudents, ...)
+2. Hook gọi API, quản lý state (loading, error, data)
+3. Container component dùng hook thay MOCK_DATA
+4. Xử lý loading skeleton + error boundary
+5. Đồng bộ TypeScript types với BE response format
+```
+
+### 5.5 Module 2 - Quản lý học viên
 
 #### Flow 1: Xem danh sách học viên
 - **Lấy danh sách**: `GET /api/instructor/students`
@@ -488,6 +644,52 @@ courses ──1:N──> order_items <──N:1── orders <──N:1── us
 - **Endpoint**: `POST /api/instructor/lessons/{lesson}/video`
 - **Request Body**: multipart `video` file.
 - **Response (200)**: URL video mới cập nhật.
+
+### Module 1.3 - CKEditor + Cloudflare R2
+
+#### API 1: Upload Video lên R2
+| Item | Value |
+|---|---|
+| Endpoint | `POST /api/instructor/lessons/{lesson}/video` (refactor) |
+| Middleware | `auth:sanctum`, `role:teacher` |
+| Policy | Ownership check (lesson → module → course → teacher_id) |
+| Request Body | `multipart/form-data: video (file, max:512000, mimes:mp4,mov,webm)` |
+| Success Response (200) | `{ "success": true, "data": { "media_id": 1, "signed_url": "https://...", "status": "processing" } }` |
+
+#### API 2: Lấy Signed URL phát video
+| Item | Value |
+|---|---|
+| Endpoint | `GET /api/instructor/lessons/{lesson}/video-url` |
+| Middleware | `auth:sanctum`, `role:teacher` |
+| Policy | Ownership check |
+| Success Response (200) | `{ "success": true, "data": { "signed_url": "https://r2.../signed...", "expires_at": "2026-07-21T15:00:00Z" } }` |
+| Error (404) | `{ "success": false, "message": "No video found for this lesson." }` |
+
+### Module 1.4 - FE ↔ BE Integration APIs bổ sung
+
+#### API 1: Lấy danh sách Categories (Public)
+| Item | Value |
+|---|---|
+| Endpoint | `GET /api/categories` |
+| Middleware | Không cần auth (public) |
+| Success Response (200) | `{ "success": true, "data": [{ "id": 1, "name": "Lập trình", "slug": "lap-trinh", "parent_id": null }, ...] }` |
+| Ghi chú | FE cần API này để load danh mục vào dropdown thay vì hardcode `COURSE_FIELDS` |
+
+#### Ghi chú: Cập nhật CourseResource cho FE
+```
+Thêm các trường sau vào CourseResource:
+- modules_count (int) — Số chương học
+- lessons_count (int) — Tổng số bài học  
+- total_duration_hours (float) — Tổng thời lượng (giờ)
+- teacher_name (string) — Tên giảng viên (optional)
+```
+
+#### Ghi chú: Cập nhật LessonResource cho FE
+```
+Thêm/sửa:
+- status (string: 'draft'|'published') — Trạng thái bài học (cần thêm migration)
+- video_url → signed_url (string|null) — Signed URL từ R2 thay vì local path
+```
 
 ### Module 2 - Quản lý học viên
 

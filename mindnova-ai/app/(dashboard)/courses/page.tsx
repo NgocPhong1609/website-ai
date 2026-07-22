@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import {
   CoursesHeader,
   ExploreMoreCard,
@@ -6,11 +5,6 @@ import {
   MyCourseCard,
 } from "@/src/features/student/courses";
 import type { Metadata } from "next";
-=======
-import { CoursesHeader, ExploreMoreCard, MY_COURSES, MyCourseCard } from "@/src/features/student/courses";
-import type { Metadata } from "next";
-
->>>>>>> main
 
 export const metadata: Metadata = {
   title: "My Courses | MindNova AI",

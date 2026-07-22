@@ -1,5 +1,4 @@
 import { twMerge } from "tailwind-merge";
-<<<<<<< HEAD
 
 import {
   FOCUS_AREAS,
@@ -7,9 +6,6 @@ import {
   RECENT_ACTIVITY,
   STUDY_STREAK,
 } from "../constants";
-=======
-import { FOCUS_AREAS, OVERALL_PROGRESS, RECENT_ACTIVITY, STUDY_STREAK } from "../constants";
->>>>>>> main
 import { FocusActionKind, IActivityGroup, IFocusArea } from "../types";
 
 // ─── Overall Progress ─────────────────────────────────────────────────────────

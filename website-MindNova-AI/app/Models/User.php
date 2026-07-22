@@ -80,24 +80,6 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'role_user');
     }
 
-    // Quan hệ với bảng Subscriptions (Một - Nhiều)
-    public function subscriptions(): HasMany
-    {
-        return $this->hasMany(Subscription::class);
-    }
-
-    // Quan hệ với bảng Payments (Một - Nhiều)
-    public function payments(): HasMany
-    {
-        return $this->hasMany(Payment::class);
-    }
-
-    // Quan hệ với bảng Notifications (Một - Nhiều)
-    public function notifications(): HasMany
-    {
-        return $this->hasMany(Notification::class);
-    }
-
     // Hàm phụ trợ kiểm tra quyền nhanh
     public function hasRole($roleName)
     {
