@@ -1,5 +1,5 @@
 // ─── Revenue Feature Public API ─────────────────────────────────────────────
 
-export { RevenueContainer } from "./components/RevenueContainer";
-export { SalesReportContainer } from "./components/SalesReportContainer";
-export { TransactionHistoryContainer } from "./components/TransactionHistoryContainer";
+export { RevenueContainer } from "./RevenueContainer";
+export { SalesReportContainer } from "./SalesReportContainer";
+export { TransactionHistoryContainer } from "./TransactionHistoryContainer";

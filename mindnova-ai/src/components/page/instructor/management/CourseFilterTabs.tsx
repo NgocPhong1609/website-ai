@@ -9,7 +9,7 @@ import {
   TOTAL_COURSES,
   ACTIVE_COURSES,
   DRAFT_COURSES,
-} from "../constants/data";
+} from "./constants/data";
 
 type FilterKey = "all" | "active" | "draft";
 

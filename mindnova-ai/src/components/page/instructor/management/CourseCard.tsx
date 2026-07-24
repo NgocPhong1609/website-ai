@@ -5,7 +5,7 @@
 
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
-import type { Course } from "../types";
+import type { Course } from "./types";
 import {
   PencilIcon,
   UploadIcon,

@@ -6,9 +6,9 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import { StepIndicator } from "./components/StepIndicator";
+import { StepIndicator } from "./StepIndicator";
 import { Step1BasicInfo } from "./Step1BasicInfo";
-import { Step3SettingsPrice } from "./components/Step3SettingsPrice";
+import { Step3SettingsPrice } from "./Step3SettingsPrice";
 import { AIOutlineModal } from "./AIOutlineModal";
 import { ArrowRightIcon, SaveIcon, BookOpenIcon, SparklesIcon } from "./icons";
 import type { CourseBasicInfo, StepKey } from "./types";

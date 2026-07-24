@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { SparklesIcon, CheckIcon, InfoIcon, FreeIcon, PaidIcon, SubscribeIcon } from "../icons";
+import { SparklesIcon, CheckIcon, InfoIcon, FreeIcon, PaidIcon, SubscribeIcon } from "./icons";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

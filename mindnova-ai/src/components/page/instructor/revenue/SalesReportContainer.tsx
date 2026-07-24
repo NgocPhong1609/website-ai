@@ -13,9 +13,9 @@ import {
   ChevronRightIcon,
   TrendUpIcon,
   TrendRightIcon,
-} from "../icons";
-import { AdsHourlySection } from "@/src/components/page/admin/ads-hourly";
-import type { DragRange } from "@/src/components/page/admin/ads-hourly";
+} from "./icons";
+import { AdsHourlySection } from "@/src/components/page/ads-hourly";
+import type { DragRange } from "@/src/components/page/ads-hourly";
 
 // ─── Topbar ───────────────────────────────────────────────────────────────────
 

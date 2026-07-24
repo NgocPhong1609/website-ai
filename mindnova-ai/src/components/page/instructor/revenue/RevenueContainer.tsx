@@ -24,7 +24,7 @@ import {
   PieChartIcon,
   SparklesIcon,
   DollarSignIcon,
-} from "../icons";
+} from "./icons";
 import { useState } from "react";
 import { WithdrawalModal } from "./WithdrawalModal";
 

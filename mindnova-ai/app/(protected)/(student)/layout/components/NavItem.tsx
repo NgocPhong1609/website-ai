@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { twMerge } from "tailwind-merge";
-import { NAV_ICON_MAP } from "@/src/components/page/student/layout/constants/navIcons";
-import type { NavIconKey } from "@/src/components/page/student/layout/types";
+import { NAV_ICON_MAP } from "../constants/navIcons";
+import type { NavIconKey } from "../types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

@@ -5,7 +5,7 @@
 
 import { useCallback } from "react";
 import { twMerge } from "tailwind-merge";
-import { ThumbnailUploader } from "./components/ThumbnailUploader";
+import { ThumbnailUploader } from "./ThumbnailUploader";
 import { AITipCard } from "./AITipCard";
 import { ChevronDownIcon } from "./icons";
 import {

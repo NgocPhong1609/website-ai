@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { PricingModelSection } from "./components/PricingModelSection";
+import { PricingModelSection } from "./PricingModelSection";
 import { CouponSection } from "./CouponSection";
 import { SaveIcon, ChevronRightIcon } from "./icons";
 

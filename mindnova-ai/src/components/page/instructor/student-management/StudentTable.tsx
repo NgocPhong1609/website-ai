@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { ChevronLeftIcon, ChevronRightIcon } from "../icons";
+import { ChevronLeftIcon, ChevronRightIcon } from "./icons";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

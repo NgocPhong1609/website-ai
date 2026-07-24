@@ -1,0 +1,50 @@
+﻿app/(protected)/(instructor)/instructor/revenue/sales-report/page.tsx(1,38): error TS2307: Cannot find module '@/src/components/page/instructor/revenue/components/SalesReportContainer' or its corresponding type declarations.
+app/(protected)/(student)/layout.tsx(2,25): error TS2307: Cannot find module '@/src/components/page/student/layout' or its corresponding type declarations.
+app/(protected)/(student)/layout/components/NavItem.tsx(6,30): error TS2307: Cannot find module '@/src/components/page/student/layout/constants/navIcons' or its corresponding type declarations.
+app/(protected)/(student)/layout/components/NavItem.tsx(7,33): error TS2307: Cannot find module '@/src/components/page/student/layout/types' or its corresponding type declarations.
+app/(protected)/(student)/layout/components/SidebarNav.tsx(3,30): error TS2307: Cannot find module '@/src/components/page/student/layout/constants/data-menu' or its corresponding type declarations.
+app/(protected)/(student)/layout/components/SidebarNav.tsx(17,28): error TS7006: Parameter 'item' implicitly has an 'any' type.
+app/(protected)/(student)/layout/constants/data-menu.ts(1,38): error TS2307: Cannot find module '@/src/components/page/student/layout/types' or its corresponding type declarations.
+app/(protected)/(student)/layout/constants/navIcons.tsx(1,33): error TS2307: Cannot find module '@/src/components/page/student/layout/types' or its corresponding type declarations.
+src/components/page/instructor/analytic/index.ts(3,43): error TS2307: Cannot find module './components/StudentAnalyticsContainer' or its corresponding type declarations.
+src/components/page/instructor/create-course/AITipCard.tsx(5,24): error TS2307: Cannot find module '../constants' or its corresponding type declarations.
+src/components/page/instructor/create-course/CreateCourseContainer.tsx(9,31): error TS2307: Cannot find module './components/StepIndicator' or its corresponding type declarations.
+src/components/page/instructor/create-course/CreateCourseContainer.tsx(11,36): error TS2307: Cannot find module './components/Step3SettingsPrice' or its corresponding type declarations.
+src/components/page/instructor/create-course/index.ts(4,36): error TS2307: Cannot find module './components/CreateCourseTopbar' or its corresponding type declarations.
+src/components/page/instructor/create-course/Step1BasicInfo.tsx(8,35): error TS2307: Cannot find module './components/ThumbnailUploader' or its corresponding type declarations.
+src/components/page/instructor/create-course/Step3SettingsPrice.tsx(8,47): error TS2307: Cannot find module '../icons' or its corresponding type declarations.
+src/components/page/instructor/create-course/StepIndicator.tsx(5,27): error TS2307: Cannot find module '../icons' or its corresponding type declarations.
+src/components/page/instructor/create-course/StepIndicator.tsx(6,30): error TS2307: Cannot find module '../types' or its corresponding type declarations.
+src/components/page/instructor/create-course/StepIndicator.tsx(7,23): error TS2307: Cannot find module '../constants' or its corresponding type declarations.
+src/components/page/instructor/create-course/StepIndicator.tsx(16,19): error TS7006: Parameter 'step' implicitly has an 'any' type.
+src/components/page/instructor/create-course/StepIndicator.tsx(16,25): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/page/instructor/create-course/ThumbnailUploader.tsx(9,34): error TS2307: Cannot find module '../icons' or its corresponding type declarations.
+src/components/page/instructor/discussion/index.ts(3,42): error TS2307: Cannot find module './components/DiscussionReplyContainer' or its corresponding type declarations.
+src/components/page/instructor/management/CourseCard.tsx(8,29): error TS2307: Cannot find module '../types' or its corresponding type declarations.
+src/components/page/instructor/management/CourseFilterTabs.tsx(12,8): error TS2307: Cannot find module '../constants/data' or its corresponding type declarations.
+src/components/page/instructor/management/CourseManagementContainer.tsx(6,29): error TS2307: Cannot find module './components/RevenueCard' or its corresponding type declarations.
+src/components/page/instructor/management/CourseManagementContainer.tsx(9,34): error TS2307: Cannot find module './components/CreateCourseCard' or its corresponding type declarations.
+src/components/page/instructor/management/CourseManagementContainer.tsx(10,34): error TS2307: Cannot find module './components/CoursePagination' or its corresponding type declarations.
+src/components/page/instructor/management/CoursePagination.tsx(9,31): error TS2307: Cannot find module '../constants/data' or its corresponding type declarations.
+src/components/page/instructor/management/index.ts(4,35): error TS2307: Cannot find module './components/InstructorSidebar' or its corresponding type declarations.
+src/components/page/instructor/management/index.ts(5,34): error TS2307: Cannot find module './components/InstructorTopbar' or its corresponding type declarations.
+src/components/page/instructor/management/RevenueCard.tsx(5,49): error TS2307: Cannot find module '../constants/data' or its corresponding type declarations.
+src/components/page/instructor/pricing/PricingContainer.tsx(8,37): error TS2307: Cannot find module './components/PricingModelSection' or its corresponding type declarations.
+src/components/page/instructor/pricing/PricingModelSection.tsx(8,86): error TS2307: Cannot find module '../icons' or its corresponding type declarations.
+src/components/page/instructor/revenue/index.ts(3,34): error TS2307: Cannot find module './components/RevenueContainer' or its corresponding type declarations.
+src/components/page/instructor/revenue/index.ts(4,38): error TS2307: Cannot find module './components/SalesReportContainer' or its corresponding type declarations.
+src/components/page/instructor/revenue/index.ts(5,45): error TS2307: Cannot find module './components/TransactionHistoryContainer' or its corresponding type declarations.
+src/components/page/instructor/revenue/RevenueContainer.tsx(27,8): error TS2307: Cannot find module '../icons' or its corresponding type declarations.
+src/components/page/instructor/revenue/SalesReportContainer.tsx(16,8): error TS2307: Cannot find module '../icons' or its corresponding type declarations.
+src/components/page/instructor/revenue/SalesReportContainer.tsx(17,34): error TS2307: Cannot find module '@/src/components/page/admin/ads-hourly' or its corresponding type declarations.
+src/components/page/instructor/revenue/SalesReportContainer.tsx(18,32): error TS2307: Cannot find module '@/src/components/page/admin/ads-hourly' or its corresponding type declarations.
+src/components/page/instructor/revenue/TransactionHistoryContainer.tsx(18,8): error TS2307: Cannot find module '../icons' or its corresponding type declarations.
+src/components/page/instructor/revenue/WithdrawalModal.tsx(3,73): error TS2307: Cannot find module '../icons' or its corresponding type declarations.
+src/components/page/instructor/student-management/RightPanels.tsx(7,53): error TS2307: Cannot find module '../icons' or its corresponding type declarations.
+src/components/page/instructor/student-management/StudentManagementContainer.tsx(8,30): error TS2307: Cannot find module './components/StudentTable' or its corresponding type declarations.
+src/components/page/instructor/student-management/StudentManagementContainer.tsx(9,29): error TS2307: Cannot find module './components/RightPanels' or its corresponding type declarations.
+src/components/page/instructor/student-management/StudentTable.tsx(8,51): error TS2307: Cannot find module '../icons' or its corresponding type declarations.
+src/hooks/useHourlyChart.ts(4,32): error TS2307: Cannot find module '../types' or its corresponding type declarations.
+src/hooks/useMetricCards.ts(9,8): error TS2307: Cannot find module '../types' or its corresponding type declarations.
+src/hooks/useMetricCards.ts(10,57): error TS2307: Cannot find module '../constants' or its corresponding type declarations.
+src/hooks/useMetricCards.ts(42,31): error TS7006: Parameter 'key' implicitly has an 'any' type.

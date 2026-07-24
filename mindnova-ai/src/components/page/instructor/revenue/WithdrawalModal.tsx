@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
-import { XIcon, WalletIcon, PencilIcon, LockIcon, ArrowRightIcon } from "../icons";
+import { XIcon, WalletIcon, PencilIcon, LockIcon, ArrowRightIcon } from "./icons";
 
 interface WithdrawalModalProps {
   isOpen: boolean;

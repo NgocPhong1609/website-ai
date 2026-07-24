@@ -6,7 +6,7 @@
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { ChevronLeftIcon, ChevronRightIcon } from "./icons";
-import { TOTAL_COURSES } from "../constants/data";
+import { TOTAL_COURSES } from "./constants/data";
 
 const PAGE_SIZE = 6;
 const TOTAL_PAGES = Math.ceil(TOTAL_COURSES / PAGE_SIZE);

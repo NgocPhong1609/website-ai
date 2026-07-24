@@ -2,9 +2,9 @@
 // Three-step progress bar shown at the top of the form.
 
 import { twMerge } from "tailwind-merge";
-import { CheckIcon } from "../icons";
-import type { StepKey } from "../types";
-import { STEPS } from "../constants";
+import { CheckIcon } from "./icons";
+import type { StepKey } from "./types";
+import { STEPS } from "./constants";
 
 interface StepIndicatorProps {
   currentStep: StepKey;

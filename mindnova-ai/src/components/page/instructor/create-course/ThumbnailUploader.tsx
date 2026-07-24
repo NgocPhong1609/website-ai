@@ -6,7 +6,7 @@
 import { useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
-import { ImageIcon, XIcon } from "../icons";
+import { ImageIcon, XIcon } from "./icons";
 
 interface ThumbnailUploaderProps {
   preview: string | null;

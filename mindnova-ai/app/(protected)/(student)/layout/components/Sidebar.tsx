@@ -34,7 +34,7 @@ function LogoutIcon() {
 
 // ─── Main Sidebar ─────────────────────────────────────────────────────────────
 
-export default function Sidebar() {
+export function Sidebar() {
   return (
     <aside className="w-60 shrink-0 h-screen flex flex-col bg-white border-r border-[#F0F0F8]">
       {/* Brand */}

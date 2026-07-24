@@ -1,4 +1,4 @@
-import type { SidebarMenuItem } from "@/src/components/page/student/layout/types";
+import type { SidebarMenuItem } from "../types";
 
 // ─── Navigation Data ──────────────────────────────────────────────────────────
 

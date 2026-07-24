@@ -2,7 +2,7 @@
 // Monthly revenue summary card shown next to the AI banner.
 
 import { TrendUpIcon } from "./icons";
-import { MONTHLY_REVENUE, REVENUE_GROWTH } from "../constants/data";
+import { MONTHLY_REVENUE, REVENUE_GROWTH } from "./constants/data";
 
 export function RevenueCard() {
   return (

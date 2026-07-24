@@ -4,7 +4,7 @@
 // Right sidebar panels: Thảo luận mới + AI Announcement + Thống kê tiến độ.
 
 import { twMerge } from "tailwind-merge";
-import { SparklesIcon, TrendUpIcon, PlusIcon } from "../icons";
+import { SparklesIcon, TrendUpIcon, PlusIcon } from "./icons";
 import { useState } from "react";
 
 // ─── Discussion Panel ─────────────────────────────────────────────────────────

@@ -2,7 +2,7 @@
 // Ambient AI suggestion card displayed below the thumbnail uploader.
 
 import { SparklesIcon, PlusIcon } from "./icons";
-import { AI_TIP } from "../constants";
+import { AI_TIP } from "./constants";
 
 export function AITipCard() {
   return (

@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { SparklesIcon, ChevronDownIcon } from "../icons";
+import { SparklesIcon, ChevronDownIcon } from "./icons";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

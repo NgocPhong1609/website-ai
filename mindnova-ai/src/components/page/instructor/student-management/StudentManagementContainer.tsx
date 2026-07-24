@@ -5,8 +5,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { StudentTable } from "./components/StudentTable";
-import { RightPanels } from "./components/RightPanels";
+import { StudentTable } from "./StudentTable";
+import { RightPanels } from "./RightPanels";
 import { AINotificationModal } from "./AINotificationModal";
 import {
   SearchIcon,

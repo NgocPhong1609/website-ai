@@ -1,6 +1,6 @@
 "use client";
 
-import { SIDEBAR_MENU } from "@/src/components/page/student/layout/constants/data-menu";
+import { SIDEBAR_MENU } from "../constants/data-menu";
 import { NavItem } from "./NavItem";
 
 /**

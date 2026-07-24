@@ -1,5 +1,5 @@
 // ─── Instructor Management — Public API ──────────────────────────────────────
 
 export { CourseManagementContainer } from "./CourseManagementContainer";
-export { InstructorSidebar } from "./components/InstructorSidebar";
-export { InstructorTopbar } from "./components/InstructorTopbar";
+export { InstructorSidebar } from "./InstructorSidebar";
+export { InstructorTopbar } from "./InstructorTopbar";

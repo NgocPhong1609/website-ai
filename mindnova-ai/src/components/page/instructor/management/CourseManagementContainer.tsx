@@ -3,11 +3,11 @@
 // Composes: header, AI banner, revenue card, filter tabs, course grid, pagination.
 
 import { AIBanner } from "./AIBanner";
-import { RevenueCard } from "./components/RevenueCard";
+import { RevenueCard } from "./RevenueCard";
 import { CourseFilterTabs } from "./CourseFilterTabs";
 import { CourseCard } from "./CourseCard";
-import { CreateCourseCard } from "./components/CreateCourseCard";
-import { CoursePagination } from "./components/CoursePagination";
+import { CreateCourseCard } from "./CreateCourseCard";
+import { CoursePagination } from "./CoursePagination";
 import { MOCK_COURSES } from "./constants/data";
 
 export function CourseManagementContainer() {

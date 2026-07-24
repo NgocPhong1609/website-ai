@@ -1,4 +1,4 @@
-import type { NavIconKey } from "@/src/components/page/student/layout/types";
+import type { NavIconKey } from "../types";
 
 // ─── Shared SVG props ─────────────────────────────────────────────────────────
 

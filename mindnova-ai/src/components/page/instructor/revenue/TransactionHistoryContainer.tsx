@@ -15,7 +15,7 @@ import {
   SparklesIcon,
   BuildingBankIcon,
   TrendUpIcon,
-} from "../icons";
+} from "./icons";
 
 // ─── Topbar ───────────────────────────────────────────────────────────────────
 
