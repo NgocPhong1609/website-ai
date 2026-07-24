@@ -1,7 +1,11 @@
+"use client"
+
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export function QuizQuestionScreen() {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-[#F8F9FB] flex flex-col font-sans">
       
@@ -156,7 +160,7 @@ export function QuizQuestionScreen() {
               Skip for now
             </button>
 
-            <button className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5452F6] hover:bg-[#4648D4] text-white font-bold text-[14px] shadow-[0_4px_14px_rgba(84,82,246,0.35)] hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-4 focus:ring-[#5452F6]/30">
+            <button className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5452F6] hover:bg-[#4648D4] text-white font-bold text-[14px] shadow-[0_4px_14px_rgba(84,82,246,0.35)] hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-4 focus:ring-[#5452F6]/30 cursor-pointer" onClick={() => router.push("/practice/quiz/result")}>
               Next Question
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="5" y1="12" x2="19" y2="12"></line>

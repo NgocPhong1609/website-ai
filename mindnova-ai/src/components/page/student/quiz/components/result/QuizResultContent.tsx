@@ -1,4 +1,9 @@
+"use client"
+
+import { useRouter } from "next/navigation";
+
 export function QuizResultContent() {
+  const router = useRouter
   return (
     <div className="flex-1 overflow-y-auto bg-[#F8F9FB] min-h-full">
       <div className="max-w-[1000px] mx-auto px-6 py-8 pb-20">
@@ -189,7 +194,9 @@ export function QuizResultContent() {
 
         {/* ─── Footer Buttons ────────────────────────────────────────────────────── */}
         <div className="flex justify-center items-center gap-4 mt-12">
-          <button className="px-8 py-3.5 bg-[#5452F6] hover:bg-[#4648D4] text-white rounded-xl font-bold text-[15px] shadow-[0_4px_14px_rgba(84,82,246,0.35)] hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-4 focus:ring-[#5452F6]/30">
+          <button 
+          className="px-8 py-3.5 bg-[#5452F6] hover:bg-[#4648D4] text-white rounded-xl font-bold text-[15px] shadow-[0_4px_14px_rgba(84,82,246,0.35)] hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-4 focus:ring-[#5452F6]/30 cursor-pointer"
+          onClick={() => router.push('/')}>
             Back to Dashboard
           </button>
           <button className="px-8 py-3.5 bg-white border border-[#D1D5DB] hover:bg-gray-50 text-gray-700 rounded-xl font-bold text-[15px] shadow-sm transition-all focus:outline-none focus:ring-4 focus:ring-gray-100">

@@ -120,7 +120,7 @@ export function MyCourseCard({ course }: { course: IMyCourse }) {
           <button
             type="button"
             onClick={() => router.push("/courses/detail")}
-            className="w-full py-2.5 rounded-xl text-sm font-semibold text-white bg-[#4F46E5] hover:bg-[#4338CA] transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:ring-offset-1"
+            className="w-full py-2.5 rounded-xl text-sm font-semibold text-white bg-[#4F46E5] hover:bg-[#4338CA] transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:ring-offset-1 cursor-pointer"
           >
             Continue
           </button>

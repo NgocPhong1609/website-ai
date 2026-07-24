@@ -296,7 +296,7 @@ export function QuizStartContent() {
                 </div>
 
                 {/* Button */}
-                <button className="w-full py-4 bg-[#5452F6] hover:bg-[#4648D4] text-white rounded-[14px] font-bold text-[15px] flex items-center justify-center gap-2 shadow-[0_6px_20px_rgba(84,82,246,0.35)] hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-4 focus:ring-[#5452F6]/30"
+                <button className="w-full py-4 bg-[#5452F6] hover:bg-[#4648D4] text-white rounded-[14px] font-bold text-[15px] flex items-center justify-center gap-2 shadow-[0_6px_20px_rgba(84,82,246,0.35)] hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-4 focus:ring-[#5452F6]/30 cursor-pointer"
                 onClick={() => router.push("/practice/quiz/question")}>
                   <svg
                     width="18"
