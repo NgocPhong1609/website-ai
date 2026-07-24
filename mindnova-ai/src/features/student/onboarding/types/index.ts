@@ -61,19 +61,3 @@ export interface ITopic {
   label: string;
   iconKey: TopicIconKey;
 }
-
-export type PlanItemStatus = "ready" | "upcoming" | "locked";
-
-export interface IPlanItem {
-  id: number;
-  label: string;
-  status: PlanItemStatus;
-  duration: string;
-}
-
-export interface IPlanPhase {
-  id: number;
-  title: string;
-  duration: string;
-  items: IPlanItem[];
-}

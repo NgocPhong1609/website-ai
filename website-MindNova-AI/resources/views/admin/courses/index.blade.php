@@ -49,6 +49,9 @@
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-800">{{ __('Delete') }}</button>
                                             </form>
+                                            <a href="{{ route('admin.course_classes.index', $course->id) }}" class="btn btn-info btn-sm">
+                                                Quản lý lớp học
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>

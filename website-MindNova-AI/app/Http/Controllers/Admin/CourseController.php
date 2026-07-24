@@ -14,7 +14,7 @@ class CourseController extends Controller
     public function index(): View
     {
         return view('admin.courses.index', [
-            'courses' => Course::with('author', 'category')->latest()->get(),
+            'courses' => Course::with('teacher', 'category')->latest()->get(),
         ]);
     }
 
@@ -36,7 +36,7 @@ class CourseController extends Controller
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
-        $validated['author_id'] = optional($request->user())->id;
+        $validated['teacher_id'] = optional($request->user())->id;
 
         Course::create($validated);
 

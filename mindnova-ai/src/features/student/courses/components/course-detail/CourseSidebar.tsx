@@ -65,8 +65,8 @@ function CourseProgressCard() {
   const { progress, lessonsLeftTime } = COURSE_DETAIL;
 
   // Derive total/completed from modules for accuracy
-  const allLessons = COURSE_DETAIL.modules.flatMap((m: IModule) => m.lessons);
-  const completedCount = allLessons.filter((l: ILesson) => l.status === "completed").length;
+  const allLessons = COURSE_DETAIL.modules.flatMap((m) => m.lessons);
+  const completedCount = allLessons.filter((l) => l.status === "completed").length;
 
   return (
     <div className="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
@@ -128,7 +128,7 @@ function ResourcesCard() {
         Resources
       </h3>
       <ul className="flex flex-col gap-3">
-        {resources.map((res: IResource) => (
+        {resources.map((res) => (
           <li key={res.id}>
             <a
               href={res.url}

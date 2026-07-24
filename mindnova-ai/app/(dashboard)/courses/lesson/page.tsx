@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LessonCurriculumSidebar, LessonContent, LessonFooter } from "@features/student/courses";
+import { LessonCurriculumSidebar, LessonContent, LessonFooter } from "@features/courses";
 
 export const metadata: Metadata = {
   title: "Lesson | MindNova AI",

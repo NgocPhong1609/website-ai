@@ -26,13 +26,14 @@ class CourseClass extends Model
         return $this->belongsTo(Course::class);
     }
 
+    // Khai báo lớp này do giáo viên nào dạy
     public function teacher(): BelongsTo
     {
         return $this->belongsTo(User::class, 'teacher_id');
     }
 
-    public function enrollments(): HasMany
+    public function enrollments()
     {
-        return $this->hasMany(Enrollment::class);
+        return $this->hasMany(Enrollment::class, 'course_class_id');
     }
 }
