@@ -40,7 +40,6 @@ export async function apiClient<T>(
     );
   }
 
-  // Handle empty responses (e.g., 204 No Content)
   const text = await response.text();
   return text ? (JSON.parse(text) as T) : ({} as T);
 }
