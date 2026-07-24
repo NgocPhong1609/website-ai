@@ -138,6 +138,7 @@ export function LoginForm() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const handleChange = useCallback(
     (field: keyof LoginFormValues) =>
@@ -151,9 +152,44 @@ export function LoginForm() {
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 1400));
-    setIsLoading(false);
-  }, []);
+    setStatusMessage(null);
+
+    try {
+      // Gọi /api/login trên cùng domain — Next.js rewrites sẽ proxy sang Laravel
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+        }),
+      });
+
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(payload?.message ?? "Đăng nhập thất bại.");
+      }
+
+      const token = payload?.access_token;
+
+      if (token) {
+        window.localStorage.setItem("accessToken", token);
+        // Set cookie cho SSR và middleware
+        document.cookie = `accessToken=${token}; path=/; max-age=2592000; SameSite=Lax`;
+      }
+
+      setStatusMessage("Đăng nhập thành công. Đang chuyển hướng...");
+      window.location.assign("/admin/users");
+    } catch (error) {
+      setStatusMessage(error instanceof Error ? error.message : "Đăng nhập thất bại.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [values.email, values.password]);
 
   const togglePassword = useCallback(() => setShowPassword((v) => !v), []);
 
@@ -186,6 +222,18 @@ export function LoginForm() {
           </div>
 
           {/* Form */}
+          {statusMessage && (
+            <div
+              className={`mb-4 p-3.5 rounded-xl text-xs font-medium border ${
+                statusMessage.includes("thành công")
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  : "bg-red-50 text-red-600 border-red-200"
+              }`}
+            >
+              {statusMessage}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
 
             {/* Email */}

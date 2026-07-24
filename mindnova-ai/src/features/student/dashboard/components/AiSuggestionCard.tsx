@@ -1,4 +1,4 @@
-import { AI_SUGGESTION } from "@features/dashboard/constants/data";
+import { AI_SUGGESTION } from "@features/student/dashboard/constants/data";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 

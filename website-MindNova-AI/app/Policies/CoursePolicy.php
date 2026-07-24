@@ -12,7 +12,7 @@ class CoursePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isTeacher();
+        return $user->hasRole('teacher');
     }
 
     /**
@@ -28,7 +28,7 @@ class CoursePolicy
      */
     public function create(User $user): bool
     {
-        return $user->isTeacher();
+        return $user->hasRole('teacher');
     }
 
     /**
