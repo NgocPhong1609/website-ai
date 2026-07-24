@@ -72,8 +72,21 @@ class LessonController extends Controller
             'video' => 'required|file|mimes:mp4,mov,avi,webm|max:512000', // 500MB
         ]);
 
-        $lesson = $this->lessonService->uploadVideo($lesson, $request->file('video'));
+        $result = $this->lessonService->uploadVideo($lesson, $request->file('video'));
 
-        return $this->successResponse(new LessonResource($lesson), 'Video uploaded successfully.');
+        return $this->successResponse($result, 'Video uploaded to R2 successfully.');
+    }
+
+    public function getVideoUrl(Lesson $lesson)
+    {
+        Gate::authorize('manage', $lesson); // Assuming instructor role here. Update policy if student needs access.
+
+        $result = $this->lessonService->generateVideoUrl($lesson);
+
+        if (!$result) {
+            return $this->notFoundResponse('No video media found for this lesson.');
+        }
+
+        return $this->successResponse($result, 'Signed URL generated.');
     }
 }

@@ -7,6 +7,8 @@
 import { useState, useCallback, useId } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
+import { LessonEditModal } from "./LessonEditModal";
+import { useCourseModules, useCreateModule, useDeleteModule, useUpdateModule, useCreateLesson, useUpdateLesson, useDeleteLesson } from "../api";
 import {
   GripIcon,
   VideoIcon,
@@ -42,6 +44,7 @@ interface Lesson {
   type: LessonType;
   duration: string; // "MM:SS"
   status: LessonStatus;
+  content?: string;
 }
 
 interface Chapter {
@@ -54,28 +57,7 @@ interface Chapter {
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
-const INITIAL_CHAPTERS: Chapter[] = [
-  {
-    id: "ch1",
-    index: 1,
-    title: "Giới thiệu về Generative AI",
-    collapsed: false,
-    lessons: [
-      { id: "l1", title: "Bài học 1.1: Khái niệm cơ bản & Lịch sử hình thành", type: "video",    duration: "15:20", status: "published" },
-      { id: "l2", title: "Bài học 1.2: Các mô hình ngôn ngữ lớn (LLMs) hoạt động như thế nào?", type: "document", duration: "22:45", status: "published" },
-    ],
-  },
-  {
-    id: "ch2",
-    index: 2,
-    title: "Kỹ thuật Prompt Engineering cơ bản",
-    collapsed: false,
-    lessons: [
-      { id: "l3", title: "Bài học 2.1: Cấu trúc của một Prompt hiệu quả",        type: "video", duration: "18:05", status: "draft"     },
-      { id: "l4", title: "Bài học 2.2: Kỹ thuật Few-shot vs Zero-shot prompting", type: "video", duration: "25:10", status: "published" },
-    ],
-  },
-];
+// No INITIAL_CHAPTERS needed anymore
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -136,10 +118,11 @@ function LessonTypeIcon({ type }: { type: LessonType }) {
 
 interface LessonRowProps {
   lesson: Lesson;
+  onEdit: () => void;
   onDelete: () => void;
 }
 
-function LessonRow({ lesson, onDelete }: LessonRowProps) {
+function LessonRow({ lesson, onEdit, onDelete }: LessonRowProps) {
   return (
     <div className="group flex items-center gap-3 px-4 py-3 hover:bg-[#FAFAFE] transition-colors duration-100 border-b border-[#F4F4FA] last:border-0">
       {/* Drag handle */}
@@ -169,6 +152,7 @@ function LessonRow({ lesson, onDelete }: LessonRowProps) {
         <button
           type="button"
           aria-label="Chỉnh sửa bài học"
+          onClick={onEdit}
           className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9090B0] hover:text-[#4648D4] hover:bg-[#EEF0FF] transition-all duration-150"
         >
           <PencilIcon size={12} />
@@ -192,11 +176,12 @@ interface ChapterCardProps {
   chapter: Chapter;
   onToggle: () => void;
   onAddLesson: () => void;
+  onEditLesson: (lesson: Lesson) => void;
   onDeleteLesson: (lessonId: string) => void;
   onDelete: () => void;
 }
 
-function ChapterCard({ chapter, onToggle, onAddLesson, onDeleteLesson, onDelete }: ChapterCardProps) {
+function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLesson, onDelete }: ChapterCardProps) {
   return (
     <div className="rounded-2xl border border-[#EAEAF4] bg-white shadow-[0_2px_10px_rgba(0,0,0,0.04)] overflow-hidden">
       {/* Chapter header */}
@@ -251,6 +236,7 @@ function ChapterCard({ chapter, onToggle, onAddLesson, onDeleteLesson, onDelete 
             <LessonRow
               key={lesson.id}
               lesson={lesson}
+              onEdit={() => onEditLesson(lesson)}
               onDelete={() => onDeleteLesson(lesson.id)}
             />
           ))}
@@ -499,62 +485,76 @@ function ChatFAB() {
 
 // ─── Main Container ───────────────────────────────────────────────────────────
 
-export function LessonManagementContainer() {
-  const [chapters, setChapters] = useState<Chapter[]>(INITIAL_CHAPTERS);
+export function LessonManagementContainer({ courseId }: { courseId: string }) {
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
+  const [editingLesson, setEditingLesson] = useState<{ chapterId: string; lesson: Lesson } | null>(null);
+  
+  // Collapse state since it's not stored in DB
+  const [collapsedChapters, setCollapsedChapters] = useState<Record<string, boolean>>({});
+
+  const { data: chaptersData = [], isLoading } = useCourseModules(courseId);
+  const createModule = useCreateModule();
+  const updateModule = useUpdateModule();
+  const deleteModuleMutation = useDeleteModule();
+  const createLesson = useCreateLesson();
+  const updateLessonMutation = useUpdateLesson();
+  const deleteLessonMutation = useDeleteLesson();
+
+  // Enhance chapter data with collapsed state
+  const chapters = chaptersData.map((ch, i) => ({
+    ...ch,
+    index: i + 1,
+    collapsed: !!collapsedChapters[ch.id],
+    lessons: ch.lessons.map((l) => ({ ...l, duration: "00:00" })) // Mock duration for now
+  }));
 
   // ── Derived stats ───────────────────────────────────────────────────────────
-  const allLessons   = totalLessons(chapters);
-  const pubLessons   = publishedLessons(chapters);
+  const allLessons   = totalLessons(chapters as any);
+  const pubLessons   = publishedLessons(chapters as any);
   const draftLessons = allLessons - pubLessons;
-  const duration     = totalDuration(chapters);
+  const duration     = totalDuration(chapters as any);
 
   // ── Handlers ────────────────────────────────────────────────────────────────
   const toggleChapter = useCallback((id: string) => {
-    setChapters((prev) =>
-      prev.map((ch) => ch.id === id ? { ...ch, collapsed: !ch.collapsed } : ch),
-    );
+    setCollapsedChapters((prev) => ({ ...prev, [id]: !prev[id] }));
   }, []);
 
   const deleteChapter = useCallback((id: string) => {
-    setChapters((prev) => prev.filter((ch) => ch.id !== id));
-  }, []);
+    if (confirm("Bạn có chắc chắn muốn xóa chương này?")) {
+      deleteModuleMutation.mutate({ courseId, moduleId: id });
+    }
+  }, [courseId, deleteModuleMutation]);
+
+  const updateLesson = useCallback((chapterId: string, lessonId: string, updates: Partial<Lesson>) => {
+    updateLessonMutation.mutate({ courseId, lessonId, payload: updates });
+  }, [courseId, updateLessonMutation]);
 
   const deleteLesson = useCallback((chapterId: string, lessonId: string) => {
-    setChapters((prev) =>
-      prev.map((ch) =>
-        ch.id === chapterId
-          ? { ...ch, lessons: ch.lessons.filter((l) => l.id !== lessonId) }
-          : ch,
-      ),
-    );
-  }, []);
+    if (confirm("Bạn có chắc chắn muốn xóa bài học này?")) {
+      deleteLessonMutation.mutate({ courseId, lessonId });
+    }
+  }, [courseId, deleteLessonMutation]);
 
   const addLesson = useCallback((chapterId: string) => {
-    const newLesson: Lesson = {
-      id: `l${Date.now()}`,
-      title: `Bài học mới`,
-      type: "video",
-      duration: "00:00",
-      status: "draft",
-    };
-    setChapters((prev) =>
-      prev.map((ch) =>
-        ch.id === chapterId ? { ...ch, lessons: [...ch.lessons, newLesson] } : ch,
-      ),
-    );
-  }, []);
+    createLesson.mutate({
+      courseId,
+      moduleId: chapterId,
+      payload: {
+        title: "Bài học mới",
+        type: "video",
+        order: chapters.find(c => c.id === chapterId)?.lessons.length || 0,
+        status: "draft"
+      }
+    });
+  }, [courseId, chapters, createLesson]);
 
   const addChapter = useCallback(() => {
-    const newChapter: Chapter = {
-      id: `ch${Date.now()}`,
-      index: chapters.length + 1,
+    createModule.mutate({
+      courseId,
       title: `Chương ${chapters.length + 1}: Chương học mới`,
-      lessons: [],
-      collapsed: false,
-    };
-    setChapters((prev) => [...prev, newChapter]);
-  }, [chapters.length]);
+      order: chapters.length,
+    });
+  }, [courseId, chapters.length, createModule]);
 
   // ── Filtered chapters ──────────────────────────────────────────────────────
   const filteredChapters = chapters.map((ch) => ({
@@ -633,6 +633,7 @@ export function LessonManagementContainer() {
                 chapter={chapter}
                 onToggle={() => toggleChapter(chapter.id)}
                 onAddLesson={() => addLesson(chapter.id)}
+                onEditLesson={(lesson) => setEditingLesson({ chapterId: chapter.id, lesson })}
                 onDeleteLesson={(lid) => deleteLesson(chapter.id, lid)}
                 onDelete={() => deleteChapter(chapter.id)}
               />
@@ -658,6 +659,18 @@ export function LessonManagementContainer() {
 
       <PageFooter />
       <ChatFAB />
+
+      {/* Modals */}
+      {editingLesson && (
+        <LessonEditModal
+          lesson={editingLesson.lesson}
+          onSave={(id, updates) => {
+            updateLesson(editingLesson.chapterId, id, updates);
+            setEditingLesson(null);
+          }}
+          onClose={() => setEditingLesson(null)}
+        />
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { COURSE_DETAIL } from "@features/courses/constants/detail";
-import type { IResource } from "@features/courses/types";
+import { COURSE_DETAIL } from "@features/student/courses/constants/detail";
+import type { ILesson, IModule, IResource } from "@features/student/courses/types";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 

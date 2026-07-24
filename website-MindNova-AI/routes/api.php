@@ -91,7 +91,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('lessons/{lesson}', [LessonController::class, 'update']);
         Route::delete('lessons/{lesson}', [LessonController::class, 'destroy']);
         Route::post('lessons/{lesson}/video', [LessonController::class, 'uploadVideo']);
-
+        Route::get('lessons/{lesson}/video-url', [LessonController::class, 'getVideoUrl']);
         // Students (Module 2)
         Route::get('students', [\App\Http\Controllers\Api\Instructor\StudentController::class, 'index']);
         Route::get('students/{student}/progress', [\App\Http\Controllers\Api\Instructor\StudentController::class, 'progress']);

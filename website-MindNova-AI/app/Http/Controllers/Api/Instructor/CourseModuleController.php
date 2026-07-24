@@ -25,7 +25,7 @@ class CourseModuleController extends Controller
         Gate::authorize('view', $course);
 
         return $this->successResponse(
-            CourseModuleResource::collection($course->modules), 
+            CourseModuleResource::collection($course->modules()->with('lessons')->orderBy('order')->get()), 
             'Modules retrieved successfully.'
         );
     }

@@ -13,6 +13,7 @@ import { AIOutlineModal } from "./AIOutlineModal";
 import { ArrowRightIcon, SaveIcon, BookOpenIcon, RobotIcon, SparklesIcon } from "./icons";
 import type { CourseBasicInfo, StepKey } from "../types";
 import type { GeneratedOutline } from "./AIOutlineModal";
+import { useCreateCourse, useUpdateCoursePrice, useUpdateCourseStatus, useUploadCourseThumbnail } from "../api";
 
 // ─── Footer bar ───────────────────────────────────────────────────────────────
 
@@ -110,6 +111,12 @@ export function CreateCourseContainer() {
   const [step, setStep] = useState<StepKey>(1);
   const [formData, setFormData] = useState<CourseBasicInfo>(INITIAL_DATA);
   const [isOutlineOpen, setIsOutlineOpen] = useState(false);
+  const [createdCourseId, setCreatedCourseId] = useState<string | null>(null);
+
+  const { mutateAsync: createCourse, isPending: isCreating } = useCreateCourse();
+  const { mutateAsync: uploadThumbnail, isPending: isUploading } = useUploadCourseThumbnail();
+  const { mutateAsync: updatePrice, isPending: isUpdatingPrice } = useUpdateCoursePrice();
+  const { mutateAsync: updateStatus, isPending: isPublishing } = useUpdateCourseStatus();
 
   const handleApplyOutline = useCallback((_outline: GeneratedOutline) => {
     // In production: convert outline chapters → CourseStructure and merge into form
@@ -123,8 +130,39 @@ export function CreateCourseContainer() {
     [],
   );
 
-  const handleNext = () => {
-    if (step < 3) setStep((s) => (s + 1) as StepKey);
+  const handleNext = async () => {
+    try {
+      if (step === 1 && !createdCourseId) {
+        if (!formData.title) {
+          alert("Vui lòng nhập tên khóa học.");
+          return;
+        }
+        // Temporary category_id to test, in reality it should come from a category select field
+        const res = await createCourse({
+          title: formData.title,
+          description: formData.description,
+          level: formData.difficulty,
+          category_id: 1, // Mock category ID
+        });
+        setCreatedCourseId(res.id);
+      } else if (step === 3 && createdCourseId) {
+        // Step 3 logic: Save price & thumbnail, then publish
+        if (formData.thumbnailFile) {
+          await uploadThumbnail({ courseId: createdCourseId, file: formData.thumbnailFile });
+        }
+        // Save price (assuming price is added to formData later, mocked to 0 for now)
+        await updatePrice({ courseId: createdCourseId, price: 0 });
+        await updateStatus({ courseId: createdCourseId, status: "published" });
+        alert("Xuất bản thành công!");
+        window.location.href = "/instructor/courses";
+        return;
+      }
+      
+      if (step < 3) setStep((s) => (s + 1) as StepKey);
+    } catch (error) {
+      console.error(error);
+      alert("Có lỗi xảy ra, vui lòng thử lại.");
+    }
   };
 
   const handleBack = () => {
@@ -172,16 +210,17 @@ export function CreateCourseContainer() {
                 id="btn-finish-publish"
                 type="button"
                 onClick={handleNext}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40"
+                disabled={isCreating || isUploading || isUpdatingPrice || isPublishing}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40 disabled:opacity-70"
               >
                 {step === 3 ? (
                   <>
                     <SparklesIcon size={13} />
-                    Hoàn tất & Đăng
+                    {isPublishing ? "Đang xử lý..." : "Hoàn tất & Đăng"}
                   </>
                 ) : (
                   <>
-                    Tiếp theo
+                    {isCreating ? "Đang lưu..." : "Tiếp theo"}
                     <ArrowRightIcon size={14} />
                   </>
                 )}
