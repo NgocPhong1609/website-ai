@@ -1,3 +1,3 @@
 // ─── Lesson Management — Public API ──────────────────────────────────────────
 
-export { LessonManagementContainer } from "./components/LessonManagementContainer";
+export { LessonManagementContainer } from "./LessonManagementContainer";

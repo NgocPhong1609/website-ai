@@ -1,3 +1,3 @@
 // ─── Student Management — Public API ─────────────────────────────────────────
 
-export { StudentManagementContainer } from "./components/StudentManagementContainer";
+export { StudentManagementContainer } from "./StudentManagementContainer";
