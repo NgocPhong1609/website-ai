@@ -2,8 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { UploadIcon, MoreVerticalIcon, SparklesIcon, RobotIcon, SendIcon } from "./icons";
-import { useAITutor } from "@/src/hooks/useAITutor";
-import { COURSE_DETAIL } from "@/src/components/page/student/courses/constants/detail";
+import { useAITutor } from "../../../../hooks/useAITutor";
 
 export function ChatPanel() {
   const [inputValue, setInputValue] = useState("");

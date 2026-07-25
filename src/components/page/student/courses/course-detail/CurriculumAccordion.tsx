@@ -3,9 +3,8 @@
 import { useRouter } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 import { useState } from "react";
-import { COURSE_DETAIL } from "@/src/components/page/student/courses/constants/detail";
-import type { IModule, ILesson } from "@/src/components/page/student/courses/types";
-
+import { ILesson, IModule } from "../types";
+import { COURSE_DETAIL } from "../constants";
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
 function CheckIcon() {

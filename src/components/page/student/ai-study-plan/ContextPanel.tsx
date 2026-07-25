@@ -7,8 +7,8 @@ import {
 } from "./icons";
 import { RoadmapGenerator } from "./RoadmapGenerator";
 import { AIFlashcards } from "./AIFlashcards";
-import type { ILessonSummary } from "@/src/types/student";
-import { COURSE_DETAIL } from "@/src/components/page/student/courses/constants/detail";
+import { COURSE_DETAIL } from "../courses";
+import { ILessonSummary } from "../../../../types/student";
 
 export function ContextPanel() {
   const [activeTab, setActiveTab] = useState<"summary" | "roadmap" | "flashcards">("summary");

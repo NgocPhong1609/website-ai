@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import { ProgressContent } from "@/src/components/page/student/progress/ProgressContent";
+import { ProgressContent } from "../../../../src/components/page/student/progress/ProgressContent";
+
 
 export const metadata: Metadata = {
   title: "Learning Progress",

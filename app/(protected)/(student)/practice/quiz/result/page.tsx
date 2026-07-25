@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { QuizResultContent } from "@/src/components/page/student/quiz";
+import { QuizResultContent } from "../../../../../../src/components/page/student/quiz";
 
 export const metadata: Metadata = {
   title: "Quiz Result | MindNova AI",

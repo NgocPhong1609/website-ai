@@ -1,6 +1,6 @@
-import { ChatPanel } from "@/src/components/page/student/ai-study-plan/ChatPanel";
-import { ContextPanel } from "@/src/components/page/student/ai-study-plan/ContextPanel";
+
 import { Metadata } from "next";
+import { ChatPanel, ContextPanel } from "../../../../src/components/page/student/ai-study-plan";
 
 export const metadata: Metadata = {
   title: "AI Study Plan",

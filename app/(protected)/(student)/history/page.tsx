@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import { LearningHistory } from "@/src/components/page/student/history/LearningHistory";
+import { LearningHistory } from "../../../../src/components/page/student/history/LearningHistory";
+
 
 export const metadata: Metadata = {
   title: "Learning History",

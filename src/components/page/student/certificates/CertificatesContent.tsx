@@ -11,8 +11,8 @@ import {
   StopwatchIcon,
   MedalIcon,
 } from "./icons";
-import { COURSE_DETAIL } from "@/src/components/page/student/courses/constants/detail";
-import type { ICertificate, ICertificateEligibility } from "@/src/types/student";
+import { ICertificate, ICertificateEligibility } from "../../../../types/student";
+import { COURSE_DETAIL } from "../courses";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
