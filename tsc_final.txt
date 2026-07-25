@@ -1,0 +1,1 @@
+﻿app/(protected)/(student)/layout.tsx(2,10): error TS2614: Module '"./layout"' has no exported member 'Sidebar'. Did you mean to use 'import Sidebar from "./layout"' instead?
