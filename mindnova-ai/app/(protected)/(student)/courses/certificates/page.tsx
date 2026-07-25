@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import { CertificatesContent } from "@/src/components/page/student/certificates/components/CertificatesContent";
+import { CertificatesContent } from "@/src/components/page/student/certificates/CertificatesContent";
+
 
 export const metadata: Metadata = {
   title: "My Certificates & Achievements",

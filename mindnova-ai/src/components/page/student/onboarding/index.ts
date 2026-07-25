@@ -2,12 +2,12 @@
 // Import from this barrel instead of deep paths inside the feature
 
 // Components
-export { default as WelcomeContainer } from "./components/welcome/WelcomeContainer";
-export { default as GoalContainer } from "./components/goal/GoalContainer";
-export { default as SkillContainer } from "./components/skills/SkillContainer";
-export { default as GeneratingContainer } from "./components/generating/GeneratingContainer";
-export { default as TopicsContainer } from "./components/topics/TopicsContainer";
-export { default as PlanContainer } from "./components/plan/PlanContainer";
+export { default as WelcomeContainer } from "./welcome/WelcomeContainer";
+export { default as GoalContainer } from "./goal/GoalContainer";
+export { default as SkillContainer } from "./skills/SkillContainer";
+export { default as GeneratingContainer } from "./generating/GeneratingContainer";
+export { default as TopicsContainer } from "./topics/TopicsContainer";
+export { default as PlanContainer } from "./plan/PlanContainer";
 
 // Hooks
 export { useOnboarding } from "./hooks";

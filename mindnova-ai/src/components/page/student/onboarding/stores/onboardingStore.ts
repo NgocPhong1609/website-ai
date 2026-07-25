@@ -1,5 +1,8 @@
 import { create } from "zustand";
-import type { OnboardingStep, OnboardingFormData } from "@/src/components/page/student/onboarding/types";
+import type {
+  OnboardingStep,
+  OnboardingFormData,
+} from "@/src/components/page/student/onboarding/types";
 
 // ─── State Flow ──────────────────────────────────────────────────────────────
 // welcome → goal → level → topics → [signup | generating]

@@ -15,6 +15,6 @@ export const USER_PROFILE: UserProfile = {
 
 export const PROFILE_TABS: ProfileTabItem[] = [
   { id: "personal-info", label: "Personal Info", iconKey: "personal-info" },
-  { id: "security",      label: "Security",      iconKey: "security"       },
-  { id: "settings",      label: "Settings",      iconKey: "settings"       },
+  { id: "security", label: "Security", iconKey: "security" },
+  { id: "settings", label: "Settings", iconKey: "settings" },
 ];
