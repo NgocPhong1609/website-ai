@@ -1,0 +1,12 @@
+# Thư mục build của Next.js
+.next/
+out/
+
+# Dependencies & Env
+node_modules/
+.env
+.env*.local
+
+# Logs & Cache
+*.log
+.tsconfig.tsbuildinfo
