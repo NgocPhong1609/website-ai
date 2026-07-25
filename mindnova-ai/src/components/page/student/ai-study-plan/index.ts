@@ -1,2 +1,2 @@
-export * from "./components/ContextPanel";
-export * from "./components/ChatPanel";
+export { ContextPanel } from "./ContextPanel";
+export { ChatPanel } from "./ChatPanel";

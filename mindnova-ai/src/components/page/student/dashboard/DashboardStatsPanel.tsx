@@ -5,9 +5,9 @@ import {
   OVERALL_PROGRESS,
   RECENT_ACTIVITY,
   STUDY_STREAK,
-} from "../constants";
+} from "./constants";
 
-import { FocusActionKind, IActivityGroup, IFocusArea } from "../types";
+import { FocusActionKind, IActivityGroup, IFocusArea } from "./types";
 
 // ─── Overall Progress ─────────────────────────────────────────────────────────
 

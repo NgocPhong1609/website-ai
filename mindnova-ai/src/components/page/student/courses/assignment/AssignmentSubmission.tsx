@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useAIGrading } from "@/src/hooks/useAIGrading";
 import {
   ChevronRightIcon,
   ClockIcon,
@@ -98,6 +99,20 @@ export function AssignmentSubmission() {
 
     return () => clearInterval(timer);
   }, [content]);
+
+  // ── AI Grading ────────────────────────────────────────────────────────────
+  const { isGrading, gradingResult, gradeSubmission } = useAIGrading({
+    instructorRubric: "Develop a 1,500-word critical analysis comparing Word2Vec and Transformer-based embeddings. Address architectural differences in handling polysemy, computational efficiency, and practical case studies.",
+    maxScore: 100
+  });
+
+  const handleAIGrade = () => {
+    if (content.length > 50) {
+      gradeSubmission(content);
+    } else {
+      alert("Please write more content before requesting an AI grade.");
+    }
+  };
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
@@ -352,40 +367,55 @@ export function AssignmentSubmission() {
 
             <div className="mb-6">
               <div className="flex items-center justify-between text-[12px] font-bold mb-2">
-                <span className="text-[#1A1A2E]">Requirement Matching</span>
-                <span className="text-[#6B6BFF]">72%</span>
+                <span className="text-[#1A1A2E]">Requirement Matching (AI Estimate)</span>
+                <span className="text-[#6B6BFF]">{gradingResult ? `${gradingResult.score}%` : "--"}</span>
               </div>
               <div className="w-full h-1.5 bg-[#F0F0F8] rounded-full overflow-hidden">
-                <div className="w-[72%] h-full bg-gradient-to-r from-[#5153DF] to-[#00D2FF] rounded-full" />
+                <div className="h-full bg-gradient-to-r from-[#5153DF] to-[#00D2FF] rounded-full transition-all duration-1000" style={{ width: gradingResult ? `${(gradingResult.score / gradingResult.maxScore) * 100}%` : "0%" }} />
               </div>
             </div>
 
-            <div className="h-px bg-[#EAEAF4] w-full mb-6" />
+            {gradingResult ? (
+              <>
+                <div className="h-px bg-[#EAEAF4] w-full mb-6" />
+                <div className="flex flex-col gap-5 mb-6">
+                  {gradingResult.detailedErrors.map((err, idx) => (
+                    <div key={idx} className="flex gap-3 items-start">
+                      <AlertTriangleIcon className="w-4 h-4 text-[#F59E0B] shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[12px] font-bold text-[#4A4B68]">{err.lineOrParagraph}</p>
+                        <p className="text-[13px] text-[#4A4B68] leading-relaxed">{err.issue}</p>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {gradingResult.correctionHints.map((hint, idx) => (
+                    <div key={`hint-${idx}`} className="flex gap-3 items-start">
+                      <LightbulbIcon className="w-4 h-4 text-[#6B6BFF] shrink-0 mt-0.5" />
+                      <p className="text-[13px] text-[#4A4B68] leading-relaxed">{hint}</p>
+                    </div>
+                  ))}
 
-            <div className="flex flex-col gap-5 mb-6">
-              <div className="flex gap-3 items-start">
-                <AlertTriangleIcon className="w-4 h-4 text-[#F59E0B] shrink-0 mt-0.5" />
-                <p className="text-[13px] text-[#4A4B68] leading-relaxed">
-                  Your analysis of <span className="font-bold">polysemy</span> lacks specific architectural diagrams or descriptions.
-                </p>
-              </div>
-              <div className="flex gap-3 items-start">
-                <CheckCircleIcon className="w-4 h-4 text-[#10B981] shrink-0 mt-0.5" />
-                <p className="text-[13px] text-[#4A4B68] leading-relaxed">
-                  Citations for <span className="font-bold">Vaswani et al. (2017)</span> correctly formatted.
-                </p>
-              </div>
-              <div className="flex gap-3 items-start">
-                <LightbulbIcon className="w-4 h-4 text-[#6B6BFF] shrink-0 mt-0.5" />
-                <p className="text-[13px] text-[#4A4B68] leading-relaxed">
-                  Suggestion: Compare inference times for real-time applications.
-                </p>
-              </div>
-            </div>
+                  <div className="mt-2 p-4 bg-[#F8F9FB] border border-[#EAEAF4] rounded-xl text-[13px] text-[#4A4B68] leading-relaxed italic">
+                    "{gradingResult.overallFeedback}"
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="h-px bg-[#EAEAF4] w-full mb-6" />
+            )}
 
-            <button className="w-full py-3.5 bg-[#5153DF] text-white rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 hover:bg-[#4648D4] shadow-md transition-colors">
-              <RefreshCwIcon className="w-4 h-4" />
-              Refresh AI Analysis
+            <button
+              onClick={handleAIGrade}
+              disabled={isGrading || isDeadlinePassed}
+              className="w-full py-3.5 bg-[#5153DF] text-white rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 hover:bg-[#4648D4] shadow-md transition-colors disabled:opacity-50"
+            >
+              {isGrading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <RefreshCwIcon className="w-4 h-4" />
+              )}
+              {isGrading ? "Analyzing..." : "Refresh AI Analysis"}
             </button>
           </div>
 

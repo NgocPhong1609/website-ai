@@ -1,6 +1,6 @@
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
-import { AI_SUGGESTION } from "../constants";
+import { AI_SUGGESTION } from "./constants";
 
 function SparkleIcon() {
   return (

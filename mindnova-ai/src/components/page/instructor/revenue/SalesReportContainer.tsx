@@ -14,8 +14,8 @@ import {
   TrendUpIcon,
   TrendRightIcon,
 } from "./icons";
-import { AdsHourlySection } from "@/src/components/page/ads-hourly";
-import type { DragRange } from "@/src/components/page/ads-hourly";
+// import { AdsHourlySection } from "@/src/components/page/ads-hourly";
+// import type { DragRange } from "@/src/components/page/ads-hourly";
 
 // ─── Topbar ───────────────────────────────────────────────────────────────────
 
@@ -447,12 +447,12 @@ export function SalesReportContainer() {
           <DatePickerHeader />
 
           {/* ── 1.1 Metric Cards + 1.2 Hourly Chart ── */}
-          <AdsHourlySection
-            onRangeSelected={(range: DragRange) => {
+          {/* <AdsHourlySection
+            onRangeSelected={(range: any) => {
               // TODO: replace with real bid-schedule navigation or modal
               console.log("[Bid Schedule] Selected range:", range);
             }}
-          />
+          /> */}
 
           <StatCards />
           <RevenueVsRefundsChart />

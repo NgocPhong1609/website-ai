@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronRightIcon, SparklesIcon } from "../icons";
+import { ChevronRightIcon, SparklesIcon } from "./icons";
 
 export function ProgressContent() {
   return (

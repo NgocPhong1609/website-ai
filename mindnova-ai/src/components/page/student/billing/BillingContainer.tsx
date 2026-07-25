@@ -1,10 +1,11 @@
 "use client";
 
+import { BillingFooter } from "./BillingFooter";
 import { PaymentMethodsCard } from "./PaymentMethodsCard";
 import { PromoCodeCard } from "./PromoCodeCard";
-import { UpcomingPaymentCard } from "./UpcomingPaymentCard";
 import { TransactionHistoryTable } from "./TransactionHistoryTable";
-import { BillingFooter } from "./BillingFooter";
+import { UpcomingPaymentCard } from "./UpcomingPaymentCard";
+
 
 // ─── Search Bar ───────────────────────────────────────────────────────────────
 

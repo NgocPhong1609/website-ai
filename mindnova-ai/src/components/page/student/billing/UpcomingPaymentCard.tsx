@@ -1,5 +1,5 @@
-import { UPCOMING_PAYMENT } from "../constants";
-import { RefreshIcon } from "../icons";
+import { UPCOMING_PAYMENT } from "./constants";
+import { RefreshIcon } from "./icons";
 
 // ─── Upcoming Payment Card ────────────────────────────────────────────────────
 

@@ -1,4 +1,5 @@
 // ─── Billing Feature — Public API ────────────────────────────────────────────
 
-export { default as BillingContainer } from "./components/BillingContainer";
+// Components
+export { default as BillingContainer } from "./BillingContainer";
 export * from "./types";

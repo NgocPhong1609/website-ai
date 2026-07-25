@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { TRANSACTIONS, FILTER_PERIODS } from "../constants";
-import type { Transaction, TransactionStatus, FilterPeriod } from "../types";
-import { DownloadIcon, FilterIcon, ChevronDownSmall } from "../icons";
+import { TRANSACTIONS, FILTER_PERIODS } from "./constants";
+import type { Transaction, TransactionStatus, FilterPeriod } from "./types";
+import { DownloadIcon, FilterIcon, ChevronDownSmall } from "./icons";
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 

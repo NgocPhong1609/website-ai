@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SparkleIcon } from "../icons";
+import { SparkleIcon } from "./icons";
 
 // ─── Promo Code Card ──────────────────────────────────────────────────────────
 

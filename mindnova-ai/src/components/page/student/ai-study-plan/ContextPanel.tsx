@@ -1,16 +1,44 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import {
   LightbulbIcon,
-  HistoryIcon,
-  FileTextIcon,
   PlayCircleIcon,
 } from "./icons";
+import { RoadmapGenerator } from "./RoadmapGenerator";
+import { AIFlashcards } from "./AIFlashcards";
+import type { ILessonSummary } from "@/src/types/student";
+import { COURSE_DETAIL } from "@/src/components/page/student/courses/constants/detail";
 
 export function ContextPanel() {
+  const [activeTab, setActiveTab] = useState<"summary" | "roadmap" | "flashcards">("summary");
+  const [summary, setSummary] = useState<ILessonSummary | null>(null);
+
+  useEffect(() => {
+    // Simulate fetching pre-computed background lesson summary
+    setTimeout(() => {
+      setSummary({
+        lessonId: 101,
+        summary: "This lesson introduces the core principles of quantum mechanics applied to computation, specifically focusing on how superposition and entanglement allow qubits to perform complex calculations exponentially faster than classical bits.",
+        keyTakeaways: [
+          "Superposition allows multiple states simultaneously.",
+          "Entanglement links particle states across distances.",
+          "Qubits are the fundamental unit of quantum information."
+        ],
+        nextLessonRecommendation: {
+          lessonId: COURSE_DETAIL.nextLessonId || 202,
+          title: COURSE_DETAIL.nextLesson || "Quantum Gates",
+          reason: "Sequential progression based on curriculum.",
+        }
+      });
+    }, 1000);
+  }, []);
+
   return (
-    <div className="w-[320px] lg:w-[380px] h-full overflow-y-auto bg-white border-r border-[#EAEAF4] flex flex-col p-6 lg:p-8 shrink-0">
+    <div className="w-[320px] lg:w-[400px] h-full overflow-y-auto bg-white border-r border-[#EAEAF4] flex flex-col shrink-0">
+      
       {/* Header section */}
-      <div className="mb-8">
+      <div className="p-6 lg:p-8 pb-0">
         <h3 className="text-[11px] font-bold tracking-widest text-[#6B6BFF] uppercase mb-2">
           Lesson Context
         </h3>
@@ -21,7 +49,7 @@ export function ContextPanel() {
         </h1>
 
         {/* Progress */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mb-8">
           <div className="flex-1 h-1.5 bg-[#F0F0F8] rounded-full overflow-hidden">
             <div className="w-[65%] h-full bg-[#183B56] rounded-full" />
           </div>
@@ -31,79 +59,105 @@ export function ContextPanel() {
         </div>
       </div>
 
-      {/* Key Concepts */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-4">
-          <LightbulbIcon className="w-4 h-4 text-[#6B6BFF]" />
-          <h2 className="text-[14px] font-bold text-[#1A1A2E]">Key Concepts</h2>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <div className="bg-[#F8F9FB] rounded-xl p-4 transition-colors hover:bg-[#F2F3F7]">
-            <h4 className="text-[14px] font-bold text-[#1A1A2E] mb-1">
-              Superposition
-            </h4>
-            <p className="text-[13px] text-[#7878A0] leading-relaxed">
-              The ability of a quantum system to be in multiple states
-              simultaneously.
-            </p>
-          </div>
-          <div className="bg-[#F8F9FB] rounded-xl p-4 transition-colors hover:bg-[#F2F3F7]">
-            <h4 className="text-[14px] font-bold text-[#1A1A2E] mb-1">
-              Entanglement
-            </h4>
-            <p className="text-[13px] text-[#7878A0] leading-relaxed">
-              A physical phenomenon where particles become interlinked.
-            </p>
-          </div>
-          <div className="bg-[#F8F9FB] rounded-xl p-4 transition-colors hover:bg-[#F2F3F7]">
-            <h4 className="text-[14px] font-bold text-[#1A1A2E] mb-1">
-              Qubits
-            </h4>
-            <p className="text-[13px] text-[#7878A0] leading-relaxed">
-              The basic unit of quantum information.
-            </p>
-          </div>
-        </div>
+      {/* Tabs */}
+      <div className="flex items-center px-6 lg:px-8 border-b border-[#EAEAF4]">
+        <button
+          onClick={() => setActiveTab("summary")}
+          className={`pb-3 px-2 text-[13px] font-bold border-b-2 transition-colors ${
+            activeTab === "summary" ? "border-[#6B6BFF] text-[#1A1A2E]" : "border-transparent text-[#A0A0C0] hover:text-[#7878A0]"
+          }`}
+        >
+          Summary
+        </button>
+        <button
+          onClick={() => setActiveTab("roadmap")}
+          className={`pb-3 px-4 text-[13px] font-bold border-b-2 transition-colors ${
+            activeTab === "roadmap" ? "border-[#6B6BFF] text-[#1A1A2E]" : "border-transparent text-[#A0A0C0] hover:text-[#7878A0]"
+          }`}
+        >
+          Roadmap
+        </button>
+        <button
+          onClick={() => setActiveTab("flashcards")}
+          className={`pb-3 px-2 text-[13px] font-bold border-b-2 transition-colors ${
+            activeTab === "flashcards" ? "border-[#6B6BFF] text-[#1A1A2E]" : "border-transparent text-[#A0A0C0] hover:text-[#7878A0]"
+          }`}
+        >
+          Flashcards
+        </button>
       </div>
 
-      {/* Recent Resources */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-5">
-          <HistoryIcon className="w-4 h-4 text-[#20B2AA]" />
-          <h2 className="text-[14px] font-bold text-[#1A1A2E]">
-            Recent Resources
-          </h2>
-        </div>
+      {/* Tab Content */}
+      <div className="p-6 lg:p-8 flex-1">
+        {activeTab === "summary" && (
+          <div className="animate-in fade-in duration-300">
+             {!summary ? (
+                <div className="flex flex-col gap-3">
+                   <div className="h-4 bg-gray-100 rounded-full w-full animate-pulse" />
+                   <div className="h-4 bg-gray-100 rounded-full w-5/6 animate-pulse" />
+                   <div className="h-4 bg-gray-100 rounded-full w-4/6 animate-pulse" />
+                </div>
+             ) : (
+                <>
+                   {/* Pre-computed Summary */}
+                   <div className="mb-8">
+                     <p className="text-[13px] text-[#7878A0] leading-relaxed mb-4">
+                       {summary.summary}
+                     </p>
+                     
+                     <div className="flex items-center gap-2 mb-3 mt-6">
+                       <LightbulbIcon className="w-4 h-4 text-[#6B6BFF]" />
+                       <h2 className="text-[14px] font-bold text-[#1A1A2E]">Key Takeaways</h2>
+                     </div>
+                     <ul className="flex flex-col gap-2">
+                        {summary.keyTakeaways.map((point, idx) => (
+                           <li key={idx} className="flex items-start gap-2 text-[13px] text-[#464554] leading-relaxed">
+                              <span className="text-[#6B6BFF] shrink-0 mt-0.5">•</span>
+                              {point}
+                           </li>
+                        ))}
+                     </ul>
+                   </div>
 
-        <div className="flex flex-col gap-4 pl-2">
-          <div className="flex items-center gap-3 cursor-pointer group">
-            <FileTextIcon className="w-4 h-4 text-[#A0A0C0] group-hover:text-[#6B6BFF] transition-colors" />
-            <span className="text-[13.5px] text-[#4A4B68] group-hover:text-[#1A1A2E] transition-colors">
-              Superposition_Draft.pdf
-            </span>
+                   {/* Next Lesson Recommendation */}
+                   {summary.nextLessonRecommendation && (
+                      <div className="bg-[#F8F9FB] rounded-xl p-5 border border-[#EAEAF4]">
+                         <h3 className="text-[11px] font-bold tracking-widest text-[#A0A0C0] uppercase mb-3">
+                            AI Recommendation
+                         </h3>
+                         <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-white border border-[#EAEAF4] flex items-center justify-center shrink-0">
+                               <PlayCircleIcon className="w-5 h-5 text-[#10B981]" />
+                            </div>
+                            <div>
+                               <h4 className="text-[14px] font-bold text-[#1A1A2E]">
+                                  {summary.nextLessonRecommendation.title}
+                               </h4>
+                               <p className="text-[11px] text-[#7878A0] mt-0.5">
+                                  {summary.nextLessonRecommendation.reason}
+                               </p>
+                            </div>
+                         </div>
+                      </div>
+                   )}
+                </>
+             )}
           </div>
-          <div className="flex items-center gap-3 cursor-pointer group">
-            <PlayCircleIcon className="w-4 h-4 text-[#A0A0C0] group-hover:text-[#6B6BFF] transition-colors" />
-            <span className="text-[13.5px] text-[#4A4B68] group-hover:text-[#1A1A2E] transition-colors">
-              Visualizing Qubits.mp4
-            </span>
+        )}
+
+        {activeTab === "roadmap" && (
+          <div className="animate-in fade-in duration-300">
+             <RoadmapGenerator />
           </div>
-        </div>
+        )}
+
+        {activeTab === "flashcards" && (
+          <div className="animate-in fade-in duration-300">
+             <AIFlashcards />
+          </div>
+        )}
       </div>
 
-      {/* AI Tip (pushed to bottom if enough space, else scroll) */}
-      <div className="mt-auto pt-6">
-        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-5 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
-          <h3 className="text-[11px] font-bold tracking-widest text-[#6B6BFF] uppercase mb-2">
-            AI Tip
-          </h3>
-          <p className="text-[13px] text-[#7878A0] italic leading-relaxed">
-            &quot;Try asking Nova to visualize the Bloch Sphere if the qubit
-            concept feels abstract.&quot;
-          </p>
-        </div>
-      </div>
     </div>
   );
 }

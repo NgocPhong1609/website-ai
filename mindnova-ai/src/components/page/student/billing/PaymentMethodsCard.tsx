@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { PAYMENT_CARDS } from "../constants";
-import type { PaymentCard } from "../types";
-import { PlusIcon, TrashIcon } from "../icons";
+import { PAYMENT_CARDS } from "./constants";
+import type { PaymentCard } from "./types";
+import { PlusIcon, TrashIcon } from "./icons";
 
 // ─── Card Brand Logos ─────────────────────────────────────────────────────────
 

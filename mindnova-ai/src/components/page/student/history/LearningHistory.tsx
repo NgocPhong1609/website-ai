@@ -14,7 +14,7 @@ import {
   MoreVerticalIcon,
   TrendingUpIcon,
   HistoryIcon
-} from "../icons";
+} from "./icons";
 
 export function LearningHistory() {
   return (

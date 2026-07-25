@@ -1,5 +1,5 @@
-import { ChatPanel } from "@/src/components/page/student/ai-study-plan/components/ChatPanel";
-import { ContextPanel } from "@/src/components/page/student/ai-study-plan/components/ContextPanel";
+import { ChatPanel } from "@/src/components/page/student/ai-study-plan/ChatPanel";
+import { ContextPanel } from "@/src/components/page/student/ai-study-plan/ContextPanel";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

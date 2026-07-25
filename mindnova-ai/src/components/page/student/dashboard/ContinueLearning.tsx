@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { DASHBOARD_COURSES } from "../constants";
-import { ICourse } from "../../courses";
+import { DASHBOARD_COURSES } from "./constants";
+import { MyCourseCard } from "../courses";
+import { ICourse } from "../courses";
 
 // ─── Sub-component ────────────────────────────────────────────────────────────
 
