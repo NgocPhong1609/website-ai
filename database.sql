@@ -139,6 +139,52 @@ CREATE TABLE `course_modules` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `discussions`
+-- Added: 2026-07-18 | Author: Instructor Module (Module 2)
+-- Purpose: Q&A forum - students ask questions on specific lessons
+--
+
+CREATE TABLE `discussions` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `lesson_id` bigint UNSIGNED NOT NULL,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` enum('open','answered','closed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `discussions_lesson_id_foreign` (`lesson_id`),
+  KEY `discussions_student_id_foreign` (`student_id`),
+  CONSTRAINT `discussions_lesson_id_foreign` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `discussions_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `discussion_replies`
+-- Added: 2026-07-18 | Author: Instructor Module (Module 2)
+-- Purpose: Replies to discussion threads (from instructors or other students)
+--
+
+CREATE TABLE `discussion_replies` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `discussion_id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `discussion_replies_discussion_id_foreign` (`discussion_id`),
+  KEY `discussion_replies_user_id_foreign` (`user_id`),
+  CONSTRAINT `discussion_replies_discussion_id_foreign` FOREIGN KEY (`discussion_id`) REFERENCES `discussions` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `discussion_replies_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `enrollments`
 --
 

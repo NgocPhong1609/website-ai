@@ -1,4 +1,4 @@
-import { DashboardTopbar } from "@/src/features/dashboard";
+import { DashboardTopbar } from "@/src/features/student/dashboard";
 import { Sidebar } from "@/src/features/student/layout";
 import { Metadata } from "next";
 

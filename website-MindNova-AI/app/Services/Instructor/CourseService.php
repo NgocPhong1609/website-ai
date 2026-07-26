@@ -33,12 +33,19 @@ class CourseService
     {
         // Delete old thumbnail if exists
         if ($course->thumbnail) {
-            $oldPath = str_replace('storage/', 'public/', $course->thumbnail);
-            Storage::delete($oldPath);
+            $oldPath = str_replace('/storage/', '', parse_url($course->thumbnail, PHP_URL_PATH));
+            // In case the old thumbnail was on R2, parse_url will just get the path without domain.
+            // But if it was on public, the path might start with /storage/ or be relative.
+            // R2 usually doesn't have /storage/ in the URL, so we just remove the leading slash.
+            $oldPathR2 = ltrim(parse_url($course->thumbnail, PHP_URL_PATH), '/');
+            
+            // Try deleting from both disks just in case of migration
+            Storage::disk('public')->delete($oldPath);
+            Storage::disk('r2')->delete($oldPathR2);
         }
 
-        $path = $file->store('public/courses/thumbnails');
-        $url = Storage::url($path);
+        $path = $file->store('courses/thumbnails', 'r2');
+        $url = Storage::disk('r2')->url($path);
 
         $course->update(['thumbnail' => $url]);
 

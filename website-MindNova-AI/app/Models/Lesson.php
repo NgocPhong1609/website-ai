@@ -15,10 +15,16 @@ class Lesson extends Model
         'video_url',
         'duration_minutes',
         'order',
+        'status',
     ];
 
     public function module(): BelongsTo
     {
         return $this->belongsTo(CourseModule::class, 'module_id');
+    }
+
+    public function media()
+    {
+        return $this->hasMany(LessonMedia::class);
     }
 }

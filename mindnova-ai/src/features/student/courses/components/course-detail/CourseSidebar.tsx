@@ -1,8 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { IResource } from "../../types";
-import { COURSE_DETAIL } from "../../constants";
-
+import { COURSE_DETAIL } from "@features/student/courses/constants/detail";
+import type { ILesson, IModule, IResource } from "@features/student/courses/types";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 

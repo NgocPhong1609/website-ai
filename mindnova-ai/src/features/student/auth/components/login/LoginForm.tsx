@@ -126,9 +126,6 @@ function FormField({ id, label, leftIcon, rightElement, labelRight, ...inputProp
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-const DEFAULT_API_BASE_URL = "http://127.0.0.1:8000/api";
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
-
 export function LoginForm() {
   const emailId   = useId();
   const passwordId = useId();
@@ -158,12 +155,13 @@ export function LoginForm() {
     setStatusMessage(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/login`, {
+      // Gọi /api/login trên cùng domain — Next.js rewrites sẽ proxy sang Laravel
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({
           email: values.email,
           password: values.password,
@@ -180,6 +178,8 @@ export function LoginForm() {
 
       if (token) {
         window.localStorage.setItem("accessToken", token);
+        // Set cookie cho SSR và middleware
+        document.cookie = `accessToken=${token}; path=/; max-age=2592000; SameSite=Lax`;
       }
 
       setStatusMessage("Đăng nhập thành công. Đang chuyển hướng...");
@@ -222,12 +222,19 @@ export function LoginForm() {
           </div>
 
           {/* Form */}
+          {statusMessage && (
+            <div
+              className={`mb-4 p-3.5 rounded-xl text-xs font-medium border ${
+                statusMessage.includes("thành công")
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  : "bg-red-50 text-red-600 border-red-200"
+              }`}
+            >
+              {statusMessage}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-            {statusMessage && (
-              <div className="rounded-xl border border-[#E4E4EF] bg-[#F8F8FC] px-3 py-2 text-sm text-[#1A1A2E]">
-                {statusMessage}
-              </div>
-            )}
 
             {/* Email */}
             <FormField

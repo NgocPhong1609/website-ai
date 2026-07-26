@@ -1,5 +1,8 @@
-import { AiSuggestionCard, ContinueLearning, DashboardStatsPanel } from "@/src/features/student/dashboard";
-
+import {
+  AiSuggestionCard,
+  ContinueLearning,
+  DashboardStatsPanel,
+} from "@/src/features/student/dashboard";
 
 export default function DashboardPage() {
   return (

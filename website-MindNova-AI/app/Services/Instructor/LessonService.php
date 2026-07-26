@@ -4,6 +4,7 @@ namespace App\Services\Instructor;
 
 use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Models\LessonMedia;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -28,31 +29,54 @@ class LessonService
 
     public function deleteLesson(Lesson $lesson): void
     {
-        // Delete video file if exists
-        if ($lesson->video_url) {
-            $oldPath = str_replace('storage/', 'public/', $lesson->video_url);
-            Storage::delete($oldPath);
+        // Delete associated media from R2
+        foreach ($lesson->media as $media) {
+            Storage::disk('r2')->delete($media->r2_key);
         }
         
         $lesson->delete();
     }
 
-    public function uploadVideo(Lesson $lesson, UploadedFile $file): Lesson
+    public function uploadVideo(Lesson $lesson, UploadedFile $file): array
     {
-        // Delete old video if exists
-        if ($lesson->video_url) {
-            $oldPath = str_replace('storage/', 'public/', $lesson->video_url);
-            Storage::delete($oldPath);
-        }
+        $uuid = \Illuminate\Support\Str::uuid()->toString();
+        $extension = $file->getClientOriginalExtension();
+        $filename = "lessons/{$lesson->id}/videos/{$uuid}.{$extension}";
 
-        $path = $file->store('public/lessons/videos');
-        $url = Storage::url($path);
+        // Upload to Cloudflare R2
+        Storage::disk('r2')->put($filename, file_get_contents($file));
 
-        $lesson->update([
-            'video_url' => $url,
-            // duration_minutes calculation could be handled here if we use a library like getID3 or ffmpeg.
+        $media = LessonMedia::create([
+            'lesson_id' => $lesson->id,
+            'media_type' => 'video',
+            'r2_key' => $filename,
+            'original_filename' => $file->getClientOriginalName(),
+            'file_size' => $file->getSize(),
+            'mime_type' => $file->getMimeType(),
+            'status' => 'ready', // We can mark it ready immediately or use a queue for processing later
         ]);
 
-        return $lesson;
+        return [
+            'media_id' => $media->id,
+            'signed_url' => Storage::disk('r2')->temporaryUrl($filename, now()->addHours(1)),
+            'status' => $media->status,
+        ];
+    }
+
+    public function generateVideoUrl(Lesson $lesson): ?array
+    {
+        $media = $lesson->media()->where('media_type', 'video')->where('status', 'ready')->latest()->first();
+
+        if (!$media) {
+            return null;
+        }
+
+        $expiresAt = now()->addHours(1);
+        $signedUrl = Storage::disk('r2')->temporaryUrl($media->r2_key, $expiresAt);
+
+        return [
+            'signed_url' => $signedUrl,
+            'expires_at' => $expiresAt,
+        ];
     }
 }

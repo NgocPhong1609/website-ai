@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ClientDashboardController;
+use App\Http\Controllers\Admin\CourseClassController;
 
 require __DIR__.'/auth.php';
 
@@ -47,6 +48,17 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::put('/admin/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/admin/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('admin.users.destroy');
     Route::post('/admin/users/{user}/toggle-lock', [\App\Http\Controllers\Admin\UserController::class, 'toggleLock'])->name('admin.users.toggle-lock');
+
+    Route::prefix('admin/courses/{course}/classes')->name('admin.course_classes.')->group(function () {
+        Route::get('/', [CourseClassController::class, 'index'])->name('index');
+        Route::get('/create', [CourseClassController::class, 'create'])->name('create');
+        Route::post('/', [CourseClassController::class, 'store'])->name('store');
+
+        Route::get('/{courseClass}/assign', [CourseClassController::class, 'assign'])->name('assign');
+        Route::post('/{courseClass}/assign', [CourseClassController::class, 'assignStudents'])->name('assignStudents');
+
+        Route::get('/{courseClass}/students', [CourseClassController::class, 'showStudents'])->name('students.index');
+    });
 
     Route::get('/admin/reports', function () {
         return view('admin.reports.index');
