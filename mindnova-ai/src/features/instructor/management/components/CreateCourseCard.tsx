@@ -2,12 +2,13 @@
 // Placeholder card at the end of the grid — prompts instructor to create a new course.
 
 import { PlusIcon } from "./icons";
+import Link from "next/link";
 
 export function CreateCourseCard() {
   return (
-    <button
+    <Link
+      href="/instructor/create-course"
       id="btn-create-course-card"
-      type="button"
       aria-label="Tạo khóa học mới"
       className="group flex flex-col items-center justify-center gap-3 rounded-2xl bg-white border-2 border-dashed border-[#D5D5F0] text-center p-8 hover:border-[#6B6BFF] hover:bg-[#F4F4FF] active:scale-98 transition-all duration-200 min-h-[200px]"
     >
@@ -24,6 +25,6 @@ export function CreateCourseCard() {
           Bắt đầu hành trình chia sẻ kiến thức ngay hôm nay.
         </p>
       </div>
-    </button>
+    </Link>
   );
 }

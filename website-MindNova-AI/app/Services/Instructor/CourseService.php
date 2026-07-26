@@ -11,11 +11,20 @@ class CourseService
 {
     public function createCourse(array $data, int $teacherId): Course
     {
+        $thumbnail = $data['thumbnail'] ?? null;
+        unset($data['thumbnail']);
+
         $data['teacher_id'] = $teacherId;
         $data['slug'] = $this->generateUniqueSlug($data['title']);
         $data['status'] = 'draft';
 
-        return Course::create($data);
+        $course = Course::create($data);
+
+        if ($thumbnail instanceof UploadedFile) {
+            $this->uploadThumbnail($course, $thumbnail);
+        }
+
+        return $course;
     }
 
     public function updateCourse(Course $course, array $data): Course

@@ -1,19 +1,22 @@
 "use client";
 
 // ─── CreateCourseContainer ─────────────────────────────────────────────────────
-// Root client component that manages the multi-step form state and composes
-// all sub-components into the full create-course page.
+// Root client component that manages the multi-step form.
+// All data is stored in Zustand store (draft) — NO API calls until "Hoàn tất & Đăng".
 
-import { useState, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import Link from "next/link";
 import { StepIndicator } from "./StepIndicator";
 import { Step1BasicInfo } from "./Step1BasicInfo";
+import { Step2CourseStructure } from "./Step2CourseStructure";
 import { Step3SettingsPrice } from "./Step3SettingsPrice";
 import { AIOutlineModal } from "./AIOutlineModal";
-import { ArrowRightIcon, SaveIcon, BookOpenIcon, RobotIcon, SparklesIcon } from "./icons";
+import { ArrowRightIcon, SaveIcon, BookOpenIcon, SparklesIcon } from "./icons";
 import type { CourseBasicInfo, StepKey } from "../types";
 import type { GeneratedOutline } from "./AIOutlineModal";
-import { useCreateCourse, useUpdateCoursePrice, useUpdateCourseStatus, useUploadCourseThumbnail } from "../api";
+import { useCreateCourse, useUploadCourseThumbnail, useUpdateCoursePrice, useUpdateCourseStatus } from "../api";
+import { useCreateModule } from "../../lesson-management/api";
+import { useCreateCourseStore } from "../stores/createCourseStore";
 
 // ─── Footer bar ───────────────────────────────────────────────────────────────
 
@@ -31,7 +34,7 @@ function FormFooter({ step, onBack, onNext }: FormFooterProps) {
       {/* Left info */}
       <div className="flex items-center gap-1.5 text-[#9090B0]">
         <SaveIcon size={12} />
-        <span className="text-[12px]">Tự động lưu lúc 10:45 AM</span>
+        <span className="text-[12px]">Dữ liệu được lưu tạm tự động</span>
       </div>
 
       {/* CTA row */}
@@ -59,17 +62,8 @@ function FormFooter({ step, onBack, onNext }: FormFooterProps) {
           onClick={onNext}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40"
         >
-          {step === 3 ? (
-            <>
-              <SparklesIcon size={13} />
-              Hoàn tất & Đăng
-            </>
-          ) : (
-            <>
-              Tiếp theo
-              <ArrowRightIcon size={15} />
-            </>
-          )}
+          Tiếp theo
+          <ArrowRightIcon size={15} />
         </button>
       </div>
     </div>
@@ -83,7 +77,7 @@ function PageFooter() {
     <div className="flex items-center justify-between text-[11px] text-[#B0B0C8]">
       <div className="flex items-center gap-1.5">
         <SaveIcon size={11} />
-        <span>Tự động lưu lúc 10:45 AM</span>
+        <span>Dữ liệu được lưu tạm tự động</span>
       </div>
       <button
         type="button"
@@ -98,77 +92,153 @@ function PageFooter() {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-const INITIAL_DATA: CourseBasicInfo = {
-  title: "",
-  description: "",
-  field: "",
-  difficulty: "beginner",
-  thumbnailFile: null,
-  thumbnailPreview: null,
-};
-
 export function CreateCourseContainer() {
-  const [step, setStep] = useState<StepKey>(1);
-  const [formData, setFormData] = useState<CourseBasicInfo>(INITIAL_DATA);
+  // ── Zustand store ─────────────────────────────────────────────────────────────
+  const step = useCreateCourseStore((s) => s.step);
+  const courseInfo = useCreateCourseStore((s) => s.courseInfo);
+  const modules = useCreateCourseStore((s) => s.modules);
+  const settings = useCreateCourseStore((s) => s.settings);
+  const setCourseInfo = useCreateCourseStore((s) => s.setCourseInfo);
+  const setStep = useCreateCourseStore((s) => s.setStep);
+  const goNext = useCreateCourseStore((s) => s.goNext);
+  const goBack = useCreateCourseStore((s) => s.goBack);
+  const resetDraft = useCreateCourseStore((s) => s.resetDraft);
+  const hydrate = useCreateCourseStore((s) => s.hydrate);
+
+  // ── AI Outline Modal ──────────────────────────────────────────────────────────
   const [isOutlineOpen, setIsOutlineOpen] = useState(false);
-  const [createdCourseId, setCreatedCourseId] = useState<string | null>(null);
 
-  const { mutateAsync: createCourse, isPending: isCreating } = useCreateCourse();
-  const { mutateAsync: uploadThumbnail, isPending: isUploading } = useUploadCourseThumbnail();
-  const { mutateAsync: updatePrice, isPending: isUpdatingPrice } = useUpdateCoursePrice();
-  const { mutateAsync: updateStatus, isPending: isPublishing } = useUpdateCourseStatus();
+  // ── Publishing state ──────────────────────────────────────────────────────────
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishError, setPublishError] = useState<string | null>(null);
 
+  // ── API mutations (only used at final publish) ────────────────────────────────
+  const { mutateAsync: createCourse } = useCreateCourse();
+  const { mutateAsync: uploadThumbnail } = useUploadCourseThumbnail();
+  const { mutateAsync: updatePrice } = useUpdateCoursePrice();
+  const { mutateAsync: updateStatus } = useUpdateCourseStatus();
+  const { mutateAsync: createModule } = useCreateModule();
+
+  // ── Hydrate on mount ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
+
+  // ── AI outline handler ────────────────────────────────────────────────────────
   const handleApplyOutline = useCallback((_outline: GeneratedOutline) => {
-    // In production: convert outline chapters → CourseStructure and merge into form
+    // In production: convert outline chapters → modules and merge into form
     setIsOutlineOpen(false);
   }, []);
 
+  // ── Course info change handler ────────────────────────────────────────────────
   const handleChange = useCallback(
     <K extends keyof CourseBasicInfo>(key: K, value: CourseBasicInfo[K]) => {
-      setFormData((prev) => ({ ...prev, [key]: value }));
+      setCourseInfo(key, value);
     },
-    [],
+    [setCourseInfo],
   );
 
-  const handleNext = async () => {
-    try {
-      if (step === 1 && !createdCourseId) {
-        if (!formData.title) {
-          alert("Vui lòng nhập tên khóa học.");
-          return;
-        }
-        // Temporary category_id to test, in reality it should come from a category select field
-        const res = await createCourse({
-          title: formData.title,
-          description: formData.description,
-          level: formData.difficulty,
-          category_id: 1, // Mock category ID
-        });
-        setCreatedCourseId(res.id);
-      } else if (step === 3 && createdCourseId) {
-        // Step 3 logic: Save price & thumbnail, then publish
-        if (formData.thumbnailFile) {
-          await uploadThumbnail({ courseId: createdCourseId, file: formData.thumbnailFile });
-        }
-        // Save price (assuming price is added to formData later, mocked to 0 for now)
-        await updatePrice({ courseId: createdCourseId, price: 0 });
-        await updateStatus({ courseId: createdCourseId, status: "published" });
-        alert("Xuất bản thành công!");
-        window.location.href = "/instructor/courses";
+  // ── Step validation & navigation ──────────────────────────────────────────────
+  const handleNext = useCallback(() => {
+    if (step === 1) {
+      if (!courseInfo.title.trim()) {
+        alert("Vui lòng nhập tên khóa học.");
         return;
       }
-      
-      if (step < 3) setStep((s) => (s + 1) as StepKey);
-    } catch (error) {
-      console.error(error);
-      alert("Có lỗi xảy ra, vui lòng thử lại.");
+      if (!courseInfo.thumbnailFile) {
+        alert("Vui lòng tải lên ảnh bìa khóa học.");
+        return;
+      }
     }
-  };
+    // Step 1, 2: Just move to next step. NO API calls.
+    if (step < 3) {
+      goNext();
+    }
+  }, [step, courseInfo.title, goNext]);
 
-  const handleBack = () => {
-    if (step > 1) setStep((s) => (s - 1) as StepKey);
-  };
+  const handleBack = useCallback(() => {
+    goBack();
+  }, [goBack]);
 
+  // ── Final publish (Step 3 only) ───────────────────────────────────────────────
+  const handlePublish = useCallback(async () => {
+    setPublishError(null);
+    setIsPublishing(true);
+
+    try {
+      // 1. Create Course
+      if (!courseInfo.thumbnailFile) {
+        throw new Error("Vui lòng tải lên ảnh bìa khóa học.");
+      }
+
+      const courseData = await createCourse({
+        title: courseInfo.title,
+        description: courseInfo.description,
+        level: courseInfo.difficulty,
+        category_id: 1, // TODO: Map from courseInfo.field when backend supports it
+        thumbnail: courseInfo.thumbnailFile,
+      });
+
+      const courseId = courseData.id;
+
+      // Note: Backend handles thumbnail upload via createCourse now, 
+      // so we skip the separate uploadThumbnail call.
+
+      // 3. Create all modules sequentially
+      for (const mod of modules) {
+        await createModule({
+          courseId,
+          title: mod.title,
+          order: mod.order,
+        });
+      }
+
+      // 4. Update price
+      const priceNum = Number(settings.basePrice.replace(/[^0-9]/g, ""));
+      await updatePrice({ courseId, price: priceNum });
+
+      // 5. Publish
+      if (!settings.isDraft) {
+        await updateStatus({ courseId, status: "published" });
+      }
+
+      // 6. Success — clean up draft and redirect
+      resetDraft();
+      alert("🎉 Xuất bản khóa học thành công!");
+      window.location.href = "/instructor/courses";
+    } catch (error: any) {
+      console.error("Publish failed:", error);
+      
+      let errorMsg = "Có lỗi xảy ra khi xuất bản. Vui lòng thử lại.";
+      if (error.response?.data) {
+        const data = error.response.data;
+        if (data.message) {
+          errorMsg = `Lỗi: ${data.message}`;
+        }
+        if (data.errors) {
+          errorMsg += ` - Chi tiết: ${JSON.stringify(data.errors)}`;
+        }
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+      
+      setPublishError(errorMsg);
+    } finally {
+      setIsPublishing(false);
+    }
+  }, [
+    courseInfo,
+    modules,
+    settings,
+    createCourse,
+    uploadThumbnail,
+    createModule,
+    updatePrice,
+    updateStatus,
+    resetDraft,
+  ]);
+
+  // ── Step labels ───────────────────────────────────────────────────────────────
   const stepLabels: Record<StepKey, string> = {
     1: "Thông tin cơ bản",
     2: "Nội dung bài học",
@@ -205,12 +275,12 @@ export function CreateCourseContainer() {
                 Lưu nháp
               </button>
 
-              {/* Finish & Publish */}
+              {/* Finish & Publish (only functional at Step 3) */}
               <button
                 id="btn-finish-publish"
                 type="button"
-                onClick={handleNext}
-                disabled={isCreating || isUploading || isUpdatingPrice || isPublishing}
+                onClick={step === 3 ? handlePublish : handleNext}
+                disabled={isPublishing}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40 disabled:opacity-70"
               >
                 {step === 3 ? (
@@ -220,7 +290,7 @@ export function CreateCourseContainer() {
                   </>
                 ) : (
                   <>
-                    {isCreating ? "Đang lưu..." : "Tiếp theo"}
+                    Tiếp theo
                     <ArrowRightIcon size={14} />
                   </>
                 )}
@@ -236,24 +306,34 @@ export function CreateCourseContainer() {
       {/* ── Form card ───────────────────────────────────────────────── */}
       <div className="flex-1 px-6 py-6">
         <div className="max-w-4xl mx-auto">
+          {/* Publish error banner */}
+          {publishError && (
+            <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-center justify-between">
+              <span>{publishError}</span>
+              <button
+                type="button"
+                onClick={() => setPublishError(null)}
+                className="text-red-500 hover:text-red-700 ml-3"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
           <div className={step === 3 ? "flex flex-col gap-0" : "bg-white rounded-2xl border border-[#EAEAF4] shadow-[0_2px_20px_rgba(70,72,212,0.06)] p-6 flex flex-col gap-6"}>
             {/* Step content */}
             {step === 1 && (
-              <Step1BasicInfo data={formData} onChange={handleChange} />
+              <Step1BasicInfo data={courseInfo} onChange={handleChange} />
             )}
 
-            {/* Step 2 — placeholder */}
             {step === 2 && (
-              <div className="flex items-center justify-center min-h-[300px] text-[#B0B0C8] text-sm">
-                Nội dung bài học sẽ hiển thị ở đây...
-              </div>
+              <Step2CourseStructure />
             )}
 
-            {/* Step 3 */}
             {step === 3 && (
               <Step3SettingsPrice
-                courseTitle={formData.title}
-                thumbnailPreview={formData.thumbnailPreview}
+                courseTitle={courseInfo.title}
+                thumbnailPreview={courseInfo.thumbnailPreview}
               />
             )}
 

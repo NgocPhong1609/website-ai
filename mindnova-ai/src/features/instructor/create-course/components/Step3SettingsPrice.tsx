@@ -3,9 +3,9 @@
 // ─── Step3SettingsPrice ──────────────────────────────────────────────────────
 // Bước 3: Cài đặt hiển thị + Cấu hình giá & Thanh toán + Preview khóa học.
 
-import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { SparklesIcon, ChevronDownIcon } from "./icons";
+import { useCreateCourseStore } from "../stores/createCourseStore";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -473,12 +473,18 @@ function ReadyPanel() {
 // ─── Main Step3 Component ─────────────────────────────────────────────────────
 
 export function Step3SettingsPrice({ courseTitle, thumbnailPreview }: Step3SettingsPriceProps) {
-  const [isDraft, setIsDraft] = useState(false);
-  const [isPublic, setIsPublic] = useState(true);
-  const [allowRating, setAllowRating] = useState(true);
-  const [currency, setCurrency] = useState("VND");
-  const [basePrice, setBasePrice] = useState("2.500.000");
-  const [salePrice, setSalePrice] = useState("1.450.000");
+  // Read/write from Zustand store so data persists between steps
+  const settings = useCreateCourseStore((s) => s.settings);
+  const setSettings = useCreateCourseStore((s) => s.setSettings);
+
+  const { isDraft, isPublic, allowRating, currency, basePrice, salePrice } = settings;
+
+  const setIsDraft = (v: boolean) => setSettings("isDraft", v);
+  const setIsPublic = (v: boolean) => setSettings("isPublic", v);
+  const setAllowRating = (v: boolean) => setSettings("allowRating", v);
+  const setCurrency = (v: string) => setSettings("currency", v);
+  const setBasePrice = (v: string) => setSettings("basePrice", v);
+  const setSalePrice = (v: string) => setSettings("salePrice", v);
 
   const handleAISuggestion = () => {
     setBasePrice("2.500.000");
