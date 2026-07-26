@@ -4,6 +4,7 @@
 // Individual course card with thumbnail, status badge, action buttons.
 
 import Image from "next/image";
+import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import type { Course } from "../types";
 import {
@@ -37,14 +38,14 @@ function StatusBadge({ status }: { status: Course["status"] }) {
 
 function EditButton({ courseId }: { courseId: string }) {
   return (
-    <button
-      type="button"
+    <Link
+      href={`/instructor/create-course`}
       id={`btn-edit-course-${courseId}`}
       aria-label="Chỉnh sửa khóa học"
       className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#4648D4] shadow-sm hover:bg-white hover:shadow-md hover:scale-110 active:scale-95 transition-all duration-150 z-10"
     >
       <PencilIcon />
-    </button>
+    </Link>
   );
 }
 
@@ -78,30 +79,31 @@ interface ActionBtn {
   id: string;
   label: string;
   Icon: React.FC;
+  href: string;
 }
 
 function CourseActionButtons({ courseId }: { courseId: string }) {
   const ACTIONS: ActionBtn[] = [
-    { id: `btn-upload-${courseId}`, label: "Upload", Icon: UploadIcon },
-    { id: `btn-lessons-${courseId}`, label: "Bài học", Icon: BookOpenIcon },
-    { id: `btn-curriculum-${courseId}`, label: "Chương học", Icon: LayersIcon },
-    { id: `btn-pricing-${courseId}`, label: "Đặt giá", Icon: TagIcon },
+    { id: `btn-upload-${courseId}`, label: "Upload", Icon: UploadIcon, href: `/instructor/create-course` },
+    { id: `btn-lessons-${courseId}`, label: "Bài học", Icon: BookOpenIcon, href: `/instructor/courses/${courseId}/lessons` },
+    { id: `btn-curriculum-${courseId}`, label: "Chương học", Icon: LayersIcon, href: `/instructor/courses/${courseId}/lessons` },
+    { id: `btn-pricing-${courseId}`, label: "Đặt giá", Icon: TagIcon, href: `/instructor/courses/${courseId}/pricing` },
   ];
 
   return (
     <div className="grid grid-cols-2 gap-2 p-4 pt-0">
-      {ACTIONS.map(({ id, label, Icon }) => (
-        <button
+      {ACTIONS.map(({ id, label, Icon, href }) => (
+        <Link
           key={id}
+          href={href}
           id={id}
-          type="button"
           className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-[#64647A] bg-[#F6F6FB] border border-[#EAEAF4] hover:bg-[#EEF0FF] hover:text-[#4648D4] hover:border-[#C5C6FF] active:scale-95 transition-all duration-150"
         >
           <span className="text-[#9090B0]">
             <Icon />
           </span>
           {label}
-        </button>
+        </Link>
       ))}
     </div>
   );
