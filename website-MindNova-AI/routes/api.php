@@ -7,6 +7,10 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Api\Admin\CourseController as AdminCourseController;
+use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\Admin\NotificationController as AdminNotificationController;
+use App\Http\Controllers\Api\Admin\InvoiceController as AdminInvoiceController;
 
 use App\Http\Controllers\Api\Instructor\CourseController;
 use App\Http\Controllers\Api\Instructor\CourseModuleController;
@@ -59,8 +63,24 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus']);
         Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
 
+        // Quản lý danh mục
+        Route::get('/categories', [AdminCategoryController::class, 'index']);
+        Route::post('/categories', [AdminCategoryController::class, 'store']);
+        Route::put('/categories/{category}', [AdminCategoryController::class, 'update']);
+        Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy']);
+
         // Quản lý khóa học
-        Route::post('/courses', [\App\Http\Controllers\Api\Admin\CourseController::class, 'store']);
+        Route::get('/courses', [AdminCourseController::class, 'index']);
+        Route::post('/courses', [AdminCourseController::class, 'store']);
+        Route::get('/courses/{course}', [AdminCourseController::class, 'show']);
+        Route::put('/courses/{course}', [AdminCourseController::class, 'update']);
+        Route::delete('/courses/{course}', [AdminCourseController::class, 'destroy']);
+
+        // Quản lý hóa đơn
+        Route::get('/invoices', [AdminInvoiceController::class, 'index']);
+
+        // Email thông báo
+        Route::post('/notifications/test-email', [AdminNotificationController::class, 'sendTestEmail']);
 
     });
 

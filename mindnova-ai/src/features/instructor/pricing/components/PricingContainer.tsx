@@ -50,13 +50,13 @@ function PageTabs({ active, onChange }: { active: TabId; onChange: (t: TabId) =>
 
 // ─── Breadcrumb ───────────────────────────────────────────────────────────────
 
-function Breadcrumb() {
+function Breadcrumb({ courseTitle }: { courseTitle: string }) {
   return (
     <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-[12px] text-[#9090B0]">
       <span className="hover:text-[#4648D4] cursor-pointer transition-colors">My Courses</span>
       <ChevronRightIcon size={12} />
-      <span className="hover:text-[#4648D4] cursor-pointer transition-colors">
-        Generative AI Masterclass
+      <span className="hover:text-[#4648D4] cursor-pointer transition-colors truncate max-w-[200px]">
+        {courseTitle}
       </span>
     </nav>
   );
@@ -64,14 +64,14 @@ function Breadcrumb() {
 
 // ─── Page Header ──────────────────────────────────────────────────────────────
 
-function PageHeader({ onSave }: { onSave: () => void }) {
+function PageHeader({ onSave, courseTitle, isPending }: { onSave: () => void; courseTitle: string; isPending: boolean }) {
   return (
     <div className="px-6 pt-5 pb-4 bg-white border-b border-[#F0F0F8]">
-      <Breadcrumb />
+      <Breadcrumb courseTitle={courseTitle} />
       <div className="flex items-start justify-between mt-2">
         <div>
-          <h1 className="text-[16px] font-extrabold text-[#1A1A2E] tracking-tight">
-            Giá & Kiếm tiền: Generative AI
+          <h1 className="text-[16px] font-extrabold text-[#1A1A2E] tracking-tight truncate max-w-[500px]">
+            Giá & Kiếm tiền: {courseTitle}
           </h1>
           <p className="text-[12px] text-[#9090B0] mt-0.5 max-w-[480px] leading-relaxed">
             Cấu hình mô hình doanh thu, định giá và quản lý các chương trình khuyến mãi cho khóa học của bạn.
@@ -81,10 +81,14 @@ function PageHeader({ onSave }: { onSave: () => void }) {
           type="button"
           id="btn-save-pricing"
           onClick={onSave}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40 shrink-0"
+          disabled={isPending}
+          className={twMerge(
+            "flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40 shrink-0",
+            isPending ? "bg-[#B0B0C8] cursor-not-allowed shadow-none" : "bg-gradient-to-r from-[#6B6BFF] to-[#4648D4]"
+          )}
         >
           <SaveIcon size={14} />
-          Lưu cài đặt
+          {isPending ? "Đang lưu..." : "Lưu cài đặt"}
         </button>
       </div>
     </div>
@@ -111,20 +115,56 @@ function SaveToast({ visible }: { visible: boolean }) {
 
 // ─── Main Container ───────────────────────────────────────────────────────────
 
-export function PricingContainer() {
+import { useInstructorCourse } from "../../management/api/courses";
+import { useUpdateCoursePrice } from "../../create-course/api";
+import { useEffect } from "react";
+
+export function PricingContainer({ courseId }: { courseId: string }) {
   const [activeTab, setActiveTab] = useState<TabId>("pricing");
   const [toastVisible, setToastVisible] = useState(false);
+  const [currentPrice, setCurrentPrice] = useState(0);
 
-  const handleSave = () => {
-    setToastVisible(true);
-    setTimeout(() => setToastVisible(false), 2800);
+  const { data: course, isLoading } = useInstructorCourse(courseId);
+  const { mutateAsync: updatePrice, isPending } = useUpdateCoursePrice();
+
+  useEffect(() => {
+    if (course) {
+      setCurrentPrice(course.price || 0);
+    }
+  }, [course]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full text-[#9090B0]">
+        Đang tải thông tin khóa học...
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div className="flex items-center justify-center h-full text-red-500">
+        Không tìm thấy khóa học
+      </div>
+    );
+  }
+
+  const handleSave = async () => {
+    try {
+      await updatePrice({ courseId, price: currentPrice });
+      setToastVisible(true);
+      setTimeout(() => setToastVisible(false), 2800);
+    } catch (error) {
+      console.error("Failed to update price", error);
+      alert("Cập nhật giá thất bại!");
+    }
   };
 
   return (
     <div className="flex flex-col h-full bg-[#FAF8FF]">
       {/* Sticky page header */}
       <div className="sticky top-0 z-10 bg-white shadow-[0_1px_0_#F0F0F8]">
-        <PageHeader onSave={handleSave} />
+        <PageHeader onSave={handleSave} courseTitle={course.title} isPending={isPending} />
         <PageTabs active={activeTab} onChange={setActiveTab} />
       </div>
 
@@ -132,7 +172,10 @@ export function PricingContainer() {
       <div className="flex-1 overflow-y-auto px-6 py-6">
         {activeTab === "pricing" && (
           <div className="max-w-[900px] mx-auto flex flex-col gap-6">
-            <PricingModelSection />
+            <PricingModelSection 
+              initialPrice={course.price || 0} 
+              onPriceChange={setCurrentPrice} 
+            />
             <CouponSection />
           </div>
         )}
@@ -154,3 +197,4 @@ export function PricingContainer() {
     </div>
   );
 }
+

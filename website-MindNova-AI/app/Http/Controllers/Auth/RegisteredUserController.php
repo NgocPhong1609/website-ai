@@ -46,8 +46,12 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        $destination = $user->isAdmin() ? route('admin.dashboard', absolute: false) : route('client.dashboard', absolute: false);
+        if ($user->isAdmin()) {
+            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/');
 
-        return redirect($destination);
+            return redirect()->away($frontendUrl . '/admin');
+        }
+
+        return redirect()->route('client.dashboard', absolute: false);
     }
 }

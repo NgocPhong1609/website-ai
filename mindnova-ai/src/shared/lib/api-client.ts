@@ -16,9 +16,11 @@ export async function apiClient<T>(
 
   // Attach auth token from cookies (server-side only)
   const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken")?.value;
+  const rawToken = cookieStore.get("accessToken")?.value;
+  const token = rawToken ? decodeURIComponent(rawToken) : undefined;
 
   const headers: Record<string, string> = {
+    Accept: "application/json",
     "Content-Type": "application/json",
     ...(options.headers as Record<string, string>),
   };
@@ -27,18 +29,49 @@ export async function apiClient<T>(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(url, { ...options, headers });
+  const response = await fetch(url, {
+    ...options,
+    headers,
+    redirect: "follow",
+  });
 
   if (!response.ok) {
+    const errorText = await response.text();
+    const compactBody = errorText.replace(/\s+/g, " ").slice(0, 220);
+
     if (response.status === 401) {
       throw new Error("[apiClient] Unauthorized (401). Token may have expired.");
     }
+
     throw new Error(
-      `[apiClient] HTTP ${response.status} ${response.statusText} — ${url}`
+      `[apiClient] HTTP ${response.status} ${response.statusText} — ${url} | body: ${compactBody}`
     );
   }
 
   // Handle empty responses (e.g., 204 No Content)
   const text = await response.text();
-  return text ? (JSON.parse(text) as T) : ({} as T);
+
+  if (!text) {
+    return {} as T;
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+  const isJson = contentType.includes("application/json");
+
+  if (!isJson) {
+    const compactBody = text.replace(/\s+/g, " ").slice(0, 220);
+    throw new Error(
+      `[apiClient] Expected JSON but got '${contentType || "unknown"}' from ${url}. ` +
+        `Check NEXT_PUBLIC_API_URL and API auth. body: ${compactBody}`
+    );
+  }
+
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    const compactBody = text.replace(/\s+/g, " ").slice(0, 220);
+    throw new Error(
+      `[apiClient] Invalid JSON response from ${url}. body: ${compactBody}`
+    );
+  }
 }

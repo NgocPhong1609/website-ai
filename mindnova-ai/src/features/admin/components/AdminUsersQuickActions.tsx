@@ -140,7 +140,7 @@ export function AdminUsersQuickActions() {
         onClick={handleExportCsv}
         className="rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10"
       >
-        Export CSV
+        Xuất CSV
       </button>
 
       <button
@@ -148,7 +148,7 @@ export function AdminUsersQuickActions() {
         onClick={() => setIsFormOpen((current) => !current)}
         className="rounded-2xl bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
       >
-        + Add user
+        + Thêm người dùng
       </button>
 
       {isFormOpen && (
@@ -212,9 +212,9 @@ export function AdminUsersQuickActions() {
                 onChange={(event) => setForm((current) => ({ ...current, role: event.target.value }))}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-cyan-500"
               >
-                <option value="student">Student</option>
-                <option value="teacher">Teacher</option>
-                <option value="admin">Admin</option>
+                <option value="student">Học viên</option>
+                <option value="teacher">Giảng viên</option>
+                <option value="admin">Quản trị viên</option>
               </select>
               <span className="block text-xs text-slate-500">Chọn quyền truy cập phù hợp cho tài khoản.</span>
             </label>
