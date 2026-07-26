@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -16,11 +17,18 @@ use Laravel\Sanctum\HasApiTokens;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'google_id', 'avatar_url', 'status', 'last_login_at', 'is_locked'
+        'name',
+        'email',
+        'password',
+        'google_id',
+        'avatar_url',
+        'status',
+        'last_login_at',
+        'is_locked',
+        'role',
     ];
 
     protected $hidden = [
@@ -76,22 +84,19 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
     }
 
-    // --- Hàm phụ trợ ---
+    public function profile(): HasOne
+    {
+        return $this->hasOne(UserProfile::class);
+    }
 
-    /**
-     * Kiểm tra người dùng có sở hữu vai trò cụ thể không
-     */
     public function hasRole(string $roleName): bool
     {
         return $this->roles()->where('name', $roleName)->exists();
     }
 
-    /**
-     * Kiểm tra người dùng có quyền admin không
-     */
     public function isAdmin(): bool
     {
-        return $this->hasRole('admin');
+        return $this->hasRole('admin') || $this->role === 'admin';
     }
 
     /**
@@ -104,6 +109,10 @@ class User extends Authenticatable
 
     public function getRoleAttribute(): ?string
     {
-        return $this->roles->pluck('name')->first();
+        if ($this->relationLoaded('roles')) {
+            return $this->roles->pluck('name')->first() ?? $this->attributes['role'] ?? null;
+        }
+
+        return $this->roles()->value('name') ?? $this->attributes['role'] ?? null;
     }
 }
