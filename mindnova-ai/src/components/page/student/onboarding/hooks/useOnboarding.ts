@@ -3,8 +3,6 @@ import type { OnboardingStep } from "@/src/components/page/student/onboarding/ty
 
 /**
  * Custom hook that provides a clean abstraction over the onboarding store.
- * Components should use this hook instead of importing the store directly,
- * making it easy to swap the underlying state management without touching components.
  */
 export function useOnboarding() {
   const currentStep = useOnboardingStore((s) => s.currentStep);
@@ -13,10 +11,12 @@ export function useOnboarding() {
   const isAuthenticated = useOnboardingStore((s) => s.isAuthenticated);
 
   const setStep = useOnboardingStore((s) => s.setStep);
+  const setAuth = useOnboardingStore((s) => s.setAuth);
   const setProgress = useOnboardingStore((s) => s.setProgress);
   const selectGoal = useOnboardingStore((s) => s.selectGoal);
   const selectLevel = useOnboardingStore((s) => s.selectLevel);
   const selectTopics = useOnboardingStore((s) => s.selectTopics);
+  const selectFreeTime = useOnboardingStore((s) => s.selectFreeTime);
   const completeSignUp = useOnboardingStore((s) => s.completeSignUp);
   const resetOnboarding = useOnboardingStore((s) => s.resetOnboarding);
 
@@ -34,10 +34,12 @@ export function useOnboarding() {
 
     // Actions
     setStep,
+    setAuth,
     setProgress,
     selectGoal,
     selectLevel,
     selectTopics,
+    selectFreeTime,
     completeSignUp,
     resetOnboarding,
   };

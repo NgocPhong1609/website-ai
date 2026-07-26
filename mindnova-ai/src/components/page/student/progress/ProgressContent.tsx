@@ -6,10 +6,11 @@ import { ChevronRightIcon, SparklesIcon } from "./icons";
 import { COURSE_DETAIL, MOCK_QUIZ } from "@/src/components/page/student/courses/constants/detail";
 import { MY_COURSES } from "@/src/components/page/student/courses/constants/data";
 import { STUDY_STREAK } from "@/src/components/page/student/dashboard/constants/data";
+import type { IMyCourse } from "@/src/components/page/student/courses/types";
 
 export function ProgressContent() {
   const router = useRouter();
-  const activeCourse = MY_COURSES[0] || {};
+  const activeCourse: Partial<IMyCourse> = (MY_COURSES[0] as IMyCourse) || {};
   const { title, level, progress, avgScore } = COURSE_DETAIL;
   const { lessonsCompleted = 18, totalLessons = 25 } = activeCourse;
 

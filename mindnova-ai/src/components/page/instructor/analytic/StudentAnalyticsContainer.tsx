@@ -1,7 +1,9 @@
 "use client";
 
+import React, { useState } from "react";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
+import { AIInsightsTab } from "./AIInsightsTab";
 import {
   SearchIcon,
   BellIcon,
@@ -307,6 +309,8 @@ function StudentProfileSidebar() {
 // ─── Main Container ───────────────────────────────────────────────────────────
 
 export function StudentAnalyticsContainer() {
+  const [activeTab, setActiveTab] = useState<"analytics" | "ai_insights">("analytics");
+
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF8FF]">
       <Topbar />
@@ -314,29 +318,61 @@ export function StudentAnalyticsContainer() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left: Main Area */}
         <main className="flex-1 overflow-y-auto">
-          <div className="max-w-[800px] mx-auto px-8 py-8 flex flex-col gap-6">
-            {/* Header */}
-            <div>
-              <h1 className="text-[26px] font-extrabold text-[#1A1A2E] tracking-tight">Quản lý Học viên</h1>
-              <p className="text-[14px] text-[#64647A] mt-1">Phân tích chuyên sâu về lộ trình học tập và tương tác của từng cá nhân.</p>
-            </div>
+          <div className="max-w-[880px] mx-auto px-8 py-8 flex flex-col gap-6">
+            {/* Header & Tab Toggle */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#EAEAF4] pb-5">
+              <div>
+                <h1 className="text-[26px] font-extrabold text-[#1A1A2E] tracking-tight">Quản lý &amp; Phân tích Học viên</h1>
+                <p className="text-[14px] text-[#64647A] mt-1">Phân tích lộ trình cá nhân hóa và chẩn đoán nghẽn cổ chai với AI.</p>
+              </div>
 
-            {/* Dashboard Grid */}
-            <div className="grid grid-cols-[1fr_200px] gap-6">
-              <InteractionChart />
-              <div className="flex flex-col gap-4">
-                <StatCard value="124 giờ" label="Tổng thời gian học" icon={<ClockIcon />} color="blue" />
-                <StatCard value="12 Chứng chỉ" label="Đã hoàn thành xuất sắc" icon={<AwardIcon />} color="purple" />
+              <div className="flex items-center gap-2 p-1 rounded-2xl bg-white border border-[#EAEAF4] shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("analytics")}
+                  className={twMerge(
+                    "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer",
+                    activeTab === "analytics" ? "bg-[#1A1A2E] text-white shadow-sm" : "text-gray-500 hover:text-gray-900"
+                  )}
+                >
+                  📊 Performance Dashboard
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("ai_insights")}
+                  className={twMerge(
+                    "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5",
+                    activeTab === "ai_insights" ? "bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] text-white shadow-md" : "text-indigo-600 hover:bg-indigo-50"
+                  )}
+                >
+                  <span>🧠 AI Insights (Section 2.3)</span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                </button>
               </div>
             </div>
 
-            {/* Students Table */}
-            <NewStudentsList />
+            {activeTab === "ai_insights" ? (
+              <AIInsightsTab />
+            ) : (
+              <>
+                {/* Dashboard Grid */}
+                <div className="grid grid-cols-[1fr_200px] gap-6">
+                  <InteractionChart />
+                  <div className="flex flex-col gap-4">
+                    <StatCard value="124 giờ" label="Tổng thời gian học" icon={<ClockIcon />} color="blue" />
+                    <StatCard value="12 Chứng chỉ" label="Đã hoàn thành xuất sắc" icon={<AwardIcon />} color="purple" />
+                  </div>
+                </div>
+
+                {/* Students Table */}
+                <NewStudentsList />
+              </>
+            )}
           </div>
         </main>
 
         {/* Right: Profile Sidebar */}
-        <StudentProfileSidebar />
+        {activeTab === "analytics" && <StudentProfileSidebar />}
       </div>
     </div>
   );

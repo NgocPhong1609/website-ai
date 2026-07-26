@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { useMutation } from "@tanstack/react-query";
+import type { IPasswordChangePayload, IPasswordChangeResult } from "@/types/student";
 
 type StrengthLevel = "empty" | "weak" | "fair" | "good" | "strong";
 
@@ -19,6 +19,7 @@ interface UsePasswordChangeReturn {
   requirements: PasswordRequirement[];
   mismatchError: string;
   successMessage: string;
+  errorMessage: string | null;
   canSubmit: boolean;
   isSubmitting: boolean;
   setCurrentPw: (v: string) => void;
@@ -26,8 +27,6 @@ interface UsePasswordChangeReturn {
   setConfirmPw: (v: string) => void;
   handleSubmit: () => Promise<void>;
 }
-
-// ─── Strength Analysis ────────────────────────────────────────────────────────
 
 function analyzePassword(pw: string): { level: StrengthLevel; requirements: PasswordRequirement[] } {
   const hasMinLength = pw.length >= 8;
@@ -39,7 +38,7 @@ function analyzePassword(pw: string): { level: StrengthLevel; requirements: Pass
     { label: "Minimum 8 characters", met: hasMinLength },
     { label: "At least 1 uppercase letter", met: hasUppercase },
     { label: "At least 1 number", met: hasNumber },
-    { label: "At least 1 special character (!@#$%...)", met: hasSpecial },
+    { label: "At least 1 special character (!@#$%^&*...)", met: hasSpecial },
   ];
 
   if (pw.length === 0) return { level: "empty", requirements };
@@ -56,51 +55,65 @@ function analyzePassword(pw: string): { level: StrengthLevel; requirements: Pass
   return { level: levelMap[metCount], requirements };
 }
 
-// ─── Hook ─────────────────────────────────────────────────────────────────────
+async function mockChangePasswordApi(payload: IPasswordChangePayload): Promise<IPasswordChangeResult> {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  // Core Rule: Require correct current password simulation & invalidate all active sessions
+  if (payload.currentPassword === "wrongpassword") {
+    throw new Error("Current password verification failed. Please try again.");
+  }
+  return {
+    success: true,
+    message: "Password updated successfully! All active sessions on other devices have been automatically logged out.",
+    sessionsInvalidated: true,
+  };
+}
 
 export function usePasswordChange(): UsePasswordChangeReturn {
   const [currentPw, setCurrentPw] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { level: strengthLevel, requirements } = analyzePassword(newPw);
 
   const allRequirementsMet = requirements.every((r) => r.met);
   const passwordsMatch = newPw === confirmPw;
   const mismatchError =
-    confirmPw.length > 0 && !passwordsMatch ? "Passwords do not match." : "";
+    confirmPw.length > 0 && !passwordsMatch ? "New password and confirmation do not match." : "";
+
+  const mutation = useMutation<IPasswordChangeResult, Error, IPasswordChangePayload>({
+    mutationFn: mockChangePasswordApi,
+    onSuccess: (res) => {
+      setCurrentPw("");
+      setNewPw("");
+      setConfirmPw("");
+      setErrorMessage(null);
+      setSuccessMessage(res.message);
+      setTimeout(() => setSuccessMessage(""), 7000);
+    },
+    onError: (err) => {
+      setErrorMessage(err.message || "An error occurred during password change.");
+    },
+  });
 
   const canSubmit =
     currentPw.length > 0 &&
     allRequirementsMet &&
     passwordsMatch &&
     confirmPw.length > 0 &&
-    !isSubmitting;
+    !mutation.isPending;
 
   const handleSubmit = useCallback(async () => {
     if (!canSubmit) return;
-
-    setIsSubmitting(true);
-
-    // In production:
-    // 1. POST /api/auth/change-password { currentPassword, newPassword }
-    // 2. Server verifies currentPassword hash
-    // 3. Server updates password hash
-    // 4. Server invalidates ALL active JWT sessions (adds to token blocklist / rotates refresh tokens)
-    // 5. Returns 200 OK
-    console.info("[Security] Submitting password change. On success, server will invalidate all active sessions.");
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-
-    setCurrentPw("");
-    setNewPw("");
-    setConfirmPw("");
-    setIsSubmitting(false);
-    // Core Rule: Notify user all other sessions have been invalidated
-    setSuccessMessage("Password updated. All other active sessions have been logged out for your security.");
-    setTimeout(() => setSuccessMessage(""), 6000);
-  }, [canSubmit]);
+    setSuccessMessage("");
+    setErrorMessage(null);
+    mutation.mutate({
+      currentPassword: currentPw,
+      newPassword: newPw,
+      confirmPassword: confirmPw,
+    });
+  }, [canSubmit, currentPw, newPw, confirmPw, mutation]);
 
   return {
     currentPw,
@@ -110,8 +123,9 @@ export function usePasswordChange(): UsePasswordChangeReturn {
     requirements,
     mismatchError,
     successMessage,
+    errorMessage,
     canSubmit,
-    isSubmitting,
+    isSubmitting: mutation.isPending,
     setCurrentPw,
     setNewPw,
     setConfirmPw,

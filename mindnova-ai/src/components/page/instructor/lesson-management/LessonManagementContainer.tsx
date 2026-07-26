@@ -7,6 +7,7 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
+import { LessonAIQuizModal } from "./LessonAIQuizModal";
 import {
   GripIcon,
   VideoIcon,
@@ -137,9 +138,10 @@ function LessonTypeIcon({ type }: { type: LessonType }) {
 interface LessonRowProps {
   lesson: Lesson;
   onDelete: () => void;
+  onGenerateQuiz: () => void;
 }
 
-function LessonRow({ lesson, onDelete }: LessonRowProps) {
+function LessonRow({ lesson, onDelete, onGenerateQuiz }: LessonRowProps) {
   return (
     <div className="group flex items-center gap-3 px-4 py-3 hover:bg-[#FAFAFE] transition-colors duration-100 border-b border-[#F4F4FA] last:border-0">
       {/* Drag handle */}
@@ -154,6 +156,16 @@ function LessonRow({ lesson, onDelete }: LessonRowProps) {
       <p className="flex-1 text-[13px] text-[#1A1A2E] font-medium truncate min-w-0">
         {lesson.title}
       </p>
+
+      {/* 🪄 Generate Quiz button (Section 2.2) */}
+      <button
+        type="button"
+        onClick={onGenerateQuiz}
+        className="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-[#6B6BFF] text-[#5153DF] hover:text-white border border-indigo-200 hover:border-transparent text-[11px] font-extrabold transition-all shadow-xs shrink-0 flex items-center gap-1 cursor-pointer"
+        title="AI analysis of lesson transcript to auto-generate multiple choice rubric"
+      >
+        <span>🪄 Generate Quiz</span>
+      </button>
 
       {/* Duration */}
       <span className="flex items-center gap-1 text-[11px] text-[#9090B0] shrink-0 font-mono">
@@ -194,9 +206,10 @@ interface ChapterCardProps {
   onAddLesson: () => void;
   onDeleteLesson: (lessonId: string) => void;
   onDelete: () => void;
+  onGenerateQuiz: (lessonTitle: string) => void;
 }
 
-function ChapterCard({ chapter, onToggle, onAddLesson, onDeleteLesson, onDelete }: ChapterCardProps) {
+function ChapterCard({ chapter, onToggle, onAddLesson, onDeleteLesson, onDelete, onGenerateQuiz }: ChapterCardProps) {
   return (
     <div className="rounded-2xl border border-[#EAEAF4] bg-white shadow-[0_2px_10px_rgba(0,0,0,0.04)] overflow-hidden">
       {/* Chapter header */}
@@ -252,6 +265,7 @@ function ChapterCard({ chapter, onToggle, onAddLesson, onDeleteLesson, onDelete 
               key={lesson.id}
               lesson={lesson}
               onDelete={() => onDeleteLesson(lesson.id)}
+              onGenerateQuiz={() => onGenerateQuiz(lesson.title)}
             />
           ))}
 
@@ -502,6 +516,7 @@ function ChatFAB() {
 export function LessonManagementContainer() {
   const [chapters, setChapters] = useState<Chapter[]>(INITIAL_CHAPTERS);
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
+  const [activeQuizLesson, setActiveQuizLesson] = useState<string | null>(null);
 
   // ── Derived stats ───────────────────────────────────────────────────────────
   const allLessons   = totalLessons(chapters);
@@ -635,6 +650,7 @@ export function LessonManagementContainer() {
                 onAddLesson={() => addLesson(chapter.id)}
                 onDeleteLesson={(lid) => deleteLesson(chapter.id, lid)}
                 onDelete={() => deleteChapter(chapter.id)}
+                onGenerateQuiz={(title) => setActiveQuizLesson(title)}
               />
             ))}
 
@@ -647,7 +663,7 @@ export function LessonManagementContainer() {
 
           {/* AI Assist */}
           <AIAssistCard
-            onQuizGenerate={() => alert("Đang sinh câu hỏi Quiz...")}
+            onQuizGenerate={() => setActiveQuizLesson("Toàn bộ khóa học (General Rubric)")}
             onSuggestChapter={() => addChapter()}
           />
 
@@ -658,6 +674,13 @@ export function LessonManagementContainer() {
 
       <PageFooter />
       <ChatFAB />
+
+      {/* Rapid Review Modal (Section 2.2) */}
+      <LessonAIQuizModal
+        isOpen={!!activeQuizLesson}
+        lessonTitle={activeQuizLesson || ""}
+        onClose={() => setActiveQuizLesson(null)}
+      />
     </div>
   );
 }

@@ -1,45 +1,15 @@
 "use client";
 
-// ─── Step2CourseStructure ──────────────────────────────────────────────────────
-// Step 2: Drag-and-drop course structure builder with chapters and lessons.
-
-import {
-  useState,
-  useCallback,
-  useRef,
-  type DragEvent,
-  type KeyboardEvent,
-} from "react";
+import React, { useState, useCallback, useRef, type DragEvent, type KeyboardEvent } from "react";
 import { twMerge } from "tailwind-merge";
+import { useCourseStructure, type CoursePublishStatus, type LessonType, type ChapterNode, type LessonNode } from "@/src/hooks/instructor/useCourseStructure";
+import { useVideoProcessing, type VideoItem } from "@/src/hooks/instructor/useVideoProcessing";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export type LessonType = "video" | "quiz" | "document";
-
-export interface Lesson {
-  id: string;
-  title: string;
-  type: LessonType;
-}
-
-export interface Chapter {
-  id: string;
-  title: string;
-  lessons: Lesson[];
-  showAiSuggestion?: boolean;
-}
-
-// ─── Icons ────────────────────────────────────────────────────────────────────
+// ─── SVG Icons ────────────────────────────────────────────────────────────────
 
 function GripIcon({ size = 16 }: { size?: number }) {
   return (
-    <svg
-      aria-hidden
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-    >
+    <svg aria-hidden width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
       <circle cx="9" cy="6" r="1.5" />
       <circle cx="15" cy="6" r="1.5" />
       <circle cx="9" cy="12" r="1.5" />
@@ -52,17 +22,7 @@ function GripIcon({ size = 16 }: { size?: number }) {
 
 function VideoIcon({ size = 16 }: { size?: number }) {
   return (
-    <svg
-      aria-hidden
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg aria-hidden width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <polygon points="5 3 19 12 5 21 5 3" />
     </svg>
   );
@@ -70,17 +30,7 @@ function VideoIcon({ size = 16 }: { size?: number }) {
 
 function QuizIcon({ size = 16 }: { size?: number }) {
   return (
-    <svg
-      aria-hidden
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg aria-hidden width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <rect x="9" y="2" width="13" height="4" rx="1" />
       <rect x="9" y="10" width="13" height="4" rx="1" />
       <rect x="9" y="18" width="13" height="4" rx="1" />
@@ -93,17 +43,7 @@ function QuizIcon({ size = 16 }: { size?: number }) {
 
 function DocIcon({ size = 16 }: { size?: number }) {
   return (
-    <svg
-      aria-hidden
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg aria-hidden width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
       <polyline points="14 2 14 8 20 8" />
       <line x1="8" y1="13" x2="16" y2="13" />
@@ -112,54 +52,9 @@ function DocIcon({ size = 16 }: { size?: number }) {
   );
 }
 
-function DotsIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg
-      aria-hidden
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-    >
-      <circle cx="12" cy="5" r="1.5" />
-      <circle cx="12" cy="12" r="1.5" />
-      <circle cx="12" cy="19" r="1.5" />
-    </svg>
-  );
-}
-
-function SparklesBigIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg
-      aria-hidden
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 2l1.6 5H19l-4.2 3 1.6 5L12 12 7.6 15l1.6-5L5 7h5.4z" />
-      <path d="M5 3l.5 1.5L7 5l-1.5.5L5 7l-.5-1.5L3 5l1.5-.5z" />
-      <path d="M19 15l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5z" />
-    </svg>
-  );
-}
-
 function PlusIcon({ size = 14 }: { size?: number }) {
   return (
-    <svg
-      aria-hidden
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-    >
+    <svg aria-hidden width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
       <line x1="12" y1="5" x2="12" y2="19" />
       <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
@@ -168,17 +63,7 @@ function PlusIcon({ size = 14 }: { size?: number }) {
 
 function TrashIcon({ size = 14 }: { size?: number }) {
   return (
-    <svg
-      aria-hidden
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg aria-hidden width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
       <polyline points="3 6 5 6 21 6" />
       <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
       <path d="M10 11v6M14 11v6" />
@@ -186,29 +71,14 @@ function TrashIcon({ size = 14 }: { size?: number }) {
   );
 }
 
-function PencilIcon({ size = 13 }: { size?: number }) {
+function UploadCloudIcon() {
   return (
-    <svg
-      aria-hidden
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+    <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21.2 15c.7-1.2 1-2.5.7-3.9-.6-2-2.4-3.5-4.4-3.5h-.5C16.3 5.3 14.3 3.6 12 3.6c-3 0-5.5 2.5-5.5 5.5v.5C4.5 9.7 3 11.6 3 13.7c0 2.5 2 4.5 4.5 4.5h13.7" />
+      <polyline points="16 16 12 12 8 16" />
+      <line x1="12" y1="12" x2="12" y2="21" />
     </svg>
   );
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function uid() {
-  return Math.random().toString(36).slice(2, 9);
 }
 
 function getLessonIcon(type: LessonType) {
@@ -223,38 +93,70 @@ function getLessonColor(type: LessonType) {
   return "text-[#D97706] bg-[#FFFBEB]";
 }
 
-// ─── Lesson Row ───────────────────────────────────────────────────────────────
+// ─── Status Badge Component (Section 1.1) ─────────────────────────────────────
+
+function CourseStatusBadge({ status, onStatusChange }: { status: CoursePublishStatus; onStatusChange: (s: CoursePublishStatus) => void }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-xs font-black text-gray-500 uppercase tracking-wider">Publish State:</span>
+      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 border border-gray-200">
+        <button
+          type="button"
+          onClick={() => onStatusChange("draft")}
+          className={twMerge(
+            "px-3 py-1 rounded-lg text-xs font-extrabold transition-all cursor-pointer",
+            status === "draft" ? "bg-gray-700 text-white shadow-sm" : "text-gray-500 hover:text-gray-900"
+          )}
+        >
+          Draft
+        </button>
+        <button
+          type="button"
+          onClick={() => onStatusChange("review")}
+          className={twMerge(
+            "px-3 py-1 rounded-lg text-xs font-extrabold transition-all cursor-pointer",
+            status === "review" ? "bg-amber-500 text-white shadow-sm" : "text-amber-700 hover:bg-amber-50"
+          )}
+        >
+          Under Review
+        </button>
+        <button
+          type="button"
+          onClick={() => onStatusChange("published")}
+          className={twMerge(
+            "px-3 py-1 rounded-lg text-xs font-extrabold transition-all cursor-pointer",
+            status === "published" ? "bg-emerald-600 text-white shadow-sm" : "text-emerald-700 hover:bg-emerald-50"
+          )}
+        >
+          Published ✓
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Lesson Row with Inline Editing & Dnd ────────────────────────────────────
 
 interface LessonRowProps {
-  lesson: Lesson;
+  lesson: LessonNode;
   chapterId: string;
   index: number;
-  onUpdate: (chapterId: string, lessonId: string, title: string) => void;
+  onUpdate: (chapterId: string, lessonId: string, updates: Partial<LessonNode>) => void;
   onDelete: (chapterId: string, lessonId: string) => void;
   onDragStart: (e: DragEvent, chapterId: string, lessonId: string) => void;
   onDrop: (e: DragEvent, chapterId: string, lessonId: string) => void;
   onDragOver: (e: DragEvent) => void;
 }
 
-function LessonRow({
-  lesson,
-  chapterId,
-  index,
-  onUpdate,
-  onDelete,
-  onDragStart,
-  onDrop,
-  onDragOver,
-}: LessonRowProps) {
+function LessonRow({ lesson, chapterId, index, onUpdate, onDelete, onDragStart, onDrop, onDragOver }: LessonRowProps) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(lesson.title);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const commitEdit = () => {
     const trimmed = draft.trim();
-    if (trimmed) onUpdate(chapterId, lesson.id, trimmed);
+    if (trimmed) onUpdate(chapterId, lesson.id, { title: trimmed });
     else setDraft(lesson.title);
     setEditing(false);
   };
@@ -281,304 +183,22 @@ function LessonRow({
       }}
       onDragLeave={() => setIsDragOver(false)}
       className={twMerge(
-        "group flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-150",
+        "group flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border transition-all duration-150 select-none",
         isDragOver
-          ? "border-[#6B6BFF] bg-[#F0F0FF] shadow-[0_0_0_2px_rgba(107,107,255,0.15)]"
-          : "border-[#EAEAF4] bg-white hover:border-[#D5D5FF] hover:bg-[#FAFAFE]",
+          ? "border-[#6B6BFF] bg-[#F0F0FF] shadow-[0_0_0_2px_rgba(107,107,255,0.2)]"
+          : "border-[#EAEAF4] bg-white hover:border-[#D5D5FF] hover:bg-[#FAFAFE]"
       )}
     >
-      {/* Drag handle */}
-      <span className="text-[#C8C8E0] group-hover:text-[#9090B0] cursor-grab active:cursor-grabbing transition-colors shrink-0">
-        <GripIcon size={14} />
-      </span>
-
-      {/* Type badge */}
-      <span
-        className={twMerge(
-          "shrink-0 w-6 h-6 rounded-md flex items-center justify-center",
-          getLessonColor(lesson.type),
-        )}
-      >
-        {getLessonIcon(lesson.type)}
-      </span>
-
-      {/* Title / Edit */}
-      <div className="flex-1 min-w-0">
-        {editing ? (
-          <input
-            ref={inputRef}
-            autoFocus
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onBlur={commitEdit}
-            onKeyDown={handleKeyDown}
-            className="w-full text-sm text-[#1A1A2E] bg-transparent border-b border-[#6B6BFF] focus:outline-none pb-0.5"
-          />
-        ) : (
-          <span className="text-sm text-[#1A1A2E] truncate block">
-            {index + 1}. {lesson.title}
-          </span>
-        )}
-      </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 relative">
-        <button
-          type="button"
-          aria-label="Chỉnh sửa bài giảng"
-          onClick={() => {
-            setEditing(true);
-            setTimeout(() => inputRef.current?.focus(), 50);
-          }}
-          className="w-6 h-6 rounded-md flex items-center justify-center text-[#9090B0] hover:text-[#4648D4] hover:bg-[#EEEEFF] transition-all"
-        >
-          <PencilIcon size={13} />
-        </button>
-
-        <div className="relative">
-          <button
-            type="button"
-            aria-label="Tùy chọn thêm"
-            onClick={() => setMenuOpen((p) => !p)}
-            className="w-6 h-6 rounded-md flex items-center justify-center text-[#9090B0] hover:text-[#4648D4] hover:bg-[#EEEEFF] transition-all"
-          >
-            <DotsIcon size={14} />
-          </button>
-
-          {menuOpen && (
-            <div className="absolute right-0 top-8 z-20 w-36 bg-white border border-[#EAEAF4] rounded-xl shadow-lg py-1 animate-fadeIn">
-              <button
-                type="button"
-                onClick={() => {
-                  onDelete(chapterId, lesson.id);
-                  setMenuOpen(false);
-                }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors"
-              >
-                <TrashIcon size={13} />
-                Xóa bài giảng
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Add Lesson Button ────────────────────────────────────────────────────────
-
-interface AddLessonButtonProps {
-  chapterId: string;
-  onAdd: (chapterId: string, type: LessonType) => void;
-}
-
-function AddLessonButton({ chapterId, onAdd }: AddLessonButtonProps) {
-  const [open, setOpen] = useState(false);
-
-  const types: { type: LessonType; label: string }[] = [
-    { type: "video", label: "Video bài giảng" },
-    { type: "quiz", label: "Bài kiểm tra" },
-    { type: "document", label: "Tài liệu đọc" },
-  ];
-
-  return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((p) => !p)}
-        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-[#D5D5FF] text-[#6B6BFF] text-sm font-medium hover:border-[#6B6BFF] hover:bg-[#F5F3FF] transition-all duration-200 group"
-      >
-        <span className="group-hover:rotate-90 transition-transform duration-200">
-          <PlusIcon size={14} />
-        </span>
-        Thêm bài giảng mới
-      </button>
-
-      {open && (
-        <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setOpen(false)}
-          />
-          <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-20 w-48 bg-white border border-[#EAEAF4] rounded-xl shadow-lg py-1 animate-fadeIn">
-            {types.map(({ type, label }) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => {
-                  onAdd(chapterId, type);
-                  setOpen(false);
-                }}
-                className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-[#1A1A2E] hover:bg-[#F5F3FF] hover:text-[#4648D4] transition-colors"
-              >
-                <span
-                  className={twMerge(
-                    "w-6 h-6 rounded-md flex items-center justify-center shrink-0",
-                    getLessonColor(type),
-                  )}
-                >
-                  {getLessonIcon(type)}
-                </span>
-                {label}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-// ─── AI Suggestion Card ───────────────────────────────────────────────────────
-
-interface AiSuggestionCardProps {
-  chapterId: string;
-  onAccept: (chapterId: string) => void;
-  onDismiss: (chapterId: string) => void;
-}
-
-function AiSuggestionCard({
-  chapterId,
-  onAccept,
-  onDismiss,
-}: AiSuggestionCardProps) {
-  return (
-    <div className="relative rounded-xl border border-[#DDD8FF] bg-gradient-to-br from-[#F5F3FF] to-[#EEF0FF] p-4 overflow-hidden">
-      {/* Decorative sparkle */}
-      <div className="absolute right-4 top-3 text-[#C8C6FF] opacity-60 pointer-events-none">
-        <SparklesBigIcon size={40} />
-      </div>
-
-      <div className="flex flex-col gap-2.5">
-        {/* Header */}
-        <div className="flex items-center gap-2 text-[#6B6BFF]">
-          <span className="animate-pulse">
-            <SparklesBigIcon size={15} />
-          </span>
-          <span className="text-[13px] font-semibold">Gợi ý từ MindNova AI</span>
-        </div>
-
-        {/* Body */}
-        <p className="text-[12px] text-[#5A5A8A] leading-relaxed">
-          Dựa trên tiêu đề chương học, AI đề xuất{" "}
-          <span className="font-semibold text-[#4648D4]">3 bài giảng</span> tiếp
-          theo để tối ưu hóa lộ trình học tập của học viên.
-        </p>
-
-        {/* Actions */}
-        <div className="flex items-center gap-2 mt-1">
-          <button
-            type="button"
-            onClick={() => onAccept(chapterId)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#4648D4] text-white text-[12px] font-semibold hover:bg-[#3D40C0] shadow-[0_4px_12px_rgba(70,72,212,0.3)] hover:shadow-[0_6px_16px_rgba(70,72,212,0.4)] hover:-translate-y-0.5 transition-all duration-200"
-          >
-            <SparklesBigIcon size={12} />
-            Xem 3 gợi ý bài giảng
-          </button>
-          <button
-            type="button"
-            onClick={() => onDismiss(chapterId)}
-            className="px-3 py-2 rounded-lg text-[12px] font-medium text-[#6B6BFF] border border-[#C8C6FF] bg-white hover:bg-[#F5F3FF] transition-all duration-150"
-          >
-            Bỏ qua
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Chapter Card ─────────────────────────────────────────────────────────────
-
-interface ChapterCardProps {
-  chapter: Chapter;
-  index: number;
-  onUpdateChapterTitle: (id: string, title: string) => void;
-  onDeleteChapter: (id: string) => void;
-  onAddLesson: (chapterId: string, type: LessonType) => void;
-  onUpdateLesson: (chapterId: string, lessonId: string, title: string) => void;
-  onDeleteLesson: (chapterId: string, lessonId: string) => void;
-  onDragStartChapter: (e: DragEvent, chapterId: string) => void;
-  onDropChapter: (e: DragEvent, chapterId: string) => void;
-  onDragOver: (e: DragEvent) => void;
-  onDragStartLesson: (e: DragEvent, chapterId: string, lessonId: string) => void;
-  onDropLesson: (e: DragEvent, chapterId: string, lessonId: string) => void;
-  onAiAccept: (chapterId: string) => void;
-  onAiDismiss: (chapterId: string) => void;
-}
-
-function ChapterCard({
-  chapter,
-  index,
-  onUpdateChapterTitle,
-  onDeleteChapter,
-  onAddLesson,
-  onUpdateLesson,
-  onDeleteLesson,
-  onDragStartChapter,
-  onDropChapter,
-  onDragOver,
-  onDragStartLesson,
-  onDropLesson,
-  onAiAccept,
-  onAiDismiss,
-}: ChapterCardProps) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(chapter.title);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const commitEdit = () => {
-    const trimmed = draft.trim();
-    if (trimmed) onUpdateChapterTitle(chapter.id, trimmed);
-    else setDraft(chapter.title);
-    setEditing(false);
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") commitEdit();
-    if (e.key === "Escape") {
-      setDraft(chapter.title);
-      setEditing(false);
-    }
-  };
-
-  return (
-    <div
-      draggable
-      onDragStart={(e) => onDragStartChapter(e, chapter.id)}
-      onDrop={(e) => {
-        setIsDragOver(false);
-        onDropChapter(e, chapter.id);
-      }}
-      onDragOver={(e) => {
-        onDragOver(e);
-        setIsDragOver(true);
-      }}
-      onDragLeave={() => setIsDragOver(false)}
-      className={twMerge(
-        "rounded-2xl border transition-all duration-200",
-        isDragOver
-          ? "border-[#6B6BFF] shadow-[0_0_0_3px_rgba(107,107,255,0.15)] bg-[#F8F7FF]"
-          : "border-[#EAEAF4] bg-white shadow-[0_2px_12px_rgba(70,72,212,0.05)]",
-      )}
-    >
-      {/* Chapter header */}
-      <div className="flex items-center gap-3 px-5 py-4 group">
-        {/* Drag handle */}
-        <span className="text-[#C8C8E0] group-hover:text-[#9090B0] cursor-grab active:cursor-grabbing transition-colors shrink-0">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        <span className="text-[#C8C8E0] group-hover:text-[#6B6BFF] cursor-grab active:cursor-grabbing transition-colors shrink-0" title="Drag to reorder lesson">
           <GripIcon size={16} />
         </span>
 
-        {/* Left accent */}
-        <div className="w-1 h-8 rounded-full bg-[#4648D4] shrink-0" />
+        <span className={twMerge("shrink-0 w-8 h-8 rounded-xl flex items-center justify-center font-bold shadow-xs", getLessonColor(lesson.type))}>
+          {getLessonIcon(lesson.type)}
+        </span>
 
-        {/* Number + title */}
-        <div className="flex flex-col flex-1 min-w-0">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#9090B0]">
-            Chương {index + 1}
-          </span>
+        <div className="flex-1 min-w-0">
           {editing ? (
             <input
               ref={inputRef}
@@ -587,400 +207,384 @@ function ChapterCard({
               onChange={(e) => setDraft(e.target.value)}
               onBlur={commitEdit}
               onKeyDown={handleKeyDown}
-              className="text-base font-bold text-[#1A1A2E] bg-transparent border-b border-[#6B6BFF] focus:outline-none"
+              className="w-full text-sm font-bold text-[#1A1A2E] bg-white border-2 border-[#6B6BFF] rounded-lg px-2 py-1 focus:outline-none"
             />
           ) : (
-            <button
-              type="button"
-              onClick={() => {
-                setEditing(true);
-                setTimeout(() => inputRef.current?.focus(), 50);
-              }}
-              className="text-base font-bold text-[#1A1A2E] text-left hover:text-[#4648D4] transition-colors truncate"
-            >
-              {chapter.title}
-            </button>
+            <div className="flex items-center gap-2 truncate">
+              <span className="text-sm font-bold text-[#1A1A2E] truncate">
+                {index + 1}. {lesson.title}
+              </span>
+              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 border border-gray-200 shrink-0">
+                {lesson.type}
+              </span>
+            </div>
           )}
         </div>
+      </div>
 
-        {/* Chapter actions */}
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+      <div className="flex items-center gap-2 shrink-0">
+        {!editing && (
           <button
             type="button"
-            aria-label="Chỉnh sửa chương"
             onClick={() => {
               setEditing(true);
               setTimeout(() => inputRef.current?.focus(), 50);
             }}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9090B0] hover:text-[#4648D4] hover:bg-[#EEEEFF] transition-all"
+            className="px-2.5 py-1 text-xs font-extrabold text-[#5153DF] bg-[#EEEEFF] hover:bg-[#D5D5FF] rounded-lg transition-all"
           >
-            <PencilIcon size={13} />
+            Inline Edit
           </button>
-          <button
-            type="button"
-            aria-label="Xóa chương"
-            onClick={() => onDeleteChapter(chapter.id)}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9090B0] hover:text-red-500 hover:bg-red-50 transition-all"
-          >
-            <TrashIcon size={14} />
-          </button>
-        </div>
+        )}
+        <button
+          type="button"
+          onClick={() => onDelete(chapterId, lesson.id)}
+          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+          title="Delete Lesson"
+        >
+          <TrashIcon size={15} />
+        </button>
       </div>
-
-      {/* Lessons */}
-      {(chapter.lessons.length > 0 || chapter.showAiSuggestion) && (
-        <div className="px-5 pb-4 flex flex-col gap-2 border-t border-[#F4F4FA] pt-3">
-          {chapter.lessons.map((lesson, li) => (
-            <LessonRow
-              key={lesson.id}
-              lesson={lesson}
-              chapterId={chapter.id}
-              index={li}
-              onUpdate={onUpdateLesson}
-              onDelete={onDeleteLesson}
-              onDragStart={onDragStartLesson}
-              onDrop={onDropLesson}
-              onDragOver={onDragOver}
-            />
-          ))}
-
-          {/* AI suggestion */}
-          {chapter.showAiSuggestion && (
-            <AiSuggestionCard
-              chapterId={chapter.id}
-              onAccept={onAiAccept}
-              onDismiss={onAiDismiss}
-            />
-          )}
-
-          {/* Add lesson */}
-          <AddLessonButton chapterId={chapter.id} onAdd={onAddLesson} />
-        </div>
-      )}
-
-      {/* Add lesson when empty */}
-      {chapter.lessons.length === 0 && !chapter.showAiSuggestion && (
-        <div className="px-5 pb-4 border-t border-[#F4F4FA] pt-3">
-          <AddLessonButton chapterId={chapter.id} onAdd={onAddLesson} />
-        </div>
-      )}
     </div>
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Main Step2CourseStructure Component ──────────────────────────────────────
 
-export interface CourseStructure {
-  chapters: Chapter[];
-}
+export function Step2CourseStructure() {
+  // Integrate custom hooks (Rule #2 & #3)
+  const {
+    chapters,
+    status,
+    versionMeta,
+    canSubmitForReview,
+    validationError,
+    setStatus,
+    addChapter,
+    updateChapterTitle,
+    deleteChapter,
+    addLesson,
+    updateLesson,
+    deleteLesson,
+    moveLesson,
+    createVersionSnapshot,
+  } = useCourseStructure("draft");
 
-interface Step2CourseStructureProps {
-  data: CourseStructure;
-  onChange: (data: CourseStructure) => void;
-}
+  const { videos, isProcessingAny, uploadError, handleDropFiles, removeVideo } = useVideoProcessing();
 
+  const [dragSource, setDragSource] = useState<{ chapterId: string; lessonId: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-export function Step2CourseStructure({
-  data,
-  onChange,
-}: Step2CourseStructureProps) {
-  // Drag state
-  const dragChapter = useRef<string | null>(null);
-  const dragLesson = useRef<{ chapterId: string; lessonId: string } | null>(
-    null,
-  );
+  // Drag handlers
+  const handleDragStart = useCallback((e: DragEvent, chapterId: string, lessonId: string) => {
+    setDragSource({ chapterId, lessonId });
+  }, []);
 
-  const update = useCallback(
-    (chapters: Chapter[]) => onChange({ ...data, chapters }),
-    [data, onChange],
-  );
-
-  // ── Chapter CRUD ─────────────────────────────────────────────────────────────
-
-  const addChapter = useCallback(() => {
-    const newChapter: Chapter = {
-      id: uid(),
-      title: `Tên chương học ${data.chapters.length + 1}`,
-      lessons: [],
-      showAiSuggestion: data.chapters.length >= 1,
-    };
-    update([...data.chapters, newChapter]);
-  }, [data.chapters, update]);
-
-  const updateChapterTitle = useCallback(
-    (id: string, title: string) => {
-      update(
-        data.chapters.map((c) => (c.id === id ? { ...c, title } : c)),
-      );
-    },
-    [data.chapters, update],
-  );
-
-  const deleteChapter = useCallback(
-    (id: string) => {
-      update(data.chapters.filter((c) => c.id !== id));
-    },
-    [data.chapters, update],
-  );
-
-  // ── Lesson CRUD ───────────────────────────────────────────────────────────────
-
-  const addLesson = useCallback(
-    (chapterId: string, type: LessonType) => {
-      const chapter = data.chapters.find((c) => c.id === chapterId);
-      if (!chapter) return;
-      const newLesson: Lesson = {
-        id: uid(),
-        title: `Bài ${chapter.lessons.length + 1} - ${
-          type === "video"
-            ? "Video bài giảng"
-            : type === "quiz"
-              ? "Bài kiểm tra"
-              : "Tài liệu đọc"
-        }`,
-        type,
-      };
-      update(
-        data.chapters.map((c) =>
-          c.id === chapterId
-            ? { ...c, lessons: [...c.lessons, newLesson] }
-            : c,
-        ),
-      );
-    },
-    [data.chapters, update],
-  );
-
-  const updateLesson = useCallback(
-    (chapterId: string, lessonId: string, title: string) => {
-      update(
-        data.chapters.map((c) =>
-          c.id === chapterId
-            ? {
-                ...c,
-                lessons: c.lessons.map((l) =>
-                  l.id === lessonId ? { ...l, title } : l,
-                ),
-              }
-            : c,
-        ),
-      );
-    },
-    [data.chapters, update],
-  );
-
-  const deleteLesson = useCallback(
-    (chapterId: string, lessonId: string) => {
-      update(
-        data.chapters.map((c) =>
-          c.id === chapterId
-            ? { ...c, lessons: c.lessons.filter((l) => l.id !== lessonId) }
-            : c,
-        ),
-      );
-    },
-    [data.chapters, update],
-  );
-
-  // ── AI Actions ────────────────────────────────────────────────────────────────
-
-  const handleAiAccept = useCallback(
-    (chapterId: string) => {
-      const chapter = data.chapters.find((c) => c.id === chapterId);
-      if (!chapter) return;
-      const suggestions: Lesson[] = [
-        { id: uid(), title: "Giới thiệu tổng quan", type: "video" },
-        { id: uid(), title: "Bài tập thực hành", type: "quiz" },
-        { id: uid(), title: "Tài liệu tham khảo", type: "document" },
-      ];
-      update(
-        data.chapters.map((c) =>
-          c.id === chapterId
-            ? {
-                ...c,
-                lessons: [...c.lessons, ...suggestions],
-                showAiSuggestion: false,
-              }
-            : c,
-        ),
-      );
-    },
-    [data.chapters, update],
-  );
-
-  const handleAiDismiss = useCallback(
-    (chapterId: string) => {
-      update(
-        data.chapters.map((c) =>
-          c.id === chapterId ? { ...c, showAiSuggestion: false } : c,
-        ),
-      );
-    },
-    [data.chapters, update],
-  );
-
-  // ── Drag-and-drop: Chapters ───────────────────────────────────────────────────
-
-  const handleDragStartChapter = useCallback(
-    (e: DragEvent, chapterId: string) => {
-      dragChapter.current = chapterId;
-      dragLesson.current = null;
-      e.dataTransfer.effectAllowed = "move";
-    },
-    [],
-  );
-
-  const handleDropChapter = useCallback(
-    (e: DragEvent, targetChapterId: string) => {
-      e.preventDefault();
-      if (!dragChapter.current || dragChapter.current === targetChapterId)
-        return;
-
-      const chapters = [...data.chapters];
-      const fromIdx = chapters.findIndex((c) => c.id === dragChapter.current);
-      const toIdx = chapters.findIndex((c) => c.id === targetChapterId);
-      if (fromIdx < 0 || toIdx < 0) return;
-
-      const [moved] = chapters.splice(fromIdx, 1);
-      chapters.splice(toIdx, 0, moved);
-      dragChapter.current = null;
-      update(chapters);
-    },
-    [data.chapters, update],
-  );
-
-  // ── Drag-and-drop: Lessons ────────────────────────────────────────────────────
-
-  const handleDragStartLesson = useCallback(
-    (e: DragEvent, chapterId: string, lessonId: string) => {
-      dragLesson.current = { chapterId, lessonId };
-      dragChapter.current = null;
-      e.dataTransfer.effectAllowed = "move";
-      e.stopPropagation();
-    },
-    [],
-  );
-
-  const handleDropLesson = useCallback(
-    (e: DragEvent, targetChapterId: string, targetLessonId: string) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!dragLesson.current) return;
-
-      const { chapterId: srcChapterId, lessonId: srcLessonId } =
-        dragLesson.current;
-      if (srcChapterId === targetChapterId && srcLessonId === targetLessonId)
-        return;
-
-      const chapters = data.chapters.map((c) => ({
-        ...c,
-        lessons: [...c.lessons],
-      }));
-
-      const srcChapter = chapters.find((c) => c.id === srcChapterId);
-      const tgtChapter = chapters.find((c) => c.id === targetChapterId);
-      if (!srcChapter || !tgtChapter) return;
-
-      const srcIdx = srcChapter.lessons.findIndex((l) => l.id === srcLessonId);
-      if (srcIdx < 0) return;
-
-      const [movedLesson] = srcChapter.lessons.splice(srcIdx, 1);
-
-      if (srcChapterId === targetChapterId) {
-        const tgtIdx = srcChapter.lessons.findIndex(
-          (l) => l.id === targetLessonId,
-        );
-        srcChapter.lessons.splice(tgtIdx, 0, movedLesson);
-      } else {
-        const tgtIdx = tgtChapter.lessons.findIndex(
-          (l) => l.id === targetLessonId,
-        );
-        tgtChapter.lessons.splice(tgtIdx, 0, movedLesson);
-      }
-
-      dragLesson.current = null;
-      update(chapters);
-    },
-    [data.chapters, update],
-  );
+  const handleDrop = useCallback((e: DragEvent, targetChapterId: string, targetLessonId: string) => {
+    e.preventDefault();
+    if (!dragSource) return;
+    moveLesson(dragSource.chapterId, targetChapterId, dragSource.lessonId);
+    setDragSource(null);
+  }, [dragSource, moveLesson]);
 
   const handleDragOver = useCallback((e: DragEvent) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
   }, []);
 
-  // ─────────────────────────────────────────────────────────────────────────────
+  const onDropZone = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.dataTransfer.files.length > 0) {
+      handleDropFiles(e.dataTransfer.files);
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Header row */}
-      <div className="flex items-start justify-between gap-4">
+    <div className="w-full flex flex-col gap-10">
+      {/* Top Banner: Status Indicators & Version Control (Section 1.1) */}
+      <div className="w-full p-6 rounded-3xl bg-white border border-[#EAEAF4] shadow-[0_8px_30px_rgba(0,0,0,0.02)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-extrabold text-[#1A1A2E] tracking-tight">
-            Cấu trúc Nội dung:{" "}
-            <span className="text-[#4648D4]">Kéo thả</span>
-          </h2>
-          <p className="text-sm text-[#9090B0] mt-0.5">
-            Tổ chức các chương học và bài giảng một cách trực quan.
+          <div className="flex items-center gap-3">
+            <h3 className="text-lg font-extrabold text-[#1A1A2E]">Curriculum Architecture Builder</h3>
+            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#F0F0FF] text-[#5153DF] border border-[#D5D5FF]">
+              {versionMeta.version}
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Drag and drop lessons across chapters effortlessly. Publish state requires $\ge 1$ chapter and $\ge 1$ lesson.
           </p>
         </div>
 
-        <button
-          type="button"
-          id="btn-add-chapter"
-          onClick={addChapter}
-          className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#4648D4] hover:bg-[#3D40C0] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40"
-        >
-          <PlusIcon size={14} />
-          Thêm Chương mới
-        </button>
-      </div>
-
-      {/* Chapter list */}
-      <div className="flex flex-col gap-4">
-        {data.chapters.length === 0 ? (
-          /* Empty state */
-          <div className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-[#D5D5FF] rounded-2xl bg-[#FAFAFE]">
-            <div className="w-14 h-14 rounded-2xl bg-[#EEEEFF] flex items-center justify-center mb-4 text-[#6B6BFF]">
-              <SparklesBigIcon size={28} />
-            </div>
-            <p className="text-base font-semibold text-[#1A1A2E]">
-              Chưa có chương học nào
-            </p>
-            <p className="text-sm text-[#9090B0] mt-1 max-w-xs">
-              Nhấn &quot;Thêm Chương mới&quot; để bắt đầu xây dựng cấu trúc
-              khóa học của bạn.
-            </p>
+        <div className="flex flex-wrap items-center gap-4">
+          <CourseStatusBadge status={status} onStatusChange={setStatus} />
+          {status === "published" && (
             <button
               type="button"
-              onClick={addChapter}
-              className="mt-5 flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-[#4648D4] border-2 border-[#C5C6FF] hover:bg-[#F0F0FF] transition-all duration-200"
+              onClick={createVersionSnapshot}
+              className="px-4 py-2 bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] text-white rounded-xl text-xs font-extrabold shadow-md hover:opacity-95 transition-all"
             >
-              <PlusIcon size={14} />
-              Thêm chương đầu tiên
+              ⚡ Publish Version Update
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Validation Error Gate Notice */}
+      {validationError && (
+        <div className="p-4 rounded-2xl bg-red-50 border-2 border-red-200 text-red-700 font-bold text-sm flex items-center gap-3">
+          <span className="text-xl">🛑</span>
+          <span>{validationError}</span>
+        </div>
+      )}
+
+      {/* Bulk Video Uploader & Asynchronous Processing Zone (Section 1.2) */}
+      <div className="w-full flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h4 className="text-base font-extrabold text-[#1A1A2E] flex items-center gap-2">
+            <span>🎬 Bulk Video Uploader (MP4, MOV)</span>
+            {isProcessingAny && (
+              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">
+                ⚙️ Asynchronous processing active in background
+              </span>
+            )}
+          </h4>
+          <span className="text-xs text-gray-500 font-semibold">
+            Instructors can leave this page while backend transcoding continues!
+          </span>
+        </div>
+
+        {uploadError && (
+          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
+            ⚠️ {uploadError}
+          </div>
+        )}
+
+        {/* Large Dropzone Area */}
+        <div
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={onDropZone}
+          onClick={() => fileInputRef.current?.click()}
+          className="w-full p-10 rounded-3xl border-2 border-dashed border-[#B0B0E0] bg-[#F8F9FF] hover:bg-[#F0F2FF] hover:border-[#6B6BFF] cursor-pointer transition-all flex flex-col items-center justify-center text-center group"
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="video/mp4,video/quicktime,.mp4,.mov"
+            className="hidden"
+            onChange={(e) => e.target.files && handleDropFiles(e.target.files)}
+          />
+          <div className="text-[#6B6BFF] group-hover:scale-110 transition-transform mb-3">
+            <UploadCloudIcon />
+          </div>
+          <h5 className="text-base font-bold text-[#1A1A2E]">Drag &amp; drop MP4 or MOV video streams here</h5>
+          <p className="text-xs font-medium text-gray-500 max-w-md mt-1">
+            System automatically manages raw stream compression, transcoding to multiple resolutions (<strong className="text-[#5153DF]">1080p, 720p, 480p</strong>), and background thumbnail generation.
+          </p>
+          <button
+            type="button"
+            className="mt-4 px-5 py-2.5 rounded-xl bg-[#1A1A2E] text-white text-xs font-extrabold shadow-md group-hover:bg-[#4648D4] transition-colors"
+          >
+            Select Bulk Files
+          </button>
+        </div>
+
+        {/* Processing State Queue Visualizer */}
+        {videos.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+            {videos.map((vid: VideoItem) => (
+              <div key={vid.id} className="p-5 rounded-2xl bg-white border border-[#EAEAF4] shadow-xs flex flex-col justify-between gap-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xs shrink-0">
+                      {vid.format.toUpperCase()}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-[#1A1A2E] truncate" title={vid.fileName}>{vid.fileName}</p>
+                      <p className="text-[11px] font-semibold text-gray-400">{vid.fileSizeMb} MB • Transcode Target: 1080p / 720p / 480p</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeVideo(vid.id)}
+                    className="text-gray-400 hover:text-red-500 font-black text-sm transition-colors"
+                    title="Remove from processing queue"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Progress Bar & Status Tag */}
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between text-xs font-bold">
+                    <span className={vid.stage === "ready" ? "text-emerald-600" : "text-[#5153DF]"}>{vid.stageLabel}</span>
+                    <span>{vid.stage === "ready" ? "100%" : `${vid.uploadProgress}%`}</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
+                    <div
+                      className={twMerge(
+                        "h-full transition-all duration-300 rounded-full",
+                        vid.stage === "ready" ? "bg-emerald-500" : "bg-gradient-to-r from-[#6B6BFF] to-[#F368E0] animate-pulse"
+                      )}
+                      style={{ width: `${vid.stage === "ready" ? 100 : Math.max(10, vid.uploadProgress)}%` }}
+                    />
+                  </div>
+                  {vid.resolutions.length > 0 && (
+                    <div className="flex items-center gap-1.5 pt-1">
+                      <span className="text-[10px] font-extrabold text-gray-400 uppercase">Available Streams:</span>
+                      {vid.resolutions.map((res) => (
+                        <span key={res} className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold">
+                          ✓ {res}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Chapters & Lessons Visual Tree Builder */}
+      <div className="w-full flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-base font-extrabold text-[#1A1A2E]">Curriculum Modules ({chapters.length})</h4>
+            <p className="text-xs text-gray-500">Each module represents an architectural milestone in the syllabus.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => addChapter(`Module ${chapters.length + 1}: Advanced Technical Application`)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#4648D4] text-white text-xs font-extrabold shadow-md hover:bg-[#3B3DB8] transition-all"
+          >
+            <PlusIcon size={14} />
+            <span>Add New Module</span>
+          </button>
+        </div>
+
+        {chapters.length === 0 ? (
+          <div className="p-16 rounded-3xl bg-[#F8F9FF] border border-dashed border-gray-300 text-center flex flex-col items-center gap-3 text-gray-500">
+            <span className="text-4xl">📚</span>
+            <p className="text-sm font-bold text-[#1A1A2E]">Your curriculum tree is empty.</p>
+            <p className="text-xs max-w-sm">Remember: A course must contain at least one chapter and one lesson before submitting for review.</p>
+            <button
+              type="button"
+              onClick={() => addChapter("Module 1: Architecture Foundations")}
+              className="mt-2 px-6 py-2.5 bg-[#6B6BFF] text-white text-xs font-extrabold rounded-xl shadow-md"
+            >
+              + Create First Chapter
             </button>
           </div>
         ) : (
-          data.chapters.map((chapter, index) => (
-            <ChapterCard
-              key={chapter.id}
-              chapter={chapter}
-              index={index}
-              onUpdateChapterTitle={updateChapterTitle}
-              onDeleteChapter={deleteChapter}
-              onAddLesson={addLesson}
-              onUpdateLesson={updateLesson}
-              onDeleteLesson={deleteLesson}
-              onDragStartChapter={handleDragStartChapter}
-              onDropChapter={handleDropChapter}
-              onDragOver={handleDragOver}
-              onDragStartLesson={handleDragStartLesson}
-              onDropLesson={handleDropLesson}
-              onAiAccept={handleAiAccept}
-              onAiDismiss={handleAiDismiss}
-            />
-          ))
+          <div className="flex flex-col gap-6">
+            {chapters.map((chap: ChapterNode, cIndex: number) => (
+              <div key={chap.id} className="p-6 rounded-3xl bg-white border border-[#EAEAF4] shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col gap-5">
+                {/* Chapter Header */}
+                <div className="flex items-center justify-between border-b border-gray-100 pb-4 gap-4">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <span className="w-8 h-8 rounded-xl bg-[#1A1A2E] text-white flex items-center justify-center font-extrabold text-xs shrink-0">
+                      {cIndex + 1}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <input
+                        type="text"
+                        value={chap.title}
+                        onChange={(e) => updateChapterTitle(chap.id, e.target.value)}
+                        className="w-full text-base font-extrabold text-[#1A1A2E] bg-transparent focus:outline-none focus:border-b-2 focus:border-[#6B6BFF] transition-colors truncate"
+                        placeholder="Chapter Title..."
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => addLesson(chap.id, `Lesson ${chap.lessons.length + 1}: Deep-Dive Walkthrough`, "video")}
+                      className="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-extrabold transition-all"
+                    >
+                      + Add Video Lesson
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => addLesson(chap.id, `Practice Quiz #${chap.lessons.length + 1}`, "quiz")}
+                      className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-extrabold transition-all"
+                    >
+                      + Add Quiz
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteChapter(chap.id)}
+                      className="p-1.5 text-gray-400 hover:text-red-500 transition-all"
+                      title="Delete Module"
+                    >
+                      <TrashIcon size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Lessons List in Chapter */}
+                <div className="flex flex-col gap-3 min-h-[50px] rounded-2xl p-2 bg-[#FAF8FF] border border-indigo-100/40">
+                  {chap.lessons.length === 0 ? (
+                    <p className="text-center text-xs font-bold text-gray-400 py-6">
+                      No lessons in this module yet. Click <strong className="text-indigo-600">+ Add Video Lesson</strong> to expand curriculum.
+                    </p>
+                  ) : (
+                    chap.lessons.map((les: LessonNode, lIndex: number) => (
+                      <LessonRow
+                        key={les.id}
+                        lesson={les}
+                        chapterId={chap.id}
+                        index={lIndex}
+                        onUpdate={updateLesson}
+                        onDelete={deleteLesson}
+                        onDragStart={handleDragStart}
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}
+                      />
+                    ))
+                  )}
+                </div>
+
+                {/* AI Co-Creator Quick Action Tag (Section 2.2 preview link) */}
+                <div className="flex items-center justify-between pt-2 text-[11px] font-bold text-gray-400">
+                  <span className="flex items-center gap-1 text-indigo-500">
+                    ✨ AI Co-Creator: Ready to evaluate video transcripts &amp; auto-generate diagnostic quiz rubrics for this module.
+                  </span>
+                  <span>{chap.lessons.length} total lessons configured</span>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
+      </div>
+
+      {/* Bottom Gate Indicator & Review Submission */}
+      <div className="p-6 rounded-3xl bg-[#1A1A2E] text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">{canSubmitForReview ? "🟢" : "⚠️"}</span>
+          <div>
+            <h4 className="text-sm font-extrabold text-white">Review Submission Readiness Gate</h4>
+            <p className="text-xs text-gray-400">
+              {canSubmitForReview
+                ? "✓ All required bounds met. Curriculum structure is locked and prepared for admin review."
+                : "Requirement pending: Add at least 1 chapter and 1 lesson to unlock submission."}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          disabled={!canSubmitForReview}
+          onClick={() => {
+            if (canSubmitForReview) setStatus("review");
+          }}
+          className={twMerge(
+            "px-6 py-3 rounded-2xl text-xs font-black tracking-wider uppercase transition-all shrink-0",
+            canSubmitForReview
+              ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg hover:shadow-emerald-500/30 cursor-pointer hover:scale-105"
+              : "bg-gray-700 text-gray-400 cursor-not-allowed"
+          )}
+        >
+          Submit For Review ➔
+        </button>
       </div>
     </div>
   );
