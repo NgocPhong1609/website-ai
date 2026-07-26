@@ -2,22 +2,28 @@
 
 namespace App\Models;
 
-use App\Models\Notification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'google_id', 'avatar_url', 'status'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'google_id', 'avatar_url', 'status', 'last_login_at', 'is_locked'
+        'name',
+        'email',
+        'password',
+        'google_id',
+        'avatar_url',
+        'status',
+        'last_login_at',
+        'is_locked',
+        'role',
     ];
 
     protected $hidden = [
@@ -62,43 +68,32 @@ class User extends Authenticatable
         return $this->hasMany(AdminLog::class, 'admin_id');
     }
 
-    public function roles(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user');
     }
 
-    // Quan hệ với bảng Subscriptions (Một - Nhiều)
-    public function subscriptions(): HasMany
+    public function profile(): HasOne
     {
-        return $this->hasMany(Subscription::class);
+        return $this->hasOne(UserProfile::class);
     }
 
-    // Quan hệ với bảng Payments (Một - Nhiều)
-    public function payments(): HasMany
+    public function hasRole(string $roleName): bool
     {
-        return $this->hasMany(Payment::class);
+        return $this->roles()->where('name', $roleName)->exists();
     }
 
-    // Quan hệ với bảng Notifications (Một - Nhiều)
-    public function notifications(): HasMany
-    {
-        return $this->hasMany(Notification::class);
-    }
-
-    // Hàm phụ trợ kiểm tra quyền nhanh
-    public function hasRole($roleName)
-    {
-        return $this->roles()->where('name', 'teacher')->exists();
-    }
-
-    // Kiểm tra xem người dùng có quyền admin không
     public function isAdmin(): bool
     {
-        return $this->hasRole('admin');
+        return $this->hasRole('admin') || $this->role === 'admin';
     }
 
     public function getRoleAttribute(): ?string
     {
-        return $this->roles->pluck('name')->first();
+        if ($this->relationLoaded('roles')) {
+            return $this->roles->pluck('name')->first() ?? $this->attributes['role'] ?? null;
+        }
+
+        return $this->roles()->value('name') ?? $this->attributes['role'] ?? null;
     }
 }

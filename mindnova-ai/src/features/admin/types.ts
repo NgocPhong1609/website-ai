@@ -17,9 +17,11 @@ export type AdminHealthItem = {
 };
 
 export type AdminUserRow = {
+  id: number;
   name: string;
   role: string;
   status: string;
+  isLocked?: boolean;
 };
 
 export type AdminUsersPageData = {
@@ -32,10 +34,17 @@ export type AdminUsersPageData = {
 };
 
 export type AdminCourseRow = {
-  name: string;
-  learners: number;
-  progress: string;
+  id: number;
+  title: string;
+  category: string;
+  level: string;
+  price: number;
   status: string;
+};
+
+export type AdminCourseFilterOption = {
+  id: number;
+  name: string;
 };
 
 export type AdminCoursesPageData = {
@@ -44,7 +53,40 @@ export type AdminCoursesPageData = {
     draft: number;
     pendingReview: number;
   };
+  filters: {
+    search: string;
+    categoryId: string;
+    level: string;
+    categories: AdminCourseFilterOption[];
+  };
   rows: AdminCourseRow[];
+};
+
+export type AdminCategoryRow = {
+  id: number;
+  name: string;
+  slug: string;
+  status: string;
+};
+
+export type AdminCategoriesPageData = {
+  rows: AdminCategoryRow[];
+};
+
+export type AdminInvoiceRow = {
+  id: number;
+  transactionId: string;
+  courseTitle: string;
+  studentName: string;
+  studentEmail: string;
+  totalAmount: number;
+  paymentMethod: string;
+  status: string;
+  createdAt: string;
+};
+
+export type AdminInvoicesPageData = {
+  rows: AdminInvoiceRow[];
 };
 
 export type AdminOverviewData = {

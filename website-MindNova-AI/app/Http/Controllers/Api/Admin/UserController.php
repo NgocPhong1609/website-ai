@@ -12,21 +12,21 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    // 1. Lấy danh sách toàn bộ người dùng (Có phân trang)
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        // Có thể thêm tính năng tìm kiếm theo tên hoặc email
-        $query = User::with(['profile', 'roles']);
+        $query = User::with(['roles']);
 
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
+        if ($request->filled('search')) {
+            $keyword = trim((string) $request->string('search'));
+            $query->where(function ($subQuery) use ($keyword): void {
+                $subQuery->where('name', 'like', '%' . $keyword . '%')
+                    ->orWhere('email', 'like', '%' . $keyword . '%');
+            });
         }
 
-        // Trả về danh sách, mỗi trang 10 người
-        $users = $query->paginate(10);
+        $users = $query->latest()->paginate(10);
 
-        return response()->json($users, 200);
+        return response()->json($users);
     }
 
     public function store(Request $request): JsonResponse
@@ -36,7 +36,7 @@ class UserController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8'],
             'role' => ['nullable', 'string', 'in:student,teacher,admin'],
-            'status' => ['nullable', 'string', 'max:50'],
+            'status' => ['nullable', 'in:active,banned'],
             'is_locked' => ['nullable', 'boolean'],
         ]);
 
@@ -44,6 +44,7 @@ class UserController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'role' => $data['role'] ?? 'student',
             'status' => $data['status'] ?? 'active',
             'is_locked' => $data['is_locked'] ?? false,
         ]);
@@ -61,36 +62,35 @@ class UserController extends Controller
         ], 201);
     }
 
-    // 2. Khóa / Mở khóa tài khoản người dùng
-    public function toggleStatus($id)
+    public function toggleStatus(int $id): JsonResponse
     {
         $user = User::findOrFail($id);
 
-        // Không cho phép Admin tự khóa chính mình
         if (Auth::id() == $user->id) {
             return response()->json(['message' => 'Không thể tự khóa tài khoản của mình!'], 403);
         }
 
-        $user->status = $user->status === 'active' ? 'banned' : 'active';
+        $isBanned = $user->status === 'active';
+        $user->status = $isBanned ? 'banned' : 'active';
+        $user->is_locked = $isBanned;
         $user->save();
 
         return response()->json([
             'message' => 'Đã thay đổi trạng thái tài khoản thành ' . $user->status,
-            'user' => $user
-        ], 200);
+            'data' => $user,
+        ]);
     }
 
-    // 3. Xóa người dùng (Tùy chọn)
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         $user = User::findOrFail($id);
 
-        if (Auth::d() == $user->id) {
+        if (Auth::id() == $user->id) {
             return response()->json(['message' => 'Không thể tự xóa chính mình!'], 403);
         }
 
-        $user->delete(); // Sẽ thực hiện Soft Delete vì bạn đã cấu hình trong DB
+        $user->delete();
 
-        return response()->json(['message' => 'Xóa người dùng thành công'], 200);
+        return response()->json(['message' => 'Xóa người dùng thành công']);
     }
 }

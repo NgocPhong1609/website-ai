@@ -180,6 +180,9 @@ export function LoginForm() {
 
       if (token) {
         window.localStorage.setItem("accessToken", token);
+
+        const maxAge = values.rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 8;
+        document.cookie = `accessToken=${encodeURIComponent(token)}; path=/; max-age=${maxAge}; samesite=lax`;
       }
 
       setStatusMessage("Đăng nhập thành công. Đang chuyển hướng...");
@@ -189,7 +192,7 @@ export function LoginForm() {
     } finally {
       setIsLoading(false);
     }
-  }, [values.email, values.password]);
+  }, [values.email, values.password, values.rememberMe]);
 
   const togglePassword = useCallback(() => setShowPassword((v) => !v), []);
 
