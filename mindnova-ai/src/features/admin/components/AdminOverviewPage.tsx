@@ -10,7 +10,7 @@ export async function AdminOverviewPage() {
   const data = await getAdminOverviewData();
 
   return (
-    <div className="space-y-6 p-6 lg:p-8">
+    <div className="space-y-6 p-6 lg:p-8 [font-family:var(--font-admin-body)]">
       <AdminHeroBanner hero={data.hero} />
       <AdminStatsGrid stats={data.stats} />
 

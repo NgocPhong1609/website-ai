@@ -4,6 +4,11 @@ import { useState } from "react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
+type CategoryOption = {
+  id: number;
+  name: string;
+};
+
 function readStoredToken(): string {
   const cookieValue = document.cookie
     .split("; ")
@@ -25,13 +30,20 @@ function getAuthHeaders(): Record<string, string> {
   };
 }
 
-export function AdminCoursesQuickActions() {
+interface AdminCoursesQuickActionsProps {
+  categories: CategoryOption[];
+}
+
+export function AdminCoursesQuickActions({ categories }: AdminCoursesQuickActionsProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "",
     description: "",
+    category_id: "",
+    price: "0",
+    level: "beginner",
     status: "draft",
   });
 
@@ -47,8 +59,8 @@ export function AdminCoursesQuickActions() {
         credentials: "include",
         body: JSON.stringify({
           ...form,
-          is_published: form.status === "published",
-          published_at: form.status === "published" ? new Date().toISOString() : null,
+          category_id: form.category_id ? Number(form.category_id) : null,
+          price: Number(form.price || 0),
         }),
       });
 
@@ -64,7 +76,14 @@ export function AdminCoursesQuickActions() {
 
       setStatus("Tạo khóa học thành công.");
       setIsFormOpen(false);
-      setForm({ title: "", description: "", status: "draft" });
+      setForm({
+        title: "",
+        description: "",
+        category_id: "",
+        price: "0",
+        level: "beginner",
+        status: "draft",
+      });
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Tạo khóa học thất bại.");
     } finally {
@@ -79,7 +98,7 @@ export function AdminCoursesQuickActions() {
         onClick={() => setIsFormOpen((current) => !current)}
         className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-violet-700 transition hover:bg-slate-100"
       >
-        + Create course
+        + Tạo khóa học
       </button>
 
       {isFormOpen && (
@@ -111,10 +130,51 @@ export function AdminCoursesQuickActions() {
                 onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-violet-500"
               >
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="archived">Archived</option>
+                <option value="draft">Bản nháp</option>
+                <option value="published">Đã xuất bản</option>
+                <option value="archived">Đã lưu trữ</option>
               </select>
+            </label>
+
+            <label className="space-y-1 text-sm text-slate-700">
+              <span className="font-medium">Danh mục</span>
+              <select
+                value={form.category_id}
+                onChange={(event) => setForm((current) => ({ ...current, category_id: event.target.value }))}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-violet-500"
+              >
+                <option value="">Chưa phân loại</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-1 text-sm text-slate-700">
+              <span className="font-medium">Cấp độ</span>
+              <select
+                value={form.level}
+                onChange={(event) => setForm((current) => ({ ...current, level: event.target.value }))}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-violet-500"
+              >
+                <option value="beginner">Cơ bản</option>
+                <option value="intermediate">Trung cấp</option>
+                <option value="advanced">Nâng cao</option>
+              </select>
+            </label>
+
+            <label className="space-y-1 text-sm text-slate-700">
+              <span className="font-medium">Giá</span>
+              <input
+                value={form.price}
+                onChange={(event) => setForm((current) => ({ ...current, price: event.target.value }))}
+                placeholder="0"
+                type="number"
+                min="0"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-violet-500"
+              />
             </label>
 
             <label className="space-y-1 text-sm text-slate-700 md:col-span-2">

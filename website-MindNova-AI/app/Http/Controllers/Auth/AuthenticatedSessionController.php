@@ -29,9 +29,14 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = $request->user();
-        $destination = $user?->isAdmin() ? route('admin.dashboard', absolute: false) : route('client.dashboard', absolute: false);
 
-        return redirect()->intended($destination);
+        if ($user?->isAdmin()) {
+            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/');
+
+            return redirect()->away($frontendUrl . '/admin');
+        }
+
+        return redirect()->intended(route('client.dashboard', absolute: false));
     }
 
     /**
