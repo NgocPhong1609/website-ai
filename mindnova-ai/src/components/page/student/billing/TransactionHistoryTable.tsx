@@ -5,6 +5,7 @@ import { twMerge } from "tailwind-merge";
 import { TRANSACTIONS, FILTER_PERIODS } from "./constants";
 import type { Transaction, TransactionStatus, FilterPeriod } from "./types";
 import { DownloadIcon, FilterIcon, ChevronDownSmall } from "./icons";
+import { useRefundRequest } from "@/src/hooks/useRefundRequest";
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
@@ -103,6 +104,31 @@ function FilterDropdown({ value, onChange }: FilterDropdownProps) {
 
 // ─── Transaction Row ──────────────────────────────────────────────────────────
 
+function RefundButton({ purchasedAt, courseProgress }: { purchasedAt: string; courseProgress: number }) {
+  const { refundResult, isProcessing, requestRefund } = useRefundRequest({ purchasedAt, courseProgress });
+
+  if (refundResult) {
+    const isApproved = refundResult.status === "AUTO_APPROVED";
+    return (
+      <div className={`text-[10px] font-semibold px-2 py-1 rounded-lg border ${isApproved ? "text-emerald-600 bg-emerald-50 border-emerald-200" : "text-amber-600 bg-amber-50 border-amber-200"}`}>
+        {isApproved ? "✓ Auto-Approved" : "⚑ Manual Review"}
+        <p className="font-mono text-[9px] opacity-70 mt-0.5">{refundResult.ticketId}</p>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={requestRefund}
+      disabled={isProcessing}
+      className="text-xs font-semibold text-[#9090B0] hover:text-[#1A1A2E] disabled:opacity-50 transition-colors duration-150"
+    >
+      {isProcessing ? "Processing..." : "Refund"}
+    </button>
+  );
+}
+
 function TransactionRow({ tx }: { tx: Transaction }) {
   return (
     <tr className="group hover:bg-[#F8F8FC] transition-colors duration-100">
@@ -120,9 +146,12 @@ function TransactionRow({ tx }: { tx: Transaction }) {
       <td className="px-4 py-3.5">
         <div className="flex items-center gap-2.5">
           <ServiceIcon icon={tx.serviceIcon} />
-          <span className="text-xs font-medium text-[#1A1A2E] leading-snug">
-            {tx.service}
-          </span>
+          <div>
+            <span className="text-xs font-medium text-[#1A1A2E] leading-snug">{tx.service}</span>
+            {tx.canRefund && tx.status === "Paid" && (
+              <p className="text-[10px] text-[#A0A0C0]">Progress: {tx.courseProgress}%</p>
+            )}
+          </div>
         </div>
       </td>
 
@@ -146,13 +175,8 @@ function TransactionRow({ tx }: { tx: Transaction }) {
             <DownloadIcon size={12} />
             Invoice
           </button>
-          {tx.canRefund && (
-            <button
-              type="button"
-              className="text-xs font-semibold text-[#9090B0] hover:text-[#1A1A2E] transition-colors duration-150"
-            >
-              Refund
-            </button>
+          {tx.canRefund && tx.status === "Paid" && (
+            <RefundButton purchasedAt={tx.purchasedAt} courseProgress={tx.courseProgress} />
           )}
           {!tx.canRefund && tx.status !== "Refunded" && (
             <span className="text-xs text-[#C0C0D0]">—</span>
@@ -162,6 +186,7 @@ function TransactionRow({ tx }: { tx: Transaction }) {
     </tr>
   );
 }
+
 
 // ─── Transaction History Table ────────────────────────────────────────────────
 

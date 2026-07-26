@@ -13,6 +13,7 @@ export type ProfileTabIconKey = "personal-info" | "security" | "settings";
 export interface UserProfile {
   fullName: string;
   email: string;
+  phone: string;
   bio: string;
   major: string;
   avatarInitials: string;

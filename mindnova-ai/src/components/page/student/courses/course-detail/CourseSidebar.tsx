@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { COURSE_DETAIL } from "@/src/components/page/student/courses/constants/detail";
 import type { ILesson, IModule, IResource } from "@/src/components/page/student/courses/types";
+import { CertificateClaimCard } from "./CertificateClaimCard";
+import { CourseRatingCard } from "./CourseRatingCard";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -176,7 +178,9 @@ export function CourseSidebar() {
   return (
     <aside className="w-[300px] xl:w-[340px] shrink-0 flex flex-col gap-4">
       <CourseProgressCard />
+      <CertificateClaimCard courseId={COURSE_DETAIL.id} progress={COURSE_DETAIL.progress} />
       <AiInsightCard />
+      <CourseRatingCard courseId={COURSE_DETAIL.id} progress={COURSE_DETAIL.progress} />
       <ResourcesCard />
       <InstructorCard />
     </aside>

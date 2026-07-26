@@ -1,8 +1,10 @@
 "use client";
 
 import { twMerge } from "tailwind-merge";
+import Image from "next/image";
 import type { ProfileTab } from "./types";
 import { PersonalInfoIcon, SecurityIcon, SettingsIcon } from "./icons";
+import { useAvatarUpload } from "@/src/hooks/useAvatarUpload";
 
 // ─── Tab Icon Map ─────────────────────────────────────────────────────────────
 
@@ -22,38 +24,65 @@ interface ProfileSidebarProps {
 }
 
 // ─── Avatar ───────────────────────────────────────────────────────────────────
+// 'use client' — avatar upload uses useRef and onChange handlers.
 
 function ProfileAvatar({ name }: { name: string }) {
+  const { previewUrl, uploadError, isUploading, fileInputRef, triggerFilePicker, handleFileChange } =
+    useAvatarUpload();
+
+  const initials = name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2);
+
   return (
     <div className="relative mx-auto w-fit">
-      {/* Gradient ring */}
+      {/* Hidden file input — JPG/PNG only */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png"
+        className="hidden"
+        onChange={handleFileChange}
+        aria-label="Upload profile avatar"
+      />
+
+      {/* Avatar circle */}
       <div className="w-24 h-24 rounded-full p-[3px] bg-gradient-to-br from-[#6B6BFF] to-[#4648D4] shadow-[0_6px_24px_rgba(107,107,255,0.45)]">
-        <div className="w-full h-full rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#2D2D5E] flex items-center justify-center">
-          <span className="text-2xl font-bold text-white tracking-wider select-none">
-            {name
-              .split(" ")
-              .map((n) => n[0])
-              .join("")
-              .slice(0, 2)}
-          </span>
+        <div className="w-full h-full rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#2D2D5E] flex items-center justify-center overflow-hidden">
+          {isUploading ? (
+            <div className="w-6 h-6 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+          ) : previewUrl ? (
+            <Image src={previewUrl} alt={`${name} avatar`} width={96} height={96} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-2xl font-bold text-white tracking-wider select-none">{initials}</span>
+          )}
         </div>
       </div>
-      {/* Verified badge */}
-      <span className="absolute bottom-0.5 right-0.5 w-6 h-6 rounded-full bg-[#6B6BFF] border-2 border-white flex items-center justify-center shadow-md">
-        <svg
-          width="10"
-          height="10"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="white"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden
-        >
-          <polyline points="20 6 9 17 4 12" />
+
+      {/* Edit button */}
+      <button
+        type="button"
+        onClick={triggerFilePicker}
+        className="absolute bottom-0.5 right-0.5 w-7 h-7 rounded-full bg-[#6B6BFF] border-2 border-white flex items-center justify-center shadow-md hover:bg-[#4648D4] transition-colors"
+        title="Upload avatar (JPG/PNG, max 5MB)"
+        aria-label="Change avatar"
+      >
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
         </svg>
-      </span>
+      </button>
+
+      {/* Upload error */}
+      {uploadError && (
+        <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-48 z-10">
+          <p className="text-[10px] font-semibold text-red-500 bg-red-50 border border-red-200 rounded-lg px-2 py-1.5 text-center leading-tight shadow-sm">
+            {uploadError.message}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -96,7 +125,7 @@ function TabButton({ id, label, isActive, onClick }: TabButtonProps) {
   );
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function ProfileSidebar({
   activeTab,
@@ -107,14 +136,14 @@ export function ProfileSidebar({
   return (
     <div className="flex flex-col gap-6">
       {/* Avatar + name */}
-      <div className="flex flex-col items-center gap-3 pt-2">
+      <div className="flex flex-col items-center gap-3 pt-4 pb-2">
         <ProfileAvatar name={fullName} />
-        <div className="text-center">
-          <p className="text-base font-bold text-[#1A1A2E] leading-tight">
-            {fullName}
-          </p>
+        {/* Spacer for potential error tooltip */}
+        <div className="mt-3 text-center">
+          <p className="text-base font-bold text-[#1A1A2E] leading-tight">{fullName}</p>
           <p className="text-xs text-[#9090B0] mt-0.5">{major}</p>
         </div>
+        <p className="text-[10px] text-[#B0B0C8] text-center">JPG or PNG · Max 5MB</p>
       </div>
 
       {/* Tab navigation */}
