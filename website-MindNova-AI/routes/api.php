@@ -29,6 +29,9 @@ Route::middleware('throttle:5,1')->group(function () {
     // ĐẢM BẢO 2 DÒNG NÀY ĐÃ CÓ VÀ NẰM Ở ĐÂY:
     Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
+    // VNPay IPN
+    Route::get('/payments/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
 });
 
 // ==========================================
@@ -45,11 +48,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/update', [UserController::class, 'updateProfile']);
         Route::post('/change-password', [UserController::class, 'changePassword']);
         Route::post('/avatar', [UserController::class, 'uploadAvatar']);
-        // -- Nhóm API Đơn hàng (Orders) --
-        Route::get('/orders', [OrderController::class, 'index']);
-        Route::post('/orders', [OrderController::class, 'store']);
-    });
 
+    });
+    // -- Nhóm API Đơn hàng (Orders) --
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::post('/orders', [OrderController::class, 'store']);
     // ==========================================
     // 3. NHÓM API QUẢN TRỊ (Dành riêng cho Admin)
     // ==========================================

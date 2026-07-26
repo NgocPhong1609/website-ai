@@ -9,112 +9,130 @@ use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
     /**
-     * Khởi tạo Đơn hàng mới (Checkout)
-     * POST: /api/orders
+     * Tạo đơn hàng mới
      */
     public function store(Request $request)
     {
-        // 1. Kiểm tra tính hợp lệ dữ liệu đầu vào
         $validator = Validator::make($request->all(), [
             'course_ids'     => 'required|array|min:1',
             'course_ids.*'   => 'required|integer|exists:courses,id',
-            'payment_method' => 'required|string|in:vnpay,momo,stripe,banking'
+            'payment_method' => 'required|string|in:vnpay,momo,banking'
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json(['success' => false, 'message' => 'Dữ liệu không hợp lệ.', 'errors' => $validator->errors()], 422);
         }
 
-        $user = $request->user(); // Lấy học viên đang đăng nhập qua token Sanctum
-        $courseIds = $request->course_ids;
+        $user = $request->user();
 
-        // 2. Kiểm tra xem học viên đã mua hoặc đang sở hữu khóa học này chưa
-        $alreadyEnrolled = DB::table('enrollments')
-            ->where('user_id', $user->id)
-            ->whereIn('course_id', $courseIds)
-            ->exists();
-
-        if ($alreadyEnrolled) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Bạn đã đăng ký một trong số các khóa học này trong tài khoản rồi.'
-            ], 400);
+        // Kiểm tra trùng lặp
+        if (DB::table('enrollments')->where('user_id', $user->id)->whereIn('course_id', $request->course_ids)->exists()) {
+            return response()->json(['success' => false, 'message' => 'Bạn đã đăng ký khóa học này rồi.'], 400);
         }
 
-        // 3. Sử dụng Database Transaction
         DB::beginTransaction();
-
         try {
-            // Truy vấn lấy danh sách khóa học thực tế từ CSDL
-            $courses = Course::whereIn('id', $courseIds)->get();
-            $totalAmount = 0;
-            $orderItemsData = [];
+            $courses = Course::whereIn('id', $request->course_ids)->get();
+            $totalAmount = $courses->sum('price');
+            $transactionId = 'ORD-' . strtoupper(Str::random(6));
 
-            foreach ($courses as $course) {
-                $totalAmount += $course->price;
-
-                $orderItemsData[] = [
-                    'course_id'  => $course->id,
-                    'price'      => $course->price,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-
-            // Tạo bản ghi Đơn hàng tổng
             $order = Order::create([
-                'user_id'        => $user->id,
-                'total_amount'   => $totalAmount,
+                'user_id' => $user->id,
+                'total_amount' => $totalAmount,
                 'payment_method' => $request->payment_method,
-                'status'         => 'pending', // Trạng thái chờ thanh toán
-                'transaction_id' => null
+                'status' => 'pending',
+                'transaction_id' => $transactionId
             ]);
 
-            // Gán ID đơn hàng vừa tạo vào từng chi tiết khóa học
-            foreach ($orderItemsData as &$item) {
-                $item['order_id'] = $order->id;
+            foreach ($courses as $course) {
+                OrderItem::create(['order_id' => $order->id, 'course_id' => $course->id, 'price' => $course->price]);
             }
+            DB::commit();
 
-            // Insert hàng loạt để tối ưu hiệu năng DB
-            OrderItem::insert($orderItemsData);
-
-            DB::commit(); // Mọi thứ trơn tru -> Chốt lưu vào CSDL
+            // Xử lý phương thức thanh toán
+            $paymentUrl = $this->handlePaymentMethod($order, $request, $totalAmount);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Tạo đơn hàng thành công! Đang chuyển hướng đến cổng thanh toán.',
-                'data'    => $order->load('orderItems')
+                'message' => 'Tạo đơn hàng thành công!',
+                'data' => $order->load('orderItems'),
+                'payment_url' => $paymentUrl
             ], 201);
 
         } catch (\Exception $e) {
-            DB::rollBack(); // Có lỗi phát sinh -> Hủy bỏ toàn bộ thao tác DB vừa rồi
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Không thể tạo đơn hàng vào lúc này. Vui lòng thử lại!',
-                'error'   => $e->getMessage()
-            ], 500);
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Lỗi hệ thống: ' . $e->getMessage()], 500);
         }
     }
 
     /**
-     * Lấy lịch sử đơn hàng của học viên
-     * GET: /api/orders
+     * Tách logic xử lý các cổng thanh toán ra riêng
      */
-    public function index(Request $request)
+    private function handlePaymentMethod($order, $request, $totalAmount)
     {
-        $orders = Order::with('orderItems')
-            ->where('user_id', $request->user()->id)
-            ->orderByDesc('created_at')
-            ->get();
+        $transactionId = $order->transaction_id;
 
-        return response()->json([
-            'success' => true,
-            'data'    => $orders
-        ]);
+        if ($order->payment_method === 'vnpay') {
+            $inputData = [
+                "vnp_Version" => "2.1.0", "vnp_TmnCode" => env('VNPAY_TMN_CODE'),
+                "vnp_Amount" => $totalAmount * 100, "vnp_Command" => "pay",
+                "vnp_CreateDate" => date('YmdHis'), "vnp_CurrCode" => "VND",
+                "vnp_IpAddr" => $request->ip(), "vnp_Locale" => "vn",
+                "vnp_OrderInfo" => "Thanh toan " . $transactionId,
+                "vnp_OrderType" => "billpayment",
+                "vnp_ReturnUrl" => "http://localhost:3000/payment/callback",
+                "vnp_TxnRef" => $transactionId,
+            ];
+            ksort($inputData);
+            $query = http_build_query($inputData);
+            $hash = hash_hmac('sha512', $query, env('VNPAY_HASH_SECRET'));
+            return "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?" . $query . "&vnp_SecureHash=" . $hash;
+        }
+
+        if ($order->payment_method === 'momo') {
+            // Nếu bạn muốn bỏ Momo thì để đoạn này trả về null hoặc thông báo
+            return "Momo is disabled";
+        }
+
+        return "https://your-website.com/banking-instruction"; // Link trang hướng dẫn banking
+    }
+
+    /**
+     * API nhận IPN VNPay
+     */
+    public function vnpayIpn(Request $request)
+    {
+        // Giữ nguyên logic IPN của bạn vì nó đang hoạt động tốt
+        $vnp_HashSecret = env('VNPAY_HASH_SECRET');
+        $inputData = array_filter($request->all(), fn($k) => str_starts_with($k, 'vnp_'), ARRAY_FILTER_USE_KEY);
+        $vnp_SecureHash = $inputData['vnp_SecureHash'];
+        unset($inputData['vnp_SecureHash'], $inputData['vnp_SecureHashType']);
+        ksort($inputData);
+        $hashData = http_build_query($inputData);
+
+        if (hash_hmac('sha512', $hashData, $vnp_HashSecret) === $vnp_SecureHash) {
+            $order = Order::where('transaction_id', $inputData['vnp_TxnRef'])->first();
+            if ($order && $order->status === 'pending') {
+                if ($inputData['vnp_ResponseCode'] == '00') {
+                    $order->update(['status' => 'completed']);
+                    // Tự động cấp quyền
+                    $items = OrderItem::where('order_id', $order->id)->get();
+                    foreach ($items as $item) {
+                        DB::table('enrollments')->insertOrIgnore([
+                            'user_id' => $order->user_id, 'course_id' => $item->course_id,
+                            'status' => 'enrolled', 'enrolled_at' => now()
+                        ]);
+                    }
+                }
+            }
+            return response()->json(['RspCode' => '00', 'Message' => 'Confirm Success']);
+        }
+        return response()->json(['RspCode' => '97', 'Message' => 'Invalid signature']);
     }
 }
