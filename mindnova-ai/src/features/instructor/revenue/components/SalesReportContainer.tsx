@@ -14,7 +14,7 @@ import {
   TrendUpIcon,
   TrendRightIcon,
 } from "./icons";
-import { AdsHourlySection } from "@/features/ads-hourly";
+import { AdsHourlySection } from "@features/ads-hourly";
 
 // ─── Topbar ───────────────────────────────────────────────────────────────────
 
@@ -97,7 +97,7 @@ function StatCards() {
             </span>
           </div>
           <div className="w-full h-1 bg-[#F0F0F8] rounded-full mt-4 overflow-hidden">
-            <div className={twMerge("h-full rounded-full", s.color)} style={{ width: \`\${50 + Math.random() * 40}%\` }} />
+            <div className={twMerge("h-full rounded-full", s.color)} style={{ width: `${50 + Math.random() * 40}%` }} />
           </div>
         </div>
       ))}
@@ -225,7 +225,7 @@ function MarketingSourcesTable() {
                   <div className="flex items-center gap-3">
                     <span className="text-[13px] font-extrabold text-[#464554] w-[45px]">{s.rate}%</span>
                     <div className="flex-1 h-1.5 rounded-full bg-[#F0F0F8] overflow-hidden max-w-[60px]">
-                      <div className="h-full rounded-full bg-[#A3A5F8]" style={{ width: \`\${s.rate * 3}%\` }} />
+                      <div className="h-full rounded-full bg-[#A3A5F8]" style={{ width: `${s.rate * 3}%` }} />
                     </div>
                   </div>
                 </td>

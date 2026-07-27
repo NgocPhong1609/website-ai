@@ -15,6 +15,9 @@ use App\Http\Controllers\Api\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Api\Instructor\CourseController;
 use App\Http\Controllers\Api\Instructor\CourseModuleController;
 use App\Http\Controllers\Api\Instructor\LessonController;
+use App\Http\Controllers\Api\Instructor\QuizController;
+use App\Http\Controllers\Api\Instructor\MediaController;
+use App\Http\Controllers\Api\StudentQuizController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -112,6 +115,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('lessons/{lesson}', [LessonController::class, 'destroy']);
         Route::post('lessons/{lesson}/video', [LessonController::class, 'uploadVideo']);
         Route::get('lessons/{lesson}/video-url', [LessonController::class, 'getVideoUrl']);
+        Route::post('lessons/{lesson}/content-media', [LessonController::class, 'uploadContentMedia']);
+
+        // Temporary Media
+        Route::post('media/temp', [MediaController::class, 'uploadTemp']);
+        Route::delete('media/temp/{media}', [MediaController::class, 'deleteTemp']);
+
+        // Quiz (Instructor CRUD)
+        Route::get('lessons/{lesson}/quiz', [QuizController::class, 'show']);
+        Route::post('lessons/{lesson}/quiz', [QuizController::class, 'store']);
+        Route::delete('lessons/{lesson}/quiz', [QuizController::class, 'destroy']);
         // Students (Module 2)
         Route::get('students', [\App\Http\Controllers\Api\Instructor\StudentController::class, 'index']);
         Route::get('students/{student}/progress', [\App\Http\Controllers\Api\Instructor\StudentController::class, 'progress']);
@@ -122,6 +135,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Notifications (Module 2)
         Route::post('notifications', [\App\Http\Controllers\Api\Instructor\NotificationController::class, 'store']);
+    });
+
+    // ==========================================
+    // 5. NHÓM API HỌC SINH (Student)
+    // ==========================================
+    Route::prefix('student')->group(function () {
+        Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
+        Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
     });
 
 

@@ -43,6 +43,7 @@ const INITIAL_SETTINGS: Step3Data = {
 
 // ─── Serialization ────────────────────────────────────────────────────────────
 // thumbnailFile (File object) cannot be serialized, so we exclude it.
+// pendingVideos (Map<string, File>) also cannot be serialized.
 
 interface SerializableState {
   step: StepKey;
@@ -81,6 +82,7 @@ function loadFromSession(): Partial<ICreateCourseState> | null {
       courseInfo: {
         ...parsed.courseInfo,
         thumbnailFile: null, // Cannot restore File from session
+        thumbnailPreview: null, // Clear preview as well since we need the File object to upload
       },
       modules: parsed.modules,
       settings: parsed.settings,

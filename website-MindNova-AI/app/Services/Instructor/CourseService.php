@@ -72,9 +72,9 @@ class CourseService
             // }
         }
 
-        if ($status === 'draft' && $course->status === 'published') {
-            throw new \Exception("Cannot change a published course back to draft.");
-        }
+        // if ($status === 'draft' && $course->status === 'published') {
+        //     throw new \Exception("Cannot change a published course back to draft.");
+        // }
 
         $course->update(['status' => $status]);
 

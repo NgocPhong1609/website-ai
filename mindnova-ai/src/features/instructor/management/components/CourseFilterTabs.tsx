@@ -5,36 +5,30 @@
 
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import {
-  TOTAL_COURSES,
-  ACTIVE_COURSES,
-  DRAFT_COURSES,
-} from "../constants/data";
-
 type FilterKey = "all" | "active" | "draft";
 
 interface Tab {
   key: FilterKey;
   label: string;
-  count: number;
 }
 
 const TABS: Tab[] = [
-  { key: "all", label: "Tất cả", count: TOTAL_COURSES },
-  { key: "active", label: "Đang dạy", count: ACTIVE_COURSES },
-  { key: "draft", label: "Bản nháp", count: DRAFT_COURSES },
+  { key: "all", label: "Tất cả" },
+  { key: "active", label: "Đang dạy" },
+  { key: "draft", label: "Bản nháp" },
 ];
 
 interface CourseFilterTabsProps {
-  onFilterChange?: (key: FilterKey) => void;
+  counts: Record<FilterKey, number>;
+  onFilterChange: (key: FilterKey) => void;
 }
 
-export function CourseFilterTabs({ onFilterChange }: CourseFilterTabsProps) {
+export function CourseFilterTabs({ counts, onFilterChange }: CourseFilterTabsProps) {
   const [active, setActive] = useState<FilterKey>("all");
 
   function handleSelect(key: FilterKey) {
     setActive(key);
-    onFilterChange?.(key);
+    onFilterChange(key);
   }
 
   return (
@@ -43,8 +37,9 @@ export function CourseFilterTabs({ onFilterChange }: CourseFilterTabsProps) {
       aria-label="Lọc khóa học"
       className="flex items-center gap-1 bg-[#F4F4FA] p-1 rounded-xl"
     >
-      {TABS.map(({ key, label, count }) => {
+      {TABS.map(({ key, label }) => {
         const isActive = active === key;
+        const count = counts[key];
         return (
           <button
             key={key}

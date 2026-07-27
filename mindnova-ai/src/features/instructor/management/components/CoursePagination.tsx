@@ -3,39 +3,41 @@
 // ─── CoursePagination ─────────────────────────────────────────────────────────
 // Page navigation for the course grid.
 
-import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { ChevronLeftIcon, ChevronRightIcon } from "./icons";
-import { TOTAL_COURSES } from "../constants/data";
 
-const PAGE_SIZE = 6;
-const TOTAL_PAGES = Math.ceil(TOTAL_COURSES / PAGE_SIZE);
+interface CoursePaginationProps {
+  currentPage: number;
+  totalItems: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+}
 
-export function CoursePagination() {
-  const [page, setPage] = useState(1);
+export function CoursePagination({
+  currentPage,
+  totalItems,
+  pageSize,
+  onPageChange,
+}: CoursePaginationProps) {
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
 
-  const from = (page - 1) * PAGE_SIZE + 1;
-  const to = Math.min(page * PAGE_SIZE, TOTAL_COURSES);
+  // We show up to 5 pages for simplicity (1, 2, 3, 4, 5)
+  // Or just all pages if it's small.
+  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-  const pages = Array.from({ length: TOTAL_PAGES }, (_, i) => i + 1);
+  if (totalItems === 0) return null;
 
   return (
-    <div className="flex items-center justify-between pt-2">
-      {/* Info text */}
-      <p className="text-sm text-[#9090B0]">
-        Hiển thị {from}–{to} trong số {TOTAL_COURSES} khóa học
-      </p>
-
-      {/* Page controls */}
-      <div className="flex items-center gap-1" role="navigation" aria-label="Phân trang">
+    <div className="flex items-center justify-center pt-8 pb-4">
+      <div className="flex items-center gap-2.5" role="navigation" aria-label="Phân trang">
         {/* Prev */}
         <button
           id="btn-page-prev"
           type="button"
           aria-label="Trang trước"
-          disabled={page === 1}
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-[#7878A0] border border-[#EAEAF4] bg-white hover:bg-[#F4F4FA] hover:text-[#4648D4] disabled:opacity-40 disabled:pointer-events-none transition-all duration-150"
+          disabled={currentPage === 1}
+          onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+          className="w-11 h-11 rounded-2xl flex items-center justify-center text-[#B0B0C8] border border-[#F0F0F8] bg-white hover:bg-[#F4F4FA] hover:text-[#4648D4] hover:border-[#EAEAF4] disabled:opacity-40 disabled:pointer-events-none transition-all duration-200 shadow-sm"
         >
           <ChevronLeftIcon />
         </button>
@@ -47,13 +49,13 @@ export function CoursePagination() {
             id={`btn-page-${p}`}
             type="button"
             aria-label={`Trang ${p}`}
-            aria-current={p === page ? "page" : undefined}
-            onClick={() => setPage(p)}
+            aria-current={p === currentPage ? "page" : undefined}
+            onClick={() => onPageChange(p)}
             className={twMerge(
-              "w-8 h-8 rounded-lg text-sm font-medium transition-all duration-150",
-              p === page
-                ? "bg-[#4648D4] text-white shadow-[0_2px_8px_rgba(70,72,212,0.4)]"
-                : "text-[#64647A] border border-[#EAEAF4] bg-white hover:bg-[#F4F4FA] hover:text-[#4648D4]",
+              "w-11 h-11 rounded-2xl text-[15px] font-bold transition-all duration-300 flex items-center justify-center",
+              p === currentPage
+                ? "bg-[#4648D4] text-white shadow-[0_8px_20px_rgba(70,72,212,0.35)] -translate-y-0.5"
+                : "text-[#64647A] border border-[#F0F0F8] bg-white hover:bg-[#F4F4FA] hover:text-[#4648D4] hover:border-[#EAEAF4] shadow-sm",
             )}
           >
             {p}
@@ -65,9 +67,9 @@ export function CoursePagination() {
           id="btn-page-next"
           type="button"
           aria-label="Trang sau"
-          disabled={page === TOTAL_PAGES}
-          onClick={() => setPage((p) => Math.min(TOTAL_PAGES, p + 1))}
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-[#7878A0] border border-[#EAEAF4] bg-white hover:bg-[#F4F4FA] hover:text-[#4648D4] disabled:opacity-40 disabled:pointer-events-none transition-all duration-150"
+          disabled={currentPage === totalPages}
+          onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+          className="w-11 h-11 rounded-2xl flex items-center justify-center text-[#B0B0C8] border border-[#F0F0F8] bg-white hover:bg-[#F4F4FA] hover:text-[#4648D4] hover:border-[#EAEAF4] disabled:opacity-40 disabled:pointer-events-none transition-all duration-200 shadow-sm"
         >
           <ChevronRightIcon />
         </button>

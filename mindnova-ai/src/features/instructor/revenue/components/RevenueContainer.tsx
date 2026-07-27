@@ -181,7 +181,7 @@ function RevenueChart() {
           <div key={i} className="relative flex flex-col items-center w-full max-w-[32px] group cursor-pointer z-10">
             <div 
               className={twMerge("w-full rounded-t-lg transition-all duration-300", i === 2 ? "bg-[#6B6BFF]" : "bg-[#EAEAF4] group-hover:bg-[#C5C6FF]")}
-              style={{ height: \`\${h * 2}px\` }}
+              style={{ height: `${h * 2}px` }}
             />
             <span className={twMerge("mt-3 text-[10px] font-bold", i === 2 ? "text-[#1A1A2E]" : "text-[#9090B0]")}>
               {["T2", "T3", "Hôm nay", "T5", "T6", "T7", "CN"][i]}
@@ -308,7 +308,7 @@ function RevenueByCourseTable() {
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-1.5 rounded-full bg-[#F0F0F8] overflow-hidden min-w-[60px]">
-                      <div className="h-full rounded-full bg-[#6B6BFF]" style={{ width: \`\${c.conv}%\` }} />
+                      <div className="h-full rounded-full bg-[#6B6BFF]" style={{ width: `${c.conv}%` }} />
                     </div>
                     <span className="text-[12px] font-bold text-[#64647A] w-7">{c.conv}%</span>
                   </div>

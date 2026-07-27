@@ -89,7 +89,7 @@ function InteractionChart() {
                 "w-full max-w-[24px] rounded-t-md transition-all duration-300",
                 i === 3 ? "bg-[#C5C6FF]" : "bg-[#F0F0F8] group-hover:bg-[#EAEAF4]"
               )}
-              style={{ height: \`\${val}%\` }}
+              style={{ height: `${val}%` }}
             />
           </div>
         ))}
@@ -210,7 +210,7 @@ function CourseProgressCard({
         <div className="w-full h-1.5 rounded-full bg-[#F0F0F8] overflow-hidden">
           <div
             className={twMerge("h-full rounded-full transition-all duration-500", progress === 100 ? "bg-emerald-500" : "bg-[#6B6BFF]")}
-            style={{ width: \`\${progress}%\` }}
+            style={{ width: `${progress}%` }}
           />
         </div>
         <div className="flex justify-between items-center text-[10px] text-[#A0A0C0]">
