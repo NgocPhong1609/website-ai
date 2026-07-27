@@ -10,6 +10,30 @@ class LessonResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $quizData = null;
+        if ($this->type === 'quiz_module' && $this->quiz) {
+            $quizData = [
+                'id' => $this->quiz->id,
+                'title' => $this->quiz->title,
+                'time_limit_minutes' => $this->quiz->time_limit_minutes,
+                'passing_score' => $this->quiz->passing_score,
+                'questions' => $this->quiz->questions->map(function ($q) {
+                    return [
+                        'id' => $q->id,
+                        'content' => $q->content,
+                        'order' => $q->order,
+                        'answers' => $q->answers->map(function ($a) {
+                            return [
+                                'id' => $a->id,
+                                'content' => $a->content,
+                                'is_correct' => (bool) $a->is_correct,
+                            ];
+                        })->toArray(),
+                    ];
+                })->toArray(),
+            ];
+        }
+
         return [
             'id' => $this->id,
             'module_id' => $this->module_id,
@@ -20,6 +44,7 @@ class LessonResource extends JsonResource
             'duration_minutes' => $this->duration_minutes,
             'order' => $this->order,
             'status' => $this->status,
+            'quizData' => $quizData,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

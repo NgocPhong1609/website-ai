@@ -29,11 +29,14 @@ export interface CourseApiResponse {
   };
 }
 
-export function useInstructorCourses() {
+export function useInstructorCourses(search?: string) {
   return useQuery({
-    queryKey: ["instructor", "courses"],
+    queryKey: ["instructor", "courses", search],
     queryFn: async (): Promise<Course[]> => {
-      const response = await axiosClient.get<CourseApiResponse>("/api/instructor/courses");
+      const params = new URLSearchParams();
+      if (search) params.append("search", search);
+      const url = `/api/instructor/courses${params.toString() ? `?${params.toString()}` : ""}`;
+      const response = await axiosClient.get<CourseApiResponse>(url);
       
       // Map API data to our Frontend UI types
       const courses = response.data.data.data;

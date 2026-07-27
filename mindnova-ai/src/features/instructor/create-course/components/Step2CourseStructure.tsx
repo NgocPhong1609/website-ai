@@ -8,6 +8,7 @@ import {
   useState,
   useCallback,
   useRef,
+  useEffect,
   type DragEvent,
   type KeyboardEvent,
 } from "react";
@@ -618,12 +619,14 @@ function ModuleModal({ isOpen, editingModule, onSave, onClose }: ModuleModalProp
   const [description, setDescription] = useState(editingModule?.description || "");
   const [titleError, setTitleError] = useState("");
 
-  // Reset form when modal opens with different data
-  const prevId = useRef(editingModule?.id);
-  if (editingModule?.id !== prevId.current) {
-    prevId.current = editingModule?.id;
-    // We use this pattern instead of useEffect to avoid extra renders
-  }
+  // Initialize form state whenever modal opens or editing module changes
+  useEffect(() => {
+    if (isOpen) {
+      setTitle(editingModule?.title || "");
+      setDescription(editingModule?.description || "");
+      setTitleError("");
+    }
+  }, [isOpen, editingModule]);
 
   const handleSave = () => {
     const trimmedTitle = title.trim();
@@ -736,7 +739,7 @@ function ModuleModal({ isOpen, editingModule, onSave, onClose }: ModuleModalProp
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function Step2CourseStructure() {
+export function Step2CourseStructure({ error }: { error?: string | null }) {
   // Read from store
   const modules = useCreateCourseStore((s) => s.modules);
   const addModuleToStore = useCreateCourseStore((s) => s.addModule);
@@ -955,6 +958,19 @@ export function Step2CourseStructure() {
           Thêm Module mới
         </button>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 8v4"/>
+              <path d="M12 16h.01"/>
+            </svg>
+            {error}
+          </div>
+        </div>
+      )}
 
       {/* Module list */}
       <div className="flex flex-col gap-4">

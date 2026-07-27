@@ -1,3 +1,8 @@
+"use client";
+
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+
 // ─── DashboardTopbar ─────────────────────────────────────────────────────────
 // Top search + actions bar for the dashboard layout.
 
@@ -32,20 +37,49 @@ function SettingsIcon() {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
+function SearchInput() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (searchTerm) {
+        params.set("search", searchTerm);
+      } else {
+        params.delete("search");
+      }
+      router.replace(`${pathname}?${params.toString()}`);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, pathname, router, searchParams]);
+
+  return (
+    <div className="flex-1 max-w-md relative">
+      <div className="absolute inset-y-0 left-3.5 flex items-center text-[#B0B0C8] pointer-events-none">
+        <SearchIcon />
+      </div>
+      <input
+        type="search"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        placeholder="Search courses, topics, or AI help…"
+        className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-[#1A1A2E] placeholder-[#B0B0C8] bg-[#F6F6FB] border border-[#EAEAF4] focus:outline-none focus:border-[#6B6BFF] focus:ring-4 focus:ring-[#6B6BFF]/10 focus:bg-white transition-all duration-200"
+      />
+    </div>
+  );
+}
+
 export function DashboardTopbar() {
   return (
     <header className="h-16 shrink-0 flex items-center gap-4 px-6 bg-white border-b border-[#F0F0F8]">
       {/* Search */}
-      <div className="flex-1 max-w-md relative">
-        <div className="absolute inset-y-0 left-3.5 flex items-center text-[#B0B0C8] pointer-events-none">
-          <SearchIcon />
-        </div>
-        <input
-          type="search"
-          placeholder="Search courses, topics, or AI help…"
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-[#1A1A2E] placeholder-[#B0B0C8] bg-[#F6F6FB] border border-[#EAEAF4] focus:outline-none focus:border-[#6B6BFF] focus:ring-4 focus:ring-[#6B6BFF]/10 focus:bg-white transition-all duration-200"
-        />
-      </div>
+      <Suspense fallback={<div className="flex-1 max-w-md relative" />}>
+        <SearchInput />
+      </Suspense>
 
       {/* Spacer */}
       <div className="flex-1" />

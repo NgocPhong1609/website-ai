@@ -11,9 +11,45 @@ import { CourseCard } from "./CourseCard";
 import { CreateCourseCard } from "./CreateCourseCard";
 import { CoursePagination } from "./CoursePagination";
 import { useInstructorCourses } from "../api/courses";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
-export function CourseManagementContainer() {
-  const { data: courses, isLoading, isError } = useInstructorCourses();
+const PAGE_SIZE = 9;
+
+function CourseManagementContent() {
+  const searchParams = useSearchParams();
+  const search = searchParams.get("search") || undefined;
+  
+  const { data: courses, isLoading, isError } = useInstructorCourses(search);
+  const [page, setPage] = useState(1);
+  const [filter, setFilter] = useState<"all" | "active" | "draft">("all");
+
+  const totalCourses = courses?.length || 0;
+  const activeCourses = courses?.filter(c => c.status === "published").length || 0;
+  const draftCourses = courses?.filter(c => c.status === "draft").length || 0;
+
+  const counts = {
+    all: totalCourses,
+    active: activeCourses,
+    draft: draftCourses,
+  };
+
+  const filteredCourses = courses?.filter((c) => {
+    if (filter === "all") return true;
+    if (filter === "active") return c.status === "published";
+    if (filter === "draft") return c.status === "draft";
+    return true;
+  });
+
+  // Combine courses and a placeholder for the "Create New Course" card
+  const allItems = [...(filteredCourses || []), "CREATE_CARD"];
+  
+  const paginatedItems = allItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  function handleFilterChange(newFilter: "all" | "active" | "draft") {
+    setFilter(newFilter);
+    setPage(1); // Reset to page 1 on filter change
+  }
 
   return (
     <div className="flex flex-col gap-6 p-6 max-w-[1200px] w-full mx-auto">
@@ -30,7 +66,7 @@ export function CourseManagementContainer() {
         </div>
 
         {/* Filter tabs */}
-        <CourseFilterTabs />
+        <CourseFilterTabs counts={counts} onFilterChange={handleFilterChange} />
       </div>
 
       {/* ── Banner + Revenue row ─────────────────────────────────────── */}
@@ -50,20 +86,39 @@ export function CourseManagementContainer() {
             <div className="col-span-full py-12 flex items-center justify-center text-red-500">
               Lỗi khi tải danh sách khóa học
             </div>
+          ) : allItems.length === 1 && allItems[0] === "CREATE_CARD" ? (
+            <div className="col-span-full flex items-center justify-center py-16 text-[13px] text-[#B0B0C8]">
+              {search ? `Không tìm thấy khóa học nào phù hợp với từ khóa "${search}".` : "Bạn chưa có khóa học nào. Hãy tạo khóa học đầu tiên nhé!"}
+            </div>
           ) : (
             <>
-              {courses?.map((course) => (
-                <CourseCard key={course.id} course={course} />
-              ))}
-              {/* "Create new" placeholder card */}
-              <CreateCourseCard />
+              {paginatedItems.map((item, index) => {
+                if (item === "CREATE_CARD") {
+                  return <CreateCourseCard key="create-card" />;
+                }
+                // @ts-ignore
+                return <CourseCard key={item.id} course={item} />;
+              })}
             </>
           )}
         </div>
       </section>
 
       {/* ── Pagination ───────────────────────────────────────────────── */}
-      <CoursePagination />
+      <CoursePagination 
+        currentPage={page}
+        totalItems={allItems.length}
+        pageSize={PAGE_SIZE}
+        onPageChange={setPage}
+      />
     </div>
+  );
+}
+
+export function CourseManagementContainer() {
+  return (
+    <Suspense fallback={<div className="flex-1" />}>
+      <CourseManagementContent />
+    </Suspense>
   );
 }
