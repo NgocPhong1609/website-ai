@@ -7,6 +7,7 @@ export const metadata: Metadata = {
     "Cấu hình mô hình doanh thu, định giá và quản lý chương trình khuyến mãi cho khóa học của bạn.",
 };
 
-export default function PricingPage() {
-  return <PricingContainer />;
+export default async function PricingPage({ params }: { params: { courseId: string } }) {
+  const { courseId } = await params;
+  return <PricingContainer courseId={courseId} />;
 }

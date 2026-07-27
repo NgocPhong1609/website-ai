@@ -7,7 +7,6 @@ export function middleware(request: NextRequest) {
   
   // Lấy đường dẫn hiện tại
   const { pathname } = request.nextUrl;
-
   // Danh sách các route bắt buộc phải đăng nhập
   const protectedRoutes = ['/instructor', '/admin', '/student'];
   

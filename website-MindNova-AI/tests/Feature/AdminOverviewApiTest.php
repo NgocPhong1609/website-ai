@@ -7,10 +7,9 @@ uses(RefreshDatabase::class);
 
 test('admin can fetch dashboard overview data through the api', function () {
     $admin = User::factory()->create([
+        'role' => 'admin',
         'email_verified_at' => now(),
     ]);
-
-    $admin->roles()->sync([1]);
 
     $response = $this->actingAs($admin, 'sanctum')->getJson('/api/admin/overview');
 

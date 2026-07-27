@@ -19,6 +19,7 @@ class StoreCourseRequest extends FormRequest
             'category_id' => 'nullable|exists:categories,id',
             'level' => 'required|in:beginner,intermediate,advanced',
             'price' => 'numeric|min:0',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
         ];
     }
 }

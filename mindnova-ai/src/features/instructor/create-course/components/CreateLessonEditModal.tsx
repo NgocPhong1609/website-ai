@@ -2,17 +2,17 @@
 
 import { useState } from "react";
 import { RichTextEditor } from "../../shared/components/RichTextEditor";
-import type { Lesson, LessonType } from "./Step2CourseStructure";
+import type { DraftLesson, DraftLessonType } from "../types";
 
 interface CreateLessonEditModalProps {
-  lesson: Lesson;
-  onSave: (id: string, updates: Partial<Lesson>) => void;
+  lesson: DraftLesson;
+  onSave: (id: string, updates: Partial<DraftLesson>) => void;
   onClose: () => void;
 }
 
 export function CreateLessonEditModal({ lesson, onSave, onClose }: CreateLessonEditModalProps) {
   const [title, setTitle] = useState(lesson.title);
-  const [type, setType] = useState<LessonType>(lesson.type);
+  const [type, setType] = useState<DraftLessonType>(lesson.type);
   const [content, setContent] = useState((lesson as any).content || "");
 
   const handleSave = () => {

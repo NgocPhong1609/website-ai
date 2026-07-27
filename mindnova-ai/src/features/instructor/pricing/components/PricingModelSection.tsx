@@ -244,10 +244,26 @@ function AIBadge() {
 
 // ─── Main Section ─────────────────────────────────────────────────────────────
 
-export function PricingModelSection() {
-  const [model, setModel] = useState<PricingModel>("paid");
-  const [basePrice, setBasePrice] = useState("1.200.000");
+export function PricingModelSection({
+  initialPrice,
+  onPriceChange,
+}: {
+  initialPrice: number;
+  onPriceChange: (price: number) => void;
+}) {
+  const [model, setModel] = useState<PricingModel>(initialPrice > 0 ? "paid" : "free");
+  // Format initial price with thousand separators
+  const [basePrice, setBasePrice] = useState(
+    initialPrice > 0 ? initialPrice.toLocaleString("vi-VN") : "0"
+  );
   const [salePrice, setSalePrice] = useState("");
+
+  // Handle base price change and propagate to parent
+  const handleBasePriceChange = (v: string) => {
+    setBasePrice(v);
+    const num = Number(v.replace(/[^0-9]/g, ""));
+    onPriceChange(num);
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-4">
@@ -284,7 +300,7 @@ export function PricingModelSection() {
           <PriceInputs
             basePrice={basePrice}
             salePrice={salePrice}
-            onBaseChange={setBasePrice}
+            onBaseChange={handleBasePriceChange}
             onSaleChange={setSalePrice}
           />
         )}
@@ -301,7 +317,7 @@ export function PricingModelSection() {
 
       {/* Right: AI panels */}
       <div className="flex flex-col gap-3">
-        <AIInsightPanel onApply={(p) => { setBasePrice(p); setModel("paid"); }} />
+        <AIInsightPanel onApply={(p) => { handleBasePriceChange(p); setModel("paid"); }} />
         <RevenueStatPanel />
       </div>
     </div>

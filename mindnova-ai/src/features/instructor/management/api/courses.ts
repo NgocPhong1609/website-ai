@@ -48,3 +48,14 @@ export function useInstructorCourses() {
     },
   });
 }
+
+export function useInstructorCourse(courseId: string) {
+  return useQuery({
+    queryKey: ["instructor", "courses", courseId],
+    queryFn: async () => {
+      const { data } = await axiosClient.get(`/api/instructor/courses/${courseId}`);
+      return data.data; // Returns { id, title, price, ... }
+    },
+    enabled: !!courseId,
+  });
+}

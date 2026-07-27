@@ -7,6 +7,7 @@ export interface CreateCoursePayload {
   description?: string;
   level?: string;
   category_id: number;
+  thumbnail?: File;
 }
 
 export function useCreateCourse() {
@@ -14,7 +15,20 @@ export function useCreateCourse() {
 
   return useMutation({
     mutationFn: async (payload: CreateCoursePayload) => {
-      const { data } = await axiosClient.post("/api/instructor/courses", payload);
+      const formData = new FormData();
+      formData.append("title", payload.title);
+      if (payload.description) formData.append("description", payload.description);
+      if (payload.level) formData.append("level", payload.level);
+      formData.append("category_id", String(payload.category_id));
+      if (payload.thumbnail) {
+        formData.append("thumbnail", payload.thumbnail);
+      }
+
+      const { data } = await axiosClient.post("/api/instructor/courses", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return data.data; // Assumes ApiResponse returns { data: { id, title... } }
     },
     onSuccess: () => {
@@ -34,7 +48,9 @@ export function useUploadCourseThumbnail() {
         `/api/instructor/courses/${courseId}/thumbnail`,
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
       return data.data;
