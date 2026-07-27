@@ -5,6 +5,8 @@ type CourseApiPayload = {
   data?: Array<{
     id?: number;
     title?: string;
+    description?: string;
+    category_id?: number | null;
     category?: { name?: string } | null;
     level?: string;
     price?: number | string;
@@ -43,6 +45,8 @@ export async function getAdminCoursesPageData(params?: {
   const rows = (coursePayload.data ?? []).map((row) => ({
     id: Number(row.id ?? 0),
     title: String(row.title ?? "Khóa học chưa có tiêu đề"),
+    description: String(row.description ?? ""),
+    categoryId: row.category_id ? Number(row.category_id) : null,
     category: String(row.category?.name ?? "Chưa phân loại"),
     level: String(row.level ?? "beginner"),
     price: Number(row.price ?? 0),

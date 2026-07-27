@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Mail\AdminSystemNotificationMail;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,12 +29,20 @@ class NotificationController extends Controller
         $subject = $data['subject'] ?? 'MindNova Admin Notification';
         $message = $data['message'] ?? 'Thong bao he thong tu trang quan tri MindNova.';
 
-        Mail::raw($message, function ($mail) use ($recipient, $subject): void {
-            $mail->to($recipient)->subject($subject);
-        });
+        $mailable = new AdminSystemNotificationMail(
+            subject: $subject,
+            message: $message,
+            senderName: $request->user()?->name,
+        );
+
+        Mail::to($recipient)->queue($mailable);
 
         return response()->json([
-            'message' => 'Notification email sent successfully.',
+            'message' => 'Notification email queued successfully.',
+            'meta' => [
+                'recipient' => $recipient,
+                'queue' => config('queue.connections.' . config('queue.default') . '.queue', 'default'),
+            ],
         ]);
     }
 }

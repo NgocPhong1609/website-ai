@@ -9,6 +9,7 @@ export async function getAdminCategoriesPageData(): Promise<AdminCategoriesPageD
       id: Number(row.id ?? 0),
       name: String(row.name ?? ""),
       slug: String(row.slug ?? ""),
+      description: String(row.description ?? ""),
       status: String(row.status ?? "active"),
     })),
   };
