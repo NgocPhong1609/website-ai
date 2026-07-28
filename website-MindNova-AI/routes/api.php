@@ -57,10 +57,6 @@ Route::middleware('throttle:5,1')->group(function () {
     Route::get('/payments/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
 });
 
-Route::prefix('student')->group(function () {
-        Route::post('/chat-tutor', [AiTutorController::class, 'streamChat']);
-    });
-
 // ==========================================
 // 2. NHÓM API PRIVATE (Bắt buộc phải có Bearer Token)
 // ==========================================
@@ -84,66 +80,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
 
-    // =========================
-    // TÍNH NĂNG AI TUTOR (PB-025)
-    // =========================
-
-
-});
-
-    Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group(function () {
-        Route::apiResource('courses', CourseController::class);
-        Route::post('courses/{course}/thumbnail', [CourseController::class, 'uploadThumbnail']);
-        Route::patch('courses/{course}/status', [CourseController::class, 'updateStatus']);
-        Route::patch('courses/{course}/price', [CourseController::class, 'updatePrice']);
-
-        // Modules
-        Route::get('courses/{course}/modules', [CourseModuleController::class, 'index']);
-        Route::get('modules/{module}', [CourseModuleController::class, 'show']);
-        Route::post('courses/{course}/modules', [CourseModuleController::class, 'store']);
-        Route::put('modules/{module}', [CourseModuleController::class, 'update']);
-        Route::delete('modules/{module}', [CourseModuleController::class, 'destroy']);
-
-        // Lessons
-        Route::get('modules/{module}/lessons', [LessonController::class, 'index']);
-        Route::get('lessons/{lesson}', [LessonController::class, 'show']);
-        Route::post('modules/{module}/lessons', [LessonController::class, 'store']);
-        Route::put('lessons/{lesson}', [LessonController::class, 'update']);
-        Route::delete('lessons/{lesson}', [LessonController::class, 'destroy']);
-        Route::post('lessons/{lesson}/video', [LessonController::class, 'uploadVideo']);
-        Route::get('lessons/{lesson}/video-url', [LessonController::class, 'getVideoUrl']);
-        Route::post('lessons/{lesson}/content-media', [LessonController::class, 'uploadContentMedia']);
-
-        // Temporary Media
-        Route::post('media/temp', [MediaController::class, 'uploadTemp']);
-        Route::delete('media/temp/{media}', [MediaController::class, 'deleteTemp']);
-
-        // Quiz (Instructor CRUD)
-        Route::get('lessons/{lesson}/quiz', [QuizController::class, 'show']);
-        Route::post('lessons/{lesson}/quiz', [QuizController::class, 'store']);
-        Route::delete('lessons/{lesson}/quiz', [QuizController::class, 'destroy']);
-        // Students (Module 2)
-        Route::get('students', [\App\Http\Controllers\Api\Instructor\StudentController::class, 'index']);
-        Route::get('students/{student}/progress', [\App\Http\Controllers\Api\Instructor\StudentController::class, 'progress']);
-
-        // Discussions (Module 2)
-        Route::get('discussions', [\App\Http\Controllers\Api\Instructor\DiscussionController::class, 'index']);
-        Route::post('discussions/{discussion}/replies', [\App\Http\Controllers\Api\Instructor\DiscussionController::class, 'reply']);
-
-        // Notifications (Module 2)
-        Route::post('notifications', [\App\Http\Controllers\Api\Instructor\NotificationController::class, 'store']);
-    });
-
     // ==========================================
-    // 5. NHÓM API HỌC SINH (Student)
+    // 3. NHÓM API HỌC SINH (Student)
     // ==========================================
     Route::prefix('student')->group(function () {
+        // TÍNH NĂNG AI TUTOR (PB-025)
+        Route::post('/chat-tutor', [AiTutorController::class, 'streamChat']);
+
+        // Quiz
         Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
         Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
     });
+});
 
 // ==========================================
-// 3. NHÓM API GIÁO VIÊN (Dành cho Teacher)
+// 4. NHÓM API GIÁO VIÊN (Dành cho Teacher)
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group(function () {
 
@@ -168,6 +119,16 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::delete('lessons/{lesson}', [LessonController::class, 'destroy']);
     Route::post('lessons/{lesson}/video', [LessonController::class, 'uploadVideo']);
     Route::get('lessons/{lesson}/video-url', [LessonController::class, 'getVideoUrl']);
+    Route::post('lessons/{lesson}/content-media', [LessonController::class, 'uploadContentMedia']);
+
+    // Temporary Media
+    Route::post('media/temp', [MediaController::class, 'uploadTemp']);
+    Route::delete('media/temp/{media}', [MediaController::class, 'deleteTemp']);
+
+    // Quiz (Instructor CRUD)
+    Route::get('lessons/{lesson}/quiz', [QuizController::class, 'show']);
+    Route::post('lessons/{lesson}/quiz', [QuizController::class, 'store']);
+    Route::delete('lessons/{lesson}/quiz', [QuizController::class, 'destroy']);
 
     // Students
     Route::get('students', [InstructorStudentController::class, 'index']);
@@ -182,7 +143,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
 });
 
 // ==========================================
-// 4. NHÓM API QUẢN TRỊ (Dành riêng cho Admin)
+// 5. NHÓM API QUẢN TRỊ (Dành riêng cho Admin)
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
 
