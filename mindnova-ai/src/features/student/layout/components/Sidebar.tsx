@@ -1,3 +1,5 @@
+"use client"; // Bắt buộc phải có dòng này để dùng được sự kiện onClick
+
 import Link from "next/link";
 import { SidebarBrand } from "./SidebarBrand";
 import { SidebarNav } from "./SidebarNav";
@@ -35,6 +37,20 @@ function LogoutIcon() {
 // ─── Main Sidebar ─────────────────────────────────────────────────────────────
 
 export default function Sidebar() {
+  
+  // Hàm xử lý Logout chuyên nghiệp
+  const handleLogout = () => {
+    // 1. Xóa sạch dữ liệu lưu trong trình duyệt
+    window.localStorage.clear();
+    
+    // 2. Xóa các Cookie bằng cách đặt thời gian hết hạn về quá khứ
+    document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    
+    // 3. Chuyển hướng về trang Login
+    window.location.assign("/login");
+  };
+
   return (
     <aside className="w-60 shrink-0 h-screen flex flex-col bg-white border-r border-[#F0F0F8]">
       {/* Brand */}
@@ -65,8 +81,11 @@ export default function Sidebar() {
             <HelpIcon />
             <span>Help</span>
           </Link>
+          
+          {/* Nút Logout đã được gán hàm handleLogout */}
           <button
             type="button"
+            onClick={handleLogout}
             className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-[#64647A] hover:bg-red-50 hover:text-red-500 transition-all duration-150 w-full text-left"
           >
             <LogoutIcon />

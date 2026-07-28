@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\Student\PaymentController;
 use App\Http\Controllers\Api\Student\SubscriptionController;
 use App\Http\Controllers\Api\Student\NotificationController as StudentNotificationController;
 use App\Http\Controllers\Api\Student\AiTutorController;
+use App\Http\Controllers\Api\Student\CourseController as StudentCourseController;
 
 // Nhóm Dùng chung
 use App\Http\Controllers\Api\RealtimeController;
@@ -52,6 +53,9 @@ Route::middleware('throttle:5,1')->group(function () {
 
     // VNPay IPN
     Route::get('/payments/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
+
+    // Lấy danh sách khóa học có sẵn (dành cho người dùng chưa đăng nhập)
+    Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
 });
 
 Route::prefix('student')->group(function () {

@@ -2,6 +2,7 @@ import {
   AiSuggestionCard,
   ContinueLearning,
   DashboardStatsPanel,
+  ExploreCourses,
 } from "@/src/features/student/dashboard";
 
 export default function DashboardPage() {
@@ -11,6 +12,7 @@ export default function DashboardPage() {
       <div className="flex-1 flex flex-col gap-8 min-w-0">
         <AiSuggestionCard />
         <ContinueLearning />
+        <ExploreCourses/>
       </div>
 
       {/* Right Sidebar */}
