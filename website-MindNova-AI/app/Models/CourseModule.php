@@ -14,6 +14,10 @@ class CourseModule extends Model
         'order',
     ];
 
+    protected $casts = [
+        'order' => 'integer',
+    ];
+
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
@@ -21,6 +25,7 @@ class CourseModule extends Model
 
     public function lessons(): HasMany
     {
-        return $this->hasMany(Lesson::class, 'module_id')->orderBy('order');
+        return $this->hasMany(Lesson::class, 'module_id')
+            ->orderBy('order');
     }
 }

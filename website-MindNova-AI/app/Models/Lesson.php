@@ -10,15 +10,20 @@ class Lesson extends Model
     protected $fillable = [
         'module_id',
         'title',
-        'type', // video, article, quiz_module
+        'type',
         'content',
         'video_url',
         'duration_minutes',
         'order',
     ];
 
+    protected $casts = [
+        'duration_minutes' => 'integer',
+        'order' => 'integer',
+    ];
+
     public function module(): BelongsTo
     {
-        return $this->belongsTo(CourseModule::class, 'module_id');
+        return $this->belongsTo(CourseModule::class);
     }
 }

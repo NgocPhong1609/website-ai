@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\CourseModule;
 
 #[Fillable(['teacher_id', 'category_id', 'title', 'slug', 'description', 'thumbnail', 'price', 'level', 'status'])]
 class Course extends Model
@@ -28,4 +30,9 @@ class Course extends Model
     {
         return $this->hasMany(CourseModule::class)->orderBy('order');
     }
+    public function modules(): HasMany
+{
+    return $this->hasMany(CourseModule::class)
+        ->orderBy('order');
+}
 }
