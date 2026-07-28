@@ -3,7 +3,11 @@ import {
   ExploreMoreCard,
   MY_COURSES,
   MyCourseCard,
+<<<<<<< HEAD:mindnova-ai/app/(protected)/(student)/courses/page.tsx
 } from "@/src/components/page/student/courses";
+=======
+} from "@/src/features/student/courses";
+>>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/app/(dashboard)/courses/page.tsx
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

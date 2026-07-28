@@ -1,7 +1,14 @@
+<<<<<<< HEAD:mindnova-ai/src/components/page/student/dashboard/AiSuggestionCard.tsx
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
 import { AI_SUGGESTION } from "./constants";
 
+=======
+import { AI_SUGGESTION } from "@features/student/dashboard/constants/data";
+
+// ─── Icons ────────────────────────────────────────────────────────────────────
+
+>>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/src/features/student/dashboard/components/AiSuggestionCard.tsx
 function SparkleIcon() {
   return (
     <div className="w-12 h-12 rounded-2xl bg-[#EEF2FF] flex items-center justify-center shrink-0">

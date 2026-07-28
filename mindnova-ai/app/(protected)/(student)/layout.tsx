@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
+<<<<<<< HEAD:mindnova-ai/app/(protected)/(student)/layout.tsx
 import { Sidebar } from "./layout/components/Sidebar";
 import { DashboardTopbar } from "@/src/components/page/student/dashboard";
+=======
+import { Sidebar } from "@/src/features/student/layout";
+import { DashboardTopbar } from "@/src/features/student/dashboard";
+>>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/app/(dashboard)/layout.tsx
 
 export const metadata: Metadata = {
   title: "Dashboard",

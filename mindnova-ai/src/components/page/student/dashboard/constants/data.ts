@@ -1,5 +1,10 @@
+<<<<<<< HEAD:mindnova-ai/src/components/page/student/dashboard/constants/data.ts
 import type { ICourse } from "@/src/components/page/student/courses/types";
 import type { IFocusArea, IActivityGroup } from "@/src/components/page/student/dashboard/types";
+=======
+import type { ICourse } from "@features/student/courses/types";
+import type { IFocusArea, IActivityGroup } from "@features/student/dashboard/types";
+>>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/src/features/student/dashboard/constants/data.ts
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 // Replace with real API calls when backend is ready.

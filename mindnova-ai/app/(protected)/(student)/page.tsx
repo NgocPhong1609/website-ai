@@ -2,7 +2,11 @@ import {
   AiSuggestionCard,
   ContinueLearning,
   DashboardStatsPanel,
+<<<<<<< HEAD:mindnova-ai/app/(protected)/(student)/page.tsx
 } from "@/src/components/page/student/dashboard";
+=======
+} from "@/src/features/student/dashboard";
+>>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/app/(dashboard)/page.tsx
 
 export default function DashboardPage() {
   return (

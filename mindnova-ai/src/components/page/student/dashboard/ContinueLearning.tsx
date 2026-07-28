@@ -1,8 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
+<<<<<<< HEAD:mindnova-ai/src/components/page/student/dashboard/ContinueLearning.tsx
 import { DASHBOARD_COURSES } from "./constants";
 import { MyCourseCard } from "../courses";
 import { ICourse } from "../courses";
+=======
+import { DASHBOARD_COURSES } from "../constants";
+import { ICourse } from "../../courses";
+>>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/src/features/student/dashboard/components/ContinueLearning.tsx
 
 // ─── Sub-component ────────────────────────────────────────────────────────────
 
