@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   description: "Answer quiz questions.",
 };
 
-export default function QuizQuestionPage() {
-  return <QuizQuestionScreen />;
+export default async function QuizQuestionPage({ searchParams }: { searchParams: Promise<{ lessonId?: string }> }) {
+  const { lessonId } = await searchParams;
+  return <QuizQuestionScreen lessonId={lessonId || "1"} />;
 }

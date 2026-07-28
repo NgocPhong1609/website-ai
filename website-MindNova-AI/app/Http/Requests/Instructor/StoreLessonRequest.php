@@ -19,6 +19,8 @@ class StoreLessonRequest extends FormRequest
             'content' => 'nullable|string',
             'order' => 'integer|min:0',
             'duration_minutes' => 'integer|min:0',
+            'temp_media_ids' => 'nullable|array',
+            'temp_media_ids.*' => 'integer|exists:lesson_media,id',
         ];
     }
 }
