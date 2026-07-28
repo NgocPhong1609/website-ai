@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { RichTextEditor } from "../../shared/components/RichTextEditor";
-import type { DraftLesson, DraftLessonType } from "../types";
+import { QuizEditor } from "./QuizEditor";
+import type { DraftLesson, DraftLessonType, DraftQuizData } from "../types";
+import { useUploadTempMedia, useDeleteTempMedia } from "../api";
 
 interface CreateLessonEditModalProps {
   lesson: DraftLesson;
@@ -14,9 +16,59 @@ export function CreateLessonEditModal({ lesson, onSave, onClose }: CreateLessonE
   const [title, setTitle] = useState(lesson.title);
   const [type, setType] = useState<DraftLessonType>(lesson.type);
   const [content, setContent] = useState((lesson as any).content || "");
+  const [quizData, setQuizData] = useState<DraftQuizData | undefined>(lesson.quizData);
+
+  const [tempMediaMap, setTempMediaMap] = useState<Map<string, number>>(new Map());
+  const uploadTempMedia = useUploadTempMedia();
+  const deleteTempMedia = useDeleteTempMedia();
+
+  const handleVideoUpload = async (file: File, onProgress: (p: number) => void) => {
+    const result = await uploadTempMedia.mutateAsync({
+      file,
+      onUploadProgress: (progressEvent: any) => {
+        if (progressEvent.total) {
+          onProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+        }
+      }
+    });
+
+    if (result && result.url && result.media_id) {
+      setTempMediaMap(prev => {
+        const newMap = new Map(prev);
+        newMap.set(result.url, result.media_id);
+        return newMap;
+      });
+      return { url: result.url, media_id: result.media_id };
+    }
+    throw new Error("Upload failed");
+  };
+
+  const handleClose = () => {
+    if (tempMediaMap.size > 0) {
+      Array.from(tempMediaMap.values()).forEach(mediaId => {
+        deleteTempMedia.mutate(mediaId).catch(console.error);
+      });
+    }
+    onClose();
+  };
 
   const handleSave = () => {
-    onSave(lesson.id, { title, type, content } as any);
+    let finalContent = content;
+    finalContent = finalContent.replace(/poster="data:image\/[^"]+"/g, 'poster=""');
+
+    const usedTempMediaIds: number[] = [...(lesson.temp_media_ids || [])];
+    const contentUrls = Array.from(finalContent.matchAll(/https?:\/\/[^\s"'><]+/g)).map((m: any) => m[0]);
+    
+    Array.from(tempMediaMap.entries()).forEach(([url, id]) => {
+      if (contentUrls.some(cUrl => cUrl.includes(url))) {
+        usedTempMediaIds.push(id);
+      } else {
+        deleteTempMedia.mutate(id);
+      }
+    });
+
+    onSave(lesson.id, { title, type, content: finalContent, quizData, temp_media_ids: usedTempMediaIds } as any);
+    setTempMediaMap(new Map());
   };
 
   return (
@@ -32,7 +84,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose }: CreateLessonE
           <h2 className="text-[16px] font-bold text-[#1A1A2E]">Soạn thảo bài học</h2>
           <button 
             type="button" 
-            onClick={onClose}
+            onClick={handleClose}
             className="w-8 h-8 rounded-lg flex items-center justify-center text-[#9090B0] hover:bg-[#F4F4FA] transition-colors"
           >
             ✕
@@ -66,12 +118,22 @@ export function CreateLessonEditModal({ lesson, onSave, onClose }: CreateLessonE
           </div>
 
           <div className="flex flex-col gap-1.5 flex-1 min-h-[400px]">
-            <label className="text-sm font-semibold text-[#1A1A2E]">Nội dung chi tiết</label>
-            <RichTextEditor
-              value={content}
-              onChange={setContent}
-              placeholder="Soạn nội dung phong phú cho bài học..."
-            />
+            {type === 'quiz' ? (
+              <QuizEditor 
+                value={quizData}
+                onChange={setQuizData}
+              />
+            ) : (
+              <>
+                <label className="text-sm font-semibold text-[#1A1A2E]">Nội dung chi tiết</label>
+                <RichTextEditor
+                  value={content}
+                  onChange={setContent}
+                  placeholder="Soạn nội dung phong phú cho bài học..."
+                  onVideoUpload={handleVideoUpload}
+                />
+              </>
+            )}
           </div>
         </div>
 
@@ -79,7 +141,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose }: CreateLessonE
         <div className="px-6 py-4 border-t border-[#F0F0F8] flex justify-end gap-3 bg-[#FAFAFE]">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#64647A] hover:bg-[#EAEAF4] transition-colors"
           >
             Hủy

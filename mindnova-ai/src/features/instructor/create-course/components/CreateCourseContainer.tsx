@@ -15,7 +15,7 @@ import { ArrowRightIcon, SaveIcon, BookOpenIcon, SparklesIcon } from "./icons";
 import type { CourseBasicInfo, StepKey } from "../types";
 import type { GeneratedOutline } from "./AIOutlineModal";
 import { useCreateCourse, useUploadCourseThumbnail, useUpdateCoursePrice, useUpdateCourseStatus } from "../api";
-import { useCreateModule } from "../../lesson-management/api";
+import { useCreateModule, useCreateLesson, useUpdateLesson, useCreateQuiz } from "../../lesson-management/api";
 import { useCreateCourseStore } from "../stores/createCourseStore";
 
 // ─── Footer bar ───────────────────────────────────────────────────────────────
@@ -111,6 +111,7 @@ export function CreateCourseContainer() {
   // ── Publishing state ──────────────────────────────────────────────────────────
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
+  const [step2Error, setStep2Error] = useState<string | null>(null);
 
   // ── API mutations (only used at final publish) ────────────────────────────────
   const { mutateAsync: createCourse } = useCreateCourse();
@@ -118,6 +119,8 @@ export function CreateCourseContainer() {
   const { mutateAsync: updatePrice } = useUpdateCoursePrice();
   const { mutateAsync: updateStatus } = useUpdateCourseStatus();
   const { mutateAsync: createModule } = useCreateModule();
+  const { mutateAsync: createLesson } = useCreateLesson();
+  const { mutateAsync: createQuiz } = useCreateQuiz();
 
   // ── Hydrate on mount ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -150,11 +153,75 @@ export function CreateCourseContainer() {
         return;
       }
     }
+    if (step === 2) {
+      let isValid = true;
+      let errorMessage = "";
+      
+      if (modules.length === 0) {
+        isValid = false;
+        errorMessage = "Vui lòng thêm ít nhất một chương học.";
+      } else {
+        for (const mod of modules) {
+          if (mod.lessons.length === 0) {
+            isValid = false;
+            errorMessage = `Chương "${mod.title}" chưa có bài học nào.`;
+            break;
+          }
+          for (const lesson of mod.lessons) {
+            if (lesson.type === "quiz") {
+              if (!lesson.quizData || !lesson.quizData.questions || lesson.quizData.questions.length === 0) {
+                isValid = false;
+                errorMessage = `Bài kiểm tra "${lesson.title}" chưa có câu hỏi nào.`;
+                break;
+              }
+              for (const q of lesson.quizData.questions) {
+                if (!q.content?.trim()) {
+                  isValid = false;
+                  errorMessage = `Có câu hỏi bị để trống nội dung trong bài kiểm tra "${lesson.title}".`;
+                  break;
+                }
+                if (!q.answers || q.answers.length < 2) {
+                  isValid = false;
+                  errorMessage = `Câu hỏi trong bài "${lesson.title}" phải có ít nhất 2 đáp án.`;
+                  break;
+                }
+                const hasCorrect = q.answers.some(ans => ans.is_correct);
+                if (!hasCorrect) {
+                  isValid = false;
+                  errorMessage = `Câu hỏi trong bài "${lesson.title}" chưa chọn đáp án đúng.`;
+                  break;
+                }
+                const hasEmptyOption = q.answers.some(ans => !ans.content?.trim());
+                if (hasEmptyOption) {
+                  isValid = false;
+                  errorMessage = `Không được để trống câu trả lời trong bài "${lesson.title}".`;
+                  break;
+                }
+              }
+            } else {
+              if (!lesson.content?.trim() && !lesson.temp_media_ids?.length) {
+                isValid = false;
+                errorMessage = `Bài học "${lesson.title}" chưa có nội dung hoặc video.`;
+                break;
+              }
+            }
+            if (!isValid) break;
+          }
+          if (!isValid) break;
+        }
+      }
+      
+      if (!isValid) {
+        setStep2Error(errorMessage);
+        return;
+      }
+      setStep2Error(null);
+    }
     // Step 1, 2: Just move to next step. NO API calls.
     if (step < 3) {
       goNext();
     }
-  }, [step, courseInfo.title, goNext]);
+  }, [step, courseInfo, modules, goNext]);
 
   const handleBack = useCallback(() => {
     goBack();
@@ -181,16 +248,45 @@ export function CreateCourseContainer() {
 
       const courseId = courseData.id;
 
-      // Note: Backend handles thumbnail upload via createCourse now, 
-      // so we skip the separate uploadThumbnail call.
-
-      // 3. Create all modules sequentially
+      // 3. Create modules and lessons
       for (const mod of modules) {
-        await createModule({
+        const createdModule = await createModule({
           courseId,
           title: mod.title,
           order: mod.order,
         });
+
+        const moduleId = createdModule.id;
+
+        // Create lessons
+        for (const lesson of mod.lessons) {
+          let finalContent = lesson.content || "";
+
+          // Strip large poster data URLs from content to prevent DB bloat
+          finalContent = finalContent.replace(/poster="data:image\/[^"]+"/g, 'poster=""');
+
+          // Create the lesson first
+          const payloadType = lesson.type === 'quiz' ? 'quiz_module' : (lesson.type === 'document' ? 'article' : lesson.type);
+          const createdLesson = await createLesson({
+            courseId,
+            moduleId,
+            payload: {
+              title: lesson.title,
+              type: payloadType,
+              content: finalContent,
+              order: lesson.order,
+              status: 'published',
+              temp_media_ids: lesson.temp_media_ids
+            }
+          });
+
+          const lessonId = createdLesson.id;
+
+          // Handle quiz data
+          if (lesson.type === 'quiz' && lesson.quizData) {
+            await createQuiz({ lessonId, payload: lesson.quizData });
+          }
+        }
       }
 
       // 4. Update price
@@ -236,6 +332,8 @@ export function CreateCourseContainer() {
     updatePrice,
     updateStatus,
     resetDraft,
+    createLesson,
+    createQuiz,
   ]);
 
   // ── Step labels ───────────────────────────────────────────────────────────────
@@ -266,6 +364,17 @@ export function CreateCourseContainer() {
             </h1>
 
             <div className="flex items-center gap-3 shrink-0">
+              {/* Back button */}
+              {step > 1 && (
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-[#464554] border border-[#DDDDF0] bg-white hover:bg-[#F4F4FA] hover:border-[#C5C6FF] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#EAEAF4]"
+                >
+                  ← Quay lại
+                </button>
+              )}
+
               {/* Save draft */}
               <button
                 type="button"
@@ -327,7 +436,7 @@ export function CreateCourseContainer() {
             )}
 
             {step === 2 && (
-              <Step2CourseStructure />
+              <Step2CourseStructure error={step2Error} />
             )}
 
             {step === 3 && (

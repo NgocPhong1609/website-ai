@@ -16,6 +16,7 @@ class LessonMedia extends Model
         'mime_type',
         'duration_seconds',
         'status',
+        'is_temp',
     ];
 
     public function lesson(): BelongsTo

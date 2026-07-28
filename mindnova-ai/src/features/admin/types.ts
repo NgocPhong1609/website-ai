@@ -36,6 +36,8 @@ export type AdminUsersPageData = {
 export type AdminCourseRow = {
   id: number;
   title: string;
+  description: string;
+  categoryId: number | null;
   category: string;
   level: string;
   price: number;
@@ -66,6 +68,7 @@ export type AdminCategoryRow = {
   id: number;
   name: string;
   slug: string;
+  description: string;
   status: string;
 };
 

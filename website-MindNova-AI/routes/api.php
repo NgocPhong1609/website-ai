@@ -10,14 +10,12 @@ use Illuminate\Support\Facades\Route;
 // Nhóm Auth
 use App\Http\Controllers\Api\Auth\AuthController;
 
-// Nhóm Student (Học sinh) - Nơi chứa PB-025
+// Nhóm Student (Học sinh)
 use App\Http\Controllers\Api\Student\UserController;
 use App\Http\Controllers\Api\Student\OrderController;
-use App\Http\Controllers\Api\Student\PaymentController;
-use App\Http\Controllers\Api\Student\SubscriptionController;
-use App\Http\Controllers\Api\Student\NotificationController as StudentNotificationController;
 use App\Http\Controllers\Api\Student\AiTutorController;
 use App\Http\Controllers\Api\Student\CourseController as StudentCourseController;
+use App\Http\Controllers\Api\StudentQuizController;
 
 // Nhóm Dùng chung
 use App\Http\Controllers\Api\RealtimeController;
@@ -37,6 +35,8 @@ use App\Http\Controllers\Api\Instructor\LessonController;
 use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentController;
 use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscussionController;
 use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNotificationController;
+use App\Http\Controllers\Api\Instructor\QuizController;
+use App\Http\Controllers\Api\Instructor\MediaController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -44,10 +44,8 @@ use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNoti
 Route::middleware('throttle:5,1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
-
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-
     Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
@@ -57,10 +55,6 @@ Route::middleware('throttle:5,1')->group(function () {
     // Lấy danh sách khóa học có sẵn (dành cho người dùng chưa đăng nhập)
     Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
 });
-
-Route::prefix('student')->group(function () {
-        Route::post('/chat-tutor', [AiTutorController::class, 'streamChat']);
-    });
 
 // ==========================================
 // 2. NHÓM API PRIVATE (Bắt buộc phải có Bearer Token)
@@ -85,11 +79,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
 
-    // =========================
-    // TÍNH NĂNG AI TUTOR (PB-025)
-    // =========================
-
-
+    // -- Nhóm API Học sinh (Student) --
+    Route::prefix('student')->group(function () {
+        Route::post('/chat-tutor', [AiTutorController::class, 'streamChat']);
+        Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
+        Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
+    });
 });
 
 // ==========================================
@@ -118,6 +113,16 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::delete('lessons/{lesson}', [LessonController::class, 'destroy']);
     Route::post('lessons/{lesson}/video', [LessonController::class, 'uploadVideo']);
     Route::get('lessons/{lesson}/video-url', [LessonController::class, 'getVideoUrl']);
+    Route::post('lessons/{lesson}/content-media', [LessonController::class, 'uploadContentMedia']);
+
+    // Temporary Media
+    Route::post('media/temp', [MediaController::class, 'uploadTemp']);
+    Route::delete('media/temp/{media}', [MediaController::class, 'deleteTemp']);
+
+    // Quiz
+    Route::get('lessons/{lesson}/quiz', [QuizController::class, 'show']);
+    Route::post('lessons/{lesson}/quiz', [QuizController::class, 'store']);
+    Route::delete('lessons/{lesson}/quiz', [QuizController::class, 'destroy']);
 
     // Students
     Route::get('students', [InstructorStudentController::class, 'index']);

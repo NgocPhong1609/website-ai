@@ -13,6 +13,7 @@ class LessonService
     public function createLesson(CourseModule $module, array $data): Lesson
     {
         $data['module_id'] = $module->id;
+        $data['course_id'] = $module->course_id;
         if (!isset($data['order'])) {
             $maxOrder = $module->lessons()->max('order') ?? 0;
             $data['order'] = $maxOrder + 1;
@@ -78,5 +79,162 @@ class LessonService
             'signed_url' => $signedUrl,
             'expires_at' => $expiresAt,
         ];
+    }
+
+    /**
+     * Upload a media file from CKEditor content (image or video) to Cloudflare R2.
+     * Returns the public URL for embedding in HTML content.
+     */
+    public function uploadContentMedia(Lesson $lesson, UploadedFile $file): array
+    {
+        $uuid = \Illuminate\Support\Str::uuid()->toString();
+        $extension = $file->getClientOriginalExtension();
+
+        $isVideo = str_starts_with($file->getMimeType(), 'video/');
+        $subfolder = $isVideo ? 'videos' : 'images';
+        $mediaType = $isVideo ? 'video' : 'image';
+
+        $filename = "lessons/{$lesson->id}/content/{$subfolder}/{$uuid}.{$extension}";
+
+        // Upload to Cloudflare R2 securely without loading into memory
+        Storage::disk('r2')->putFileAs(
+            "lessons/{$lesson->id}/content/{$subfolder}",
+            $file,
+            "{$uuid}.{$extension}"
+        );
+
+        $media = LessonMedia::create([
+            'lesson_id' => $lesson->id,
+            'media_type' => $mediaType,
+            'r2_key' => $filename,
+            'original_filename' => $file->getClientOriginalName(),
+            'file_size' => $file->getSize(),
+            'mime_type' => $file->getMimeType(),
+            'status' => 'ready',
+        ]);
+
+        $url = Storage::disk('r2')->url($filename);
+
+        return [
+            'media_id' => $media->id,
+            'url' => $url,
+            'media_type' => $mediaType,
+        ];
+    }
+
+    /**
+     * Upload a temporary media file to Cloudflare R2.
+     * Returns the public URL and media ID for CKEditor preview.
+     */
+    public function uploadTempMedia(UploadedFile $file): array
+    {
+        $uuid = \Illuminate\Support\Str::uuid()->toString();
+        $extension = $file->getClientOriginalExtension();
+
+        $isVideo = str_starts_with($file->getMimeType(), 'video/');
+        $subfolder = $isVideo ? 'videos' : 'images';
+        $mediaType = $isVideo ? 'video' : 'image';
+
+        $filename = "temp/{$subfolder}/{$uuid}.{$extension}";
+
+        Storage::disk('r2')->putFileAs("temp/{$subfolder}", $file, "{$uuid}.{$extension}");
+
+        $media = LessonMedia::create([
+            'lesson_id' => null,
+            'media_type' => $mediaType,
+            'r2_key' => $filename,
+            'original_filename' => $file->getClientOriginalName(),
+            'file_size' => $file->getSize(),
+            'mime_type' => $file->getMimeType(),
+            'status' => 'ready',
+            'is_temp' => true,
+        ]);
+
+        $url = Storage::disk('r2')->url($filename);
+
+        return [
+            'media_id' => $media->id,
+            'url' => $url,
+            'media_type' => $mediaType,
+            'file_name' => $file->getClientOriginalName(),
+            'file_size' => $file->getSize(),
+            'mime_type' => $file->getMimeType(),
+        ];
+    }
+
+    /**
+     * Move temporary media to official lesson folder, mark as active, update lesson content URLs, and clean orphans.
+     */
+    public function confirmTempMedia(array $mediaIds, Lesson $lesson): void
+    {
+        $contentChanged = false;
+        $content = $lesson->content ?? '';
+        
+        // 1. Move and update new media from temp folder
+        if (!empty($mediaIds)) {
+            $mediaList = LessonMedia::whereIn('id', $mediaIds)
+                ->where('is_temp', true)
+                ->get();
+
+            foreach ($mediaList as $media) {
+                $subfolder = $media->media_type === 'video' ? 'videos' : 'images';
+                $filename = basename($media->r2_key);
+                $newKey = "lessons/{$lesson->id}/content/{$subfolder}/{$filename}";
+                
+                $oldUrl = Storage::disk('r2')->url($media->r2_key);
+                $newUrl = Storage::disk('r2')->url($newKey);
+
+                // Move the file in Cloudflare R2
+                if (Storage::disk('r2')->exists($media->r2_key)) {
+                    Storage::disk('r2')->move($media->r2_key, $newKey);
+                }
+
+                $media->update([
+                    'lesson_id' => $lesson->id,
+                    'r2_key' => $newKey,
+                    'is_temp' => false,
+                ]);
+
+                // Replace old URL with new URL in content
+                if (str_contains($content, $oldUrl)) {
+                    $content = str_replace($oldUrl, $newUrl, $content);
+                    $contentChanged = true;
+                }
+            }
+        }
+
+        // 2. Clean up orphaned media (files in DB but no longer in HTML content)
+        $existingMedia = $lesson->media()->where('is_temp', false)->get();
+        foreach ($existingMedia as $media) {
+            $mediaUrl = Storage::disk('r2')->url($media->r2_key);
+            // If the URL is no longer in the HTML content, delete the file and record
+            if (!str_contains($content, $mediaUrl)) {
+                if (Storage::disk('r2')->exists($media->r2_key)) {
+                    Storage::disk('r2')->delete($media->r2_key);
+                }
+                $media->delete();
+            }
+        }
+
+        // Save lesson if content was updated with new URLs
+        if ($contentChanged) {
+            $lesson->content = $content;
+            $lesson->save();
+        }
+    }
+
+    /**
+     * Delete a temporary media file.
+     */
+    public function deleteTempMedia(int $mediaId): void
+    {
+        $media = LessonMedia::where('id', $mediaId)->where('is_temp', true)->first();
+
+        if ($media) {
+            if (Storage::disk('r2')->exists($media->r2_key)) {
+                Storage::disk('r2')->delete($media->r2_key);
+            }
+            $media->delete();
+        }
     }
 }
