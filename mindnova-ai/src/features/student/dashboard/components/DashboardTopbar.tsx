@@ -43,7 +43,12 @@ function SearchInput() {
   const pathname = usePathname();
   const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
 
+  // Chỉ chạy debounce khi searchTerm thay đổi, KHÔNG phụ thuộc vào searchParams
   useEffect(() => {
+    const currentSearch = searchParams.get("search") || "";
+    // Không làm gì nếu searchTerm đã khớp với URL hiện tại
+    if (searchTerm === currentSearch) return;
+
     const timer = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
       if (searchTerm) {
@@ -55,7 +60,7 @@ function SearchInput() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, pathname, router, searchParams]);
+  }, [searchTerm]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="flex-1 max-w-md relative">
@@ -117,12 +122,12 @@ export function DashboardTopbar() {
         ) : (
           // Chưa đăng nhập: Hiện nút Đăng nhập / Đăng ký
           <div className="flex items-center gap-3">
-            <Link href="/login" className="px-4 py-2 text-sm font-semibold text-[#1A1A2E] hover:text-[#6B6BFF] transition-colors">
+            <a href="/login" className="px-4 py-2 text-sm font-semibold text-[#1A1A2E] hover:text-[#6B6BFF] transition-colors">
               Đăng nhập
-            </Link>
-            <Link href="/register" className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] rounded-xl hover:shadow-[0_4px_18px_rgba(107,107,255,0.45)] transition-all">
+            </a>
+            <a href="/register" className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] rounded-xl hover:shadow-[0_4px_18px_rgba(107,107,255,0.45)] transition-all">
               Đăng ký
-            </Link>
+            </a>
           </div>
         )}
       </div>
