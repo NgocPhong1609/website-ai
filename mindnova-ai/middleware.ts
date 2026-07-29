@@ -1,42 +1,33 @@
+// src/middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// Trong file src/middleware.ts
 export function middleware(request: NextRequest) {
-  // Đọc accessToken từ Cookie
   const token = request.cookies.get('accessToken')?.value;
-  
-  // Lấy đường dẫn hiện tại
+  const role = request.cookies.get('userRole')?.value;
   const { pathname } = request.nextUrl;
-  // Danh sách các route bắt buộc phải đăng nhập
-  const protectedRoutes = ['/instructor', '/admin', '/student'];
-  
-  // Kiểm tra xem đường dẫn hiện tại có bắt đầu bằng một trong các route được bảo vệ không
+
+  // CẬP NHẬT Ở ĐÂY: Bảo vệ trang chủ "/" thay vì "/dashboard"
+  const protectedRoutes = ['/instructor', '/admin']; 
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
-  // Nếu đây là route được bảo vệ mà không có token, chuyển hướng về trang login
+  // Chặn truy cập nếu chưa đăng nhập
   if (isProtectedRoute && !token) {
-    const loginUrl = new URL('/login', request.url);
-    // Có thể truyền thêm tham số redirect để login xong quay lại trang cũ
-    loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Nếu người dùng đã đăng nhập (có token) mà cố tình vào trang login/register, đẩy về trang chủ hoặc dashboard
+  // Nếu đã login mà vào trang login, đẩy về trang tương ứng
   const authRoutes = ['/login', '/register'];
   if (authRoutes.includes(pathname) && token) {
-    return NextResponse.redirect(new URL('/instructor/courses', request.url));
+    if (role === 'admin') return NextResponse.redirect(new URL('/admin', request.url));
+    if (role === 'instructor') return NextResponse.redirect(new URL('/instructor/courses', request.url));
+    return NextResponse.redirect(new URL('/', request.url)); // SỬA Ở ĐÂY: Trỏ về "/"
   }
 
   return NextResponse.next();
 }
 
-// Cấu hình các đường dẫn mà middleware này sẽ chạy qua
 export const config = {
-  matcher: [
-    '/instructor/:path*',
-    '/admin/:path*',
-    '/student/:path*',
-    '/login',
-    '/register'
-  ],
+  matcher: ['/instructor/:path*', '/admin/:path*', '/login', '/register'], // Bỏ /dashboard ở đây
 };

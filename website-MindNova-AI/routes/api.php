@@ -10,13 +10,12 @@ use Illuminate\Support\Facades\Route;
 // Nhóm Auth
 use App\Http\Controllers\Api\Auth\AuthController;
 
-// Nhóm Student (Học sinh) - Nơi chứa PB-025
+// Nhóm Student (Học sinh)
 use App\Http\Controllers\Api\Student\UserController;
 use App\Http\Controllers\Api\Student\OrderController;
-use App\Http\Controllers\Api\Student\PaymentController;
-use App\Http\Controllers\Api\Student\SubscriptionController;
-use App\Http\Controllers\Api\Student\NotificationController as StudentNotificationController;
 use App\Http\Controllers\Api\Student\AiTutorController;
+use App\Http\Controllers\Api\Student\CourseController as StudentCourseController;
+use App\Http\Controllers\Api\StudentQuizController;
 
 // Nhóm Dùng chung
 use App\Http\Controllers\Api\RealtimeController;
@@ -35,7 +34,7 @@ use App\Http\Controllers\Api\Instructor\CourseModuleController;
 use App\Http\Controllers\Api\Instructor\LessonController;
 use App\Http\Controllers\Api\Instructor\QuizController;
 use App\Http\Controllers\Api\Instructor\MediaController;
-use App\Http\Controllers\Api\StudentQuizController;
+// use App\Http\Controllers\Api\StudentQuizController;
 use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentController;
 use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscussionController;
 use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNotificationController;
@@ -46,15 +45,16 @@ use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNoti
 Route::middleware('throttle:5,1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
-
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-
     Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
     // VNPay IPN
     Route::get('/payments/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
+
+    // Lấy danh sách khóa học có sẵn (dành cho người dùng chưa đăng nhập)
+    Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
 });
 
 // ==========================================
