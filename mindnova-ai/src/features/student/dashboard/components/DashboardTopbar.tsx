@@ -123,12 +123,12 @@ export function DashboardTopbar() {
         ) : (
           // Chưa đăng nhập: Hiện nút Đăng nhập / Đăng ký
           <div className="flex items-center gap-3">
-            <a href="/login" className="px-4 py-2 text-sm font-semibold text-[#1A1A2E] hover:text-[#6B6BFF] transition-colors">
+            <link href="/login" className="px-4 py-2 text-sm font-semibold text-[#1A1A2E] hover:text-[#6B6BFF] transition-colors">
               Đăng nhập
-            </a>
-            <a href="/register" className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] rounded-xl hover:shadow-[0_4px_18px_rgba(107,107,255,0.45)] transition-all">
+            </link>
+            <link href="/register" className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] rounded-xl hover:shadow-[0_4px_18px_rgba(107,107,255,0.45)] transition-all">
               Đăng ký
-            </a>
+            </link>
           </div>
         )}
       </div>
