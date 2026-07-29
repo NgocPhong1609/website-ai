@@ -1,15 +1,10 @@
 "use client";
 
-<<<<<<< HEAD
-import { useEffect, useState } from "react";
-import Link from "next/link";
-=======
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 
 // ─── DashboardTopbar ─────────────────────────────────────────────────────────
 // Top search + actions bar for the dashboard layout.
->>>>>>> 6cd68b158bdea860a333852fe76da13a4cf0331b
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
