@@ -44,7 +44,10 @@ class LessonResource extends JsonResource
             'duration_minutes' => $this->duration_minutes,
             'order' => $this->order,
             'status' => $this->status,
+<<<<<<< HEAD
             'quizData' => $quizData,
+=======
+>>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

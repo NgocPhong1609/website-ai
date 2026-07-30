@@ -54,6 +54,7 @@ function ActivePanel({
     <PersonalInfoPanel
       fullName={profile.fullName}
       email={profile.email}
+      phone={profile.phone}
       bio={profile.bio}
     />
   );

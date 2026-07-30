@@ -79,6 +79,7 @@ class LessonService
             'signed_url' => $signedUrl,
             'expires_at' => $expiresAt,
         ];
+<<<<<<< HEAD
     }
 
     /**
@@ -236,5 +237,7 @@ class LessonService
             }
             $media->delete();
         }
+=======
+>>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
     }
 }

@@ -1,3 +1,5 @@
+import { FloatingAIChatbot } from "@/src/components/page/student/onboarding";
+
 interface OnboardingLayoutProps {
   children: React.ReactNode;
 }
@@ -10,6 +12,8 @@ export default function OnboardingLayout({
       <div className="max-w-7xl min-h-screen w-full flex flex-col items-center mx-auto">
         {children}
       </div>
+      {/* USP: AI Advisor available throughout the Guest exploration flow */}
+      <FloatingAIChatbot />
     </main>
   );
 }

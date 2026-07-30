@@ -19,6 +19,7 @@ function makeQueryClient(): QueryClient {
   });
 }
 
+<<<<<<< HEAD
 let browserQueryClient: QueryClient | undefined = undefined;
 
 function getQueryClient() {
@@ -30,8 +31,10 @@ function getQueryClient() {
   }
 }
 
+=======
+>>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 export default function Providers({ children }: ProvidersProps) {
-  const queryClient = getQueryClient();
+  const [queryClient] = useState(() => makeQueryClient());
 
   return (
     <QueryClientProvider client={queryClient}>

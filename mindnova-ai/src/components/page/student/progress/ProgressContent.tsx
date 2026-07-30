@@ -1,37 +1,56 @@
+"use client";
+
 import React from "react";
+import { useRouter } from "next/navigation";
 import { ChevronRightIcon, SparklesIcon } from "./icons";
+import { COURSE_DETAIL, MOCK_QUIZ } from "@/src/components/page/student/courses/constants/detail";
+import { MY_COURSES } from "@/src/components/page/student/courses/constants/data";
+import { STUDY_STREAK } from "@/src/components/page/student/dashboard/constants/data";
+import type { IMyCourse } from "@/src/components/page/student/courses/types";
 
 export function ProgressContent() {
+  const router = useRouter();
+  const activeCourse: Partial<IMyCourse> = (MY_COURSES[0] as IMyCourse) || {};
+  const { title, level, progress, avgScore } = COURSE_DETAIL;
+  const { lessonsCompleted = 18, totalLessons = 25 } = activeCourse;
+
   return (
     <div className="max-w-[1200px] mx-auto w-full p-8 lg:p-10 space-y-8">
-      
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-[13px] font-semibold text-[#7878A0] mb-3">
-            <span className="cursor-pointer hover:text-[#5153DF] transition-colors">My Courses</span>
+            <button
+              type="button"
+              onClick={() => router.push("/courses")}
+              className="cursor-pointer hover:text-[#5153DF] transition-colors bg-transparent border-0 p-0"
+            >
+              My Courses
+            </button>
             <ChevronRightIcon className="w-3.5 h-3.5" />
             <span className="text-[#5153DF] font-bold">Learning Progress</span>
           </div>
 
           <h1 className="text-2xl font-bold text-[#1A1A2E] leading-tight mb-1">
-            Advanced Neural Networks
+            {title}
           </h1>
           <p className="text-[14px] text-[#7878A0]">
-            Deep Learning Specialization &bull; 4th Generation AI Curriculum
+            {level} Specialization &bull; Modern Web Development &amp; AI Curriculum
           </p>
         </div>
         
         {/* Header Stats */}
         <div className="flex items-center gap-8 shrink-0">
           <div className="flex flex-col items-end">
-            <span className="text-2xl font-bold text-[#1A1A2E]">65%</span>
+            <span className="text-2xl font-bold text-[#1A1A2E]">{progress}%</span>
             <span className="text-[10px] font-bold tracking-widest text-[#A0A0C0] uppercase">Complete</span>
           </div>
           <div className="w-px h-10 bg-[#EAEAF4]" />
           <div className="flex flex-col items-start">
-            <span className="text-2xl font-bold text-[#1A1A2E]">14 / 22</span>
+            <span className="text-2xl font-bold text-[#1A1A2E]">
+              {lessonsCompleted} / {totalLessons}
+            </span>
             <span className="text-[11px] font-semibold text-[#A0A0C0] uppercase tracking-wide">Lessons</span>
           </div>
         </div>
@@ -53,8 +72,8 @@ export function ProgressContent() {
         <div className="bg-white border border-[#EAEAF4] rounded-2xl p-5 shadow-sm">
           <h3 className="text-[11px] font-bold tracking-widest text-[#A0A0C0] uppercase mb-2">Quiz Average</h3>
           <div className="flex items-baseline gap-2.5">
-            <span className="text-[18px] font-bold text-[#1A1A2E]">88%</span>
-            <span className="text-[13px] font-medium text-[#A0A0C0]">Top 5% of class</span>
+            <span className="text-[18px] font-bold text-[#1A1A2E]">{avgScore}%</span>
+            <span className="text-[13px] font-medium text-[#A0A0C0]">Top 5% in Next.js Fullstack</span>
           </div>
         </div>
 
@@ -62,8 +81,8 @@ export function ProgressContent() {
         <div className="bg-white border border-[#EAEAF4] rounded-2xl p-5 shadow-sm">
           <h3 className="text-[11px] font-bold tracking-widest text-[#A0A0C0] uppercase mb-2">Skills Mastered</h3>
           <div className="flex items-baseline gap-2.5">
-            <span className="text-[18px] font-bold text-[#1A1A2E]">4/10</span>
-            <span className="text-[13px] font-medium text-[#A0A0C0]">Core competencies</span>
+            <span className="text-[18px] font-bold text-[#1A1A2E]">6/8</span>
+            <span className="text-[13px] font-medium text-[#A0A0C0]">Core Next.js competencies</span>
           </div>
         </div>
 
@@ -79,10 +98,10 @@ export function ProgressContent() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <h2 className="text-[15px] font-semibold text-[#4A4B68]">Visual Roadmap</h2>
             <div className="flex items-center bg-white border border-[#EAEAF4] p-1 rounded-full shadow-sm">
-              <button className="px-5 py-1.5 rounded-full text-[13px] font-semibold text-[#A0A0C0] hover:text-[#4A4B68] transition-colors">
+              <button type="button" className="px-5 py-1.5 rounded-full text-[13px] font-semibold text-[#A0A0C0] hover:text-[#4A4B68] transition-colors">
                 Module View
               </button>
-              <button className="px-5 py-1.5 rounded-full bg-[#5153DF] text-white text-[13px] font-semibold shadow-md">
+              <button type="button" className="px-5 py-1.5 rounded-full bg-[#5153DF] text-white text-[13px] font-semibold shadow-md">
                 Linear Progression
               </button>
             </div>
@@ -102,10 +121,14 @@ export function ProgressContent() {
                 </div>
                 <div className="flex-1 flex items-center justify-between py-3 pr-2">
                   <div>
-                    <h3 className="text-[15px] font-bold text-[#1A1A2E] mb-0.5">Foundations of Deep Learning</h3>
-                    <p className="text-[13px] text-[#7878A0]">4 Lessons &bull; Completed</p>
+                    <h3 className="text-[15px] font-bold text-[#1A1A2E] mb-0.5">Module 1: Introduction to Next.js &amp; App Router</h3>
+                    <p className="text-[13px] text-[#7878A0]">3 Lessons &bull; Completed</p>
                   </div>
-                  <button className="text-[13px] font-bold text-[#20B2AA] hover:text-[#168C86] transition-colors uppercase tracking-wide">
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/courses/detail?courseId=${COURSE_DETAIL.id}`)}
+                    className="text-[13px] font-bold text-[#20B2AA] hover:text-[#168C86] transition-colors uppercase tracking-wide cursor-pointer bg-transparent border-0 p-0"
+                  >
                     Review
                   </button>
                 </div>
@@ -119,15 +142,19 @@ export function ProgressContent() {
                 <div className="flex-1 bg-white border border-[#6B6BFF]/20 rounded-2xl p-6 shadow-sm">
                   <div className="flex items-center justify-between gap-4 mb-4">
                     <div>
-                      <h3 className="text-[15px] font-bold text-[#5153DF] mb-0.5">Optimization Algorithms</h3>
-                      <p className="text-[13px] text-[#4A4B68]">Currently on: RMSprop Optimization</p>
+                      <h3 className="text-[15px] font-bold text-[#5153DF] mb-0.5">Module 2: Advanced Data Fetching &amp; Routing</h3>
+                      <p className="text-[13px] text-[#4A4B68]">Currently on: {COURSE_DETAIL.nextLesson}</p>
                     </div>
-                    <button className="px-6 py-2.5 bg-[#5153DF] text-white rounded-xl text-[13px] font-bold shadow-[0_4px_12px_rgba(81,83,223,0.3)] hover:shadow-lg hover:bg-[#4648D4] transition-all shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/courses/detail?courseId=${COURSE_DETAIL.id}`)}
+                      className="px-6 py-2.5 bg-[#5153DF] text-white rounded-xl text-[13px] font-bold shadow-[0_4px_12px_rgba(81,83,223,0.3)] hover:shadow-lg hover:bg-[#4648D4] transition-all shrink-0 cursor-pointer"
+                    >
                       CONTINUE
                     </button>
                   </div>
                   <div className="w-64 max-w-full h-1.5 bg-[#F0F0F8] rounded-full overflow-hidden">
-                    <div className="w-[35%] h-full bg-[#5153DF] rounded-full" />
+                    <div className="w-[66%] h-full bg-[#5153DF] rounded-full" />
                   </div>
                 </div>
               </div>
@@ -138,8 +165,8 @@ export function ProgressContent() {
                   <div className="w-2.5 h-2.5 rounded-full bg-[#D0D0E0]" />
                 </div>
                 <div className="flex-1 py-3 pr-2">
-                  <h3 className="text-[15px] font-medium text-[#7878A0] mb-0.5">Regularization &amp; Hyperparameters</h3>
-                  <p className="text-[13px] text-[#A0A0C0]">6 Lessons &bull; Locked</p>
+                  <h3 className="text-[15px] font-medium text-[#7878A0] mb-0.5">Module 3: Authentication &amp; OAuth Providers</h3>
+                  <p className="text-[13px] text-[#A0A0C0]">2 Lessons &bull; Locked</p>
                 </div>
               </div>
 
@@ -149,8 +176,8 @@ export function ProgressContent() {
                   <div className="w-2.5 h-2.5 rounded-full bg-[#D0D0E0]" />
                 </div>
                 <div className="flex-1 py-3 pr-2">
-                  <h3 className="text-[15px] font-medium text-[#7878A0] mb-0.5">Sequence Models &amp; RNNs</h3>
-                  <p className="text-[13px] text-[#A0A0C0]">8 Lessons &bull; Locked</p>
+                  <h3 className="text-[15px] font-medium text-[#7878A0] mb-0.5">Module 4: Performance Optimization &amp; Deployment</h3>
+                  <p className="text-[13px] text-[#A0A0C0]">4 Lessons &bull; Locked</p>
                 </div>
               </div>
 
@@ -172,15 +199,29 @@ export function ProgressContent() {
             <div className="mb-6">
               <h4 className="text-[10px] font-bold tracking-widest text-[#20B2AA] uppercase mb-2">Priority Review</h4>
               <p className="text-[13.5px] text-[#4A4B68] leading-relaxed">
-                Backpropagation calculus is key for the next chapter. <span className="text-[#5153DF] font-semibold hover:underline cursor-pointer">Open lesson</span>
+                Understanding Server Components &amp; Route Handlers is key for upcoming Authentication.{" "}
+                <button
+                  type="button"
+                  onClick={() => router.push(`/courses/detail?courseId=${COURSE_DETAIL.id}`)}
+                  className="text-[#5153DF] font-semibold hover:underline cursor-pointer bg-transparent border-0 p-0 inline"
+                >
+                  Review lesson
+                </button>
               </p>
             </div>
 
             <div>
               <h4 className="text-[10px] font-bold tracking-widest text-[#A0A0C0] uppercase mb-2">Next Milestone</h4>
-              <p className="text-[13.5px] text-[#4A4B68] leading-relaxed">
-                Complete Module 2 Quiz to boost retention by 40%.
+              <p className="text-[13.5px] text-[#4A4B68] leading-relaxed mb-2">
+                Take the &quot;{MOCK_QUIZ.title}&quot; practice quiz to validate your skills and boost retention.
               </p>
+              <button
+                type="button"
+                onClick={() => router.push("/practice")}
+                className="text-xs font-bold text-white bg-gradient-to-r from-[#5153DF] to-[#4648D4] px-3.5 py-2 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 block w-full text-center cursor-pointer"
+              >
+                Start Practice Quiz ({Math.floor(MOCK_QUIZ.durationSeconds / 60)} mins) &rarr;
+              </button>
             </div>
 
             <div className="h-px bg-[#EAEAF4] w-full my-6" />
@@ -188,11 +229,11 @@ export function ProgressContent() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[13px] font-medium text-[#7878A0]">Streak</span>
-                <span className="text-[14px] font-bold text-[#1A1A2E]">5 Days</span>
+                <span className="text-[14px] font-bold text-[#1A1A2E]">{STUDY_STREAK.days} Days</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-medium text-[#7878A0]">Score</span>
-                <span className="text-[14px] font-bold text-[#10B981]">A+</span>
+                <span className="text-[13px] font-medium text-[#7878A0]">Avg Quiz Score</span>
+                <span className="text-[14px] font-bold text-[#10B981]">{avgScore}% (A)</span>
               </div>
             </div>
 
@@ -204,3 +245,4 @@ export function ProgressContent() {
     </div>
   );
 }
+

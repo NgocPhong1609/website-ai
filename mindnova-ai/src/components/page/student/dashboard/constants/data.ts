@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <<<<<<< HEAD:mindnova-ai/src/components/page/student/dashboard/constants/data.ts
 import type { ICourse } from "@/src/components/page/student/courses/types";
 import type { IFocusArea, IActivityGroup } from "@/src/components/page/student/dashboard/types";
@@ -5,27 +6,62 @@ import type { IFocusArea, IActivityGroup } from "@/src/components/page/student/d
 import type { ICourse } from "@features/student/courses/types";
 import type { IFocusArea, IActivityGroup } from "@features/student/dashboard/types";
 >>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/src/features/student/dashboard/constants/data.ts
+=======
+import type { ICourse } from "@/src/components/page/student/courses/types";
+import type { IFocusArea, IActivityGroup } from "@/src/components/page/student/dashboard/types";
+>>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
-// Replace with real API calls when backend is ready.
 
 export const DASHBOARD_COURSES: ICourse[] = [
   {
     id: 1,
-    title: "Next.js Fullstack",
-    nextLesson: "Route Handlers",
+    title: "Next.js 15 Fullstack Architecture & Route Handlers",
+    nextLesson: "Route Handlers & Advanced APIs",
     progress: 72,
     thumbnailGradient: "from-[#0f0c29] via-[#302b63] to-[#24243e]",
     thumbnailUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&auto=format&fit=crop",
+    lastWatchedTimestamp: "08:14 / 15:30",
+    status: "in-progress",
+    category: "Fullstack Web",
+    instructorName: "David Miller",
   },
   {
     id: 2,
-    title: "React Query Mastery",
-    nextLesson: "Mutations",
+    title: "React Query & State Management Mastery",
+    nextLesson: "Optimistic Mutations & Cache Invalidation",
     progress: 45,
     thumbnailGradient: "from-[#0f2027] via-[#203a43] to-[#2c5364]",
     thumbnailUrl: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=600&auto=format&fit=crop",
+    lastWatchedTimestamp: "03:45 / 12:00",
+    status: "in-progress",
+    category: "React Ecosystem",
+    instructorName: "Elena Rostova",
   },
+  {
+    id: 3,
+    title: "Legacy PHP Backend Fundamentals",
+    nextLesson: "Session Handling",
+    progress: 12,
+    thumbnailGradient: "from-[#2C3E50] via-[#3498DB] to-[#2980B9]",
+    thumbnailUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop",
+    lastWatchedTimestamp: "02:10 / 25:00 (Inactive for 45 days)",
+    status: "abandoned",
+    category: "Legacy Systems",
+    instructorName: "Alex Vance",
+  },
+  {
+    id: 4,
+    title: "Tailwind CSS 4 & Modern UI Design Systems",
+    nextLesson: "Course Completed 🎉",
+    progress: 100,
+    thumbnailGradient: "from-[#134E5E] via-[#71B280] to-[#2ECC71]",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=600&auto=format&fit=crop",
+    lastWatchedTimestamp: "Completed • Cryptographic Certificate Issued",
+    status: "completed",
+    category: "Design Systems",
+    instructorName: "Sarah Jenkins",
+  }
 ];
 
 export const FOCUS_AREAS: IFocusArea[] = [

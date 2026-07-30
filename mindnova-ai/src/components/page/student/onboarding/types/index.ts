@@ -28,12 +28,14 @@ export type OnboardingStep =
   | "level"
   | "topics"
   | "signup"
-  | "generating";
+  | "generating"
+  | "plan";
 
 export interface OnboardingFormData {
   goal: string;
   level: string;
   topics: string[];
+  freeTime: string;
 }
 
 export type GeneratingStepStatus = "completed" | "in-progress" | "pending";
@@ -69,11 +71,49 @@ export interface IPlanItem {
   label: string;
   status: PlanItemStatus;
   duration: string;
+  courseTitle?: string;
+  instructor?: string;
+  rating?: number;
+  originalPrice?: string;
+  discountPrice?: string;
 }
 
 export interface IPlanPhase {
   id: number;
   title: string;
   duration: string;
+  description?: string;
   items: IPlanItem[];
+}
+
+// ─── AI Chat & Guest Recommendation Models ────────────────────────────────────
+
+export interface IAICourseRecommendation {
+  id: string;
+  title: string;
+  instructor: string;
+  rating: number;
+  reviewCount: number;
+  originalPrice: string;
+  price: string;
+  discountPercent: string;
+  level: string;
+  duration: string;
+  thumbnail: string;
+}
+
+export interface IChatMessage {
+  id: string;
+  sender: "user" | "ai";
+  text?: string;
+  recommendation?: IAICourseRecommendation;
+  timestamp: string;
+}
+
+export interface IAuthModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  defaultTab?: "login" | "register" | "forgot";
+  compellingReason?: string;
+  onSuccess?: () => void;
 }

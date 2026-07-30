@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { twMerge } from "tailwind-merge";
+<<<<<<< HEAD
 <<<<<<< HEAD:mindnova-ai/src/components/page/student/courses/course-detail/CurriculumAccordion.tsx
 import { useState } from "react";
 import { COURSE_DETAIL } from "@/src/components/page/student/courses/constants/detail";
@@ -10,6 +11,11 @@ import type { IModule, ILesson } from "@/src/components/page/student/courses/typ
 import { COURSE_DETAIL } from "@features/student/courses/constants/detail";
 import type { IModule, ILesson } from "@features/student/courses/types";
 >>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/src/features/student/courses/components/course-detail/CurriculumAccordion.tsx
+=======
+import { useState } from "react";
+import { COURSE_DETAIL } from "@/src/components/page/student/courses/constants/detail";
+import type { IModule, ILesson } from "@/src/components/page/student/courses/types";
+>>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -213,7 +219,10 @@ function ModuleItem({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function CurriculumAccordion() {
+<<<<<<< HEAD
 <<<<<<< HEAD:mindnova-ai/src/components/page/student/courses/course-detail/CurriculumAccordion.tsx
+=======
+>>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
   const { modules, id: courseId } = COURSE_DETAIL;
 
   // Initialize expanded state from `isExpanded` on the module data
@@ -232,9 +241,12 @@ export function CurriculumAccordion() {
       return next;
     });
   };
+<<<<<<< HEAD
 =======
   const { modules } = COURSE_DETAIL;
 >>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/src/features/student/courses/components/course-detail/CurriculumAccordion.tsx
+=======
+>>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 
   return (
     <div className="mt-10">

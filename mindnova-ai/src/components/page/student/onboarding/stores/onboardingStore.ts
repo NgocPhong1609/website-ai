@@ -5,7 +5,7 @@ import type {
 } from "@/src/components/page/student/onboarding/types";
 
 // ─── State Flow ──────────────────────────────────────────────────────────────
-// welcome → goal → level → topics → [signup | generating]
+// welcome → goal → level → topics & time → generating → plan
 
 interface IOnboardingState {
   currentStep: OnboardingStep;
@@ -20,6 +20,7 @@ interface IOnboardingState {
   selectGoal: (goal: string) => void;
   selectLevel: (level: string) => void;
   selectTopics: (topics: string[]) => void;
+  selectFreeTime: (freeTime: string) => void;
   completeSignUp: () => void;
   resetOnboarding: () => void;
 }
@@ -28,9 +29,10 @@ const INITIAL_FORM_DATA: OnboardingFormData = {
   goal: "",
   level: "",
   topics: [],
+  freeTime: "2h/day - Dedicated",
 };
 
-export const useOnboardingStore = create<IOnboardingState>((set, get) => ({
+export const useOnboardingStore = create<IOnboardingState>((set) => ({
   currentStep: "welcome",
   isAuthenticated: false,
   progressData: 0,
@@ -53,15 +55,19 @@ export const useOnboardingStore = create<IOnboardingState>((set, get) => ({
     })),
 
   selectTopics: (topics) => {
-    const { isAuthenticated } = get();
     set((state) => ({
       formData: { ...state.formData, topics },
-      currentStep: isAuthenticated ? "generating" : "signup",
+      currentStep: "generating",
     }));
   },
 
+  selectFreeTime: (freeTime) =>
+    set((state) => ({
+      formData: { ...state.formData, freeTime },
+    })),
+
   completeSignUp: () => {
-    set({ isAuthenticated: true, currentStep: "generating" });
+    set({ isAuthenticated: true });
   },
 
   resetOnboarding: () =>

@@ -1,191 +1,208 @@
+"use client";
+
 import React, { useState } from "react";
-import type { IAIFlashcard } from "@/src/types/student";
+import { useAIFlashcards } from "@/src/hooks/useAIFlashcards";
+
+// Client leaf component — all state manipulation is delegated to custom logic + Tinder swipe UX (Section 3.3).
 
 export function AIFlashcards() {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [flashcards, setFlashcards] = useState<IAIFlashcard[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [showExplanation, setShowExplanation] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const {
+    flashcards,
+    currentIndex,
+    isFlipped,
+    showExplanation,
+    selectedOption,
+    isGenerating,
+    schemaValidated,
+    generateFlashcards,
+    handleNext,
+    handlePrev,
+    handleOptionSelect,
+  } = useAIFlashcards();
 
-  const generateFlashcards = () => {
-    setIsGenerating(true);
-    setFlashcards([]);
-    setIsFlipped(false);
-    setShowExplanation(false);
-    setSelectedOption(null);
-    setCurrentIndex(0);
+  const [swipeAnim, setSwipeAnim] = useState<"none" | "left" | "right">("none");
+  const [knownCount, setKnownCount] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
 
-    console.log("[Backend Simulation] Injecting Lesson Transcript into prompt...");
-    console.log("[Backend Simulation] Enforcing strict JSON return schema...");
+  const currentCard = flashcards[currentIndex];
+
+  // Tinder-style swipe execution (Section 3.3)
+  const handleSwipe = (direction: "left" | "right") => {
+    setSwipeAnim(direction);
+    if (direction === "right") setKnownCount((c) => c + 1);
+    if (direction === "left") setReviewCount((c) => c + 1);
 
     setTimeout(() => {
-      // Simulated strictly parsed JSON from the LLM
-      const mockJSONResponse: IAIFlashcard[] = [
-        {
-          id: "fc-1",
-          question: "What is quantum superposition?",
-          options: [
-            "The ability to spin in multiple directions",
-            "The ability of a quantum system to be in multiple states simultaneously",
-            "A fast method of data encryption",
-            "The collapsing of a quantum wave function"
-          ],
-          correctAnswer: 1,
-          explanation: "Superposition allows a quantum bit (qubit) to exist as a 0, 1, or both simultaneously until it is measured.",
-        },
-        {
-          id: "fc-2",
-          question: "Which term describes particles that remain connected so that actions performed on one affect the other?",
-          options: [
-            "Quantum entanglement",
-            "Quantum tunneling",
-            "Superposition",
-            "Decoherence"
-          ],
-          correctAnswer: 0,
-          explanation: "Entanglement is a phenomenon where entangled particles remain connected such that the state of one instantly influences the other, regardless of distance.",
-        }
-      ];
-
-      setFlashcards(mockJSONResponse);
-      setIsGenerating(false);
-    }, 2500);
-  };
-
-  const handleNext = () => {
-    if (currentIndex < flashcards.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
-      setIsFlipped(false);
-      setShowExplanation(false);
-      setSelectedOption(null);
-    }
-  };
-
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
-      setIsFlipped(false);
-      setShowExplanation(false);
-      setSelectedOption(null);
-    }
-  };
-
-  const handleOptionSelect = (idx: number) => {
-    if (selectedOption !== null) return; // Prevent changing answer
-    setSelectedOption(idx);
-    setIsFlipped(true); // Auto-reveal
-    setTimeout(() => setShowExplanation(true), 500);
+      setSwipeAnim("none");
+      if (currentIndex < flashcards.length - 1) {
+        handleNext();
+      } else {
+        alert(`🎉 Flashcard deck completed! Mastered: ${knownCount + (direction === "right" ? 1 : 0)} • Needs review: ${reviewCount + (direction === "left" ? 1 : 0)}`);
+      }
+    }, 300);
   };
 
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[14px] font-bold text-[#1A1A2E]">AI Flashcards</h3>
-        <button
-          onClick={generateFlashcards}
-          disabled={isGenerating}
-          className="px-3 py-1.5 bg-[#F0F0FF] text-[#6B6BFF] text-[12px] font-bold rounded-lg hover:bg-[#EAEAF4] transition-colors disabled:opacity-50"
-        >
-          {isGenerating ? "Extracting..." : flashcards.length === 0 ? "Generate from Transcript" : "Regenerate"}
-        </button>
+    <div className="w-full flex flex-col gap-6 bg-white rounded-3xl border border-gray-100 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)]">
+      {/* Header & Stats */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#6B6BFF] to-[#F368E0] flex items-center justify-center text-white font-extrabold text-xl shadow-md">
+            🗂️
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-black text-[#131B2E]">AI Tinder-Style Flashcards</h3>
+              {schemaValidated && (
+                <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">
+                  ✓ Schema Verified
+                </span>
+              )}
+            </div>
+            <p className="text-xs font-semibold text-gray-500 mt-0.5">
+              Swipe right for <strong className="text-emerald-600">&quot;I know this&quot;</strong> • Swipe left for <strong className="text-red-500">&quot;Needs review&quot;</strong>
+            </p>
+          </div>
+        </div>
+
+        {/* Real-time Deck Meter */}
+        <div className="flex items-center gap-2 font-mono text-xs font-bold">
+          <span className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200">
+            👉 Mastered: {knownCount}
+          </span>
+          <span className="px-3 py-1.5 rounded-xl bg-red-50 text-red-600 border border-red-200">
+            👈 Review: {reviewCount}
+          </span>
+        </div>
       </div>
 
       {isGenerating && (
-        <div className="flex flex-col items-center justify-center py-10 gap-3">
-          <div className="w-6 h-6 border-2 border-[#6B6BFF] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[12px] text-[#7878A0]">Parsing transcript into strict JSON...</p>
+        <div className="flex flex-col items-center justify-center py-16 gap-3 bg-[#F8F9FB] rounded-3xl border border-dashed border-gray-200">
+          <div className="w-8 h-8 border-4 border-[#6B6BFF] border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm font-bold text-gray-600">Extracting algorithmic vocabulary & architectural concepts from video stream...</p>
         </div>
       )}
 
-      {!isGenerating && flashcards.length > 0 && (
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between text-[11px] font-bold text-[#A0A0C0] uppercase tracking-widest">
+      {!isGenerating && flashcards.length > 0 && currentCard && (
+        <div className="flex flex-col items-center gap-6 max-w-xl mx-auto w-full">
+          <div className="w-full flex items-center justify-between text-xs font-black text-gray-400 uppercase tracking-wider px-2">
             <span>Card {currentIndex + 1} of {flashcards.length}</span>
-            <span>Knowledge Check</span>
+            <span>Interactive Comprehension Deck</span>
           </div>
 
-          <div className="perspective-1000 w-full min-h-[300px]">
-             {/* Note: We aren't implementing a full CSS 3D transform here to keep it simple, just conditionally rendering */}
-            <div className="w-full h-full bg-white border border-[#EAEAF4] rounded-2xl p-6 shadow-sm flex flex-col">
-              <h4 className="text-[15px] font-bold text-[#1A1A2E] leading-relaxed mb-6">
-                {flashcards[currentIndex].question}
-              </h4>
-              
-              <div className="flex flex-col gap-3 flex-1">
-                {flashcards[currentIndex].options.map((option, idx) => {
-                  const isSelected = selectedOption === idx;
-                  const isCorrect = idx === flashcards[currentIndex].correctAnswer;
-                  const showResult = isFlipped;
-
-                  let borderClass = "border-[#EAEAF4] hover:border-[#6B6BFF]/30 hover:bg-[#F8F9FB]";
-                  let icon = null;
-
-                  if (showResult) {
-                     if (isCorrect) {
-                        borderClass = "border-emerald-500 bg-emerald-50 text-emerald-800";
-                        icon = <svg className="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>;
-                     } else if (isSelected && !isCorrect) {
-                        borderClass = "border-red-500 bg-red-50 text-red-800";
-                        icon = <svg className="w-4 h-4 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>;
-                     } else {
-                        borderClass = "border-[#EAEAF4] opacity-50";
-                     }
-                  } else if (isSelected) {
-                     borderClass = "border-[#6B6BFF] bg-[#F0F0FF]";
-                  }
-
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => handleOptionSelect(idx)}
-                      disabled={showResult}
-                      className={`flex items-center justify-between text-left px-4 py-3 rounded-xl border transition-all ${borderClass}`}
-                    >
-                      <span className="text-[13px] font-medium">{option}</span>
-                      {icon && <span className="shrink-0 ml-3">{icon}</span>}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {showExplanation && (
-                 <div className="mt-6 p-4 rounded-xl bg-[#F0F0FF] border border-[#EAEAF4] animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    <p className="text-[11px] font-bold text-[#6B6BFF] uppercase tracking-widest mb-1">AI Explanation</p>
-                    <p className="text-[13px] text-[#464554] leading-relaxed">
-                       {flashcards[currentIndex].explanation}
-                    </p>
-                 </div>
-              )}
+          {/* Swipe Card Container */}
+          <div
+            className={`w-full bg-gradient-to-b from-[#1E233E] to-[#121626] text-white border-2 border-indigo-500/30 rounded-3xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.18)] flex flex-col justify-between min-h-[360px] transition-all duration-300 relative overflow-hidden select-none ${
+              swipeAnim === "left"
+                ? "-translate-x-32 rotate-[-12deg] opacity-20 bg-red-950/80 border-red-500"
+                : swipeAnim === "right"
+                ? "translate-x-32 rotate-[12deg] opacity-20 bg-emerald-950/80 border-emerald-500"
+                : "translate-x-0 rotate-0"
+            }`}
+          >
+            {/* Top Tag */}
+            <div className="flex items-center justify-between mb-4">
+              <span className="px-3 py-1 rounded-full text-[10px] font-mono font-extrabold uppercase bg-white/10 text-indigo-300">
+                Key Video Term Extraction
+              </span>
+              <span className="text-xs font-bold text-gray-400">Tap options to flip answer</span>
             </div>
+
+            <h4 className="text-lg font-black text-white leading-relaxed mb-6">
+              {currentCard.question}
+            </h4>
+
+            <div className="flex flex-col gap-3 flex-1">
+              {currentCard.options.map((option, idx) => {
+                const isSelected = selectedOption === idx;
+                const isCorrect = idx === currentCard.correctAnswer;
+                const showResult = isFlipped;
+
+                let borderClass = "border-white/15 bg-white/5 hover:bg-white/10 text-gray-200";
+                let icon = null;
+
+                if (showResult) {
+                  if (isCorrect) {
+                    borderClass = "border-emerald-500 bg-emerald-500/20 text-emerald-300 font-extrabold shadow-sm";
+                    icon = <span className="text-emerald-400 font-black text-xs">✓ Correct Answer</span>;
+                  } else if (isSelected && !isCorrect) {
+                    borderClass = "border-red-500 bg-red-500/20 text-red-300 font-extrabold";
+                    icon = <span className="text-red-400 font-black text-xs">✕ Incorrect</span>;
+                  } else {
+                    borderClass = "border-white/5 opacity-40 text-gray-500";
+                  }
+                } else if (isSelected) {
+                  borderClass = "border-[#6B6BFF] bg-[#6B6BFF]/20 text-white font-bold";
+                }
+
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleOptionSelect(idx)}
+                    disabled={showResult}
+                    className={`flex items-center justify-between text-left px-5 py-3.5 rounded-2xl border transition-all ${borderClass}`}
+                  >
+                    <span className="text-sm font-semibold">{option}</span>
+                    {icon && <span className="shrink-0 ml-3">{icon}</span>}
+                  </button>
+                );
+              })}
+            </div>
+
+            {showExplanation && (
+              <div className="mt-6 p-4 rounded-2xl bg-black/60 border border-indigo-400/30 backdrop-blur-md animate-fadeIn">
+                <p className="text-[10px] font-black text-[#A5D6FF] uppercase tracking-widest mb-1">🤖 RAG AI Explanation</p>
+                <p className="text-xs text-gray-300 leading-relaxed font-medium">
+                  {currentCard.explanation}
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* Navigation Controls */}
-          <div className="flex items-center justify-between mt-2">
+          {/* Tinder-Style Swipe Buttons Footer (Section 3.3) */}
+          <div className="flex items-center justify-center gap-6 w-full pt-2">
             <button
-              onClick={handlePrev}
-              disabled={currentIndex === 0}
-              className="text-[13px] font-bold text-[#7878A0] hover:text-[#1A1A2E] disabled:opacity-30 transition-colors"
+              type="button"
+              onClick={() => handleSwipe("left")}
+              className="group flex flex-col items-center gap-1 focus:outline-none"
+              title="Swipe Left: Needs review"
             >
-              Previous
+              <div className="w-16 h-16 rounded-full bg-red-50 hover:bg-red-500 text-red-500 hover:text-white border-2 border-red-200 hover:border-red-500 shadow-md hover:shadow-[0_8px_25px_rgba(239,68,68,0.4)] flex items-center justify-center text-2xl font-black transition-all hover:scale-110 active:scale-95">
+                ✕
+              </div>
+              <span className="text-xs font-black text-red-500 tracking-wide uppercase">Needs Review</span>
             </button>
+
             <button
-              onClick={handleNext}
-              disabled={currentIndex === flashcards.length - 1}
-              className="text-[13px] font-bold text-[#7878A0] hover:text-[#1A1A2E] disabled:opacity-30 transition-colors"
+              type="button"
+              onClick={() => handleSwipe("right")}
+              className="group flex flex-col items-center gap-1 focus:outline-none"
+              title="Swipe Right: I know this"
             >
-              Next
+              <div className="w-16 h-16 rounded-full bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white border-2 border-emerald-200 hover:border-emerald-500 shadow-md hover:shadow-[0_8px_25px_rgba(16,185,129,0.4)] flex items-center justify-center text-2xl font-black transition-all hover:scale-110 active:scale-95">
+                ♥
+              </div>
+              <span className="text-xs font-black text-emerald-600 tracking-wide uppercase">I Know This</span>
             </button>
           </div>
         </div>
       )}
 
       {!isGenerating && flashcards.length === 0 && (
-        <div className="bg-[#F8F9FB] rounded-xl p-6 text-center border border-dashed border-[#EAEAF4]">
-          <p className="text-[13px] text-[#7878A0]">
-            Generate intelligent flashcards parsed directly from the lesson transcript.
+        <div className="bg-[#F8F9FB] rounded-3xl p-10 text-center border border-dashed border-gray-200 flex flex-col items-center gap-3">
+          <span className="text-4xl">✨</span>
+          <h4 className="text-base font-black text-[#131B2E]">Ready to memorize core architectural concepts?</h4>
+          <p className="text-xs text-gray-500 max-w-md">
+            Generate interactive Tinder-style swipe decks extracted directly from video timestamp transcripts.
           </p>
+          <button
+            type="button"
+            onClick={generateFlashcards}
+            className="mt-2 px-6 py-3 bg-[#6B6BFF] text-white text-xs font-extrabold rounded-2xl shadow-md hover:bg-[#5249DE] transition-all"
+          >
+            ⚡ Generate Deck Now
+          </button>
         </div>
       )}
     </div>

@@ -9,6 +9,10 @@ export { default as GeneratingContainer } from "./generating/GeneratingContainer
 export { default as TopicsContainer } from "./topics/TopicsContainer";
 export { default as PlanContainer } from "./plan/PlanContainer";
 
+// AI Assistant & Auth features for Guest Actor
+export { FloatingAIChatbot } from "./ai-assistant/FloatingAIChatbot";
+export { GuestAuthModal } from "./auth/GuestAuthModal";
+
 // Hooks
 export { useOnboarding } from "./hooks";
 

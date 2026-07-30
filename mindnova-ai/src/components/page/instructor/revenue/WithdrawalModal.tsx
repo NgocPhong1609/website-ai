@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { XIcon, WalletIcon, PencilIcon, LockIcon, ArrowRightIcon } from "./icons";
 
@@ -7,12 +7,21 @@ interface WithdrawalModalProps {
   onClose: () => void;
 }
 
+export type PayoutMethodType = "bank" | "paypal" | "stripe";
+
 export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
-  const [amount, setAmount] = useState("10.000.000");
+  const [amount, setAmount] = useState("10,000,000");
+  const [payoutMethod, setPayoutMethod] = useState<PayoutMethodType>("bank");
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
+  const availableBalanceNum = 42180000; // 42,180,000 VND
+  const escrowHoldingBalance = 15400000; // Held for 30-day refund window (Section 4.2)
+  const minWithdrawalNum = 1000000; // Minimum 1,000,000 VND (~$50)
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      setStatusMessage(null);
     } else {
       document.body.style.overflow = "unset";
     }
@@ -23,100 +32,170 @@ export function WithdrawalModal({ isOpen, onClose }: WithdrawalModalProps) {
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-[#1A1A2E]/40 backdrop-blur-sm transition-opacity" 
-        onClick={onClose}
-      />
+  const cleanAmountNum = parseInt(amount.replace(/[^0-9]/g, "") || "0", 10);
+  const isBelowMinimum = cleanAmountNum < minWithdrawalNum;
+  const isExceedingAvailable = cleanAmountNum > availableBalanceNum;
+  const canSubmit = !isBelowMinimum && !isExceedingAvailable && cleanAmountNum > 0;
 
-      {/* Modal Content */}
-      <div className="relative w-[400px] bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+  const handleSubmit = () => {
+    if (!canSubmit) return;
+    setStatusMessage("⚡ Payout Request Created! Status: PENDING (Automated fraud screening inside 24h).");
+    setTimeout(() => {
+      onClose();
+    }, 2500);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-[#F0F0F8]">
-          <h2 className="text-[15px] font-extrabold text-[#1A1A2E]">Yêu cầu rút tiền</h2>
-          <button 
+        <div className="flex items-center justify-between p-6 bg-[#1A1A2E] text-white">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#6B6BFF] to-[#4648D4] flex items-center justify-center text-lg font-black shadow-md">
+              💰
+            </span>
+            <div>
+              <h2 className="text-base font-black text-white">Instructor Revenue Withdrawal (Section 4.2)</h2>
+              <p className="text-xs text-indigo-200">Secure automated disbursement gateway</p>
+            </div>
+          </div>
+          <button
+            type="button"
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full text-[#9090B0] hover:bg-[#F4F4FA] hover:text-[#464554] transition-colors"
+            className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 hover:text-white transition-colors"
           >
             <XIcon size={18} />
           </button>
         </div>
 
-        <div className="p-6 flex flex-col gap-6">
+        <div className="p-6 flex flex-col gap-6 overflow-y-auto max-h-[80vh]">
           
-          {/* Available Balance Card */}
-          <div className="flex items-center gap-3 p-4 rounded-xl bg-[#F6F6FB] border border-[#EAEAF4]">
-            <div className="w-10 h-10 rounded-full bg-[#EEF0FF] text-[#6B6BFF] flex items-center justify-center shrink-0">
-              <WalletIcon size={18} />
+          {/* Balance Breakdown & 30-Day Escrow Withholding (Section 4.2) */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-emerald-800 uppercase">Available Balance</span>
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-200 text-emerald-900">Ready</span>
+              </div>
+              <span className="text-xl font-black text-emerald-900 mt-2">42,180,000đ</span>
+              <span className="text-[10px] font-bold text-emerald-700 mt-1">Cleared 30-day withholding</span>
             </div>
-            <div className="flex flex-col">
-              <span className="text-[12px] font-semibold text-[#64647A]">Số dư khả dụng</span>
-              <span className="text-[16px] font-extrabold text-[#4648D4]">42.180.000đ</span>
+
+            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col justify-between" title="Funds locked in escrow during student 30-day refund window">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-amber-800 uppercase">Escrow Holding</span>
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-amber-200 text-amber-900">30-Day Rule</span>
+              </div>
+              <span className="text-xl font-black text-amber-900 mt-2">15,400,000đ</span>
+              <span className="text-[10px] font-bold text-amber-700 mt-1">Pending student refund period</span>
             </div>
           </div>
 
           {/* Amount Input */}
           <div className="flex flex-col gap-2">
-            <label className="text-[13px] font-bold text-[#464554]">Nhập số tiền muốn rút</label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-black text-[#1A1A2E] uppercase">Withdrawal Amount</label>
+              <span className="text-[11px] font-extrabold text-gray-500">Min: 1,000,000đ (~$50)</span>
+            </div>
             <div className="relative flex items-center">
               <input
                 type="text"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full h-12 pl-4 pr-24 rounded-xl border border-[#D0D0E8] text-[15px] font-extrabold text-[#1A1A2E] focus:outline-none focus:border-[#6B6BFF] focus:ring-2 focus:ring-[#6B6BFF]/10 transition-all"
+                className={twMerge(
+                  "w-full h-12 pl-4 pr-28 rounded-2xl border-2 font-extrabold text-base focus:outline-none transition-all",
+                  isBelowMinimum || isExceedingAvailable ? "border-rose-400 bg-rose-50/20 text-rose-700" : "border-[#6B6BFF] bg-white text-[#1A1A2E]"
+                )}
               />
-              <div className="absolute right-2 flex items-center gap-2">
-                <span className="text-[14px] font-extrabold text-[#1A1A2E]">đ</span>
-                <button className="px-3 py-1.5 rounded bg-[#EEF0FF] text-[11px] font-bold text-[#6B6BFF] hover:bg-[#D5D5FF] transition-colors">
-                  Tối đa
+              <div className="absolute right-3 flex items-center gap-2">
+                <span className="text-xs font-black text-gray-400">VND</span>
+                <button
+                  type="button"
+                  onClick={() => setAmount("42,180,000")}
+                  className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-extrabold text-[11px] hover:bg-indigo-600 hover:text-white transition-all"
+                >
+                  Max Available
                 </button>
               </div>
             </div>
-            <span className="text-[11px] text-[#9090B0] mt-1">
-              Phí rút tiền: 0đ <span className="italic">(Miễn phí cho đối tác Instructor Pro)</span>
-            </span>
+
+            {isBelowMinimum && (
+              <p className="text-xs font-extrabold text-rose-600 flex items-center gap-1 mt-0.5">
+                ⚠️ Minimum withdrawal balance requirement is 1,000,000đ ($50).
+              </p>
+            )}
+            {isExceedingAvailable && (
+              <p className="text-xs font-extrabold text-rose-600 flex items-center gap-1 mt-0.5">
+                ⚠️ Amount exceeds immediate available balance. Escrow holding funds cannot be prematurely withdrawn.
+              </p>
+            )}
           </div>
 
-          {/* Payment Method */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[13px] font-bold text-[#464554]">Phương thức nhận tiền</label>
-            <div className="flex items-center justify-between p-4 rounded-xl border border-[#D0D0E8] hover:border-[#C5C6FF] transition-colors cursor-pointer group">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-6 bg-white border border-[#EAEAF4] rounded flex items-center justify-center shrink-0">
-                  <span className="text-[9px] font-extrabold text-[#4648D4]">MB</span>
+          {/* Payout Method Selection (Bank / PayPal / Stripe) */}
+          <div className="flex flex-col gap-2.5">
+            <label className="text-xs font-black text-[#1A1A2E] uppercase">Select Verified Payout Gateway (Section 4.2)</label>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { id: "bank", title: "Bank Transfer", icon: "🏦", verified: true, desc: "MB Bank - **** 1234" },
+                { id: "paypal", title: "PayPal Global", icon: "PayPal", verified: true, desc: "dr.khoi@paypal.me" },
+                { id: "stripe", title: "Stripe Connect", icon: "S", verified: false, desc: "Pending KYC setup" },
+              ].map((m) => (
+                <div
+                  key={m.id}
+                  onClick={() => m.verified && setPayoutMethod(m.id as any)}
+                  className={twMerge(
+                    "p-3.5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 relative",
+                    payoutMethod === m.id ? "border-[#6B6BFF] bg-indigo-50/40 shadow-xs" : "border-gray-200 bg-white hover:border-indigo-300",
+                    !m.verified && "opacity-50 cursor-not-allowed bg-gray-50"
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="w-7 h-7 rounded-lg bg-[#1A1A2E] text-white font-black text-xs flex items-center justify-center">{m.icon}</span>
+                    <span className={twMerge("text-[9px] font-black px-1.5 py-0.5 rounded", m.verified ? "bg-emerald-100 text-emerald-800" : "bg-gray-200 text-gray-600")}>
+                      {m.verified ? "Verified ✓" : "Unverified"}
+                    </span>
+                  </div>
+                  <div>
+                    <h5 className="text-xs font-black text-[#1A1A2E]">{m.title}</h5>
+                    <p className="text-[10px] font-semibold text-gray-400 truncate mt-0.5">{m.desc}</p>
+                  </div>
                 </div>
-                <div className="flex flex-col leading-tight">
-                  <span className="text-[13px] font-bold text-[#1A1A2E]">MB Bank - **** 1234</span>
-                  <span className="text-[11px] font-semibold text-[#9090B0]">NGUYEN VAN A</span>
-                </div>
-              </div>
-              <div className="text-[#9090B0] group-hover:text-[#6B6BFF] transition-colors">
-                <PencilIcon size={14} />
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Security Banner */}
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-[#F8F8FD] border border-[#EAEAF4]">
-            <LockIcon size={14} className="text-[#64647A] shrink-0" />
-            <span className="text-[11px] font-medium text-[#64647A]">
-              Giao dịch được bảo mật bởi hệ thống mã hóa đa lớp.
+          {statusMessage && (
+            <div className="p-4 rounded-2xl bg-indigo-600 text-white font-black text-xs flex items-center justify-between shadow-md">
+              <span>{statusMessage}</span>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            </div>
+          )}
+
+          {/* Security & Rule Reminder */}
+          <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-[#F0F0FF] text-[#2E2F5B] border border-[#D5D5FF]/60 text-xs font-semibold">
+            <span className="text-base shrink-0">🛡️</span>
+            <span>
+              All disbursements adhere to automatic tax statement generation and AML compliance checks.
             </span>
           </div>
 
           {/* Action Button */}
-          <button className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-[14px] font-bold text-white bg-[#4648D4] hover:bg-[#3D40C0] shadow-[0_4px_14px_rgba(70,72,212,0.3)] transition-all hover:-translate-y-0.5 mt-2">
-            Xác nhận rút tiền <ArrowRightIcon size={16} />
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!canSubmit || !!statusMessage}
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-xs font-black text-white uppercase tracking-wider bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] hover:opacity-95 shadow-lg transition-all disabled:opacity-40 cursor-pointer"
+          >
+            <span>Confirm &amp; Request Disbursement Now</span>
+            <ArrowRightIcon size={16} />
           </button>
         </div>
 
         {/* Footer */}
-        <div className="py-4 bg-[#FAFAFE] border-t border-[#F0F0F8] text-center">
-          <span className="text-[11px] text-[#9090B0]">
-            Thời gian xử lý dự kiến: <strong className="text-[#64647A]">5-10 phút</strong> (trong giờ hành chính)
+        <div className="py-3 bg-[#FAF8FF] border-t border-[#EAEAF4] text-center">
+          <span className="text-[11px] font-bold text-gray-400">
+            Estimated automated gateway arrival: <strong className="text-gray-700">Instant to 2 Business Days</strong>
           </span>
         </div>
         

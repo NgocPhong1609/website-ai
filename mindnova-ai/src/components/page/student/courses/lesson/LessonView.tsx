@@ -36,13 +36,11 @@ function findAdjacentLessons(lessonId: string): {
   };
 }
 
-// ─── Main Wrapper ─────────────────────────────────────────────────────────────
+// ─── Main Coordinator Component ───────────────────────────────────────────────
 
 /**
- * LessonView orchestrates the communication between LessonContent (which holds
- * video/heartbeat state) and LessonFooter (which needs `canMarkComplete`).
- *
- * This is a thin client wrapper that lifts the completion state up.
+ * LessonView coordinates communication between LessonContent (video heartbeat state)
+ * and LessonFooter (completion lock state) per RSC client leaf boundaries.
  */
 export function LessonView({ lessonId }: LessonViewProps) {
   const [canMarkComplete, setCanMarkComplete] = useState(false);
@@ -59,7 +57,7 @@ export function LessonView({ lessonId }: LessonViewProps) {
   }, []);
 
   return (
-    <div className="flex-1 relative flex flex-col">
+    <div className="flex-1 relative flex flex-col min-h-screen bg-[#0A0D12]">
       <LessonContent
         lessonId={lessonId}
         onCompletionChange={handleCompletionChange}

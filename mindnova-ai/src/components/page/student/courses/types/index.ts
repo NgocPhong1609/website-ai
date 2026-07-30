@@ -1,5 +1,7 @@
 // ─── Course Feature Types ──────────────────────────────────────────────────────
 
+export type CourseStatus = "in-progress" | "completed" | "not-started" | "abandoned";
+
 export interface ICourse {
   id: number;
   title: string;
@@ -7,9 +9,11 @@ export interface ICourse {
   progress: number; // 0–100
   thumbnailGradient: string;
   thumbnailUrl?: string;
+  lastWatchedTimestamp?: string;
+  status?: CourseStatus;
+  category?: string;
+  instructorName?: string;
 }
-
-export type CourseStatus = "in-progress" | "completed" | "not-started";
 
 export interface IMyCourse extends ICourse {
   status: CourseStatus;
@@ -27,7 +31,7 @@ export interface ILesson {
   title: string;
   duration: string;
   status: LessonStatus;
-  /** Total video duration in seconds (used for 90% completion gate) */
+  /** Total video duration in seconds (used for watch time calculation) */
   videoDurationSeconds: number;
   /** Seconds of the video actually watched by the user */
   watchedSeconds?: number;

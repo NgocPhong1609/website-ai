@@ -14,33 +14,37 @@ export function useAIGrading({ instructorRubric, maxScore }: UseAIGradingOptions
     setIsGrading(true);
     setGradingResult(null);
 
-    console.log("[Backend Simulation] AI Grader invoked.");
+    console.log("[Backend Simulation] AI Grader invoked against custom Instructor Rubrics.");
     console.log("Rubric Context:", instructorRubric);
     console.log("User Content Length:", userSubmission.length);
 
-    // Simulate LLM processing time
-    await new Promise((resolve) => setTimeout(resolve, 2500));
+    // Simulate LLM Processing latency
+    await new Promise((resolve) => setTimeout(resolve, 1800));
 
-    // Simulated Structured JSON output from LLM based on comparison
-    // In production, the prompt enforces strict JSON return schema
+    // Simulated Structured JSON output from LLM based on precise rubric comparison
     const mockLLMResponse: IAIGradingResult = {
-      score: Math.floor(maxScore * 0.85), // Example 85%
+      score: Math.floor(maxScore * 0.88), // 88/100
       maxScore,
       detailedErrors: [
         {
-          lineOrParagraph: "Paragraph 2, Line 1",
-          issue: "Lacks sufficient depth in explaining the architectural tradeoffs. The rubric requires specific examples of scalability.",
+          lineOrParagraph: "Line 14: Route Handler Verification",
+          issue: "Potential Promise rejection: missing explicit error handling around JSON payload extraction in Edge runtime.",
         },
         {
-          lineOrParagraph: "Conclusion",
-          issue: "Did not summarize the core thesis clearly as required by the assignment guidelines.",
+          lineOrParagraph: "Line 28: HMAC Cryptographic Validation",
+          issue: "Used timing-unsafe string comparison (===) for SHA-256 signatures instead of crypto.timingSafeEqual(), exposing potential timing side-channel attacks.",
+        },
+        {
+          lineOrParagraph: "Section 3: Architectural Tradeoff Analysis",
+          issue: "Lacks sufficient depth in comparing Redis in-memory cache TTLs against database replica invalidations as required by rubric clause #2.",
         }
       ],
       correctionHints: [
-        "Try integrating a real-world case study to support your claims in the second section.",
-        "Ensure your conclusion directly maps back to the introduction."
+        "💡 Line 28 Actionable Hint: Convert both hex signature strings into Buffer objects and verify via crypto.timingSafeEqual(bufA, bufB) to harden against timing side-channels.",
+        "💡 Line 14 Hint: Wrap await req.json() inside a try/catch block and return a standard 400 Bad Request JSON payload upon parsing failure.",
+        "💡 Architectural Tip: Include an explicit memory evict policy (LRU vs LFU) diagram when describing Redis cache fallback patterns."
       ],
-      overallFeedback: "Solid effort overall. The foundational concepts are correct, but the application lacks the depth expected for a perfect score. Review the hints and try adding more concrete examples.",
+      overallFeedback: "Exceptional code quality and strong domain mastery! The core API endpoints conform cleanly to Next.js 15 native Request/Response patterns. Addressing the signature verification timing-safe hint will elevate this project to production enterprise standards.",
     };
 
     setGradingResult(mockLLMResponse);

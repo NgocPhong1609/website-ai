@@ -20,6 +20,10 @@ export interface IRoadmapNode {
   isCompleted: boolean;
   isCurrent: boolean;
   isLocked: boolean;
+  practicalPercent?: number;
+  theoreticalPercent?: number;
+  milestoneBadge?: string;
+  remedialReason?: string;
 }
 
 export interface IAIGradingResult {

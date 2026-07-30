@@ -16,9 +16,13 @@ export interface Transaction {
   id: string;
   invoiceId: string;
   date: string;
+  /** ISO datetime string — used for refund eligibility (7-day window) */
+  purchasedAt: string;
   service: string;
   serviceIcon: "course" | "subscription" | "python";
   amount: number;
   status: TransactionStatus;
   canRefund: boolean;
+  /** 0-100 — used for refund eligibility (≤10% progress) */
+  courseProgress: number;
 }

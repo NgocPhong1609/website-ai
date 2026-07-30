@@ -105,6 +105,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::put('modules/{module}', [CourseModuleController::class, 'update']);
     Route::delete('modules/{module}', [CourseModuleController::class, 'destroy']);
 
+<<<<<<< HEAD
     // Lessons
     Route::get('modules/{module}/lessons', [LessonController::class, 'index']);
     Route::get('lessons/{lesson}', [LessonController::class, 'show']);
@@ -114,6 +115,27 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::post('lessons/{lesson}/video', [LessonController::class, 'uploadVideo']);
     Route::get('lessons/{lesson}/video-url', [LessonController::class, 'getVideoUrl']);
     Route::post('lessons/{lesson}/content-media', [LessonController::class, 'uploadContentMedia']);
+=======
+        // Lessons
+        Route::get('modules/{module}/lessons', [LessonController::class, 'index']);
+        Route::get('lessons/{lesson}', [LessonController::class, 'show']);
+        Route::post('modules/{module}/lessons', [LessonController::class, 'store']);
+        Route::put('lessons/{lesson}', [LessonController::class, 'update']);
+        Route::delete('lessons/{lesson}', [LessonController::class, 'destroy']);
+        Route::post('lessons/{lesson}/video', [LessonController::class, 'uploadVideo']);
+        Route::get('lessons/{lesson}/video-url', [LessonController::class, 'getVideoUrl']);
+        // Students (Module 2)
+        Route::get('students', [\App\Http\Controllers\Api\Instructor\StudentController::class, 'index']);
+        Route::get('students/{student}/progress', [\App\Http\Controllers\Api\Instructor\StudentController::class, 'progress']);
+
+        // Discussions (Module 2)
+        Route::get('discussions', [\App\Http\Controllers\Api\Instructor\DiscussionController::class, 'index']);
+        Route::post('discussions/{discussion}/replies', [\App\Http\Controllers\Api\Instructor\DiscussionController::class, 'reply']);
+
+        // Notifications (Module 2)
+        Route::post('notifications', [\App\Http\Controllers\Api\Instructor\NotificationController::class, 'store']);
+    });
+>>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 
     // Temporary Media
     Route::post('media/temp', [MediaController::class, 'uploadTemp']);

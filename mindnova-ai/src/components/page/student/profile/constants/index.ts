@@ -5,6 +5,7 @@ import type { UserProfile, ProfileTabItem } from "../types";
 export const USER_PROFILE: UserProfile = {
   fullName: "Alex Rivera",
   email: "alex.rivera@edu.mindnova.ai",
+  phone: "+84 90 123 4567",
   bio: "Passionate about AI ethics and machine learning. Currently specializing in NLP at the Global Institute of Tech.",
   major: "Computer Science Major",
   avatarInitials: "AR",

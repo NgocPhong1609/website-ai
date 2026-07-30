@@ -34,43 +34,52 @@ export const TRANSACTIONS: Transaction[] = [
     id: "tx-1",
     invoiceId: "#MN-90234",
     date: "Sep 14, 2024",
+    purchasedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago → eligible
     service: "Advanced Neural Networks",
     serviceIcon: "course",
     amount: 149.0,
     status: "Paid",
     canRefund: true,
+    courseProgress: 5, // 5% → eligible
   },
   {
     id: "tx-2",
     invoiceId: "#MN-89112",
     date: "Aug 14, 2024",
+    purchasedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(), // 20 days ago → manual review
     service: "MindNova Pro Monthly",
     serviceIcon: "subscription",
     amount: 29.0,
     status: "Paid",
     canRefund: true,
+    courseProgress: 0,
   },
   {
     id: "tx-3",
     invoiceId: "#MN-88540",
     date: "Jul 28, 2024",
+    purchasedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
     service: "Python for Data Science",
     serviceIcon: "python",
     amount: 89.0,
     status: "Refunded",
     canRefund: false,
+    courseProgress: 8,
   },
   {
     id: "tx-4",
     invoiceId: "#MN-87002",
     date: "Jul 14, 2024",
+    purchasedAt: new Date(Date.now() - 75 * 24 * 60 * 60 * 1000).toISOString(),
     service: "MindNova Pro Monthly",
     serviceIcon: "subscription",
     amount: 29.0,
     status: "Paid",
     canRefund: false,
+    courseProgress: 45,
   },
 ];
+
 
 export const FILTER_PERIODS = [
   "Last 6 Months",
