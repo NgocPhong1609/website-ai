@@ -22,12 +22,45 @@ export interface CourseBasicInfo {
 
 export type DraftLessonType = "video" | "quiz" | "document";
 
+// ─── Quiz Draft Types ─────────────────────────────────────────────────────────
+
+export interface DraftAnswer {
+  id: string;
+  content: string;
+  is_correct: boolean;
+}
+
+export interface DraftQuestion {
+  id: string;
+  content: string;
+  answers: DraftAnswer[];
+}
+
+export interface DraftQuizData {
+  title: string;
+  time_limit_minutes: number;
+  passing_score: number;
+  questions: DraftQuestion[];
+}
+
+// ─── Video Upload Types ───────────────────────────────────────────────────────
+
+export interface PendingVideoUpload {
+  blobUrl: string;
+  file: File;
+}
+
+// ─── Lesson Draft ─────────────────────────────────────────────────────────────
+
 export interface DraftLesson {
   id: string;
   title: string;
   type: DraftLessonType;
   content?: string;
   order: number;
+  quizData?: DraftQuizData;
+  temp_media_ids?: number[];
+  // pendingVideos are tracked separately in the store to avoid serialization issues
 }
 
 export interface DraftModule {

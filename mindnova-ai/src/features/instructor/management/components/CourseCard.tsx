@@ -39,7 +39,7 @@ function StatusBadge({ status }: { status: Course["status"] }) {
 function EditButton({ courseId }: { courseId: string }) {
   return (
     <Link
-      href={`/instructor/create-course`}
+      href={`/instructor/courses/${courseId}/edit`}
       id={`btn-edit-course-${courseId}`}
       aria-label="Chỉnh sửa khóa học"
       className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#4648D4] shadow-sm hover:bg-white hover:shadow-md hover:scale-110 active:scale-95 transition-all duration-150 z-10"
@@ -84,7 +84,7 @@ interface ActionBtn {
 
 function CourseActionButtons({ courseId }: { courseId: string }) {
   const ACTIONS: ActionBtn[] = [
-    { id: `btn-upload-${courseId}`, label: "Upload", Icon: UploadIcon, href: `/instructor/create-course` },
+    { id: `btn-info-${courseId}`, label: "Thông tin", Icon: PencilIcon, href: `/instructor/courses/${courseId}/edit` },
     { id: `btn-lessons-${courseId}`, label: "Bài học", Icon: BookOpenIcon, href: `/instructor/courses/${courseId}/lessons` },
     { id: `btn-curriculum-${courseId}`, label: "Chương học", Icon: LayersIcon, href: `/instructor/courses/${courseId}/lessons` },
     { id: `btn-pricing-${courseId}`, label: "Đặt giá", Icon: TagIcon, href: `/instructor/courses/${courseId}/pricing` },

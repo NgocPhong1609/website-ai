@@ -20,6 +20,11 @@ export const axiosClient = axios.create({
 // Interceptor tự động thêm token vào header request
 axiosClient.interceptors.request.use(
   (config) => {
+    // Nếu data là FormData, xóa Content-Type để Axios tự động thêm multipart/form-data kèm boundary
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    }
+
     // Ưu tiên đọc từ localStorage, fallback sang cookie
     let token: string | null = null;
     if (typeof window !== "undefined") {

@@ -12,6 +12,7 @@ export interface Lesson {
   content?: string;
   signed_url?: string;
   order: number;
+  quizData?: any;
 }
 
 export interface Chapter {
@@ -42,9 +43,10 @@ export function useCourseModules(courseId: string) {
 export function useCreateModule() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ courseId, title, order }: { courseId: string; title: string; order: number }) => {
+    mutationFn: async ({ courseId, title, description, order }: { courseId: string; title: string; description?: string; order: number }) => {
       const { data } = await axiosClient.post(`/api/instructor/courses/${courseId}/modules`, {
         title,
+        description,
         order,
       });
       return data.data;
@@ -58,9 +60,10 @@ export function useCreateModule() {
 export function useUpdateModule() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ courseId, moduleId, title }: { courseId: string; moduleId: string | number; title: string }) => {
+    mutationFn: async ({ courseId, moduleId, title, description }: { courseId: string; moduleId: string | number; title: string; description?: string }) => {
       const { data } = await axiosClient.put(`/api/instructor/modules/${moduleId}`, {
         title,
+        description,
       });
       return data.data;
     },
@@ -116,6 +119,66 @@ export function useDeleteLesson() {
     },
     onSuccess: (_, { courseId }) => {
       queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId, "modules"] });
+    },
+  });
+}
+
+// ─── Quiz Hooks ─────────────────────────────────────────────────────────────
+
+export function useCreateQuiz() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ lessonId, payload }: { lessonId: string | number; payload: any }) => {
+      const { data } = await axiosClient.post(`/api/instructor/lessons/${lessonId}/quiz`, payload);
+      return data.data;
+    },
+    onSuccess: (_, { lessonId }) => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "lesson", lessonId, "quiz"] });
+    },
+  });
+}
+
+export function useUploadContentMedia() {
+  return useMutation({
+    mutationFn: async ({ lessonId, file, onUploadProgress }: { lessonId: string | number; file: File; onUploadProgress?: (progressEvent: any) => void }) => {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const { data } = await axiosClient.post(
+        `/api/instructor/lessons/${lessonId}/content-media`,
+        formData,
+        {
+          onUploadProgress,
+        }
+      );
+      return data.data;
+    },
+  });
+}
+
+export function useUploadTempMedia() {
+  return useMutation({
+    mutationFn: async ({ file, onUploadProgress }: { file: File; onUploadProgress?: (progressEvent: any) => void }) => {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const { data } = await axiosClient.post(
+        `/api/instructor/media/temp`,
+        formData,
+        {
+          onUploadProgress,
+        }
+      );
+      return data;
+    },
+  });
+}
+
+export function useDeleteTempMedia() {
+  return useMutation({
+    mutationFn: async (mediaId: number | string) => {
+      const { data } = await axiosClient.delete(`/api/instructor/media/temp/${mediaId}`);
+      return data;
     },
   });
 }

@@ -30,7 +30,7 @@ class CategoryController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'parent_id' => ['nullable', 'integer', 'exists:categories,id'],
-            'status' => ['nullable', 'in:active,inactive'],
+            'status' => ['nullable', 'in:pending,active,inactive'],
         ]);
 
         $slug = Str::slug($data['name']);
@@ -47,7 +47,7 @@ class CategoryController extends Controller
             'slug' => $slug,
             'description' => $data['description'] ?? null,
             'parent_id' => $data['parent_id'] ?? null,
-            'status' => $data['status'] ?? 'active',
+            'status' => $data['status'] ?? 'pending',
         ]);
 
         return response()->json([
@@ -62,7 +62,7 @@ class CategoryController extends Controller
             'name' => ['sometimes', 'string', 'max:255'],
             'description' => ['sometimes', 'nullable', 'string'],
             'parent_id' => ['sometimes', 'nullable', 'integer', 'exists:categories,id'],
-            'status' => ['sometimes', 'in:active,inactive'],
+            'status' => ['sometimes', 'in:pending,active,inactive'],
         ]);
 
         if (array_key_exists('name', $data)) {

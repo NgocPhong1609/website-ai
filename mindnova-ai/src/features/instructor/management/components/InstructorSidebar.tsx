@@ -29,27 +29,17 @@ interface NavItem {
 
 const INSTRUCTOR_NAV: NavItem[] = [
   {
-    label: "Dashboard",
-    href: "/instructor",
-    Icon: CourseManagementNavIcon,
-  },
-  {
-    label: "My Courses",
+    label: "Course Management",
     href: "/instructor/courses",
     Icon: CourseManagementNavIcon,
   },
   {
-    label: "Discussions",
-    href: "/instructor/discussions",
-    Icon: DiscussionsNavIcon,
-  },
-  {
-    label: "Student Analytics",
-    href: "/instructor/analytics",
+    label: "Student Management",
+    href: "/instructor/students",
     Icon: StudentManagementNavIcon,
   },
   {
-    label: "AI Tools",
+    label: "AI Teaching Hub",
     href: "/instructor/ai-teaching",
     Icon: AITeachingNavIcon,
   },
@@ -58,7 +48,7 @@ const INSTRUCTOR_NAV: NavItem[] = [
 
 const BOTTOM_LINKS: NavItem[] = [
   { label: "Settings", href: "/instructor/settings", Icon: SettingsNavIcon },
-  { label: "Support", href: "/instructor/help", Icon: HelpNavIcon },
+  { label: "Help Center", href: "/instructor/help", Icon: HelpNavIcon },
 ];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -81,7 +71,8 @@ function LogoMark() {
 
 function SidebarNavItem({ label, href, Icon }: NavItem) {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  // Mark as active if it's the exact path or a sub-path
+  const isActive = pathname === href || pathname.startsWith(href + '/');
 
   return (
     <li>
@@ -89,26 +80,18 @@ function SidebarNavItem({ label, href, Icon }: NavItem) {
         href={href}
         aria-current={isActive ? "page" : undefined}
         className={twMerge(
-          "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+          "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150",
           isActive
-            ? "bg-[#6B6BFF]/10 text-[#4648D4]"
+            ? "bg-[#4648D4] text-white shadow-md shadow-[#4648D4]/30"
             : "text-[#64647A] hover:bg-[#F4F4FA] hover:text-[#1A1A2E]",
         )}
       >
-        {/* Active indicator */}
-        <span
-          className={twMerge(
-            "absolute left-0 w-[3px] h-6 rounded-r-full bg-[#6B6BFF] transition-all duration-200",
-            isActive ? "opacity-100 scale-y-100" : "opacity-0 scale-y-0",
-          )}
-        />
-
         {/* Icon wrapper */}
         <span
           className={twMerge(
             "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-150",
             isActive
-              ? "bg-[#6B6BFF]/15 text-[#6B6BFF]"
+              ? "text-white"
               : "text-[#9090B0] group-hover:text-[#4648D4] group-hover:bg-[#6B6BFF]/8",
           )}
         >
@@ -158,10 +141,10 @@ export function InstructorSidebar() {
           <LogoMark />
           <div className="flex flex-col leading-tight">
             <span className="text-[14px] font-extrabold text-[#1A1A2E] tracking-tight group-hover:text-[#4648D4] transition-colors duration-150">
-              Instructor Portal
+              MindNova AI
             </span>
             <span className="text-[10px] text-[#9090B0] font-medium tracking-wide">
-              Professional Suite
+              Instructor Admin
             </span>
           </div>
         </Link>

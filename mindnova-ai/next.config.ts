@@ -33,15 +33,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  // Proxy /api requests → Laravel backend (tránh CORS hoàn toàn)
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: `${BACKEND_URL}/api/:path*`,
-      },
-    ];
-  },
 };
 
 export default nextConfig;

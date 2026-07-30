@@ -9,6 +9,7 @@ const navItems = [
   { label: "Khóa học", href: "/admin/courses", icon: "▣" },
   { label: "Kiểm duyệt", href: "/admin/users", icon: "◎" },
   { label: "Hóa đơn", href: "/admin/invoices", icon: "◌" },
+  { label: "Thông báo email", href: "/admin/notifications", icon: "✉" },
 ];
 
 export function AdminSidebar() {

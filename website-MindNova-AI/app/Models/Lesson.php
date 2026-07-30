@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Lesson extends Model
 {
     protected $fillable = [
+        'course_id',
         'module_id',
         'title',
         'type', // video, article, quiz_module
@@ -26,5 +27,10 @@ class Lesson extends Model
     public function media()
     {
         return $this->hasMany(LessonMedia::class);
+    }
+
+    public function quiz()
+    {
+        return $this->hasOne(Quiz::class);
     }
 }
