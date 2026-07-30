@@ -12,7 +12,24 @@ export async function apiClient<T>(
     );
   }
 
-  const url = `${API_BASE_URL}${endpoint}`;
+  // =========================================================
+  // ĐOẠN ĐÃ SỬA: Tự động ghép thêm /api nếu endpoint chưa có
+  // =========================================================
+  
+  // Xóa dấu '/' ở cuối BASE_URL (nếu có) để tránh bị lỗi 2 dấu gạch chéo
+  const safeBaseUrl = API_BASE_URL.replace(/\/$/, "");
+  
+  // Đảm bảo endpoint luôn bắt đầu bằng dấu '/'
+  const safeEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  
+  // Kiểm tra, nếu chưa có '/api' thì thêm vào
+  const finalEndpoint = safeEndpoint.startsWith("/api") 
+    ? safeEndpoint 
+    : `/api${safeEndpoint}`;
+
+  // URL cuối cùng gửi đi
+  const url = `${safeBaseUrl}${finalEndpoint}`;
+  // =========================================================
 
   // Attach auth token from cookies (server-side only)
   const cookieStore = await cookies();

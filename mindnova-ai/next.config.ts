@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "pub-bfe1280f0c5041a4bd4e8104c0aa9ae6.r2.dev",
       },
+      {
+        protocol: "https",
+        hostname: "pub-fec983cf8e334817b4c2983707bf8eef.r2.dev",
+      },
     ],
   },
   // Proxy /api requests → Laravel backend (tránh CORS hoàn toàn)

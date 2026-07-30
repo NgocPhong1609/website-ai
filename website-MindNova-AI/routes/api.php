@@ -54,6 +54,8 @@ Route::middleware('throttle:5,1')->group(function () {
 
     // Lấy danh sách khóa học có sẵn (dành cho người dùng chưa đăng nhập)
     Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
+
+    Route::post('/student/chat-tutor', [AiTutorController::class, 'streamChat']);
 });
 
 // ==========================================
@@ -84,7 +86,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // ==========================================
     Route::prefix('student')->group(function () {
         // TÍNH NĂNG AI TUTOR (PB-025)
-        Route::post('/chat-tutor', [AiTutorController::class, 'streamChat']);
+
 
         // Quiz
         Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
