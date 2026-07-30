@@ -36,11 +36,7 @@ function LogoutIcon() {
 
 // ─── Main Sidebar ─────────────────────────────────────────────────────────────
 
-<<<<<<< HEAD:mindnova-ai/app/(protected)/(student)/layout/components/Sidebar.tsx
 export function Sidebar() {
-=======
-export default function Sidebar() {
-  
   // Hàm xử lý Logout chuyên nghiệp
   const handleLogout = () => {
     // 1. Xóa sạch dữ liệu lưu trong trình duyệt
@@ -53,8 +49,6 @@ export default function Sidebar() {
     // 3. Chuyển hướng về trang Login
     window.location.assign("/login");
   };
-
->>>>>>> d992cb0ab12794193226d83e3c42b24fadda4c43:mindnova-ai/src/features/student/layout/components/Sidebar.tsx
   return (
     <aside className="w-60 shrink-0 h-screen flex flex-col bg-white border-r border-[#F0F0F8]">
       {/* Brand */}

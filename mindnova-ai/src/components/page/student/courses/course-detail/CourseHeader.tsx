@@ -1,13 +1,5 @@
 import Link from "next/link";
-<<<<<<< HEAD
-<<<<<<< HEAD:mindnova-ai/src/components/page/student/courses/course-detail/CourseHeader.tsx
 import { COURSE_DETAIL } from "@/src/components/page/student/courses/constants/detail";
-=======
-import { COURSE_DETAIL } from "@features/student/courses/constants/detail";
->>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/src/features/student/courses/components/course-detail/CourseHeader.tsx
-=======
-import { COURSE_DETAIL } from "@/src/components/page/student/courses/constants/detail";
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 
 function PlayIcon() {
   return (

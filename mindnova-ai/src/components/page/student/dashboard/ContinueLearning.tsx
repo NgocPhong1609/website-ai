@@ -3,21 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-<<<<<<< HEAD
-<<<<<<< HEAD:mindnova-ai/src/components/page/student/dashboard/ContinueLearning.tsx
-import { DASHBOARD_COURSES } from "./constants";
-import { MyCourseCard } from "../courses";
-import { ICourse } from "../courses";
-=======
-import { DASHBOARD_COURSES } from "../constants";
-import { ICourse } from "../../courses";
->>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/src/features/student/dashboard/components/ContinueLearning.tsx
-
-// ─── Sub-component ────────────────────────────────────────────────────────────
-=======
 import { DASHBOARD_COURSES } from "./constants";
 import type { ICourse, CourseStatus } from "../courses/types";
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 
 function PlayCircleIcon() {
   return (

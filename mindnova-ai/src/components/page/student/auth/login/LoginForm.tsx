@@ -182,11 +182,7 @@ export function LoginForm() {
     setStatusMessage(null);
 
     try {
-<<<<<<< HEAD
-      const response = await fetch("http://127.0.0.1:8000/api/login", {
-=======
       const response = await fetch(`${API_BASE_URL}/login`, {
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -209,11 +205,7 @@ export function LoginForm() {
 
       if (token && user) {
         window.localStorage.setItem("accessToken", token);
-<<<<<<< HEAD
         window.localStorage.setItem("userInfo", JSON.stringify(user));
-=======
-      }
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 
         const maxAge = values.rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 8;
         document.cookie = `accessToken=${encodeURIComponent(token)}; path=/; max-age=${maxAge}; samesite=lax`;
@@ -252,31 +244,20 @@ export function LoginForm() {
             </p>
           </div>
 
-<<<<<<< HEAD
-          {statusMessage && (
-            <div
-              className={`mb-4 p-3.5 rounded-xl text-xs font-medium border ${
-                statusMessage.includes("thành công")
-                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                  : "bg-red-50 text-red-600 border-red-200"
-              }`}
-            >
-              {statusMessage}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-=======
-          {/* Form */}
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
             {statusMessage && (
-              <div className="rounded-xl border border-[#E4E4EF] bg-[#F8F8FC] px-3 py-2 text-sm text-[#1A1A2E]">
+              <div
+                className={`p-3.5 rounded-xl text-xs font-medium border ${
+                  statusMessage.includes("thành công")
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                    : "bg-red-50 text-red-600 border-red-200"
+                }`}
+              >
                 {statusMessage}
               </div>
             )}
 
             {/* Email */}
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
             <FormField
               id={emailId}
               label="Email Address"

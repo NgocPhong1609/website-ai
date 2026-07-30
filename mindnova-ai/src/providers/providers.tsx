@@ -18,21 +18,6 @@ function makeQueryClient(): QueryClient {
     },
   });
 }
-
-<<<<<<< HEAD
-let browserQueryClient: QueryClient | undefined = undefined;
-
-function getQueryClient() {
-  if (typeof window === "undefined") {
-    return makeQueryClient();
-  } else {
-    if (!browserQueryClient) browserQueryClient = makeQueryClient();
-    return browserQueryClient;
-  }
-}
-
-=======
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 export default function Providers({ children }: ProvidersProps) {
   const [queryClient] = useState(() => makeQueryClient());
 

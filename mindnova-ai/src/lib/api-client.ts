@@ -45,20 +45,9 @@ export async function apiClient<T>(
       );
     }
 
-    throw new Error(
-<<<<<<< HEAD:mindnova-ai/src/lib/api-client.ts
-      `[apiClient] HTTP ${response.status} ${response.statusText} — ${url}`,
-=======
       `[apiClient] HTTP ${response.status} ${response.statusText} — ${url} | body: ${compactBody}`
->>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/src/shared/lib/api-client.ts
     );
   }
-
-  const text = await response.text();
-<<<<<<< HEAD:mindnova-ai/src/lib/api-client.ts
-  return text ? (JSON.parse(text) as T) : ({} as T);
-}
-=======
 
   if (!text) {
     return {} as T;
@@ -84,4 +73,3 @@ export async function apiClient<T>(
     );
   }
 }
->>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/src/shared/lib/api-client.ts

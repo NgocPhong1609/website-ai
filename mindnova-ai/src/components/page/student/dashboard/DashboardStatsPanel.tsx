@@ -1,31 +1,11 @@
 import { twMerge } from "tailwind-merge";
-<<<<<<< HEAD
-<<<<<<< HEAD:mindnova-ai/src/components/page/student/dashboard/DashboardStatsPanel.tsx
-
-=======
->>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/src/features/student/dashboard/components/DashboardStatsPanel.tsx
-=======
-
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 import {
   FOCUS_AREAS,
   OVERALL_PROGRESS,
   RECENT_ACTIVITY,
   STUDY_STREAK,
-<<<<<<< HEAD
-<<<<<<< HEAD:mindnova-ai/src/components/page/student/dashboard/DashboardStatsPanel.tsx
 } from "./constants";
-
 import { FocusActionKind, IActivityGroup, IFocusArea } from "./types";
-=======
-} from "../constants";
-import { FocusActionKind, IActivityGroup, IFocusArea } from "../types";
->>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/src/features/student/dashboard/components/DashboardStatsPanel.tsx
-=======
-} from "./constants";
-
-import { FocusActionKind, IActivityGroup, IFocusArea } from "./types";
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 
 // ─── Overall Progress ─────────────────────────────────────────────────────────
 
