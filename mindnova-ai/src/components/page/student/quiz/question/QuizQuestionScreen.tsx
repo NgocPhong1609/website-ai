@@ -82,7 +82,7 @@ function OptionButton({ optionId, label, text, isSelected, isDisabled, onClick }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function QuizQuestionScreen() {
+export function QuizQuestionScreen({ lessonId: _lessonId }: { lessonId?: string } = {}) {
   const router = useRouter();
   const quiz = MOCK_QUIZ;
 

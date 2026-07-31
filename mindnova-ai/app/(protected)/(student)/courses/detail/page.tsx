@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
-<<<<<<< HEAD:mindnova-ai/app/(protected)/(student)/courses/detail/page.tsx
 import { CourseHeader, CurriculumAccordion, CourseSidebar } from "@/src/components/page/student/courses";
-=======
-import { CourseHeader, CurriculumAccordion, CourseSidebar } from "@features/student/courses";
->>>>>>> d992cb0ab12794193226d83e3c42b24fadda4c43:mindnova-ai/app/(dashboard)/courses/detail/page.tsx
 
 export const metadata: Metadata = {
   title: "Course Detail | MindNova AI",

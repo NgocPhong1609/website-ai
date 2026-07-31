@@ -1,19 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-<<<<<<< HEAD
-<<<<<<< HEAD:mindnova-ai/src/components/page/student/courses/course-detail/CourseSidebar.tsx
-import { COURSE_DETAIL } from "@/src/components/page/student/courses/constants/detail";
-import type { ILesson, IModule, IResource } from "@/src/components/page/student/courses/types";
-=======
-import { COURSE_DETAIL } from "@features/student/courses/constants/detail";
-import type { ILesson, IModule, IResource } from "@features/student/courses/types";
->>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/src/features/student/courses/components/course-detail/CourseSidebar.tsx
-=======
 import { COURSE_DETAIL } from "@/src/components/page/student/courses/constants/detail";
 import type { ILesson, IModule, IResource } from "@/src/components/page/student/courses/types";
 import { CertificateClaimCard } from "./CertificateClaimCard";
 import { CourseRatingCard } from "./CourseRatingCard";
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 

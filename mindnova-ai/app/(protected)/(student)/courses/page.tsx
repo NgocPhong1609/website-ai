@@ -3,15 +3,7 @@ import {
   ExploreMoreCard,
   MY_COURSES,
   MyCourseCard,
-<<<<<<< HEAD
-<<<<<<< HEAD:mindnova-ai/app/(protected)/(student)/courses/page.tsx
 } from "@/src/components/page/student/courses";
-=======
-} from "@/src/features/student/courses";
->>>>>>> cb5bd5256681bc413148896ee90827b7f054ec2e:mindnova-ai/app/(dashboard)/courses/page.tsx
-=======
-} from "@/src/components/page/student/courses";
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

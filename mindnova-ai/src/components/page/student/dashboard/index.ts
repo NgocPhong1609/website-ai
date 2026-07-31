@@ -7,6 +7,7 @@ export { DashboardTopbar } from "./DashboardTopbar";
 export { AiSuggestionCard } from "./AiSuggestionCard";
 export { ContinueLearning } from "./ContinueLearning";
 export { DashboardStatsPanel } from "./DashboardStatsPanel";
+export { ExploreCourses } from "./ExploreCourses";
 
 // Constants
 export * from "./constants";

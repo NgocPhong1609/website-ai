@@ -1,4 +1,4 @@
-import { apiClient } from "@/src/shared/lib";
+import { apiClient } from "@/src/lib";
 import type { AdminCoursesPageData } from "@/src/features/admin/types";
 
 type CourseApiPayload = {

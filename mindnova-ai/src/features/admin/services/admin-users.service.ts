@@ -1,4 +1,4 @@
-import { apiClient } from "@/src/shared/lib";
+import { apiClient } from "@/src/lib";
 import type { AdminUsersPageData } from "@/src/features/admin/types";
 
 export async function getAdminUsersPageData(): Promise<AdminUsersPageData> {

@@ -45,9 +45,12 @@ export async function apiClient<T>(
       );
     }
 
+    throw new Error(
       `[apiClient] HTTP ${response.status} ${response.statusText} — ${url} | body: ${compactBody}`
     );
   }
+
+  const text = await response.text();
 
   if (!text) {
     return {} as T;
