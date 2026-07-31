@@ -46,7 +46,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose }: CreateLessonE
   const handleClose = () => {
     if (tempMediaMap.size > 0) {
       Array.from(tempMediaMap.values()).forEach(mediaId => {
-        deleteTempMedia.mutate(mediaId).catch(console.error);
+        deleteTempMedia.mutate(mediaId, { onError: console.error });
       });
     }
     onClose();
