@@ -7,3 +7,34 @@ export type { InputProps } from "./Input";
 export { default as Stepper } from "./Stepper";
 
 export { ArrowRightIcon } from "../icons/ArrowRightIcon";
+
+export {
+  SidebarProvider,
+  useSidebar,
+  Sidebar,
+  SidebarOpenButton,
+  SidebarHeader,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarItem,
+  SidebarSubMenu,
+  SidebarFooter,
+  SidebarToggleButton,
+  SidebarMobileTrigger,
+  SidebarLogo,
+} from "./Sidebar";
+export type {
+  SidebarContextType,
+  SidebarProviderProps,
+  SidebarProps,
+  SidebarMenuItemProps,
+  SidebarSubMenuProps,
+  SidebarHeaderProps,
+  SidebarFooterProps,
+  SidebarGroupConfig,
+  SidebarItemConfig,
+} from "./Sidebar";
+

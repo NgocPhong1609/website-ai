@@ -1,5 +1,6 @@
-import { getAdminCoursesPageData } from "@/src/features/admin/services/admin-courses.service";
-import { AdminCoursesQuickActions } from "@/src/features/admin/components/AdminCoursesQuickActions";
+"use client";
+
+import React from "react";
 
 interface AdminCoursesPageProps {
   filters?: {
@@ -9,95 +10,95 @@ interface AdminCoursesPageProps {
   };
 }
 
-export async function AdminCoursesPage({ filters }: AdminCoursesPageProps) {
-  const data = await getAdminCoursesPageData(filters);
+export function AdminCoursesPage({ filters }: AdminCoursesPageProps) {
+  const searchTerm = filters?.search || "";
 
   return (
-    <div className="space-y-6 p-6 lg:p-8 [font-family:var(--font-admin-body)]">
-      <section className="mn-stagger rounded-[30px] border border-cyan-200/20 bg-[linear-gradient(125deg,#0f1a3c_0%,#183067_45%,#0284c7_100%)] p-6 text-white shadow-[0_30px_70px_-30px_rgba(13,23,56,0.95)]">
+    <div className="p-6 lg:p-8 space-y-6">
+      {/* Header Card */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-2xs">
         <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-cyan-100/70">Quản lý khóa học</p>
-          <h1 className="mt-2 text-3xl font-semibold [font-family:var(--font-admin-head)]">Kiểm duyệt khóa học</h1>
-          <p className="mt-2 text-sm text-slate-200/90">
-            Theo dõi tình trạng xuất bản và chất lượng nội dung khóa học theo quy trình kiểm duyệt.
+          <h1 className="text-2xl font-extrabold text-[#111827]">Quản lý danh sách khóa học</h1>
+          <p className="text-[14px] font-medium text-[#6B7280] mt-1">
+            Quản lý toàn bộ nội dung học, phê duyệt khóa học và cập nhật học liệu
           </p>
         </div>
-      </section>
+        <button
+          type="button"
+          className="px-5 py-2.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white font-extrabold text-sm rounded-xl shadow-sm transition-all cursor-pointer whitespace-nowrap"
+        >
+          + Tạo khóa học mới
+        </button>
+      </div>
 
-      <section className="rounded-2xl border border-cyan-100/80 bg-white/95 p-4 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
-        <form method="GET" className="grid gap-3 md:grid-cols-4">
-          <label className="space-y-1 text-sm text-slate-700 md:col-span-2">
-            <span className="font-medium">Tìm theo từ khóa</span>
+      {/* Filter and Content Card */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-2xs">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+          <div className="relative w-full sm:w-80">
             <input
-              name="search"
-              defaultValue={data.filters.search}
-              placeholder="Tên khóa học"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-cyan-400"
+              type="text"
+              defaultValue={searchTerm}
+              placeholder="Tìm kiếm tên khóa học..."
+              className="w-full px-4 py-2 text-sm rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] text-[#111827]"
             />
-          </label>
-
-          <label className="space-y-1 text-sm text-slate-700">
-            <span className="font-medium">Danh mục</span>
-            <select
-              name="categoryId"
-              defaultValue={data.filters.categoryId}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-cyan-400"
-            >
-              <option value="">Tất cả danh mục</option>
-              {data.filters.categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="space-y-1 text-sm text-slate-700">
-            <span className="font-medium">Cấp độ</span>
-            <select
-              name="level"
-              defaultValue={data.filters.level}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-cyan-400"
-            >
-              <option value="">Tất cả cấp độ</option>
+          </div>
+          <div className="flex gap-2">
+            <select className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 bg-white text-[#111827]">
+              <option value="">Tất cả Trình độ</option>
               <option value="beginner">Cơ bản</option>
-              <option value="intermediate">Trung cấp</option>
               <option value="advanced">Nâng cao</option>
             </select>
-          </label>
-
-          <div className="md:col-span-4">
-            <button className="rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_-16px_rgba(79,70,229,0.9)] transition hover:from-cyan-400 hover:to-indigo-400">
-              Áp dụng bộ lọc
-            </button>
+            <select className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 bg-white text-[#111827]">
+              <option value="">Tất cả Danh mục</option>
+              <option value="1">Next.js</option>
+              <option value="2">AI Engineering</option>
+            </select>
           </div>
-        </form>
-      </section>
+        </div>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border border-cyan-100/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
-          <p className="text-sm text-slate-500">Đã xuất bản</p>
-          <p className="mt-3 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{data.summary.published}</p>
+        {/* Sample Table */}
+        <div className="overflow-x-auto border border-gray-100 rounded-xl">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200 text-[12px] font-extrabold text-[#6B7280] uppercase tracking-wider">
+                <th className="py-4 px-6">Tên khóa học</th>
+                <th className="py-4 px-6">Trình độ</th>
+                <th className="py-4 px-6">Học viên</th>
+                <th className="py-4 px-6 text-center">Trạng thái</th>
+                <th className="py-4 px-6 text-right">Hành động</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 text-sm font-medium">
+              <tr className="hover:bg-gray-50/70 transition-colors">
+                <td className="py-4 px-6 font-bold text-[#111827]">Next.js 15 Fullstack Masterclass</td>
+                <td className="py-4 px-6 text-[#6B7280]">Chuyên sâu</td>
+                <td className="py-4 px-6 text-[#4F46E5] font-extrabold">1,240</td>
+                <td className="py-4 px-6 text-center">
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    Đã xuất bản
+                  </span>
+                </td>
+                <td className="py-4 px-6 text-right space-x-3">
+                  <button className="text-[#4F46E5] hover:underline font-bold text-xs cursor-pointer">Quản lý</button>
+                </td>
+              </tr>
+              <tr className="hover:bg-gray-50/70 transition-colors">
+                <td className="py-4 px-6 font-bold text-[#111827]">AI Agents &amp; Langchain Deep Dive</td>
+                <td className="py-4 px-6 text-[#6B7280]">Nâng cao</td>
+                <td className="py-4 px-6 text-[#4F46E5] font-extrabold">856</td>
+                <td className="py-4 px-6 text-center">
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#EEF2FF] text-[#4F46E5] border border-indigo-100">
+                    Đang nháp
+                  </span>
+                </td>
+                <td className="py-4 px-6 text-right space-x-3">
+                  <button className="text-[#4F46E5] hover:underline font-bold text-xs cursor-pointer">Quản lý</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div className="rounded-2xl border border-cyan-100/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
-          <p className="text-sm text-slate-500">Bản nháp</p>
-          <p className="mt-3 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{data.summary.draft}</p>
-        </div>
-        <div className="rounded-2xl border border-cyan-100/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
-          <p className="text-sm text-slate-500">Chờ duyệt</p>
-          <p className="mt-3 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{data.summary.pendingReview}</p>
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-cyan-100/80 bg-white/95 p-4 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Tổng quan khóa học</h2>
-          <span className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 ring-1 ring-cyan-100">
-            {data.rows.length} khóa học
-          </span>
-        </div>
-        <AdminCoursesQuickActions categories={data.filters.categories} courses={data.rows} />
-      </section>
+      </div>
     </div>
   );
 }

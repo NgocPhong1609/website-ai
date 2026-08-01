@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useState, useEffect, Suspense, useRef } from "react";
 import Link from "next/link";
+import { SidebarOpenButton } from "@/src/components/ui";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -147,7 +148,10 @@ export function DashboardTopbar() {
   }, []);
 
   return (
-    <header className="h-16 shrink-0 flex items-center gap-4 px-6 bg-white border-b border-[#F0F0F8] relative z-30">
+    <header className="h-16 shrink-0 flex items-center gap-3 px-5 bg-white border-b border-[#F0F0F8] relative z-30">
+      {/* Nút mở lại sidebar trên desktop */}
+      <SidebarOpenButton />
+
       {/* Search */}
       <Suspense fallback={<div className="flex-1 max-w-md relative" />}>
         <SearchInput />

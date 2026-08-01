@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { DASHBOARD_COURSES } from "./constants";
-import type { ICourse, CourseStatus } from "../courses/types";
+import type { ICourse } from "../courses/types";
 
 function PlayCircleIcon() {
   return (
@@ -26,7 +26,7 @@ function ClockIcon() {
 
 function CheckCircleIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-[#4F46E5]">
       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
       <polyline points="22 4 12 14.01 9 11.01" />
     </svg>
@@ -51,17 +51,17 @@ interface CourseCardProps {
 
 function CourseCard({ course }: CourseCardProps) {
   const statusColors = {
-    "in-progress": "border-[#6B6BFF] text-[#6B6BFF] bg-[#6B6BFF]/10",
-    "completed": "border-emerald-500 text-emerald-600 bg-emerald-50",
+    "in-progress": "border-[#4F46E5] text-[#4F46E5] bg-[#EEF2FF]",
+    "completed": "border-emerald-500 text-emerald-700 bg-emerald-50",
     "abandoned": "border-amber-500 text-amber-700 bg-amber-50",
-    "not-started": "border-gray-300 text-gray-500 bg-gray-50",
+    "not-started": "border-gray-300 text-gray-600 bg-gray-50",
   };
 
   const currentStatus = course.status || "in-progress";
   const statusBadgeClass = statusColors[currentStatus as keyof typeof statusColors] || statusColors["in-progress"];
 
   return (
-    <div className="group bg-white rounded-3xl border border-gray-100 hover:border-[#6B6BFF]/40 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_35px_rgba(107,107,255,0.12)] transition-all duration-300 flex flex-col justify-between">
+    <div className="group bg-white rounded-2xl border border-gray-200 hover:border-[#4F46E5]/50 overflow-hidden shadow-2xs hover:shadow-sm transition-all duration-300 flex flex-col justify-between">
       <div>
         {/* Thumbnail & Overlays */}
         <div className="relative h-44 w-full bg-gray-100 overflow-hidden">
@@ -82,7 +82,7 @@ function CourseCard({ course }: CourseCardProps) {
 
           {/* Top Status & Category Badge */}
           <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between z-10">
-            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-black/50 text-white backdrop-blur-md border border-white/20">
+            <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-black/50 text-white backdrop-blur-md border border-white/20">
               {course.category || "Development"}
             </span>
             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border backdrop-blur-sm ${statusBadgeClass}`}>
@@ -95,21 +95,21 @@ function CourseCard({ course }: CourseCardProps) {
             <div className="flex items-center justify-between text-xs font-bold">
               <div className="flex items-center gap-1.5 bg-black/60 px-2.5 py-1 rounded-lg backdrop-blur-sm">
                 <ClockIcon />
-                <span className="font-mono text-[11px] text-indigo-200">
+                <span className="font-mono text-[11px] text-indigo-100">
                   {course.lastWatchedTimestamp || "00:00 / 15:00"}
                 </span>
               </div>
-              <span className="text-emerald-400 font-extrabold text-sm">{course.progress}%</span>
+              <span className="text-white font-extrabold text-sm">{course.progress}%</span>
             </div>
-            {/* Progress Bar */}
+            {/* Progress Bar (Strictly using #4F46E5 indigo accent) */}
             <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
               <div
                 className={`h-full transition-all duration-500 ${
                   currentStatus === "completed"
-                    ? "bg-emerald-400"
+                    ? "bg-emerald-500"
                     : currentStatus === "abandoned"
-                    ? "bg-amber-400"
-                    : "bg-gradient-to-r from-[#6B6BFF] to-[#22D3EE]"
+                    ? "bg-amber-500"
+                    : "bg-[#4F46E5]"
                 }`}
                 style={{ width: `${course.progress}%` }}
               />
@@ -119,15 +119,15 @@ function CourseCard({ course }: CourseCardProps) {
 
         {/* Content Body */}
         <div className="p-5 flex flex-col gap-3">
-          <h3 className="text-base font-extrabold text-[#131B2E] group-hover:text-[#4648D4] transition-colors leading-snug line-clamp-2">
+          <h3 className="text-base font-extrabold text-[#111827] group-hover:text-[#4F46E5] transition-colors leading-snug line-clamp-2">
             {course.title}
           </h3>
 
-          <div className="p-3 rounded-xl bg-[#F8F9FE] border border-indigo-50/80 flex items-center gap-2.5 text-xs text-gray-600 font-semibold">
+          <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-center gap-2.5 text-xs text-[#6B7280] font-semibold">
             {currentStatus === "completed" ? (
               <>
                 <CheckCircleIcon />
-                <span className="text-emerald-700">Course Fully Mastered</span>
+                <span className="text-[#4F46E5] font-bold">Course Fully Mastered</span>
               </>
             ) : currentStatus === "abandoned" ? (
               <>
@@ -136,8 +136,10 @@ function CourseCard({ course }: CourseCardProps) {
               </>
             ) : (
               <>
-                <PlayCircleIcon />
-                <span className="text-[#4648D4] font-bold line-clamp-1">Up Next: {course.nextLesson}</span>
+                <div className="text-[#4F46E5]">
+                  <PlayCircleIcon />
+                </div>
+                <span className="text-[#111827] font-bold line-clamp-1">Up Next: {course.nextLesson}</span>
               </>
             )}
           </div>
@@ -148,12 +150,12 @@ function CourseCard({ course }: CourseCardProps) {
       <div className="px-5 pb-5 pt-1">
         <Link
           href="/courses/101"
-          className={`w-full py-3 px-4 rounded-xl text-xs font-black tracking-wide flex items-center justify-center gap-2 transition-all shadow-sm ${
+          className={`w-full py-3 px-4 rounded-xl text-xs font-bold tracking-wide flex items-center justify-center gap-2 transition-all shadow-2xs ${
             currentStatus === "completed"
-              ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
+              ? "bg-[#EEF2FF] text-[#4F46E5] hover:bg-[#E0E7FF] border border-indigo-200 font-extrabold"
               : currentStatus === "abandoned"
-              ? "bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20"
-              : "bg-gradient-to-r from-[#6B6BFF] via-[#5848DF] to-[#4648D4] text-white hover:shadow-md hover:-translate-y-0.5"
+              ? "bg-amber-500 hover:bg-amber-600 text-white font-extrabold"
+              : "bg-[#4F46E5] hover:bg-[#4338CA] text-white font-extrabold hover:-translate-y-0.5"
           }`}
         >
           {currentStatus === "completed" ? (
@@ -190,27 +192,27 @@ export function ContinueLearning() {
 
   return (
     <section aria-labelledby="continue-learning-heading" className="flex flex-col gap-5">
-      {/* Widget Header & Filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#1A1F36] via-[#242A4A] to-[#1A1F36] p-6 rounded-3xl text-white shadow-[0_10px_35px_rgba(26,31,54,0.18)]">
+      {/* Widget Header & Filters (Clean white surface per Rule #7) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-2xs">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#6B6BFF] to-[#22D3EE] flex items-center justify-center text-white font-black text-2xl shadow-inner">
+          <div className="w-12 h-12 rounded-2xl bg-[#EEF2FF] text-[#4F46E5] flex items-center justify-center font-black text-2xl border border-indigo-100 shrink-0">
             🚀
           </div>
           <div>
-            <h2 id="continue-learning-heading" className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+            <h2 id="continue-learning-heading" className="text-xl font-extrabold text-[#111827] tracking-tight flex items-center gap-2">
               <span>Jump Back In</span>
-              <span className="text-xs font-bold bg-[#6B6BFF]/30 text-[#A5D6FF] px-2.5 py-0.5 rounded-full border border-[#6B6BFF]/40">
+              <span className="text-xs font-bold bg-[#EEF2FF] text-[#4F46E5] px-2.5 py-0.5 rounded-full border border-indigo-100">
                 Live Timestamps
               </span>
             </h2>
-            <p className="text-xs text-gray-300 mt-0.5">
+            <p className="text-xs text-[#6B7280] mt-0.5 font-medium">
               Resume your exact video timestamp or re-engage with abandoned courses.
             </p>
           </div>
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-1 bg-black/30 p-1.5 rounded-2xl border border-white/10 overflow-x-auto">
+        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl border border-gray-200 overflow-x-auto">
           {[
             { id: "all", label: "All (" + DASHBOARD_COURSES.length + ")" },
             { id: "in-progress", label: "🔥 Active" },
@@ -221,10 +223,10 @@ export function ContinueLearning() {
               key={pill.id}
               type="button"
               onClick={() => setActiveFilter(pill.id as "all" | "in-progress" | "abandoned" | "completed")}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                 activeFilter === pill.id
-                  ? "bg-[#6B6BFF] text-white shadow-sm"
-                  : "text-gray-300 hover:text-white hover:bg-white/10"
+                  ? "bg-[#4F46E5] text-white shadow-2xs"
+                  : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
               }`}
             >
               {pill.label}
@@ -235,13 +237,13 @@ export function ContinueLearning() {
 
       {/* Courses Grid */}
       {filteredCourses.length === 0 ? (
-        <div className="p-12 rounded-3xl bg-white border border-gray-200 text-center flex flex-col items-center gap-3 text-gray-500">
+        <div className="p-12 rounded-2xl bg-white border border-gray-200 text-center flex flex-col items-center gap-3 text-gray-500">
           <span className="text-3xl">📭</span>
-          <p className="text-sm font-bold">No courses found matching this criteria.</p>
+          <p className="text-sm font-bold text-[#111827]">No courses found matching this criteria.</p>
           <button
             type="button"
             onClick={() => setActiveFilter("all")}
-            className="text-xs text-[#6B6BFF] font-extrabold hover:underline"
+            className="text-xs text-[#4F46E5] font-extrabold hover:underline cursor-pointer"
           >
             Show all learning history
           </button>

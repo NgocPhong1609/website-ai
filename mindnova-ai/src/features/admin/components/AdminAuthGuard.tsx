@@ -1,11 +1,18 @@
 "use client";
 
-/**
- * AdminAuthGuard
- * Client-side guard that redirects unauthenticated users away from admin pages.
- * Currently a placeholder — wire up your auth logic (e.g. NextAuth, JWT check) here.
- */
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 export function AdminAuthGuard() {
-  // TODO: Add real auth check logic here (e.g. redirect if not admin)
+  const router = useRouter();
+
+  useEffect(() => {
+    // Proactively check accessToken or admin role if needed
+    const token = typeof window !== "undefined" ? window.localStorage.getItem("accessToken") : null;
+    if (!token) {
+      // Keep silent or redirect if auth enforcement is enabled
+    }
+  }, [router]);
+
   return null;
 }

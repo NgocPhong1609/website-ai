@@ -43,3 +43,10 @@ Your goal is to write clean, maintainable, type-safe code that strictly adheres 
 - Components, Interfaces, Types: Use `PascalCase` (e.g., `ProductList.tsx`).
 - Variables, Functions, Hooks: Use `camelCase` (e.g., `formatCurrency`, `useAuth`).
 - Adopt the "Early Return" principle in functions to avoid deeply nested if-else conditions.
+
+7. Design System & Color Palette
+Overall Canvas Background: The entire space containing the design screens must use a consistent light gray color.
+
+Accent Color: Throughout all interface screens (Student Dashboard, My Courses, Quiz...), use indigo/purple-blue as the accent color for interactive elements such as buttons ("Ask AI Tutor", "Continue", "Start Quiz"), progress bars, and icons.
+
+Surface/Card Background Color: The application pages themselves or content blocks (containers/cards) must use a white background to optimize contrast and highlight the content within.

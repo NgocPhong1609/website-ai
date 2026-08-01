@@ -1,7 +1,5 @@
-"use client"
-
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import type { IMyCourse } from "@/src/components/page/student/courses/types";
 
 function SparkleIcon() {
@@ -41,7 +39,6 @@ function PlayCircleIcon() {
 }
 
 export function MyCourseCard({ course }: { course: IMyCourse }) {
-  const router = useRouter();
   return (
     <div className="bg-white rounded-2xl border border-[#F0F0F8] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col group">
       {/* Thumbnail Header */}
@@ -117,14 +114,12 @@ export function MyCourseCard({ course }: { course: IMyCourse }) {
         </div>
 
         <div className="mt-auto pt-5">
-          <button
-            type="button"
-            onClick={() => router.push(`/courses/detail?courseId=${course.id}`)}
-
-            className="w-full py-2.5 rounded-xl text-sm font-semibold text-white bg-[#4F46E5] hover:bg-[#4338CA] transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:ring-offset-1 cursor-pointer"
+          <Link
+            href={`/courses/detail?courseId=${course.id}`}
+            className="w-full py-2.5 rounded-xl text-sm font-semibold text-white bg-[#4F46E5] hover:bg-[#4338CA] transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:ring-offset-1 cursor-pointer block text-center"
           >
             Continue
-          </button>
+          </Link>
         </div>
       </div>
     </div>

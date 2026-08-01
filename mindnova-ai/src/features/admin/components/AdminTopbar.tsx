@@ -1,75 +1,39 @@
 "use client";
 
-const DEFAULT_API_BASE_URL = "http://127.0.0.1:8000/api";
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
-
-function getStoredToken() {
-  const cookieValue = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("accessToken="))
-    ?.split("=")[1];
-
-  const cookieToken = cookieValue ? decodeURIComponent(cookieValue) : "";
-  const localToken = window.localStorage.getItem("accessToken") ?? "";
-
-  return cookieToken || localToken;
-}
+import React from "react";
+import { SidebarOpenButton } from "@/src/components/ui";
 
 export function AdminTopbar() {
-  const handleLogout = async () => {
-    const token = getStoredToken();
-
-    try {
-      await fetch(`${API_BASE_URL}/logout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        credentials: "include",
-      });
-    } catch {
-      // Ignore backend logout errors and continue local cleanup.
-    } finally {
-      window.localStorage.removeItem("accessToken");
-      document.cookie = "accessToken=; Max-Age=0; path=/";
-      window.location.replace("/login");
-    }
-  };
-
   return (
-    <header className="flex h-20 shrink-0 items-center gap-4 border-b border-cyan-100/70 bg-white/75 px-5 backdrop-blur-2xl">
-      <div className="flex flex-1 items-center gap-3">
-        <div className="flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50/70 px-3 py-1.5 text-xs font-semibold text-emerald-700">
-          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          Đồng bộ trực tiếp
-        </div>
-
-        <div className="relative max-w-lg flex-1">
-          <input
-            type="search"
-            placeholder="Tìm người dùng, doanh thu, khóa học..."
-            className="w-full rounded-2xl border border-cyan-100 bg-white/90 px-4 py-3 text-sm text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition focus:border-cyan-300 focus:bg-white focus:ring-4 focus:ring-cyan-100"
-          />
+    <header className="h-16 w-full bg-white border-b border-gray-200 px-6 flex items-center justify-between shrink-0 shadow-2xs">
+      <div className="flex items-center gap-4">
+        {/* Sidebar Reopen Button */}
+        <SidebarOpenButton />
+        
+        <div>
+          <h1 className="text-[17px] font-bold text-[#111827]">
+            Cổng quản trị MindNova
+          </h1>
+          <p className="text-[12px] text-[#6B7280] hidden sm:block">
+            Vận hành và quản lý nội dung AI
+          </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <button className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700">
-          Xuất dữ liệu
-        </button>
-        <button className="rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_-15px_rgba(79,70,229,0.9)] transition hover:from-cyan-400 hover:to-indigo-400">
-          Làm mới dữ liệu
-        </button>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="rounded-2xl border border-rose-200 bg-rose-50/80 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
-        >
-          Đăng xuất
-        </button>
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-indigo-500 text-sm font-bold text-white shadow-[0_14px_24px_-14px_rgba(37,99,235,0.9)]">
-          A
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-[#EEF2FF] border border-indigo-100 rounded-full">
+          <div className="w-2 h-2 rounded-full bg-[#4F46E5] animate-pulse" />
+          <span className="text-[12px] font-bold text-[#4F46E5]">System Online</span>
+        </div>
+
+        <div className="flex items-center gap-3 border-l border-gray-200 pl-4">
+          <div className="w-9 h-9 rounded-full bg-[#4F46E5] text-white flex items-center justify-center font-bold text-[13px] shadow-sm">
+            AD
+          </div>
+          <div className="hidden md:block text-left">
+            <p className="text-[13px] font-bold text-[#111827] leading-tight">Admin Principal</p>
+            <p className="text-[11px] font-medium text-[#6B7280]">Quản trị viên</p>
+          </div>
         </div>
       </div>
     </header>

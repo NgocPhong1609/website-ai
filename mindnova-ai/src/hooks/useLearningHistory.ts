@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { ILearningHistoryItem } from "@/types/student";
+import type { ILearningHistoryItem } from "@/src/types/student";
 
 const MOCK_HISTORY_LOGS: ILearningHistoryItem[] = [
   {

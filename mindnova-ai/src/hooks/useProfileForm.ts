@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { IStudentProfile } from "@/types/student";
+import type { IStudentProfile } from "@/src/types/student";
 
 interface ValidationResult {
   isValid: boolean;

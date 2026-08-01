@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
-import type { IPasswordChangePayload, IPasswordChangeResult } from "@/types/student";
+import type { IPasswordChangePayload, IPasswordChangeResult } from "@/src/types/student";
 
 type StrengthLevel = "empty" | "weak" | "fair" | "good" | "strong";
 

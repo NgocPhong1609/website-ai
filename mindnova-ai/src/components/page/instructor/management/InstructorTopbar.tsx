@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { BellIcon } from "./icons";
+import { SidebarOpenButton } from "@/src/components/ui";
 
 const NAV_SVG = {
   viewBox: "0 0 24 24",
@@ -91,9 +92,10 @@ export function InstructorTopbar() {
   };
 
   return (
-    <header className="h-16 shrink-0 flex items-center justify-between px-8 bg-white border-b border-[#EAEAF4] relative z-40 shadow-2xs">
+    <header className="h-16 shrink-0 flex items-center justify-between px-5 bg-white border-b border-[#EAEAF4] relative z-40 shadow-2xs">
       {/* Brand & Context */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
+        <SidebarOpenButton />
         <Link
           href="/instructor"
           className="text-[17px] font-extrabold text-[#4648D4] tracking-tight hover:text-[#3D40C0] transition-colors shrink-0"
