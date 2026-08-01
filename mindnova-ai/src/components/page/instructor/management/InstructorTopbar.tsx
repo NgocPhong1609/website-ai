@@ -28,7 +28,7 @@ function HelpIcon() {
 
 function UserAvatar() {
   return (
-    <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#6B6BFF] to-[#4648D4] flex items-center justify-center text-white text-[13px] font-extrabold shadow-sm shrink-0 cursor-pointer hover:scale-105 transition-all">
+    <div className="w-9 h-9 rounded-xl bg-[#4F46E5] hover:bg-[#4338CA] flex items-center justify-center text-white text-[13px] font-extrabold shadow-sm shrink-0 cursor-pointer hover:scale-105 transition-all">
       MN
     </div>
   );
@@ -181,7 +181,7 @@ export function InstructorTopbar() {
                       )}
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <span className="text-xs font-black text-[#1A1A2E] leading-snug">{item.title}</span>
+                        <span className="text-xs font-bold text-[#111827] leading-snug">{item.title}</span>
                         <button
                           type="button"
                           onClick={() => dismissAlert(item.id)}
@@ -199,7 +199,7 @@ export function InstructorTopbar() {
                           <Link
                             href={item.actionHref}
                             onClick={() => setIsAlertOpen(false)}
-                            className="text-[11px] font-extrabold text-[#5153DF] hover:underline flex items-center gap-1"
+                            className="text-[11px] font-bold text-[#4F46E5] hover:underline flex items-center gap-1"
                           >
                             {item.actionText}
                           </Link>
@@ -229,7 +229,7 @@ export function InstructorTopbar() {
         <button
           type="button"
           aria-label="Trợ giúp"
-          className="w-10 h-10 rounded-2xl bg-[#F6F6FB] flex items-center justify-center text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-all cursor-pointer"
+          className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-[#EEF2FF] hover:text-[#4F46E5] transition-all cursor-pointer shadow-2xs"
         >
           <HelpIcon />
         </button>

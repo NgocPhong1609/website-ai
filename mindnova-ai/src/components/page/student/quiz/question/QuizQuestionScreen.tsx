@@ -52,14 +52,14 @@ function OptionButton({ optionId, label, text, isSelected, isDisabled, onClick }
       className={[
         "flex items-center p-4 rounded-xl border-2 transition-all text-left w-full",
         isSelected
-          ? "border-[#6B6BFF] bg-[#EEF2FF]/40 shadow-sm"
-          : "border-[#F3F4F6] bg-white hover:border-gray-300",
+          ? "border-[#4F46E5] bg-[#EEF2FF]/40 shadow-2xs"
+          : "border-gray-200 bg-white hover:border-gray-300",
         isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
       ].join(" ")}
     >
       <div className={[
-        "w-10 h-10 rounded-lg flex items-center justify-center font-bold text-[15px] shrink-0 shadow-sm",
-        isSelected ? "bg-[#6B6BFF] text-white" : "bg-[#F3F4F6] text-gray-500",
+        "w-10 h-10 rounded-lg flex items-center justify-center font-bold text-[15px] shrink-0 shadow-2xs",
+        isSelected ? "bg-[#4F46E5] text-white" : "bg-gray-100 text-gray-500",
       ].join(" ")}>
         {label}
       </div>
@@ -167,27 +167,27 @@ export function QuizQuestionScreen({ lessonId: _lessonId }: { lessonId?: string 
 
   if (!currentQuestion) {
     return (
-      <div className="min-h-screen bg-[#F8F9FB] flex items-center justify-center">
-        <p className="text-gray-500">No questions available.</p>
+      <div className="min-h-screen bg-[#F4F4F8] flex items-center justify-center">
+        <p className="text-[#6B7280]">No questions available.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F4F4F8] flex flex-col font-sans">
 
       {/* ─── Topbar ────────────────────────────────────────────────────────── */}
-      <header className="h-[72px] bg-white border-b border-[#F0F2F5] flex items-center justify-between px-6 shrink-0 sticky top-0 z-20">
+      <header className="h-[72px] bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0 sticky top-0 z-20">
         {/* Left: Close & Brand */}
         <div className="flex items-center gap-4">
-          <Link href="/practice" className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
+          <Link href="/practice" className="p-2 hover:bg-gray-100 rounded-full transition-colors text-[#6B7280]">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </Link>
-          <div className="h-8 w-[1px] bg-gray-200" />
+          <div className="h-8 w-px bg-gray-200" />
           <div className="flex flex-col">
-            <span className="text-[#3b3dbf] font-bold text-lg leading-tight">MindNova</span>
+            <span className="text-[#4F46E5] font-extrabold text-lg leading-tight">MindNova</span>
             <span className="text-gray-400 text-[11px] font-medium leading-tight">Next.js Advanced Patterns</span>
           </div>
         </div>
@@ -196,15 +196,15 @@ export function QuizQuestionScreen({ lessonId: _lessonId }: { lessonId?: string 
         <div className="flex items-center gap-4">
           {/* Live Timer */}
           <div className={[
-            "flex items-center gap-2 px-3.5 py-1.5 rounded-full shadow-sm transition-colors",
+            "flex items-center gap-2 px-3.5 py-1.5 rounded-full shadow-2xs transition-colors border",
             isUrgent
-              ? "bg-red-50 text-red-500 animate-pulse"
-              : "bg-[#EEF2FF] text-[#6B6BFF]",
+              ? "bg-red-50 text-red-600 border-red-200 animate-pulse"
+              : "bg-[#EEF2FF] text-[#4F46E5] border-indigo-100",
           ].join(" ")}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
             </svg>
-            <span className="text-[13px] font-bold tracking-wide tabular-nums">
+            <span className="text-[13px] font-extrabold tracking-wide tabular-nums">
               {formattedTime} remaining
             </span>
           </div>
@@ -213,7 +213,7 @@ export function QuizQuestionScreen({ lessonId: _lessonId }: { lessonId?: string 
           <button
             onClick={() => handleSubmit(false)}
             disabled={isSubmitting}
-            className="px-4 py-2 rounded-xl bg-[#5452F6] text-white text-[13px] font-bold hover:bg-[#4648D4] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-xl bg-[#4F46E5] text-white text-[13px] font-bold hover:bg-[#4338CA] transition-colors shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isSubmitting ? "Submitting..." : "Submit Quiz"}
           </button>
@@ -239,9 +239,9 @@ export function QuizQuestionScreen({ lessonId: _lessonId }: { lessonId?: string 
             </div>
 
             {/* Progress Bar */}
-            <div className="w-full h-1.5 bg-[#EEF2FF] rounded-full mt-4 overflow-hidden">
+            <div className="w-full h-1.5 bg-gray-200 rounded-full mt-4 overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-[#6B6BFF] to-[#0891B2] rounded-full transition-all duration-500"
+                className="h-full bg-[#4F46E5] rounded-full transition-all duration-500"
                 style={{ width: `${completionPercent}%` }}
               />
             </div>
@@ -254,12 +254,12 @@ export function QuizQuestionScreen({ lessonId: _lessonId }: { lessonId?: string 
                   onClick={() => setCurrentIndex(i)}
                   aria-label={`Go to question ${i + 1}`}
                   className={[
-                    "w-7 h-7 rounded-lg text-[11px] font-bold transition-all",
+                    "w-7 h-7 rounded-lg text-[11px] font-bold transition-all cursor-pointer",
                     i === currentIndex
-                      ? "bg-[#6B6BFF] text-white shadow-sm"
+                      ? "bg-[#4F46E5] text-white shadow-2xs"
                       : answers[q.id]
-                        ? "bg-emerald-100 text-emerald-700"
-                        : "bg-gray-100 text-gray-500 hover:bg-gray-200",
+                        ? "bg-emerald-100 text-emerald-800"
+                        : "bg-gray-100 text-[#6B7280] hover:bg-gray-200",
                   ].join(" ")}
                 >
                   {i + 1}
@@ -328,7 +328,7 @@ export function QuizQuestionScreen({ lessonId: _lessonId }: { lessonId?: string 
             {currentIndex < totalQuestions - 1 && !selectedOption && (
               <button
                 onClick={handleNext}
-                className="text-[14px] font-bold text-[#6B6BFF] hover:text-[#4648D4] hover:underline transition-all"
+                className="text-[14px] font-bold text-[#4F46E5] hover:text-[#4338CA] hover:underline transition-all cursor-pointer"
               >
                 Skip for now
               </button>
@@ -338,7 +338,7 @@ export function QuizQuestionScreen({ lessonId: _lessonId }: { lessonId?: string 
               <button
                 onClick={handleNext}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5452F6] hover:bg-[#4648D4] text-white font-bold text-[14px] shadow-[0_4px_14px_rgba(84,82,246,0.35)] hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-4 focus:ring-[#5452F6]/30 cursor-pointer disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#4F46E5] hover:bg-[#4338CA] text-white font-bold text-[14px] shadow-2xs hover:shadow-sm transition-all cursor-pointer disabled:opacity-50"
               >
                 Next Question
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -349,7 +349,7 @@ export function QuizQuestionScreen({ lessonId: _lessonId }: { lessonId?: string 
               <button
                 onClick={() => handleSubmit(false)}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[14px] shadow-[0_4px_14px_rgba(16,185,129,0.35)] hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-4 focus:ring-emerald-500/30 cursor-pointer disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[14px] shadow-2xs hover:shadow-sm transition-all cursor-pointer disabled:opacity-50"
               >
                 {isSubmitting ? "Submitting..." : "Submit Quiz"}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

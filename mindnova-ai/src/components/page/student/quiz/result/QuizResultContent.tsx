@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 export function QuizResultContent() {
   const router = useRouter();
   return (
-    <div className="flex-1 overflow-y-auto bg-[#F8F9FB] min-h-full">
+    <div className="flex-1 overflow-y-auto bg-[#F4F4F8] min-h-full">
       <div className="max-w-[1000px] mx-auto px-6 py-8 pb-20">
         {/* ─── Top Section: Score & Insight ────────────────────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Score Card */}
-          <div className="md:col-span-2 bg-[#FAFBFF] rounded-[24px] border border-[#F0F2F5] shadow-sm relative overflow-hidden p-8 flex flex-col items-center justify-center">
+          <div className="md:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-2xs relative overflow-hidden p-8 flex flex-col items-center justify-center">
             {/* Abstract Background Elements */}
             <div className="absolute inset-0 pointer-events-none opacity-40">
               {/* Just a simple decorative diagonal gradient background to mimic the original */}
@@ -18,7 +18,7 @@ export function QuizResultContent() {
             </div>
 
             {/* Passed Badge */}
-            <div className="absolute top-6 right-6 bg-[#2DD4BF] text-white px-3.5 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-sm">
+            <div className="absolute top-6 right-6 bg-emerald-600 text-white px-3.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-2xs">
               <svg
                 width="14"
                 height="14"
@@ -31,11 +31,11 @@ export function QuizResultContent() {
             </div>
 
             <div className="relative z-10 text-center mt-4">
-              <p className="text-[12px] font-bold tracking-[0.2em] text-gray-500 uppercase mb-2">
+              <p className="text-[11px] font-extrabold tracking-[0.2em] text-[#6B7280] uppercase mb-2">
                 Final Score
               </p>
               <div className="flex items-baseline justify-center gap-1">
-                <span className="text-[90px] font-bold text-[#5452F6] leading-none tracking-tighter">
+                <span className="text-[84px] font-black text-[#4F46E5] leading-none tracking-tight">
                   75
                 </span>
                 <span className="text-[32px] font-medium text-gray-400">
@@ -292,12 +292,12 @@ export function QuizResultContent() {
         {/* ─── Footer Buttons ────────────────────────────────────────────────────── */}
         <div className="flex justify-center items-center gap-4 mt-12">
           <button
-            className="px-8 py-3.5 bg-[#5452F6] hover:bg-[#4648D4] text-white rounded-xl font-bold text-[15px] shadow-[0_4px_14px_rgba(84,82,246,0.35)] hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-4 focus:ring-[#5452F6]/30 cursor-pointer"
-            onClick={() => router.push("/")}
+            className="px-6 py-3 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-xl font-bold text-sm shadow-2xs transition-all cursor-pointer"
+            onClick={() => router.push("/dashboard")}
           >
             Back to Dashboard
           </button>
-          <button className="px-8 py-3.5 bg-white border border-[#D1D5DB] hover:bg-gray-50 text-gray-700 rounded-xl font-bold text-[15px] shadow-sm transition-all focus:outline-none focus:ring-4 focus:ring-gray-100">
+          <button className="px-6 py-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl font-bold text-sm shadow-2xs transition-all cursor-pointer">
             Share Result
           </button>
         </div>

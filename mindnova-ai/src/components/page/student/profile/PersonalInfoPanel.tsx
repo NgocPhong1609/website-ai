@@ -48,7 +48,7 @@ function FormInput({ id, value, onChange, type = "text", placeholder, hasError, 
         className={`w-full ${icon ? "pl-10 pr-4" : "px-4"} py-3 rounded-2xl text-sm text-[#1A1A2E] bg-white border font-bold transition-all duration-200 focus:outline-none focus:ring-2 placeholder-[#B0B0C8] disabled:opacity-60 disabled:cursor-not-allowed ${
           hasError
             ? "border-red-400 focus:border-red-500 bg-red-50/10 text-red-900"
-            : "border-[#EAEAF4] focus:border-[#6B6BFF] focus:ring-[#6B6BFF]/20 hover:border-gray-300"
+            : "border-gray-200 focus:border-[#4F46E5] focus:ring-[#4F46E5]/20 hover:border-gray-300"
         }`}
       />
     </div>
@@ -62,26 +62,26 @@ function FieldError({ message }: { message?: string }) {
 
 function AiInsightsCard({ completionPercent }: { completionPercent: number }) {
   return (
-    <div className="mt-4 rounded-3xl border border-[#6B6BFF]/30 bg-gradient-to-br from-[#F6F5FF] via-[#EEEDFF] to-[#E6E4FF] p-6 shadow-xs">
+    <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-2xs">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
-          <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-[#6B6BFF] text-white shadow-sm">
+          <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-[#EEF2FF] text-[#4F46E5] border border-indigo-100">
             <SparkleIcon size={16} />
           </span>
-          <h3 className="text-xs font-black text-[#5249DE] uppercase tracking-wider">
+          <h3 className="text-xs font-extrabold text-[#111827] uppercase tracking-wider">
             MindNova AI Community Profile &amp; Certificate Intelligence
           </h3>
         </div>
-        <span className="text-xs font-black text-[#5249DE] bg-white/90 px-3.5 py-1 rounded-xl border border-[#6B6BFF]/20 shadow-xs font-mono">
+        <span className="text-xs font-bold text-[#4F46E5] bg-[#EEF2FF] px-3.5 py-1 rounded-xl border border-indigo-100 font-mono">
           {completionPercent}% Mastered
         </span>
       </div>
-      <p className="text-xs text-[#3A3B60] leading-relaxed font-bold">
-        Your profile data directly customizes your <strong className="text-[#5249DE]">Cryptographic Graduation Certificates</strong> and professional presence in timestamped student discussions and peer leaderboards.
+      <p className="text-xs text-[#6B7280] leading-relaxed font-medium">
+        Your profile data directly customizes your <strong className="text-[#111827] font-bold">Cryptographic Graduation Certificates</strong> and professional presence in timestamped student discussions and peer leaderboards.
       </p>
-      <div className="mt-4 h-2 w-full rounded-full bg-indigo-100 overflow-hidden shadow-inner">
+      <div className="mt-4 h-2 w-full rounded-full bg-gray-100 overflow-hidden">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-[#6B6BFF] via-[#5249DE] to-[#22D3EE] transition-all duration-700 shadow-sm"
+          className="h-full rounded-full bg-[#4F46E5] transition-all duration-700"
           style={{ width: `${completionPercent}%` }}
         />
       </div>
@@ -146,15 +146,15 @@ export function PersonalInfoPanel({ fullName: initName = "", email: initEmail = 
 
   return (
     <div className="flex flex-col gap-8 animate-fadeIn">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#1A1A2E] p-7 rounded-3xl text-white shadow-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white border border-gray-200 p-6 rounded-2xl shadow-2xs">
         <div>
-          <h2 className="text-xl font-extrabold text-white flex items-center gap-2.5">
+          <h2 className="text-xl font-extrabold text-[#111827] flex items-center gap-2.5">
             <span>Profile Details &amp; Community Presence</span>
-            <span className="px-2.5 py-1 rounded-xl text-[11px] font-black bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 font-mono">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
               ⚡ Inline Editing Enabled
             </span>
           </h2>
-          <p className="text-xs text-indigo-200 mt-1">
+          <p className="text-xs text-[#6B7280] font-medium mt-1">
             Edit your public persona directly below without navigating away. Changes reflect instantly on cryptographic certificates &amp; forums.
           </p>
         </div>
@@ -268,7 +268,7 @@ export function PersonalInfoPanel({ fullName: initName = "", email: initEmail = 
             className={`w-full px-5 py-4 rounded-3xl text-sm font-bold text-[#1A1A2E] bg-white border transition-all duration-200 focus:outline-none focus:ring-2 placeholder-[#B0B0C8] resize-none leading-relaxed ${
               errors.bio
                 ? "border-red-400 focus:border-red-500 bg-red-50/10 text-red-900"
-                : "border-[#EAEAF4] focus:border-[#6B6BFF] focus:ring-[#6B6BFF]/20 shadow-xs"
+                : "border-gray-200 focus:border-[#4F46E5] focus:ring-[#4F46E5]/20 shadow-2xs"
             }`}
           />
           <FieldError message={errors.bio} />
@@ -307,7 +307,7 @@ export function PersonalInfoPanel({ fullName: initName = "", email: initEmail = 
             type="button"
             onClick={handleSave}
             disabled={!isDirty || isSaving}
-            className="px-8 py-3.5 rounded-2xl text-xs font-black text-white bg-gradient-to-r from-[#6B6BFF] via-[#5A50E5] to-[#4648D4] shadow-lg hover:opacity-95 transition-all disabled:opacity-40 uppercase tracking-wider cursor-pointer flex items-center gap-2"
+            className="px-6 py-3 rounded-xl text-xs font-extrabold text-white bg-[#4F46E5] hover:bg-[#4338CA] shadow-2xs hover:shadow-sm transition-all disabled:opacity-40 uppercase tracking-wider cursor-pointer flex items-center gap-2"
           >
             {isSaving && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
             <span>{isSaving ? "Synchronizing..." : "Save & Sync Profile"}</span>

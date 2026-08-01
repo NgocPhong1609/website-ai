@@ -123,7 +123,7 @@ export function QuizStartContent() {
           </p>
           <button
             onClick={() => router.push("/practice/quiz/result")}
-            className="px-6 py-3 bg-[#5452F6] text-white rounded-xl font-bold text-sm hover:bg-[#4648D4] transition-colors"
+            className="px-6 py-3 bg-[#4F46E5] text-white rounded-xl font-bold text-sm hover:bg-[#4338CA] transition-colors shadow-2xs cursor-pointer"
           >
             View Last Result
           </button>
@@ -134,35 +134,32 @@ export function QuizStartContent() {
 
   // ─── Normal State ─────────────────────────────────────────────────────────
   return (
-    <div className="flex-1 overflow-y-auto bg-white relative min-h-full">
-      {/* Soft Background Gradient */}
-      <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[#EEF2FF]/60 to-transparent pointer-events-none" />
-
-      <div className="relative p-8 lg:p-12 max-w-6xl mx-auto">
+    <div className="flex-1 overflow-y-auto bg-[#F4F4F8] relative min-h-full py-8">
+      <div className="relative px-6 lg:px-12 max-w-6xl mx-auto pb-20">
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-sm mb-6">
-          <span className="text-gray-500 font-medium">Courses</span>
+          <span className="text-[#6B7280] font-medium">Courses</span>
           <span className="text-gray-400"><ChevronRightIcon /></span>
-          <span className="text-gray-500 font-medium">Next.js Advanced</span>
+          <span className="text-[#6B7280] font-medium">Next.js Advanced</span>
           <span className="text-gray-400"><ChevronRightIcon /></span>
-          <span className="text-[#6B6BFF] font-semibold">Quiz</span>
+          <span className="text-[#4F46E5] font-bold">Quiz</span>
         </div>
 
         {/* Header */}
-        <h1 className="text-4xl md:text-[2.75rem] leading-tight font-extrabold text-[#1F2937] mb-4 tracking-tight">
+        <h1 className="text-3xl md:text-4xl leading-tight font-extrabold text-[#111827] mb-3 tracking-tight">
           Quiz: {quiz.title}
         </h1>
-        <p className="text-lg text-gray-600 max-w-3xl leading-relaxed">
+        <p className="text-base text-[#6B7280] font-medium max-w-3xl leading-relaxed">
           {quiz.description}
         </p>
 
         {/* Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
           {/* Left Column (Main Info) */}
           <div className="lg:col-span-2 flex flex-col gap-6">
             {/* Overview Card */}
-            <div className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#F3F4F6]">
-              <h3 className="text-xl font-bold text-gray-900 mb-8">Quiz Overview</h3>
+            <div className="bg-white rounded-2xl p-7 shadow-2xs border border-gray-200">
+              <h3 className="text-lg font-extrabold text-[#111827] mb-6">Quiz Overview</h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-8 gap-x-6">
                 <StatItem
@@ -265,25 +262,25 @@ export function QuizStartContent() {
           {/* Right Column (Actions) */}
           <div className="lg:col-span-1 flex flex-col gap-6">
             {/* Start Card */}
-            <div className="bg-[#F8F9FC] rounded-[24px] p-5 shadow-sm border border-[#F0F2F5]">
-              <div className="w-full aspect-[4/3] rounded-[16px] overflow-hidden bg-[#111827] shadow-inner mb-6 relative">
+            <div className="bg-white rounded-2xl p-6 shadow-2xs border border-gray-200">
+              <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-[#111827] shadow-inner mb-6 relative">
                 <div className="absolute inset-0 opacity-80 bg-[url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center" />
               </div>
 
-              <div className="px-1">
-                <h4 className="text-[11px] font-bold text-gray-500 tracking-widest uppercase mb-3">Prerequisites</h4>
+              <div>
+                <h4 className="text-[11px] font-extrabold text-[#6B7280] tracking-widest uppercase mb-3">Prerequisites</h4>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  <span className="px-3.5 py-1.5 bg-[#E0E7FF] text-[#4F46E5] text-[13px] font-semibold rounded-full">Next.js Basics</span>
-                  <span className="px-3.5 py-1.5 bg-[#E0E7FF] text-[#4F46E5] text-[13px] font-semibold rounded-full">Web APIs</span>
+                  <span className="px-3 py-1 bg-[#EEF2FF] border border-indigo-100 text-[#4F46E5] text-xs font-bold rounded-lg">Next.js Basics</span>
+                  <span className="px-3 py-1 bg-[#EEF2FF] border border-indigo-100 text-[#4F46E5] text-xs font-bold rounded-lg">Web APIs</span>
                 </div>
 
                 <button
                   onClick={handleStart}
                   disabled={isBlocked}
-                  className="w-full py-4 bg-[#5452F6] hover:bg-[#4648D4] text-white rounded-[14px] font-bold text-[15px] flex items-center justify-center gap-2 shadow-[0_6px_20px_rgba(84,82,246,0.35)] hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-4 focus:ring-[#5452F6]/30 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                  className="w-full py-3.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-2xs hover:shadow-sm transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <PlayIcon />
-                  Start Quiz
+                  <span>Start Quiz</span>
                 </button>
 
                 <p className="text-center text-[#6B7280] text-[12px] mt-4 px-2 leading-relaxed">

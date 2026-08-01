@@ -33,7 +33,7 @@ function SearchBar() {
         type="search"
         id="profile-search"
         placeholder="Search settings…"
-        className="w-full pl-9 pr-4 py-2 rounded-xl text-sm text-[#1A1A2E] placeholder-[#B0B0C8] bg-[#F6F6FB] border border-[#EAEAF4] focus:outline-none focus:border-[#6B6BFF] focus:ring-4 focus:ring-[#6B6BFF]/10 focus:bg-white transition-all duration-200"
+        className="w-full pl-9 pr-4 py-2 rounded-xl text-sm text-[#111827] placeholder-gray-400 bg-white border border-gray-200 focus:outline-none focus:border-[#4F46E5] focus:ring-2 focus:ring-[#4F46E5]/20 transition-all duration-200 shadow-2xs"
       />
     </div>
   );
@@ -66,14 +66,14 @@ export default function ProfileContainer() {
   const [activeTab, setActiveTab] = useState<ProfileTab>("personal-info");
 
   return (
-    <div className="flex flex-col h-full px-6 py-6 gap-6">
+    <div className="flex flex-col h-full min-h-screen bg-[#F4F4F8] px-6 lg:px-10 py-8 gap-8">
       {/* Page header row */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#131B2E] leading-tight tracking-tight">
+          <h1 className="text-2xl font-extrabold text-[#111827] leading-tight tracking-tight">
             Account Settings
           </h1>
-          <p className="text-sm text-[#84849A] mt-1">
+          <p className="text-sm text-[#6B7280] font-medium mt-1">
             Manage your personal information and account security preferences.
           </p>
         </div>
@@ -81,10 +81,10 @@ export default function ProfileContainer() {
       </div>
 
       {/* Main grid: left sidebar card + right content card */}
-      <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
+      <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0 pb-20">
         {/* ── Left card (profile sidebar) ─────────────────────────────────── */}
         <div className="w-full lg:w-64 xl:w-72 shrink-0">
-          <div className="rounded-2xl bg-white border border-[#EAEAF4] shadow-sm p-5 h-full">
+          <div className="rounded-2xl bg-white border border-gray-200 shadow-2xs p-5 h-full">
             <ProfileSidebar
               activeTab={activeTab}
               onTabChange={setActiveTab}
@@ -95,9 +95,9 @@ export default function ProfileContainer() {
         </div>
 
         {/* ── Right column ────────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-4 flex-1 min-w-0">
+        <div className="flex flex-col gap-6 flex-1 min-w-0">
           {/* Content panel */}
-          <div className="rounded-2xl bg-white border border-[#EAEAF4] shadow-sm p-6 flex-1">
+          <div className="rounded-2xl bg-white border border-gray-200 shadow-2xs p-6 flex-1">
             <ActivePanel tab={activeTab} profile={USER_PROFILE} />
           </div>
 
