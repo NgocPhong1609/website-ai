@@ -18,7 +18,7 @@ const renderVideoPreview = (url: string) => {
   const meta = videoMetadataCache.get(url);
   const displayName = meta?.name || 'Video đã tải lên';
   const displaySize = meta?.size ? ` • ${meta.size}` : '';
-  
+
   return `
     <div style="width: 100%; max-width: 100%; padding: 24px; border-radius: 12px; background-color: #F4F4FA; border: 2px dashed #D5D5F0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; cursor: default;">
       <div style="width: 48px; height: 48px; border-radius: 50%; background-color: #EEF0FF; color: #4648D4; display: flex; align-items: center; justify-content: center;">
@@ -45,7 +45,7 @@ const CKEditorComponent = dynamic(
       // MindNova custom video plugin
       function MindNovaVideoPlugin(editor: any) {
         let ButtonView: any = null;
-        
+
         const getButtonViewClass = () => {
           if (ButtonView) return ButtonView;
           try {
@@ -64,7 +64,7 @@ const CKEditorComponent = dynamic(
         editor.ui.componentFactory.add('mindNovaVideo', (locale: any) => {
           const BtnClass = getButtonViewClass();
           if (!BtnClass) return null;
-          
+
           const view = new BtnClass(locale);
           view.set({
             label: 'Video',
@@ -72,7 +72,7 @@ const CKEditorComponent = dynamic(
             tooltip: true
           });
           view.on('execute', () => {
-             window.dispatchEvent(new CustomEvent('mindNovaVideoAction'));
+            window.dispatchEvent(new CustomEvent('mindNovaVideoAction'));
           });
           return view;
         });
@@ -84,7 +84,7 @@ const CKEditorComponent = dynamic(
           const btn = new BtnClass(locale);
           btn.set({ label: 'Đổi video', withText: true, tooltip: true });
           btn.on('execute', () => {
-             window.dispatchEvent(new CustomEvent('mindNovaVideoReplaceFile'));
+            window.dispatchEvent(new CustomEvent('mindNovaVideoReplaceFile'));
           });
           return btn;
         });
@@ -95,7 +95,7 @@ const CKEditorComponent = dynamic(
           const btn = new BtnClass(locale);
           btn.set({ label: 'Đổi liên kết', withText: true, tooltip: true });
           btn.on('execute', () => {
-             window.dispatchEvent(new CustomEvent('mindNovaVideoReplaceLink'));
+            window.dispatchEvent(new CustomEvent('mindNovaVideoReplaceLink'));
           });
           return btn;
         });
@@ -106,13 +106,13 @@ const CKEditorComponent = dynamic(
           const btn = new BtnClass(locale);
           btn.set({ label: 'Xóa video', withText: true, tooltip: true });
           btn.on('execute', () => {
-             editor.model.change((writer: any) => {
-                const selection = editor.model.document.selection;
-                const el = selection.getSelectedElement();
-                if (el && el.is('element', 'media')) {
-                   writer.remove(el);
-                }
-             });
+            editor.model.change((writer: any) => {
+              const selection = editor.model.document.selection;
+              const el = selection.getSelectedElement();
+              if (el && el.is('element', 'media')) {
+                writer.remove(el);
+              }
+            });
           });
           return btn;
         });
@@ -124,12 +124,28 @@ const CKEditorComponent = dynamic(
         onChange,
         placeholder,
         onEditorReady,
+        onImageUpload,
       }: {
         value: string;
         onChange: (v: string) => void;
         placeholder?: string;
         onEditorReady?: (editor: any) => void;
+        onImageUpload?: (file: File) => Promise<string>;
       }) {
+        function CustomUploadAdapterPlugin(editor: any) {
+          if (!onImageUpload) return;
+          editor.plugins.get('FileRepository').createUploadAdapter = (loader: any) => {
+            return {
+              upload: () => {
+                return loader.file.then((file: File) => 
+                  onImageUpload(file).then(url => ({ default: url }))
+                );
+              },
+              abort: () => {}
+            };
+          };
+        }
+
         return (
           <div className="prose prose-sm max-w-none ckeditor-wrapper relative">
             <CKEditor
@@ -142,7 +158,7 @@ const CKEditorComponent = dynamic(
                 onChange(editor.getData());
               }}
               config={{
-                extraPlugins: [MindNovaVideoPlugin],
+                extraPlugins: [MindNovaVideoPlugin, CustomUploadAdapterPlugin],
                 placeholder: placeholder || "Nhập nội dung...",
                 toolbar: [
                   "heading",
@@ -157,7 +173,6 @@ const CKEditorComponent = dynamic(
                   "indent",
                   "|",
                   "imageUpload",
-                  "mindNovaVideo",
                   "blockQuote",
                   "insertTable",
                   "undo",
@@ -198,7 +213,8 @@ interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  onVideoUpload?: (file: File, onProgress: (progress: number) => void) => Promise<{url: string, media_id: number}>;
+  onVideoUpload?: (file: File, onProgress: (progress: number) => void) => Promise<{ url: string, media_id: number }>;
+  onImageUpload?: (file: File) => Promise<string>;
 }
 
 export function RichTextEditor({
@@ -206,11 +222,12 @@ export function RichTextEditor({
   onChange,
   placeholder,
   onVideoUpload,
+  onImageUpload,
 }: RichTextEditorProps) {
   const [mounted, setMounted] = useState(false);
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Custom UI states
   const [showMenu, setShowMenu] = useState(false);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
@@ -282,7 +299,7 @@ export function RichTextEditor({
 
       // Insert Cloudflare URL directly
       const videoUrl = result.url;
-      
+
       videoMetadataCache.set(videoUrl, { name: file.name, size: formatBytes(file.size) });
 
       if (isReplacing) {
@@ -290,19 +307,19 @@ export function RichTextEditor({
           const selection = editorInstance.model.document.selection;
           const el = selection.getSelectedElement();
           if (el && el.is('element', 'media')) {
-             writer.setAttribute('url', videoUrl, el);
-             // Store media_id in a custom attribute if needed, but CKEditor mediaEmbed doesn't easily support extra attributes.
-             // We'll extract temp_media_ids from the raw HTML content later.
+            writer.setAttribute('url', videoUrl, el);
+            // Store media_id in a custom attribute if needed, but CKEditor mediaEmbed doesn't easily support extra attributes.
+            // We'll extract temp_media_ids from the raw HTML content later.
           }
         });
       } else {
         editorInstance.execute('mediaEmbed', videoUrl);
       }
     } catch (error: any) {
-        console.error("Video upload failed:", error);
-        const serverError = error.response?.data?.message || error.response?.data?.error || error.message || "Unknown error";
-        alert(`Tải video lên thất bại.\nChi tiết: ${serverError}\nVui lòng kiểm tra Console.`);
-      } finally {
+      console.error("Video upload failed:", error);
+      const serverError = error.response?.data?.message || error.response?.data?.error || error.message || "Unknown error";
+      alert(`Tải video lên thất bại.\nChi tiết: ${serverError}\nVui lòng kiểm tra Console.`);
+    } finally {
       setIsUploading(false);
       setIsReplacing(false);
     }
@@ -317,7 +334,7 @@ export function RichTextEditor({
         const selection = editorInstance.model.document.selection;
         const el = selection.getSelectedElement();
         if (el && el.is('element', 'media')) {
-           writer.setAttribute('url', linkInput.trim(), el);
+          writer.setAttribute('url', linkInput.trim(), el);
         }
       });
     } else {
@@ -337,12 +354,12 @@ export function RichTextEditor({
 
   return (
     <div className="flex flex-col gap-2 relative z-0">
-      <input 
-        type="file" 
-        accept="video/*" 
-        ref={fileInputRef} 
-        onChange={handleVideoUpload} 
-        className="hidden" 
+      <input
+        type="file"
+        accept="video/*"
+        ref={fileInputRef}
+        onChange={handleVideoUpload}
+        className="hidden"
       />
 
       {showMenu && (
@@ -430,6 +447,7 @@ export function RichTextEditor({
         onChange={onChange}
         placeholder={placeholder}
         onEditorReady={setEditorInstance}
+        onImageUpload={onImageUpload}
       />
 
       {isUploading && (
@@ -438,7 +456,7 @@ export function RichTextEditor({
           <div className="text-[#1A1A2E] font-medium mb-1">Đang tải video lên...</div>
           <div className="text-[#64647A] text-sm">{Math.round(uploadProgress)}%</div>
           <div className="w-48 h-1.5 bg-[#F4F4FA] rounded-full mt-3 overflow-hidden">
-            <div 
+            <div
               className="h-full bg-[#4648D4] transition-all duration-300"
               style={{ width: `${uploadProgress}%` }}
             ></div>

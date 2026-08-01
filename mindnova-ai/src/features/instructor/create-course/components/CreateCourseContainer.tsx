@@ -276,7 +276,8 @@ export function CreateCourseContainer() {
               content: finalContent,
               order: lesson.order,
               status: 'published',
-              temp_media_ids: lesson.temp_media_ids
+              temp_media_ids: lesson.temp_media_ids,
+              video_url: lesson.video_url
             }
           });
 

@@ -43,7 +43,7 @@ interface Lesson {
   id: string;
   title: string;
   type: LessonType;
-  duration: string; // "MM:SS"
+  duration_seconds: number;
   status: LessonStatus;
   content?: string;
   quizData?: any;
@@ -63,12 +63,24 @@ interface Chapter {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+function formatDurationSeconds(totalSeconds: number): string {
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  
+  const pad = (num: number) => num.toString().padStart(2, "0");
+  
+  if (h > 0) {
+    return `${pad(h)}:${pad(m)}:${pad(s)}`;
+  }
+  return `${pad(m)}:${pad(s)}`;
+}
+
 function totalDuration(chapters: Chapter[]): string {
   let secs = 0;
   chapters.forEach((ch) =>
     ch.lessons.forEach((l) => {
-      const [m, s] = l.duration.split(":").map(Number);
-      secs += (m || 0) * 60 + (s || 0);
+      secs += l.duration_seconds || 0;
     }),
   );
   const h = Math.floor(secs / 3600);
@@ -168,7 +180,7 @@ function LessonRow({ lesson, onEdit, onDelete }: LessonRowProps) {
       {/* Duration */}
       <span className="flex items-center gap-1 text-[11px] text-[#9090B0] shrink-0 font-mono">
         <ClockIcon size={11} />
-        {lesson.duration}
+        {formatDurationSeconds(lesson.duration_seconds || 0)}
       </span>
 
       {/* Actions */}
@@ -685,7 +697,7 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
     ...ch,
     index: i + 1,
     collapsed: !!collapsedChapters[ch.id],
-    lessons: ch.lessons.map((l) => ({ ...l, duration: "00:00" })) // Mock duration for now
+    lessons: ch.lessons.map((l) => ({ ...l }))
   }));
 
   // ── Derived stats ───────────────────────────────────────────────────────────
@@ -705,10 +717,10 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
     }
   }, [courseId, deleteModuleMutation]);
 
-  const updateLesson = useCallback((chapterId: string, lessonId: string, updates: Partial<Lesson>) => {
-    updateLessonMutation.mutate({ courseId, lessonId, payload: updates });
+  const updateLesson = useCallback(async (chapterId: string, lessonId: string, updates: Partial<Lesson>) => {
+    await updateLessonMutation.mutateAsync({ courseId, lessonId, payload: updates });
     if (updates.quizData) {
-      createQuizMutation.mutate({ lessonId, payload: updates.quizData });
+      await createQuizMutation.mutateAsync({ lessonId, payload: updates.quizData });
     }
   }, [courseId, updateLessonMutation, createQuizMutation]);
 
@@ -880,9 +892,14 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
       {editingLesson && (
         <LessonEditModal
           lesson={editingLesson.lesson}
-          onSave={(id, updates) => {
-            updateLesson(editingLesson.chapterId, id, updates);
-            setEditingLesson(null);
+          onSave={async (id, updates) => {
+            try {
+              await updateLesson(editingLesson.chapterId, id, updates);
+              setEditingLesson(null);
+            } catch (err) {
+              console.error(err);
+              throw err; // throw so LessonEditModal catch block can handle it!
+            }
           }}
           onClose={() => setEditingLesson(null)}
         />

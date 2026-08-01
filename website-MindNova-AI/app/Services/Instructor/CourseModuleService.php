@@ -7,6 +7,10 @@ use App\Models\CourseModule;
 
 class CourseModuleService
 {
+    public function __construct(private readonly LessonService $lessonService)
+    {
+    }
+
     public function createModule(Course $course, array $data): CourseModule
     {
         $data['course_id'] = $course->id;
@@ -26,6 +30,9 @@ class CourseModuleService
 
     public function deleteModule(CourseModule $module): void
     {
+        foreach ($module->lessons as $lesson) {
+            $this->lessonService->deleteLesson($lesson);
+        }
         $module->delete();
     }
 }

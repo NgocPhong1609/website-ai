@@ -14,7 +14,7 @@ class Lesson extends Model
         'type', // video, article, quiz_module
         'content',
         'video_url',
-        'duration_minutes',
+        'duration_seconds',
         'order',
         'status',
     ];

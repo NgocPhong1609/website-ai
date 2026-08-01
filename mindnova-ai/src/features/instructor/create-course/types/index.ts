@@ -60,6 +60,7 @@ export interface DraftLesson {
   order: number;
   quizData?: DraftQuizData;
   temp_media_ids?: number[];
+  video_url?: string;
   // pendingVideos are tracked separately in the store to avoid serialization issues
 }
 

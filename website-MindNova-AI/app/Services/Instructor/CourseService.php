@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Storage;
 
 class CourseService
 {
+    public function __construct(private readonly CourseModuleService $moduleService)
+    {
+    }
+
     public function createCourse(array $data, int $teacherId): Course
     {
         $thumbnail = $data['thumbnail'] ?? null;
@@ -36,6 +40,22 @@ class CourseService
         $course->update($data);
 
         return $course;
+    }
+
+    public function deleteCourse(Course $course): void
+    {
+        // Delete course thumbnail if exists
+        if ($course->thumbnail) {
+            $oldPath = str_replace('/storage/', '', parse_url($course->thumbnail, PHP_URL_PATH));
+            $oldPathR2 = ltrim(parse_url($course->thumbnail, PHP_URL_PATH), '/');
+            Storage::disk('public')->delete($oldPath);
+            Storage::disk('r2')->delete($oldPathR2);
+        }
+
+        foreach ($course->modules as $module) {
+            $this->moduleService->deleteModule($module);
+        }
+        $course->delete();
     }
 
     public function uploadThumbnail(Course $course, UploadedFile $file): Course

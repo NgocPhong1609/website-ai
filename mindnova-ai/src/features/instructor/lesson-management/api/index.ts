@@ -7,7 +7,7 @@ export interface Lesson {
   id: string | number;
   title: string;
   type: "video" | "document" | "quiz" | "article" | "quiz_module";
-  duration_minutes: number;
+  duration_seconds: number;
   status: "published" | "draft";
   content?: string;
   signed_url?: string;
@@ -158,7 +158,7 @@ export function useUploadContentMedia() {
 
 export function useUploadTempMedia() {
   return useMutation({
-    mutationFn: async ({ file, onUploadProgress }: { file: File; onUploadProgress?: (progressEvent: any) => void }) => {
+    mutationFn: async ({ file, onUploadProgress, signal }: { file: File; onUploadProgress?: (progressEvent: any) => void; signal?: AbortSignal }) => {
       const formData = new FormData();
       formData.append("file", file);
 
@@ -167,6 +167,7 @@ export function useUploadTempMedia() {
         formData,
         {
           onUploadProgress,
+          signal
         }
       );
       return data;

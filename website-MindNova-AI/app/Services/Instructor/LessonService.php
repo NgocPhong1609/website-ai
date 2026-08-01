@@ -24,7 +24,17 @@ class LessonService
 
     public function updateLesson(Lesson $lesson, array $data): Lesson
     {
-        $lesson->update($data);
+        $lesson->fill($data);
+
+        if ($lesson->type === 'article') {
+            $content = $lesson->content ?? '';
+            $text = strip_tags($content);
+            // Count words (Unicode friendly)
+            $wordCount = count(preg_split('~[^\p{L}\p{N}\']+~u', $text, -1, PREG_SPLIT_NO_EMPTY));
+            $lesson->duration_seconds = (int) ceil(($wordCount / 200) * 60);
+        }
+
+        $lesson->save();
         return $lesson;
     }
 
@@ -34,7 +44,7 @@ class LessonService
         foreach ($lesson->media as $media) {
             Storage::disk('r2')->delete($media->r2_key);
         }
-        
+
         $lesson->delete();
     }
 
@@ -135,6 +145,15 @@ class LessonService
         $subfolder = $isVideo ? 'videos' : 'images';
         $mediaType = $isVideo ? 'video' : 'image';
 
+        $durationSeconds = 0;
+        if ($isVideo) {
+            $getID3 = new \getID3();
+            $fileInfo = $getID3->analyze($file->getPathname());
+            if (isset($fileInfo['playtime_seconds'])) {
+                $durationSeconds = round($fileInfo['playtime_seconds']);
+            }
+        }
+
         $filename = "temp/{$subfolder}/{$uuid}.{$extension}";
 
         Storage::disk('r2')->putFileAs("temp/{$subfolder}", $file, "{$uuid}.{$extension}");
@@ -146,6 +165,7 @@ class LessonService
             'original_filename' => $file->getClientOriginalName(),
             'file_size' => $file->getSize(),
             'mime_type' => $file->getMimeType(),
+            'duration_seconds' => $durationSeconds,
             'status' => 'ready',
             'is_temp' => true,
         ]);
@@ -169,7 +189,8 @@ class LessonService
     {
         $contentChanged = false;
         $content = $lesson->content ?? '';
-        
+        $videoUrl = $lesson->video_url ?? '';
+
         // 1. Move and update new media from temp folder
         if (!empty($mediaIds)) {
             $mediaList = LessonMedia::whereIn('id', $mediaIds)
@@ -180,7 +201,7 @@ class LessonService
                 $subfolder = $media->media_type === 'video' ? 'videos' : 'images';
                 $filename = basename($media->r2_key);
                 $newKey = "lessons/{$lesson->id}/content/{$subfolder}/{$filename}";
-                
+
                 $oldUrl = Storage::disk('r2')->url($media->r2_key);
                 $newUrl = Storage::disk('r2')->url($newKey);
 
@@ -200,15 +221,26 @@ class LessonService
                     $content = str_replace($oldUrl, $newUrl, $content);
                     $contentChanged = true;
                 }
+
+                // Replace old URL with new URL in video_url
+                if (str_contains($videoUrl, $oldUrl)) {
+                    $videoUrl = str_replace($oldUrl, $newUrl, $videoUrl);
+                    $contentChanged = true;
+                }
+
+                if ($lesson->type === 'video' && $media->media_type === 'video' && $media->duration_seconds > 0) {
+                    $lesson->duration_seconds = $media->duration_seconds;
+                    $contentChanged = true;
+                }
             }
         }
 
-        // 2. Clean up orphaned media (files in DB but no longer in HTML content)
+        // 2. Clean up orphaned media (files in DB but no longer in HTML content or video_url)
         $existingMedia = $lesson->media()->where('is_temp', false)->get();
         foreach ($existingMedia as $media) {
             $mediaUrl = Storage::disk('r2')->url($media->r2_key);
-            // If the URL is no longer in the HTML content, delete the file and record
-            if (!str_contains($content, $mediaUrl)) {
+            // If the URL is no longer in the HTML content or video_url, delete the file and record
+            if (!str_contains($content, $mediaUrl) && !str_contains($videoUrl, $mediaUrl)) {
                 if (Storage::disk('r2')->exists($media->r2_key)) {
                     Storage::disk('r2')->delete($media->r2_key);
                 }
@@ -216,9 +248,10 @@ class LessonService
             }
         }
 
-        // Save lesson if content was updated with new URLs
+        // Save lesson if content or video_url was updated with new URLs
         if ($contentChanged) {
             $lesson->content = $content;
+            $lesson->video_url = $videoUrl;
             $lesson->save();
         }
     }
