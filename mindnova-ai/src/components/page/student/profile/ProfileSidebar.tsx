@@ -66,14 +66,14 @@ function ProfileAvatar({ name }: { name: string }) {
         {/* Avatar circle with drag drop visual state */}
         <div
           onClick={triggerFilePicker}
-          className={`group relative w-28 h-28 rounded-full p-[4px] cursor-pointer transition-all duration-300 shadow-[0_8px_30px_rgba(107,107,255,0.35)] hover:scale-105 ${
+          className={`group relative w-28 h-28 rounded-full p-1 cursor-pointer transition-all duration-300 border-2 ${
             isDragging
-              ? "bg-gradient-to-r from-emerald-400 to-cyan-400 scale-110 ring-4 ring-emerald-500/30"
-              : "bg-gradient-to-br from-[#6B6BFF] to-[#4648D4]"
+              ? "border-emerald-500 scale-105 ring-4 ring-emerald-100"
+              : "border-indigo-100 bg-[#EEF2FF] hover:border-[#4F46E5] shadow-2xs hover:shadow-sm hover:scale-102"
           }`}
           title="Click or drag & drop image to upload avatar (JPG/PNG, max 5MB)"
         >
-          <div className="w-full h-full rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#2D2D5E] flex items-center justify-center overflow-hidden relative">
+          <div className="w-full h-full rounded-full bg-[#4F46E5] flex items-center justify-center overflow-hidden relative">
             {isUploading ? (
               <div className="w-7 h-7 border-2 border-white/40 border-t-white rounded-full animate-spin" />
             ) : previewUrl ? (
@@ -94,7 +94,7 @@ function ProfileAvatar({ name }: { name: string }) {
         <button
           type="button"
           onClick={triggerFilePicker}
-          className="absolute bottom-1 right-8 w-8 h-8 rounded-full bg-[#6B6BFF] border-2 border-white flex items-center justify-center shadow-md hover:bg-[#4648D4] transition-transform hover:scale-110 z-10"
+          className="absolute bottom-1 right-6 w-8 h-8 rounded-full bg-[#4F46E5] border-2 border-white flex items-center justify-center shadow-2xs hover:bg-[#4338CA] transition-all hover:scale-105 z-10 cursor-pointer"
           title="Upload & Crop avatar (JPG/PNG, max 5MB)"
           aria-label="Change avatar"
         >
@@ -117,36 +117,36 @@ function ProfileAvatar({ name }: { name: string }) {
 
       {/* Built-In Image Cropper Modal */}
       {isCropperOpen && rawImageUrl && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fadeIn">
-          <div className="w-full max-w-md rounded-3xl bg-[#131B2E] border border-gray-800 text-white p-6 shadow-2xl flex flex-col gap-6">
-            <div className="flex items-center justify-between border-b border-gray-800 pb-3">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fadeIn">
+          <div className="w-full max-w-md rounded-2xl bg-white border border-gray-200 text-[#111827] p-6 shadow-2xl flex flex-col gap-6">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div>
-                <h3 className="text-lg font-extrabold text-white flex items-center gap-2">
-                  <span>✂️ built-in Avatar Cropper</span>
+                <h3 className="text-lg font-extrabold text-[#111827] flex items-center gap-2">
+                  <span>✂️ Avatar Cropper</span>
                 </h3>
-                <p className="text-xs text-indigo-200 mt-0.5">Adjust zoom & center your professional presence</p>
+                <p className="text-xs text-[#6B7280] font-medium mt-0.5">Adjust zoom & center your professional presence</p>
               </div>
               <button
                 type="button"
                 onClick={handleCancelCrop}
-                className="w-8 h-8 rounded-full bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white flex items-center justify-center font-bold"
+                className="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-[#111827] flex items-center justify-center font-bold cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
             {/* Cropper Viewport */}
-            <div className="relative w-64 h-64 mx-auto rounded-full overflow-hidden bg-black border-4 border-[#6B6BFF] shadow-[0_0_35px_rgba(107,107,255,0.4)] flex items-center justify-center">
+            <div className="relative w-64 h-64 mx-auto rounded-full overflow-hidden bg-gray-100 border-4 border-[#4F46E5] shadow-sm flex items-center justify-center">
               {/* Grid Guides */}
-              <div className="absolute inset-0 border border-white/20 grid grid-cols-3 grid-rows-3 pointer-events-none z-10">
-                <div className="border-r border-b border-white/15" />
-                <div className="border-r border-b border-white/15" />
-                <div className="border-b border-white/15" />
-                <div className="border-r border-b border-white/15" />
-                <div className="border-r border-b border-white/15" />
-                <div className="border-b border-white/15" />
-                <div className="border-r border-white/15" />
-                <div className="border-r border-white/15" />
+              <div className="absolute inset-0 border border-white/40 grid grid-cols-3 grid-rows-3 pointer-events-none z-10">
+                <div className="border-r border-b border-white/30" />
+                <div className="border-r border-b border-white/30" />
+                <div className="border-b border-white/30" />
+                <div className="border-r border-b border-white/30" />
+                <div className="border-r border-b border-white/30" />
+                <div className="border-b border-white/30" />
+                <div className="border-r border-white/30" />
+                <div className="border-r border-white/30" />
                 <div />
               </div>
 
@@ -166,7 +166,7 @@ function ProfileAvatar({ name }: { name: string }) {
 
             {/* Zoom Slider Controls */}
             <div className="flex flex-col gap-2 px-4">
-              <div className="flex justify-between text-xs font-mono font-bold text-indigo-200">
+              <div className="flex justify-between text-xs font-mono font-bold text-[#6B7280]">
                 <span>Zoom: {zoomLevel.toFixed(1)}x</span>
                 <span>Max: 3.0x</span>
               </div>
@@ -177,23 +177,23 @@ function ProfileAvatar({ name }: { name: string }) {
                 step="0.1"
                 value={zoomLevel}
                 onChange={(e) => setZoomLevel(parseFloat(e.target.value))}
-                className="w-full h-2 rounded-lg bg-gray-700 accent-[#6B6BFF] cursor-pointer"
+                className="w-full h-2 rounded-lg bg-gray-200 accent-[#4F46E5] cursor-pointer"
               />
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center justify-end gap-3 pt-2 border-t border-gray-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
               <button
                 type="button"
                 onClick={handleCancelCrop}
-                className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-gray-300 hover:bg-white/10 transition-colors"
+                className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-[#6B7280] hover:bg-gray-100 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleApplyCrop}
-                className="px-6 py-2.5 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#6B6BFF] to-[#22D3EE] shadow-[0_4px_16px_rgba(107,107,255,0.4)] hover:scale-105 transition-transform"
+                className="px-6 py-2.5 rounded-xl text-xs font-extrabold text-white bg-[#4F46E5] hover:bg-[#4338CA] shadow-2xs transition-all cursor-pointer"
               >
                 ✓ Apply Crop & Save
               </button>
@@ -222,18 +222,18 @@ function TabButton({ id, label, isActive, onClick }: TabButtonProps) {
       onClick={onClick}
       aria-current={isActive ? "page" : undefined}
       className={twMerge(
-        "group w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all duration-200",
+        "group w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-150 cursor-pointer",
         isActive
-          ? "bg-[#6B6BFF] text-white shadow-[0_6px_20px_rgba(107,107,255,0.35)]"
-          : "text-[#64647A] hover:bg-[#F4F4FA] hover:text-[#1A1A2E]",
+          ? "bg-[#4F46E5] text-white shadow-2xs"
+          : "text-[#6B7280] hover:bg-gray-50 hover:text-[#111827]",
       )}
     >
       <span
         className={twMerge(
-          "flex items-center justify-center w-8 h-8 rounded-xl transition-colors duration-200",
+          "flex items-center justify-center w-7 h-7 rounded-lg transition-colors duration-150",
           isActive
             ? "bg-white/20 text-white"
-            : "bg-[#F0F0F8] text-[#9090B0] group-hover:bg-[#6B6BFF]/10 group-hover:text-[#4648D4]",
+            : "bg-gray-100 text-[#6B7280] group-hover:bg-[#EEF2FF] group-hover:text-[#4F46E5]",
         )}
       >
         <Icon />
@@ -254,15 +254,15 @@ export function ProfileSidebar({
   return (
     <div className="flex flex-col gap-6">
       {/* Avatar + name */}
-      <div className="flex flex-col items-center gap-2 pt-4 pb-2">
+      <div className="flex flex-col items-center gap-2 pt-4 pb-2 border-b border-gray-100">
         <ProfileAvatar name={fullName} />
         <div className="mt-2 text-center">
-          <p className="text-lg font-extrabold text-[#1A1A2E] leading-tight">{fullName}</p>
-          <p className="text-xs font-semibold text-[#6B6BFF] mt-1 bg-[#6B6BFF]/10 px-3 py-1 rounded-full border border-[#6B6BFF]/20">
+          <p className="text-lg font-extrabold text-[#111827] leading-tight">{fullName}</p>
+          <p className="text-xs font-bold text-[#4F46E5] mt-1.5 bg-[#EEF2FF] px-3 py-1 rounded-full border border-indigo-100 inline-block">
             {major}
           </p>
         </div>
-        <p className="text-[11px] font-bold text-[#B0B0C8] text-center mt-1">
+        <p className="text-[11px] font-medium text-[#6B7280] text-center mt-1 pb-2">
           JPG / PNG • Max 5MB • Drag & drop supported
         </p>
       </div>

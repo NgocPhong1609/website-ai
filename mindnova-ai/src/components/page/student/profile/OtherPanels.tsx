@@ -83,8 +83,8 @@ export function SecurityPanel() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="text-lg font-bold text-[#1A1A2E]">Security</h2>
-        <p className="text-sm text-[#84849A] mt-0.5">
+        <h2 className="text-lg font-extrabold text-[#111827]">Security</h2>
+        <p className="text-sm text-[#6B7280] font-medium mt-0.5">
           Manage your password. Changing it will log out all other active sessions.
         </p>
       </div>
@@ -92,7 +92,7 @@ export function SecurityPanel() {
       <div className="flex flex-col gap-4 max-w-sm">
         {/* Current Password */}
         <div>
-          <label htmlFor="current-pw" className="block text-sm font-semibold text-[#1A1A2E] mb-1.5">
+          <label htmlFor="current-pw" className="block text-xs font-bold text-[#111827] uppercase tracking-wider mb-1.5">
             Current Password
           </label>
           <div className="relative">
@@ -102,9 +102,9 @@ export function SecurityPanel() {
               value={currentPw}
               onChange={(e) => setCurrentPw(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-2.5 pr-10 rounded-xl text-sm text-[#1A1A2E] bg-white border border-[#EAEAF4] focus:outline-none focus:border-[#6B6BFF] focus:ring-4 focus:ring-[#6B6BFF]/10 placeholder-[#B0B0C8] transition-all"
+              className="w-full px-4 py-2.5 pr-10 rounded-xl text-sm text-[#111827] bg-white border border-gray-200 focus:outline-none focus:border-[#4F46E5] focus:ring-2 focus:ring-[#4F46E5]/20 placeholder-gray-400 transition-all shadow-2xs"
             />
-            <button type="button" onClick={() => setShowCurrent((v) => !v)} className="absolute right-3 inset-y-0 text-[#A0A0C0] hover:text-[#6B6BFF] transition-colors">
+            <button type="button" onClick={() => setShowCurrent((v) => !v)} className="absolute right-3 inset-y-0 text-gray-400 hover:text-[#4F46E5] transition-colors cursor-pointer">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 {showCurrent
                   ? <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></>
@@ -117,7 +117,7 @@ export function SecurityPanel() {
 
         {/* New Password */}
         <div>
-          <label htmlFor="new-pw" className="block text-sm font-semibold text-[#1A1A2E] mb-1.5">
+          <label htmlFor="new-pw" className="block text-xs font-bold text-[#111827] uppercase tracking-wider mb-1.5">
             New Password
           </label>
           <div className="relative">
@@ -127,9 +127,9 @@ export function SecurityPanel() {
               value={newPw}
               onChange={(e) => setNewPw(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-2.5 pr-10 rounded-xl text-sm text-[#1A1A2E] bg-white border border-[#EAEAF4] focus:outline-none focus:border-[#6B6BFF] focus:ring-4 focus:ring-[#6B6BFF]/10 placeholder-[#B0B0C8] transition-all"
+              className="w-full px-4 py-2.5 pr-10 rounded-xl text-sm text-[#111827] bg-white border border-gray-200 focus:outline-none focus:border-[#4F46E5] focus:ring-2 focus:ring-[#4F46E5]/20 placeholder-gray-400 transition-all shadow-2xs"
             />
-            <button type="button" onClick={() => setShowNew((v) => !v)} className="absolute right-3 inset-y-0 text-[#A0A0C0] hover:text-[#6B6BFF] transition-colors">
+            <button type="button" onClick={() => setShowNew((v) => !v)} className="absolute right-3 inset-y-0 text-gray-400 hover:text-[#4F46E5] transition-colors cursor-pointer">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 {showNew
                   ? <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></>
@@ -138,9 +138,7 @@ export function SecurityPanel() {
               </svg>
             </button>
           </div>
-          {/* Strength meter */}
           <PasswordStrengthMeter level={strengthLevel} />
-          {/* Requirements */}
           {newPw.length > 0 && (
             <ul className="mt-2.5 space-y-1 pl-0.5">
               {requirements.map((req) => (
@@ -152,7 +150,7 @@ export function SecurityPanel() {
 
         {/* Confirm Password */}
         <div>
-          <label htmlFor="confirm-pw" className="block text-sm font-semibold text-[#1A1A2E] mb-1.5">
+          <label htmlFor="confirm-pw" className="block text-xs font-bold text-[#111827] uppercase tracking-wider mb-1.5">
             Confirm New Password
           </label>
           <input
@@ -161,43 +159,43 @@ export function SecurityPanel() {
             value={confirmPw}
             onChange={(e) => setConfirmPw(e.target.value)}
             placeholder="••••••••"
-            className={`w-full px-4 py-2.5 rounded-xl text-sm text-[#1A1A2E] bg-white border transition-all focus:outline-none focus:ring-4 placeholder-[#B0B0C8] ${
+            className={`w-full px-4 py-2.5 rounded-xl text-sm text-[#111827] bg-white border transition-all focus:outline-none focus:ring-2 shadow-2xs placeholder-gray-400 ${
               mismatchError
-                ? "border-red-400 focus:border-red-400 focus:ring-red-100"
-                : "border-[#EAEAF4] focus:border-[#6B6BFF] focus:ring-[#6B6BFF]/10"
+                ? "border-red-400 focus:border-red-500 focus:ring-red-200"
+                : "border-gray-200 focus:border-[#4F46E5] focus:ring-[#4F46E5]/20"
             }`}
           />
           {mismatchError && (
-            <p className="mt-1.5 text-xs font-medium text-red-500">{mismatchError}</p>
+            <p className="mt-1.5 text-xs font-bold text-red-600">{mismatchError}</p>
           )}
         </div>
 
         {/* Session-invalidation notice */}
-        <div className="flex items-start gap-2 px-3.5 py-3 rounded-xl bg-amber-50 border border-amber-200">
-          <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900">
+          <svg className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
-          <p className="text-xs text-amber-700 leading-relaxed">
-            <span className="font-semibold">Security notice:</span> Changing your password will automatically invalidate all active sessions on other devices.
+          <p className="text-xs leading-relaxed font-medium">
+            <span className="font-bold">Security notice:</span> Changing your password will automatically invalidate all active sessions on other devices.
           </p>
         </div>
 
         {/* Success message */}
         {successMessage && (
-          <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200">
-            <svg className="w-4 h-4 text-emerald-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200">
+            <svg className="w-4 h-4 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
             </svg>
-            <p className="text-sm font-semibold text-emerald-700">{successMessage}</p>
+            <p className="text-xs font-bold text-emerald-800">{successMessage}</p>
           </div>
         )}
 
-        <div className="flex justify-end">
+        <div className="flex justify-end pt-2">
           <button
             type="button"
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(107,107,255,0.4)] hover:shadow-[0_6px_22px_rgba(107,107,255,0.55)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none transition-all duration-200"
+            className="px-6 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider text-white bg-[#4F46E5] shadow-2xs hover:bg-[#4338CA] active:bg-[#3730A3] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150 cursor-pointer"
           >
             {isSubmitting ? "Updating..." : "Update Password"}
           </button>
@@ -223,27 +221,27 @@ export function SettingsPanel() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="text-lg font-bold text-[#1A1A2E]">Settings</h2>
-        <p className="text-sm text-[#84849A] mt-0.5">
+        <h2 className="text-lg font-extrabold text-[#111827]">Settings</h2>
+        <p className="text-sm text-[#6B7280] font-medium mt-0.5">
           Customize your learning experience and notification preferences.
         </p>
       </div>
 
       <div className="flex flex-col gap-3">
         {toggles.map(({ id, label, description, value, set }) => (
-          <div key={id} className="flex items-center justify-between gap-4 p-4 rounded-2xl border border-[#EAEAF4] bg-white">
+          <div key={id} className="flex items-center justify-between gap-4 p-4 rounded-xl border border-gray-200 bg-white shadow-2xs">
             <div>
-              <p className="text-sm font-semibold text-[#1A1A2E]">{label}</p>
-              <p className="text-xs text-[#84849A] mt-0.5">{description}</p>
+              <p className="text-sm font-extrabold text-[#111827]">{label}</p>
+              <p className="text-xs text-[#6B7280] font-medium mt-0.5">{description}</p>
             </div>
             <button
               type="button"
               role="switch"
               aria-checked={value}
               onClick={() => set(!value)}
-              className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/40 shrink-0 ${value ? "bg-[#6B6BFF]" : "bg-[#D0D0E0]"}`}
+              className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/40 shrink-0 cursor-pointer ${value ? "bg-[#4F46E5]" : "bg-gray-300"}`}
             >
-              <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-200 ${value ? "translate-x-5" : "translate-x-0"}`} />
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${value ? "translate-x-5" : "translate-x-0"}`} />
             </button>
           </div>
         ))}
