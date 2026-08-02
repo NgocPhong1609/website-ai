@@ -1,17 +1,12 @@
-import { ChatPanel } from "@/src/components/page/student/ai-study-plan/ChatPanel";
-import { ContextPanel } from "@/src/components/page/student/ai-study-plan/ContextPanel";
+import React from "react";
+import { AIStudyPlanContainer } from "@/src/components/page/student/ai-study-plan";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AI Study Plan",
-  description: "Your AI-powered study plan and interactive tutor.",
+  title: "Lộ trình & Gia sư AI | MindNova AI",
+  description: "Trợ lý Trí tuệ Nhân tạo hỗ trợ lập lộ trình học tập 80/20 và trực tuyến giải đáp mã nguồn 24/7.",
 };
 
 export default function AIStudyPlanPage() {
-  return (
-    <div className="flex h-full w-full overflow-hidden relative bg-white">
-      <ContextPanel />
-      <ChatPanel />
-    </div>
-  );
+  return <AIStudyPlanContainer />;
 }

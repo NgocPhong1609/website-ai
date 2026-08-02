@@ -1,45 +1,38 @@
 "use client";
 
-// ─── PricingContainer ─────────────────────────────────────────────────────────
-// Main container for the Quản lý Giá & Kiếm tiền page.
-
-import { useState } from "react";
+import React, { useState } from "react";
+import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { PricingModelSection } from "./PricingModelSection";
 import { CouponSection } from "./CouponSection";
 import { SaveIcon, ChevronRightIcon } from "./icons";
 
-// ─── Top nav tabs ─────────────────────────────────────────────────────────────
-
 const TABS = [
   { id: "pricing", label: "Giá & Kiếm tiền" },
-  { id: "content", label: "Nội dung" },
-  { id: "students", label: "Học viên" },
+  { id: "content", label: "Nội dung học liệu" },
+  { id: "students", label: "Học viên đăng ký" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
 
 function PageTabs({ active, onChange }: { active: TabId; onChange: (t: TabId) => void }) {
   return (
-    <div className="flex items-center gap-1 border-b border-[#F0F0F8] px-6 bg-white">
+    <div className="flex items-center gap-2 border-b border-gray-200 px-6 bg-white">
       {TABS.map((tab) => (
         <button
           key={tab.id}
           type="button"
           onClick={() => onChange(tab.id)}
           className={twMerge(
-            "relative px-4 py-3.5 text-[13px] font-semibold transition-all duration-150 focus:outline-none",
-            active === tab.id
-              ? "text-[#4648D4]"
-              : "text-[#9090B0] hover:text-[#464554]",
+            "relative px-4 py-3 text-xs font-black transition-all duration-150 cursor-pointer",
+            active === tab.id ? "text-[#4F46E5]" : "text-gray-400 hover:text-gray-700"
           )}
         >
           {tab.label}
-          {/* Underline indicator */}
           <span
             className={twMerge(
-              "absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-[#6B6BFF] transition-all duration-200",
-              active === tab.id ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0",
+              "absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-[#4F46E5] transition-all duration-200",
+              active === tab.id ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
             )}
           />
         </button>
@@ -48,68 +41,60 @@ function PageTabs({ active, onChange }: { active: TabId; onChange: (t: TabId) =>
   );
 }
 
-// ─── Breadcrumb ───────────────────────────────────────────────────────────────
-
 function Breadcrumb() {
   return (
-    <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-[12px] text-[#9090B0]">
-      <span className="hover:text-[#4648D4] cursor-pointer transition-colors">My Courses</span>
+    <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs font-bold text-gray-400">
+      <Link href="/instructor/courses" className="hover:text-[#4F46E5] transition-colors">
+        Khóa học của tôi
+      </Link>
       <ChevronRightIcon size={12} />
-      <span className="hover:text-[#4648D4] cursor-pointer transition-colors">
-        Generative AI Masterclass
-      </span>
+      <span className="text-gray-700">Generative AI Masterclass 2026</span>
     </nav>
   );
 }
 
-// ─── Page Header ──────────────────────────────────────────────────────────────
-
 function PageHeader({ onSave }: { onSave: () => void }) {
   return (
-    <div className="px-6 pt-5 pb-4 bg-white border-b border-[#F0F0F8]">
+    <div className="px-6 pt-5 pb-4 bg-white border-b border-gray-200 shadow-2xs">
       <Breadcrumb />
-      <div className="flex items-start justify-between mt-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-2.5 gap-3">
         <div>
-          <h1 className="text-[16px] font-extrabold text-[#1A1A2E] tracking-tight">
-            Giá & Kiếm tiền: Generative AI
+          <h1 className="text-lg font-black text-gray-900 tracking-tight">
+            Quản Lý Giá &amp; Kiếm Tiền: Generative AI Masterclass
           </h1>
-          <p className="text-[12px] text-[#9090B0] mt-0.5 max-w-[480px] leading-relaxed">
-            Cấu hình mô hình doanh thu, định giá và quản lý các chương trình khuyến mãi cho khóa học của bạn.
+          <p className="text-xs text-gray-500 mt-0.5 max-w-[540px] leading-relaxed">
+            Cấu hình mô hình doanh thu, định giá niêm yết và quản lý các chiến lược mã giảm giá khuyến mãi cho khóa học của bạn trên sàn MindNova AI.
           </p>
         </div>
         <button
           type="button"
           id="btn-save-pricing"
           onClick={onSave}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40 shrink-0"
+          className="flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-extrabold text-white bg-[#4F46E5] hover:bg-[#4338CA] shadow-2xs transition-all cursor-pointer shrink-0"
         >
           <SaveIcon size={14} />
-          Lưu cài đặt
+          <span>Lưu thiết lập</span>
         </button>
       </div>
     </div>
   );
 }
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
 function SaveToast({ visible }: { visible: boolean }) {
   return (
     <div
       className={twMerge(
-        "fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-[#1A1A2E] text-white text-[13px] font-semibold shadow-[0_8px_30px_rgba(0,0,0,0.2)] transition-all duration-300",
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none",
+        "fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-gray-900 text-white text-xs font-bold shadow-lg transition-all duration-300",
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
       )}
     >
-      <span className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px]">
+      <span className="w-4.5 h-4.5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px] font-black">
         ✓
       </span>
-      Đã lưu cài đặt thành công!
+      Đã cập nhật chiến lược định giá thành công!
     </div>
   );
 }
-
-// ─── Main Container ───────────────────────────────────────────────────────────
 
 export function PricingContainer() {
   const [activeTab, setActiveTab] = useState<TabId>("pricing");
@@ -121,31 +106,31 @@ export function PricingContainer() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#FAF8FF]">
-      {/* Sticky page header */}
-      <div className="sticky top-0 z-10 bg-white shadow-[0_1px_0_#F0F0F8]">
+    <div className="flex flex-col min-h-[calc(100vh-64px)] bg-[#F4F4F8]">
+      {/* Sticky page header & tab bar */}
+      <div className="sticky top-0 z-10 bg-white shadow-2xs">
         <PageHeader onSave={handleSave} />
         <PageTabs active={activeTab} onChange={setActiveTab} />
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-6 py-6">
+      <div className="flex-1 overflow-y-auto px-6 py-8">
         {activeTab === "pricing" && (
-          <div className="max-w-[900px] mx-auto flex flex-col gap-6">
+          <div className="max-w-[900px] mx-auto flex flex-col gap-6 pb-12 animate-fadeIn">
             <PricingModelSection />
             <CouponSection />
           </div>
         )}
 
         {activeTab === "content" && (
-          <div className="max-w-[900px] mx-auto flex items-center justify-center py-20 text-[#B0B0C8] text-sm">
-            Nội dung khóa học sẽ hiển thị ở đây.
+          <div className="max-w-[900px] mx-auto flex items-center justify-center py-24 text-gray-400 font-bold text-xs">
+            📚 Danh sách bài giảng và nội dung học liệu AI sẽ hiển thị tại tab này.
           </div>
         )}
 
         {activeTab === "students" && (
-          <div className="max-w-[900px] mx-auto flex items-center justify-center py-20 text-[#B0B0C8] text-sm">
-            Danh sách học viên sẽ hiển thị ở đây.
+          <div className="max-w-[900px] mx-auto flex items-center justify-center py-24 text-gray-400 font-bold text-xs">
+            👥 Báo cáo chuyên sâu và danh sách học viên đăng ký khóa học sẽ hiển thị tại đây.
           </div>
         )}
       </div>

@@ -33,7 +33,7 @@ function StatusBadge({ status }: { status: Course["status"] }) {
 function EditButton({ courseId }: { courseId: string }) {
   return (
     <Link
-      href="/instructor/create-course"
+      href={`/instructor/courses/${courseId}/edit`}
       id={`btn-edit-course-${courseId}`}
       aria-label="Chỉnh sửa khóa học"
       className="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#4F46E5] shadow-sm hover:bg-white hover:text-[#4338CA] hover:scale-105 active:scale-95 transition-all duration-150 z-10 cursor-pointer border border-gray-100"
@@ -63,7 +63,7 @@ function CourseActionButtons({ courseId }: { courseId: string }) {
   return (
     <div className="grid grid-cols-2 gap-2 p-3.5 mt-auto border-t border-gray-100 bg-gray-50/50">
       <Link
-        href="/instructor/create-course"
+        href={`/instructor/courses/${courseId}/lessons`}
         className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#111827] bg-white border border-gray-200 hover:bg-[#EEF2FF] hover:text-[#4F46E5] hover:border-indigo-200 active:scale-98 transition-all duration-150 cursor-pointer shadow-2xs"
       >
         <span className="text-[#4F46E5]">

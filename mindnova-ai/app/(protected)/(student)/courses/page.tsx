@@ -1,29 +1,13 @@
-import {
-  CoursesHeader,
-  ExploreMoreCard,
-  MY_COURSES,
-  MyCourseCard,
-} from "@/src/components/page/student/courses";
+import React from "react";
 import type { Metadata } from "next";
+import { StudentCoursesContainer } from "@/src/components/page/student/courses";
 
 export const metadata: Metadata = {
-  title: "My Courses | MindNova AI",
+  title: "Khóa học của tôi | MindNova AI",
   description:
-    "View and manage your in-progress and completed courses on MindNova AI.",
+    "Quản lý danh sách khóa học đã đăng ký, theo dõi tiến độ học tập và tối ưu hóa lộ trình bởi trợ lý AI MindNova.",
 };
 
 export default function MyCoursesPage() {
-  return (
-    <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col">
-      <CoursesHeader />
-
-      {/* Course Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-12">
-        {MY_COURSES.map((course) => (
-          <MyCourseCard key={course.id} course={course} />
-        ))}
-        <ExploreMoreCard />
-      </div>
-    </div>
-  );
+  return <StudentCoursesContainer />;
 }

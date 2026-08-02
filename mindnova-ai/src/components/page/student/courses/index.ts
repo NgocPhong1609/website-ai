@@ -2,6 +2,7 @@
 // Import from this barrel instead of deep paths inside the feature
 
 // Top-level components
+export { StudentCoursesContainer } from "./StudentCoursesContainer";
 export { CoursesHeader } from "./CoursesHeader";
 export { ExploreMoreCard } from "./ExploreMoreCard";
 export { MyCourseCard } from "./MyCourseCard";

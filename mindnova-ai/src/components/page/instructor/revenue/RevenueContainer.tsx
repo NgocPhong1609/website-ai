@@ -1,89 +1,84 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
+import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import {
-  SearchIcon,
-  BellIcon,
-  MessageIcon,
-  SettingsIcon,
-  DownloadIcon,
   WalletIcon,
   TrendUpIcon,
   ClockIcon,
-  UsersIcon,
   InfoCircleIcon,
-  ChevronDownIcon,
-  FilterIcon,
-  BuildingBankIcon,
-  ShieldCheckIcon,
-  CheckCircleIcon,
-  BarChartIcon,
-  BrainIcon,
-  CodeIcon,
-  PieChartIcon,
   SparklesIcon,
-  DollarSignIcon,
 } from "./icons";
 import { WithdrawalModal } from "./WithdrawalModal";
 
-function Topbar() {
+function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
   return (
-    <header className="h-16 shrink-0 flex items-center gap-4 px-8 bg-white border-b border-[#F0F0F8]">
-      <div className="relative flex-1 max-w-[400px]">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#B0B0C8] pointer-events-none">
-          <SearchIcon size={14} />
-        </span>
-        <input
-          id="revenue-search"
-          type="search"
-          placeholder="Search transactions or statements..."
-          className="w-full pl-9 pr-4 h-9 rounded-2xl text-[13px] text-[#1A1A2E] placeholder:text-[#B0B0C8] bg-[#F6F6FB] border border-[#EAEAF4] focus:outline-none focus:border-[#6B6BFF] transition-all"
-        />
-      </div>
-      <div className="flex-1" />
-      <div className="flex items-center gap-1.5 text-[#7878A0]">
-        <button type="button" className="w-8 h-8 rounded-xl flex items-center justify-center hover:bg-gray-100 transition-all">
-          <BellIcon size={17} />
-        </button>
-      </div>
-      <div className="flex items-center gap-3 pl-3 border-l border-[#EAEAF4]">
-        <div className="flex flex-col items-end leading-tight">
-          <span className="text-[12px] font-bold text-[#1A1A2E]">Minh Nguyễn</span>
-          <span className="text-[10px] text-[#9090B0] font-bold">Professional Instructor</span>
-        </div>
-        <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xs font-black shadow-md">
-          MN
-        </div>
-      </div>
-    </header>
+    <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-gray-200 shadow-2xs w-fit">
+      <Link
+        href="/instructor/revenue"
+        className={twMerge(
+          "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
+          active === "overview"
+            ? "bg-[#4F46E5] text-white shadow-sm"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        )}
+      >
+        <span>📊 Tổng quan Doanh thu</span>
+      </Link>
+
+      <Link
+        href="/instructor/revenue/sales-report"
+        className={twMerge(
+          "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
+          active === "report"
+            ? "bg-[#4F46E5] text-white shadow-sm"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        )}
+      >
+        <span>📈 Báo cáo Bán hàng</span>
+      </Link>
+
+      <Link
+        href="/instructor/revenue/history"
+        className={twMerge(
+          "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
+          active === "history"
+            ? "bg-[#4F46E5] text-white shadow-sm"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        )}
+      >
+        <span>📜 Lịch sử Giao dịch</span>
+      </Link>
+    </div>
   );
 }
 
 function PageHeader({ onOpenWithdrawal, onToggleForecast }: { onOpenWithdrawal: () => void; onToggleForecast: () => void }) {
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div className="flex flex-col">
-        <h1 className="text-[26px] font-extrabold text-[#1A1A2E] tracking-tight">Financial Suite &amp; Performance Analytics (Section 4)</h1>
-        <p className="text-[13px] text-[#64647A] mt-1">
-          Monitor escrow balances, evaluate promotional revenue share tiers, and leverage AI financial forecasting.
+      <div>
+        <h1 className="text-xl font-black text-gray-900 tracking-tight">Quản lý Doanh thu &amp; Tài chính</h1>
+        <p className="text-xs text-gray-500 mt-1">
+          Theo dõi số dư khả dụng, doanh thu bán khóa học và các khoản hoa hồng theo tỷ lệ chia sẻ của Giảng viên.
         </p>
       </div>
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-center gap-2.5 flex-wrap">
         <button
           type="button"
           onClick={onToggleForecast}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-indigo-200 text-xs font-black text-[#5153DF] bg-indigo-50 hover:bg-indigo-100 transition-all cursor-pointer shadow-xs"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-indigo-200 text-xs font-extrabold text-[#4F46E5] bg-indigo-50/80 hover:bg-indigo-100 transition-all cursor-pointer shadow-2xs"
         >
-          <span>🤖 AI Financial Forecast (Section 4.3)</span>
+          <SparklesIcon size={15} />
+          <span>Dự báo Thu nhập AI</span>
         </button>
         <button
           type="button"
           onClick={onOpenWithdrawal}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-[#1A1A2E] hover:bg-[#4648D4] shadow-md transition-all cursor-pointer"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-[#4F46E5] hover:bg-[#4338CA] active:scale-95 shadow-sm transition-all cursor-pointer"
         >
-          <WalletIcon /> Request Withdrawal
+          <WalletIcon />
+          <span>Yêu cầu Rút tiền</span>
         </button>
       </div>
     </div>
@@ -92,136 +87,137 @@ function PageHeader({ onOpenWithdrawal, onToggleForecast }: { onOpenWithdrawal: 
 
 function StatCards() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-      <div className="bg-white rounded-3xl p-6 border border-[#EAEAF4] shadow-xs flex flex-col justify-between">
-        <span className="text-xs font-black text-[#64647A] uppercase tracking-wide">Total Revenue (Month)</span>
-        <span className="text-2xl font-black text-[#1A1A2E] mt-2">128,450,000đ</span>
-        <div className="flex items-center gap-1.5 mt-3 text-[11px] font-black text-emerald-600">
-          <TrendUpIcon /> +12.5% vs previous cycle
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-2xs flex flex-col justify-between">
+        <span className="text-xs font-black text-gray-500 uppercase tracking-wide">Tổng Doanh Thu (Tháng này)</span>
+        <span className="text-2xl font-black text-gray-900 mt-2">128,450,000đ</span>
+        <div className="flex items-center gap-1.5 mt-3 text-xs font-extrabold text-emerald-600">
+          <TrendUpIcon />
+          <span>+12.5% so với tháng trước</span>
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl p-6 border border-[#EAEAF4] shadow-xs flex flex-col justify-between">
-        <span className="text-xs font-black text-[#64647A] uppercase tracking-wide">Immediate Available Balance</span>
-        <span className="text-2xl font-black text-[#6B6BFF] mt-2">42,180,000đ</span>
-        <div className="flex items-center gap-1.5 mt-3 text-[11px] font-bold text-gray-400">
-          <ClockIcon /> Cleared 30-day refund window
+      <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-2xs flex flex-col justify-between">
+        <span className="text-xs font-black text-gray-500 uppercase tracking-wide">Số Dư Khả Dụng Ngay</span>
+        <span className="text-2xl font-black text-[#4F46E5] mt-2">42,180,000đ</span>
+        <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-gray-400">
+          <ClockIcon />
+          <span>Đã qua hạn hoàn tiền 30 ngày</span>
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl p-6 border border-[#EAEAF4] shadow-xs flex flex-col justify-between">
-        <span className="text-xs font-black text-[#64647A] uppercase tracking-wide">Escrow Holding Balance</span>
+      <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-2xs flex flex-col justify-between">
+        <span className="text-xs font-black text-gray-500 uppercase tracking-wide">Quỹ Bảo Lãnh (Escrow)</span>
         <span className="text-2xl font-black text-amber-600 mt-2">15,400,000đ</span>
-        <div className="flex items-center gap-1.5 mt-3 text-[11px] font-bold text-amber-700">
-          <InfoCircleIcon /> Withheld during student refund window
+        <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-amber-700">
+          <InfoCircleIcon />
+          <span>Tạm giữ chờ cấn trừ đơn mới</span>
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl p-6 border border-[#EAEAF4] shadow-xs flex flex-col justify-between">
-        <span className="text-xs font-black text-[#64647A] uppercase tracking-wide">Refund Rate (Section 4.2)</span>
-        <span className="text-2xl font-black text-[#1A1A2E] mt-2">0.8%</span>
-        <div className="flex items-center gap-1.5 mt-3 text-[11px] font-black text-emerald-600">
-          <InfoCircleIcon /> Optimum (Industry average 2.4%)
+      <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-2xs flex flex-col justify-between">
+        <span className="text-xs font-black text-gray-500 uppercase tracking-wide">Tỷ Lệ Hoàn Tiền (Refund)</span>
+        <span className="text-2xl font-black text-gray-900 mt-2">0.8%</span>
+        <div className="flex items-center gap-1.5 mt-3 text-xs font-extrabold text-emerald-600">
+          <InfoCircleIcon />
+          <span>Cực kỳ an toàn (Trung bình: 2.4%)</span>
         </div>
       </div>
     </div>
   );
 }
-
-// ─── AI Revenue Forecasting Box (Section 4.3) ─────────────────────────────────
 
 function AIForecastSection({ onClose }: { onClose: () => void }) {
   return (
-    <div className="p-7 rounded-3xl bg-gradient-to-br from-[#1E233E] via-[#2D316A] to-[#141628] text-white border-2 border-indigo-400/50 shadow-[0_15px_60px_rgba(0,0,0,0.25)] flex flex-col gap-6 animate-fadeIn">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#6B6BFF] to-[#F368E0] flex items-center justify-center text-2xl font-black shadow-md">
-            📈
+    <div className="p-6 rounded-2xl bg-white border border-indigo-200 shadow-sm flex flex-col gap-5 animate-fadeIn">
+      <div className="flex items-center justify-between border-b border-indigo-100 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-[#4F46E5] flex items-center justify-center text-xl font-black shadow-2xs">
+            🤖
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-black text-white">AI Financial Forecasting &amp; Optimization (Section 4.3)</h3>
-              <span className="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
-                Predictive Analytics Engine
+              <h3 className="text-sm font-black text-gray-900">Dự Báo &amp; Tối Ưu Hóa Thu Nhập AI</h3>
+              <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-800">
+                AI Predictive Engine
               </span>
             </div>
-            <p className="text-xs text-indigo-200 mt-0.5">
-              Projected monthly revenue trajectory based on daily student enrollment momentum and historical refund frequency.
+            <p className="text-xs text-gray-500 mt-0.5">
+              Phóng tác đà tăng trưởng thu nhập dựa trên số lượng ghi danh thực tế và lưu lượng từ liên kết giới thiệu.
             </p>
           </div>
         </div>
-        <button type="button" onClick={onClose} className="text-gray-400 hover:text-white font-black text-xl p-1">✕</button>
+        <button type="button" onClick={onClose} aria-label="Đóng bảng dự báo" className="text-gray-400 hover:text-gray-700 font-black text-base p-1 cursor-pointer">
+          ✕
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-1">
-          <span className="text-[11px] font-bold text-gray-300 uppercase">Projected EOM Earnings</span>
-          <span className="text-2xl font-black text-emerald-300">184,500,000đ</span>
-          <span className="text-xs text-gray-400 mt-1">Expected end-of-month tally (+43% surge)</span>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 flex flex-col justify-between">
+          <span className="text-xs font-bold text-gray-500 uppercase">Thu Nhập Cuối Tháng Dự Kiến</span>
+          <span className="text-xl font-black text-[#4F46E5] mt-1.5">184,500,000đ</span>
+          <span className="text-xs font-semibold text-emerald-600 mt-1">▲ Dự kiến tăng trưởng +43% so với kỳ trước</span>
         </div>
         
-        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-1">
-          <span className="text-[11px] font-bold text-gray-300 uppercase">Top Converting Catalyst</span>
-          <span className="text-lg font-black text-white truncate">AI Mastery for Business</span>
-          <span className="text-xs text-indigo-300 mt-1">Responsible for 68% of affiliate referral traffic</span>
+        <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 flex flex-col justify-between">
+          <span className="text-xs font-bold text-gray-500 uppercase">Khóa Học Đứng Đầu Chuyển Đổi</span>
+          <span className="text-base font-black text-gray-900 truncate mt-1.5">AI Mastery for Business</span>
+          <span className="text-xs font-semibold text-gray-500 mt-1">Chiếm 68% doanh số từ nguồn liên kết chia sẻ</span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/40 flex flex-col justify-between">
+        <div className="p-4 rounded-xl bg-indigo-50/60 border border-indigo-200 flex flex-col justify-between gap-3">
           <div>
-            <span className="text-[11px] font-black text-amber-300 uppercase flex items-center gap-1">
-              <span>⚡ AI Action Recommendation</span>
+            <span className="text-xs font-black text-indigo-900 uppercase flex items-center gap-1.5">
+              <span>⚡ Đề xuất nhanh từ AI</span>
             </span>
-            <p className="text-xs font-semibold text-gray-200 mt-1.5 leading-relaxed">
-              &ldquo;Machine Learning Basics&rdquo; has seen a 14% conversion dip this week. Consider creating a 20% discount coupon or promoting an affiliate link.
+            <p className="text-xs font-medium text-indigo-950 mt-1 leading-relaxed">
+              Khóa &ldquo;Machine Learning Basics&rdquo; đang giảm nhẹ 14% lượt xem. Khuyến nghị tạo ngay mã giảm giá 20% hoặc đẩy link giới thiệu.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => alert("Redirecting to Step 3 Pricing Strategy to create a limited promotional coupon...")}
-            className="mt-3 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#1A1A2E] text-xs font-black transition-all text-center cursor-pointer"
+          <Link
+            href="/instructor"
+            className="px-4 py-2 rounded-xl bg-[#4F46E5] hover:bg-[#4338CA] text-white text-xs font-extrabold transition-all text-center shadow-2xs"
           >
-            Apply Discount Coupon ➔
-          </button>
+            Tạo Mã Khuyến Mãi Ngay ➔
+          </Link>
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Middle Section (Chart & Revenue Share Rules) ─────────────────────────────
-
 function RevenueChart() {
   return (
-    <div className="bg-white rounded-3xl border border-[#EAEAF4] p-6 flex flex-col shadow-xs">
+    <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col shadow-2xs">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h3 className="text-base font-black text-[#1A1A2E]">Revenue Flow Matrix &amp; Share Rules (Section 4.1)</h3>
-          <p className="text-xs text-gray-400 mt-0.5">Dynamic revenue split varies based on student purchase attribution source.</p>
+          <h3 className="text-base font-black text-gray-900">Biểu Đồ Nguồn Thu &amp; Tỷ Lệ Chiết Khấu</h3>
+          <p className="text-xs text-gray-500 mt-0.5">Tỷ lệ phân chia tự động tùy thuộc vào nguồn ghi danh của học viên.</p>
         </div>
         
-        <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-xl bg-indigo-50 text-indigo-800 border border-indigo-200 text-xs font-black">
-            🚀 Referral Affiliate Link: 85% Instructor Share (15% Platform Fee)
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="px-3 py-1 rounded-xl bg-indigo-50 text-[#4F46E5] border border-indigo-200 text-xs font-bold">
+            🚀 Link Giới thiệu Giảng viên: 85% Thực nhận
           </span>
           <span className="px-3 py-1 rounded-xl bg-gray-100 text-gray-700 border border-gray-200 text-xs font-bold">
-            🛒 Organic Marketplace: 70% Share (30% Fee)
+            🛒 Chợ Khóa học Chung: 70% Thực nhận
           </span>
         </div>
       </div>
       
-      {/* Visual Bar Representation */}
-      <div className="flex-1 min-h-[200px] flex items-end justify-between gap-4 px-4 pt-6 border-t border-gray-100 relative">
+      {/* Visual Bar Chart Simulation */}
+      <div className="flex-1 min-h-[200px] flex items-end justify-between gap-3 px-2 sm:px-6 pt-6 border-t border-gray-100 relative">
         {[35, 52, 90, 60, 68, 48, 85].map((h, i) => (
-          <div key={i} className="relative flex flex-col items-center w-full max-w-[36px] group cursor-pointer z-10">
+          <div key={i} className="relative flex flex-col items-center w-full max-w-[42px] group cursor-pointer">
             <div
               className={twMerge(
                 "w-full rounded-xl transition-all duration-300",
-                i === 2 || i === 6 ? "bg-[#6B6BFF] shadow-[0_4px_16px_rgba(107,107,255,0.4)]" : "bg-gray-200 group-hover:bg-indigo-300"
+                i === 2 || i === 6 ? "bg-[#4F46E5] shadow-sm" : "bg-gray-100 group-hover:bg-indigo-200"
               )}
               style={{ height: `${h * 2}px` }}
             />
-            <span className={twMerge("mt-2.5 text-[11px] font-black", i === 2 || i === 6 ? "text-[#1A1A2E]" : "text-gray-400")}>
-              {["Mon", "Tue", "Today", "Thu", "Fri", "Sat", "Sun"][i]}
+            <span className={twMerge("mt-2.5 text-xs font-extrabold", i === 2 || i === 6 ? "text-[#4F46E5]" : "text-gray-400")}>
+              {["T2", "T3", "Hnay", "T5", "T6", "T7", "CN"][i]}
             </span>
           </div>
         ))}
@@ -232,31 +228,33 @@ function RevenueChart() {
 
 function RecentTransactions() {
   const items = [
-    { id: "TX-921", title: "Course Sale: AI Mastery", detail: "Referral Affiliate Link (85% Tier)", amount: "+2,550,000đ", status: "CLEARED", color: "text-emerald-700 bg-emerald-50" },
-    { id: "TX-918", title: "Course Sale: ML Basics", detail: "Organic Marketplace (70% Tier)", amount: "+840,000đ", status: "IN ESCROW", color: "text-amber-700 bg-amber-50" },
-    { id: "TX-890", title: "Bank Disbursement", detail: "MB Bank - **** 1234", amount: "-15,000,000đ", status: "COMPLETED", color: "text-indigo-700 bg-indigo-50" },
+    { id: "TX-921", title: "Khóa AI Mastery", detail: "Link Giới thiệu Giảng viên (Hoa hồng 85%)", amount: "+2,550,000đ", status: "KHẢ DỤNG", color: "text-emerald-700 bg-emerald-50 border-emerald-200" },
+    { id: "TX-918", title: "Khóa ML Basics", detail: "Chợ Khóa học Chung (Hoa hồng 70%)", amount: "+840,000đ", status: "ESCROW TẠM GIỮ", color: "text-amber-700 bg-amber-50 border-amber-200" },
+    { id: "TX-890", title: "Rút tiền về Ngân hàng", detail: "MB Bank - **** 1234", amount: "-15,000,000đ", status: "ĐÃ XỬ LÝ", color: "text-indigo-700 bg-indigo-50 border-indigo-200" },
   ];
 
   return (
-    <div className="bg-white rounded-3xl border border-[#EAEAF4] flex flex-col shadow-xs overflow-hidden">
-      <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100">
-        <h3 className="text-sm font-black text-[#1A1A2E]">Verified Transaction Logs</h3>
-        <span className="text-xs font-bold text-[#5153DF]">Section 4.2 Record</span>
+    <div className="bg-white rounded-2xl border border-gray-200 flex flex-col shadow-2xs overflow-hidden">
+      <div className="flex items-center justify-between p-5 border-b border-gray-100">
+        <h3 className="text-sm font-black text-gray-900">Giao dịch mới cập nhật</h3>
+        <Link href="/instructor/revenue/history" className="text-xs font-extrabold text-[#4F46E5] hover:underline">
+          Xem tất cả ➔
+        </Link>
       </div>
 
-      <div className="flex flex-col p-4 gap-3 flex-1">
+      <div className="flex flex-col p-4 gap-2.5 flex-1">
         {items.map((item) => (
-          <div key={item.id} className="flex items-center justify-between p-3.5 rounded-2xl bg-gray-50 border border-gray-200 hover:bg-white transition-all">
+          <div key={item.id} className="flex items-center justify-between p-3.5 rounded-xl bg-gray-50/70 border border-gray-100 hover:border-gray-200 transition-all">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-black text-[#1A1A2E]">{item.title}</span>
-                <span className="text-[10px] font-mono font-extrabold text-gray-400">({item.id})</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-extrabold text-gray-900">{item.title}</span>
+                <span className="text-[11px] font-mono font-bold text-gray-400">({item.id})</span>
               </div>
-              <p className="text-[11px] font-bold text-gray-500 mt-0.5">{item.detail}</p>
+              <p className="text-xs font-medium text-gray-500 mt-0.5">{item.detail}</p>
             </div>
             <div className="text-right">
-              <span className="block text-xs font-black font-mono text-[#1A1A2E]">{item.amount}</span>
-              <span className={twMerge("inline-block text-[9px] font-extrabold px-1.5 py-0.5 rounded mt-0.5 uppercase", item.color)}>
+              <span className="block text-xs font-black font-mono text-gray-900">{item.amount}</span>
+              <span className={twMerge("inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-md mt-1 uppercase border", item.color)}>
                 {item.status}
               </span>
             </div>
@@ -264,53 +262,44 @@ function RecentTransactions() {
         ))}
       </div>
 
-      <div className="p-4 bg-[#F0F0FF] border-t border-[#EAEAF4] flex items-center gap-2 text-xs font-bold text-[#4648D4]">
-        <span>🔒</span>
-        <span>Escrow withholding automatically releases 30 days post-purchase.</span>
+      <div className="p-3.5 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs font-medium text-gray-500">
+        <span>🔒 Quỹ tạm giữ (Escrow) sẽ tự động cộng vào khả dụng sau 30 ngày.</span>
       </div>
     </div>
   );
 }
-
-// ─── Main Revenue Container ───────────────────────────────────────────────────
 
 export function RevenueContainer() {
   const [isWithdrawalOpen, setIsWithdrawalOpen] = useState(false);
   const [showForecast, setShowForecast] = useState(true);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAF8FF]">
-      <Topbar />
-
+    <div className="flex flex-col min-h-screen bg-[#F4F4F8] font-sans">
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-[1150px] mx-auto px-8 py-8 flex flex-col gap-8 pb-32">
+        <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col gap-6 pb-16">
+          
+          {/* Top Tabs Navigation */}
+          <RevenueNavigationTabs active="overview" />
+
+          {/* Page Title & Actions */}
           <PageHeader
             onOpenWithdrawal={() => setIsWithdrawalOpen(true)}
             onToggleForecast={() => setShowForecast((prev) => !prev)}
           />
+
+          {/* KPI Stat Cards */}
           <StatCards />
 
+          {/* AI Forecast Section */}
           {showForecast && <AIForecastSection onClose={() => setShowForecast(false)} />}
           
-          <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6">
+          {/* Charts & Transaction Table */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
             <RevenueChart />
             <RecentTransactions />
           </div>
         </div>
       </main>
-
-      {/* Footer / Floating AI Forecast Button */}
-      <div className="fixed bottom-0 right-0 left-0 lg:left-[240px] px-8 py-4 bg-white/85 backdrop-blur border-t border-[#F0F0F8] flex items-center justify-between z-10">
-        <span className="text-xs font-bold text-gray-400">© 2026 MindNova AI Education Suite. Compliant with Section 4 Financial Specifications.</span>
-        
-        <button
-          type="button"
-          onClick={() => setShowForecast(true)}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs font-extrabold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-lg transition-all hover:scale-105 cursor-pointer"
-        >
-          <span>✨ Re-open AI Revenue Forecast</span>
-        </button>
-      </div>
 
       <WithdrawalModal
         isOpen={isWithdrawalOpen}

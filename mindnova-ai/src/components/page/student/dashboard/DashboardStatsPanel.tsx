@@ -1,195 +1,142 @@
-import { twMerge } from "tailwind-merge";
-import {
-  FOCUS_AREAS,
-  OVERALL_PROGRESS,
-  RECENT_ACTIVITY,
-  STUDY_STREAK,
-} from "./constants";
-import { FocusActionKind, IActivityGroup, IFocusArea } from "./types";
+"use client";
 
-// ─── Overall Progress ─────────────────────────────────────────────────────────
-
-function OverallProgressCard() {
-  const { percent, delta } = OVERALL_PROGRESS;
-
-  return (
-    <div className="bg-white rounded-2xl border border-[#F0F0F8] p-5 shadow-sm">
-      <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider mb-2">
-        Overall Progress
-      </p>
-      <div className="flex items-baseline gap-2 mb-3">
-        <span className="text-[32px] font-bold text-[#4F46E5] leading-none">
-          {percent}%
-        </span>
-        <span className="text-xs font-semibold text-[#10B981]">{delta}</span>
-      </div>
-      <div className="h-2.5 rounded-full bg-[#EEF2FF] overflow-hidden">
-        <div
-          className="h-full rounded-full bg-[#4F46E5]"
-          style={{ width: `${percent}%` }}
-          role="progressbar"
-          aria-valuenow={percent}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={`Overall progress: ${percent}%`}
-        />
-      </div>
-    </div>
-  );
-}
-
-// ─── Study Streak ─────────────────────────────────────────────────────────────
-
-function StudyStreakCard() {
-  const { days, message } = STUDY_STREAK;
-
-  return (
-    <div className="bg-white rounded-2xl border border-[#F0F0F8] p-5 shadow-sm">
-      <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider mb-2">
-        Study Streak
-      </p>
-      <div className="flex items-center gap-2 mb-1">
-        <span className="text-[28px] font-bold text-[#4F46E5] leading-none">
-          {days} days
-        </span>
-      </div>
-      <p className="text-xs text-[#6B7280]">{message}</p>
-    </div>
-  );
-}
-
-// ─── Focus Areas ──────────────────────────────────────────────────────────────
-
-const ACTION_STYLES: Record<FocusActionKind, string> = {
-  review: "bg-[#FEE2E2] text-[#DC2626]",
-  practice: "bg-[#CCFBF1] text-[#0D9488]",
-};
-
-const ACCURACY_TEXT_STYLES: Record<FocusActionKind, string> = {
-  review: "text-[#DC2626]",
-  practice: "text-[#0D9488]",
-};
-
-function FocusAreaRow({ area }: { area: IFocusArea }) {
-  return (
-    <div className="flex items-center justify-between gap-2 py-1.5">
-      <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-bold text-[#111827] truncate">
-          {area.topic}
-        </p>
-        <p
-          className={twMerge(
-            "text-[11px] font-medium",
-            ACCURACY_TEXT_STYLES[area.action],
-          )}
-        >
-          {area.accuracy}% Accuracy
-        </p>
-      </div>
-      <button
-        type="button"
-        className={twMerge(
-          "shrink-0 px-3 py-1 rounded-full text-[11px] font-bold capitalize transition-all duration-150 hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#4F46E5]/40",
-          ACTION_STYLES[area.action],
-        )}
-      >
-        {area.action}
-      </button>
-    </div>
-  );
-}
-
-function FocusAreasCard() {
-  return (
-    <div className="bg-white rounded-2xl border border-[#F0F0F8] p-5 shadow-sm">
-      <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider mb-3">
-        Focus Areas
-      </p>
-      <div className="flex flex-col gap-3">
-        {FOCUS_AREAS.map((area) => (
-          <FocusAreaRow key={area.id} area={area} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── Recent Activity ──────────────────────────────────────────────────────────
-
-function ActivityGroup({
-  group,
-  isLast,
-}: {
-  group: IActivityGroup;
-  isLast: boolean;
-}) {
-  const isToday = group.day === "Today";
-
-  return (
-    <div className="relative">
-      {/* Connecting line */}
-      {!isLast && (
-        <div className="absolute left-[7px] top-6 bottom-[-20px] w-0.5 bg-[#F3F4F6]" />
-      )}
-
-      {/* Day header */}
-      <div className="flex items-center gap-3 mb-3 relative z-10">
-        <div
-          className={twMerge(
-            "w-4 h-4 rounded-full flex items-center justify-center border-2 border-white shadow-sm ring-1 ring-black/5",
-            isToday ? "bg-[#4F46E5]" : "bg-[#D1D5DB]",
-          )}
-        />
-        <p className="text-[13px] font-bold text-[#111827]">{group.day}</p>
-      </div>
-
-      {/* Items list */}
-      <ul className="ml-[22px] space-y-2 pb-2">
-        {group.items.map((item, i) => (
-          <li
-            key={i}
-            className="flex items-center gap-2.5 text-[13px] text-[#4B5563]"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#0D9488] shrink-0" />
-            {item.label}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function RecentActivityCard() {
-  return (
-    <div className="bg-white rounded-2xl border border-[#F0F0F8] p-5 shadow-sm">
-      <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider mb-4">
-        Recent Activity
-      </p>
-      <div className="flex flex-col gap-4">
-        {RECENT_ACTIVITY.map((group, i) => (
-          <ActivityGroup
-            key={group.day}
-            group={group}
-            isLast={i === RECENT_ACTIVITY.length - 1}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── Right Sidebar Panel ──────────────────────────────────────────────────────
+import React from "react";
 
 export function DashboardStatsPanel() {
+  const focusAreas = [
+    { id: "1", topic: "React Server Actions & Mutation", accuracy: 68, action: "Ôn luyện", type: "review" },
+    { id: "2", topic: "Redis Distributed Cache Invalidation", accuracy: 84, action: "Thực chiến", type: "practice" },
+    { id: "3", topic: "RAG Embeddings & Vector Search", accuracy: 72, action: "Ôn luyện", type: "review" },
+  ];
+
+  const recentActivity = [
+    {
+      day: "Hôm nay",
+      isToday: true,
+      items: ["Hoàn tất bài kiểm tra Route Handlers (Đạt 90%)", "Trò chuyện với Gia sư AI về Server Actions"],
+    },
+    {
+      day: "Hôm qua",
+      isToday: false,
+      items: ["Xem video: Kiến trúc App Router & Suspense", "Hoàn tất module 1 trong lộ trình Fullstack"],
+    },
+    {
+      day: "3 ngày trước",
+      isToday: false,
+      items: ["Đăng ký khóa học Fullstack Development & AI"],
+    },
+  ];
+
   return (
-    <aside
-      className="w-[300px] xl:w-[320px] shrink-0 flex flex-col gap-5"
-      aria-label="Dashboard stats"
-    >
-      <OverallProgressCard />
-      <StudyStreakCard />
-      <FocusAreasCard />
-      <RecentActivityCard />
+    <aside className="w-full xl:w-[350px] shrink-0 flex flex-col gap-6" aria-label="Dashboard stats panel">
+      {/* Overall Progress Card */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-2xs">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest font-mono">
+            Tiến Độ Lộ Trình Chung
+          </span>
+          <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 font-mono">
+            +4.2% tuần này
+          </span>
+        </div>
+        <div className="flex items-baseline gap-2 mb-4">
+          <span className="text-3xl font-black text-[#4F46E5] font-mono leading-none">
+            72%
+          </span>
+          <span className="text-xs font-bold text-gray-500">Hoàn thành chứng chỉ</span>
+        </div>
+        <div className="h-2.5 rounded-full bg-gray-100 overflow-hidden border border-gray-200/60">
+          <div
+            className="h-full rounded-full bg-[#4F46E5] transition-all duration-500"
+            style={{ width: "72%" }}
+          />
+        </div>
+      </div>
+
+      {/* Study Streak Card */}
+      <div className="bg-gradient-to-br from-indigo-50/50 to-white rounded-2xl border border-indigo-100 p-6 shadow-2xs">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[11px] font-black text-[#4F46E5] uppercase tracking-widest font-mono">
+            Chuỗi Ngày Học Tích Cực
+          </span>
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+        </div>
+        <div className="flex items-center gap-3 mb-2.5">
+          <span className="text-3xl font-black text-gray-900 font-mono leading-none">
+            3 Ngày
+          </span>
+          <span className="text-2xl">🔥</span>
+        </div>
+        <p className="text-xs text-gray-600 font-semibold leading-relaxed">
+          Phong độ học tập rất xuất sắc! Hãy hoàn thành thêm 1 bài giảng hôm nay để bảo vệ chuỗi điểm thưởng AI.
+        </p>
+      </div>
+
+      {/* Focus Areas Card */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-2xs">
+        <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-4 font-mono flex items-center gap-1.5">
+          <span>🎯</span>
+          <span>Trọng Tâm Cần Ôn Luyện</span>
+        </h4>
+        <div className="flex flex-col gap-3.5">
+          {focusAreas.map((area) => (
+            <div key={area.id} className="flex items-center justify-between gap-3 py-1.5 border-b border-gray-100 last:border-0 pb-3 last:pb-0">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-black text-gray-900 truncate mb-0.5">
+                  {area.topic}
+                </p>
+                <p className={`text-[11px] font-extrabold font-mono ${area.type === "review" ? "text-amber-600" : "text-emerald-600"}`}>
+                  Độ chính xác hiện tại: {area.accuracy}%
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => window.location.href = "/study-plan"}
+                className={`shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-extrabold transition-all cursor-pointer shadow-2xs ${
+                  area.type === "review"
+                    ? "bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200"
+                    : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
+                }`}
+              >
+                {area.action} ➔
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent Activity Card */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-2xs">
+        <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-5 font-mono flex items-center gap-1.5">
+          <span>📜</span>
+          <span>Lịch Sử Hoạt Động Gần Đây</span>
+        </h4>
+        <div className="flex flex-col gap-6">
+          {recentActivity.map((group, idx) => (
+            <div key={group.day} className="relative">
+              {idx < recentActivity.length - 1 && (
+                <div className="absolute left-[7px] top-6 bottom-[-22px] w-0.5 bg-gray-200" />
+              )}
+              <div className="flex items-center gap-3 mb-3 relative z-10">
+                <div
+                  className={`w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm shrink-0 ${
+                    group.isToday ? "bg-[#4F46E5] ring-2 ring-indigo-100" : "bg-gray-300"
+                  }`}
+                />
+                <p className="text-xs font-black text-gray-900 font-mono">{group.day}</p>
+              </div>
+              <ul className="ml-[22px] flex flex-col gap-2.5">
+                {group.items.map((item, itemIdx) => (
+                  <li key={itemIdx} className="flex items-start gap-2.5 text-xs text-gray-600 font-semibold leading-relaxed">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1.5" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
     </aside>
   );
 }

@@ -1,5 +1,6 @@
 // ─── Lesson Components — Barrel Export ────────────────────────────────────────
 
+export { CoursePlayerContainer } from "./CoursePlayerContainer";
 export { LessonCurriculumSidebar } from "./LessonCurriculumSidebar";
 export { LessonView } from "./LessonView";
 export { LessonContent } from "./LessonContent";

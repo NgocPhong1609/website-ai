@@ -1,7 +1,4 @@
-// ─── Dashboard Feature — Public API ───────────────────────────────────────────
-// Import from this barrel instead of deep paths inside the feature
-
-// Components
+export { StudentDashboardContainer } from "./StudentDashboardContainer";
 export { DashboardContent } from "./DashboardContent";
 export { DashboardTopbar } from "./DashboardTopbar";
 export { AiSuggestionCard } from "./AiSuggestionCard";
@@ -9,8 +6,5 @@ export { ContinueLearning } from "./ContinueLearning";
 export { DashboardStatsPanel } from "./DashboardStatsPanel";
 export { ExploreCourses } from "./ExploreCourses";
 
-// Constants
 export * from "./constants";
-
-// Types
 export type * from "./types";

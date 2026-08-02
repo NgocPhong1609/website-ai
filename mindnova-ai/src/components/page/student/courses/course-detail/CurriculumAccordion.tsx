@@ -104,13 +104,13 @@ function LessonItem({ lesson, courseId }: { lesson: ILesson; courseId: number })
       {/* Right side (Duration / Badge) */}
       <div className="flex items-center gap-3">
         {isCurrent && (
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold text-white bg-[#4F46E5] uppercase tracking-wider">
-            Current
+          <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-black text-white bg-[#4F46E5] uppercase tracking-wider">
+            ▶ Đang học
           </span>
         )}
         {isLocked && (
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold text-gray-400 bg-gray-100 uppercase tracking-wider">
-            Locked
+          <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-black text-gray-400 bg-gray-100 uppercase tracking-wider">
+            🔒 Chưa mở khóa
           </span>
         )}
         <span className={twMerge(
@@ -228,20 +228,17 @@ export function CurriculumAccordion() {
   };
 
   return (
-    <div className="mt-10">
-      <h2 className="text-[20px] font-bold text-[#111827] mb-5">Curriculum</h2>
-      <div className="flex flex-col">
-        {modules.map((mod: IModule, i: number) => (
-          <ModuleItem
-            key={mod.id}
-            mod={mod}
-            moduleIndex={i}
-            courseId={courseId}
-            expandedModules={expandedModules}
-            onToggle={handleToggle}
-          />
-        ))}
-      </div>
+    <div className="flex flex-col gap-4">
+      {modules.map((mod: IModule, i: number) => (
+        <ModuleItem
+          key={mod.id}
+          mod={mod}
+          moduleIndex={i}
+          courseId={courseId}
+          expandedModules={expandedModules}
+          onToggle={handleToggle}
+        />
+      ))}
     </div>
   );
 }

@@ -2,11 +2,9 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import React from "react";
 
 interface LessonFooterProps {
-  /** Enabled only when user has watched >= 90% of the video per Core Rule */
   canMarkComplete: boolean;
   isAlreadyCompleted?: boolean;
   previousLessonId?: number | null;
@@ -14,8 +12,6 @@ interface LessonFooterProps {
   courseId?: number;
   onMarkComplete?: () => void;
 }
-
-// ─── Main Component ───────────────────────────────────────────────────────────
 
 export function LessonFooter({
   canMarkComplete,
@@ -33,15 +29,12 @@ export function LessonFooter({
     if (!canMarkComplete || markedDone || isMarking) return;
 
     setIsMarking(true);
-    console.info(`[LessonFooter] Sending atomic progress completion update for course #${courseId}...`);
-
-    // Simulate atomic completion update on server: PATCH /api/lessons/[lessonId]/complete
-    await new Promise<void>((resolve) => setTimeout(resolve, 800));
+    await new Promise<void>((resolve) => setTimeout(resolve, 600));
 
     setMarkedDone(true);
     setIsMarking(false);
     onMarkComplete?.();
-  }, [canMarkComplete, markedDone, isMarking, courseId, onMarkComplete]);
+  }, [canMarkComplete, markedDone, isMarking, onMarkComplete]);
 
   const navigatePrevious = useCallback(() => {
     if (previousLessonId) {
@@ -58,92 +51,59 @@ export function LessonFooter({
   const isMarkButtonActive = canMarkComplete && !markedDone && !isMarking;
 
   return (
-    <div className="bg-white border-t border-[#F0F0F8] px-8 py-4 sticky bottom-0 z-20 shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
+    <div className="bg-white border-t border-gray-200 px-6 py-4 sticky bottom-0 z-20 shadow-2xs">
       <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-        {/* Previous Action */}
+        {/* Previous Lesson Action */}
         <button
           type="button"
           onClick={navigatePrevious}
           disabled={!previousLessonId}
-          className="flex items-center gap-2 text-sm font-semibold text-[#64647A] hover:text-[#1A1A2E] transition-colors disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus:underline"
+          className="px-5 py-2.5 rounded-xl text-xs font-black text-gray-700 bg-gray-100 hover:bg-gray-200 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer uppercase tracking-wider flex items-center gap-2"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <line x1="19" y1="12" x2="5" y2="12" />
-            <polyline points="12 19 5 12 12 5" />
-          </svg>
-          Previous
+          <span>⬅️</span>
+          <span>Bài Trước</span>
         </button>
 
-        {/* Center: Mark as Completed (Gated by >=90% video heartbeat) */}
+        {/* Center Completion Button */}
         <div className="relative group flex items-center gap-3">
           <button
             type="button"
             onClick={handleMarkComplete}
             disabled={!isMarkButtonActive}
-            className={`flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-[#6B6BFF] ${
+            className={`px-6 py-3 rounded-xl text-xs font-black transition-all shadow-2xs uppercase tracking-wider flex items-center gap-2 ${
               markedDone
                 ? "text-emerald-700 bg-emerald-50 border border-emerald-200 cursor-default"
                 : isMarkButtonActive
-                ? "text-white bg-[#6B6BFF] hover:bg-[#5858E0] shadow-[0_4px_12px_rgba(107,107,255,0.35)] hover:-translate-y-0.5 cursor-pointer"
-                : "text-[#A0A0C0] bg-[#F4F4FA] border border-[#EAEAF4] cursor-not-allowed"
+                ? "text-white bg-[#4F46E5] hover:bg-[#4338CA] active:scale-[0.99] cursor-pointer"
+                : "text-gray-500 bg-gray-100 border border-gray-200 cursor-not-allowed"
             }`}
           >
             {isMarking ? (
-              <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="12" cy="12" r="10" strokeOpacity=".25" />
-                <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
-              </svg>
+              <span>⌛ Đang ghi nhận...</span>
             ) : markedDone || canMarkComplete ? (
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
-              </svg>
+              <>
+                <span>✅</span>
+                <span>{markedDone ? "Đã Hoàn Thành Bài Giảng" : "Đánh Dấu Hoàn Thành"}</span>
+              </>
             ) : (
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
+              <>
+                <span>🔒</span>
+                <span>Chưa Đạt Thời Lượng (Cần ≥80%)</span>
+              </>
             )}
-            <span>
-              {isMarking
-                ? "Recording Progress..."
-                : markedDone
-                ? "Lesson Completed"
-                : "Mark as Completed"}
-            </span>
-          </button>
-
-          {!canMarkComplete && !markedDone && (
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 rounded-lg bg-[#1A1A2E] text-white text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg z-30">
-              Watch 90% of video to unlock completion
-              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1A1A2E]" />
-            </div>
-          )}
-        </div>
-
-        {/* Right Actions */}
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => router.push("/practice")}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#6B6BFF] border border-[#6B6BFF]/40 bg-white hover:bg-[#F8F8FC] transition-all focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/50"
-          >
-            Take Quiz
-          </button>
-
-          <button
-            type="button"
-            onClick={navigateNext}
-            disabled={!nextLessonId}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_12px_rgba(107,107,255,0.3)] hover:shadow-[0_6px_18px_rgba(107,107,255,0.45)] hover:-translate-y-0.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0 focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]"
-          >
-            <span>Next Lesson</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="5" y1="12" x2="19" y2="12" />
-              <polyline points="12 5 19 12 12 19" />
-            </svg>
           </button>
         </div>
+
+        {/* Next Lesson Action */}
+        <button
+          type="button"
+          onClick={navigateNext}
+          disabled={!nextLessonId}
+          className="px-5 py-2.5 rounded-xl text-xs font-black text-[#4F46E5] bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer uppercase tracking-wider flex items-center gap-2"
+        >
+          <span>Bài Tiếp Theo</span>
+          <span>➡️</span>
+        </button>
       </div>
     </div>
   );

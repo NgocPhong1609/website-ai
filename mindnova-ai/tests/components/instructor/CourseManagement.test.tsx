@@ -58,7 +58,10 @@ describe("Instructor Course Management UI/UX Suite", () => {
     expect(screen.getByText(/45 bài học/i)).toBeInTheDocument();
 
     const contentLink = screen.getByText("Nội dung AI").closest("a");
-    expect(contentLink).toHaveAttribute("href", "/instructor/create-course");
+    expect(contentLink).toHaveAttribute("href", "/instructor/courses/test-course-1/lessons");
+
+    const editLink = screen.getByLabelText("Chỉnh sửa khóa học");
+    expect(editLink).toHaveAttribute("href", "/instructor/courses/test-course-1/edit");
 
     const revenueLink = screen.getByText("Giá & Doanh thu").closest("a");
     expect(revenueLink).toHaveAttribute("href", "/instructor/revenue");

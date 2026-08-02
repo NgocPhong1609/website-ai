@@ -40,3 +40,37 @@ export type {
 
 export { ActorSwitcher } from "./ActorSwitcher";
 
+// ─── Chart System ─────────────────────────────────────────────────────────────
+export {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+  ChartStyle,
+  useChartConfig,
+  getChartColor,
+  // Recharts primitives re-exported
+  Area, AreaChart,
+  Bar, BarChart,
+  Line, LineChart,
+  Pie, PieChart,
+  Cell,
+  XAxis, YAxis,
+  CartesianGrid,
+  ReferenceLine,
+  ComposedChart,
+  Scatter, ScatterChart,
+  Radar, RadarChart,
+  PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  RadialBar, RadialBarChart,
+  Funnel, FunnelChart,
+} from "./chart";
+export type {
+  ChartConfig,
+  ChartConfigItem,
+  ChartContainerProps,
+  ChartTooltipContentProps,
+  ChartLegendContentProps,
+  ChartStyleProps,
+} from "./chart";

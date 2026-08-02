@@ -57,7 +57,7 @@ export function LessonView({ lessonId }: LessonViewProps) {
   }, []);
 
   return (
-    <div className="flex-1 relative flex flex-col min-h-screen bg-[#0A0D12]">
+    <div className="flex-1 relative flex flex-col min-h-screen bg-[#F4F4F8]">
       <LessonContent
         lessonId={lessonId}
         onCompletionChange={handleCompletionChange}

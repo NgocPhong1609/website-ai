@@ -1,22 +1,12 @@
 import type { Metadata } from "next";
-import { CourseHeader, CurriculumAccordion, CourseSidebar } from "@/src/components/page/student/courses";
+import React from "react";
+import { CourseDetailContainer } from "@/src/components/page/student/courses";
 
 export const metadata: Metadata = {
-  title: "Course Detail | MindNova AI",
-  description: "View course curriculum and progress.",
+  title: "Chi tiết chuyên đề & Lộ trình đào tạo | MindNova AI",
+  description: "Xem cấu trúc học thuật, đánh giá chuyên sâu và nhận chứng chỉ tốt nghiệp được hậu thuẫn bởi Trí tuệ Nhân tạo MindNova.",
 };
 
 export default function CourseDetailPage() {
-  return (
-    <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col lg:flex-row items-start gap-8">
-      {/* Main Content (Left) */}
-      <div className="flex-1 w-full min-w-0">
-        <CourseHeader />
-        <CurriculumAccordion />
-      </div>
-
-      {/* Sidebar (Right) */}
-      <CourseSidebar />
-    </div>
-  );
+  return <CourseDetailContainer />;
 }

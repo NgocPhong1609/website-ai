@@ -25,10 +25,6 @@ import {
   LayersIcon,
   FilterIcon,
   SortIcon,
-  MessageCircleIcon,
-  SearchIcon,
-  BellIcon,
-  HelpCircleIcon,
 } from "./icons";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -405,108 +401,20 @@ function FilterBar({ active, onChange, total, published, draft, totalHours, tota
   );
 }
 
-// ─── Page Topbar ──────────────────────────────────────────────────────────────
-
-function PageTopbar() {
-  return (
-    <header className="h-14 shrink-0 flex items-center gap-3 px-6 bg-white border-b border-[#F0F0F8]">
-      {/* Brand */}
-      <Link
-        href="/instructor"
-        className="text-[15px] font-extrabold text-[#4648D4] tracking-tight hover:text-[#3D40C0] transition-colors shrink-0"
-      >
-        MindNova AI
-      </Link>
-
-      <div className="w-px h-5 bg-[#EAEAF4] mx-1" aria-hidden />
-
-      {/* Context breadcrumb */}
-      <div className="flex items-center gap-1.5 text-[12px] text-[#64647A] shrink-0">
-        <LayersIcon size={13} />
-        <span className="font-semibold">Quản lý Khóa học</span>
-      </div>
-
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* Search */}
-      <div className="relative hidden sm:block w-52">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#B0B0C8] pointer-events-none">
-          <SearchIcon size={14} />
-        </span>
-        <input
-          id="lesson-search"
-          type="search"
-          placeholder="Tìm kiếm bài học..."
-          className="w-full pl-9 pr-3 h-9 rounded-xl text-sm text-[#1A1A2E] placeholder:text-[#B0B0C8] bg-[#F6F6FB] border border-[#EAEAF4] focus:outline-none focus:border-[#6B6BFF] focus:ring-2 focus:ring-[#6B6BFF]/10 transition-all duration-200"
-        />
-      </div>
-
-      {/* Icons */}
-      <div className="flex items-center gap-1">
-        <button type="button" aria-label="Thông báo" className="relative w-8 h-8 rounded-xl flex items-center justify-center text-[#7878A0] hover:bg-[#F4F4FA] hover:text-[#4648D4] transition-all duration-150">
-          <BellIcon size={17} />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-400 border border-white" />
-        </button>
-        <button type="button" aria-label="Trợ giúp" className="w-8 h-8 rounded-xl flex items-center justify-center text-[#7878A0] hover:bg-[#F4F4FA] hover:text-[#4648D4] transition-all duration-150">
-          <HelpCircleIcon size={17} />
-        </button>
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#6B6BFF] to-[#4648D4] flex items-center justify-center text-white text-[12px] font-bold shadow-[0_2px_8px_rgba(107,107,255,0.35)] cursor-pointer ml-0.5">
-          N
-        </div>
-      </div>
-    </header>
-  );
-}
-
-// ─── Add Chapter CTA ──────────────────────────────────────────────────────────
-
 function AddChapterButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
       id="btn-add-chapter"
       onClick={onClick}
-      className="w-full flex flex-col items-center justify-center gap-2 py-7 rounded-2xl border-2 border-dashed border-[#D5D5F0] bg-white hover:border-[#6B6BFF] hover:bg-[#F5F3FF] transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/30"
+      className="w-full flex flex-col items-center justify-center gap-2 py-7 rounded-2xl border-2 border-dashed border-gray-300 bg-white hover:border-[#4F46E5] hover:bg-indigo-50/30 transition-all duration-200 group cursor-pointer shadow-2xs"
     >
-      <span className="w-10 h-10 rounded-full border-2 border-dashed border-[#C5C6FF] group-hover:border-[#6B6BFF] group-hover:bg-[#EEF0FF] flex items-center justify-center text-[#9090B0] group-hover:text-[#6B6BFF] transition-all duration-200">
+      <span className="w-10 h-10 rounded-xl border-2 border-dashed border-gray-300 group-hover:border-[#4F46E5] group-hover:bg-indigo-50 flex items-center justify-center text-gray-400 group-hover:text-[#4F46E5] transition-all">
         <PlusCircleIcon size={20} />
       </span>
-      <span className="text-[13px] font-semibold text-[#9090B0] group-hover:text-[#6B6BFF] transition-colors duration-200">
-        Thêm Chương mới
+      <span className="text-xs font-black text-gray-500 group-hover:text-[#4F46E5] transition-colors duration-200 uppercase tracking-wider">
+        Thêm Chuyên Đề / Chương Mới
       </span>
-    </button>
-  );
-}
-
-// ─── Page Footer ─────────────────────────────────────────────────────────────
-
-function PageFooter() {
-  return (
-    <footer className="border-t border-[#F0F0F8] bg-white px-6 py-3 flex items-center justify-between text-[11px] text-[#B0B0C8]">
-      <span>© 2024 MindNova AI Education Platform. All rights reserved.</span>
-      <div className="flex items-center gap-4">
-        {["Hướng dẫn giảng viên", "Chính sách bảo mật", "Hỗ trợ"].map((l) => (
-          <button key={l} type="button" className="hover:text-[#4648D4] transition-colors duration-150">
-            {l}
-          </button>
-        ))}
-      </div>
-    </footer>
-  );
-}
-
-// ─── Chat FAB ────────────────────────────────────────────────────────────────
-
-function ChatFAB() {
-  return (
-    <button
-      type="button"
-      id="btn-chat-fab"
-      aria-label="Mở hộp chat hỗ trợ"
-      className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-gradient-to-br from-[#6B6BFF] to-[#4648D4] text-white flex items-center justify-center shadow-[0_8px_24px_rgba(107,107,255,0.5)] hover:shadow-[0_10px_30px_rgba(107,107,255,0.65)] hover:scale-110 active:scale-95 transition-all duration-200"
-    >
-      <MessageCircleIcon size={18} />
     </button>
   );
 }
@@ -583,53 +491,48 @@ export function LessonManagementContainer() {
   })).filter((ch) => activeFilter === "all" || ch.lessons.length > 0);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAF8FF]">
-      <PageTopbar />
-
-      {/* ── Content ── */}
+    <div className="flex flex-col min-h-screen bg-[#F4F4F8]">
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-[860px] mx-auto px-6 py-6 flex flex-col gap-5">
-
-          {/* Back link */}
+        <div className="max-w-[900px] mx-auto px-6 py-6 flex flex-col gap-6">
           <Link
             href="/instructor/courses"
-            className="flex items-center gap-1 text-[13px] text-[#6B6BFF] font-semibold hover:text-[#4648D4] transition-colors w-fit"
+            className="flex items-center gap-1.5 text-xs text-[#4F46E5] font-bold hover:underline transition-colors w-fit"
           >
             <ChevronLeftIcon size={14} />
-            Quay lại danh sách khóa học
+            <span>Quay lại danh sách khóa học</span>
           </Link>
 
-          {/* Page header */}
-          <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-[26px] font-extrabold text-[#1A1A2E] tracking-tight leading-tight">
-                Generative AI Cơ bản
+              <h1 className="text-xl font-black text-gray-900 tracking-tight leading-tight">
+                Generative AI Masterclass
               </h1>
-              <p className="text-[13px] text-[#9090B0] mt-1">
-                Quản lý nội dung và cấu trúc bài giảng
+              <p className="text-xs text-gray-500 mt-1">
+                Trung tâm quản lý nội dung học liệu và cấu trúc bài giảng AI
               </p>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2.5 shrink-0">
               <button
                 type="button"
                 id="btn-preview-course"
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#DDDDF0] text-[13px] font-semibold text-[#464554] bg-white hover:bg-[#F4F4FA] hover:border-[#C5C6FF] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#EAEAF4]"
+                onClick={() => alert("Mở giao diện học tập xem trước...")}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all cursor-pointer shadow-2xs"
               >
-                <EyeIcon size={13} />
-                Xem trước
+                <EyeIcon size={14} />
+                <span>Xem trước</span>
               </button>
               <button
                 type="button"
                 id="btn-add-lesson"
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40"
+                onClick={() => addLesson(chapters[0]?.id || "ch1")}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-[#4F46E5] hover:bg-[#4338CA] shadow-2xs transition-all cursor-pointer"
               >
-                <PlusIcon size={13} />
-                Thêm Bài học mới
+                <PlusIcon size={14} />
+                <span>Thêm bài giảng</span>
               </button>
             </div>
           </div>
 
-          {/* Filter + stats bar */}
           <FilterBar
             active={activeFilter}
             onChange={setActiveFilter}
@@ -640,8 +543,7 @@ export function LessonManagementContainer() {
             totalChapters={chapters.length}
           />
 
-          {/* Chapter list */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {filteredChapters.map((chapter) => (
               <ChapterCard
                 key={chapter.id}
@@ -655,27 +557,21 @@ export function LessonManagementContainer() {
             ))}
 
             {filteredChapters.length === 0 && (
-              <div className="flex items-center justify-center py-16 text-[13px] text-[#B0B0C8]">
-                Không có bài học nào phù hợp với bộ lọc này.
+              <div className="flex items-center justify-center py-20 text-xs font-bold text-gray-400 bg-white rounded-2xl border border-gray-200">
+                Không có bài giảng nào phù hợp với bộ lọc này.
               </div>
             )}
           </div>
 
-          {/* AI Assist */}
           <AIAssistCard
             onQuizGenerate={() => setActiveQuizLesson("Toàn bộ khóa học (General Rubric)")}
             onSuggestChapter={() => addChapter()}
           />
 
-          {/* Add Chapter CTA */}
           <AddChapterButton onClick={addChapter} />
         </div>
       </div>
 
-      <PageFooter />
-      <ChatFAB />
-
-      {/* Rapid Review Modal (Section 2.2) */}
       <LessonAIQuizModal
         isOpen={!!activeQuizLesson}
         lessonTitle={activeQuizLesson || ""}

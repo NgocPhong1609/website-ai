@@ -24,46 +24,46 @@ export function LessonComments({ lessonId, onJumpToTime }: LessonCommentsProps) 
   });
 
   return (
-    <div className="rounded-2xl bg-[#0D1117] border border-gray-800 p-6 text-gray-300">
-      <div className="flex items-center justify-between border-b border-gray-800 pb-4 mb-6">
+    <div className="rounded-2xl bg-white border border-gray-200 p-6 shadow-2xs">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
         <div className="flex items-center gap-2.5">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#6B6BFF]">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
-          <h3 className="text-lg font-bold text-white tracking-tight">Timestamped Discussions</h3>
+          <span className="text-lg">💬</span>
+          <h3 className="text-base font-black text-gray-900 tracking-tight">Bình Luận Theo Mốc Thời Gian</h3>
         </div>
-        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#161B22] text-gray-400 border border-gray-700">
-          {comments.length} Discussion Threads
+        <span className="text-xs font-mono font-black px-2.5 py-1 rounded-xl bg-indigo-50 text-[#4F46E5] border border-indigo-100">
+          {comments.length} Thảo luận
         </span>
       </div>
 
-      <div className="bg-[#161B22] p-4 rounded-xl border border-gray-800 mb-6 flex flex-col gap-3">
+      {/* New Comment Form */}
+      <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6 flex flex-col gap-3">
         <div className="flex items-center gap-3">
-          <span className="text-xs font-semibold text-gray-400">Anchor to video timestamp:</span>
+          <span className="text-xs font-bold text-gray-600">Gắn vào mốc thời gian:</span>
           <input
             type="text"
             value={timestampInput}
             onChange={(e) => setTimestampInput(e.target.value)}
             placeholder="01:30"
-            className="w-24 px-3 py-1.5 rounded-lg font-mono text-xs font-bold text-center bg-[#0D1117] text-[#79C0FF] border border-gray-700 focus:outline-none focus:border-[#6B6BFF]"
-            aria-label="Video Timestamp in minutes and seconds"
+            className="w-24 px-3 py-1.5 rounded-xl font-mono text-xs font-bold text-center bg-white text-[#4F46E5] border border-gray-300 focus:outline-none focus:border-[#4F46E5] focus:ring-2 focus:ring-[#4F46E5]/10 transition-all"
+            aria-label="Mốc thời gian video theo phút và giây"
           />
-          <span className="text-[11px] text-gray-500">Format: MM:SS</span>
+          <span className="text-[11px] text-gray-400 font-medium">Định dạng: MM:SS</span>
         </div>
 
         <textarea
           rows={2}
           value={newCommentText}
           onChange={(e) => setNewCommentText(e.target.value)}
-          placeholder="Ask a question or share insight regarding this specific video moment..."
+          placeholder="Đặt câu hỏi hoặc chia sẻ nhận xét về khoảnh khắc video này..."
           disabled={isSubmitting}
-          className={`w-full p-3 rounded-lg text-sm bg-[#0D1117] text-white border placeholder-gray-500 focus:outline-none transition-all resize-none ${
-            profanityError ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-gray-700 focus:border-[#6B6BFF]"
+          className={`w-full p-3 rounded-xl text-xs font-medium bg-white text-gray-900 border placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/10 transition-all resize-none ${
+            profanityError ? "border-red-400 focus:border-red-400" : "border-gray-200 focus:border-[#4F46E5]"
           }`}
         />
 
         {profanityError && (
-          <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold flex items-center gap-2">
+          <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold flex items-center gap-2">
             <span>✕</span>
             <span>{profanityError}</span>
           </div>
@@ -74,44 +74,46 @@ export function LessonComments({ lessonId, onJumpToTime }: LessonCommentsProps) 
             type="button"
             onClick={handleAddComment}
             disabled={isSubmitting || !newCommentText.trim()}
-            className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4F46E5] hover:opacity-95 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            className="px-5 py-2.5 rounded-xl text-xs font-black text-white bg-[#4F46E5] hover:bg-[#4338CA] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-2xs cursor-pointer uppercase tracking-wider"
           >
-            {isSubmitting ? "Posting..." : "Post Comment"}
+            {isSubmitting ? "⌛ Đang đăng..." : "✉️ Đăng bình luận"}
           </button>
         </div>
       </div>
 
+      {/* Comment List */}
       {comments.length === 0 ? (
-        <p className="text-center py-8 text-sm text-gray-500">
-          No discussion threads yet. Be the first to start a conversation!
-        </p>
+        <div className="text-center py-10 bg-gray-50 rounded-xl border border-gray-200">
+          <p className="text-sm font-bold text-gray-500">💭 Chưa có thảo luận nào.</p>
+          <p className="text-xs text-gray-400 mt-1 font-medium">Hãy là người đầu tiên đặt câu hỏi!</p>
+        </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {comments.map((item) => (
             <div
               key={item.id}
-              className="p-4 rounded-xl bg-[#161B22]/60 hover:bg-[#161B22] border border-gray-800/80 transition-colors flex flex-col gap-2"
+              className="p-4 rounded-xl bg-white hover:bg-indigo-50/30 border border-gray-200 hover:border-indigo-100 transition-all flex flex-col gap-2"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-[10px] font-bold text-white">
+                  <div className="w-7 h-7 rounded-full bg-[#4F46E5] flex items-center justify-center text-[11px] font-black text-white">
                     {item.authorName[0]}
                   </div>
-                  <span className="text-xs font-bold text-gray-200">{item.authorName}</span>
-                  <span className="text-[11px] text-gray-500">• {item.createdAt}</span>
+                  <span className="text-xs font-black text-gray-900">{item.authorName}</span>
+                  <span className="text-[11px] text-gray-400 font-medium">• {item.createdAt}</span>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => handleJumpToTimestamp(item.timestampSec)}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-[#6B6BFF]/15 text-[#A5D6FF] hover:bg-[#6B6BFF]/25 border border-[#6B6BFF]/30 transition-colors group"
-                  title="Jump directly to this moment in video"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-mono font-extrabold bg-indigo-50 text-[#4F46E5] hover:bg-indigo-100 border border-indigo-100 transition-colors cursor-pointer"
+                  title="Nhảy đến mốc thời gian này trong video"
                 >
                   <span>▶ {item.timestampFormatted}</span>
                 </button>
               </div>
 
-              <p className="text-sm text-gray-300 leading-relaxed pl-8">
+              <p className="text-xs text-gray-700 leading-relaxed pl-9 font-medium">
                 {item.content}
               </p>
             </div>

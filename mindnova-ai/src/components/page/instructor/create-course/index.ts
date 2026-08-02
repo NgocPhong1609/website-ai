@@ -1,4 +1,9 @@
-// ─── Create Course — Public API ───────────────────────────────────────────────
-
 export { CreateCourseContainer } from "./CreateCourseContainer";
-export { CreateCourseTopbar } from "./CreateCourseTopbar";
+export { CourseStudio } from "./CourseStudio";
+export { Step1BasicInfo } from "./Step1BasicInfo";
+export { Step2CourseStructure } from "./Step2CourseStructure";
+export { Step3SettingsPrice } from "./Step3SettingsPrice";
+export { ThumbnailUploader } from "./ThumbnailUploader";
+export { AITipCard } from "./AITipCard";
+export { StepIndicator } from "./StepIndicator";
+export { AIOutlineModal } from "./AIOutlineModal";
