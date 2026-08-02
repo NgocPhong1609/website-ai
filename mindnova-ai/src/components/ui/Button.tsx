@@ -24,11 +24,11 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  */
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus:ring-blue-500",
+    "bg-[#4F46E5] text-white hover:bg-[#4338CA] active:bg-[#3730A3] focus:ring-indigo-500",
   secondary:
     "bg-gray-600 text-white hover:bg-gray-700 active:bg-gray-800 focus:ring-gray-500",
   outline:
-    "border border-gray-300 text-gray-700 hover:bg-gray-50 active:bg-gray-100 focus:ring-blue-500",
+    "border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 active:bg-gray-100 focus:ring-indigo-500 shadow-2xs",
   ghost:
     "text-gray-600 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-500",
   danger:
@@ -37,9 +37,9 @@ const variantStyles: Record<ButtonVariant, string> = {
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: "px-3 py-1.5 text-xs rounded",
-  md: "px-4 py-2 text-sm rounded-md",
-  lg: "px-5 py-2.5 text-base rounded-lg",
+  sm: "px-3 py-1.5 text-xs rounded-lg",
+  md: "px-4 py-2 text-sm font-bold rounded-xl",
+  lg: "px-6 py-3 text-base font-extrabold rounded-2xl",
   unstyled: "", // Không có padding/radius mặc định
 };
 

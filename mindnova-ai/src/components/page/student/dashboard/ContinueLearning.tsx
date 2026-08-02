@@ -194,30 +194,22 @@ export function ContinueLearning() {
     <section aria-labelledby="continue-learning-heading" className="flex flex-col gap-5">
       {/* Widget Header & Filters (Clean white surface per Rule #7) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-2xs">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-[#EEF2FF] text-[#4F46E5] flex items-center justify-center font-black text-2xl border border-indigo-100 shrink-0">
-            🚀
-          </div>
-          <div>
-            <h2 id="continue-learning-heading" className="text-xl font-extrabold text-[#111827] tracking-tight flex items-center gap-2">
-              <span>Jump Back In</span>
-              <span className="text-xs font-bold bg-[#EEF2FF] text-[#4F46E5] px-2.5 py-0.5 rounded-full border border-indigo-100">
-                Live Timestamps
-              </span>
-            </h2>
-            <p className="text-xs text-[#6B7280] mt-0.5 font-medium">
-              Resume your exact video timestamp or re-engage with abandoned courses.
-            </p>
-          </div>
+        <div>
+          <h2 id="continue-learning-heading" className="text-xl font-extrabold text-[#111827] tracking-tight">
+            Jump Back In
+          </h2>
+          <p className="text-xs text-[#6B7280] mt-0.5 font-medium">
+            Resume your learning progress or re-engage with previous courses.
+          </p>
         </div>
 
         {/* Filter Pills */}
         <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl border border-gray-200 overflow-x-auto">
           {[
             { id: "all", label: "All (" + DASHBOARD_COURSES.length + ")" },
-            { id: "in-progress", label: "🔥 Active" },
-            { id: "abandoned", label: "⚠️ Abandoned" },
-            { id: "completed", label: "✅ Done" },
+            { id: "in-progress", label: "Active" },
+            { id: "abandoned", label: "Abandoned" },
+            { id: "completed", label: "Completed" },
           ].map((pill) => (
             <button
               key={pill.id}

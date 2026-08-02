@@ -52,9 +52,6 @@ function StudyStreakCard() {
         <span className="text-[28px] font-bold text-[#4F46E5] leading-none">
           {days} days
         </span>
-        <span className="text-2xl leading-none" role="img" aria-label="fire">
-          🔥
-        </span>
       </div>
       <p className="text-xs text-[#6B7280]">{message}</p>
     </div>

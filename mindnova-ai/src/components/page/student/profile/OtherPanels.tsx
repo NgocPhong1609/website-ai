@@ -11,7 +11,7 @@ const STRENGTH_CONFIG: Record<StrengthLevel, { label: string; color: string; bar
   empty: { label: "", color: "bg-[#E0E0E8]", bars: 0 },
   weak:  { label: "Weak",   color: "bg-red-500",    bars: 1 },
   fair:  { label: "Fair",   color: "bg-amber-500",  bars: 2 },
-  good:  { label: "Good",   color: "bg-blue-500",   bars: 3 },
+  good:  { label: "Good",   color: "bg-[#4F46E5]",   bars: 3 },
   strong:{ label: "Strong", color: "bg-emerald-500",bars: 4 },
 };
 
@@ -34,7 +34,7 @@ function PasswordStrengthMeter({ level }: { level: StrengthLevel }) {
       <span className={`text-[11px] font-bold ${
         level === "weak" ? "text-red-500" :
         level === "fair" ? "text-amber-500" :
-        level === "good" ? "text-blue-500" :
+        level === "good" ? "text-[#4F46E5]" :
         "text-emerald-500"
       }`}>
         {config.label}

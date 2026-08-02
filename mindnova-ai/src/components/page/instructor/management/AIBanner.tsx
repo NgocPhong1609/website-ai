@@ -1,6 +1,7 @@
 // ─── AIBanner ─────────────────────────────────────────────────────────────────
 // Promotional AI banner at the top of the course management page (Minimalist Rule #7)
 
+import Link from "next/link";
 import { SparklesIcon } from "./icons";
 
 export function AIBanner() {
@@ -18,14 +19,14 @@ export function AIBanner() {
         <p className="text-[#6B7280] text-sm leading-relaxed font-medium">
           Sử dụng Trí tuệ Nhân tạo để tự động tạo cấu trúc chương học logic và toàn diện dựa trên tiêu đề khóa học chỉ trong vài giây.
         </p>
-        <button
+        <Link
           id="btn-ai-banner-cta"
-          type="button"
+          href="/instructor/create-course"
           className="mt-2 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] shadow-2xs hover:shadow-sm transition-all duration-150 w-fit cursor-pointer"
         >
           <SparklesIcon />
           <span>Thử ngay bây giờ</span>
-        </button>
+        </Link>
       </div>
 
       {/* Right decorative graphic (Minimalist Indigo) */}

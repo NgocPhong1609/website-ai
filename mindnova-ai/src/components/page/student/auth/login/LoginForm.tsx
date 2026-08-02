@@ -148,13 +148,11 @@ export function LoginForm() {
 
   // 1. Chức năng phân luồng đường dẫn
   const getRedirectPath = (roles: UserRole[]) => {
-  const isAdmin = roles.some((r: UserRole) => r.id === 1 || r.name?.toLowerCase() === 'admin');
-  const isInstructor = roles.some((r: UserRole) => r.id === 2 || r.name?.toLowerCase() === 'instructor' || r.name?.toLowerCase() === 'teacher');
-  
-  if (isAdmin) return "/admin";
-  if (isInstructor) return "/instructor/courses"; // Giữ nguyên nếu bạn muốn vào thẳng trang khóa học
-  
-  return "/"; // SỬA Ở ĐÂY: Trỏ về trang chủ "/" thay vì "/dashboard"
+    const isInstructor = roles.some((r: UserRole) => r.id === 2 || r.name?.toLowerCase() === 'instructor' || r.name?.toLowerCase() === 'teacher');
+    
+    if (isInstructor) return "/instructor/courses";
+    
+    return "/"; // Trỏ về trang chủ "/" của Học viên
   };
 
   // 2. Tự động chuyển hướng nếu đã đăng nhập

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 
 // ─── Types & Interfaces ───────────────────────────────────────────────────────
 
@@ -64,14 +64,14 @@ export function useReportContentError({
     }
   }, []);
 
-  const context: ErrorReportContext = {
+  const context: ErrorReportContext = useMemo(() => ({
     userId: "usr-alex-rivera-882",
     courseId,
     lessonId,
     userAgent: clientInfo.userAgent,
     timestamp: new Date().toISOString(),
     pageUrl: clientInfo.pageUrl,
-  };
+  }), [courseId, lessonId, clientInfo.userAgent, clientInfo.pageUrl]);
 
   const handleSubmitReport = useCallback(async () => {
     if (isSubmitting) return;
@@ -80,6 +80,7 @@ export function useReportContentError({
 
     const payload = {
       ...context,
+      timestamp: new Date().toISOString(),
       errorType,
       description: description.trim(),
     };

@@ -12,7 +12,7 @@ import { useRefundRequest } from "@/src/hooks/useRefundRequest";
 const STATUS_STYLES: Record<TransactionStatus, string> = {
   Paid:     "bg-emerald-50 text-emerald-600 border border-emerald-200",
   Refunded: "bg-amber-50 text-amber-600 border border-amber-200",
-  Pending:  "bg-blue-50 text-blue-600 border border-blue-200",
+  Pending:  "bg-[#EEF2FF] text-[#4F46E5] border border-indigo-200",
   Failed:   "bg-red-50 text-red-500 border border-red-200",
 };
 
@@ -33,7 +33,7 @@ function StatusBadge({ status }: { status: TransactionStatus }) {
 
 const SERVICE_COLORS: Record<Transaction["serviceIcon"], string> = {
   course:       "bg-violet-100 text-violet-500",
-  subscription: "bg-blue-100 text-blue-500",
+  subscription: "bg-[#EEF2FF] text-[#4F46E5]",
   python:       "bg-amber-100 text-amber-500",
 };
 

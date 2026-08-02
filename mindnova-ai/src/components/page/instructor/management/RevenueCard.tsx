@@ -1,6 +1,7 @@
 // ─── RevenueCard ──────────────────────────────────────────────────────────────
 // Monthly revenue summary card shown next to the AI banner (Minimalist Rule #7)
 
+import Link from "next/link";
 import { TrendUpIcon } from "./icons";
 import { MONTHLY_REVENUE, REVENUE_GROWTH } from "./constants/data";
 
@@ -27,9 +28,11 @@ export function RevenueCard() {
         </div>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-[#6B7280]">
-        <span className="font-medium">Trạng thái thanh toán:</span>
-        <span className="text-[#4F46E5] font-bold">Ổn định</span>
+      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between text-xs">
+        <span className="text-[#6B7280] font-medium">Trạng thái: Ổn định</span>
+        <Link href="/instructor/revenue" className="text-[#4F46E5] font-bold hover:underline cursor-pointer">
+          Chi tiết ➔
+        </Link>
       </div>
     </div>
   );

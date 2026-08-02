@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { BellIcon } from "./icons";
-import { SidebarOpenButton } from "@/src/components/ui";
+import { SidebarOpenButton, ActorSwitcher } from "@/src/components/ui";
 
 const NAV_SVG = {
   viewBox: "0 0 24 24",
@@ -48,35 +48,34 @@ export interface AlertItem {
 const INITIAL_ALERTS: AlertItem[] = [
   {
     id: "alt-1",
-    title: "⚠️ SLA Mentoring Alert (Section 5.1)",
-    desc: "3 student Q&A discussions in 'UI/UX Design Masterclass' have exceeded the 24-hour response window.",
+    title: "Thảo luận cần phản hồi (Mentoring SLA)",
+    desc: "3 học viên đặt câu hỏi trong 'UI/UX Design Masterclass' đang chờ phản hồi từ bạn.",
     type: "urgent",
-    timestamp: "10 mins ago",
-    actionText: "Open Q&A Inbox ➔",
+    timestamp: "10 phút trước",
+    actionText: "Mở Hòm thư Hỏi đáp ➔",
     actionHref: "/instructor/discussions",
     read: false,
   },
   {
     id: "alt-2",
-    title: "💰 Escrow Withholding Release Scheduled",
-    desc: "15,400,000đ in student payments have completed their 30-day refund safety holding period and will move to Available Balance tonight.",
+    title: "Chu kỳ thanh toán học phí hoàn tất",
+    desc: "15,400,000đ từ doanh thu học phí đã hoàn tất thời gian bảo lưu 30 ngày và chuyển vào Số dư Khả dụng.",
     type: "info",
-    timestamp: "2 hours ago",
-    actionText: "View Financials ➔",
+    timestamp: "2 giờ trước",
+    actionText: "Xem Doanh thu ➔",
     actionHref: "/instructor/revenue",
     read: false,
   },
   {
     id: "alt-3",
-    title: "🔒 Data Protection Enforcement Active",
-    desc: "Student export records and cohort analytics have automatically excluded passwords and sensitive financial billing attributes as required by Section 3.1.",
+    title: "Bảo mật dữ liệu học viên được kích hoạt",
+    desc: "Hệ thống tự động mã hóa thông tin thanh toán và tài khoản của học viên trong các báo cáo xuất dữ liệu.",
     type: "security",
-    timestamp: "1 day ago",
+    timestamp: "1 ngày trước",
     read: true,
   },
 ];
 
-// Leaf UI Presentation Component for Section 5 Proactive Alert & Communication Center
 export function InstructorTopbar() {
   const [alerts, setAlerts] = useState<AlertItem[]>(INITIAL_ALERTS);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -92,32 +91,33 @@ export function InstructorTopbar() {
   };
 
   return (
-    <header className="h-16 shrink-0 flex items-center justify-between px-5 bg-white border-b border-[#EAEAF4] relative z-40 shadow-2xs">
+    <header className="h-16 shrink-0 flex items-center justify-between px-6 bg-white border-b border-gray-200 relative z-40 shadow-2xs">
       {/* Brand & Context */}
       <div className="flex items-center gap-3">
         <SidebarOpenButton />
         <Link
           href="/instructor"
-          className="text-[17px] font-extrabold text-[#4648D4] tracking-tight hover:text-[#3D40C0] transition-colors shrink-0"
+          className="text-lg font-black text-[#111827] tracking-tight hover:text-[#4F46E5] transition-colors shrink-0 flex items-center gap-2"
         >
-          MindNova Instructor Pro
+          <span>MindNova Instructor</span>
+          <span className="text-[10px] font-extrabold bg-[#EEF2FF] text-[#4F46E5] px-2.5 py-0.5 rounded-full border border-indigo-100">
+            PRO
+          </span>
         </Link>
-        <span className="hidden sm:inline-block text-[11px] font-black uppercase px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
-          Section 5 Alert Center Enabled
-        </span>
       </div>
 
       {/* Actions */}
       <div className="flex items-center gap-3">
         
-        {/* Proactive SLA Banner Indicator (Section 5.1) */}
+        {/* Proactive SLA Badge (Clean style per Rule #7) */}
         {unreadCount > 0 && (
           <button
             type="button"
             onClick={() => setIsAlertOpen((p) => !p)}
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 text-xs font-bold animate-pulse transition-all cursor-pointer"
+            className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gray-50 text-[#111827] border border-gray-200 hover:bg-[#EEF2FF] hover:text-[#4F46E5] hover:border-indigo-100 text-xs font-bold transition-all cursor-pointer"
           >
-            <span>🔥 {unreadCount} Active Mentoring SLA Alerts</span>
+            <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+            <span>{unreadCount} thảo luận mới</span>
           </button>
         )}
 
@@ -128,56 +128,52 @@ export function InstructorTopbar() {
             aria-label="Toggle Alert Center"
             onClick={() => setIsAlertOpen((p) => !p)}
             className={twMerge(
-              "relative w-10 h-10 rounded-2xl flex items-center justify-center transition-all cursor-pointer",
-              isAlertOpen ? "bg-[#1A1A2E] text-white shadow-md" : "bg-[#F6F6FB] text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
+              "relative w-9 h-9 rounded-xl flex items-center justify-center border border-gray-200 transition-all cursor-pointer",
+              isAlertOpen ? "bg-[#4F46E5] text-white border-[#4F46E5] shadow-2xs" : "bg-gray-50 text-[#6B7280] hover:bg-[#EEF2FF] hover:text-[#4F46E5] hover:border-indigo-100"
             )}
           >
             <BellIcon />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center border-2 border-white px-1">
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center border-2 border-white px-0.5">
                 {unreadCount}
               </span>
             )}
           </button>
 
-          {/* Interactive Alert Dropdown (Section 5.1 & 5.2) */}
+          {/* Interactive Alert Dropdown */}
           {isAlertOpen && (
-            <div className="absolute right-0 top-13 w-80 sm:w-96 rounded-3xl bg-white border border-[#EAEAF4] shadow-[0_20px_70px_rgba(0,0,0,0.2)] p-5 flex flex-col gap-4 z-50 animate-fadeIn">
+            <div className="absolute right-0 top-12 w-80 sm:w-96 rounded-2xl bg-white border border-gray-200 shadow-lg p-5 flex flex-col gap-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
               
               <div className="flex items-center justify-between pb-3 border-b border-gray-100">
                 <div>
-                  <h3 className="text-sm font-black text-[#1A1A2E] flex items-center gap-2">
-                    <span>🔔 Proactive Alert Center</span>
-                    <span className="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">
-                      Section 5
-                    </span>
+                  <h3 className="text-sm font-extrabold text-[#111827] flex items-center gap-2">
+                    <span>Thông báo Giảng viên</span>
                   </h3>
-                  <p className="text-[11px] text-gray-400">Real-time mentoring SLA flags &amp; security checks</p>
+                  <p className="text-[11px] text-[#6B7280] font-medium mt-0.5">Cập nhật thảo luận & doanh thu</p>
                 </div>
                 {unreadCount > 0 && (
                   <button
                     type="button"
                     onClick={markAllRead}
-                    className="text-xs font-black text-[#6B6BFF] hover:underline whitespace-nowrap cursor-pointer"
+                    className="text-xs font-bold text-[#4F46E5] hover:underline whitespace-nowrap cursor-pointer"
                   >
-                    ✓ Mark all read
+                    Đọc tất cả
                   </button>
                 )}
               </div>
 
-              <div className="flex flex-col gap-3 max-h-[380px] overflow-y-auto pr-1">
+              <div className="flex flex-col gap-2.5 max-h-[380px] overflow-y-auto pr-1">
                 {alerts.length === 0 ? (
-                  <div className="py-10 text-center text-xs font-bold text-gray-400">
-                    No system flags or active SLA alerts at this time.
+                  <div className="py-8 text-center text-xs font-medium text-[#6B7280]">
+                    Bạn không có thông báo mới nào.
                   </div>
                 ) : (
                   alerts.map((item) => (
                     <div
                       key={item.id}
                       className={twMerge(
-                        "p-4 rounded-2xl border-2 transition-all flex flex-col gap-2 relative",
-                        !item.read ? "bg-white border-indigo-200 shadow-xs" : "bg-gray-50 border-gray-100 opacity-80",
-                        item.type === "urgent" && !item.read && "border-rose-300 bg-rose-50/20"
+                        "p-3.5 rounded-xl border transition-all flex flex-col gap-1.5 relative",
+                        !item.read ? "bg-[#F8FAFC] border-indigo-100 shadow-2xs" : "bg-white border-gray-100 opacity-70"
                       )}
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -185,16 +181,16 @@ export function InstructorTopbar() {
                         <button
                           type="button"
                           onClick={() => dismissAlert(item.id)}
-                          className="text-gray-400 hover:text-red-500 font-extrabold text-xs px-1"
+                          className="text-[#6B7280] hover:text-red-600 font-bold text-xs px-1 cursor-pointer"
                         >
                           ✕
                         </button>
                       </div>
 
-                      <p className="text-xs text-gray-600 font-medium leading-relaxed">{item.desc}</p>
+                      <p className="text-xs text-[#6B7280] leading-relaxed">{item.desc}</p>
                       
                       <div className="flex items-center justify-between pt-1">
-                        <span className="text-[10px] font-extrabold text-gray-400">{item.timestamp}</span>
+                        <span className="text-[10px] font-bold text-gray-400">{item.timestamp}</span>
                         {item.actionText && item.actionHref && (
                           <Link
                             href={item.actionHref}
@@ -210,14 +206,13 @@ export function InstructorTopbar() {
                 )}
               </div>
 
-              <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] font-extrabold text-gray-500">
-                <span>🛡️ Student security data privacy active</span>
+              <div className="pt-2 border-t border-gray-100 flex items-center justify-end">
                 <button
                   type="button"
                   onClick={() => setIsAlertOpen(false)}
-                  className="text-gray-700 hover:text-black cursor-pointer"
+                  className="text-xs font-bold text-[#6B7280] hover:text-[#111827] cursor-pointer"
                 >
-                  Close
+                  Đóng lại
                 </button>
               </div>
 
@@ -225,14 +220,7 @@ export function InstructorTopbar() {
           )}
         </div>
 
-        {/* Help */}
-        <button
-          type="button"
-          aria-label="Trợ giúp"
-          className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-[#EEF2FF] hover:text-[#4F46E5] transition-all cursor-pointer shadow-2xs"
-        >
-          <HelpIcon />
-        </button>
+        <ActorSwitcher />
 
         {/* Avatar */}
         <UserAvatar />

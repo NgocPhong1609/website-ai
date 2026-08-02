@@ -83,21 +83,13 @@ export function InstructorSidebar() {
   // TRUYỀN DATA BẰNG PROPS
   const instructorGroups: SidebarGroupConfig[] = [
     {
-      title: "QUẢN TRỊ GIẢNG DẠY",
+      title: "QUẢN LÝ & GIẢNG DẠY",
       items: [
-        { label: "Dashboard", href: "/instructor", icon: <CourseManagementNavIcon /> },
-        { label: "My Courses", href: "/instructor/courses", icon: <CourseManagementNavIcon /> },
-        { label: "Discussions", href: "/instructor/discussions", icon: <DiscussionsNavIcon /> },
-        { label: "Student Analytics", href: "/instructor/analytics", icon: <StudentManagementNavIcon /> },
-        { label: "AI Tools", href: "/instructor/ai-teaching", icon: <AITeachingNavIcon /> },
-        { label: "Revenue", href: "/instructor/revenue", icon: <RevenueNavIcon /> },
-      ],
-    },
-    {
-      title: "CẤU HÌNH & HỖ TRỢ",
-      items: [
-        { label: "Settings", href: "/instructor/settings", icon: <SettingsNavIcon /> },
-        { label: "Support", href: "/instructor/help", icon: <HelpNavIcon /> },
+        { label: "Quản lý Khóa học", href: "/instructor", icon: <CourseManagementNavIcon /> },
+        { label: "Tạo Khóa Học AI", href: "/instructor/create-course", icon: <AITeachingNavIcon /> },
+        { label: "Thảo luận & Hỏi đáp", href: "/instructor/discussions", icon: <DiscussionsNavIcon /> },
+        { label: "Phân tích Học viên", href: "/instructor/analytics", icon: <StudentManagementNavIcon /> },
+        { label: "Quản lý Doanh thu", href: "/instructor/revenue", icon: <RevenueNavIcon /> },
       ],
     },
   ];

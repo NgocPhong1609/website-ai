@@ -14,7 +14,7 @@ export function CoursesHeader() {
         </p>
       </div>
 
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
+      <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-xl border border-gray-200 overflow-x-auto">
         {TABS.map((tab) => {
           const isActive = tab === "All";
           return (
@@ -22,10 +22,10 @@ export function CoursesHeader() {
               key={tab}
               type="button"
               className={twMerge(
-                "whitespace-nowrap px-4 py-2 rounded-full text-[13px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#4F46E5]/40",
+                "whitespace-nowrap px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer",
                 isActive
-                  ? "bg-[#4F46E5] text-white shadow-md shadow-[#4F46E5]/20"
-                  : "bg-[#EEF2FF] text-[#4B5563] hover:bg-[#E0E7FF] hover:text-[#111827]"
+                  ? "bg-[#4F46E5] text-white shadow-2xs"
+                  : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
               )}
             >
               {tab}

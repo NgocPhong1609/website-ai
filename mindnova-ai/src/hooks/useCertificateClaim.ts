@@ -43,12 +43,12 @@ export function useCertificateClaim({
   const [isClaiming, setIsClaiming] = useState(false);
   const [certId, setCertId] = useState<string | undefined>(undefined);
 
-  const computeStatus = (): CertificateStatus => {
+  const computeStatus = useCallback((): CertificateStatus => {
     if (certId) return "claimed";
     if (courseProgress < 100) return "ineligible_progress";
     if (avgScore < minScoreThreshold) return "ineligible_score";
     return "eligible";
-  };
+  }, [certId, courseProgress, avgScore, minScoreThreshold]);
 
   const eligibility: ICertificateEligibility = {
     status: computeStatus(),
@@ -71,7 +71,7 @@ export function useCertificateClaim({
     setIsClaiming(false);
 
     console.info("[Certificate] Generated and stored:", uniqueCertId);
-  }, [courseId, courseProgress, avgScore, minScoreThreshold]);
+  }, [computeStatus, courseId]);
 
   return { eligibility, isClaiming, claimCertificate };
 }

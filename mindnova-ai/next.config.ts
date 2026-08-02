@@ -11,16 +11,16 @@ const nextConfig: NextConfig = {
     ],
   },
   // Proxy /api requests → Laravel backend (tránh CORS hoàn toàn)
- async rewrites() {
+  async rewrites() {
     return [
       {
         source: "/api/:path*",
-        destination: `${process.env.BACKEND_URL}/api/:path*`,
+        destination: `${process.env.BACKEND_URL || "http://localhost:8000"}/api/:path*`,
       },
     ];
-  }, // <-- Thêm dòng này (ngoặc nhọn và dấu phẩy)
+  },
   turbopack: {
-    root: path.resolve(__dirname),
+    root: path.resolve(process.cwd()),
   },
 };
 

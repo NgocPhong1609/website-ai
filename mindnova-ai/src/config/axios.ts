@@ -112,4 +112,5 @@ apiClient.interceptors.response.use(
   },
 );
 
+export { apiClient, apiClient as axiosClient };
 export default apiClient;

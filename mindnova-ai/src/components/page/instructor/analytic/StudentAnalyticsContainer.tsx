@@ -331,22 +331,21 @@ export function StudentAnalyticsContainer() {
                   type="button"
                   onClick={() => setActiveTab("analytics")}
                   className={twMerge(
-                    "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer",
-                    activeTab === "analytics" ? "bg-[#1A1A2E] text-white shadow-sm" : "text-gray-500 hover:text-gray-900"
+                    "px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer",
+                    activeTab === "analytics" ? "bg-[#4F46E5] text-white shadow-2xs" : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
                   )}
                 >
-                  📊 Performance Dashboard
+                  Báo cáo Tương tác & Tiến độ
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab("ai_insights")}
                   className={twMerge(
-                    "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5",
-                    activeTab === "ai_insights" ? "bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] text-white shadow-md" : "text-indigo-600 hover:bg-indigo-50"
+                    "px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5",
+                    activeTab === "ai_insights" ? "bg-[#4F46E5] text-white shadow-2xs" : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
                   )}
                 >
-                  <span>🧠 AI Insights (Section 2.3)</span>
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span>Phân tích AI Chuyên sâu</span>
                 </button>
               </div>
             </div>

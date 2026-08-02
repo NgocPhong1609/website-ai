@@ -188,21 +188,21 @@ export function DiscussionReplyContainer() {
                 type="button"
                 onClick={() => setActiveTab("inbox")}
                 className={twMerge(
-                  "px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer",
-                  activeTab === "inbox" ? "bg-[#1A1A2E] text-white shadow-md" : "text-gray-500 hover:text-gray-900"
+                  "px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer",
+                  activeTab === "inbox" ? "bg-[#4F46E5] text-white shadow-2xs" : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
                 )}
               >
-                📬 Q&amp;A Inbox ({threads.filter((t) => t.needsAttention).length})
+                Hòm thư Hỏi đáp ({threads.filter((t) => t.needsAttention).length})
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab("announcements")}
                 className={twMerge(
-                  "px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer",
-                  activeTab === "announcements" ? "bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] text-white shadow-md" : "text-indigo-600 hover:bg-indigo-50"
+                  "px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer",
+                  activeTab === "announcements" ? "bg-[#4F46E5] text-white shadow-2xs" : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
                 )}
               >
-                📢 Cohort Announcer (WYSIWYG)
+                Thông báo Lớp học
               </button>
             </div>
           </div>
@@ -212,12 +212,11 @@ export function DiscussionReplyContainer() {
             <div className="flex flex-col gap-6 animate-fadeIn">
               {/* Inbox Filters */}
               <div className="flex items-center justify-between flex-wrap gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-extrabold text-gray-400 uppercase mr-1">Inbox Filters:</span>
+                <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-xl border border-gray-200">
                   {[
-                    { id: "needs_attention", label: "🔥 Needs Attention" },
-                    { id: "unanswered", label: "💬 Unanswered" },
-                    { id: "all", label: "All Threads" },
+                    { id: "needs_attention", label: "Cần phản hồi" },
+                    { id: "unanswered", label: "Chưa trả lời" },
+                    { id: "all", label: "Tất cả thảo luận" },
                   ].map((tab) => (
                     <button
                       key={tab.id}

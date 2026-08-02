@@ -130,7 +130,7 @@ export function ExploreCourses() {
 
     setProcessingId(courseId); // Bật loading riêng cho nút này
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/orders", {
+      const response = await fetch("/api/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -158,22 +158,35 @@ export function ExploreCourses() {
   };
 
   useEffect(() => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // Ngắt yêu cầu sau 3 giây nếu backend chậm/offline để tránh đơ page
+
     const fetchCourses = async () => {
       try {
         const token = window.localStorage.getItem("accessToken");
         const headers: Record<string, string> = { "Content-Type": "application/json" };
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
-        const res = await fetch("http://127.0.0.1:8000/api/courses/available", { headers });
+        const res = await fetch("/api/courses/available", {
+          headers,
+          signal: controller.signal,
+        });
+        if (!res.ok) throw new Error("Network status not ok");
         const data = await res.json();
         setCourses(Array.isArray(data) ? data : []);
       } catch (error: unknown) {
-        console.error("Lỗi lấy khóa học:", error);
+        console.warn("Không thể tải khóa học hoặc timeout 3s:", error);
       } finally {
+        clearTimeout(timeoutId);
         setIsLoading(false);
       }
     };
     fetchCourses();
+
+    return () => {
+      controller.abort();
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   

@@ -78,7 +78,7 @@ export function CourseRatingCard({ courseId, progress }: CourseRatingCardProps) 
         <h3 className="text-[14px] font-bold text-[#111827] flex items-center gap-2">
           <span>Course Review</span>
           {hasExistingRating && (
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#4F46E5] border border-indigo-100">
               Your Review
             </span>
           )}

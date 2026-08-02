@@ -3,14 +3,13 @@
 // ─── CourseCard ───────────────────────────────────────────────────────────────
 // Individual course card with minimalist white card, crisp border, and indigo actions (Rule #7).
 
+import Link from "next/link";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
 import type { Course } from "./types";
 import {
   PencilIcon,
-  UploadIcon,
   BookOpenIcon,
-  LayersIcon,
   TagIcon,
   ClockIcon,
 } from "./icons";
@@ -33,14 +32,14 @@ function StatusBadge({ status }: { status: Course["status"] }) {
 
 function EditButton({ courseId }: { courseId: string }) {
   return (
-    <button
-      type="button"
+    <Link
+      href="/instructor/create-course"
       id={`btn-edit-course-${courseId}`}
       aria-label="Chỉnh sửa khóa học"
       className="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#4F46E5] shadow-sm hover:bg-white hover:text-[#4338CA] hover:scale-105 active:scale-95 transition-all duration-150 z-10 cursor-pointer border border-gray-100"
     >
       <PencilIcon />
-    </button>
+    </Link>
   );
 }
 
@@ -60,35 +59,28 @@ function CourseThumbnail({ title, thumbnail }: Pick<Course, "title" | "thumbnail
   );
 }
 
-interface ActionBtn {
-  id: string;
-  label: string;
-  Icon: React.FC;
-}
-
 function CourseActionButtons({ courseId }: { courseId: string }) {
-  const ACTIONS: ActionBtn[] = [
-    { id: `btn-upload-${courseId}`, label: "Upload", Icon: UploadIcon },
-    { id: `btn-lessons-${courseId}`, label: "Bài học", Icon: BookOpenIcon },
-    { id: `btn-curriculum-${courseId}`, label: "Chương học", Icon: LayersIcon },
-    { id: `btn-pricing-${courseId}`, label: "Đặt giá", Icon: TagIcon },
-  ];
-
   return (
-    <div className="grid grid-cols-2 gap-2 p-4 pt-2 mt-auto border-t border-gray-100 bg-gray-50/50">
-      {ACTIONS.map(({ id, label, Icon }) => (
-        <button
-          key={id}
-          id={id}
-          type="button"
-          className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#4B5563] bg-white border border-gray-200 hover:bg-[#EEF2FF] hover:text-[#4F46E5] hover:border-indigo-200 active:scale-98 transition-all duration-150 cursor-pointer shadow-2xs"
-        >
-          <span className="text-[#6B7280] group-hover:text-[#4F46E5]">
-            <Icon />
-          </span>
-          <span>{label}</span>
-        </button>
-      ))}
+    <div className="grid grid-cols-2 gap-2 p-3.5 mt-auto border-t border-gray-100 bg-gray-50/50">
+      <Link
+        href="/instructor/create-course"
+        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#111827] bg-white border border-gray-200 hover:bg-[#EEF2FF] hover:text-[#4F46E5] hover:border-indigo-200 active:scale-98 transition-all duration-150 cursor-pointer shadow-2xs"
+      >
+        <span className="text-[#4F46E5]">
+          <BookOpenIcon />
+        </span>
+        <span>Nội dung AI</span>
+      </Link>
+
+      <Link
+        href="/instructor/revenue"
+        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#111827] bg-white border border-gray-200 hover:bg-[#EEF2FF] hover:text-[#4F46E5] hover:border-indigo-200 active:scale-98 transition-all duration-150 cursor-pointer shadow-2xs"
+      >
+        <span className="text-[#4F46E5]">
+          <TagIcon />
+        </span>
+        <span>Giá & Doanh thu</span>
+      </Link>
     </div>
   );
 }

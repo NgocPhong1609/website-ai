@@ -8,6 +8,7 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import { StepIndicator } from "./StepIndicator";
 import { Step1BasicInfo } from "./Step1BasicInfo";
+import { Step2CourseStructure } from "./Step2CourseStructure";
 import { Step3SettingsPrice } from "./Step3SettingsPrice";
 import { AIOutlineModal } from "./AIOutlineModal";
 import { ArrowRightIcon, SaveIcon, BookOpenIcon, SparklesIcon } from "./icons";
@@ -215,12 +216,8 @@ export function CreateCourseContainer() {
               <Step1BasicInfo data={formData} onChange={handleChange} />
             )}
 
-            {/* Step 2 — placeholder */}
-            {step === 2 && (
-              <div className="flex items-center justify-center min-h-[300px] text-[#B0B0C8] text-sm">
-                Nội dung bài học sẽ hiển thị ở đây...
-              </div>
-            )}
+            {/* Step 2 — Course Structure */}
+            {step === 2 && <Step2CourseStructure />}
 
             {/* Step 3 */}
             {step === 3 && (
