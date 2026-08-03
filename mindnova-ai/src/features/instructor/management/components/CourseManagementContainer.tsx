@@ -1,8 +1,8 @@
 "use client";
 
-// ─── CourseManagementContainer ────────────────────────────────────────────────
-// Main content area for the instructor course management page.
-// Composes: header, AI banner, revenue card, filter tabs, course grid, pagination.
+import { useInstructorCourses } from "../api/courses";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { AIBanner } from "./AIBanner";
 import { RevenueCard } from "./RevenueCard";
@@ -10,9 +10,6 @@ import { CourseFilterTabs } from "./CourseFilterTabs";
 import { CourseCard } from "./CourseCard";
 import { CreateCourseCard } from "./CreateCourseCard";
 import { CoursePagination } from "./CoursePagination";
-import { useInstructorCourses } from "../api/courses";
-import { useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
 
 const PAGE_SIZE = 9;
 
@@ -41,83 +38,84 @@ function CourseManagementContent() {
     return true;
   });
 
-  // Combine courses and a placeholder for the "Create New Course" card
   const allItems = [...(filteredCourses || []), "CREATE_CARD"];
-  
   const paginatedItems = allItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   function handleFilterChange(newFilter: "all" | "active" | "draft") {
     setFilter(newFilter);
-    setPage(1); // Reset to page 1 on filter change
+    setPage(1);
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-[1200px] w-full mx-auto">
-      {/* ── Page header ─────────────────────────────────────────────── */}
-      <div className="flex items-start justify-between gap-4">
-        {/* Title */}
-        <div>
-          <h1 className="text-2xl font-extrabold text-[#1A1A2E] tracking-tight">
-            Quản lý khóa học
-          </h1>
-          <p className="mt-1 text-sm text-[#9090B0]">
-            Theo dõi và tinh chỉnh nội dung giáo dục AI của bạn.
-          </p>
+    <div className="min-h-screen bg-[#F4F4F8] font-sans">
+      <div className="max-w-[1200px] w-full mx-auto p-6 lg:p-8 flex flex-col gap-8 pb-20 animate-fadeIn">
+        {/* ── Page Header & Filter Tabs ───────────────────────────────────────── */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-black text-gray-900 tracking-tight">
+              Quản lý khóa học
+            </h1>
+            <p className="mt-1.5 text-xs text-gray-500 font-medium max-w-xl leading-relaxed">
+              Theo dõi, phân tích và tối ưu hóa hệ thống tài liệu giáo dục của bạn với sự hỗ trợ của trí tuệ nhân tạo MindNova AI.
+            </p>
+          </div>
+
+          <CourseFilterTabs counts={counts} onFilterChange={handleFilterChange} />
         </div>
 
-        {/* Filter tabs */}
-        <CourseFilterTabs counts={counts} onFilterChange={handleFilterChange} />
-      </div>
-
-      {/* ── Banner + Revenue row ─────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-4">
-        <AIBanner />
-        <RevenueCard />
-      </div>
-
-      {/* ── Course grid ──────────────────────────────────────────────── */}
-      <section aria-label="Danh sách khóa học">
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {isLoading ? (
-            <div className="col-span-full py-12 flex items-center justify-center text-[#9090B0]">
-              Đang tải dữ liệu...
-            </div>
-          ) : isError ? (
-            <div className="col-span-full py-12 flex items-center justify-center text-red-500">
-              Lỗi khi tải danh sách khóa học
-            </div>
-          ) : allItems.length === 1 && allItems[0] === "CREATE_CARD" ? (
-            <div className="col-span-full flex items-center justify-center py-16 text-[13px] text-[#B0B0C8]">
-              {search ? `Không tìm thấy khóa học nào phù hợp với từ khóa "${search}".` : "Bạn chưa có khóa học nào. Hãy tạo khóa học đầu tiên nhé!"}
-            </div>
-          ) : (
-            <>
-              {paginatedItems.map((item, index) => {
-                if (item === "CREATE_CARD") {
-                  return <CreateCourseCard key="create-card" />;
-                }
-                // @ts-ignore
-                return <CourseCard key={item.id} course={item} />;
-              })}
-            </>
-          )}
+        {/* ── Banner + Revenue Row ─────────────────────────────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+          <AIBanner />
+          <RevenueCard />
         </div>
-      </section>
 
-      {/* ── Pagination ───────────────────────────────────────────────── */}
-      <CoursePagination 
-        currentPage={page}
-        totalItems={allItems.length}
-        pageSize={PAGE_SIZE}
-        onPageChange={setPage}
-      />
+        {/* ── Course Grid ──────────────────────────────────────────────────────── */}
+        <section aria-label="Danh sách khóa học">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {isLoading ? (
+              <div className="col-span-full py-12 flex items-center justify-center text-gray-500">
+                Đang tải dữ liệu...
+              </div>
+            ) : isError ? (
+              <div className="col-span-full py-12 flex items-center justify-center text-red-500">
+                Lỗi khi tải danh sách khóa học
+              </div>
+            ) : allItems.length === 1 && allItems[0] === "CREATE_CARD" ? (
+              <div className="col-span-full flex flex-col items-center justify-center py-16 gap-4">
+                <p className="text-sm text-gray-500">
+                  {search ? `Không tìm thấy khóa học nào phù hợp với từ khóa "${search}".` : "Bạn chưa có khóa học nào. Hãy tạo khóa học đầu tiên nhé!"}
+                </p>
+                <CreateCourseCard />
+              </div>
+            ) : (
+              <>
+                {paginatedItems.map((item) => {
+                  if (item === "CREATE_CARD") {
+                    return <CreateCourseCard key="create-card" />;
+                  }
+                  // @ts-ignore
+                  return <CourseCard key={item.id} course={item} />;
+                })}
+              </>
+            )}
+          </div>
+        </section>
+
+        {/* ── Pagination ───────────────────────────────────────────────────────── */}
+        <CoursePagination 
+          currentPage={page}
+          totalItems={allItems.length}
+          pageSize={PAGE_SIZE}
+          onPageChange={setPage}
+        />
+      </div>
     </div>
   );
 }
 
 export function CourseManagementContainer() {
   return (
-    <Suspense fallback={<div className="flex-1" />}>
+    <Suspense fallback={<div className="flex-1 bg-[#F4F4F8] min-h-screen" />}>
       <CourseManagementContent />
     </Suspense>
   );

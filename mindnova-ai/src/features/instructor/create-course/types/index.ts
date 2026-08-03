@@ -7,7 +7,7 @@ export interface Step {
   label: string;
 }
 
-export type DifficultyLevel = "beginner" | "advanced";
+export type DifficultyLevel = "beginner" | "intermediate" | "advanced";
 
 export interface CourseBasicInfo {
   title: string;
