@@ -12,7 +12,12 @@ export async function apiClient<T>(
     );
   }
 
-  const url = `${API_BASE_URL}${endpoint}`;
+  // Ensure base URL correctly targets the Laravel /api prefix even if .env omits it
+  const baseUrl = API_BASE_URL.replace(/\/+$/, "");
+  const apiPrefix = baseUrl.endsWith("/api") || endpoint.startsWith("/api") ? "" : "/api";
+  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+
+  const url = `${baseUrl}${apiPrefix}${cleanEndpoint}`;
 
   // Attach auth token from cookies (server-side only)
   const cookieStore = await cookies();
@@ -27,7 +32,11 @@ export async function apiClient<T>(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(url, { ...options, headers });
+  const response = await fetch(url, {
+    signal: options.signal ?? AbortSignal.timeout(8000), // Prevent SSR blocking/hanging
+    ...options,
+    headers,
+  });
 
   if (!response.ok) {
     if (response.status === 401) {

@@ -155,6 +155,7 @@ function InstructorCard() {
           src={instructor.avatarUrl}
           alt={instructor.name}
           fill
+          sizes="64px"
           className="object-cover"
         />
       </div>

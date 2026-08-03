@@ -1,11 +1,6 @@
 // ─── Dashboard Feature — Public API ───────────────────────────────────────────
-// Import from this barrel instead of deep paths inside the feature
+// Import from this barrel for components, constants and types
 
-// Components
 export * from "./components";
-
-// Constants
 export * from "./constants";
-
-// Types
 export type * from "./types";

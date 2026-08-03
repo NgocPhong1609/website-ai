@@ -2,6 +2,7 @@
 
 import { twMerge } from "tailwind-merge";
 import { ILesson, IModule } from "../../types";
+import { COURSE_DETAIL } from "../../constants";
 
 
 
@@ -162,7 +163,7 @@ function ModuleItem({ mod, moduleIndex }: { mod: IModule; moduleIndex: number })
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function CurriculumAccordion() {
-  const { modules } = COURSE_DETAILL;
+  const { modules } = COURSE_DETAIL;
 
   return (
     <div className="mt-10">

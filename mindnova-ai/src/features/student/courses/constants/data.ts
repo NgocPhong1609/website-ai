@@ -1,6 +1,6 @@
-import type { IMyCourse } from "@features/courses/types";
+import type { MyCourse } from "../types";
 
-export const MY_COURSES: IMyCourse[] = [
+export const MY_COURSES: MyCourse[] = [
   {
     id: 1,
     title: "Next.js Fullstack",
@@ -45,5 +45,38 @@ export const MY_COURSES: IMyCourse[] = [
     status: "in-progress",
     lessonsCompleted: 7,
     totalLessons: 20,
+  },
+  {
+    id: 5,
+    title: "Tailwind CSS Design Systems",
+    nextLesson: "Course Completed 🎉",
+    progress: 100,
+    thumbnailGradient: "from-[#1D4ED8] to-[#1E40AF]",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=600&auto=format&fit=crop",
+    status: "completed",
+    lessonsCompleted: 15,
+    totalLessons: 15,
+  },
+  {
+    id: 6,
+    title: "TypeScript Fundamentals",
+    nextLesson: "Course Completed 🎉",
+    progress: 100,
+    thumbnailGradient: "from-[#312E81] to-[#1E1B4B]",
+    thumbnailUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop",
+    status: "completed",
+    lessonsCompleted: 12,
+    totalLessons: 12,
+  },
+  {
+    id: 7,
+    title: "AI Prompts & Copilots",
+    nextLesson: "Introduction to LLMs",
+    progress: 0,
+    thumbnailGradient: "from-[#047857] to-[#064E3B]",
+    thumbnailUrl: "https://images.unsplash.com/photo-1677442136019-21780efad99a?q=80&w=600&auto=format&fit=crop",
+    status: "not-started",
+    lessonsCompleted: 0,
+    totalLessons: 10,
   },
 ];

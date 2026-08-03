@@ -11,11 +11,13 @@ use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\Instructor\CourseController;
 use App\Http\Controllers\Api\Instructor\CourseModuleController;
 use App\Http\Controllers\Api\Instructor\LessonController;
+use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Api\Student\StudyPlanController as StudentStudyPlanController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
 // ==========================================
-Route::middleware('throttle:5,1')->group(function () {
+Route::middleware('throttle:30,1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
@@ -25,6 +27,11 @@ Route::middleware('throttle:5,1')->group(function () {
     // ĐẢM BẢO 2 DÒNG NÀY ĐÃ CÓ VÀ NẰM Ở ĐÂY:
     Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
+    // API Student Dashboard Overview (Hỗ trợ cả guest dev và logged-in sanctum user)
+    Route::get('/student/dashboard', [StudentDashboardController::class, 'overview']);
+    Route::get('/student/study-plan', [StudentStudyPlanController::class, 'overview']);
+    Route::post('/student/study-plan/chat', [StudentStudyPlanController::class, 'chat']);
 });
 
 // ==========================================
