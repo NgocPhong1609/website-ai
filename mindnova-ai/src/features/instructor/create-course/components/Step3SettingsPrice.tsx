@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { useInstructorPricing } from "@/src/hooks/instructor/useInstructorPricing";
+import { useCreateCourseStore } from "../stores/createCourseStore";
 
 export interface Step3SettingsPriceProps {
   courseTitle?: string;
@@ -11,6 +12,8 @@ export interface Step3SettingsPriceProps {
 }
 
 export function Step3SettingsPrice({ courseTitle = "Khóa học AI mới", thumbnailPreview, onSaveConfig }: Step3SettingsPriceProps) {
+  const setSettings = useCreateCourseStore((s) => s.setSettings);
+  
   const {
     isFree,
     basePrice,
@@ -24,6 +27,10 @@ export function Step3SettingsPrice({ courseTitle = "Khóa học AI mới", thumb
     toggleDiscount,
     updateDiscount,
   } = useInstructorPricing(50);
+
+  useEffect(() => {
+    setSettings("basePrice", basePrice);
+  }, [basePrice, setSettings]);
 
   return (
     <div className="w-full flex flex-col gap-6 animate-fadeIn">
