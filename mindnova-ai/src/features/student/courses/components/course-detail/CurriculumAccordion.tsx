@@ -1,15 +1,10 @@
 "use client";
 
 import { twMerge } from "tailwind-merge";
-<<<<<<< HEAD
 import { ILesson, IModule } from "../../types";
 import { COURSE_DETAIL } from "../../constants";
 
 
-=======
-import { COURSE_DETAIL } from "@features/student/courses/constants/detail";
-import type { IModule, ILesson } from "@features/student/courses/types";
->>>>>>> 7e154dade1d41e3edc19ae56dfd6b83146d023b7
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 

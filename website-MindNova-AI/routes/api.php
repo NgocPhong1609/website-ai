@@ -32,16 +32,8 @@ use App\Http\Controllers\Api\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Api\Instructor\CourseController;
 use App\Http\Controllers\Api\Instructor\CourseModuleController;
 use App\Http\Controllers\Api\Instructor\LessonController;
-<<<<<<< HEAD
 use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Api\Student\StudyPlanController as StudentStudyPlanController;
-=======
-use App\Http\Controllers\Api\Instructor\QuizController;
-use App\Http\Controllers\Api\Instructor\MediaController;
-use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentController;
-use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscussionController;
-use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNotificationController;
->>>>>>> 7e154dade1d41e3edc19ae56dfd6b83146d023b7
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -54,20 +46,10 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
-<<<<<<< HEAD
     // API Student Dashboard Overview (Hỗ trợ cả guest dev và logged-in sanctum user)
     Route::get('/student/dashboard', [StudentDashboardController::class, 'overview']);
     Route::get('/student/study-plan', [StudentStudyPlanController::class, 'overview']);
     Route::post('/student/study-plan/chat', [StudentStudyPlanController::class, 'chat']);
-=======
-    // VNPay IPN
-    Route::get('/payments/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
-
-    // Lấy danh sách khóa học có sẵn (dành cho người dùng chưa đăng nhập)
-    Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
-
-    Route::post('/student/chat-tutor', [AiTutorController::class, 'streamChat']);
->>>>>>> 7e154dade1d41e3edc19ae56dfd6b83146d023b7
 });
 
 // ==========================================

@@ -1,18 +1,8 @@
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
-<<<<<<< HEAD
 import { FOCUS_AREAS, OVERALL_PROGRESS, STUDY_STREAK } from "../constants";
 import type { FocusActionKind, FocusArea as FocusAreaType, OverallProgress, StudyStreak } from "../types";
 import { Card, getCardClassName } from "@/src/shared/components";
-=======
-import {
-  FOCUS_AREAS,
-  OVERALL_PROGRESS,
-  RECENT_ACTIVITY,
-  STUDY_STREAK,
-} from "../constants";
-import { FocusActionKind, IActivityGroup, IFocusArea } from "../types";
->>>>>>> 7e154dade1d41e3edc19ae56dfd6b83146d023b7
 
 // ─── Overall Progress ─────────────────────────────────────────────────────────
 

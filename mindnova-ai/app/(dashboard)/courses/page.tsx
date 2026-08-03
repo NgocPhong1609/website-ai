@@ -1,13 +1,4 @@
-<<<<<<< HEAD
 import { FilteredCoursesView, MY_COURSES } from "@/src/features/student/courses";
-=======
-import {
-  CoursesHeader,
-  ExploreMoreCard,
-  MY_COURSES,
-  MyCourseCard,
-} from "@/src/features/student/courses";
->>>>>>> 7e154dade1d41e3edc19ae56dfd6b83146d023b7
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

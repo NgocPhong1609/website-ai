@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
-<<<<<<< HEAD
 import { CourseHeader, CurriculumAccordion, CourseSidebar } from "@/src/features/student/courses";
-=======
-import { CourseHeader, CurriculumAccordion, CourseSidebar } from "@features/student/courses";
->>>>>>> 7e154dade1d41e3edc19ae56dfd6b83146d023b7
 
 export const metadata: Metadata = {
   title: "Course Detail | MindNova AI",
