@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useId } from "react";
+import { useState, useCallback, useId, useEffect } from "react";
 import Link from "next/link";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -9,6 +9,11 @@ interface LoginFormValues {
   email: string;
   password: string;
   rememberMe: boolean;
+}
+
+interface UserRole {
+  id: number;
+  name?: string;
 }
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -104,7 +109,6 @@ function FormField({ id, label, leftIcon, rightElement, labelRight, ...inputProp
         {labelRight}
       </div>
       <div className="relative group">
-        {/* Left icon */}
         <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-[#B0B0C8] group-focus-within:text-[#6B6BFF] transition-colors duration-200">
           {leftIcon}
         </div>
@@ -113,7 +117,6 @@ function FormField({ id, label, leftIcon, rightElement, labelRight, ...inputProp
           className="w-full pl-11 pr-11 py-3.5 rounded-xl text-sm text-[#1A1A2E] placeholder-[#C0C0D8] bg-[#F8F8FC] border border-[#E4E4EF] transition-all duration-200 focus:outline-none focus:bg-white focus:border-[#6B6BFF] focus:ring-4 focus:ring-[#6B6BFF]/10 hover:border-[#C8C8E0]"
           {...inputProps}
         />
-        {/* Right element */}
         {rightElement && (
           <div className="absolute inset-y-0 right-4 flex items-center">
             {rightElement}
@@ -125,9 +128,6 @@ function FormField({ id, label, leftIcon, rightElement, labelRight, ...inputProp
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-
-const DEFAULT_API_BASE_URL = "http://127.0.0.1:8000/api";
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
 
 export function LoginForm() {
   const emailId   = useId();
@@ -142,6 +142,27 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
+  // 1. Chức năng phân luồng đường dẫn
+  const getRedirectPath = (roles: UserRole[]) => {
+  const isAdmin = roles.some((r: UserRole) => r.id === 1 || r.name?.toLowerCase() === 'admin');
+  const isInstructor = roles.some((r: UserRole) => r.id === 2 || r.name?.toLowerCase() === 'instructor' || r.name?.toLowerCase() === 'teacher');
+  
+  if (isAdmin) return "/admin";
+  if (isInstructor) return "/instructor/courses"; // Giữ nguyên nếu bạn muốn vào thẳng trang khóa học
+  
+  return "/"; // SỬA Ở ĐÂY: Trỏ về trang chủ "/" thay vì "/dashboard"
+  };
+
+  // 2. Tự động chuyển hướng nếu đã đăng nhập
+  useEffect(() => {
+    const token = window.localStorage.getItem("accessToken");
+    const userInfoRaw = window.localStorage.getItem("userInfo");
+    if (token && userInfoRaw) {
+      const user = JSON.parse(userInfoRaw);
+      window.location.assign(getRedirectPath(user.roles || []));
+    }
+  }, []);
 
   const handleChange = useCallback(
     (field: keyof LoginFormValues) =>
@@ -158,12 +179,12 @@ export function LoginForm() {
     setStatusMessage(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/login`, {
+      const response = await fetch("http://127.0.0.1:8000/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({
           email: values.email,
           password: values.password,
@@ -177,28 +198,30 @@ export function LoginForm() {
       }
 
       const token = payload?.access_token;
+      const user = payload?.user; 
 
-      if (token) {
+      if (token && user) {
         window.localStorage.setItem("accessToken", token);
-      }
+        window.localStorage.setItem("userInfo", JSON.stringify(user));
 
-      setStatusMessage("Đăng nhập thành công. Đang chuyển hướng...");
-      window.location.assign("/admin/users");
+        const maxAge = values.rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 8;
+        document.cookie = `accessToken=${encodeURIComponent(token)}; path=/; max-age=${maxAge}; samesite=lax`;
+
+        setStatusMessage("Đăng nhập thành công...");
+        window.location.assign(getRedirectPath(user.roles || []));
+      }
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : "Đăng nhập thất bại.");
     } finally {
       setIsLoading(false);
     }
-  }, [values.email, values.password]);
+  }, [values.email, values.password, values.rememberMe]);
 
   const togglePassword = useCallback(() => setShowPassword((v) => !v), []);
-
   const canSubmit = values.email.trim() !== "" && values.password.length >= 1;
 
   return (
-    /* Outer shell: fill left pane height, center content vertically */
     <div className="flex flex-col flex-1 min-h-screen">
-      {/* Top bar — logo */}
       <div className="px-10 pt-8 pb-4">
         <div className="flex items-center gap-3">
           <LogoMark />
@@ -206,11 +229,8 @@ export function LoginForm() {
         </div>
       </div>
 
-      {/* Main area — vertically centered */}
       <div className="flex flex-col flex-1 justify-center px-10 py-6">
         <div className="w-full max-w-[380px] mx-auto">
-
-          {/* Heading */}
           <div className="mb-8">
             <h1 className="text-[30px] font-bold text-[#1A1A2E] leading-tight tracking-tight">
               Welcome back
@@ -221,15 +241,19 @@ export function LoginForm() {
             </p>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-            {statusMessage && (
-              <div className="rounded-xl border border-[#E4E4EF] bg-[#F8F8FC] px-3 py-2 text-sm text-[#1A1A2E]">
-                {statusMessage}
-              </div>
-            )}
+          {statusMessage && (
+            <div
+              className={`mb-4 p-3.5 rounded-xl text-xs font-medium border ${
+                statusMessage.includes("thành công")
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  : "bg-red-50 text-red-600 border-red-200"
+              }`}
+            >
+              {statusMessage}
+            </div>
+          )}
 
-            {/* Email */}
+          <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
             <FormField
               id={emailId}
               label="Email Address"
@@ -239,18 +263,7 @@ export function LoginForm() {
               value={values.email}
               onChange={handleChange("email")}
               leftIcon={<EmailIcon />}
-              rightElement={
-                values.email.includes("@") ? (
-                  <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-                      <path d="M2 5l2 2 4-4" stroke="#10B981" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                ) : undefined
-              }
             />
-
-            {/* Password */}
             <FormField
               id={passwordId}
               label="Password"
@@ -272,15 +285,12 @@ export function LoginForm() {
                 <button
                   type="button"
                   onClick={togglePassword}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
                   className="text-[#B0B0C8] hover:text-[#6B6BFF] transition-colors focus:outline-none"
                 >
                   {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
                 </button>
               }
             />
-
-            {/* Remember me */}
             <label
               htmlFor={rememberMeId}
               className="flex items-center gap-2.5 cursor-pointer w-fit group mt-1"
@@ -305,38 +315,21 @@ export function LoginForm() {
                 Remember me for 30 days
               </span>
             </label>
-
-            {/* Submit button */}
             <button
               type="submit"
               disabled={isLoading || !canSubmit}
               className="mt-2 w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-[14px] font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_18px_rgba(107,107,255,0.45)] hover:shadow-[0_8px_28px_rgba(107,107,255,0.55)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#6B6BFF]/30"
             >
-              {isLoading ? (
-                <>
-                  <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Signing in…
-                </>
-              ) : (
-                <>
-                  Login
-                  <ArrowRightIcon />
-                </>
-              )}
+              {isLoading ? "Signing in..." : <>Login <ArrowRightIcon /></>}
             </button>
           </form>
 
-          {/* Divider */}
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#E4E4EF] to-transparent" />
             <span className="text-xs text-[#B0B0C8] font-medium uppercase tracking-widest">OR</span>
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#E4E4EF] to-transparent" />
           </div>
 
-          {/* Google SSO */}
           <button
             type="button"
             className="w-full flex items-center justify-center gap-3 py-3.5 rounded-xl text-sm font-semibold text-[#1A1A2E] bg-white border border-[#E4E4EF] hover:border-[#6B6BFF]/40 hover:bg-[#F8F8FF] hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(107,107,255,0.1)] active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-[#6B6BFF]/15"
@@ -345,7 +338,6 @@ export function LoginForm() {
             Continue with Google
           </button>
 
-          {/* Sign up */}
           <p className="mt-7 text-center text-sm text-[#7878A0]">
             Don&apos;t have an account?{" "}
             <Link
@@ -358,7 +350,6 @@ export function LoginForm() {
         </div>
       </div>
 
-      {/* Footer */}
       <div className="px-10 py-6 text-center">
         <p className="text-[11px] text-[#C0C0D4] leading-relaxed">
           © 2024 MindNova AI. Empowering global learners through intelligence.

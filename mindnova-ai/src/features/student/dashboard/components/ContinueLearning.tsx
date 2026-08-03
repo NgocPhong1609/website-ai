@@ -1,8 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
+<<<<<<< HEAD
 import type { DashboardCourse } from "../types";
 import { DASHBOARD_COURSES } from "../constants";
 import { Card } from "@/src/shared/components";
+=======
+import { DASHBOARD_COURSES } from "../constants";
+import { ICourse } from "../../courses";
+
+// ─── Sub-component ────────────────────────────────────────────────────────────
+>>>>>>> 7e154dade1d41e3edc19ae56dfd6b83146d023b7
 
 function PlayCircleIcon() {
   return (

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { AssignmentSubmission } from "@/src/features/courses/components/assignment/AssignmentSubmission";
+import { AssignmentSubmission } from "@/src/features/student/courses/components/assignment/AssignmentSubmission";
 
 export const metadata: Metadata = {
   title: "Assignment Submission",

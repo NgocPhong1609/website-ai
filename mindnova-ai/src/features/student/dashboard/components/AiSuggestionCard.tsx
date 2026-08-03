@@ -1,9 +1,13 @@
+import { AI_SUGGESTION } from "@features/student/dashboard/constants/data";
 
-
+<<<<<<< HEAD
 import Link from "next/link";
 import { AI_SUGGESTION } from "../constants";
 import type { AiSuggestion } from "../types";
 import { Card } from "@/src/shared/components";
+=======
+// ─── Icons ────────────────────────────────────────────────────────────────────
+>>>>>>> 7e154dade1d41e3edc19ae56dfd6b83146d023b7
 
 function SparkleIcon() {
   return (

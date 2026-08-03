@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Link from "next/link";
 import { 
   AiSuggestionCard, 
@@ -14,14 +15,32 @@ import { getDashboardOverview } from "@/src/features/student/dashboard/services/
 export default async function DashboardPage() {
   const dashboardData = await getDashboardOverview();
   const userName = dashboardData.user?.name ?? "Future Leader";
+=======
+import {
+  AiSuggestionCard,
+  ContinueLearning,
+  DashboardStatsPanel,
+  ExploreCourses,
+} from "@/src/features/student/dashboard";
+>>>>>>> 7e154dade1d41e3edc19ae56dfd6b83146d023b7
 
   return (
+<<<<<<< HEAD
     <div className="flex flex-col gap-10 p-6 lg:p-8 max-w-[1440px] w-full mx-auto min-h-[calc(100vh-4rem)]">
       {/* Top Row: Engaging, Luminous Welcome Hero */}
       <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#EEF2FF]/90 via-[#F6F6FB] to-[#E0F2FE]/80 border border-[#6B6BFF]/25 p-6 sm:p-7 shadow-[0_8px_30px_rgba(107,107,255,0.07)] transition-all duration-300 hover:shadow-[0_12px_36px_rgba(107,107,255,0.12)] w-full">
         {/* Subtle animated background glow balls (refined and gentle) */}
         <div className="absolute -top-16 -right-16 w-60 h-60 rounded-full bg-[#6B6BFF]/10 blur-3xl pointer-events-none animate-pulse" />
         <div className="absolute -bottom-16 -left-16 w-60 h-60 rounded-full bg-[#4CD7F6]/15 blur-3xl pointer-events-none" />
+=======
+    <div className="flex flex-col xl:flex-row gap-8 p-6 lg:p-8 max-w-[1400px] mx-auto">
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col gap-8 min-w-0">
+        <AiSuggestionCard />
+        <ContinueLearning />
+        <ExploreCourses/>
+      </div>
+>>>>>>> 7e154dade1d41e3edc19ae56dfd6b83146d023b7
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 w-full">
           <div className="space-y-3 max-w-xl">

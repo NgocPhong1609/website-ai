@@ -13,7 +13,7 @@ test('admin users are redirected to the admin dashboard after login', function (
         'password' => 'password',
     ]);
 
-    $response->assertRedirect('/admin/dashboard');
+    $response->assertRedirectContains('/admin');
 });
 
 test('client users are redirected to the client dashboard after login', function () {
@@ -30,24 +30,24 @@ test('client users are redirected to the client dashboard after login', function
     $response->assertRedirect('/client/dashboard');
 });
 
-test('admin users can access the course management page', function () {
+test('admin users can access the admin courses api', function () {
     $user = User::factory()->create([
         'role' => 'admin',
         'email_verified_at' => now(),
     ]);
 
-    $response = $this->actingAs($user)->get('/admin/courses');
+    $response = $this->actingAs($user, 'sanctum')->getJson('/api/admin/courses');
 
     $response->assertOk();
 });
 
-test('client users cannot access admin pages', function () {
+test('client users cannot access admin api endpoints', function () {
     $user = User::factory()->create([
         'role' => 'user',
         'email_verified_at' => now(),
     ]);
 
-    $response = $this->actingAs($user)->get('/admin/dashboard');
+    $response = $this->actingAs($user, 'sanctum')->getJson('/api/admin/overview');
 
-    $response->assertRedirect('/client/dashboard');
+    $response->assertForbidden();
 });

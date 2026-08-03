@@ -75,7 +75,7 @@ class CourseController extends Controller
     {
         Gate::authorize('delete', $course);
 
-        $course->delete();
+        $this->courseService->deleteCourse($course);
 
         return $this->noContentResponse();
     }

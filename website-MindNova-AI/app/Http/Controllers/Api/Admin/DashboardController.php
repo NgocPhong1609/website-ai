@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
-use App\Models\Payment;
+use App\Models\Order;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -16,7 +16,7 @@ class DashboardController extends Controller
     {
         $totalUsers = User::count();
         $totalCourses = Course::count();
-        $totalRevenue = (float) Payment::where('status', 'completed')->sum('amount');
+        $totalRevenue = (float) Order::where('status', 'completed')->sum('total_amount');
         $activeSubscriptions = Subscription::where('status', 'active')->count();
 
         $recentUsers = User::query()
@@ -24,10 +24,20 @@ class DashboardController extends Controller
             ->take(5)
             ->get()
             ->map(function (User $user) {
+                $role = strtolower((string) ($user->role ?? 'user'));
+
+                if (str_contains($role, 'admin')) {
+                    $roleLabel = 'Quản trị viên';
+                } elseif (str_contains($role, 'teacher') || str_contains($role, 'instructor')) {
+                    $roleLabel = 'Giảng viên';
+                } else {
+                    $roleLabel = 'Học viên';
+                }
+
                 return [
                     'name' => $user->name,
-                    'role' => $user->role ?? 'user',
-                    'status' => $user->status === 'active' ? 'Active' : 'Inactive',
+                    'role' => $roleLabel,
+                    'status' => $user->status === 'active' ? 'Đang hoạt động' : 'Ngưng hoạt động',
                 ];
             })
             ->values()
@@ -35,8 +45,8 @@ class DashboardController extends Controller
 
         return response()->json([
             'hero' => [
-                'title' => 'Xin chào, Admin',
-                'description' => 'Trang quản trị để bạn theo dõi người dùng, khóa học, doanh thu và trạng thái hệ thống real-time.',
+                'title' => 'Xin chào, Quản trị viên',
+                'description' => 'Trang quản trị để bạn theo dõi người dùng, khóa học, doanh thu và trạng thái hệ thống theo thời gian thực.',
                 'primaryAction' => 'Thêm mới',
                 'secondaryAction' => 'Xuất báo cáo',
             ],
@@ -76,17 +86,18 @@ class DashboardController extends Controller
                 ['label' => 'T7', 'value' => 130],
             ],
             'health' => [
-                ['title' => 'API Laravel', 'status' => 'Healthy', 'color' => 'bg-emerald-500'],
-                ['title' => 'Queue Jobs', 'status' => 'Stable', 'color' => 'bg-cyan-500'],
-                ['title' => 'Storage', 'status' => 'Warning', 'color' => 'bg-amber-500'],
-                ['title' => 'AI Service', 'status' => 'Healthy', 'color' => 'bg-violet-500'],
+                ['title' => 'API Laravel', 'status' => 'Ổn định', 'color' => 'bg-emerald-500'],
+                ['title' => 'Hàng đợi tác vụ', 'status' => 'Ổn định', 'color' => 'bg-cyan-500'],
+                ['title' => 'Lưu trữ', 'status' => 'Cảnh báo', 'color' => 'bg-amber-500'],
+                ['title' => 'Dịch vụ AI', 'status' => 'Ổn định', 'color' => 'bg-violet-500'],
             ],
             'users' => $recentUsers,
             'quickActions' => [
+                'Quản lý danh mục khóa học',
                 'Quản lý khóa học',
-                'Quản lý người dùng',
-                'Báo cáo doanh thu',
-                'Cấu hình hệ thống',
+                'Lọc và tìm kiếm khóa học',
+                'Kiểm duyệt và khóa người dùng',
+                'Gửi email thông báo',
             ],
         ]);
     }

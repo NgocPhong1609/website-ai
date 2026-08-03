@@ -41,7 +41,15 @@ class LessonController extends Controller
     {
         Gate::authorize('manage', $module);
 
-        $lesson = $this->lessonService->createLesson($module, $request->validated());
+        $validated = $request->validated();
+        $tempMediaIds = $validated['temp_media_ids'] ?? [];
+        unset($validated['temp_media_ids']);
+
+        $lesson = $this->lessonService->createLesson($module, $validated);
+
+        if (!empty($tempMediaIds)) {
+            $this->lessonService->confirmTempMedia($tempMediaIds, $lesson);
+        }
 
         return $this->createdResponse(new LessonResource($lesson), 'Lesson created successfully.');
     }
@@ -50,7 +58,15 @@ class LessonController extends Controller
     {
         Gate::authorize('manage', $lesson);
 
-        $lesson = $this->lessonService->updateLesson($lesson, $request->validated());
+        $validated = $request->validated();
+        $tempMediaIds = $validated['temp_media_ids'] ?? [];
+        unset($validated['temp_media_ids']);
+
+        $lesson = $this->lessonService->updateLesson($lesson, $validated);
+
+        if (!empty($tempMediaIds) || count($lesson->media) > 0) {
+            $this->lessonService->confirmTempMedia($tempMediaIds, $lesson);
+        }
 
         return $this->successResponse(new LessonResource($lesson), 'Lesson updated successfully.');
     }
@@ -72,8 +88,34 @@ class LessonController extends Controller
             'video' => 'required|file|mimes:mp4,mov,avi,webm|max:512000', // 500MB
         ]);
 
-        $lesson = $this->lessonService->uploadVideo($lesson, $request->file('video'));
+        $result = $this->lessonService->uploadVideo($lesson, $request->file('video'));
 
-        return $this->successResponse(new LessonResource($lesson), 'Video uploaded successfully.');
+        return $this->successResponse($result, 'Video uploaded to R2 successfully.');
+    }
+
+    public function getVideoUrl(Lesson $lesson)
+    {
+        Gate::authorize('manage', $lesson); // Assuming instructor role here. Update policy if student needs access.
+
+        $result = $this->lessonService->generateVideoUrl($lesson);
+
+        if (!$result) {
+            return $this->notFoundResponse('No video media found for this lesson.');
+        }
+
+        return $this->successResponse($result, 'Signed URL generated.');
+    }
+
+    public function uploadContentMedia(Request $request, Lesson $lesson)
+    {
+        Gate::authorize('manage', $lesson);
+
+        $request->validate([
+            'file' => 'required|file|mimes:jpg,jpeg,png,gif,webp,mp4,mov,avi,webm|max:512000', // 500MB
+        ]);
+
+        $result = $this->lessonService->uploadContentMedia($lesson, $request->file('file'));
+
+        return $this->successResponse($result, 'Content media uploaded to R2 successfully.');
     }
 }

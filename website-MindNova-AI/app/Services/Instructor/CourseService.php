@@ -9,13 +9,26 @@ use Illuminate\Support\Facades\Storage;
 
 class CourseService
 {
+    public function __construct(private readonly CourseModuleService $moduleService)
+    {
+    }
+
     public function createCourse(array $data, int $teacherId): Course
     {
+        $thumbnail = $data['thumbnail'] ?? null;
+        unset($data['thumbnail']);
+
         $data['teacher_id'] = $teacherId;
         $data['slug'] = $this->generateUniqueSlug($data['title']);
         $data['status'] = 'draft';
 
-        return Course::create($data);
+        $course = Course::create($data);
+
+        if ($thumbnail instanceof UploadedFile) {
+            $this->uploadThumbnail($course, $thumbnail);
+        }
+
+        return $course;
     }
 
     public function updateCourse(Course $course, array $data): Course
@@ -29,16 +42,39 @@ class CourseService
         return $course;
     }
 
+    public function deleteCourse(Course $course): void
+    {
+        // Delete course thumbnail if exists
+        if ($course->thumbnail) {
+            $oldPath = str_replace('/storage/', '', parse_url($course->thumbnail, PHP_URL_PATH));
+            $oldPathR2 = ltrim(parse_url($course->thumbnail, PHP_URL_PATH), '/');
+            Storage::disk('public')->delete($oldPath);
+            Storage::disk('r2')->delete($oldPathR2);
+        }
+
+        foreach ($course->modules as $module) {
+            $this->moduleService->deleteModule($module);
+        }
+        $course->delete();
+    }
+
     public function uploadThumbnail(Course $course, UploadedFile $file): Course
     {
         // Delete old thumbnail if exists
         if ($course->thumbnail) {
-            $oldPath = str_replace('storage/', 'public/', $course->thumbnail);
-            Storage::delete($oldPath);
+            $oldPath = str_replace('/storage/', '', parse_url($course->thumbnail, PHP_URL_PATH));
+            // In case the old thumbnail was on R2, parse_url will just get the path without domain.
+            // But if it was on public, the path might start with /storage/ or be relative.
+            // R2 usually doesn't have /storage/ in the URL, so we just remove the leading slash.
+            $oldPathR2 = ltrim(parse_url($course->thumbnail, PHP_URL_PATH), '/');
+            
+            // Try deleting from both disks just in case of migration
+            Storage::disk('public')->delete($oldPath);
+            Storage::disk('r2')->delete($oldPathR2);
         }
 
-        $path = $file->store('public/courses/thumbnails');
-        $url = Storage::url($path);
+        $path = $file->store('courses/thumbnails', 'r2');
+        $url = Storage::disk('r2')->url($path);
 
         $course->update(['thumbnail' => $url]);
 
@@ -56,9 +92,9 @@ class CourseService
             // }
         }
 
-        if ($status === 'draft' && $course->status === 'published') {
-            throw new \Exception("Cannot change a published course back to draft.");
-        }
+        // if ($status === 'draft' && $course->status === 'published') {
+        //     throw new \Exception("Cannot change a published course back to draft.");
+        // }
 
         $course->update(['status' => $status]);
 

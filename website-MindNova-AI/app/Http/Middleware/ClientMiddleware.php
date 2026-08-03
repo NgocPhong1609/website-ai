@@ -24,6 +24,8 @@ class ClientMiddleware
             return response()->json(['message' => 'Unauthorized. Client access required.'], 403);
         }
 
-        return redirect()->route('admin.dashboard');
+        $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/');
+
+        return redirect()->away($frontendUrl . '/admin');
     }
 }
