@@ -47,6 +47,11 @@ class QuizService
                 }
             }
 
+            // Update lesson duration based on quiz time limit
+            $lesson->update([
+                'duration_seconds' => $quiz->time_limit_minutes * 60,
+            ]);
+
             return $quiz->load('questions.answers');
         });
     }

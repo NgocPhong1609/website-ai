@@ -104,7 +104,6 @@ class LessonController extends Controller
         }
 
         return $this->successResponse($result, 'Signed URL generated.');
-<<<<<<< HEAD
     }
 
     public function uploadContentMedia(Request $request, Lesson $lesson)
@@ -118,7 +117,5 @@ class LessonController extends Controller
         $result = $this->lessonService->uploadContentMedia($lesson, $request->file('file'));
 
         return $this->successResponse($result, 'Content media uploaded to R2 successfully.');
-=======
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
     }
 }

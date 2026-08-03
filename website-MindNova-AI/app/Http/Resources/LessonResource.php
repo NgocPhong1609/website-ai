@@ -40,14 +40,12 @@ class LessonResource extends JsonResource
             'title' => $this->title,
             'type' => $this->type,
             'content' => $this->content,
+            'video_url' => $this->video_url,
             'signed_url' => $this->getSignedUrl(),
-            'duration_minutes' => $this->duration_minutes,
+            'duration_seconds' => $this->duration_seconds,
             'order' => $this->order,
             'status' => $this->status,
-<<<<<<< HEAD
             'quizData' => $quizData,
-=======
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

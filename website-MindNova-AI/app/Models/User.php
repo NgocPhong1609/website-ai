@@ -84,7 +84,6 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
     }
 
-<<<<<<< HEAD
     public function profile(): HasOne
     {
         return $this->hasOne(UserProfile::class);
@@ -95,32 +94,9 @@ class User extends Authenticatable
         return $this->roles()->where('name', $roleName)->exists();
     }
 
-=======
-    // --- Hàm phụ trợ ---
-
-    /**
-     * Kiểm tra người dùng có sở hữu vai trò cụ thể không
-     */
-    public function hasRole(string $roleName): bool
-    {
-        return $this->roles()->where('name', $roleName)->exists();
-    }
-
-    /**
-     * Kiểm tra người dùng có quyền admin không
-     */
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
     public function isAdmin(): bool
     {
         return $this->hasRole('admin') || $this->role === 'admin';
-    }
-
-    /**
-     * Kiểm tra người dùng có quyền teacher không (Phục vụ cho việc chọn giáo viên)
-     */
-    public function isTeacher(): bool
-    {
-        return $this->hasRole('teacher');
     }
 
     /**

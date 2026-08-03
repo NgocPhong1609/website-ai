@@ -14,7 +14,7 @@ class Lesson extends Model
         'type', // video, article, quiz_module
         'content',
         'video_url',
-        'duration_minutes',
+        'duration_seconds',
         'order',
         'status',
     ];
@@ -28,12 +28,9 @@ class Lesson extends Model
     {
         return $this->hasMany(LessonMedia::class);
     }
-<<<<<<< HEAD
 
     public function quiz()
     {
         return $this->hasOne(Quiz::class);
     }
-=======
->>>>>>> 83c13480e0df972562db35c4fc048e4e29106ede
 }

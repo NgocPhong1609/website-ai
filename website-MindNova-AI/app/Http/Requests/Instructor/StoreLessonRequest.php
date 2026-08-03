@@ -17,8 +17,9 @@ class StoreLessonRequest extends FormRequest
             'title' => 'required|string|max:255',
             'type' => 'required|in:video,article,quiz_module',
             'content' => 'nullable|string',
+            'video_url' => 'nullable|string',
             'order' => 'integer|min:0',
-            'duration_minutes' => 'integer|min:0',
+            'status' => 'required|in:draft,published',
             'temp_media_ids' => 'nullable|array',
             'temp_media_ids.*' => 'integer|exists:lesson_media,id',
         ];
