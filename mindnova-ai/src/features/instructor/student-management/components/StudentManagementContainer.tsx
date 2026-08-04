@@ -6,6 +6,7 @@ import { twMerge } from "tailwind-merge";
 import { StudentTable } from "./StudentTable";
 import { RightPanels } from "./RightPanels";
 import { AINotificationModal } from "./AINotificationModal";
+import { exportStudentsCSV } from "../api";
 import { DownloadIcon, SparklesIcon } from "./icons";
 
 function StudentNavigationTabs({ active }: { active: "students" | "analytics" }) {
@@ -38,7 +39,18 @@ function StudentNavigationTabs({ active }: { active: "students" | "analytics" })
   );
 }
 
-function PageHeader({ onOpenModal }: { onOpenModal: () => void }) {
+function PageHeader({ onOpenModal, onExport }: { onOpenModal: () => void, onExport: () => void }) {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      await onExport();
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
@@ -54,11 +66,16 @@ function PageHeader({ onOpenModal }: { onOpenModal: () => void }) {
         <button
           type="button"
           id="btn-export-report"
-          onClick={() => alert("Đang tải xuống báo cáo danh sách học viên CSV...")}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all cursor-pointer shadow-2xs"
+          onClick={handleExport}
+          disabled={isExporting}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all cursor-pointer shadow-2xs disabled:opacity-50"
         >
-          <DownloadIcon size={14} />
-          <span>Xuất Danh Sách CSV</span>
+          {isExporting ? (
+            <div className="w-3.5 h-3.5 border-2 border-gray-300 border-t-gray-700 rounded-full animate-spin"></div>
+          ) : (
+            <DownloadIcon size={14} />
+          )}
+          <span>{isExporting ? "Đang xuất..." : "Xuất Danh Sách CSV"}</span>
         </button>
 
         <button
@@ -77,27 +94,45 @@ function PageHeader({ onOpenModal }: { onOpenModal: () => void }) {
 
 export function StudentManagementContainer() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [initialTopic, setInitialTopic] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCourse, setFilterCourse] = useState("TẤT CẢ");
+  const [page, setPage] = useState(1);
+
+  const handleExport = async () => {
+    await exportStudentsCSV({
+      search: searchTerm || undefined,
+      course_id: filterCourse === "TẤT CẢ" ? undefined : filterCourse
+    });
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F4F4F8] font-sans">
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col gap-6 pb-16">
+        <div className="max-w-[1600px] w-full mx-auto px-6 lg:px-12 py-6 flex flex-col gap-6 pb-16">
           <StudentNavigationTabs active="students" />
-          <PageHeader onOpenModal={() => setModalOpen(true)} />
+          <PageHeader onOpenModal={() => { setInitialTopic(""); setModalOpen(true); }} onExport={handleExport} />
 
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-6 items-start">
             <div className="min-w-0">
-              <StudentTable />
+              <StudentTable 
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                filterCourse={filterCourse}
+                setFilterCourse={setFilterCourse}
+                page={page}
+                setPage={setPage}
+              />
             </div>
 
             <div className="flex flex-col gap-4">
-              <RightPanels onOpenModal={() => setModalOpen(true)} />
+              <RightPanels onOpenModal={(t) => { setInitialTopic(t || ""); setModalOpen(true); }} courseId={filterCourse} />
             </div>
           </div>
         </div>
       </div>
 
-      <AINotificationModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <AINotificationModal isOpen={modalOpen} onClose={() => setModalOpen(false)} initialTopic={initialTopic} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { TransactionHistoryContainer } from "@/src/features/instructor/revenue";
+import { TransactionHistoryContainer } from "@features/instructor/revenue";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
