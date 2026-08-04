@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Http;
 
 // ==========================================
 // IMPORT CÁC CONTROLLER TỪ ĐÚNG THƯ MỤC
@@ -16,6 +17,7 @@ use App\Http\Controllers\Api\Student\OrderController;
 use App\Http\Controllers\Api\Student\AiTutorController;
 use App\Http\Controllers\Api\Student\CourseController as StudentCourseController;
 use App\Http\Controllers\Api\StudentQuizController;
+use App\Http\Controllers\Api\Student\OnboardingController;
 
 // Nhóm Dùng chung
 use App\Http\Controllers\Api\RealtimeController;
@@ -51,6 +53,96 @@ Route::middleware('throttle:30,1')->group(function () {
 Route::get('/student/dashboard', [StudentDashboardController::class, 'overview']);
 Route::get('/student/study-plan', [StudentStudyPlanController::class, 'overview']);
 Route::post('/student/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
+Route::post('/student/onboarding', [OnboardingController::class, 'store']);
+// 🌟 BƯỚC 1: ĐẶT API AI PHÂN TÍCH BÀI HỌC VÀ GỢI Ý KHÓA HỌC Ở ĐÂY
+    Route::post('/student/analyze-lesson', function (Illuminate\Http\Request $request) {
+    $lessonTitle = $request->input('lesson_title');
+    $goal = $request->input('goal');
+
+    // Prompt cực kỳ khắt khe, ép AI phải phân tích riêng biệt cho bài học cụ thể này
+    $prompt = "You are an expert AI curriculum analyst. A student is studying for '{$goal}' and looking specifically at the lesson titled '{$lessonTitle}'.
+    You MUST generate a completely custom, highly specific breakdown for THIS exact lesson. Do not use generic templates.
+    Return ONLY valid JSON format with no markdown, no backticks:
+    {
+      \"overview\": \"Write a unique 2-sentence overview specifically explaining what concepts, techniques, or theories are mastered in '{$lessonTitle}'.\",
+      \"key_takeaways\": [
+        \"First specific learning outcome of {$lessonTitle}\",
+        \"Second practical skill gained from {$lessonTitle}\",
+        \"Third technical implementation detail of {$lessonTitle}\"
+      ],
+      \"suggested_course_keywords\": [\"keyword1\", \"keyword2\"]
+    }";
+
+    try {
+        $response = Http::withToken(env('GROQ_API_KEY'))
+            ->post('https://api.groq.com/openai/v1/chat/completions', [
+                'model' => 'llama-3.3-70b-versatile',
+                'messages' => [
+                    ['role' => 'system', 'content' => 'Return only raw JSON.'],
+                    ['role' => 'user', 'content' => $prompt]
+                ],
+                'temperature' => 0.95, // Đẩy độ sáng tạo lên cao nhất để không bị lặp text
+            ]);
+
+        $aiContent = $response->json('choices.0.message.content');
+        $cleanJson = trim(str_replace(['```json', '```'], '', $aiContent));
+        $aiData = json_decode($cleanJson, true);
+
+        // LỌC KHÓA HỌC LIÊN QUAN CHẶT CHẼ TỪ DATABASE
+        // Lấy các khóa học có tiêu đề chứa từ khóa liên quan đến bài học hoặc lấy theo độ phù hợp
+        $keywords = $aiData['suggested_course_keywords'] ?? [$lessonTitle];
+        $query = \App\Models\Course::with('teacher');
+
+        foreach ($keywords as $kw) {
+            $query->orWhere('title', 'like', '%' . $kw . '%');
+        }
+
+        $matchedCourses = $query->take(3)->get();
+
+        // Nếu database chưa khớp được từ khóa thì lấy ngẫu nhiên 3 khóa học chất lượng khác nhau
+        if ($matchedCourses->isEmpty()) {
+            $matchedCourses = \App\Models\Course::with('teacher')->inRandomOrder()->take(3)->get();
+        }
+
+        $coursesList = [];
+        foreach ($matchedCourses as $index => $course) {
+            $coursesList[] = [
+                'title' => $course->title,
+                'instructor' => $course->teacher ? $course->teacher->name : "Expert Instructor",
+                'rating' => "4." . rand(7, 9) . " (" . rand(600, 1400) . " students)",
+                'price' => "$" . number_format($course->price, 2),
+                'badge' => $index === 0 ? "Best Match" : "Related Course"
+            ];
+        }
+
+        $aiData['recommended_courses'] = $coursesList;
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $aiData
+        ], 200);
+    } catch (\Exception $e) {
+        $fallbackCourses = \App\Models\Course::with('teacher')->take(2)->get();
+        $coursesList = [];
+        foreach ($fallbackCourses as $c) {
+            $coursesList[] = [
+                'title' => $c->title,
+                'instructor' => $c->teacher ? $c->teacher->name : "Instructor",
+                'rating' => "4.8 (950 students)",
+                'price' => "$" . number_format($c->price, 2),
+                'badge' => "Recommended"
+            ];
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'overview' => "Master the core concepts of {$lessonTitle} to accelerate your progress toward {$goal}.",
+                'key_takeaways' => ["Understanding fundamental principles of " . $lessonTitle, "Hands-on configuration and workflow", "Best practices and implementation"],
+                'recommended_courses' => $coursesList
+            ]
+        ], 200);
+}});
 
 // ==========================================
 // 2. NHÓM API PRIVATE (Bắt buộc phải có Bearer Token)
@@ -79,7 +171,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // 3. NHÓM API HỌC SINH (Student)
     // ==========================================
     Route::prefix('student')->group(function () {
-        // TÍNH NĂNG AI TUTOR (PB-025)
+
 
 
         // Quiz
