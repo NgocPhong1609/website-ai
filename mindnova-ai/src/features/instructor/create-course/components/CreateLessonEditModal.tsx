@@ -133,7 +133,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose }: CreateLessonE
     
     if (tempMediaMap.size > 0) {
       Array.from(tempMediaMap.values()).forEach(mediaId => {
-        deleteTempMedia.mutate(mediaId).catch(console.error);
+        void deleteTempMedia.mutateAsync(mediaId).catch(console.error);
       });
     }
     setTempMediaMap(new Map());

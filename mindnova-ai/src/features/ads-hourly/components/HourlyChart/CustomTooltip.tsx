@@ -1,12 +1,14 @@
 "use client";
 
-import type { TooltipProps } from "recharts";
 import type { MetricKey } from "../../types";
 import { METRIC_CONFIGS } from "../../constants";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface CustomTooltipProps extends TooltipProps<number, string> {
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ dataKey?: string | number; value?: number | string }>;
+  label?: string | number;
   selectedMetrics: MetricKey[];
 }
 

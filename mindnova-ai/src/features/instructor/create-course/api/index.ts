@@ -95,7 +95,7 @@ export function useUploadContentMedia() {
 }
 export function useUploadTempMedia() {
   return useMutation({
-    mutationFn: async ({ file, onUploadProgress }: { file: File; onUploadProgress?: (progressEvent: any) => void }) => {
+    mutationFn: async ({ file, onUploadProgress, signal }: { file: File; onUploadProgress?: (progressEvent: any) => void; signal?: AbortSignal }) => {
       const formData = new FormData();
       formData.append("file", file);
 
@@ -104,6 +104,7 @@ export function useUploadTempMedia() {
         formData,
         {
           onUploadProgress,
+          signal,
         }
       );
       return data;

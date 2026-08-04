@@ -18,11 +18,18 @@ class Course extends Model
         'price',
         'level',
         'status',
+        'admin_hidden_at',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'admin_hidden_at' => 'datetime',
     ];
+
+    public function scopeVisibleInAdmin($query)
+    {
+        return $query->whereNull('admin_hidden_at');
+    }
 
     public function teacher(): BelongsTo
     {

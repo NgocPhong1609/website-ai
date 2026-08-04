@@ -1,4 +1,4 @@
-import type { IMyCourse } from "@features/courses/types";
+import type { IMyCourse } from "@features/student/courses/types";
 
 export const MY_COURSES: IMyCourse[] = [
   {

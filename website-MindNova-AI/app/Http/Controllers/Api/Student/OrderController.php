@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Course;
+use App\Services\Instructor\InstructorPayoutService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -129,6 +130,8 @@ class OrderController extends Controller
                             'status' => 'enrolled', 'enrolled_at' => now()
                         ]);
                     }
+
+                    app(InstructorPayoutService::class)->createForOrder($order);
                 }
             }
             return response()->json(['RspCode' => '00', 'Message' => 'Confirm Success']);
