@@ -308,10 +308,6 @@ export function QuizStartContent() {
                     : "bg-white border-[#EAEAF4] shadow-2xs hover:shadow-md hover:border-[#6B6BFF]/40 hover:-translate-y-0.5"
                 }`}
               >
-                {/* Accent top stripe when active */}
-                {isSelected && (
-                  <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488]" />
-                )}
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">

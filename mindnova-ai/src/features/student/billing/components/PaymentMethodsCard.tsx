@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import { NoData } from "@/src/shared/components/ui/NoData";
 import { PAYMENT_CARDS } from "../constants";
 import type { PaymentCard } from "../types";
 import { PlusIcon, TrashIcon } from "./icons";
@@ -115,9 +116,7 @@ export function PaymentMethodsCard() {
           <CardRow key={card.id} card={card} onRemove={handleRemove} />
         ))}
         {cards.length === 0 && (
-          <p className="text-xs font-normal text-[#9090B0] py-6 text-center bg-[#F8FAFC] rounded-xl border border-[#EAEAF4]">
-            Chưa có thẻ nào được liên kết trong hệ thống của bạn.
-          </p>
+          <NoData title="Chưa có thẻ" description="Chưa có thẻ nào được liên kết trong hệ thống của bạn." className="bg-[#F8FAFC] rounded-xl border border-[#EAEAF4] py-6" />
         )}
       </div>
     </div>

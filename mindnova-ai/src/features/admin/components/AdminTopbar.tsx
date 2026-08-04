@@ -1,4 +1,5 @@
 "use client";
+import { Avatar } from "@/src/shared/components/ui/Avatar";
 
 const DEFAULT_API_BASE_URL = "http://127.0.0.1:8000/api";
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
@@ -70,9 +71,7 @@ export function AdminTopbar() {
         >
           Đăng xuất
         </button>
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-indigo-500 text-sm font-bold text-white shadow-[0_14px_24px_-14px_rgba(37,99,235,0.9)]">
-          A
-        </div>
+        <Avatar fallback="A" size="md" className="shadow-[0_14px_24px_-14px_rgba(37,99,235,0.9)]" />
       </div>
     </header>
   );

@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef, type DragEvent, type KeyboardEvent } from "react";
 import { twMerge } from "tailwind-merge";
+import { NoData } from "@/src/shared/components/ui/NoData";
 import { useCourseStructure, type CoursePublishStatus, type LessonType, type ChapterNode, type LessonNode } from "@/src/hooks/instructor/useCourseStructure";
 import { useVideoProcessing, type VideoItem } from "@/src/hooks/instructor/useVideoProcessing";
 import { CreateLessonEditModal } from "./CreateLessonEditModal";
@@ -283,18 +284,21 @@ export function Step2CourseStructure() {
         </div>
 
         {chapters.length === 0 ? (
-          <div className="p-14 rounded-2xl bg-white border border-dashed border-gray-300 text-center flex flex-col items-center gap-2.5 text-gray-500 shadow-2xs">
-            <span className="text-4xl">📚</span>
-            <p className="text-sm font-black text-gray-900">Giáo trình của bạn đang chưa có chuyên đề nào.</p>
-            <p className="text-xs max-w-sm">Hãy tạo chuyên đề đầu tiên để bắt đầu thêm bài học video, trắc nghiệm hoặc tài liệu.</p>
-            <button
-              type="button"
-              onClick={() => addChapter("Chuyên đề 1: Nền tảng Core Architecture")}
-              className="mt-2 px-5 py-2.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white text-xs font-extrabold rounded-xl shadow-2xs transition-all cursor-pointer"
-            >
-              + Tạo Chuyên Đề Đầu Tiên
-            </button>
-          </div>
+          <NoData
+            icon={<span className="text-4xl">📚</span>}
+            title="Giáo trình của bạn đang chưa có chuyên đề nào."
+            description="Hãy tạo chuyên đề đầu tiên để bắt đầu thêm bài học video, trắc nghiệm hoặc tài liệu."
+            action={
+              <button
+                type="button"
+                onClick={() => addChapter("Chuyên đề 1: Nền tảng Core Architecture")}
+                className="mt-2 px-5 py-2.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white text-xs font-extrabold rounded-xl shadow-2xs transition-all cursor-pointer"
+              >
+                + Tạo Chuyên Đề Đầu Tiên
+              </button>
+            }
+            className="bg-white border border-dashed border-gray-300 shadow-2xs p-14 rounded-2xl"
+          />
         ) : (
           <div className="flex flex-col gap-5">
             {chapters.map((chap: ChapterNode, cIndex: number) => (
@@ -352,9 +356,11 @@ export function Step2CourseStructure() {
                 {/* Lessons List in Chapter */}
                 <div className="flex flex-col gap-2.5 min-h-[50px] rounded-xl p-2 bg-gray-50/70 border border-gray-200">
                   {chap.lessons.length === 0 ? (
-                    <p className="text-center text-xs font-bold text-gray-400 py-6">
-                      Chuyên đề này chưa có bài giảng. Nhấn <strong className="text-[#4F46E5]">+ Thêm Video</strong> để xây dựng chi tiết.
-                    </p>
+                    <NoData
+                      title="Chưa có bài giảng"
+                      description="Chuyên đề này chưa có bài giảng. Nhấn + Thêm Video để xây dựng chi tiết."
+                      className="py-6"
+                    />
                   ) : (
                     chap.lessons.map((les: LessonNode, lIndex: number) => (
                       <LessonRow

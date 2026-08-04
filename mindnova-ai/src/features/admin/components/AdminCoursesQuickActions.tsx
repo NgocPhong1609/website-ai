@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { NoData } from "@/src/shared/components/ui/NoData";
 
 import type { AdminCourseRow } from "@/src/features/admin/types";
 
@@ -554,8 +555,8 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
 
             {courses.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-slate-500">
-                  Chưa có dữ liệu khóa học.
+                <td colSpan={7} className="p-0">
+                  <NoData title="Không có dữ liệu" description="Chưa có dữ liệu khóa học." className="py-6" />
                 </td>
               </tr>
             )}

@@ -2,6 +2,8 @@
 
 import React, { useState, useCallback } from "react";
 import { twMerge } from "tailwind-merge";
+import { Loader } from "@/src/shared/components/ui/Loader";
+import { SparklesIcon, CheckCircleIcon, PlayCircleIcon } from "./icons";
 
 export interface OutlineChapter {
   title: string;
@@ -202,7 +204,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
             <div className="flex flex-col gap-6 animate-fadeIn">
               {genState === "loading" ? (
                 <div className="py-20 flex flex-col items-center justify-center gap-4 text-center">
-                  <div className="w-10 h-10 border-4 border-[#6B6BFF] border-t-transparent rounded-full animate-spin" />
+                  <Loader size="md" />
                   <h4 className="text-sm font-extrabold text-[#1A1A2E]">Architecting course outline via best practices...</h4>
                   <p className="text-xs text-gray-500 max-w-sm">
                     Structuring chapters with a strict 80/20 ratio of practical application to theoretical paradigms.

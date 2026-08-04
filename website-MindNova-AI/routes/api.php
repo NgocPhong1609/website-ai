@@ -19,6 +19,8 @@ use App\Http\Controllers\Api\StudentQuizController;
 use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Api\Student\StudyPlanController as StudentStudyPlanController;
 use App\Http\Controllers\Api\Student\PracticeController as StudentPracticeController;
+use App\Http\Controllers\Api\Student\ProgressController as StudentProgressController;
+use App\Http\Controllers\Api\Student\HistoryController as StudentHistoryController;
 
 // Nhóm Dùng chung
 use App\Http\Controllers\Api\RealtimeController;
@@ -53,10 +55,17 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 });
 
+// -- API VNPay IPN (Webhooks) --
+Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
+
 // API Student Dashboard, Study Plan & Quizzes (Áp dụng cho mọi phiên học viên)
 Route::get('/student/dashboard', [StudentDashboardController::class, 'overview']);
 Route::get('/student/study-plan', [StudentStudyPlanController::class, 'overview']);
 Route::get('/student/practice/overview', [StudentPracticeController::class, 'overview']);
+Route::get('/student/progress/overview', [StudentProgressController::class, 'overview']);
+Route::get('/student/history/overview', [StudentHistoryController::class, 'overview']);
+Route::get('/student/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
+Route::get('/student/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
 Route::post('/student/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
 Route::get('/student/lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
 Route::post('/student/lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);

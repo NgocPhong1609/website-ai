@@ -110,7 +110,7 @@ export function MyCourseCard({ course }: { course: MyCourse }) {
       {/* Clean White Body Content */}
       <div className="p-5 flex flex-col flex-1 bg-white justify-between gap-4">
         <div>
-          <Link href="/courses/detail" className="block text-decoration-none focus:outline-none min-w-0 group/title">
+          <Link href={`/courses/detail?courseId=${course.id}`} className="block text-decoration-none focus:outline-none min-w-0 group/title">
             <h3 className="text-base sm:text-lg font-bold text-[#1A1A2E] leading-snug line-clamp-1 group-hover/card:text-[#5052EE] group-hover/title:text-[#5052EE] transition-colors">
               {course.title}
             </h3>
@@ -134,7 +134,7 @@ export function MyCourseCard({ course }: { course: MyCourse }) {
         </div>
 
         <Link
-          href="/courses/lesson"
+          href={`/courses/lesson?courseId=${course.id}`}
           className={twMerge(
             "w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 hover:-translate-y-0.5 text-decoration-none mt-auto group/btn",
             buttonStyle

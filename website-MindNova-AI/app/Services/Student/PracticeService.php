@@ -47,7 +47,19 @@ class PracticeService
         }
 
         // QUERY REAL DATABASE: Load all available quizzes along with their parent Lesson and Course
-        $dbQuizzes = Quiz::with(['lesson', 'lesson.module', 'lesson.module.course', 'questions'])->get();
+        // Filter strictly by the courses the user is enrolled in.
+        $dbQuizzes = Quiz::with(['lesson', 'lesson.module', 'lesson.module.course', 'questions'])
+            ->whereHas('lesson.module.course.enrollments', function ($q) use ($userId) {
+                if ($userId) {
+                    $q->where('user_id', $userId);
+                }
+            })
+            ->get();
+        
+        // If user is not logged in or has no enrollments, $dbQuizzes will be empty (or we can just show empty state)
+        if (!$userId) {
+            $dbQuizzes = collect();
+        }
         $modulesList = [];
         $index = 1;
 
@@ -173,41 +185,37 @@ class PracticeService
             $index++;
         }
 
-        // Fallback default selection is index 2 (or first item if fewer exist)
+        // If no items exist, provide empty fallback
         $defaultIndex = isset($modulesList[2]) ? 2 : 0;
         $defaultMod = $modulesList[$defaultIndex] ?? [
-            'id' => '1',
-            'title' => 'Kiểm tra Thực chiến: Tích hợp API & AI Stream 🚀',
-            'badge_title' => 'Đánh giá Năng lực Thực chiến • Module 3',
-            'course_title' => 'Next.js 15 AI Master Pro',
-            'description' => 'Thử sức và kiểm nghiệm mức độ thông tuệ về Xử lý Route Handlers và Streaming LLM.',
-            'questions_count_text' => '10 Câu trắc nghiệm',
-            'time_limit_text' => '15 Phút',
-            'passing_condition_text' => '70% (Từ 7/10 câu)',
-            'attempts_allowed_text' => 'Không giới hạn (Xáo trộn ngẫu nhiên)',
-            'time_limit_minutes' => 15,
-            'questions_count' => 10,
-            'passing_percentage' => 70,
+            'id' => null,
+            'title' => 'Chưa có bài kiểm tra',
+            'badge_title' => 'Chưa có dữ liệu',
+            'course_title' => 'Vui lòng quay lại sau',
+            'description' => 'Hiện tại chưa có bài kiểm tra nào được tạo trên hệ thống.',
+            'questions_count_text' => '0 Câu trắc nghiệm',
+            'time_limit_text' => '0 Phút',
+            'passing_condition_text' => '0%',
+            'attempts_allowed_text' => 'Không',
+            'time_limit_minutes' => 0,
+            'questions_count' => 0,
+            'passing_percentage' => 0,
             'readiness' => [
                 'status_label' => 'Trạng thái chuẩn bị ↗',
-                'percentage_text' => 'Sẵn sàng 100%',
-                'level_text' => 'Level 3',
-                'level_subtext' => '(AI Streaming)',
-                'status_tag' => 'Active',
-                'action_prompt' => '🔥 Hãy tự tin chinh phục!',
-                'time_prompt' => 'Thời gian: 15 Phút ➔',
+                'percentage_text' => 'Sẵn sàng 0%',
+                'level_text' => 'Level 0',
+                'level_subtext' => '',
+                'status_tag' => 'Inactive',
+                'action_prompt' => 'Chưa mở',
+                'time_prompt' => 'Thời gian: 0 Phút ➔',
             ],
             'ai_insight' => [
                 'title' => '💡 Lời khuyên từ Gia sư AI Nova',
                 'tag' => '✨ AI Advisory',
-                'content' => '"Hãy đọc kỹ từng tùy chọn và phân tích ranh giới của Route Handlers và Streaming."',
+                'content' => 'Hệ thống đang cập nhật dữ liệu. Bạn hãy tiếp tục học lý thuyết trước nhé!',
                 'footer' => 'Hệ thống giám sát chuyên môn MindNova Co-Pilot',
             ],
-            'prerequisites' => [
-                ['id' => 1, 'name' => 'Next.js 15 App Router', 'color' => 'indigo', 'bg_class' => 'bg-[#EEF2FF]', 'text_class' => 'text-[#5052EE]', 'border_class' => 'border-[#5052EE]/15'],
-                ['id' => 2, 'name' => 'LLM API & Stream', 'color' => 'teal', 'bg_class' => 'bg-[#EAF8F5]', 'text_class' => 'text-[#0D9488]', 'border_class' => 'border-[#0D9488]/15'],
-                ['id' => 3, 'name' => 'Async / Await Logic', 'color' => 'amber', 'bg_class' => 'bg-[#FFF8EB]', 'text_class' => 'text-[#D97706]', 'border_class' => 'border-[#D97706]/15'],
-            ],
+            'prerequisites' => [],
         ];
 
         return [

@@ -6,36 +6,22 @@ import type {
   CoreConcept,
 } from "../types";
 
-function normalizeSyllabus(raw?: ActiveSyllabus): ActiveSyllabus {
+function normalizeSyllabus(raw?: any): ActiveSyllabus | null {
   if (!raw) {
-    return {
-      id: "syl-qc-01",
-      title: "Quantum Computing Fundamentals",
-      currentModuleIndex: 4,
-      totalModules: 8,
-      moduleTitle: "Module 4: Quantum Gates & Superposition Circuits",
-      description:
-        "Master the mathematics and logical architectures of superposition, quantum entanglement, and qubit gate circuits with your interactive real-time AI tutor.",
-      progressPercentage: 65,
-      completedTopics: 13,
-      totalTopics: 20,
-      statusBadge: "On Track",
-    };
+    return null;
   }
 
   return {
-    id: raw.id || "syl-qc-01",
-    title: raw.title || "Quantum Computing Fundamentals",
-    currentModuleIndex: raw.current_module_index ?? raw.currentModuleIndex ?? 4,
-    totalModules: raw.total_modules ?? raw.totalModules ?? 8,
-    moduleTitle: raw.module_title ?? raw.moduleTitle ?? "Module 4: Quantum Gates & Superposition Circuits",
-    description:
-      raw.description ||
-      "Master the mathematics and logical architectures of superposition, quantum entanglement, and qubit gate circuits with your interactive real-time AI tutor.",
-    progressPercentage: raw.progress_percentage ?? raw.progressPercentage ?? 65,
-    completedTopics: raw.completed_topics ?? raw.completedTopics ?? 13,
-    totalTopics: raw.total_topics ?? raw.totalTopics ?? 20,
-    statusBadge: raw.status_badge ?? raw.statusBadge ?? "On Track",
+    id: raw.id,
+    title: raw.title,
+    currentModuleIndex: raw.current_module_index ?? raw.currentModuleIndex ?? 1,
+    totalModules: raw.total_modules ?? raw.totalModules ?? 1,
+    moduleTitle: raw.module_title ?? raw.moduleTitle ?? "Module",
+    description: raw.description,
+    progressPercentage: raw.progress_percentage ?? raw.progressPercentage ?? 0,
+    completedTopics: raw.completed_topics ?? raw.completedTopics ?? 0,
+    totalTopics: raw.total_topics ?? raw.totalTopics ?? 0,
+    statusBadge: raw.status_badge ?? raw.statusBadge ?? "Active",
   };
 }
 
@@ -56,7 +42,7 @@ function normalizeConcept(raw: CoreConcept): CoreConcept {
 export async function getStudyPlanOverview(): Promise<StudyPlanOverview> {
   try {
     const response = await apiClient<StudyPlanApiResponse>("/student/study-plan", {
-      next: { revalidate: 60 },
+      cache: "no-store",
     } as RequestInit);
 
     if (response?.success && response?.data) {
@@ -79,55 +65,18 @@ export async function getStudyPlanOverview(): Promise<StudyPlanOverview> {
     console.warn("[StudyPlanService] Unable to reach backend /student/study-plan API, falling back to cached local demo:", error);
   }
 
-  // Fallback demo object if server is temporarily disconnected
+  // Fallback if server is disconnected or returns empty
   return {
-    activeSyllabus: normalizeSyllabus(),
-    coreConcepts: [
-      {
-        id: "concept-1",
-        title: "Superposition (Chồng chập lượng tử)",
-        status: "Mastered",
-        statusColor: "teal",
-        description: "Hệ thống tồn tại đồng thời ở nhiều trạng thái cho đến khi được quan sát hoặc đo đạc.",
-      },
-      {
-        id: "concept-2",
-        title: "Entanglement (Vướng víu lượng tử)",
-        status: "In Progress",
-        statusColor: "amber",
-        description: "Mối liên kết bất biến giữa các hạt lượng tử, bất kể khoảng cách vật lý trong không gian.",
-      },
-      {
-        id: "concept-3",
-        title: "Qubits Architecture (Cấu trúc Qubit)",
-        status: "Queued",
-        statusColor: "neutral",
-        description: "Đơn vị kiến trúc nền tảng cho xử lý thông tin toán học lượng tử nâng cao.",
-      },
-    ],
-    lessonResources: [
-      {
-        id: "res-pdf",
-        type: "pdf",
-        title: "Superposition_Notes.pdf",
-        meta: "Hướng dẫn PDF • 2.4 MB",
-        url: "#resource-pdf",
-      },
-      {
-        id: "res-video",
-        type: "video",
-        title: "Visualizing Qubits.mp4",
-        meta: "Video bài giảng • 14:20",
-        url: "#resource-video",
-      },
-    ],
-    aiInsight: "Hãy hỏi Gia sư Nova mô phỏng Mặt cầu Bloch (Bloch Sphere) nếu bạn muốn có một mô hình 3D trực quan về trạng thái Qubit đa chiều.",
+    activeSyllabus: null,
+    coreConcepts: [],
+    lessonResources: [],
+    aiInsight: "Vui lòng đăng ký khóa học để có Lộ trình AI cá nhân hóa.",
     initialMessages: [
       {
         id: "msg-init",
         sender: "ai",
         timestamp: "Vừa xong",
-        text: "Chào bạn! 👋 Mình là **Nova**, trợ lý AI Co-Pilot đồng hành cùng bạn tại MindNova AI. Hiện tại chúng ta đang học **Module 4: Quantum Computing Fundamentals**.\n\nBạn đã thành thạo khái niệm *Superposition* (Chồng chập lượng tử)! Hôm nay bạn muốn tìm hiểu sâu hơn về toán học của **Quantum Entanglement** (Vướng víu lượng tử) hay muốn chạy thử nghiệm mô phỏng mạch **Qubit Gates**?",
+        text: "Chào bạn! Vui lòng bắt đầu một khóa học để kích hoạt Gia sư AI.",
       },
     ],
   };

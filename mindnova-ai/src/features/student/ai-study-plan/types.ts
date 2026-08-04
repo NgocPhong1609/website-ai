@@ -44,7 +44,7 @@ export interface AiChatMessage {
 }
 
 export interface StudyPlanOverview {
-  activeSyllabus: ActiveSyllabus;
+  activeSyllabus: ActiveSyllabus | null;
   coreConcepts: CoreConcept[];
   lessonResources: LessonResource[];
   aiInsight: string;
