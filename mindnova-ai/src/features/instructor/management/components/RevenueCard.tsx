@@ -1,54 +1,38 @@
 // ─── RevenueCard ──────────────────────────────────────────────────────────────
-// Monthly revenue summary card shown next to the AI banner.
+// Monthly revenue summary card shown next to the AI banner (Minimalist Rule #7)
 
+import Link from "next/link";
 import { TrendUpIcon } from "./icons";
-import {
-  MONTHLY_REVENUE,
-  REVENUE_GROWTH,
-} from "../constants/data";
+import { MONTHLY_REVENUE, REVENUE_GROWTH } from "../constants/data";
 
 export function RevenueCard() {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#4648D4] to-[#6B6BFF] p-6 flex flex-col justify-between h-full min-h-[120px]">
-      {/* Decorative blob */}
-      <div
-        aria-hidden="true"
-        className="absolute -bottom-6 -right-6 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none"
-      />
-
-      <div className="relative z-10 flex flex-col gap-3">
-        <p className="text-white/70 text-xs font-medium uppercase tracking-widest">
-          Tổng doanh thu tháng này
+    <div className="rounded-2xl bg-white border border-gray-200 p-6 flex flex-col justify-between h-full min-h-[120px] shadow-2xs">
+      <div className="flex flex-col gap-2">
+        <p className="text-[#6B7280] text-[11px] font-extrabold uppercase tracking-widest">
+          Doanh thu tháng này
         </p>
 
-        <p className="text-white text-3xl font-extrabold tracking-tight leading-none">
+        <p className="text-[#111827] text-2xl font-black tracking-tight mt-1">
           {MONTHLY_REVENUE}
         </p>
 
-        {/* Growth badge */}
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-400/20 border border-green-400/30 w-fit">
-          <span className="text-green-300">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-100 w-fit mt-1">
+          <span className="text-emerald-600 font-bold">
             <TrendUpIcon />
           </span>
-          <span className="text-green-300 text-xs font-semibold">
-            {REVENUE_GROWTH}
+          <span className="text-emerald-700 text-[12px] font-bold">
+            +{REVENUE_GROWTH}
           </span>
-          <span className="text-white/50 text-xs">so với tháng trước</span>
+          <span className="text-[#6B7280] text-[11px] font-medium">so với tháng trước</span>
         </div>
       </div>
 
-      {/* Subtle decorative bar chart */}
-      <div
-        aria-hidden="true"
-        className="absolute bottom-4 right-4 flex items-end gap-1 opacity-20"
-      >
-        {[40, 60, 45, 75, 55, 90, 70].map((h, i) => (
-          <div
-            key={i}
-            className="w-2 rounded-sm bg-white"
-            style={{ height: `${h * 0.5}px` }}
-          />
-        ))}
+      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between text-xs">
+        <span className="text-[#6B7280] font-medium">Trạng thái: Ổn định</span>
+        <Link href="/instructor/revenue" className="text-[#4F46E5] font-bold hover:underline cursor-pointer">
+          Chi tiết ➔
+        </Link>
       </div>
     </div>
   );

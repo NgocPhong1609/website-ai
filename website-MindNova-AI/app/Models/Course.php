@@ -54,4 +54,15 @@ class Course extends Model
     {
         return $this->hasMany(CourseClass::class);
     }
+
+    public function getTotalLessonsAttribute(): int
+    {
+        return \App\Models\Lesson::whereIn('module_id', $this->modules()->select('id'))->count();
+    }
+
+    public function getDurationHoursAttribute(): float
+    {
+        $totalSeconds = \App\Models\Lesson::whereIn('module_id', $this->modules()->select('id'))->sum('duration_seconds');
+        return round($totalSeconds / 3600, 1);
+    }
 }

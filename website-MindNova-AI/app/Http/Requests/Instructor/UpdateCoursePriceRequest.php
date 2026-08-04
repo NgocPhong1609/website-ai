@@ -14,7 +14,7 @@ class UpdateCoursePriceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'price' => 'required|numeric|min:0|max:9999999.99',
+            'price' => 'required|numeric|min:0|max:100000000',
         ];
     }
 }

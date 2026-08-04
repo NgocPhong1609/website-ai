@@ -1,10 +1,9 @@
-// ─── InstructorTopbar ─────────────────────────────────────────────────────────
-// Top navigation bar — brand name + icon actions on the right.
+"use client";
 
+import React, { useState } from "react";
 import Link from "next/link";
+import { twMerge } from "tailwind-merge";
 import { BellIcon } from "./icons";
-
-// ─── Local icons ──────────────────────────────────────────────────────────────
 
 const NAV_SVG = {
   viewBox: "0 0 24 24",
@@ -26,53 +25,202 @@ function HelpIcon() {
   );
 }
 
-// ─── User Avatar ──────────────────────────────────────────────────────────────
-
 function UserAvatar() {
   return (
-    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#6B6BFF] to-[#4648D4] flex items-center justify-center text-white text-[13px] font-bold shadow-[0_2px_8px_rgba(107,107,255,0.35)] shrink-0 cursor-pointer hover:shadow-[0_4px_14px_rgba(107,107,255,0.45)] transition-all duration-150">
-      N
+    <div className="w-9 h-9 rounded-xl bg-[#4F46E5] hover:bg-[#4338CA] flex items-center justify-center text-white text-[13px] font-extrabold shadow-sm shrink-0 cursor-pointer hover:scale-105 transition-all">
+      MN
     </div>
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+export interface AlertItem {
+  id: string;
+  title: string;
+  desc: string;
+  type: "urgent" | "info" | "security";
+  timestamp: string;
+  actionText?: string;
+  actionHref?: string;
+  read: boolean;
+}
+
+const INITIAL_ALERTS: AlertItem[] = [
+  {
+    id: "alt-1",
+    title: "Thảo luận cần phản hồi (Mentoring SLA)",
+    desc: "3 học viên đặt câu hỏi trong 'UI/UX Design Masterclass' đang chờ phản hồi từ bạn.",
+    type: "urgent",
+    timestamp: "10 phút trước",
+    actionText: "Mở Hòm thư Hỏi đáp ➔",
+    actionHref: "/instructor/discussions",
+    read: false,
+  },
+  {
+    id: "alt-2",
+    title: "Chu kỳ thanh toán học phí hoàn tất",
+    desc: "15,400,000đ từ doanh thu học phí đã hoàn tất thời gian bảo lưu 30 ngày và chuyển vào Số dư Khả dụng.",
+    type: "info",
+    timestamp: "2 giờ trước",
+    actionText: "Xem Doanh thu ➔",
+    actionHref: "/instructor/revenue",
+    read: false,
+  },
+  {
+    id: "alt-3",
+    title: "Bảo mật dữ liệu học viên được kích hoạt",
+    desc: "Hệ thống tự động mã hóa thông tin thanh toán và tài khoản của học viên trong các báo cáo xuất dữ liệu.",
+    type: "security",
+    timestamp: "1 ngày trước",
+    read: true,
+  },
+];
 
 export function InstructorTopbar() {
-  return (
-    <header className="h-14 shrink-0 flex items-center gap-4 px-6 bg-white border-b border-[#F0F0F8]">
-      {/* Brand */}
-      <Link
-        href="/instructor"
-        className="text-[15px] font-extrabold text-[#4648D4] tracking-tight hover:text-[#3D40C0] transition-colors duration-150 shrink-0"
-        aria-label="MindNova AI"
-      >
-        MindNova AI
-      </Link>
+  const [alerts, setAlerts] = useState<AlertItem[]>(INITIAL_ALERTS);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
 
-      {/* Spacer */}
-      <div className="flex-1" />
+  const unreadCount = alerts.filter((a) => !a.read).length;
+
+  const markAllRead = () => {
+    setAlerts((prev) => prev.map((a) => ({ ...a, read: true })));
+  };
+
+  const dismissAlert = (id: string) => {
+    setAlerts((prev) => prev.filter((a) => a.id !== id));
+  };
+
+  return (
+    <header className="h-16 shrink-0 flex items-center justify-between px-6 bg-white border-b border-gray-200 relative z-40 shadow-2xs">
+      {/* Brand & Context */}
+      <div className="flex items-center gap-3">
+        {/* Placeholder for sidebar open button if needed on mobile, removed SidebarOpenButton to avoid missing module error */}
+        <button type="button" className="md:hidden w-9 h-9 rounded-xl flex items-center justify-center border border-gray-200 bg-gray-50 text-[#6B7280]">
+          <svg viewBox="0 0 24 24" width={20} height={20} stroke="currentColor" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <Link
+          href="/instructor"
+          className="text-lg font-black text-[#111827] tracking-tight hover:text-[#4F46E5] transition-colors shrink-0 flex items-center gap-2"
+        >
+          <span>MindNova Instructor</span>
+          <span className="text-[10px] font-extrabold bg-[#EEF2FF] text-[#4F46E5] px-2.5 py-0.5 rounded-full border border-indigo-100">
+            PRO
+          </span>
+        </Link>
+      </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1.5">
-        {/* Bell */}
-        <button
-          type="button"
-          aria-label="Thông báo"
-          className="relative w-9 h-9 rounded-xl flex items-center justify-center text-[#7878A0] hover:bg-[#F4F4FA] hover:text-[#4648D4] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/30"
-        >
-          <BellIcon />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-400 border-2 border-white" />
-        </button>
+      <div className="flex items-center gap-3">
+        
+        {/* Proactive SLA Badge (Clean style per Rule #7) */}
+        {unreadCount > 0 && (
+          <button
+            type="button"
+            onClick={() => setIsAlertOpen((p) => !p)}
+            className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gray-50 text-[#111827] border border-gray-200 hover:bg-[#EEF2FF] hover:text-[#4F46E5] hover:border-indigo-100 text-xs font-bold transition-all cursor-pointer"
+          >
+            <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+            <span>{unreadCount} thảo luận mới</span>
+          </button>
+        )}
 
-        {/* Help */}
-        <button
-          type="button"
-          aria-label="Trợ giúp"
-          className="w-9 h-9 rounded-xl flex items-center justify-center text-[#7878A0] hover:bg-[#F4F4FA] hover:text-[#4648D4] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/30"
-        >
-          <HelpIcon />
-        </button>
+        {/* Bell Button */}
+        <div className="relative">
+          <button
+            type="button"
+            aria-label="Toggle Alert Center"
+            onClick={() => setIsAlertOpen((p) => !p)}
+            className={twMerge(
+              "relative w-9 h-9 rounded-xl flex items-center justify-center border border-gray-200 transition-all cursor-pointer",
+              isAlertOpen ? "bg-[#4F46E5] text-white border-[#4F46E5] shadow-2xs" : "bg-gray-50 text-[#6B7280] hover:bg-[#EEF2FF] hover:text-[#4F46E5] hover:border-indigo-100"
+            )}
+          >
+            <BellIcon />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center border-2 border-white px-0.5">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+
+          {/* Interactive Alert Dropdown */}
+          {isAlertOpen && (
+            <div className="absolute right-0 top-12 w-80 sm:w-96 rounded-2xl bg-white border border-gray-200 shadow-lg p-5 flex flex-col gap-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              
+              <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                <div>
+                  <h3 className="text-sm font-extrabold text-[#111827] flex items-center gap-2">
+                    <span>Thông báo Giảng viên</span>
+                  </h3>
+                  <p className="text-[11px] text-[#6B7280] font-medium mt-0.5">Cập nhật thảo luận & doanh thu</p>
+                </div>
+                {unreadCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={markAllRead}
+                    className="text-xs font-bold text-[#4F46E5] hover:underline whitespace-nowrap cursor-pointer"
+                  >
+                    Đọc tất cả
+                  </button>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2.5 max-h-[380px] overflow-y-auto pr-1">
+                {alerts.length === 0 ? (
+                  <div className="py-8 text-center text-xs font-medium text-[#6B7280]">
+                    Bạn không có thông báo mới nào.
+                  </div>
+                ) : (
+                  alerts.map((item) => (
+                    <div
+                      key={item.id}
+                      className={twMerge(
+                        "p-3.5 rounded-xl border transition-all flex flex-col gap-1.5 relative",
+                        !item.read ? "bg-[#F8FAFC] border-indigo-100 shadow-2xs" : "bg-white border-gray-100 opacity-70"
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="text-xs font-bold text-[#111827] leading-snug">{item.title}</span>
+                        <button
+                          type="button"
+                          onClick={() => dismissAlert(item.id)}
+                          className="text-[#6B7280] hover:text-red-600 font-bold text-xs px-1 cursor-pointer"
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      <p className="text-xs text-[#6B7280] leading-relaxed">{item.desc}</p>
+                      
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-[10px] font-bold text-gray-400">{item.timestamp}</span>
+                        {item.actionText && item.actionHref && (
+                          <Link
+                            href={item.actionHref}
+                            onClick={() => setIsAlertOpen(false)}
+                            className="text-[11px] font-bold text-[#4F46E5] hover:underline flex items-center gap-1"
+                          >
+                            {item.actionText}
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="pt-2 border-t border-gray-100 flex items-center justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsAlertOpen(false)}
+                  className="text-xs font-bold text-[#6B7280] hover:text-[#111827] cursor-pointer"
+                >
+                  Đóng lại
+                </button>
+              </div>
+
+            </div>
+          )}
+        </div>
 
         {/* Avatar */}
         <UserAvatar />

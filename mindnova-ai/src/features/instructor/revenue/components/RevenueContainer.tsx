@@ -1,108 +1,84 @@
 "use client";
 
-import Image from "next/image";
+import React, { useState } from "react";
+import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import {
-  SearchIcon,
-  BellIcon,
-  MessageIcon,
-  SettingsIcon,
-  DownloadIcon,
   WalletIcon,
   TrendUpIcon,
   ClockIcon,
-  UsersIcon,
   InfoCircleIcon,
-  ChevronDownIcon,
-  FilterIcon,
-  BuildingBankIcon,
-  ShieldCheckIcon,
-  CheckCircleIcon,
-  BarChartIcon,
-  BrainIcon,
-  CodeIcon,
-  PieChartIcon,
   SparklesIcon,
-  DollarSignIcon,
 } from "./icons";
-import { useState } from "react";
 import { WithdrawalModal } from "./WithdrawalModal";
 
-// ─── Topbar ───────────────────────────────────────────────────────────────────
-
-function Topbar() {
+function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
   return (
-    <header className="h-16 shrink-0 flex items-center gap-4 px-8 bg-white border-b border-[#F0F0F8]">
-      {/* Search */}
-      <div className="relative flex-1 max-w-[400px]">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#B0B0C8] pointer-events-none">
-          <SearchIcon size={14} />
-        </span>
-        <input
-          id="revenue-search"
-          type="search"
-          placeholder="Tìm kiếm giao dịch, báo cáo..."
-          className="w-full pl-9 pr-4 h-9 rounded-full text-[13px] text-[#1A1A2E] placeholder:text-[#B0B0C8] bg-[#F6F6FB] border border-[#EAEAF4] focus:outline-none focus:border-[#6B6BFF] focus:ring-2 focus:ring-[#6B6BFF]/10 transition-all duration-200"
-        />
-      </div>
+    <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-gray-200 shadow-2xs w-fit">
+      <Link
+        href="/instructor/revenue"
+        className={twMerge(
+          "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
+          active === "overview"
+            ? "bg-[#4F46E5] text-white shadow-sm"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        )}
+      >
+        <span>📊 Tổng quan Doanh thu</span>
+      </Link>
 
-      <div className="flex-1" />
+      <Link
+        href="/instructor/revenue/sales-report"
+        className={twMerge(
+          "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
+          active === "report"
+            ? "bg-[#4F46E5] text-white shadow-sm"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        )}
+      >
+        <span>📈 Báo cáo Bán hàng</span>
+      </Link>
 
-      {/* Icons */}
-      <div className="flex items-center gap-1.5 text-[#7878A0]">
-        <button type="button" className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F4F4FA] hover:text-[#4648D4] transition-all relative">
-          <BellIcon size={17} />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-500" />
-        </button>
-        <button type="button" className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F4F4FA] hover:text-[#4648D4] transition-all">
-          <MessageIcon size={17} />
-        </button>
-        <button type="button" className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F4F4FA] hover:text-[#4648D4] transition-all">
-          <SettingsIcon size={17} />
-        </button>
-      </div>
-
-      {/* Profile */}
-      <div className="flex items-center gap-3 pl-3 border-l border-[#EAEAF4] cursor-pointer group">
-        <div className="flex flex-col items-end leading-tight">
-          <span className="text-[12px] font-bold text-[#1A1A2E] group-hover:text-[#4648D4] transition-colors">Minh Nguyễn</span>
-          <span className="text-[10px] text-[#9090B0]">Professional Instructor</span>
-        </div>
-        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-[#EAEAF4] bg-slate-200">
-          <Image
-            src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop"
-            alt="Avatar"
-            width={32}
-            height={32}
-            className="w-full h-full object-cover"
-            unoptimized
-          />
-        </div>
-      </div>
-    </header>
+      <Link
+        href="/instructor/revenue/history"
+        className={twMerge(
+          "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
+          active === "history"
+            ? "bg-[#4F46E5] text-white shadow-sm"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        )}
+      >
+        <span>📜 Lịch sử Giao dịch</span>
+      </Link>
+    </div>
   );
 }
 
-// ─── Header & Stats ───────────────────────────────────────────────────────────
-
-function PageHeader({ onOpenWithdrawal }: { onOpenWithdrawal: () => void }) {
+function PageHeader({ onOpenWithdrawal, onToggleForecast }: { onOpenWithdrawal: () => void; onToggleForecast: () => void }) {
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div className="flex flex-col">
-        <h1 className="text-[26px] font-extrabold text-[#1A1A2E] tracking-tight">Doanh thu & Tài chính</h1>
-        <p className="text-[13px] text-[#64647A] mt-1">
-          Theo dõi thu nhập và quản lý các giao dịch của bạn tại MindNova.
+      <div>
+        <h1 className="text-xl font-black text-gray-900 tracking-tight">Quản lý Doanh thu &amp; Tài chính</h1>
+        <p className="text-xs text-gray-500 mt-1">
+          Theo dõi số dư khả dụng, doanh thu bán khóa học và các khoản hoa hồng theo tỷ lệ chia sẻ của Giảng viên.
         </p>
       </div>
-      <div className="flex items-center gap-3">
-        <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#DDDDF0] text-[13px] font-bold text-[#464554] bg-white hover:bg-[#F4F4FA] transition-colors">
-          <DownloadIcon /> Xem báo cáo bán hàng
-        </button>
-        <button 
-          onClick={onOpenWithdrawal}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold text-white bg-[#4648D4] hover:bg-[#3D40C0] shadow-[0_4px_14px_rgba(70,72,212,0.3)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.4)] transition-all hover:-translate-y-0.5"
+      <div className="flex items-center gap-2.5 flex-wrap">
+        <button
+          type="button"
+          onClick={onToggleForecast}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-indigo-200 text-xs font-extrabold text-[#4F46E5] bg-indigo-50/80 hover:bg-indigo-100 transition-all cursor-pointer shadow-2xs"
         >
-          <WalletIcon /> Rút tiền ngay
+          <SparklesIcon size={15} />
+          <span>Dự báo Thu nhập AI</span>
+        </button>
+        <button
+          type="button"
+          onClick={onOpenWithdrawal}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-[#4F46E5] hover:bg-[#4338CA] active:scale-95 shadow-sm transition-all cursor-pointer"
+        >
+          <WalletIcon />
+          <span>Yêu cầu Rút tiền</span>
         </button>
       </div>
     </div>
@@ -111,101 +87,140 @@ function PageHeader({ onOpenWithdrawal }: { onOpenWithdrawal: () => void }) {
 
 function StatCards() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-      {/* Total Revenue */}
-      <div className="bg-white rounded-2xl p-5 border border-[#EAEAF4] shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col relative overflow-hidden">
-        <div className="absolute right-4 top-4 text-[#F0F0F8] scale-150 transform translate-x-2 -translate-y-2">
-          <DollarSignIcon size={48} />
-        </div>
-        <span className="text-[12px] font-bold text-[#64647A] uppercase tracking-wide">Tổng doanh thu <span className="normal-case font-medium text-[#9090B0]">(Tháng này)</span></span>
-        <span className="text-[24px] font-extrabold text-[#1A1A2E] mt-2 leading-tight">128.450.000đ</span>
-        <div className="flex items-center gap-1.5 mt-3 text-[11px] font-bold text-[#4648D4]">
-          <TrendUpIcon /> +12.5% so với tháng trước
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-2xs flex flex-col justify-between">
+        <span className="text-xs font-black text-gray-500 uppercase tracking-wide">Tổng Doanh Thu (Tháng này)</span>
+        <span className="text-2xl font-black text-gray-900 mt-2">128,450,000đ</span>
+        <div className="flex items-center gap-1.5 mt-3 text-xs font-extrabold text-emerald-600">
+          <TrendUpIcon />
+          <span>+12.5% so với tháng trước</span>
         </div>
       </div>
 
-      {/* Available Balance */}
-      <div className="bg-white rounded-2xl p-5 border border-[#EAEAF4] shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col">
-        <span className="text-[12px] font-bold text-[#64647A] uppercase tracking-wide">Số dư khả dụng</span>
-        <span className="text-[24px] font-extrabold text-[#4648D4] mt-2 leading-tight">42.180.000đ</span>
-        <div className="flex items-center gap-1.5 mt-3 text-[11px] font-medium text-[#9090B0]">
-          <ClockIcon /> Cập nhật 5 phút trước
+      <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-2xs flex flex-col justify-between">
+        <span className="text-xs font-black text-gray-500 uppercase tracking-wide">Số Dư Khả Dụng Ngay</span>
+        <span className="text-2xl font-black text-[#4F46E5] mt-2">42,180,000đ</span>
+        <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-gray-400">
+          <ClockIcon />
+          <span>Đã qua hạn hoàn tiền 30 ngày</span>
         </div>
       </div>
 
-      {/* New Registrations */}
-      <div className="bg-white rounded-2xl p-5 border border-[#EAEAF4] shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col">
-        <span className="text-[12px] font-bold text-[#64647A] uppercase tracking-wide">Lượt đăng ký mới</span>
-        <span className="text-[24px] font-extrabold text-[#1A1A2E] mt-2 leading-tight">342</span>
-        <div className="flex items-center gap-1.5 mt-3 text-[11px] font-bold text-[#4648D4]">
-          <UsersIcon /> +48 học viên hôm nay
+      <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-2xs flex flex-col justify-between">
+        <span className="text-xs font-black text-gray-500 uppercase tracking-wide">Quỹ Bảo Lãnh (Escrow)</span>
+        <span className="text-2xl font-black text-amber-600 mt-2">15,400,000đ</span>
+        <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-amber-700">
+          <InfoCircleIcon />
+          <span>Tạm giữ chờ cấn trừ đơn mới</span>
         </div>
       </div>
 
-      {/* Refund Rate */}
-      <div className="bg-white rounded-2xl p-5 border border-[#EAEAF4] shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col">
-        <span className="text-[12px] font-bold text-[#64647A] uppercase tracking-wide">Tỷ lệ hoàn tiền</span>
-        <span className="text-[24px] font-extrabold text-[#1A1A2E] mt-2 leading-tight">0.8%</span>
-        <div className="flex items-center gap-1.5 mt-3 text-[11px] font-medium text-[#9090B0]">
-          <InfoCircleIcon /> Thấp hơn mức trung bình 1.2%
+      <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-2xs flex flex-col justify-between">
+        <span className="text-xs font-black text-gray-500 uppercase tracking-wide">Tỷ Lệ Hoàn Tiền (Refund)</span>
+        <span className="text-2xl font-black text-gray-900 mt-2">0.8%</span>
+        <div className="flex items-center gap-1.5 mt-3 text-xs font-extrabold text-emerald-600">
+          <InfoCircleIcon />
+          <span>Cực kỳ an toàn (Trung bình: 2.4%)</span>
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Middle Section (Chart & Transactions) ────────────────────────────────────
+function AIForecastSection({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="p-6 rounded-2xl bg-white border border-indigo-200 shadow-sm flex flex-col gap-5 animate-fadeIn">
+      <div className="flex items-center justify-between border-b border-indigo-100 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-[#4F46E5] flex items-center justify-center text-xl font-black shadow-2xs">
+            🤖
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-black text-gray-900">Dự Báo &amp; Tối Ưu Hóa Thu Nhập AI</h3>
+              <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-800">
+                AI Predictive Engine
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Phóng tác đà tăng trưởng thu nhập dựa trên số lượng ghi danh thực tế và lưu lượng từ liên kết giới thiệu.
+            </p>
+          </div>
+        </div>
+        <button type="button" onClick={onClose} aria-label="Đóng bảng dự báo" className="text-gray-400 hover:text-gray-700 font-black text-base p-1 cursor-pointer">
+          ✕
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 flex flex-col justify-between">
+          <span className="text-xs font-bold text-gray-500 uppercase">Thu Nhập Cuối Tháng Dự Kiến</span>
+          <span className="text-xl font-black text-[#4F46E5] mt-1.5">184,500,000đ</span>
+          <span className="text-xs font-semibold text-emerald-600 mt-1">▲ Dự kiến tăng trưởng +43% so với kỳ trước</span>
+        </div>
+        
+        <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 flex flex-col justify-between">
+          <span className="text-xs font-bold text-gray-500 uppercase">Khóa Học Đứng Đầu Chuyển Đổi</span>
+          <span className="text-base font-black text-gray-900 truncate mt-1.5">AI Mastery for Business</span>
+          <span className="text-xs font-semibold text-gray-500 mt-1">Chiếm 68% doanh số từ nguồn liên kết chia sẻ</span>
+        </div>
+
+        <div className="p-4 rounded-xl bg-indigo-50/60 border border-indigo-200 flex flex-col justify-between gap-3">
+          <div>
+            <span className="text-xs font-black text-indigo-900 uppercase flex items-center gap-1.5">
+              <span>⚡ Đề xuất nhanh từ AI</span>
+            </span>
+            <p className="text-xs font-medium text-indigo-950 mt-1 leading-relaxed">
+              Khóa &ldquo;Machine Learning Basics&rdquo; đang giảm nhẹ 14% lượt xem. Khuyến nghị tạo ngay mã giảm giá 20% hoặc đẩy link giới thiệu.
+            </p>
+          </div>
+          <Link
+            href="/instructor"
+            className="px-4 py-2 rounded-xl bg-[#4F46E5] hover:bg-[#4338CA] text-white text-xs font-extrabold transition-all text-center shadow-2xs"
+          >
+            Tạo Mã Khuyến Mãi Ngay ➔
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function RevenueChart() {
   return (
-    <div className="bg-white rounded-2xl border border-[#EAEAF4] p-6 flex flex-col shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-      <div className="flex items-center justify-between mb-8">
-        <h3 className="text-[15px] font-extrabold text-[#1A1A2E]">Biểu đồ doanh thu</h3>
-        <div className="flex items-center bg-[#F4F4FA] rounded-lg p-1">
-          <button className="px-4 py-1.5 text-[12px] font-bold text-[#464554] bg-white rounded shadow-sm">Tuần</button>
-          <button className="px-4 py-1.5 text-[12px] font-semibold text-[#9090B0] hover:text-[#464554] transition-colors">Tháng</button>
-          <button className="px-4 py-1.5 text-[12px] font-semibold text-[#9090B0] hover:text-[#464554] transition-colors">Năm</button>
+    <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col shadow-2xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h3 className="text-base font-black text-gray-900">Biểu Đồ Nguồn Thu &amp; Tỷ Lệ Chiết Khấu</h3>
+          <p className="text-xs text-gray-500 mt-0.5">Tỷ lệ phân chia tự động tùy thuộc vào nguồn ghi danh của học viên.</p>
+        </div>
+        
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="px-3 py-1 rounded-xl bg-indigo-50 text-[#4F46E5] border border-indigo-200 text-xs font-bold">
+            🚀 Link Giới thiệu Giảng viên: 85% Thực nhận
+          </span>
+          <span className="px-3 py-1 rounded-xl bg-gray-100 text-gray-700 border border-gray-200 text-xs font-bold">
+            🛒 Chợ Khóa học Chung: 70% Thực nhận
+          </span>
         </div>
       </div>
       
-      {/* Mock Chart Area */}
-      <div className="flex-1 min-h-[220px] flex items-end justify-between gap-4 px-2 relative">
-        {/* Grid lines */}
-        <div className="absolute inset-0 flex flex-col justify-between pointer-events-none border-b border-[#F0F0F8]">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="w-full h-px bg-[#F0F0F8] mb-[60px]" />
-          ))}
-        </div>
-        {/* Bars */}
-        {[30, 45, 80, 55, 60, 40, 70].map((h, i) => (
-          <div key={i} className="relative flex flex-col items-center w-full max-w-[32px] group cursor-pointer z-10">
-            <div 
-              className={twMerge("w-full rounded-t-lg transition-all duration-300", i === 2 ? "bg-[#6B6BFF]" : "bg-[#EAEAF4] group-hover:bg-[#C5C6FF]")}
+      {/* Visual Bar Chart Simulation */}
+      <div className="flex-1 min-h-[200px] flex items-end justify-between gap-3 px-2 sm:px-6 pt-6 border-t border-gray-100 relative">
+        {[35, 52, 90, 60, 68, 48, 85].map((h, i) => (
+          <div key={i} className="relative flex flex-col items-center w-full max-w-[42px] group cursor-pointer">
+            <div
+              className={twMerge(
+                "w-full rounded-xl transition-all duration-300",
+                i === 2 || i === 6 ? "bg-[#4F46E5] shadow-sm" : "bg-gray-100 group-hover:bg-indigo-200"
+              )}
               style={{ height: `${h * 2}px` }}
             />
-            <span className={twMerge("mt-3 text-[10px] font-bold", i === 2 ? "text-[#1A1A2E]" : "text-[#9090B0]")}>
-              {["T2", "T3", "Hôm nay", "T5", "T6", "T7", "CN"][i]}
+            <span className={twMerge("mt-2.5 text-xs font-extrabold", i === 2 || i === 6 ? "text-[#4F46E5]" : "text-gray-400")}>
+              {["T2", "T3", "Hnay", "T5", "T6", "T7", "CN"][i]}
             </span>
           </div>
         ))}
-      </div>
-
-      {/* Legend */}
-      <div className="flex items-center gap-8 mt-8 pt-6 border-t border-[#F0F0F8]">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#6B6BFF]" />
-            <span className="text-[11px] font-semibold text-[#9090B0]">Khóa học bán chạy nhất:</span>
-          </div>
-          <span className="text-[13px] font-bold text-[#1A1A2E] ml-4">AI Mastery for Business</span>
-        </div>
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#00A3FF]" />
-            <span className="text-[11px] font-semibold text-[#9090B0]">Nguồn thu chính:</span>
-          </div>
-          <span className="text-[13px] font-bold text-[#1A1A2E] ml-4">Đăng ký trực tiếp (85%)</span>
-        </div>
       </div>
     </div>
   );
@@ -213,178 +228,83 @@ function RevenueChart() {
 
 function RecentTransactions() {
   const items = [
-    { type: "buy", title: "Bán khóa học", detail: "Lê Anh Tuấn • 14:20", amount: "+1.250.000đ", color: "text-emerald-600", bg: "bg-emerald-50", icon: <CheckCircleIcon size={14} /> },
-    { type: "withdraw", title: "Rút tiền (MB Bank)", detail: "Đã hoàn thành • 09:15", amount: "-15.000.000đ", color: "text-[#464554]", bg: "bg-[#F0F0F8]", icon: <BuildingBankIcon size={14} /> },
-    { type: "buy", title: "Bán khóa học", detail: "Nguyễn Trần Nhã...", amount: "+1.250.000đ", color: "text-emerald-600", bg: "bg-emerald-50", icon: <CheckCircleIcon size={14} /> },
+    { id: "TX-921", title: "Khóa AI Mastery", detail: "Link Giới thiệu Giảng viên (Hoa hồng 85%)", amount: "+2,550,000đ", status: "KHẢ DỤNG", color: "text-emerald-700 bg-emerald-50 border-emerald-200" },
+    { id: "TX-918", title: "Khóa ML Basics", detail: "Chợ Khóa học Chung (Hoa hồng 70%)", amount: "+840,000đ", status: "ESCROW TẠM GIỮ", color: "text-amber-700 bg-amber-50 border-amber-200" },
+    { id: "TX-890", title: "Rút tiền về Ngân hàng", detail: "MB Bank - **** 1234", amount: "-15,000,000đ", status: "ĐÃ XỬ LÝ", color: "text-indigo-700 bg-indigo-50 border-indigo-200" },
   ];
 
   return (
-    <div className="bg-white rounded-2xl border border-[#EAEAF4] flex flex-col shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-      <div className="flex items-center justify-between p-6 pb-4">
-        <h3 className="text-[15px] font-extrabold text-[#1A1A2E]">Giao dịch gần đây</h3>
-        <button className="text-[12px] font-bold text-[#6B6BFF] hover:underline">Tất cả</button>
+    <div className="bg-white rounded-2xl border border-gray-200 flex flex-col shadow-2xs overflow-hidden">
+      <div className="flex items-center justify-between p-5 border-b border-gray-100">
+        <h3 className="text-sm font-black text-gray-900">Giao dịch mới cập nhật</h3>
+        <Link href="/instructor/revenue/history" className="text-xs font-extrabold text-[#4F46E5] hover:underline">
+          Xem tất cả ➔
+        </Link>
       </div>
 
-      <div className="flex flex-col px-4 gap-2 flex-1">
-        {items.map((item, i) => (
-          <div key={i} className="flex items-center justify-between p-3 rounded-xl hover:bg-[#FAFAFE] transition-colors cursor-pointer">
-            <div className="flex items-center gap-3">
-              <div className={twMerge("w-9 h-9 rounded-full flex items-center justify-center shrink-0", item.bg, item.color)}>
-                {item.icon}
+      <div className="flex flex-col p-4 gap-2.5 flex-1">
+        {items.map((item) => (
+          <div key={item.id} className="flex items-center justify-between p-3.5 rounded-xl bg-gray-50/70 border border-gray-100 hover:border-gray-200 transition-all">
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-extrabold text-gray-900">{item.title}</span>
+                <span className="text-[11px] font-mono font-bold text-gray-400">({item.id})</span>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[13px] font-bold text-[#1A1A2E]">{item.title}</span>
-                <span className="text-[11px] text-[#9090B0] mt-0.5">{item.detail}</span>
-              </div>
+              <p className="text-xs font-medium text-gray-500 mt-0.5">{item.detail}</p>
             </div>
-            <span className={twMerge("text-[13px] font-extrabold", item.type === "buy" ? "text-[#6B6BFF]" : "text-[#1A1A2E]")}>
-              {item.amount}
-            </span>
+            <div className="text-right">
+              <span className="block text-xs font-black font-mono text-gray-900">{item.amount}</span>
+              <span className={twMerge("inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-md mt-1 uppercase border", item.color)}>
+                {item.status}
+              </span>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="p-4 m-4 mt-2 bg-gradient-to-r from-[#EEF0FF] to-[#E6E8FF] rounded-xl flex items-start gap-3">
-        <div className="text-[#6B6BFF] mt-0.5 shrink-0"><ShieldCheckIcon /></div>
-        <p className="text-[11px] text-[#4648D4] leading-relaxed font-medium">
-          Mọi giao dịch của bạn đều được mã hóa và bảo vệ bởi hệ thống MindNova Secure.
-        </p>
+      <div className="p-3.5 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs font-medium text-gray-500">
+        <span>🔒 Quỹ tạm giữ (Escrow) sẽ tự động cộng vào khả dụng sau 30 ngày.</span>
       </div>
     </div>
   );
 }
-
-// ─── Bottom Section (Course Revenue Table) ────────────────────────────────────
-
-function RevenueByCourseTable() {
-  const courses = [
-    { name: "AI Mastery for Business", icon: <BrainIcon />, color: "bg-[#6B6BFF]", students: 156, rev: "65.400.000đ", conv: 72, status: "TĂNG TRƯỞNG", statusColor: "text-emerald-600 bg-emerald-50" },
-    { name: "Machine Learning Basics", icon: <CodeIcon />, color: "bg-[#00A3FF]", students: 84, rev: "32.800.000đ", conv: 45, status: "ỔN ĐỊNH", statusColor: "text-[#4648D4] bg-[#EEF0FF]" },
-    { name: "Data Visualization Secrets", icon: <PieChartIcon />, color: "bg-[#9D4EDD]", students: 102, rev: "30.250.000đ", conv: 68, status: "TĂNG TRƯỞNG", statusColor: "text-emerald-600 bg-emerald-50" },
-  ];
-
-  return (
-    <div className="bg-white rounded-2xl border border-[#EAEAF4] shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col overflow-hidden">
-      <div className="p-6 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#F0F0F8]">
-        <div>
-          <h3 className="text-[16px] font-extrabold text-[#1A1A2E]">Chi tiết doanh số theo khóa học</h3>
-          <p className="text-[12px] text-[#9090B0] mt-1">Dữ liệu tổng hợp từ 30 ngày qua</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#DDDDF0] text-[12px] font-semibold text-[#464554] bg-white hover:bg-[#F4F4FA]">
-            Tháng này <ChevronDownIcon />
-          </button>
-          <button className="w-9 h-9 flex items-center justify-center rounded-lg border border-[#DDDDF0] text-[#64647A] hover:bg-[#F4F4FA]">
-            <FilterIcon />
-          </button>
-        </div>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[800px]">
-          <thead>
-            <tr className="bg-[#FAFAFE] border-b border-[#F0F0F8]">
-              <th className="px-6 py-4 text-[11px] font-bold text-[#9090B0] uppercase tracking-wide">Tên khóa học</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-[#9090B0] uppercase tracking-wide">Học viên mới</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-[#9090B0] uppercase tracking-wide">Doanh thu</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-[#9090B0] uppercase tracking-wide">Tỷ lệ chuyển đổi</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-[#9090B0] uppercase tracking-wide">Trạng thái</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-[#9090B0] uppercase tracking-wide text-right">Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            {courses.map((c, i) => (
-              <tr key={i} className="border-b border-[#F0F0F8] last:border-0 hover:bg-[#FAFAFE] transition-colors">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className={twMerge("w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm", c.color)}>
-                      {c.icon}
-                    </div>
-                    <span className="text-[13px] font-bold text-[#1A1A2E] truncate max-w-[180px]">{c.name}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-[13px] font-bold text-[#464554]">{c.students}</td>
-                <td className="px-6 py-4 text-[13px] font-extrabold text-[#1A1A2E]">{c.rev}</td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-1.5 rounded-full bg-[#F0F0F8] overflow-hidden min-w-[60px]">
-                      <div className="h-full rounded-full bg-[#6B6BFF]" style={{ width: `${c.conv}%` }} />
-                    </div>
-                    <span className="text-[12px] font-bold text-[#64647A] w-7">{c.conv}%</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={twMerge("px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest", c.statusColor)}>
-                    {c.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <button className="w-8 h-8 inline-flex items-center justify-center rounded-lg text-[#9090B0] hover:text-[#4648D4] hover:bg-[#EEF0FF] transition-colors">
-                    <BarChartIcon />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="px-6 py-4 flex items-center justify-between border-t border-[#F0F0F8]">
-        <span className="text-[12px] font-medium text-[#9090B0]">Hiển thị 3 trên 12 khóa học</span>
-        <div className="flex items-center gap-2">
-          <button className="text-[12px] font-semibold text-[#B0B0C8] cursor-not-allowed px-2 py-1">Trước</button>
-          <button className="text-[12px] font-semibold text-[#4648D4] hover:bg-[#EEF0FF] rounded px-3 py-1 transition-colors">Sau</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Main Container ───────────────────────────────────────────────────────────
 
 export function RevenueContainer() {
   const [isWithdrawalOpen, setIsWithdrawalOpen] = useState(false);
+  const [showForecast, setShowForecast] = useState(true);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAF8FF]">
-      <Topbar />
-
+    <div className="flex flex-col min-h-screen bg-[#F4F4F8] font-sans">
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-[1100px] mx-auto px-8 py-8 flex flex-col gap-8 pb-32">
-          <PageHeader onOpenWithdrawal={() => setIsWithdrawalOpen(true)} />
-          <StatCards />
+        <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col gap-6 pb-16">
           
-          <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6">
+          {/* Top Tabs Navigation */}
+          <RevenueNavigationTabs active="overview" />
+
+          {/* Page Title & Actions */}
+          <PageHeader
+            onOpenWithdrawal={() => setIsWithdrawalOpen(true)}
+            onToggleForecast={() => setShowForecast((prev) => !prev)}
+          />
+
+          {/* KPI Stat Cards */}
+          <StatCards />
+
+          {/* AI Forecast Section */}
+          {showForecast && <AIForecastSection onClose={() => setShowForecast(false)} />}
+          
+          {/* Charts & Transaction Table */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
             <RevenueChart />
             <RecentTransactions />
           </div>
-
-          <RevenueByCourseTable />
         </div>
       </main>
 
-      {/* Footer Links & Floating AI Button */}
-      <div className="fixed bottom-0 right-0 left-0 lg:left-[240px] px-8 py-4 bg-white/80 backdrop-blur border-t border-[#F0F0F8] flex items-center justify-between pointer-events-none z-10">
-        <div className="flex items-center gap-6 pointer-events-auto">
-          <button className="text-[11px] font-semibold text-[#9090B0] hover:text-[#464554]">Chính sách thanh toán</button>
-          <button className="text-[11px] font-semibold text-[#9090B0] hover:text-[#464554]">Điều khoản sử dụng</button>
-          <button className="text-[11px] font-semibold text-[#9090B0] hover:text-[#464554]">Trung tâm trợ giúp</button>
-        </div>
-        
-        <div className="flex items-center gap-6 pointer-events-auto">
-          <span className="text-[11px] text-[#B0B0C8]">© 2024 MindNova AI Education. All rights reserved.</span>
-          <button className="flex items-center gap-2 px-5 py-3 rounded-full text-[13px] font-bold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] transition-all hover:-translate-y-0.5 group">
-            <span className="group-hover:rotate-12 transition-transform"><SparklesIcon size={14} /></span>
-            Phân tích bằng AI
-          </button>
-        </div>
-      </div>
-
-      <WithdrawalModal 
-        isOpen={isWithdrawalOpen} 
-        onClose={() => setIsWithdrawalOpen(false)} 
+      <WithdrawalModal
+        isOpen={isWithdrawalOpen}
+        onClose={() => setIsWithdrawalOpen(false)}
       />
     </div>
   );
 }
-// ─── End of RevenueContainer ──────────────────────────────────────────────────              

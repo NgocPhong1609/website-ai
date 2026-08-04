@@ -1,5 +1,5 @@
-import { CourseManagementContainer } from "@/src/features/instructor/management";
+import { redirect } from "next/navigation";
 
 export default function InstructorPage() {
-  return <CourseManagementContainer />;
+  redirect("/instructor/courses");
 }

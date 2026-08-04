@@ -1,9 +1,6 @@
 "use client";
 
-// ─── ThumbnailUploader ────────────────────────────────────────────────────────
-// Drag-and-drop + click-to-upload area for the course thumbnail image.
-
-import { useRef, useState, useCallback } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
 import { ImageIcon, XIcon } from "./icons";
@@ -28,7 +25,7 @@ export function ThumbnailUploader({
       const url = URL.createObjectURL(file);
       onChange(file, url);
     },
-    [onChange],
+    [onChange]
   );
 
   const handleDrop = useCallback(
@@ -38,7 +35,7 @@ export function ThumbnailUploader({
       const file = e.dataTransfer.files[0];
       if (file) handleFile(file);
     },
-    [handleFile],
+    [handleFile]
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,18 +43,21 @@ export function ThumbnailUploader({
     if (file) handleFile(file);
   };
 
-  // ── Has preview ────────────────────────────────────────────────────────────
   if (preview) {
     return (
-      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border border-[#EAEAF4] group">
-        <Image src={preview} alt="Ảnh bìa khóa học" fill className="object-cover" />
-        {/* Remove overlay */}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border border-gray-200 group shadow-2xs">
+        <Image
+          src={preview}
+          alt="Ảnh bìa khóa học"
+          fill
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
           <button
             type="button"
             onClick={onRemove}
             aria-label="Xóa ảnh bìa"
-            className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center text-red-500 hover:bg-white transition-all duration-150"
+            className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-rose-600 hover:bg-rose-50 transition-all cursor-pointer shadow-sm"
           >
             <XIcon size={15} />
           </button>
@@ -66,37 +66,38 @@ export function ThumbnailUploader({
     );
   }
 
-  // ── Empty / drag zone ──────────────────────────────────────────────────────
   return (
     <button
       type="button"
       id="thumbnail-upload-area"
       aria-label="Tải ảnh bìa lên"
       onClick={() => inputRef.current?.click()}
-      onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setIsDragging(true);
+      }}
       onDragLeave={() => setIsDragging(false)}
       onDrop={handleDrop}
       className={twMerge(
-        "w-full aspect-[4/3] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-3 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/40",
+        "w-full aspect-[4/3] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2.5 transition-all duration-200 cursor-pointer",
         isDragging
-          ? "border-[#6B6BFF] bg-[#6B6BFF]/5 scale-[1.02]"
-          : "border-[#D5D5F0] bg-[#F8F8FF] hover:border-[#6B6BFF] hover:bg-[#F4F4FF]",
+          ? "border-[#4F46E5] bg-indigo-50/50 scale-[1.01]"
+          : "border-gray-300 bg-gray-50/60 hover:border-[#4F46E5] hover:bg-indigo-50/20 shadow-2xs"
       )}
     >
-      {/* Icon */}
       <div
         className={twMerge(
-          "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200",
-          isDragging ? "text-[#6B6BFF]" : "text-[#9090B0]",
+          "w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200",
+          isDragging ? "text-[#4F46E5]" : "text-gray-400"
         )}
       >
-        <ImageIcon size={28} />
+        <ImageIcon size={26} />
       </div>
 
-      <div className="flex flex-col items-center gap-1 text-center">
-        <p className="text-sm font-semibold text-[#4648D4]">Tải ảnh lên</p>
-        <p className="text-[11px] text-[#9090B0] uppercase tracking-wide">
-          JPG, PNG hoặc WEBP
+      <div className="flex flex-col items-center gap-0.5 text-center">
+        <p className="text-xs font-black text-[#4F46E5]">Tải ảnh bìa (4:3)</p>
+        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+          JPG, PNG hoặc WEBP (Tối đa 5MB)
         </p>
       </div>
 

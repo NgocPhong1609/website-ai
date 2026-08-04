@@ -32,6 +32,11 @@ use App\Http\Controllers\Api\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Api\Instructor\CourseController;
 use App\Http\Controllers\Api\Instructor\CourseModuleController;
 use App\Http\Controllers\Api\Instructor\LessonController;
+use App\Http\Controllers\Api\Instructor\MediaController;
+use App\Http\Controllers\Api\Instructor\QuizController;
+use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentController;
+use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscussionController;
+use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNotificationController;
 use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Api\Student\StudyPlanController as StudentStudyPlanController;
 

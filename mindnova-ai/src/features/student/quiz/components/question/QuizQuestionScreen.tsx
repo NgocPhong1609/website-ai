@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useGetStudentQuiz, useSubmitQuiz } from "../../api";
 
 interface QuizQuestionScreenProps {
@@ -19,11 +19,29 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Khóa học" }: Qu
   const [isFinished, setIsFinished] = useState(false);
   const [result, setResult] = useState<any>(null);
 
+  const handleSubmit = useCallback(async (finalAnswers = answers) => {
+    if (!quiz || isSubmitting) return;
+    try {
+      const timeTaken = (quiz.time_limit_minutes * 60) - timeRemaining;
+      const res = await submitQuiz({
+        lessonId,
+        answers: finalAnswers,
+        time_taken_seconds: timeTaken > 0 ? timeTaken : 0
+      });
+      setResult(res);
+      setIsFinished(true);
+    } catch (error) {
+      console.error("Lỗi khi nộp bài:", error);
+      alert("Đã xảy ra lỗi khi nộp bài. Vui lòng thử lại.");
+    }
+  }, [quiz, isSubmitting, timeRemaining, submitQuiz, lessonId, answers]);
+
   // Initialize timer
   useEffect(() => {
     if (quiz && timeRemaining === 0 && !isFinished) {
       setTimeRemaining(quiz.time_limit_minutes * 60);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quiz]);
 
   // Timer countdown
@@ -40,7 +58,7 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Khóa học" }: Qu
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [timeRemaining, isFinished, quiz]);
+  }, [timeRemaining, isFinished, quiz, handleSubmit, answers]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -63,23 +81,6 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Khóa học" }: Qu
   const handlePrevious = () => {
     if (currentIndex > 0) {
       setCurrentIndex(prev => prev - 1);
-    }
-  };
-
-  const handleSubmit = async (finalAnswers = answers) => {
-    if (!quiz || isSubmitting) return;
-    try {
-      const timeTaken = (quiz.time_limit_minutes * 60) - timeRemaining;
-      const res = await submitQuiz({
-        lessonId,
-        answers: finalAnswers,
-        time_taken_seconds: timeTaken > 0 ? timeTaken : 0
-      });
-      setResult(res);
-      setIsFinished(true);
-    } catch (error) {
-      console.error("Lỗi khi nộp bài:", error);
-      alert("Đã xảy ra lỗi khi nộp bài. Vui lòng thử lại.");
     }
   };
 

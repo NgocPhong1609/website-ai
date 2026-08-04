@@ -22,6 +22,10 @@ class StoreLessonRequest extends FormRequest
             'status' => 'required|in:draft,published',
             'temp_media_ids' => 'nullable|array',
             'temp_media_ids.*' => 'integer|exists:lesson_media,id',
+            'quizData' => 'nullable|array',
+            'quizData.time_limit_minutes' => 'nullable|integer',
+            'quizData.passing_score' => 'nullable|numeric',
+            'quizData.questions' => 'nullable|array',
         ];
     }
 }

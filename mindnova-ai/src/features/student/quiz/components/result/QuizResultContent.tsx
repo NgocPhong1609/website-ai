@@ -53,7 +53,7 @@ export function QuizResultContent() {
                 <h3 className="font-bold text-[17px]">AI Insight</h3>
               </div>
               <p className="text-[15px] italic text-gray-600 leading-relaxed">
-                "You understand the main idea of Route Handlers, but you still need more practice with error handling and response status codes."
+                &quot;You understand the main idea of Route Handlers, but you still need more practice with error handling and response status codes.&quot;
               </p>
             </div>
             

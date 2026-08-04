@@ -1,8 +1,8 @@
 // ─── CreateCourseCard ─────────────────────────────────────────────────────────
-// Placeholder card at the end of the grid — prompts instructor to create a new course.
+// Minimalist create course card (Rule #7)
 
-import { PlusIcon } from "./icons";
 import Link from "next/link";
+import { PlusIcon } from "./icons";
 
 export function CreateCourseCard() {
   return (
@@ -10,19 +10,18 @@ export function CreateCourseCard() {
       href="/instructor/create-course"
       id="btn-create-course-card"
       aria-label="Tạo khóa học mới"
-      className="group flex flex-col items-center justify-center gap-3 rounded-2xl bg-white border-2 border-dashed border-[#D5D5F0] text-center p-8 hover:border-[#6B6BFF] hover:bg-[#F4F4FF] active:scale-98 transition-all duration-200 min-h-[200px]"
+      className="group flex flex-col items-center justify-center gap-4 rounded-2xl bg-white border-2 border-dashed border-gray-300 hover:border-[#4F46E5] text-center p-8 hover:bg-[#EEF2FF]/40 active:scale-98 transition-all duration-200 min-h-[220px] cursor-pointer shadow-2xs hover:shadow-sm"
     >
-      {/* Plus icon ring */}
-      <div className="w-14 h-14 rounded-full border-2 border-[#D5D5F0] flex items-center justify-center text-[#B0B0C8] group-hover:border-[#6B6BFF] group-hover:text-[#6B6BFF] group-hover:bg-[#6B6BFF]/10 group-hover:scale-110 transition-all duration-200">
-        <PlusIcon size={24} />
+      <div className="w-12 h-12 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-[#6B7280] group-hover:border-[#4F46E5] group-hover:text-white group-hover:bg-[#4F46E5] group-hover:scale-105 transition-all duration-200 shadow-2xs">
+        <PlusIcon size={22} />
       </div>
 
-      <div className="flex flex-col gap-1">
-        <p className="text-[14px] font-semibold text-[#64647A] group-hover:text-[#4648D4] transition-colors duration-150">
+      <div className="flex flex-col gap-1 max-w-[200px]">
+        <p className="text-[15px] font-bold text-[#111827] group-hover:text-[#4F46E5] transition-colors">
           Tạo khóa học mới
         </p>
-        <p className="text-[12px] text-[#B0B0C8]">
-          Bắt đầu hành trình chia sẻ kiến thức ngay hôm nay.
+        <p className="text-[12px] text-[#6B7280] font-medium leading-relaxed">
+          Bắt đầu hành trình thiết kế bài giảng AI ngay hôm nay.
         </p>
       </div>
     </Link>

@@ -19,7 +19,24 @@ class LessonService
             $data['order'] = $maxOrder + 1;
         }
 
-        return Lesson::create($data);
+        if ($data['type'] === 'article' && isset($data['content'])) {
+            $content = $data['content'] ?? '';
+            $text = strip_tags($content);
+            $wordCount = count(preg_split('~[^\p{L}\p{N}\']+~u', $text, -1, PREG_SPLIT_NO_EMPTY));
+            $imageCount = substr_count($content, '<img ');
+            $data['duration_seconds'] = (int) ceil(($wordCount / 200) * 60) + ($imageCount * 10);
+        } elseif ($data['type'] === 'quiz_module' && isset($data['quizData']['time_limit_minutes'])) {
+            $data['duration_seconds'] = (int) $data['quizData']['time_limit_minutes'] * 60;
+        }
+
+        $lesson = Lesson::create($data);
+
+        // Save Quiz Data if present
+        if ($lesson->type === 'quiz_module' && isset($data['quizData'])) {
+            $this->saveQuizData($lesson, $data['quizData']);
+        }
+
+        return $lesson;
     }
 
     public function updateLesson(Lesson $lesson, array $data): Lesson
@@ -29,12 +46,20 @@ class LessonService
         if ($lesson->type === 'article') {
             $content = $lesson->content ?? '';
             $text = strip_tags($content);
-            // Count words (Unicode friendly)
             $wordCount = count(preg_split('~[^\p{L}\p{N}\']+~u', $text, -1, PREG_SPLIT_NO_EMPTY));
-            $lesson->duration_seconds = (int) ceil(($wordCount / 200) * 60);
+            $imageCount = substr_count($content, '<img ');
+            $lesson->duration_seconds = (int) ceil(($wordCount / 200) * 60) + ($imageCount * 10);
+        } elseif ($lesson->type === 'quiz_module' && isset($data['quizData']['time_limit_minutes'])) {
+            $lesson->duration_seconds = (int) $data['quizData']['time_limit_minutes'] * 60;
         }
 
         $lesson->save();
+
+        // Save Quiz Data if present
+        if ($lesson->type === 'quiz_module' && isset($data['quizData'])) {
+            $this->saveQuizData($lesson, $data['quizData']);
+        }
+
         return $lesson;
     }
 
@@ -52,7 +77,7 @@ class LessonService
     {
         $uuid = \Illuminate\Support\Str::uuid()->toString();
         $extension = $file->getClientOriginalExtension();
-        $filename = "lessons/{$lesson->id}/videos/{$uuid}.{$extension}";
+        $filename = "Courses/{$lesson->course_id}/Modules/{$lesson->module_id}/Lessons/{$lesson->id}/Videos/{$uuid}.{$extension}";
 
         // Upload to Cloudflare R2
         Storage::disk('r2')->put($filename, file_get_contents($file));
@@ -101,10 +126,10 @@ class LessonService
         $extension = $file->getClientOriginalExtension();
 
         $isVideo = str_starts_with($file->getMimeType(), 'video/');
-        $subfolder = $isVideo ? 'videos' : 'images';
+        $subfolder = $isVideo ? 'Videos' : 'Images';
         $mediaType = $isVideo ? 'video' : 'image';
 
-        $filename = "lessons/{$lesson->id}/content/{$subfolder}/{$uuid}.{$extension}";
+        $filename = "Courses/{$lesson->course_id}/Modules/{$lesson->module_id}/Lessons/{$lesson->id}/{$subfolder}/{$uuid}.{$extension}";
 
         // Upload to Cloudflare R2 securely without loading into memory
         Storage::disk('r2')->putFileAs(
@@ -198,16 +223,18 @@ class LessonService
                 ->get();
 
             foreach ($mediaList as $media) {
-                $subfolder = $media->media_type === 'video' ? 'videos' : 'images';
+                $subfolder = $media->media_type === 'video' ? 'Videos' : 'Images';
                 $filename = basename($media->r2_key);
-                $newKey = "lessons/{$lesson->id}/content/{$subfolder}/{$filename}";
+                $newKey = "Courses/{$lesson->course_id}/Modules/{$lesson->module_id}/Lessons/{$lesson->id}/{$subfolder}/{$filename}";
 
                 $oldUrl = Storage::disk('r2')->url($media->r2_key);
                 $newUrl = Storage::disk('r2')->url($newKey);
 
                 // Move the file in Cloudflare R2
-                if (Storage::disk('r2')->exists($media->r2_key)) {
+                try {
                     Storage::disk('r2')->move($media->r2_key, $newKey);
+                } catch (\Exception $e) {
+                    \Log::error("Failed to move temp media: " . $e->getMessage());
                 }
 
                 $media->update([
@@ -241,9 +268,7 @@ class LessonService
             $mediaUrl = Storage::disk('r2')->url($media->r2_key);
             // If the URL is no longer in the HTML content or video_url, delete the file and record
             if (!str_contains($content, $mediaUrl) && !str_contains($videoUrl, $mediaUrl)) {
-                if (Storage::disk('r2')->exists($media->r2_key)) {
-                    Storage::disk('r2')->delete($media->r2_key);
-                }
+                Storage::disk('r2')->delete($media->r2_key);
                 $media->delete();
             }
         }
@@ -264,10 +289,45 @@ class LessonService
         $media = LessonMedia::where('id', $mediaId)->where('is_temp', true)->first();
 
         if ($media) {
-            if (Storage::disk('r2')->exists($media->r2_key)) {
-                Storage::disk('r2')->delete($media->r2_key);
-            }
+            Storage::disk('r2')->delete($media->r2_key);
             $media->delete();
+        }
+    }
+
+    private function saveQuizData(Lesson $lesson, array $quizData): void
+    {
+        $quiz = $lesson->quiz()->firstOrCreate(
+            ['lesson_id' => $lesson->id],
+            [
+                'title' => $quizData['title'] ?? 'Bài kiểm tra',
+            ]
+        );
+
+        $quiz->update([
+            'title' => $quizData['title'] ?? 'Bài kiểm tra',
+            'time_limit_minutes' => $quizData['time_limit_minutes'] ?? 15,
+            'passing_score' => $quizData['passing_score'] ?? 80,
+        ]);
+
+        if (isset($quizData['questions']) && is_array($quizData['questions'])) {
+            // Delete old questions to simplify sync for now
+            $quiz->questions()->delete();
+            
+            foreach ($quizData['questions'] as $index => $qData) {
+                $question = $quiz->questions()->create([
+                    'content' => $qData['content'] ?? '',
+                    'order' => $index + 1,
+                ]);
+
+                if (isset($qData['answers']) && is_array($qData['answers'])) {
+                    foreach ($qData['answers'] as $aData) {
+                        $question->answers()->create([
+                            'content' => $aData['content'] ?? '',
+                            'is_correct' => $aData['is_correct'] ?? false,
+                        ]);
+                    }
+                }
+            }
         }
     }
 }
