@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { axiosClient } from "../../../../shared/lib/axios";
+import type { PracticeOverviewData, QuizGradingResult } from "../types";
 
 export interface StudentAnswer {
   id: string | number;
@@ -22,6 +23,17 @@ export interface StudentQuizData {
   questions: StudentQuestion[];
 }
 
+export function useGetPracticeOverview() {
+  return useQuery({
+    queryKey: ["student", "practice", "overview"],
+    queryFn: async (): Promise<PracticeOverviewData> => {
+      const { data } = await axiosClient.get("/api/student/practice/overview");
+      return data.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 export function useGetStudentQuiz(lessonId: string | number) {
   return useQuery({
     queryKey: ["student", "lesson", lessonId, "quiz"],
@@ -41,9 +53,9 @@ export function useSubmitQuiz() {
       time_taken_seconds,
     }: {
       lessonId: string | number;
-      answers: Record<string, number>;
+      answers: Record<string, number | string>;
       time_taken_seconds: number;
-    }) => {
+    }): Promise<QuizGradingResult> => {
       const { data } = await axiosClient.post(`/api/student/lessons/${lessonId}/quiz/submit`, {
         answers,
         time_taken_seconds,
@@ -52,3 +64,5 @@ export function useSubmitQuiz() {
     },
   });
 }
+
+export * from "../types";

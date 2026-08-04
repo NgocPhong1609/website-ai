@@ -16,6 +16,9 @@ use App\Http\Controllers\Api\Student\OrderController;
 use App\Http\Controllers\Api\Student\AiTutorController;
 use App\Http\Controllers\Api\Student\CourseController as StudentCourseController;
 use App\Http\Controllers\Api\StudentQuizController;
+use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Api\Student\StudyPlanController as StudentStudyPlanController;
+use App\Http\Controllers\Api\Student\PracticeController as StudentPracticeController;
 
 // Nhóm Dùng chung
 use App\Http\Controllers\Api\RealtimeController;
@@ -32,8 +35,11 @@ use App\Http\Controllers\Api\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Api\Instructor\CourseController;
 use App\Http\Controllers\Api\Instructor\CourseModuleController;
 use App\Http\Controllers\Api\Instructor\LessonController;
-use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardController;
-use App\Http\Controllers\Api\Student\StudyPlanController as StudentStudyPlanController;
+use App\Http\Controllers\Api\Instructor\MediaController;
+use App\Http\Controllers\Api\Instructor\QuizController;
+use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentController;
+use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscussionController;
+use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNotificationController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -47,10 +53,13 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 });
 
-// API Student Dashboard & Study Plan (Áp dụng Rate Limiting 5 câu/phút cho chatbox AI để chống spam)
+// API Student Dashboard, Study Plan & Quizzes (Áp dụng cho mọi phiên học viên)
 Route::get('/student/dashboard', [StudentDashboardController::class, 'overview']);
 Route::get('/student/study-plan', [StudentStudyPlanController::class, 'overview']);
+Route::get('/student/practice/overview', [StudentPracticeController::class, 'overview']);
 Route::post('/student/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
+Route::get('/student/lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
+Route::post('/student/lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
 
 // ==========================================
 // 2. NHÓM API PRIVATE (Bắt buộc phải có Bearer Token)
@@ -76,15 +85,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders', [OrderController::class, 'store']);
 
     // ==========================================
-    // 3. NHÓM API HỌC SINH (Student)
+    // 3. NHÓM API HỌC SINH (Student) - Các tiện ích cần xác thực
     // ==========================================
     Route::prefix('student')->group(function () {
-        // TÍNH NĂNG AI TUTOR (PB-025)
-
-
-        // Quiz
-        Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
-        Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
+        // TÍNH NĂNG AI TUTOR & Các tiện ích nâng cao khác
     });
 });
 
