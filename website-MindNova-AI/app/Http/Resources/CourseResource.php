@@ -24,6 +24,8 @@ class CourseResource extends JsonResource
             'level' => $this->level,
             'status' => $this->status,
             'category_id' => $this->category_id,
+            'totalLessons' => $this->total_lessons,
+            'durationHours' => $this->duration_hours,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -5,6 +5,7 @@ import { RichTextEditor } from "../../shared/components/RichTextEditor";
 import { QuizEditor } from "../../create-course/components/QuizEditor";
 import { twMerge } from "tailwind-merge";
 import { useUploadTempMedia, useDeleteTempMedia } from "../api";
+import { getEmbedUrl } from "../../shared/utils/videoHelpers";
 import type { DraftQuizData } from "../../create-course/types";
 
 interface LessonEditModalProps {
@@ -188,13 +189,15 @@ export function LessonEditModal({ lesson, onSave, onClose }: LessonEditModalProp
       finalContent = finalContent.replace(/poster="data:image\/[^"]+"/g, 'poster=""');
 
       const usedTempMediaIds: number[] = [];
+      const deletePromises: Promise<any>[] = [];
       Array.from(tempMediaMap.entries()).forEach(([url, id]) => {
         if (finalContent.includes(url) || (videoUrl && videoUrl.includes(url))) {
           usedTempMediaIds.push(id);
         } else {
-          deleteTempMedia.mutate(id);
+          deletePromises.push(deleteTempMedia.mutateAsync(id).catch(e => console.error(e)));
         }
       });
+      await Promise.all(deletePromises);
 
       const updates: any = {
         title,
@@ -347,12 +350,22 @@ export function LessonEditModal({ lesson, onSave, onClose }: LessonEditModalProp
                 )}
 
                 {videoUrl && !isUploadingVideo && (
-                  <div className="mt-2 w-full bg-black rounded-xl overflow-hidden border border-[#EAEAF4] flex items-center justify-center relative">
-                    <video 
-                      src={videoUrl} 
-                      controls 
-                      className="w-full max-h-[350px] object-contain"
-                    />
+                  <div className="mt-2 w-full bg-black rounded-xl overflow-hidden border border-[#EAEAF4] flex items-center justify-center relative min-h-[300px]">
+                    {getEmbedUrl(videoUrl) ? (
+                      <iframe
+                        src={getEmbedUrl(videoUrl)!}
+                        className="w-full h-[350px]"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <video 
+                        src={videoUrl} 
+                        controls 
+                        className="w-full max-h-[350px] object-contain"
+                      />
+                    )}
                   </div>
                 )}
               </div>

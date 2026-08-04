@@ -1,14 +1,7 @@
 "use client";
 
-// ─── AIOutlineModal ─────────────────────────────────────────────────────────────
-// Modal "Hỗ trợ AI: Lập đề cương thông minh" — nhập chủ đề và sinh đề cương bằng AI.
-// Thiết kế nhất quán với design system của create-course feature.
-
-import { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { twMerge } from "tailwind-merge";
-import { SparklesIcon, XIcon } from "./icons";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface OutlineChapter {
   title: string;
@@ -22,477 +15,290 @@ export interface GeneratedOutline {
 export interface AIOutlineModalProps {
   isOpen: boolean;
   onClose: () => void;
-  /** Callback khi instructor muốn áp dụng đề cương vào khóa học */
   onApply?: (outline: GeneratedOutline) => void;
 }
 
+type WizardStep = "params" | "preview";
 type GenerationState = "idle" | "loading" | "done" | "error";
 
-// ─── Mock generator ───────────────────────────────────────────────────────────
-// Giả lập gọi AI — trong production sẽ thay bằng API call thực.
-
-async function mockGenerateOutline(topic: string): Promise<GeneratedOutline> {
-  await new Promise((r) => setTimeout(r, 1800));
-  return {
-    chapters: [
-      {
-        title: `Giới thiệu về ${topic}`,
-        lessons: ["Tổng quan và lịch sử phát triển", "Cài đặt môi trường", "Bài tập khởi động"],
-      },
-      {
-        title: "Kiến thức nền tảng",
-        lessons: ["Các khái niệm cốt lõi", "Thực hành cơ bản", "Bài kiểm tra nền tảng"],
-      },
-      {
-        title: "Kỹ năng nâng cao",
-        lessons: ["Kỹ thuật chuyên sâu", "Case study thực tế", "Dự án cuối module"],
-      },
-    ],
-  };
-}
-
-// ─── Local icons ──────────────────────────────────────────────────────────────
-
-const SVG_BASE = {
-  viewBox: "0 0 24 24",
-  fill: "none" as const,
-  stroke: "currentColor" as const,
-  strokeLinecap: "round" as const,
-  strokeLinejoin: "round" as const,
-  "aria-hidden": true as const,
-};
-
-function ListIcon() {
-  return (
-    <svg {...SVG_BASE} width={20} height={20} strokeWidth={1.6}>
-      <line x1="8" y1="6" x2="21" y2="6" />
-      <line x1="8" y1="12" x2="21" y2="12" />
-      <line x1="8" y1="18" x2="21" y2="18" />
-      <line x1="3" y1="6" x2="3.01" y2="6" />
-      <line x1="3" y1="12" x2="3.01" y2="12" />
-      <line x1="3" y1="18" x2="3.01" y2="18" />
-    </svg>
-  );
-}
-
-function CheckCircleIcon({ size = 14 }: { size?: number }) {
-  return (
-    <svg {...SVG_BASE} width={size} height={size} strokeWidth={2}>
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-      <polyline points="22 4 12 14.01 9 11.01" />
-    </svg>
-  );
-}
-
-function VideoIcon() {
-  return (
-    <svg {...SVG_BASE} width={11} height={11} strokeWidth={2}>
-      <polygon points="5 3 19 12 5 21 5 3" />
-    </svg>
-  );
-}
-
-function SendIcon() {
-  return (
-    <svg {...SVG_BASE} width={14} height={14} strokeWidth={1.8}>
-      <line x1="22" y1="2" x2="11" y2="13" />
-      <polygon points="22 2 15 22 11 13 2 9 22 2" />
-    </svg>
-  );
-}
-
-// ─── Loading skeleton ─────────────────────────────────────────────────────────
-
-function SkeletonBar({ className }: { className?: string }) {
-  return <div className={twMerge("animate-pulse rounded bg-[#EDEEFF]", className)} />;
-}
-
-function OutlineSkeleton() {
-  const rows = [3, 2, 3] as const;
-  return (
-    <div className="flex flex-col gap-4 p-4" aria-busy aria-label="Đang tạo đề cương...">
-      {rows.map((count, ci) => (
-        <div key={ci} className="rounded-xl border border-[#EAEAF4] bg-[#FAFAFE] p-4 flex flex-col gap-3">
-          <SkeletonBar className="h-4 w-2/5" />
-          <div className="flex flex-col gap-2 pl-2">
-            {Array.from({ length: count }).map((_, li) => (
-              <SkeletonBar key={li} className={`h-3 ${li % 2 === 0 ? "w-3/5" : "w-4/5"}`} />
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ─── Empty state ──────────────────────────────────────────────────────────────
-
-function EmptyState() {
-  return (
-    <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
-      <div className="w-12 h-12 rounded-xl bg-[#F0F0FF] flex items-center justify-center text-[#ADADD8]">
-        <ListIcon />
-      </div>
-      <p className="text-sm text-[#B0B0C8] leading-relaxed max-w-[220px]">
-        Kết quả đề cương sẽ xuất hiện tại đây
-      </p>
-    </div>
-  );
-}
-
-// ─── Error state ──────────────────────────────────────────────────────────────
-
-function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
-  return (
-    <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
-      <span className="text-2xl">⚠️</span>
-      <p className="text-sm text-red-500 font-medium">{message}</p>
-      <button
-        type="button"
-        onClick={onRetry}
-        className="text-[12px] text-[#6B6BFF] underline hover:no-underline transition-all"
-      >
-        Thử lại
-      </button>
-    </div>
-  );
-}
-
-// ─── Chapter card ─────────────────────────────────────────────────────────────
-
-function ChapterCard({ chapter, index }: { chapter: OutlineChapter; index: number }) {
-  return (
-    <div className="rounded-xl border border-[#EAEAF4] bg-white overflow-hidden shadow-[0_1px_6px_rgba(70,72,212,0.05)] hover:shadow-[0_2px_12px_rgba(70,72,212,0.1)] hover:border-[#D5D5FF] transition-all duration-200">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#F5F3FF] to-[#EEF0FF] border-b border-[#EAEAF4]">
-        <div className="w-6 h-6 rounded-lg bg-[#4648D4] flex items-center justify-center text-white text-[11px] font-bold shrink-0">
-          {index + 1}
-        </div>
-        <span className="text-sm font-semibold text-[#1A1A2E] flex-1 min-w-0 truncate">
-          {chapter.title}
-        </span>
-        <span className="text-[11px] text-[#9090B0] shrink-0">
-          {chapter.lessons.length} bài
-        </span>
-      </div>
-
-      {/* Lessons */}
-      <ul className="flex flex-col divide-y divide-[#F4F4FA]">
-        {chapter.lessons.map((lesson, li) => (
-          <li key={li} className="flex items-center gap-2.5 px-4 py-2.5">
-            <span className="w-5 h-5 rounded-md bg-[#EEEEFF] text-[#4648D4] flex items-center justify-center shrink-0">
-              <VideoIcon />
-            </span>
-            <span className="text-[13px] text-[#464554]">
-              {li + 1}. {lesson}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-// ─── Outline result ───────────────────────────────────────────────────────────
-
-interface OutlineResultProps {
-  outline: GeneratedOutline;
-  onApply?: (outline: GeneratedOutline) => void;
-  onRegenerate: () => void;
-}
-
-function OutlineResult({ outline, onApply, onRegenerate }: OutlineResultProps) {
-  const totalLessons = outline.chapters.reduce((acc, c) => acc + c.lessons.length, 0);
-
-  return (
-    <div className="flex flex-col gap-3 p-3">
-      {/* Stats bar */}
-      <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-3 text-[12px] text-[#6B6BFF] font-semibold">
-          <span className="flex items-center gap-1">
-            <CheckCircleIcon size={13} />
-            {outline.chapters.length} chương
-          </span>
-          <span className="w-px h-3 bg-[#D5D5FF]" aria-hidden />
-          <span>{totalLessons} bài giảng</span>
-        </div>
-        <button
-          type="button"
-          onClick={onRegenerate}
-          className="flex items-center gap-1 text-[11px] text-[#9090B0] hover:text-[#6B6BFF] transition-colors duration-150"
-        >
-          <span className="text-base leading-none">↺</span>
-          Tạo lại
-        </button>
-      </div>
-
-      {/* Chapter list */}
-      <div className="flex flex-col gap-2">
-        {outline.chapters.map((chapter, i) => (
-          <ChapterCard key={i} chapter={chapter} index={i} />
-        ))}
-      </div>
-
-      {/* Apply CTA */}
-      {onApply && (
-        <button
-          type="button"
-          onClick={() => onApply(outline)}
-          className="w-full mt-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-white bg-[#4648D4] hover:bg-[#3D40C0] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40"
-        >
-          <CheckCircleIcon size={14} />
-          Áp dụng đề cương này
-        </button>
-      )}
-    </div>
-  );
-}
-
-// ─── Result panel ─────────────────────────────────────────────────────────────
-
-interface ResultPanelProps {
-  state: GenerationState;
-  outline: GeneratedOutline | null;
-  errorMsg: string;
-  onApply?: (outline: GeneratedOutline) => void;
-  onRegenerate: () => void;
-  onGenerate: () => void;
-}
-
-function ResultPanel({ state, outline, errorMsg, onApply, onRegenerate, onGenerate }: ResultPanelProps) {
-  return (
-    <div className="rounded-xl border border-[#EAEAF4] bg-[#FAFAFE] min-h-[160px]">
-      {state === "idle"    && <EmptyState />}
-      {state === "loading" && <OutlineSkeleton />}
-      {state === "error"   && <ErrorState message={errorMsg} onRetry={onGenerate} />}
-      {state === "done" && outline && (
-        <OutlineResult outline={outline} onApply={onApply} onRegenerate={onRegenerate} />
-      )}
-    </div>
-  );
-}
-
-// ─── Modal shell ──────────────────────────────────────────────────────────────
-
 export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps) {
-  const [topic, setTopic] = useState("");
-  const [state, setState] = useState<GenerationState>("idle");
-  const [outline, setOutline] = useState<GeneratedOutline | null>(null);
-  const [errorMsg, setErrorMsg] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [step, setStep] = useState<WizardStep>("params");
+  const [genState, setGenState] = useState<GenerationState>("idle");
 
-  // Auto-focus khi modal mở
-  useEffect(() => {
-    if (isOpen) setTimeout(() => inputRef.current?.focus(), 80);
-  }, [isOpen]);
+  // Step 1: Course Parameters (Section 2.1)
+  const [topic, setTopic] = useState("Fullstack Next.js & Serverless Architectures");
+  const [targetAudience, setTargetAudience] = useState("Intermediate Web Developers & Bootcamp Graduates");
+  const [skillLevel, setSkillLevel] = useState("Intermediate to Advanced");
+  const [methodology, setMethodology] = useState("80/20 Practical Application vs Theoretical Concepts");
 
-  // Đóng bằng Escape
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKeyDown = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [isOpen, onClose]);
+  // Step 2: Generated Skeleton Tree
+  const [outline, setOutline] = useState<GeneratedOutline>({ chapters: [] });
+  const [editingChapterIdx, setEditingChapterIdx] = useState<number | null>(null);
 
-  const handleGenerate = useCallback(async () => {
-    const trimmed = topic.trim();
-    if (!trimmed) { inputRef.current?.focus(); return; }
+  const handleGenerate = useCallback(() => {
+    if (!topic.trim()) return;
+    setGenState("loading");
+    setStep("preview");
 
-    setState("loading");
-    setOutline(null);
-    setErrorMsg("");
+    setTimeout(() => {
+      const is8020 = methodology.includes("80/20");
+      setOutline({
+        chapters: [
+          {
+            title: `Module 1: ${topic} Foundations & Architecture`,
+            lessons: [
+              "Why this technology matters: Core Paradigms (20% Theory)",
+              "Hands-On Lab: Initializing Type-Safe Project Environment (80% Practice)",
+              "Live Build: Setting up OAuth Authentication Providers",
+            ],
+          },
+          {
+            title: "Module 2: Advanced Edge Caching & Database Connectivity",
+            lessons: [
+              "RSC vs Client Component Execution Boundaries",
+              "Hands-On Workshop: Optimistic UI & React Server Actions",
+              "Production Challenge: Connecting PostgreSQL with Drizzle ORM",
+            ],
+          },
+          {
+            title: "Module 3: Enterprise Deployment & Observability",
+            lessons: [
+              "Automated CI/CD Pipelines with GitHub & Vercel",
+              "Real-World Case Study: Diagnosing Memory Leaks in Server Actions",
+              "Final Capstone Project Architecture Submission",
+            ],
+          },
+        ],
+      });
+      setGenState("done");
+    }, 1800);
+  }, [topic, methodology]);
 
-    try {
-      const result = await mockGenerateOutline(trimmed);
-      setOutline(result);
-      setState("done");
-    } catch {
-      setErrorMsg("Đã xảy ra lỗi. Vui lòng thử lại.");
-      setState("error");
+  const handleApply = () => {
+    if (onApply && outline.chapters.length > 0) {
+      onApply(outline);
     }
-  }, [topic]);
+    onClose();
+  };
 
-  const handleRegenerate = useCallback(() => {
-    if (state !== "loading") handleGenerate();
-  }, [state, handleGenerate]);
-
-  const handleApply = useCallback(
-    (result: GeneratedOutline) => { onApply?.(result); onClose(); },
-    [onApply, onClose],
-  );
-
-  const handleReset = useCallback(() => {
-    setTopic("");
-    setState("idle");
-    setOutline(null);
-    setErrorMsg("");
-    setTimeout(() => inputRef.current?.focus(), 50);
-  }, []);
+  const updateLessonTitle = (cIdx: number, lIdx: number, newTitle: string) => {
+    const updated = { ...outline };
+    updated.chapters[cIdx].lessons[lIdx] = newTitle;
+    setOutline(updated);
+  };
 
   if (!isOpen) return null;
 
-  const isLoading  = state === "loading";
-  const canGenerate = !!topic.trim() && !isLoading;
-
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px] animate-fadeIn"
-        onClick={onClose}
-        aria-hidden
-      />
-
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-        <div
-          role="dialog"
-          aria-modal
-          aria-label="Hỗ trợ AI: Lập đề cương thông minh"
-          className="pointer-events-auto w-full max-w-[520px] bg-white rounded-2xl border border-[#EAEAF4] shadow-[0_20px_60px_rgba(70,72,212,0.18),0_8px_24px_rgba(0,0,0,0.08)] flex flex-col overflow-hidden animate-scaleIn"
-        >
-          {/* ── Header ── */}
-          <div className="flex items-start gap-3 px-5 pt-5 pb-4 border-b border-[#F0F0F8]">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6B6BFF] to-[#4648D4] flex items-center justify-center text-white shadow-[0_4px_12px_rgba(70,72,212,0.35)] shrink-0">
-              <SparklesIcon size={16} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white rounded-3xl border border-[#EAEAF4] shadow-[0_25px_80px_rgba(0,0,0,0.25)] max-w-3xl w-full overflow-hidden flex flex-col max-h-[90vh]">
+        
+        {/* Header */}
+        <div className="p-6 bg-gradient-to-r from-[#1A1A2E] to-[#2B2D62] text-white flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-2xl bg-[#6B6BFF] flex items-center justify-center text-xl font-bold shadow-md">
+              🪄
+            </span>
+            <div>
+              <h3 className="text-base font-black text-white">AI Teaching Co-Creator Wizard (Section 2.1)</h3>
+              <p className="text-xs text-indigo-200">Architect structured course curriculums based on domain best practices.</p>
             </div>
-
-            <div className="flex-1 min-w-0">
-              <h2 className="text-[15px] font-extrabold text-[#1A1A2E] leading-snug tracking-tight">
-                Hỗ trợ AI: Lập đề cương thông minh
-              </h2>
-              <p className="text-[12px] text-[#9090B0] mt-0.5 leading-snug">
-                Tạo cấu trúc khóa học chuyên nghiệp chỉ trong vài giây
-              </p>
-            </div>
-
-            <button
-              type="button"
-              aria-label="Đóng"
-              onClick={onClose}
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9090B0] hover:text-[#1A1A2E] hover:bg-[#F4F4FA] transition-all duration-150 shrink-0 focus:outline-none focus:ring-2 focus:ring-[#EAEAF4]"
-            >
-              <XIcon size={15} />
-            </button>
           </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-white font-black text-lg p-2 transition-colors"
+          >
+            ✕
+          </button>
+        </div>
 
-          {/* ── Body ── */}
-          <div className="flex flex-col gap-4 px-5 py-5 overflow-y-auto max-h-[70vh]">
-
-            {/* Topic input */}
-            <div className="flex flex-col gap-2">
-              <label htmlFor="outline-topic" className="text-[13px] font-semibold text-[#464554]">
-                Nhập chủ đề khóa học của bạn:
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ADADC0] pointer-events-none">
-                  <SendIcon />
-                </span>
+        {/* Modal Body */}
+        <div className="p-6 overflow-y-auto flex-1 flex flex-col gap-6">
+          {step === "params" ? (
+            <div className="flex flex-col gap-5 animate-fadeIn">
+              <div>
+                <label className="block text-xs font-black text-[#1A1A2E] uppercase tracking-wide mb-1.5">
+                  Course Topic &amp; Core Domain
+                </label>
                 <input
-                  ref={inputRef}
-                  id="outline-topic"
                   type="text"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && canGenerate && handleGenerate()}
-                  placeholder="Ví dụ: Generative AI Cơ bản"
-                  disabled={isLoading}
-                  className="w-full h-10 pl-8 pr-3 rounded-xl border border-[#DDDDF0] bg-[#FAFAFE] text-sm text-[#1A1A2E] placeholder:text-[#C4C4D8] focus:outline-none focus:border-[#6B6BFF] focus:ring-2 focus:ring-[#6B6BFF]/15 transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 rounded-2xl border-2 border-[#D5D5FF] text-[#1A1A2E] font-bold text-sm focus:outline-none focus:border-[#6B6BFF] transition-all"
                 />
               </div>
-            </div>
 
-            {/* Generate button */}
-            <button
-              type="button"
-              id="btn-generate-outline"
-              onClick={handleGenerate}
-              disabled={!canGenerate}
-              className={twMerge(
-                "w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40",
-                canGenerate
-                  ? "text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-                  : "bg-[#DDDDF5] text-[#ADADD8] cursor-not-allowed",
-              )}
-            >
-              {isLoading ? (
-                <>
-                  <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                  Đang tạo đề cương...
-                </>
-              ) : (
-                <>
-                  <span className={state !== "idle" ? "" : "animate-pulse"}>
-                    <SparklesIcon size={14} />
-                  </span>
-                  Lập đề cương
-                </>
-              )}
-            </button>
-
-            {/* Result area */}
-            <div className="flex flex-col gap-2">
-              {/* Section header */}
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-md bg-[#EEEEFF] text-[#6B6BFF] flex items-center justify-center">
-                  <ListIcon />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-black text-[#1A1A2E] uppercase tracking-wide mb-1.5">
+                    Target Audience
+                  </label>
+                  <input
+                    type="text"
+                    value={targetAudience}
+                    onChange={(e) => setTargetAudience(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-2xl border border-gray-300 text-xs font-bold text-[#1A1A2E] focus:outline-none focus:border-[#6B6BFF]"
+                  />
                 </div>
-                <span className="text-[13px] font-semibold text-[#464554]">
-                  Đề cương gợi ý của AI
-                </span>
+                <div>
+                  <label className="block text-xs font-black text-[#1A1A2E] uppercase tracking-wide mb-1.5">
+                    Target Skill Level
+                  </label>
+                  <select
+                    value={skillLevel}
+                    onChange={(e) => setSkillLevel(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-2xl border border-gray-300 text-xs font-bold text-[#1A1A2E] bg-white focus:outline-none focus:border-[#6B6BFF]"
+                  >
+                    <option value="Beginner">Beginner (Foundations)</option>
+                    <option value="Intermediate to Advanced">Intermediate to Advanced</option>
+                    <option value="Executive Mastery">Executive Mastery</option>
+                  </select>
+                </div>
+              </div>
 
-                {/* Reset hint after done */}
-                {state === "done" && (
+              {/* Teaching Methodology Selection */}
+              <div>
+                <label className="block text-xs font-black text-[#1A1A2E] uppercase tracking-wide mb-2">
+                  Pedagogical Methodology (Architecture Strategy)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
                     type="button"
-                    onClick={handleReset}
-                    className="ml-auto text-[11px] text-[#9090B0] hover:text-[#6B6BFF] transition-colors"
+                    onClick={() => setMethodology("80/20 Practical Application vs Theoretical Concepts")}
+                    className={twMerge(
+                      "p-4 rounded-2xl border-2 text-left transition-all",
+                      methodology.includes("80/20")
+                        ? "border-[#6B6BFF] bg-[#F0F0FF] text-[#4648D4] shadow-xs font-bold"
+                        : "border-gray-200 text-gray-600 hover:border-gray-300"
+                    )}
                   >
-                    Nhập lại chủ đề
+                    <p className="text-xs font-extrabold">🚀 80/20 Practical vs Theory (Recommended)</p>
+                    <p className="text-[11px] font-semibold text-gray-500 mt-1">
+                      Heavily project-based syllabus; 80% hands-on building &amp; capstone application, 20% fundamental core concepts.
+                    </p>
                   </button>
-                )}
-              </div>
 
-              {/* Content states */}
-              <div className="rounded-xl border border-[#EAEAF4] bg-[#FAFAFE] min-h-[160px]">
-                {state === "idle" && (
-                  <EmptyState />
-                )}
-
-                {state === "loading" && (
-                  <div className="p-4">
-                    <OutlineSkeleton />
-                  </div>
-                )}
-
-                {state === "error" && (
-                  <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
-                    <span className="text-2xl">⚠️</span>
-                    <p className="text-sm text-red-500 font-medium">{errorMsg}</p>
-                    <button
-                      type="button"
-                      onClick={handleGenerate}
-                      className="text-[12px] text-[#6B6BFF] underline hover:no-underline transition-all"
-                    >
-                      Thử lại
-                    </button>
-                  </div>
-                )}
-
-                {state === "done" && outline && (
-                  <div className="p-3">
-                    <OutlineResult
-                      outline={outline}
-                      onApply={onApply ? handleApply : undefined}
-                      onRegenerate={handleRegenerate}
-                    />
-                  </div>
-                )}
+                  <button
+                    type="button"
+                    onClick={() => setMethodology("Theoretical Deep-Dive & Academic Analysis")}
+                    className={twMerge(
+                      "p-4 rounded-2xl border-2 text-left transition-all",
+                      !methodology.includes("80/20")
+                        ? "border-[#6B6BFF] bg-[#F0F0FF] text-[#4648D4] shadow-xs font-bold"
+                        : "border-gray-200 text-gray-600 hover:border-gray-300"
+                    )}
+                  >
+                    <p className="text-xs font-extrabold">🎓 Comprehensive Academic Mastery</p>
+                    <p className="text-[11px] font-semibold text-gray-500 mt-1">
+                      Deep theoretical immersion with research case studies, algorithmic proofing, and formal architectural defense.
+                    </p>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            /* Step 2: Skeleton Tree Preview & Edit */
+            <div className="flex flex-col gap-6 animate-fadeIn">
+              {genState === "loading" ? (
+                <div className="py-20 flex flex-col items-center justify-center gap-4 text-center">
+                  <div className="w-10 h-10 border-4 border-[#6B6BFF] border-t-transparent rounded-full animate-spin" />
+                  <h4 className="text-sm font-extrabold text-[#1A1A2E]">Architecting course outline via best practices...</h4>
+                  <p className="text-xs text-gray-500 max-w-sm">
+                    Structuring chapters with a strict 80/20 ratio of practical application to theoretical paradigms.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-extrabold text-emerald-600 px-3 py-1 bg-emerald-50 rounded-xl border border-emerald-200">
+                      ✓ AI Curriculum Tree Generated
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setStep("params")}
+                      className="text-xs font-bold text-indigo-600 hover:underline"
+                    >
+                      ← Modify Parameters
+                    </button>
+                  </div>
+
+                  <p className="text-xs text-gray-500 font-semibold">
+                    Review and manually tweak the generated chapters and lesson titles before populating your live builder.
+                  </p>
+
+                  <div className="flex flex-col gap-4 max-h-[360px] overflow-y-auto pr-2">
+                    {outline.chapters.map((ch, cIdx) => (
+                      <div key={cIdx} className="p-4 rounded-2xl bg-[#F8F9FF] border border-[#EAEAF4] flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                          <h5 className="text-sm font-black text-[#1A1A2E]">
+                            {cIdx + 1}. {ch.title}
+                          </h5>
+                          <span className="text-[10px] font-bold text-gray-400 uppercase">{ch.lessons.length} Lessons</span>
+                        </div>
+
+                        <ul className="flex flex-col gap-2">
+                          {ch.lessons.map((lessonTitle, lIdx) => (
+                            <li key={lIdx} className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-gray-200 shadow-2xs">
+                              <span className="text-xs text-indigo-500 font-extrabold">🔹</span>
+                              <input
+                                type="text"
+                                value={lessonTitle}
+                                onChange={(e) => updateLessonTitle(cIdx, lIdx, e.target.value)}
+                                className="flex-1 text-xs font-bold text-gray-800 bg-transparent focus:outline-none focus:text-[#6B6BFF]"
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 px-6 bg-[#F8F9FF] border-t border-[#EAEAF4] flex items-center justify-between">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-5 py-2 rounded-xl text-xs font-extrabold text-gray-500 hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+
+          {step === "params" ? (
+            <button
+              type="button"
+              onClick={handleGenerate}
+              className="px-6 py-2.5 bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] text-white text-xs font-extrabold rounded-xl shadow-md hover:opacity-95 transition-all flex items-center gap-2"
+            >
+              <span>✨ Generate Curriculum Tree</span>
+            </button>
+          ) : (
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleGenerate}
+                disabled={genState === "loading"}
+                className="px-4 py-2 bg-white border border-[#D5D5FF] text-[#4648D4] text-xs font-extrabold rounded-xl hover:bg-[#FAF8FF] transition-all disabled:opacity-50"
+              >
+                🔄 Regenerate
+              </button>
+              <button
+                type="button"
+                onClick={handleApply}
+                disabled={genState === "loading"}
+                className="px-6 py-2.5 bg-[#1A1A2E] text-white text-xs font-black rounded-xl shadow-md hover:bg-[#4648D4] transition-all disabled:opacity-50"
+              >
+                ✓ Apply To Curriculum Builder
+              </button>
+            </div>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

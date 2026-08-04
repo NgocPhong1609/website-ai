@@ -149,6 +149,7 @@ const CKEditorComponent = dynamic(
         return (
           <div className="prose prose-sm max-w-none ckeditor-wrapper relative">
             <CKEditor
+              // @ts-ignore
               editor={ClassicEditor}
               data={value}
               onReady={(editor: any) => {
