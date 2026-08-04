@@ -2,47 +2,47 @@
 
 import { MonitorIcon, TrashIcon } from "./icons";
 
-// ─── ActiveSessionsCard ────────────────────────────────────────────────────────
-
 function ActiveSessionsCard() {
   return (
-    <div className="flex-1 min-w-0 rounded-2xl border border-[#EAEAF4] bg-white p-5 flex flex-col gap-3">
-      <div className="flex items-start gap-3">
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#EEF0FF] text-[#6B6BFF] shrink-0">
+    <div className="flex-1 min-w-0 rounded-2xl border border-[#EAEAF4] bg-white p-5 flex flex-col gap-3 shadow-2xs hover:shadow-sm transition-shadow duration-200">
+      <div className="flex items-start gap-3.5">
+        <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#EEF2FF] text-[#5052EE] border border-[#5052EE]/15 shrink-0 shadow-2xs">
           <MonitorIcon />
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-[#1A1A2E] leading-snug">Active Sessions</p>
-          <p className="text-xs text-[#84849A] mt-0.5">2 active devices found.</p>
+        <div className="flex-1 min-w-0 space-y-1">
+          <p className="text-xs sm:text-sm font-bold text-[#1A1A2E] leading-snug">Thiết bị đang đăng nhập</p>
+          <p className="text-xs text-[#7878A0] leading-relaxed">Phát hiện 2 thiết bị và trình duyệt đang truy cập hoạt động.</p>
           <button
             type="button"
-            className="mt-2 text-xs font-semibold text-[#6B6BFF] hover:text-[#4648D4] underline underline-offset-2 transition-colors duration-150"
+            onClick={() => alert("Chức năng đang được tích hợp cùng trang quản trị bảo mật!")}
+            className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-[#5052EE] hover:text-[#4648D4] hover:underline underline-offset-2 transition-colors duration-200 focus:outline-none cursor-pointer"
           >
-            Manage Devices
+            <span>Quản lý danh sách thiết bị</span>
+            <span>➔</span>
           </button>
         </div>
       </div>
     </div>
   );
 }
-
-// ─── DeactivateAccountCard ────────────────────────────────────────────────────
 
 function DeactivateAccountCard() {
   return (
-    <div className="flex-1 min-w-0 rounded-2xl border border-red-100 bg-red-50/60 p-5 flex flex-col gap-3">
-      <div className="flex items-start gap-3">
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-red-100 text-red-500 shrink-0">
+    <div className="flex-1 min-w-0 rounded-2xl border border-[#EF4444]/20 bg-gradient-to-br from-[#FEF2F2]/80 via-white to-[#FEF2F2]/50 p-5 flex flex-col gap-3 shadow-2xs hover:shadow-sm transition-shadow duration-200">
+      <div className="flex items-start gap-3.5">
+        <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#FEE2E2] text-[#EF4444] border border-[#EF4444]/20 shrink-0 shadow-2xs">
           <TrashIcon />
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-[#1A1A2E] leading-snug">Deactivate Account</p>
-          <p className="text-xs text-[#84849A] mt-0.5">This action cannot be undone.</p>
+        <div className="flex-1 min-w-0 space-y-1">
+          <p className="text-xs sm:text-sm font-bold text-[#1A1A2E] leading-snug">Vô hiệu hoá Tài khoản</p>
+          <p className="text-xs text-[#7878A0] leading-relaxed">Hành động này sẽ tạm ngưng tiến trình học và không thể tự khôi phục.</p>
           <button
             type="button"
-            className="mt-2 text-xs font-semibold text-red-500 hover:text-red-700 underline underline-offset-2 transition-colors duration-150"
+            onClick={() => alert("Vui lòng liên hệ hỗ trợ viên MindNova để thực hiện quy trình vô hiệu hoá an toàn.")}
+            className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-[#EF4444] hover:text-[#DC2626] hover:underline underline-offset-2 transition-colors duration-200 focus:outline-none cursor-pointer"
           >
-            Start Process
+            <span>Bắt đầu yêu cầu</span>
+            <span>➔</span>
           </button>
         </div>
       </div>
@@ -50,11 +50,9 @@ function DeactivateAccountCard() {
   );
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export function AccountActionsRow() {
   return (
-    <div className="flex flex-col sm:flex-row gap-4">
+    <div className="flex flex-col sm:flex-row gap-6">
       <ActiveSessionsCard />
       <DeactivateAccountCard />
     </div>

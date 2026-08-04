@@ -7,19 +7,22 @@ import { ExploreMoreCard } from "./ExploreMoreCard";
 import { MyCourseCard } from "./MyCourseCard";
 import type { CourseTabStatus, MyCourse } from "../types";
 
+const TAB_LABELS: Record<CourseTabStatus, string> = {
+  All: "Tất cả",
+  "In Progress": "Đang học",
+  Completed: "Đã hoàn tất",
+  "Not Started": "Chưa bắt đầu",
+};
+
 interface FilteredCoursesViewProps {
   initialCourses: MyCourse[];
 }
 
-/**
- * Client Component leaf node (Rule #2) handling interactive debounced status filtering and search.
- * Uses custom useDebounce hook (Rule #1) to optimize performance and prevent re-render thrashing.
- */
 export function FilteredCoursesView({ initialCourses }: FilteredCoursesViewProps) {
   const [activeTab, setActiveTab] = useState<CourseTabStatus>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  // Debounce both status selection and search text by 300ms using our custom hook
+  // Debounce both status selection and search text by 300ms using custom hook
   const debouncedTab = useDebounce(activeTab, 300);
   const debouncedQuery = useDebounce(searchQuery, 300);
 
@@ -39,14 +42,12 @@ export function FilteredCoursesView({ initialCourses }: FilteredCoursesViewProps
   // Filter courses based on debounced tab status and debounced search keyword
   const filteredCourses = useMemo(() => {
     return initialCourses.filter((course) => {
-      // Status match logic
       const matchesStatus =
         debouncedTab === "All" ||
         (debouncedTab === "In Progress" && course.status === "in-progress") ||
         (debouncedTab === "Completed" && course.status === "completed") ||
         (debouncedTab === "Not Started" && course.status === "not-started");
 
-      // Title search match logic
       const matchesSearch =
         debouncedQuery.trim() === "" ||
         course.title.toLowerCase().includes(debouncedQuery.toLowerCase());
@@ -67,18 +68,18 @@ export function FilteredCoursesView({ initialCourses }: FilteredCoursesViewProps
         counts={counts}
       />
 
-      {/* Courses Grid with gentle opacity transition during debounced filtering */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-12 transition-opacity duration-200 ${isFiltering ? "opacity-60" : "opacity-100"}`}>
+      {/* Courses Grid with gentle opacity transition and 3-column layout from lg screen width */}
+      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12 transition-opacity duration-200 ${isFiltering ? "opacity-60" : "opacity-100"}`}>
         {filteredCourses.length > 0 ? (
           filteredCourses.map((course) => (
             <MyCourseCard key={course.id} course={course} />
           ))
         ) : (
-          <div className="col-span-full py-12 px-4 text-center bg-[#F8FAFC] rounded-2xl border border-[#EAEAF4] flex flex-col items-center justify-center">
+          <div className="col-span-full py-12 px-6 text-center bg-white rounded-2xl border border-[#EAEAF4] flex flex-col items-center justify-center shadow-sm">
             <span className="text-4xl mb-3" role="img" aria-label="empty">🔍</span>
-            <h3 className="text-base font-bold text-[#111827] mb-1">No courses matched your filter</h3>
-            <p className="text-xs text-[#6B7280] max-w-sm mb-4">
-              We couldn&apos;t find any courses matching your criteria &quot;{activeTab}&quot;{searchQuery ? ` with title "${searchQuery}"` : ""}.
+            <h3 className="text-base sm:text-lg font-bold text-[#1A1A2E] mb-1.5">Không tìm thấy khoá học phù hợp</h3>
+            <p className="text-xs sm:text-sm font-normal text-[#64647A] max-w-md mb-5 leading-relaxed">
+              Hệ thống không tìm thấy khoá học nào trong mục &quot;{TAB_LABELS[activeTab]}&quot;{searchQuery ? ` với từ khoá "${searchQuery}"` : ""}. Bạn hãy thử thay đổi tiêu chí bộ lọc hoặc tìm kiếm từ khoá khác.
             </p>
             <button
               type="button"
@@ -86,9 +87,9 @@ export function FilteredCoursesView({ initialCourses }: FilteredCoursesViewProps
                 setActiveTab("All");
                 setSearchQuery("");
               }}
-              className="px-4 py-2 rounded-xl bg-[#4F46E5] text-white text-xs font-semibold shadow-sm hover:bg-[#4338CA] transition-colors"
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] text-white text-xs sm:text-sm font-semibold shadow-sm hover:opacity-95 transition-all"
             >
-              Reset Filters
+              Đặt lại bộ lọc
             </button>
           </div>
         )}

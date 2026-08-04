@@ -4,26 +4,28 @@ import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { TRANSACTIONS, FILTER_PERIODS } from "../constants";
 import type { Transaction, TransactionStatus, FilterPeriod } from "../types";
-import { DownloadIcon, FilterIcon, ChevronDownSmall } from "./icons";
+import { FilterIcon, ChevronDownSmall } from "./icons";
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
-const STATUS_STYLES: Record<TransactionStatus, string> = {
-  Paid:     "bg-emerald-50 text-emerald-600 border border-emerald-200",
-  Refunded: "bg-amber-50 text-amber-600 border border-amber-200",
-  Pending:  "bg-blue-50 text-blue-600 border border-blue-200",
-  Failed:   "bg-red-50 text-red-500 border border-red-200",
+const STATUS_STYLES: Record<TransactionStatus, { text: string; clazz: string }> = {
+  Paid:     { text: "Thành công",    clazz: "bg-[#EAF8F5] text-[#0D9488] border border-[#0D9488]/25" },
+  Refunded: { text: "Đã hoàn tiền",  clazz: "bg-[#FFFBEB] text-[#D97706] border border-[#F59E0B]/25" },
+  Pending:  { text: "Đang xử lý",    clazz: "bg-[#EEF2FF] text-[#5052EE] border border-[#5052EE]/25" },
+  Failed:   { text: "Thất bại",      clazz: "bg-[#FEE2E2] text-[#EF4444] border border-[#EF4444]/25" },
 };
 
 function StatusBadge({ status }: { status: TransactionStatus }) {
+  const config = STATUS_STYLES[status] || { text: status, clazz: "bg-gray-100 text-gray-600 border border-gray-200" };
   return (
     <span
       className={twMerge(
-        "inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold leading-none",
-        STATUS_STYLES[status],
+        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold leading-none shadow-2xs",
+        config.clazz,
       )}
     >
-      {status}
+      <span className="w-1.5 h-1.5 rounded-full bg-current inline-block" />
+      {config.text}
     </span>
   );
 }
@@ -31,14 +33,14 @@ function StatusBadge({ status }: { status: TransactionStatus }) {
 // ─── Service Icon ─────────────────────────────────────────────────────────────
 
 const SERVICE_COLORS: Record<Transaction["serviceIcon"], string> = {
-  course:       "bg-violet-100 text-violet-500",
-  subscription: "bg-blue-100 text-blue-500",
-  python:       "bg-amber-100 text-amber-500",
+  course:       "bg-[#EEF2FF] text-[#5052EE] border border-[#5052EE]/20",
+  subscription: "bg-[#EAF8F5] text-[#0D9488] border border-[#0D9488]/20",
+  python:       "bg-[#FFFBEB] text-[#D97706] border border-[#F59E0B]/20",
 };
 
 const SERVICE_LETTERS: Record<Transaction["serviceIcon"], string> = {
   course:       "AI",
-  subscription: "MN",
+  subscription: "Pro",
   python:       "Py",
 };
 
@@ -46,7 +48,7 @@ function ServiceIcon({ icon }: { icon: Transaction["serviceIcon"] }) {
   return (
     <div
       className={twMerge(
-        "w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0",
+        "w-9 h-9 rounded-xl flex items-center justify-center text-xs font-semibold shrink-0 shadow-2xs",
         SERVICE_COLORS[icon],
       )}
     >
@@ -70,13 +72,14 @@ function FilterDropdown({ value, onChange }: FilterDropdownProps) {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#64647A] bg-[#F6F6FB] border border-[#EAEAF4] hover:border-[#6B6BFF]/40 hover:bg-white transition-all duration-150"
+        className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium text-[#1A1A2E] bg-[#F8FAFC] border border-[#E4E6F0] hover:border-[#5052EE]/40 hover:bg-white transition-all duration-150 shadow-2xs cursor-pointer"
       >
-        {value}
+        <span className="text-[#5052EE]">📅</span>
+        <span>{value}</span>
         <ChevronDownSmall />
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1.5 z-10 w-40 rounded-xl bg-white border border-[#EAEAF4] shadow-[0_8px_24px_rgba(0,0,0,0.10)] py-1 overflow-hidden">
+        <div className="absolute right-0 top-full mt-1.5 z-30 w-44 rounded-xl bg-white border border-[#EAEAF4] shadow-[0_8px_24px_rgba(0,0,0,0.12)] py-1 overflow-hidden">
           {FILTER_PERIODS.map((period) => (
             <button
               key={period}
@@ -86,13 +89,14 @@ function FilterDropdown({ value, onChange }: FilterDropdownProps) {
                 setOpen(false);
               }}
               className={twMerge(
-                "w-full text-left px-3.5 py-2 text-xs font-medium transition-colors duration-100",
+                "w-full text-left px-4 py-2.5 text-xs font-medium transition-colors duration-100 flex items-center justify-between cursor-pointer",
                 period === value
-                  ? "text-[#6B6BFF] bg-[#F5F5FF]"
-                  : "text-[#64647A] hover:bg-[#F8F8FC]",
+                  ? "text-[#5052EE] bg-[#F0F2FF] font-semibold"
+                  : "text-[#64647A] hover:bg-[#F8F8FC] hover:text-[#1A1A2E]",
               )}
             >
-              {period}
+              <span>{period}</span>
+              {period === value && <span className="text-[#5052EE]">✓</span>}
             </button>
           ))}
         </div>
@@ -105,59 +109,54 @@ function FilterDropdown({ value, onChange }: FilterDropdownProps) {
 
 function TransactionRow({ tx }: { tx: Transaction }) {
   return (
-    <tr className="group hover:bg-[#F8F8FC] transition-colors duration-100">
+    <tr className="group hover:bg-[#F8FAFC]/80 transition-colors duration-150 border-b border-[#F4F5FB] last:border-b-0">
       {/* Invoice ID */}
-      <td className="px-4 py-3.5 text-xs font-bold text-[#6B6BFF] whitespace-nowrap">
-        {tx.invoiceId}
+      <td className="pl-6 pr-4 py-4 whitespace-nowrap">
+        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#F4F5FD] text-[#5052EE] font-semibold text-xs border border-[#6B6BFF]/20 select-all">
+          {tx.invoiceId}
+        </span>
       </td>
 
       {/* Date */}
-      <td className="px-4 py-3.5 text-xs text-[#84849A] whitespace-nowrap">
+      <td className="px-4 py-4 text-xs font-normal text-[#7878A0] whitespace-nowrap">
         {tx.date}
       </td>
 
-      {/* Service */}
-      <td className="px-4 py-3.5">
-        <div className="flex items-center gap-2.5">
+      {/* Service & Details */}
+      <td className="px-4 py-4 min-w-[240px]">
+        <div className="flex items-center gap-3">
           <ServiceIcon icon={tx.serviceIcon} />
-          <span className="text-xs font-medium text-[#1A1A2E] leading-snug">
-            {tx.service}
-          </span>
+          <div className="space-y-0.5">
+            <p className="text-xs sm:text-sm font-semibold text-[#1A1A2E] leading-snug group-hover:text-[#5052EE] transition-colors">
+              {tx.service}
+            </p>
+            <p className="text-[11px] font-normal text-[#9090B0]">
+              Thanh toán thành công qua thẻ trực tuyến
+            </p>
+          </div>
         </div>
       </td>
 
       {/* Amount */}
-      <td className="px-4 py-3.5 text-xs font-bold text-[#1A1A2E] whitespace-nowrap">
-        ${tx.amount.toFixed(2)}
+      <td className="px-4 py-4 text-xs sm:text-sm font-semibold text-[#1A1A2E] whitespace-nowrap">
+        {tx.amount}
       </td>
 
       {/* Status */}
-      <td className="px-4 py-3.5 whitespace-nowrap">
+      <td className="px-4 py-4 whitespace-nowrap">
         <StatusBadge status={tx.status} />
       </td>
 
-      {/* Actions */}
-      <td className="px-4 py-3.5 whitespace-nowrap">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            className="flex items-center gap-1 text-xs font-semibold text-[#6B6BFF] hover:text-[#4648D4] transition-colors duration-150"
-          >
-            <DownloadIcon size={12} />
-            Invoice
-          </button>
-          {tx.canRefund && (
-            <button
-              type="button"
-              className="text-xs font-semibold text-[#9090B0] hover:text-[#1A1A2E] transition-colors duration-150"
-            >
-              Refund
-            </button>
-          )}
-          {!tx.canRefund && tx.status !== "Refunded" && (
-            <span className="text-xs text-[#C0C0D0]">—</span>
-          )}
-        </div>
+      {/* Actions - Completely removed PDF download button */}
+      <td className="pr-6 pl-4 py-4 whitespace-nowrap text-right">
+        <button
+          type="button"
+          onClick={() => alert(`Yêu cầu hỗ trợ giao dịch ${tx.invoiceId} đã được ghi nhận. Chuyên viên chăm sóc học viên sẽ kết nối qua khung Chat!`)}
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-[#5052EE] bg-[#EEF2FF]/70 hover:bg-[#EEF2FF] hover:text-[#4648D4] border border-[#5052EE]/20 hover:border-[#5052EE]/40 transition-all duration-150 cursor-pointer shadow-2xs"
+          title="Yêu cầu hỗ trợ về khoản học phí này"
+        >
+          <span>💬 Hỗ trợ</span>
+        </button>
       </td>
     </tr>
   );
@@ -166,46 +165,63 @@ function TransactionRow({ tx }: { tx: Transaction }) {
 // ─── Transaction History Table ────────────────────────────────────────────────
 
 export function TransactionHistoryTable() {
-  const [filter, setFilter] = useState<FilterPeriod>("Last 6 Months");
+  const [filter, setFilter] = useState<FilterPeriod>("6 Tháng qua");
   const [showAll, setShowAll] = useState(false);
 
   const displayed = showAll ? TRANSACTIONS : TRANSACTIONS.slice(0, 4);
 
   return (
-    <div className="rounded-2xl bg-white border border-[#EAEAF4] overflow-hidden">
-      {/* Table header */}
-      <div className="flex items-center justify-between gap-3 px-4 py-4 border-b border-[#F4F4FA]">
-        <h2 className="text-sm font-bold text-[#1A1A2E]">Transaction History</h2>
-        <div className="flex items-center gap-2">
+    <div className="rounded-2xl bg-white border border-[#EAEAF4] shadow-2xs overflow-hidden transition-all duration-300 hover:shadow-sm">
+      {/* Table header console */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-5 border-b border-[#EAEAF4] bg-[#F8FAFC]/50">
+        <div>
+          <h2 className="text-base font-semibold text-[#1A1A2E] flex items-center gap-2">
+            <span>Lịch Sử Giao Dịch &amp; Học Phí</span>
+            <span className="text-[11px] font-medium text-[#5052EE] bg-[#EEF2FF] px-2.5 py-0.5 rounded-full border border-[#5052EE]/20">
+              {TRANSACTIONS.length} Giao dịch
+            </span>
+          </h2>
+          <p className="text-xs font-normal text-[#7878A0] mt-1">
+            Theo dõi chi tiết thống kê thanh toán học phí và các khóa học đã đăng ký trong lộ trình của bạn.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
           <FilterDropdown value={filter} onChange={setFilter} />
           <button
             type="button"
-            aria-label="Filter columns"
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9090B0] bg-[#F6F6FB] border border-[#EAEAF4] hover:border-[#6B6BFF]/40 hover:text-[#6B6BFF] hover:bg-white transition-all duration-150"
+            aria-label="Lọc nâng cao"
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-[#7878A0] bg-white border border-[#E4E6F0] hover:border-[#5052EE]/40 hover:text-[#5052EE] transition-all duration-150 shadow-2xs cursor-pointer"
+            title="Bộ lọc nâng cao"
           >
-            <FilterIcon size={13} />
+            <FilterIcon size={15} />
           </button>
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table grid with cohesive proportions */}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px]">
+        <table className="w-full text-left min-w-[760px]">
           <thead>
-            <tr className="border-b border-[#F4F4FA]">
-              {["Invoice ID", "Date", "Course / Service", "Amount", "Status", "Actions"].map(
-                (h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-3 text-left text-[10px] font-extrabold text-[#9090B0] uppercase tracking-widest"
-                  >
-                    {h}
-                  </th>
-                ),
-              )}
+            <tr className="border-b border-[#EAEAF4] bg-[#F8FAFC]">
+              {[
+                { label: "Mã Giao Dịch", clazz: "pl-6 pr-4 py-3 text-left w-[15%]" },
+                { label: "Ngày Giao Dịch", clazz: "px-4 py-3 text-left w-[15%]" },
+                { label: "Khóa Học / Dịch Vụ", clazz: "px-4 py-3 text-left w-[35%]" },
+                { label: "Số Tiền", clazz: "px-4 py-3 text-left w-[15%]" },
+                { label: "Trạng Thái", clazz: "px-4 py-3 text-left w-[10%]" },
+                { label: "Thao Tác", clazz: "pr-6 pl-4 py-3 text-right w-[10%]" },
+              ].map(({ label, clazz }) => (
+                <th
+                  key={label}
+                  className={twMerge("text-xs font-semibold text-[#64647A] tracking-normal select-none", clazz)}
+                >
+                  {label}
+                </th>
+              ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#F8F8FC]">
+          <tbody className="divide-y divide-[#F4F5FB]">
             {displayed.map((tx) => (
               <TransactionRow key={tx.id} tx={tx} />
             ))}
@@ -213,15 +229,15 @@ export function TransactionHistoryTable() {
         </table>
       </div>
 
-      {/* Load more */}
+      {/* Footer view controls */}
       {!showAll && TRANSACTIONS.length > 4 && (
-        <div className="border-t border-[#F4F4FA] py-3 flex justify-center">
+        <div className="border-t border-[#F0F2FA] p-4 flex justify-center bg-[#F8FAFC]/40">
           <button
             type="button"
             onClick={() => setShowAll(true)}
-            className="flex items-center gap-1.5 text-xs font-semibold text-[#6B6BFF] hover:text-[#4648D4] transition-colors duration-150"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-semibold text-[#5052EE] bg-white border border-[#E4E6F0] hover:bg-[#EEF2FF] hover:border-[#5052EE]/30 transition-all duration-200 shadow-2xs cursor-pointer"
           >
-            Load more transactions
+            <span>Xem toàn bộ lịch sử học phí</span>
             <ChevronDownSmall />
           </button>
         </div>

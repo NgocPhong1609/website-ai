@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { twMerge } from "tailwind-merge";
 import { PAYMENT_CARDS } from "../constants";
 import type { PaymentCard } from "../types";
 import { PlusIcon, TrashIcon } from "./icons";
@@ -10,15 +9,15 @@ import { PlusIcon, TrashIcon } from "./icons";
 
 function VisaLogo() {
   return (
-    <div className="flex items-center justify-center w-10 h-6 bg-[#1A1F71] rounded-md shrink-0">
-      <span className="text-white text-[9px] font-black tracking-widest italic">VISA</span>
+    <div className="flex items-center justify-center w-11 h-7 bg-[#1A1F71] rounded-lg shrink-0 shadow-2xs">
+      <span className="text-white text-[10px] font-extrabold tracking-widest italic select-none">VISA</span>
     </div>
   );
 }
 
 function MastercardLogo() {
   return (
-    <div className="flex items-center justify-center w-10 h-6 rounded-md shrink-0 overflow-hidden bg-gray-800">
+    <div className="flex items-center justify-center w-11 h-7 rounded-lg shrink-0 overflow-hidden bg-gray-800 shadow-2xs">
       <div className="relative w-6 h-4">
         <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-[#EB001B] opacity-90" />
         <div className="absolute right-0 top-0 w-4 h-4 rounded-full bg-[#F79E1B] opacity-90" />
@@ -37,30 +36,35 @@ interface CardRowProps {
 
 function CardRow({ card, onRemove }: CardRowProps) {
   return (
-    <div className="flex items-center gap-3 py-2.5 px-1 group">
-      {card.brand === "visa" ? <VisaLogo /> : <MastercardLogo />}
+    <div className="flex items-center justify-between py-3 px-3.5 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC]/60 hover:bg-white hover:border-[#6B6BFF]/30 transition-all duration-200 shadow-2xs group">
+      <div className="flex items-center gap-3.5 min-w-0">
+        {card.brand === "visa" ? <VisaLogo /> : <MastercardLogo />}
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-[#1A1A2E] tracking-wider">
-            •••• {card.last4}
-          </span>
-          {card.isDefault && (
-            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold text-white bg-[#6B6BFF] leading-none">
-              DEFAULT
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs sm:text-sm font-semibold text-[#1A1A2E] tracking-normal">
+              Thẻ {card.brand === "visa" ? "Visa" : "Mastercard"} •••• {card.last4}
             </span>
-          )}
+            {card.isDefault && (
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold text-[#5052EE] bg-[#EEF2FF] border border-[#5052EE]/25 shrink-0">
+                Mặc định
+              </span>
+            )}
+          </div>
+          <p className="text-xs font-normal text-[#64647A]">
+            Hết hạn: <span className="font-medium text-[#4A4A68]">{card.expiry}</span>
+          </p>
         </div>
-        <p className="text-xs text-[#9090B0] mt-0.5">Expires {card.expiry}</p>
       </div>
 
       <button
         type="button"
-        aria-label={`Remove card ending in ${card.last4}`}
+        aria-label={`Xóa thẻ kết thúc bằng số ${card.last4}`}
         onClick={() => onRemove(card.id)}
-        className="opacity-0 group-hover:opacity-100 w-7 h-7 rounded-lg flex items-center justify-center text-[#C0C0D0] hover:text-red-500 hover:bg-red-50 transition-all duration-150"
+        className="w-8 h-8 rounded-lg flex items-center justify-center text-[#A0A0B8] hover:text-[#EF4444] hover:bg-[#FEE2E2]/70 transition-all duration-150 cursor-pointer opacity-75 group-hover:opacity-100"
+        title="Xóa thẻ liên kết"
       >
-        <TrashIcon size={13} />
+        <TrashIcon size={15} />
       </button>
     </div>
   );
@@ -75,28 +79,44 @@ export function PaymentMethodsCard() {
     setCards((prev) => prev.filter((c) => c.id !== id));
   }
 
+  function handleAddNew() {
+    alert("Hệ thống kết nối luồng thêm thẻ an toàn SSL 256-bit qua cổng Napas & Quốc tế.");
+  }
+
   return (
-    <div className="rounded-2xl bg-white border border-[#EAEAF4] p-5 flex flex-col gap-4 min-w-0">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-bold text-[#1A1A2E]">Payment Methods</h2>
+    <div className="rounded-2xl bg-white border border-[#EAEAF4] shadow-2xs p-6 flex flex-col gap-5 transition-all duration-300 hover:shadow-sm">
+      {/* Header with integrated trust badge */}
+      <div className="flex items-center justify-between gap-4 border-b border-[#F0F2FA] pb-4">
+        <div>
+          <h2 className="text-base font-semibold text-[#1A1A2E] flex items-center gap-2">
+            <span>Phương thức Thanh toán</span>
+            <span className="text-[11px] font-medium text-[#10B981] bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#10B981]/20">
+              🛡️ PCI-DSS
+            </span>
+          </h2>
+          <p className="text-xs font-normal text-[#7878A0] mt-1">
+            Quản lý các thẻ tín dụng &amp; ghi nợ liên kết tự động thanh toán học phí.
+          </p>
+        </div>
+
         <button
           type="button"
-          className="flex items-center gap-1.5 text-xs font-semibold text-[#6B6BFF] hover:text-[#4648D4] transition-colors duration-150"
+          onClick={handleAddNew}
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#5052EE] bg-[#EEF2FF] hover:bg-[#E2E6FF] border border-[#5052EE]/20 transition-all duration-150 cursor-pointer shrink-0"
         >
-          <PlusIcon size={12} />
-          Add New
+          <PlusIcon size={13} />
+          <span>Thêm thẻ mới</span>
         </button>
       </div>
 
-      {/* Card list */}
-      <div className="flex flex-col divide-y divide-[#F4F4FA]">
+      {/* Compact, well-spaced card list without vertical void gap */}
+      <div className="flex flex-col gap-3">
         {cards.map((card) => (
           <CardRow key={card.id} card={card} onRemove={handleRemove} />
         ))}
         {cards.length === 0 && (
-          <p className="text-sm text-[#B0B0C8] py-3 text-center">
-            No payment methods added.
+          <p className="text-xs font-normal text-[#9090B0] py-6 text-center bg-[#F8FAFC] rounded-xl border border-[#EAEAF4]">
+            Chưa có thẻ nào được liên kết trong hệ thống của bạn.
           </p>
         )}
       </div>

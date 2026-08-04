@@ -17,9 +17,14 @@ export const axiosClient = axios.create({
   },
 });
 
-// Interceptor tự động thêm token vào header request
+// Interceptor tự động thêm token vào header request & chuẩn hóa đường dẫn tránh lặp /api/api
 axiosClient.interceptors.request.use(
   (config) => {
+    // Tự động loại bỏ tiền tố /api bị lặp khi baseURL trong .env đã chứa sẵn /api
+    if (config.url && config.url.startsWith("/api") && config.baseURL && config.baseURL.replace(/\/+$/, "").endsWith("/api")) {
+      config.url = config.url.slice(4) || "/";
+    }
+
     // Nếu data là FormData, xóa Content-Type để Axios tự động thêm multipart/form-data kèm boundary
     if (config.data instanceof FormData) {
       delete config.headers["Content-Type"];

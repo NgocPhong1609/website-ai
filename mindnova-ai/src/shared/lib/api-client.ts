@@ -12,10 +12,13 @@ export async function apiClient<T>(
     );
   }
 
-  // Ensure base URL correctly targets the Laravel /api prefix even if .env omits it
+  // Ensure base URL correctly targets the Laravel /api prefix without duplicating /api/api
   const baseUrl = API_BASE_URL.replace(/\/+$/, "");
-  const apiPrefix = baseUrl.endsWith("/api") || endpoint.startsWith("/api") ? "" : "/api";
-  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  let cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  if (baseUrl.endsWith("/api") && cleanEndpoint.startsWith("/api")) {
+    cleanEndpoint = cleanEndpoint.slice(4);
+  }
+  const apiPrefix = baseUrl.endsWith("/api") || cleanEndpoint.startsWith("/api") ? "" : "/api";
 
   const url = `${baseUrl}${apiPrefix}${cleanEndpoint}`;
 

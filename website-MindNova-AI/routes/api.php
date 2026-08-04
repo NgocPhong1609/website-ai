@@ -45,12 +45,12 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
-
-    // API Student Dashboard Overview (Hỗ trợ cả guest dev và logged-in sanctum user)
-    Route::get('/student/dashboard', [StudentDashboardController::class, 'overview']);
-    Route::get('/student/study-plan', [StudentStudyPlanController::class, 'overview']);
-    Route::post('/student/study-plan/chat', [StudentStudyPlanController::class, 'chat']);
 });
+
+// API Student Dashboard & Study Plan (Áp dụng Rate Limiting 5 câu/phút cho chatbox AI để chống spam)
+Route::get('/student/dashboard', [StudentDashboardController::class, 'overview']);
+Route::get('/student/study-plan', [StudentStudyPlanController::class, 'overview']);
+Route::post('/student/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
 
 // ==========================================
 // 2. NHÓM API PRIVATE (Bắt buộc phải có Bearer Token)

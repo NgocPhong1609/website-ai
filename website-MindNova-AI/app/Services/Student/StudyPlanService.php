@@ -31,24 +31,24 @@ class StudyPlanService
             'core_concepts' => [
                 [
                     'id' => 'concept-1',
-                    'title' => 'Superposition',
+                    'title' => 'Superposition (Chồng chập lượng tử)',
                     'status' => 'Mastered',
                     'status_color' => 'teal',
-                    'description' => 'System existing in multiple theoretical states simultaneously until observed.',
+                    'description' => 'Hệ thống tồn tại đồng thời ở nhiều trạng thái cho đến khi được quan sát hoặc đo đạc.',
                 ],
                 [
                     'id' => 'concept-2',
-                    'title' => 'Entanglement',
+                    'title' => 'Entanglement (Vướng víu lượng tử)',
                     'status' => 'In Progress',
                     'status_color' => 'amber',
-                    'description' => 'Interconnected particle correlations remaining linked across physical distances.',
+                    'description' => 'Mối liên kết bất biến giữa các hạt lượng tử, bất kể khoảng cách vật lý trong không gian.',
                 ],
                 [
                     'id' => 'concept-3',
-                    'title' => 'Qubits Architecture',
+                    'title' => 'Qubits Architecture (Cấu trúc Qubit)',
                     'status' => 'Queued',
                     'status_color' => 'neutral',
-                    'description' => 'Basic architectural unit of advanced quantum mathematical information.',
+                    'description' => 'Đơn vị kiến trúc nền tảng cho xử lý thông tin toán học lượng tử nâng cao.',
                 ],
             ],
             'lesson_resources' => [
@@ -56,18 +56,18 @@ class StudyPlanService
                     'id' => 'res-pdf',
                     'type' => 'pdf',
                     'title' => 'Superposition_Notes.pdf',
-                    'meta' => 'PDF Guide • 2.4 MB',
+                    'meta' => 'Hướng dẫn PDF • 2.4 MB',
                     'url' => '#resource-pdf',
                 ],
                 [
                     'id' => 'res-video',
                     'type' => 'video',
                     'title' => 'Visualizing Qubits.mp4',
-                    'meta' => 'Video Lesson • 14:20',
+                    'meta' => 'Video bài giảng • 14:20',
                     'url' => '#resource-video',
                 ],
             ],
-            'ai_insight' => 'Ask Nova to illustrate the Bloch Sphere if you need a tangible 3D mental model for multi-dimensional qubit states.',
+            'ai_insight' => 'Hãy hỏi Gia sư Nova mô phỏng Mặt cầu Bloch (Bloch Sphere) nếu bạn muốn có một mô hình 3D trực quan về trạng thái Qubit đa chiều.',
             'initial_messages' => [
                 [
                     'id' => 'msg-init',
@@ -103,23 +103,28 @@ class StudyPlanService
                     'message' => $message,
                 ]);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Table might not exist in dev sandbox; proceed gracefully without halting AI chat
             Log::info('AI Tutor DB logging skipped: ' . $e->getMessage());
         }
 
-        // 2. Generate response using OpenAI API or Gemini API from .env configuration
+        // 2. Generate response using Gemini API first, falling back to OpenAI (gpt-4o-mini) if Gemini fails
         $aiResponseText = null;
-        $openAiKey = env('OPENAI_API_KEY') ?: config('services.openai.key');
-        $geminiKey = env('GEMINI_API_KEY') ?: config('services.gemini.key');
+        $geminiKey = $this->getEnvKey('GEMINI_API_KEY') ?: config('services.gemini.key');
+        $openAiKey = $this->getEnvKey('OPENAI_API_KEY') ?: config('services.openai.key');
 
-        if (!empty($openAiKey)) {
-            $aiResponseText = $this->callOpenAi($openAiKey, $systemPrompt, $message, $history);
-        } elseif (!empty($geminiKey)) {
+        // Bước 1 & 2: Luôn gọi Gemini API đầu tiên. Nếu thành công -> Gửi kết quả về cho học sinh (Bỏ qua GPT).
+        if (!empty($geminiKey)) {
             $aiResponseText = $this->callGemini($geminiKey, $systemPrompt, $message, $history);
         }
 
-        // 3. Fallback intelligence if APIs fail or keys are unassigned in .env
+        // Bước 3 & 4: Nếu Gemini bị lỗi (quá tải 429, sập API, hết lượt request -> trả về null) -> Tự động gọi sang OpenAI (gpt-4o-mini) để chữa cháy.
+        if (empty($aiResponseText) && !empty($openAiKey)) {
+            Log::info('[AI Fallback] Gemini unavailable or exceeded quota; automatically switching to OpenAI (gpt-4o-mini) transparently.');
+            $aiResponseText = $this->callOpenAi($openAiKey, $systemPrompt, $message, $history);
+        }
+
+        // 3. Fallback intelligence or user-friendly status notice if both APIs fail or keys are unassigned
         if (empty($aiResponseText)) {
             $aiResponseText = $this->generateIntelligentFallback($message, $history);
         }
@@ -133,7 +138,7 @@ class StudyPlanService
                     'message' => $aiResponseText,
                 ]);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Silent fallback for DB
         }
 
@@ -146,12 +151,35 @@ class StudyPlanService
     }
 
     /**
-     * Invoke OpenAI Chat Completion API.
+     * Dynamically retrieve an environment key from memory or directly from the .env filesystem.
+     * This ensures developer updates to .env take immediate effect without needing to restart running servers.
+     */
+    private function getEnvKey(string $key): ?string
+    {
+        $val = env($key) ?: getenv($key);
+        if (!empty($val)) {
+            return $val;
+        }
+        $envPath = base_path('.env');
+        if (file_exists($envPath)) {
+            $contents = file_get_contents($envPath);
+            if (preg_match('/^' . preg_quote($key, '/') . '\s*=\s*([^\r\n]+)$/m', $contents, $matches)) {
+                $trimmed = trim(trim($matches[1]), '"\' ');
+                if (!empty($trimmed)) {
+                    return $trimmed;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Invoke OpenAI Chat Completion API (e.g. gpt-4o-mini as emergency backup).
      */
     private function callOpenAi(string $apiKey, string $systemPrompt, string $userMessage, array $history): ?string
     {
         try {
-            $model = env('OPENAI_MODEL', config('services.openai.model', 'gpt-4o-mini'));
+            $model = $this->getEnvKey('OPENAI_MODEL') ?: config('services.openai.model', 'gpt-4o-mini');
             $messages = [
                 ['role' => 'system', 'content' => $systemPrompt],
             ];
@@ -165,7 +193,7 @@ class StudyPlanService
             $messages[] = ['role' => 'user', 'content' => $userMessage];
 
             $response = Http::withToken($apiKey)
-                ->timeout(20)
+                ->timeout(30)
                 ->post('https://api.openai.com/v1/chat/completions', [
                     'model' => $model,
                     'messages' => $messages,
@@ -176,9 +204,9 @@ class StudyPlanService
             if ($response->successful()) {
                 return $response->json('choices.0.message.content');
             }
-            Log::warning('OpenAI API request unsuccessful: ' . $response->body());
+            Log::warning('[AI Fallback] OpenAI API request failed: ' . $response->body());
         } catch (\Exception $e) {
-            Log::warning('OpenAI API invocation failed: ' . $e->getMessage());
+            Log::warning('[AI Fallback] OpenAI API invocation exception: ' . $e->getMessage());
         }
 
         return null;
@@ -190,12 +218,13 @@ class StudyPlanService
     private function callGemini(string $apiKey, string $systemPrompt, string $userMessage, array $history = []): ?string
     {
         try {
-            $model = env('GEMINI_MODEL', config('services.gemini.model', 'gemini-1.5-flash'));
+            $model = $this->getEnvKey('GEMINI_MODEL') ?: config('services.gemini.model', 'gemini-3.5-flash');
+            if (str_contains($model, '1.5')) {
+                $model = 'gemini-3.5-flash';
+            }
             $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
             
             $contents = [];
-            
-            // Build Gemini conversation context
             foreach (array_slice($history, -4) as $item) {
                 $role = ($item['sender'] ?? '') === 'user' ? 'user' : 'model';
                 if (!empty($item['text'])) {
@@ -211,18 +240,25 @@ class StudyPlanService
                 'parts' => [['text' => "System Instruction: {$systemPrompt}\n\nUser Message: {$userMessage}"]]
             ];
 
-            $response = Http::timeout(20)->post($url, [
+            $response = Http::timeout(35)->post($url, [
                 'contents' => $contents
             ]);
 
             if ($response->successful()) {
+                $parts = $response->json('candidates.0.content.parts') ?? [];
+                foreach ($parts as $part) {
+                    if (!empty($part['text'])) {
+                        return $part['text'];
+                    }
+                }
                 return $response->json('candidates.0.content.parts.0.text');
             }
-            Log::warning('Gemini API request unsuccessful: ' . $response->body());
+            Log::warning("[Gemini Fallback] Gemini API request unsuccessful (status {$response->status()}): " . $response->body());
         } catch (\Exception $e) {
-            Log::warning('Gemini API invocation failed: ' . $e->getMessage());
+            Log::warning('[Gemini Fallback] Gemini API exception encountered: ' . $e->getMessage());
         }
 
+        // Return null on any error, 429 quota limit, or exception so the flow automatically falls back to OpenAI
         return null;
     }
 
@@ -231,6 +267,14 @@ class StudyPlanService
      */
     private function generateIntelligentFallback(string $message, array $history = []): string
     {
+        $hasKey = !empty($this->getEnvKey('GEMINI_API_KEY')) || !empty($this->getEnvKey('OPENAI_API_KEY'));
+
+        // If at least one API key was configured in .env but BOTH Gemini and OpenAI failed (or both reached rate limits), display friendly UI guidance
+        if ($hasKey) {
+            return "⏳ **Gia sư Nova hiện đang bận xíu (Hệ thống vừa chạm giới hạn tần suất yêu cầu hoặc đang bảo trì tải cao). Bạn vui lòng chờ khoảng 1 phút rồi quay lại trò chuyện với mình nhé!** 😊";
+        }
+
+        // Local Intelligent Engine demonstration when no API keys are provided in .env
         $query = mb_strtolower($message, 'UTF-8');
 
         // Check for casual greetings or introducing chat
@@ -255,6 +299,8 @@ class StudyPlanService
 
         // Dynamic conversational echo for custom input when offline
         $shortMessage = htmlspecialchars(mb_strimwidth($message, 0, 150, '...', 'UTF-8'));
-        return "### 💡 Phân tích yêu cầu từ bạn\n\nMình đã tiếp nhận thông điệp của bạn: **\"{$shortMessage}\"**\n\nTrong lộ trình của **Module 4: Quantum Computing Fundamentals**, đây là một góc nhìn rất đáng quan tâm. Để tháo gỡ vấn đề này hiệu quả nhất, bạn có thể áp dụng chiến thuật sau:\n\n1. **Phủ định và xác định bản chất:** Đặt ra các câu hỏi cốt lõi để loại bỏ những ràng buộc không liên quan, tập trung thẳng vào logic nền tảng.\n2. **Đối chiếu với kiến thức chủ chốt:** Liên hệ với tài liệu trong phần *Study Inspector* bên phải, đặc biệt là các công thức toán học và biểu đồ mặt cầu.\n3. **Mô hình hóa thực nghiệm:** Nếu bạn đang triển khai giải thuật hoặc phân tích, hãy thử chia nhỏ thành từng bước hàm (function steps) để kiểm chứng giá trị đầu ra.\n\n> [!NOTE]\n> **Chế độ AI Cục bộ (Offline Mode Notification):**\n> Hiện tại hệ thống Backend kiểm tra thấy biến `OPENAI_API_KEY` và `GEMINI_API_KEY` trong file `.env` **đang bị để trống (chưa điền key)**.\n> 👉 Để trợ lý **Nova** trả lời tự do bằng Trí tuệ Nhân tạo thông minh (LLM), trò chuyện theo chính xác từng ý hỏi của bạn một cách không giới hạn, bạn hãy điền API Key thật của OpenAI hoặc Gemini vào file `.env` của Backend nhé!\n\n✨ *Bạn muốn cùng mình đào sâu chi tiết hơn vào khía cạnh nào ở trên?*";
+        $noticeBox = "> [!NOTE]\n> **Chế độ AI Cục bộ (Offline Mode Notification):**\n> Hiện tại hệ thống Backend kiểm tra thấy biến `OPENAI_API_KEY` và `GEMINI_API_KEY` trong file `.env` **đang bị để trống (chưa điền key)**.\n> 👉 Để trợ lý **Nova** trả lời tự do bằng Trí tuệ Nhân tạo thông minh (LLM), trò chuyện theo chính xác từng ý hỏi của bạn một cách không giới hạn, bạn hãy điền API Key thật của OpenAI hoặc Gemini vào file `.env` của Backend nhé!";
+
+        return "### 💡 Phân tích yêu cầu từ bạn\n\nMình đã tiếp nhận thông điệp của bạn: **\"{$shortMessage}\"**\n\nTrong lộ trình của **Module 4: Quantum Computing Fundamentals**, đây là một góc nhìn rất đáng quan tâm. Để tháo gỡ vấn đề này hiệu quả nhất, bạn có thể áp dụng chiến thuật sau:\n\n1. **Phủ định và xác định bản chất:** Đặt ra các câu hỏi cốt lõi để loại bỏ những ràng buộc không liên quan, tập trung thẳng vào logic nền tảng.\n2. **Đối chiếu với kiến thức chủ chốt:** Liên hệ với tài liệu trong phần *Study Inspector* bên phải, đặc biệt là các công thức toán học và biểu đồ mặt cầu.\n3. **Mô hình hóa thực nghiệm:** Nếu bạn đang triển khai giải thuật hoặc phân tích, hãy thử chia nhỏ thành từng bước hàm (function steps) để kiểm chứng giá trị đầu ra.\n\n{$noticeBox}\n\n✨ *Bạn muốn cùng mình đào sâu chi tiết hơn vào khía cạnh nào ở trên?*";
     }
 }

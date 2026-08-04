@@ -2,7 +2,7 @@
 
 export type TransactionStatus = "Paid" | "Refunded" | "Pending" | "Failed";
 
-export type FilterPeriod = "Last 6 Months" | "Last 3 Months" | "Last Year" | "All Time";
+export type FilterPeriod = "6 Tháng qua" | "3 Tháng qua" | "1 Năm qua" | "Tất cả thời gian";
 
 export interface PaymentCard {
   id: string;
@@ -18,7 +18,7 @@ export interface Transaction {
   date: string;
   service: string;
   serviceIcon: "course" | "subscription" | "python";
-  amount: number;
+  amount: number | string;
   status: TransactionStatus;
   canRefund: boolean;
 }

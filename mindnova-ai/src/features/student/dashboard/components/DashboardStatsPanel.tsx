@@ -4,7 +4,7 @@ import { FOCUS_AREAS, OVERALL_PROGRESS, STUDY_STREAK } from "../constants";
 import type { FocusActionKind, FocusArea as FocusAreaType, OverallProgress, StudyStreak } from "../types";
 import { Card, getCardClassName } from "@/src/shared/components";
 
-// ─── Overall Progress ─────────────────────────────────────────────────────────
+// ─── Overall Progress Card (Compact & Cohesive) ─────────────────────────────
 
 function OverallProgressCard({ data }: { data: OverallProgress }) {
   const { percent, delta } = data;
@@ -12,50 +12,45 @@ function OverallProgressCard({ data }: { data: OverallProgress }) {
   return (
     <Link 
       href="/progress" 
-      className={getCardClassName({ 
-        variant: "default", 
-        hoverEffect: "lift", 
-        padding: "md", 
-        className: "group flex flex-col justify-between border-[#E8E8F2] focus:outline-none w-full h-full min-h-[260px]" 
-      })}
+      className="group bg-white rounded-2xl p-5 border border-[#EAEAF4] shadow-sm hover:shadow-md hover:border-[#5052EE]/40 transition-all duration-300 flex flex-col justify-between gap-4 text-decoration-none focus:outline-none"
     >
-      {/* Subtle background glow on hover */}
-      <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#6B6BFF]/5 rounded-full blur-2xl group-hover:bg-[#6B6BFF]/15 transition-all duration-500 pointer-events-none" />
-
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#7878A0] group-hover:text-[#4648D4] transition-colors">
-            Overall Progress ↗
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-[#7878A0] group-hover:text-[#4648D4] transition-colors">
+            Tiến độ tổng thể ↗
           </span>
-          <span className="w-8 h-8 rounded-xl bg-[#EEF2FF] text-[#4648D4] flex items-center justify-center text-base shadow-2xs group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">
+          <div className="w-9 h-9 rounded-xl bg-[#EEF2FF] text-[#5052EE] flex items-center justify-center text-sm font-semibold border border-[#5052EE]/20 shadow-2xs group-hover:scale-105 transition-transform">
             🏆
-          </span>
+          </div>
         </div>
 
-        <div className="flex items-baseline justify-between mb-2">
+        <div className="flex items-baseline justify-between">
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl sm:text-4xl font-bold text-[#1A1A2E] tracking-tight">
+            <span className="text-2xl font-bold text-[#1A1A2E] tracking-tight">
               {percent}%
             </span>
-            <span className="text-xs font-bold text-[#10B981] bg-[#D1FAE5]/80 px-2 py-0.5 rounded-lg border border-[#10B981]/20">
+            <span className="text-xs font-semibold text-[#059669] bg-[#D1FAE5] px-2 py-0.5 rounded-md border border-[#059669]/20">
               ▲ {delta}
             </span>
           </div>
-          <span className="text-xs font-semibold text-[#6B6BFF] bg-[#EEF2FF] px-2.5 py-1 rounded-md">Level 4</span>
+          <span className="text-[11px] font-semibold text-[#5052EE] bg-[#EEF2FF] px-2 py-0.5 rounded-md border border-[#5052EE]/20">
+            Level 4
+          </span>
         </div>
 
-        <p className="text-xs text-[#64647A] font-medium">Consistent daily progression across active courses.</p>
+        <p className="text-xs text-[#64647A] font-normal leading-relaxed line-clamp-1">
+          Tối ưu hóa đều đặn qua từng học phần của khoá học.
+        </p>
       </div>
 
-      {/* Aligned Footer Area matching Study Streak grid height */}
-      <div className="mt-auto pt-4 border-t border-[#F0F0F8]">
-        <div className="flex items-center justify-between text-xs font-semibold text-[#64647A] mb-2">
-          <span>Syllabus Completion</span>
-          <span className="text-[#4648D4]">On Target</span>
+      <div className="pt-3 border-t border-[#F0F0F8] space-y-1.5">
+        <div className="flex items-center justify-between text-xs font-medium text-[#64647A]">
+          <span>Hoàn tất lộ trình</span>
+          <span className="text-[#0D9488] font-semibold">Đạt tiến độ chuẩn</span>
         </div>
-        <div className="h-2.5 rounded-full bg-[#F4F4FA] overflow-hidden p-0.5 border border-[#EAEAF4]/70">
+        <div className="h-2 rounded-full bg-[#F4F4FA] overflow-hidden p-0.5 border border-[#EAEAF4]">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-[#4CD7F6] via-[#6B6BFF] to-[#4648D4] shadow-[0_0_8px_rgba(107,107,255,0.4)] transition-all duration-700"
+            className="h-full rounded-full bg-gradient-to-r from-[#4CD7F6] via-[#6B6BFF] to-[#10B981] shadow-xs transition-all duration-700"
             style={{ width: `${percent}%` }}
             role="progressbar"
             aria-valuenow={percent}
@@ -68,55 +63,59 @@ function OverallProgressCard({ data }: { data: OverallProgress }) {
   );
 }
 
-// ─── Study Streak ─────────────────────────────────────────────────────────────
+// ─── Study Streak Card (Compact & Cohesive) ─────────────────────────────────
 
 function StudyStreakCard({ data }: { data: StudyStreak }) {
   const { days, message } = data;
-  const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
+  const weekDays = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
 
   return (
     <Link 
       href="/progress" 
-      className={getCardClassName({ 
-        variant: "gradient", 
-        hoverEffect: "lift", 
-        padding: "md", 
-        className: "group flex flex-col justify-between bg-gradient-to-br from-[#FFFBEB] via-white to-white border-[#FEF3C7] hover:border-[#F59E0B]/50 focus:outline-none w-full h-full min-h-[260px]" 
-      })}
+      className="group bg-white rounded-2xl p-5 border border-[#EAEAF4] shadow-sm hover:shadow-md hover:border-[#F59E0B]/40 transition-all duration-300 flex flex-col justify-between gap-4 text-decoration-none focus:outline-none"
     >
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#92400E] group-hover:text-[#B45309] transition-colors">
-            Study Streak ↗
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-[#7878A0] group-hover:text-[#D97706] transition-colors">
+            Chuỗi ngày chuyên cần ↗
           </span>
-          <span className="text-2xl group-hover:animate-bounce transition-transform duration-300" role="img" aria-label="fire">🔥</span>
+          <div className="w-9 h-9 rounded-xl bg-[#FFF9ED] text-[#D97706] flex items-center justify-center text-sm font-semibold border border-[#F59E0B]/20 shadow-2xs group-hover:scale-105 transition-transform">
+            🔥
+          </div>
         </div>
 
-        <div className="flex items-baseline gap-2 mb-2">
-          <span className="text-3xl sm:text-4xl font-bold text-[#1A1A2E] tracking-tight">
-            {days} days
-          </span>
-          <span className="text-[11px] font-bold text-[#D97706] bg-[#FEF3C7] px-2.5 py-1 rounded-full border border-[#D97706]/25 shadow-2xs">
-            STREAK ACTIVE
+        <div className="flex items-baseline justify-between">
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold text-[#1A1A2E] tracking-tight">
+              {days} Ngày
+            </span>
+            <span className="text-[11px] font-semibold text-[#D97706] bg-[#FFF3DF] px-2 py-0.5 rounded-md border border-[#D97706]/20">
+              Đang duy trì
+            </span>
+          </div>
+          <span className="text-[11px] font-semibold text-[#10B981] bg-[#D1FAE5] px-2 py-0.5 rounded-md">
+            Active
           </span>
         </div>
 
-        <p className="text-xs text-[#64647A] font-medium">{message}</p>
+        <p className="text-xs text-[#64647A] font-normal leading-relaxed line-clamp-1">
+          Chỉ còn 2 ngày nữa để mở khóa huy chương Bạch Kim.
+        </p>
       </div>
-      
-      {/* Rewarding Weekday Indicator */}
-      <div className="grid grid-cols-7 gap-1.5 pt-4 border-t border-[#FEF3C7]/70 mt-auto">
+
+      {/* Rewarding Weekday Indicator (Compact & Soothing) */}
+      <div className="grid grid-cols-7 gap-1.5 pt-3 border-t border-[#F0F0F8] mt-auto">
         {weekDays.map((d, i) => {
           const isDone = i < 5;
           const isToday = i === 4;
           return (
-            <div key={i} className="flex flex-col items-center gap-1.5 group/day">
-              <span className="text-[10px] font-bold text-[#7878A0]">{d}</span>
+            <div key={i} className="flex flex-col items-center gap-1 group/day">
+              <span className="text-[10px] font-medium text-[#7878A0]">{d}</span>
               <div className={twMerge(
-                "w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold transition-all duration-200 shadow-2xs group-hover/day:scale-110",
+                "w-6 h-6 rounded-lg flex items-center justify-center text-[11px] font-semibold transition-all duration-200 shadow-2xs",
                 isDone 
-                  ? "bg-gradient-to-tr from-[#F59E0B] to-[#D97706] text-white shadow-sm shadow-[#D97706]/30" 
-                  : "bg-[#F4F4FA] text-[#9090B0] border border-[#EAEAF4]",
+                  ? "bg-gradient-to-tr from-[#F59E0B] to-[#D97706] text-white shadow-2xs" 
+                  : "bg-[#F8FAFC] text-[#A0A0C0] border border-[#EAEAF4]",
                 isToday && "ring-2 ring-[#F59E0B] ring-offset-1 scale-105"
               )}>
                 {isDone ? "✓" : "•"}
@@ -129,53 +128,59 @@ function StudyStreakCard({ data }: { data: StudyStreak }) {
   );
 }
 
-// ─── Focus Areas ──────────────────────────────────────────────────────────────
+// ─── Focus Areas Card (Compact & Cohesive) ──────────────────────────────────
 
 const ACTION_STYLES: Record<FocusActionKind, string> = {
-  review:   "bg-[#FEE2E2]/90 text-[#DC2626] hover:bg-[#DC2626] hover:text-white border border-[#DC2626]/30",
-  practice: "bg-[#CCFBF1]/90 text-[#0D9488] hover:bg-[#0D9488] hover:text-white border border-[#0D9488]/30",
+  review:   "bg-[#EEF2FF] text-[#5052EE] hover:bg-[#5052EE] hover:text-white border border-[#5052EE]/30",
+  practice: "bg-[#EAF8F5] text-[#0D9488] hover:bg-[#0D9488] hover:text-white border border-[#0D9488]/30",
 };
 
 function FocusAreaRow({ area }: { area: FocusAreaType }) {
   const targetHref = area.action === "review" ? "/practice" : "/practice/quiz";
 
   return (
-    <div className="group/row flex items-center justify-between gap-3 p-2 rounded-xl hover:bg-[#F6F6FB] transition-colors border border-transparent hover:border-[#EAEAF4]">
+    <div className="group/row flex items-center justify-between gap-2 p-2 rounded-xl hover:bg-[#F8FAFC] transition-colors border border-transparent hover:border-[#EAEAF4]">
       <div className="flex-1 min-w-0">
-        <p className="text-xs sm:text-sm font-bold text-[#1A1A2E] truncate group-hover/row:text-[#4648D4] transition-colors">{area.topic}</p>
+        <p className="text-xs sm:text-sm font-bold text-[#1A1A2E] truncate group-hover/row:text-[#4648D4] transition-colors">
+          {area.topic === "React Server Components (RSC)" ? "React Server Components & SSR" : area.topic}
+        </p>
         <div className="flex items-center gap-1.5 mt-0.5">
-          <span className={`w-2 h-2 rounded-full ${area.accuracy < 60 ? "bg-red-500 animate-pulse" : "bg-[#10B981]"}`} />
-          <p className="text-xs font-semibold text-[#64647A]">
-            {area.accuracy}% mastery score
+          <span className={`w-2 h-2 rounded-full ${area.accuracy < 60 ? "bg-[#F59E0B]" : "bg-[#10B981]"}`} />
+          <p className="text-xs font-normal text-[#64647A]">
+            {area.accuracy}% mức độ thấu hiểu
           </p>
         </div>
       </div>
       <Link
         href={targetHref}
         className={twMerge(
-          "shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 shadow-2xs hover:shadow-sm active:scale-95 text-center",
+          "shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 shadow-2xs text-decoration-none text-center",
           ACTION_STYLES[area.action]
         )}
       >
-        {area.action === "review" ? "⚡ Review" : "🎯 Practice"}
+        {area.action === "review" ? "⚡ Ôn tập" : "🎯 Luyện quiz"}
       </Link>
     </div>
   );
 }
 
 function FocusAreasCard({ areas }: { areas: FocusAreaType[] }) {
-  const displayAreas = areas.slice(0, 2); // Show top 2 items to ensure exact equal height matching in 3-col grid
+  const displayAreas = areas.slice(0, 2);
 
   return (
-    <Card variant="default" hoverEffect="none" padding="md" className="border-[#E8E8F2] shadow-sm w-full h-full min-h-[260px] flex flex-col justify-between">
+    <div className="bg-white rounded-2xl p-5 border border-[#EAEAF4] shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between gap-4">
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#7878A0]">
-            AI Recommended Focus
+          <span className="text-xs font-medium text-[#7878A0]">
+            Trọng tâm AI khuyến nghị
           </span>
-          <span className="w-2.5 h-2.5 rounded-full bg-[#6B6BFF] animate-ping" />
+          <span className="text-[11px] font-semibold text-[#0D9488] bg-[#EAF8F5] px-2 py-0.5 rounded-md border border-[#0D9488]/20 flex items-center gap-1">
+            <span>✨ AI Focus</span>
+          </span>
         </div>
-        <p className="text-xs font-medium text-[#8888A8] mb-3 pb-2.5 border-b border-[#F0F0F8]">Prioritized by AI based on diagnostic patterns</p>
+        <p className="text-xs font-normal text-[#64647A] pb-2 border-b border-[#F0F0F8]">
+          Cá nhân hóa từ phân tích chẩn đoán thực chiến
+        </p>
       </div>
 
       <div className="flex flex-col gap-1 -mx-1 mt-auto">
@@ -183,7 +188,7 @@ function FocusAreasCard({ areas }: { areas: FocusAreaType[] }) {
           <FocusAreaRow key={area.id} area={area} />
         ))}
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -201,14 +206,10 @@ export function DashboardStatsPanel({
   focusAreas = FOCUS_AREAS,
 }: DashboardStatsPanelProps) {
   return (
-    <section className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-label="Dashboard overview stats and focus areas">
+    <section className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-label="Thống kê tổng quan học tập và trọng tâm AI">
       <OverallProgressCard data={overallProgress} />
       <StudyStreakCard data={studyStreak} />
       <FocusAreasCard areas={focusAreas} />
     </section>
   );
 }
-
-
-
-

@@ -25,7 +25,18 @@ export async function sendAiChatMessage(
   });
 
   if (!response.ok) {
-    throw new Error(`[sendAiChatMessage] Request failed with status ${response.status}`);
+    if (response.status === 429) {
+      throw new Error("⏳ **Gia sư Nova hiện đang bận xíu hoặc bạn đã gửi câu hỏi quá nhanh (> 5 câu/phút). Bạn vui lòng chờ khoảng 1 phút rồi thử đặt câu hỏi lại nhé!** 😊");
+    }
+    try {
+      const errJson = await response.json();
+      if (errJson && errJson.message) {
+        throw new Error(errJson.message);
+      }
+    } catch {
+      // Ignore JSON parse errors on non-OK responses
+    }
+    throw new Error(`⏳ **Gia sư Nova hiện đang bận xíu (lỗi máy chủ ${response.status}), bạn vui lòng chờ khoảng 1 phút rồi thử lại nhé!** 😊`);
   }
 
   const result: AiChatApiResponse = await response.json();
@@ -33,5 +44,5 @@ export async function sendAiChatMessage(
     return result.data;
   }
 
-  throw new Error(result.message || "Failed to parse AI Tutor response.");
+  throw new Error(result.message || "⏳ **Gia sư Nova đang bận xíu, bạn vui lòng chờ khoảng 1 phút rồi gửi lại tin nhắn cho mình nhé!** 😊");
 }

@@ -40,6 +40,7 @@ export interface AiChatMessage {
   sender: "user" | "ai";
   timestamp: string;
   text: string;
+  animate?: boolean;
 }
 
 export interface StudyPlanOverview {

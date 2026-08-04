@@ -143,24 +143,46 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  // 1. Chức năng phân luồng đường dẫn
-  const getRedirectPath = (roles: UserRole[]) => {
-  const isAdmin = roles.some((r: UserRole) => r.id === 1 || r.name?.toLowerCase() === 'admin');
-  const isInstructor = roles.some((r: UserRole) => r.id === 2 || r.name?.toLowerCase() === 'instructor' || r.name?.toLowerCase() === 'teacher');
-  
-  if (isAdmin) return "/admin";
-  if (isInstructor) return "/instructor/courses"; // Giữ nguyên nếu bạn muốn vào thẳng trang khóa học
-  
-  return "/"; // SỬA Ở ĐÂY: Trỏ về trang chủ "/" thay vì "/dashboard"
+  // 1. Chức năng phân luồng đường dẫn & xác định quyền cho Cookie
+  const getUserRoleStr = (roles: UserRole[]) => {
+    const isAdmin = roles.some((r: UserRole) => r.id === 1 || r.name?.toLowerCase() === 'admin');
+    const isInstructor = roles.some((r: UserRole) => r.id === 2 || r.name?.toLowerCase() === 'instructor' || r.name?.toLowerCase() === 'teacher');
+    if (isAdmin) return "admin";
+    if (isInstructor) return "instructor";
+    return "student";
   };
 
-  // 2. Tự động chuyển hướng nếu đã đăng nhập
+  const getRedirectPath = (roles: UserRole[]) => {
+    const roleStr = getUserRoleStr(roles);
+    if (roleStr === "admin") return "/admin";
+    if (roleStr === "instructor") return "/instructor/courses"; // Giữ nguyên nếu bạn muốn vào thẳng trang khóa học
+    return "/"; // SỬA Ở ĐÂY: Trỏ về trang chủ "/" thay vì "/dashboard"
+  };
+
+  // 2. Tự động đồng bộ token & chuyển hướng nếu đã đăng nhập (tránh xung đột lặp loop giữa Cookie middleware và LocalStorage)
   useEffect(() => {
     const token = window.localStorage.getItem("accessToken");
     const userInfoRaw = window.localStorage.getItem("userInfo");
+
     if (token && userInfoRaw) {
-      const user = JSON.parse(userInfoRaw);
-      window.location.assign(getRedirectPath(user.roles || []));
+      try {
+        const user = JSON.parse(userInfoRaw);
+        const roleStr = getUserRoleStr(user.roles || []);
+        
+        // Luôn đảm bảo Cookie được đồng bộ khớp với localStorage trước khi redirect để Middleware không đẩy ngược lại
+        document.cookie = `accessToken=${encodeURIComponent(token)}; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
+        document.cookie = `userRole=${roleStr}; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
+
+        window.location.assign(getRedirectPath(user.roles || []));
+      } catch {
+        window.localStorage.clear();
+        document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      }
+    } else {
+      // Nếu localStorage không có trọn vẹn thông tin, xoá sạch cả Cookie để đảm bảo server middleware không ngầm đẩy ngược về trang bảo vệ gây loop
+      document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     }
   }, []);
 
@@ -205,7 +227,9 @@ export function LoginForm() {
         window.localStorage.setItem("userInfo", JSON.stringify(user));
 
         const maxAge = values.rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 8;
+        const roleStr = getUserRoleStr(user.roles || []);
         document.cookie = `accessToken=${encodeURIComponent(token)}; path=/; max-age=${maxAge}; samesite=lax`;
+        document.cookie = `userRole=${roleStr}; path=/; max-age=${maxAge}; samesite=lax`;
 
         setStatusMessage("Đăng nhập thành công...");
         window.location.assign(getRedirectPath(user.roles || []));

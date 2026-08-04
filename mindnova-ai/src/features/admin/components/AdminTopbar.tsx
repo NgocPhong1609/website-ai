@@ -32,7 +32,9 @@ export function AdminTopbar() {
       // Ignore backend logout errors and continue local cleanup.
     } finally {
       window.localStorage.removeItem("accessToken");
-      document.cookie = "accessToken=; Max-Age=0; path=/";
+      window.localStorage.removeItem("userInfo");
+      document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
       window.location.replace("/login");
     }
   };

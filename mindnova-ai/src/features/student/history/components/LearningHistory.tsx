@@ -1,4 +1,7 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
 import {
   CalendarIcon,
   ChevronDownIcon,
@@ -11,248 +14,473 @@ import {
   ClockIcon,
   FileTextIcon,
   MessageSquareIcon,
-  MoreVerticalIcon,
   TrendingUpIcon,
   HistoryIcon
 } from "./icons";
 
 export function LearningHistory() {
+  const [filterType, setFilterType] = useState<"all" | "quiz" | "milestone" | "lesson">("all");
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = () => {
+    setIsExporting(true);
+    setTimeout(() => setIsExporting(false), 2000);
+  };
+
   return (
-    <div className="max-w-6xl mx-auto w-full p-8 lg:p-10 space-y-10">
-        
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <h1 className="text-2xl font-bold text-[#1A1A2E] leading-tight mb-1.5">
-              Learning History
+    <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-7">
+      
+      {/* ─── Synchronized Hero Banner matching /courses, /study-plan, /practice & /progress ─── */}
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#EEF2FF]/90 via-[#F6F6FB] to-[#E0F2FE]/80 border border-[#6B6BFF]/25 p-6 sm:p-8 shadow-[0_8px_30px_rgba(107,107,255,0.07)] transition-all duration-300 hover:shadow-[0_12px_36px_rgba(107,107,255,0.12)]">
+        <div className="absolute -top-16 -right-16 w-60 h-60 rounded-full bg-[#6B6BFF]/10 blur-3xl pointer-events-none animate-pulse" />
+        <div className="absolute -bottom-16 -left-16 w-60 h-60 rounded-full bg-[#4CD7F6]/15 blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            {/* Breadcrumbs */}
+            <div className="flex items-center gap-2 text-xs font-normal text-[#64647A]">
+              <Link href="/courses" className="hover:text-[#5052EE] transition-colors text-decoration-none font-medium">
+                Khoá học của tôi
+              </Link>
+              <ChevronRightIcon className="w-3.5 h-3.5 text-[#A0A0C0]" />
+              <span className="text-[#0D9488] font-medium bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#0D9488]/20">
+                Lịch sử học tập
+              </span>
+            </div>
+
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-[#6B6BFF]/30 text-xs font-medium text-[#4648D4] shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
+              <span className="w-2 h-2 rounded-full bg-[#10B981] absolute" />
+              Nhật ký hoạt động hệ thống AI • 24/7
+            </div>
+
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1A1A2E] leading-tight">
+              Lịch sử học tập: {" "}
+              <span className="bg-gradient-to-r from-[#4648D4] via-[#6063EE] to-[#4CD7F6] bg-clip-text text-transparent drop-shadow-2xs font-bold">
+                Hành trình Trí tuệ AI ⏳
+              </span>
             </h1>
-            <p className="text-[14px] text-[#7878A0]">
-              A comprehensive record of your academic journey and milestones.
+
+            <p className="text-xs sm:text-sm text-[#64647A] leading-relaxed font-normal">
+              Theo dõi trọn vẹn các mốc học tập, kết quả kiểm tra và thành tích trên hành trình rèn luyện kỹ năng công nghệ cùng <span className="text-[#5052EE] font-medium">Gia sư Nova</span>.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#EAEAF4] rounded-xl text-[13px] font-semibold text-[#4A4B68] hover:bg-[#F8F9FB] transition-colors shadow-sm">
-              <span className="flex items-center gap-1.5">
-                <ChevronDownIcon className="w-4 h-4 text-[#A0A0C0]" />
-                All Activities
+
+          {/* Interactive Activity Mastery Widget */}
+          <div className="group shrink-0 bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-[#6B6BFF]/20 flex flex-col justify-center min-w-[320px] sm:min-w-[370px] shadow-2xs hover:border-[#6B6BFF]/40 transition-all duration-300">
+            <div className="w-full flex items-center justify-between gap-4 mb-2">
+              <span className="text-xs font-medium text-[#7878A0] group-hover:text-[#4648D4] transition-colors">Tổng quan hoạt động ↗</span>
+              <span className="text-[11px] font-medium text-[#0D9488] bg-[#CCFBF1]/70 px-2.5 py-0.5 rounded-full border border-[#10B981]/20">
+                Tích cực 100%
               </span>
-            </button>
-            <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#EAEAF4] rounded-xl text-[13px] font-semibold text-[#4A4B68] hover:bg-[#F8F9FB] transition-colors shadow-sm">
-              <CalendarIcon className="w-4 h-4 text-[#A0A0C0]" />
-              Last 30 Days
-            </button>
-            <button className="flex items-center gap-2 px-5 py-2.5 bg-[#5153DF] text-white rounded-xl text-[13px] font-semibold hover:bg-[#4648D4] transition-colors shadow-md">
-              <DownloadIcon className="w-4 h-4" />
-              Export Log
-            </button>
+            </div>
+
+            <div className="text-2xl font-semibold text-[#1A1A2E] my-1 flex items-baseline justify-between gap-6">
+              <div>
+                <span className="text-[#4648D4] font-semibold text-2xl sm:text-3xl">142</span>
+                <span className="text-xs font-normal text-[#7878A0] ml-1.5">lượt tương tác</span>
+              </div>
+              <span className="text-xs font-medium text-[#10B981] bg-[#EAF8F5] px-2.5 py-0.5 rounded-md border border-[#10B981]/20">
+                Active
+              </span>
+            </div>
+
+            <div className="w-full h-2 bg-[#F4F4FA] rounded-full mt-2.5 overflow-hidden p-0.5 border border-[#EAEAF4]/80">
+              <div className="h-full bg-gradient-to-r from-[#4CD7F6] via-[#6B6BFF] to-[#10B981] rounded-full shadow-[0_0_8px_rgba(107,107,255,0.3)] transition-all duration-1000 w-full group-hover:brightness-105" />
+            </div>
+
+            <p className="text-xs font-medium text-[#6B6BFF] mt-3 flex items-center justify-between">
+              <span>🔥 Chuỗi 30 ngày chuyên cần</span>
+              <span className="text-[#4648D4] font-medium">Level 8 ➔</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 4 Key Metrics Row (Eye-Soothing Typography Guarantee - No Line Wrap) ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        
+        {/* Total Lessons */}
+        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-all duration-300 flex flex-col justify-between gap-3.5 group hover:border-[#5052EE]/30">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#64647A]">Tổng số bài học</span>
+            <div className="w-9 h-9 rounded-xl bg-[#EEF2FF]/80 text-[#5052EE] flex items-center justify-center shrink-0 border border-[#5052EE]/15 shadow-2xs">
+              <BookIcon className="w-4.5 h-4.5" />
+            </div>
+          </div>
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-2xl font-semibold text-[#1A1A2E] tracking-normal">
+              142 <span className="text-xs font-normal text-[#7878A0] ml-0.5">bài</span>
+            </span>
+            <span className="text-[11px] font-medium text-[#059669] bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#059669]/15">
+              +12% tháng này
+            </span>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {/* Total Lessons */}
-          <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
-            <h3 className="text-[11px] font-bold tracking-widest text-[#A0A0C0] uppercase mb-3">Total Lessons</h3>
-            <div className="flex items-baseline gap-2.5">
-              <span className="text-3xl font-bold text-[#1A1A2E]">142</span>
-              <span className="text-[14px] font-bold text-[#20B2AA] flex items-center">
-                +12%
-              </span>
+        {/* Avg Quiz Score */}
+        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-all duration-300 flex flex-col justify-between gap-3.5 group hover:border-[#0D9488]/30">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#64647A]">Điểm Quiz trung bình</span>
+            <div className="w-9 h-9 rounded-xl bg-[#EAF8F5] text-[#0D9488] flex items-center justify-center shrink-0 border border-[#0D9488]/15 shadow-2xs">
+              <TrophyIcon className="w-4.5 h-4.5" />
             </div>
           </div>
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-2xl font-semibold text-[#1A1A2E] tracking-normal">
+              88%
+            </span>
+            <span className="text-[11px] font-medium text-[#0284C7] bg-[#E0F2FE]/80 px-2.5 py-0.5 rounded-full border border-[#0284C7]/15 flex items-center gap-1">
+              <TrendingUpIcon className="w-3 h-3" />
+              <span>Tiến bộ tốt</span>
+            </span>
+          </div>
+        </div>
 
-          {/* Avg Quiz Score */}
-          <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
-            <h3 className="text-[11px] font-bold tracking-widest text-[#A0A0C0] uppercase mb-3">Avg. Quiz Score</h3>
-            <div className="flex items-baseline gap-2.5">
-              <span className="text-3xl font-bold text-[#1A1A2E]">88%</span>
-              <TrendingUpIcon className="w-5 h-5 text-[#20B2AA]" />
+        {/* Study Hours (Resolved Line Wrap issue with whitespace-nowrap and soft font-semibold) */}
+        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-all duration-300 flex flex-col justify-between gap-3.5 group hover:border-[#0284C7]/30">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#64647A]">Thời gian rèn luyện</span>
+            <div className="w-9 h-9 rounded-xl bg-[#E0F2FE]/80 text-[#0284C7] flex items-center justify-center shrink-0 border border-[#0284C7]/15 shadow-2xs">
+              <ClockIcon className="w-4.5 h-4.5" />
             </div>
           </div>
-
-          {/* Study Hours */}
-          <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
-            <h3 className="text-[11px] font-bold tracking-widest text-[#A0A0C0] uppercase mb-3">Study Hours</h3>
-            <div className="flex items-baseline gap-2.5">
-              <span className="text-3xl font-bold text-[#1A1A2E]">48.5h</span>
-            </div>
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-2xl font-semibold text-[#1A1A2E] whitespace-nowrap tracking-normal">
+              48.5 <span className="text-sm font-normal text-[#64647A]">giờ</span>
+            </span>
+            <span className="text-[11px] font-normal text-[#64647A] bg-[#F8FAFC] px-2.5 py-0.5 rounded-lg border border-[#EAEAF4] whitespace-nowrap">
+              Chuyên cần cao
+            </span>
           </div>
+        </div>
 
-          {/* AI Proficiency */}
-          <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
-            <h3 className="text-[11px] font-bold tracking-widest text-[#A0A0C0] uppercase mb-3">AI Proficiency</h3>
-            <div className="flex flex-col gap-2 mt-1">
-              <span className="text-xl font-bold text-[#6B6BFF]">Level 8</span>
-              <div className="w-full h-1.5 bg-[#F0F0F8] rounded-full overflow-hidden">
-                <div className="w-[80%] h-full bg-[#6B6BFF] rounded-full" />
-              </div>
+        {/* AI Proficiency */}
+        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-all duration-300 flex flex-col justify-between gap-3.5 group hover:border-[#9333EA]/30">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#64647A]">Thành thạo công nghệ AI</span>
+            <span className="text-[11px] font-medium text-[#9333EA] bg-[#F3E8FF]/80 px-2.5 py-0.5 rounded-full border border-[#9333EA]/15">
+              🌟 Top 10%
+            </span>
+          </div>
+          <div className="space-y-2 pt-0.5">
+            <div className="flex items-center justify-between text-sm font-semibold text-[#5052EE]">
+              <span>Level 8</span>
+              <span className="text-xs font-normal text-[#64647A]">80 / 100 XP</span>
+            </div>
+            <div className="w-full h-2 bg-[#F4F5FC] rounded-full overflow-hidden p-0.5 border border-[#EAEAF4]/80">
+              <div className="w-[80%] h-full bg-gradient-to-r from-[#5052EE] to-[#9333EA] rounded-full shadow-2xs" />
             </div>
           </div>
         </div>
 
-        {/* Timeline */}
-        <div className="space-y-8">
-          
-          {/* Today */}
-          <div>
-            <div className="flex items-center gap-2.5 mb-4 pl-1">
-              <div className="w-7 h-7 rounded-full bg-[#5153DF] flex items-center justify-center text-white shrink-0">
-                <CalendarIcon className="w-3.5 h-3.5" />
-              </div>
-              <h2 className="text-[15px] font-bold text-[#1A1A2E]">Today, Oct 24</h2>
-            </div>
-            <div className="flex flex-col gap-3">
-              {/* Item 1 */}
-              <div className="bg-white border border-[#EAEAF4] rounded-2xl p-4 flex items-center gap-5 shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-xl bg-[#F0F0FF] text-[#6B6BFF] flex items-center justify-center shrink-0">
-                  <BookIcon className="w-5 h-5" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-bold tracking-widest text-[#8EB4FF] uppercase">Assessment</span>
-                    <span className="w-1 h-1 rounded-full bg-[#D0D0E0]" />
-                    <span className="text-[11px] font-semibold text-[#A0A0C0]">10:45 AM</span>
-                  </div>
-                  <h4 className="text-[15px] font-bold text-[#1A1A2E] mb-0.5">Neural Networks Basics Quiz</h4>
-                  <p className="text-[13px] text-[#7878A0]">Module 4: Deep Learning Foundations</p>
-                </div>
-                <div className="flex items-center gap-4 text-right">
-                  <div>
-                    <div className="text-[15px] font-bold text-[#1A1A2E]">92/100</div>
-                    <div className="text-[12px] text-[#7878A0]">Distinction</div>
-                  </div>
-                  <button className="w-8 h-8 rounded-full border border-[#EAEAF4] flex items-center justify-center text-[#A0A0C0] hover:text-[#1A1A2E] hover:border-[#D0D0E0] transition-colors">
-                    <ChevronRightIcon className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+      </div>
 
-              {/* Item 2 */}
-              <div className="bg-white border border-[#EAEAF4] rounded-2xl p-4 flex items-center gap-5 shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-xl bg-[#F0F0FF] text-[#6B6BFF] flex items-center justify-center shrink-0">
-                  <TrophyIcon className="w-5 h-5" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-bold tracking-widest text-[#8EB4FF] uppercase">Milestone Reached</span>
-                    <span className="w-1 h-1 rounded-full bg-[#D0D0E0]" />
-                    <span className="text-[11px] font-semibold text-[#A0A0C0]">09:15 AM</span>
-                  </div>
-                  <h4 className="text-[15px] font-bold text-[#1A1A2E] mb-0.5">30-Day Learning Streak!</h4>
-                  <p className="text-[13px] text-[#7878A0]">You&apos;ve earned the &apos;Consistent Learner&apos; digital badge.</p>
-                </div>
-                <div className="shrink-0">
-                  <button className="px-5 py-2.5 bg-[#5153DF] text-white rounded-xl text-[13px] font-bold hover:bg-[#4648D4] transition-colors shadow-md">
-                    Share Achievement
-                  </button>
-                </div>
+      {/* ─── Interactive Filter Bar & Export Actions (Soothing Fonts) ─── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:px-6 sm:py-4 rounded-2xl border border-[#EAEAF4] shadow-2xs">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-[#64647A] mr-1.5 flex items-center gap-1.5">
+            <HistoryIcon className="w-4 h-4 text-[#5052EE]" />
+            <span>Lọc theo hoạt động:</span>
+          </span>
+
+          <button
+            type="button"
+            onClick={() => setFilterType("all")}
+            className={`px-3.5 py-1.5 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
+              filterType === "all"
+                ? "bg-[#5052EE] text-white font-medium shadow-2xs"
+                : "bg-[#F8FAFC] text-[#64647A] border border-[#EAEAF4] hover:text-[#1A1A2E] hover:bg-white font-normal"
+            }`}
+          >
+            ✨ Tất cả
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setFilterType("quiz")}
+            className={`px-3.5 py-1.5 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
+              filterType === "quiz"
+                ? "bg-[#5052EE] text-white font-medium shadow-2xs"
+                : "bg-[#F8FAFC] text-[#64647A] border border-[#EAEAF4] hover:text-[#1A1A2E] hover:bg-white font-normal"
+            }`}
+          >
+            📝 Bài đánh giá (Quiz)
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setFilterType("milestone")}
+            className={`px-3.5 py-1.5 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
+              filterType === "milestone"
+                ? "bg-[#5052EE] text-white font-medium shadow-2xs"
+                : "bg-[#F8FAFC] text-[#64647A] border border-[#EAEAF4] hover:text-[#1A1A2E] hover:bg-white font-normal"
+            }`}
+          >
+            🏆 Cột mốc thành tựu
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setFilterType("lesson")}
+            className={`px-3.5 py-1.5 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
+              filterType === "lesson"
+                ? "bg-[#5052EE] text-white font-medium shadow-2xs"
+                : "bg-[#F8FAFC] text-[#64647A] border border-[#EAEAF4] hover:text-[#1A1A2E] hover:bg-white font-normal"
+            }`}
+          >
+            📖 Bài học hoàn tất
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleExport}
+          disabled={isExporting}
+          className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-medium shadow-2xs transition-all duration-200 cursor-pointer shrink-0 ${
+            isExporting
+              ? "bg-[#10B981] text-white"
+              : "bg-white border border-[#5052EE]/25 text-[#5052EE] hover:bg-[#EEF2FF]/70"
+          }`}
+        >
+          <DownloadIcon className={`w-3.5 h-3.5 ${isExporting ? "animate-bounce" : ""}`} />
+          <span>{isExporting ? "Đang xuất file PDF..." : "Xuất báo cáo cá nhân"}</span>
+        </button>
+      </div>
+
+      {/* ─── Timeline Activity Area ─── */}
+      <div className="space-y-8">
+        
+        {/* Section: Today */}
+        {(filterType === "all" || filterType === "quiz" || filterType === "milestone") && (
+          <div className="space-y-3.5">
+            <div className="flex items-center gap-3 pl-1">
+              <div className="w-8 h-8 rounded-xl bg-[#EEF2FF] text-[#5052EE] flex items-center justify-center shrink-0 border border-[#5052EE]/15 shadow-2xs">
+                <CalendarIcon className="w-4 h-4" />
               </div>
+              <div>
+                <h2 className="text-sm sm:text-base font-semibold text-[#1A1A2E]">Hôm nay, 24 Tháng 10</h2>
+                <p className="text-xs font-normal text-[#7878A0]">Hoạt động rèn luyện vừa hoàn thành trong ngày</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3.5 pl-3 sm:pl-5 border-l-2 border-[#EAECEE] ml-4">
+              
+              {/* Item 1: Quiz (Show if all or quiz) */}
+              {(filterType === "all" || filterType === "quiz") && (
+                <div className="bg-white border border-[#EAEAF4] rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-sm transition-all duration-200 hover:border-[#6B6BFF]/30 group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-11 h-11 rounded-xl bg-[#EEF2FF]/80 text-[#5052EE] flex items-center justify-center shrink-0 border border-[#5052EE]/15">
+                      <BookIcon className="w-5 h-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-[#5052EE] bg-[#EEF2FF]/70 px-2 py-0.5 rounded-md border border-[#5052EE]/15">Bài đánh giá</span>
+                        <span className="w-1 h-1 rounded-full bg-[#D0D0E0]" />
+                        <span className="text-xs font-normal text-[#7878A0]">10:45 AM</span>
+                      </div>
+                      <h4 className="text-sm sm:text-base font-semibold text-[#1A1A2E] group-hover:text-[#5052EE] transition-colors">Trắc nghiệm cơ sở Neural Networks &amp; AI</h4>
+                      <p className="text-xs font-normal text-[#64647A]">Module 4: Deep Learning Foundations • Chấm bằng AI Co-Pilot</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-5 justify-between sm:justify-end pt-3 sm:pt-0 border-t sm:border-0 border-[#F0F0F8]">
+                    <div className="text-right">
+                      <div className="text-base font-semibold text-[#1A1A2E]">
+                        92 <span className="text-xs font-normal text-[#7878A0]">/ 100</span>
+                      </div>
+                      <div className="text-[11px] font-medium text-[#0D9488] bg-[#EAF8F5] px-2 py-0.5 rounded-full inline-block border border-[#0D9488]/15 mt-0.5">Xuất sắc</div>
+                    </div>
+                    <Link href="/practice/quiz/result" className="text-decoration-none">
+                      <button type="button" className="px-3.5 py-2 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4] text-[#5052EE] font-medium text-xs hover:bg-[#EEF2FF] hover:border-[#5052EE]/25 transition-all flex items-center gap-1 shadow-2xs">
+                        <span>Xem kết quả</span>
+                        <ChevronRightIcon className="w-4 h-4" />
+                      </button>
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {/* Item 2: Milestone (Show if all or milestone) */}
+              {(filterType === "all" || filterType === "milestone") && (
+                <div className="bg-gradient-to-r from-white via-[#FFF9ED]/40 to-[#FFF3DF]/50 border border-[#F59E0B]/25 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-sm transition-all duration-200 group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-11 h-11 rounded-xl bg-[#FFF3DF] text-[#D97706] flex items-center justify-center shrink-0 border border-[#F59E0B]/25">
+                      <TrophyIcon className="w-5 h-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-[#D97706] bg-[#FFF3DF] px-2 py-0.5 rounded-md border border-[#D97706]/15">Cột mốc mới</span>
+                        <span className="w-1 h-1 rounded-full bg-[#D0D0E0]" />
+                        <span className="text-xs font-normal text-[#7878A0]">09:15 AM</span>
+                      </div>
+                      <h4 className="text-sm sm:text-base font-semibold text-[#1A1A2E] group-hover:text-[#D97706] transition-colors">Chuỗi 30 ngày chuyên cần liên tiếp!</h4>
+                      <p className="text-xs font-normal text-[#64647A]">Bạn đã mở khóa thành tựu danh dự <span className="font-medium text-[#D97706]">Học viên Bền bỉ (Consistent Learner)</span>.</p>
+                    </div>
+                  </div>
+
+                  <div className="shrink-0 pt-3 sm:pt-0 border-t sm:border-0 border-[#F59E0B]/20">
+                    <button
+                      type="button"
+                      onClick={() => alert("🏆 Đã sao chép liên kết chứng nhận huy hiệu để chia sẻ với bạn bè!")}
+                      className="w-full sm:w-auto px-4 py-2 bg-[#FFF3DF] hover:bg-[#FDE68A]/60 border border-[#F59E0B]/30 text-[#D97706] rounded-xl text-xs font-medium transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <span>✨ Chia sẻ thành tích</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
             </div>
           </div>
+        )}
 
-          {/* Yesterday */}
-          <div>
-            <div className="flex items-center gap-2.5 mb-4 pl-1 text-[#7878A0]">
-               <div className="w-7 h-7 rounded-full border border-[#EAEAF4] bg-white flex items-center justify-center shrink-0">
-                  <CalendarIcon className="w-3.5 h-3.5" />
-               </div>
-              <h2 className="text-[15px] font-bold text-[#1A1A2E]">Yesterday, Oct 23</h2>
+        {/* Section: Yesterday */}
+        {(filterType === "all" || filterType === "lesson" || filterType === "milestone") && (
+          <div className="space-y-3.5">
+            <div className="flex items-center gap-3 pl-1">
+              <div className="w-8 h-8 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC] flex items-center justify-center shrink-0 shadow-2xs text-[#64647A]">
+                <CalendarIcon className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-sm sm:text-base font-semibold text-[#1A1A2E]">Hôm qua, 23 Tháng 10</h2>
+                <p className="text-xs font-normal text-[#7878A0]">Các học phần đã tiếp thu và khoá học đã đăng ký</p>
+              </div>
             </div>
-            <div className="flex flex-col gap-3">
-              {/* Item 3 */}
-              <div className="bg-white border border-[#EAEAF4] rounded-2xl p-4 flex items-center gap-5 shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-xl bg-[#F8F9FB] border border-[#EAEAF4] text-[#6B6BFF] flex items-center justify-center shrink-0">
-                  <PlayCircleIcon className="w-5 h-5" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-bold tracking-widest text-[#20B2AA] uppercase">Lesson Completed</span>
-                    <span className="w-1 h-1 rounded-full bg-[#D0D0E0]" />
-                    <span className="text-[11px] font-semibold text-[#A0A0C0]">4:20 PM</span>
-                  </div>
-                  <h4 className="text-[15px] font-bold text-[#1A1A2E] mb-0.5">Intro to Prompt Engineering</h4>
-                  <p className="text-[13px] text-[#7878A0]">Generative AI Elective Track</p>
-                </div>
-                <div className="shrink-0 w-32 flex flex-col items-end gap-1.5">
-                  <div className="flex items-center justify-between w-full text-[11px] font-bold">
-                    <span className="text-[#A0A0C0]">Progress</span>
-                    <span className="text-[#6B6BFF]">100%</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-[#F0F0F8] rounded-full overflow-hidden">
-                    <div className="w-full h-full bg-[#6B6BFF] rounded-full" />
-                  </div>
-                </div>
-              </div>
 
-              {/* Item 4 */}
-              <div className="bg-white border border-[#EAEAF4] rounded-2xl p-4 flex items-center gap-5 shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-xl bg-[#F8F9FB] border border-[#EAEAF4] text-[#6B6BFF] flex items-center justify-center shrink-0">
-                  <GraduationCapIcon className="w-5 h-5" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-bold tracking-widest text-[#A0A0C0] uppercase">Course Enrolled</span>
-                    <span className="w-1 h-1 rounded-full bg-[#D0D0E0]" />
-                    <span className="text-[11px] font-semibold text-[#A0A0C0]">11:00 AM</span>
+            <div className="flex flex-col gap-3.5 pl-3 sm:pl-5 border-l-2 border-[#EAECEE] ml-4">
+              
+              {/* Item 3: Lesson Completed */}
+              {(filterType === "all" || filterType === "lesson") && (
+                <div className="bg-white border border-[#EAEAF4] rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-sm transition-all duration-200 hover:border-[#0D9488]/30 group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-11 h-11 rounded-xl bg-[#EAF8F5] text-[#0D9488] flex items-center justify-center shrink-0 border border-[#0D9488]/20">
+                      <PlayCircleIcon className="w-5 h-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-[#0D9488] bg-[#EAF8F5] px-2 py-0.5 rounded-md border border-[#0D9488]/15">Bài học hoàn tất</span>
+                        <span className="w-1 h-1 rounded-full bg-[#D0D0E0]" />
+                        <span className="text-xs font-normal text-[#7878A0]">16:20 PM</span>
+                      </div>
+                      <h4 className="text-sm sm:text-base font-semibold text-[#1A1A2E] group-hover:text-[#0D9488] transition-colors">Nhập môn Kỹ thuật Prompt Engineering</h4>
+                      <p className="text-xs font-normal text-[#64647A]">Chuyên đề Trí tuệ Tạo sinh (Generative AI Elective Track)</p>
+                    </div>
                   </div>
-                  <h4 className="text-[15px] font-bold text-[#1A1A2E] mb-0.5">Advanced Python for Data Science</h4>
-                  <p className="text-[13px] text-[#7878A0]">Started your new specialization track.</p>
+
+                  <div className="shrink-0 sm:w-44 flex flex-col sm:items-end gap-1.5 pt-3 sm:pt-0 border-t sm:border-0 border-[#F0F0F8]">
+                    <div className="flex items-center justify-between w-full text-xs">
+                      <span className="text-[#64647A] font-normal">Tiến độ học:</span>
+                      <span className="text-[#0D9488] font-medium">100% Hoàn thành</span>
+                    </div>
+                    <div className="w-full h-2 bg-[#F4F5FC] rounded-full overflow-hidden p-0.5 border border-[#EAEAF4]/80">
+                      <div className="w-full h-full bg-gradient-to-r from-[#10B981] to-[#0D9488] rounded-full" />
+                    </div>
+                  </div>
                 </div>
-                <div className="shrink-0 flex items-center gap-1.5 text-[#A0A0C0]">
-                  <ClockIcon className="w-4 h-4" />
-                  <span className="text-[13px] font-semibold">12 Weeks</span>
+              )}
+
+              {/* Item 4: Course Enrolled */}
+              {(filterType === "all" || filterType === "milestone") && (
+                <div className="bg-white border border-[#EAEAF4] rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-sm transition-all duration-200 hover:border-[#5052EE]/30 group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-11 h-11 rounded-xl bg-[#EEF2FF] text-[#5052EE] flex items-center justify-center shrink-0 border border-[#5052EE]/20">
+                      <GraduationCapIcon className="w-5 h-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-[#5052EE] bg-[#EEF2FF] px-2 py-0.5 rounded-md border border-[#5052EE]/15">Đăng ký khoá mới</span>
+                        <span className="w-1 h-1 rounded-full bg-[#D0D0E0]" />
+                        <span className="text-xs font-normal text-[#7878A0]">11:00 AM</span>
+                      </div>
+                      <h4 className="text-sm sm:text-base font-semibold text-[#1A1A2E] group-hover:text-[#5052EE] transition-colors">Lập trình Python chuyên sâu cho Data Science &amp; AI</h4>
+                      <p className="text-xs font-normal text-[#64647A]">Đã mở khóa học phần mới trong lộ trình đào tạo cá nhân hóa.</p>
+                    </div>
+                  </div>
+
+                  <div className="shrink-0 flex items-center justify-between sm:justify-end gap-3 pt-3 sm:pt-0 border-t sm:border-0 border-[#F0F0F8]">
+                    <span className="flex items-center gap-1.5 text-xs font-normal text-[#64647A] bg-[#F8FAFC] px-3 py-1.5 rounded-xl border border-[#EAEAF4]">
+                      <ClockIcon className="w-4 h-4 text-[#5052EE]" />
+                      <span>Thời lượng 12 Tuần</span>
+                    </span>
+                    <Link href="/courses" className="text-decoration-none">
+                      <button type="button" className="px-4 py-2 rounded-xl bg-[#EEF2FF] text-[#5052EE] font-medium text-xs hover:bg-[#E2E6FF] border border-[#5052EE]/20 transition-colors shadow-2xs">
+                        Vào học ngay
+                      </button>
+                    </Link>
+                  </div>
                 </div>
-              </div>
+              )}
+
             </div>
           </div>
+        )}
 
-          {/* Earlier this week */}
-          <div>
-            <div className="flex items-center gap-2.5 mb-4 pl-1 text-[#7878A0]">
-               <div className="w-7 h-7 rounded-full border border-[#EAEAF4] bg-white flex items-center justify-center shrink-0">
-                  <HistoryIcon className="w-3.5 h-3.5" />
-               </div>
-              <h2 className="text-[15px] font-bold text-[#1A1A2E]">Earlier this week</h2>
+        {/* Section: Earlier this week */}
+        {(filterType === "all" || filterType === "lesson") && (
+          <div className="space-y-3.5">
+            <div className="flex items-center gap-3 pl-1">
+              <div className="w-8 h-8 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC] flex items-center justify-center shrink-0 shadow-2xs text-[#64647A]">
+                <HistoryIcon className="w-4 h-4 text-[#7878A0]" />
+              </div>
+              <div>
+                <h2 className="text-sm sm:text-base font-semibold text-[#1A1A2E]">Các hoạt động trong tuần</h2>
+                <p className="text-xs font-normal text-[#7878A0]">Tài liệu đã tham khảo và bài luận đã đăng</p>
+              </div>
             </div>
-            <div className="flex flex-col gap-3">
+
+            <div className="flex flex-col gap-3 pl-3 sm:pl-5 border-l-2 border-[#EAECEE] ml-4">
+              
               {/* Item 5 */}
-              <div className="bg-[#FBFBFC] border border-[#EAEAF4] rounded-2xl p-4 flex items-center gap-5 opacity-80 hover:opacity-100 transition-opacity">
-                <div className="w-9 h-9 rounded-xl bg-white border border-[#EAEAF4] text-[#A0A0C0] flex items-center justify-center shrink-0">
-                  <FileTextIcon className="w-4 h-4" />
+              <div className="bg-white/90 border border-[#EAEAF4] rounded-2xl p-4 flex items-center justify-between gap-4 hover:bg-white transition-all duration-150 shadow-2xs hover:border-[#6B6BFF]/25">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4] text-[#64647A] flex items-center justify-center shrink-0 shadow-2xs">
+                    <FileTextIcon className="w-4.5 h-4.5" />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-xs sm:text-sm font-medium text-[#1A1A2E] truncate hover:text-[#5052EE] transition-colors">Tài liệu đọc: Đạo đức trong phát triển AI &amp; Trách nhiệm máy</h4>
+                    <p className="text-[11px] font-normal text-[#7878A0]">21 Tháng 10 • 17:10 PM</p>
+                  </div>
                 </div>
-                <div className="flex-1 flex flex-col justify-center">
-                  <h4 className="text-[14px] font-bold text-[#1A1A2E] mb-0.5">Reading: Ethics in AI</h4>
-                  <p className="text-[12px] text-[#A0A0C0]">Oct 21 • 5:10 PM</p>
-                </div>
-                <div className="shrink-0 text-[#C0C0D0]">
-                  <MoreVerticalIcon className="w-5 h-5" />
-                </div>
+                <span className="text-[11px] font-medium text-[#0D9488] bg-[#EAF8F5] px-2.5 py-1 rounded-lg shrink-0 border border-[#0D9488]/15">
+                  Đã lưu trữ
+                </span>
               </div>
 
               {/* Item 6 */}
-              <div className="bg-[#FBFBFC] border border-[#EAEAF4] rounded-2xl p-4 flex items-center gap-5 opacity-80 hover:opacity-100 transition-opacity">
-                <div className="w-9 h-9 rounded-xl bg-white border border-[#EAEAF4] text-[#A0A0C0] flex items-center justify-center shrink-0">
-                  <MessageSquareIcon className="w-4 h-4" />
+              <div className="bg-white/90 border border-[#EAEAF4] rounded-2xl p-4 flex items-center justify-between gap-4 hover:bg-white transition-all duration-150 shadow-2xs hover:border-[#6B6BFF]/25">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4] text-[#64647A] flex items-center justify-center shrink-0 shadow-2xs">
+                    <MessageSquareIcon className="w-4.5 h-4.5" />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-xs sm:text-sm font-medium text-[#1A1A2E] truncate hover:text-[#5052EE] transition-colors">Thảo luận chuyên gia: Mô hình Đa phương thức (Multi-modal LLMs)</h4>
+                    <p className="text-[11px] font-normal text-[#7878A0]">20 Tháng 10 • 14:30 PM</p>
+                  </div>
                 </div>
-                <div className="flex-1 flex flex-col justify-center">
-                  <h4 className="text-[14px] font-bold text-[#1A1A2E] mb-0.5">Discussion Post: Multi-modal LLMs</h4>
-                  <p className="text-[12px] text-[#A0A0C0]">Oct 20 • 2:30 PM</p>
-                </div>
-                <div className="shrink-0 text-[#C0C0D0]">
-                  <MoreVerticalIcon className="w-5 h-5" />
-                </div>
+                <span className="text-[11px] font-medium text-[#5052EE] bg-[#EEF2FF]/80 px-2.5 py-1 rounded-lg shrink-0 border border-[#5052EE]/15">
+                  2 Phản hồi mới
+                </span>
               </div>
+
             </div>
           </div>
-          
-          <div className="pt-4 flex justify-center pb-12">
-            <button className="flex items-center gap-2 px-6 py-2.5 bg-white border border-[#EAEAF4] rounded-full text-[13px] font-bold text-[#4A4B68] hover:bg-[#F8F9FB] transition-colors shadow-sm">
-              Load More Activities
-              <ChevronDownIcon className="w-4 h-4 text-[#A0A0C0]" />
-            </button>
-          </div>
+        )}
 
+        {/* Footer Load More Button */}
+        <div className="pt-2 flex flex-col items-center justify-center pb-6 gap-2">
+          <button
+            type="button"
+            onClick={() => alert("⚡ Hệ thống đã cập nhật đầy đủ dữ liệu học tập mới nhất trong bộ nhớ MindNova.")}
+            className="flex items-center gap-2 px-6 py-2.5 bg-white border border-[#EAEAF4] rounded-xl text-xs font-medium text-[#5052EE] hover:bg-[#EEF2FF]/60 hover:border-[#5052EE]/30 transition-all shadow-2xs cursor-pointer"
+          >
+            <span>Hiển thị thêm lịch sử hoạt động</span>
+            <ChevronDownIcon className="w-4 h-4 text-[#5052EE]" />
+          </button>
+          <p className="text-[11px] font-normal text-[#9090B0]">Đã hiển thị 6 trên tổng số 142 hoạt động rèn luyện</p>
         </div>
+
       </div>
+    </div>
   );
 }
