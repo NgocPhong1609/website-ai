@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 import { SparklesIcon, PlusIcon } from "./icons";
+import { generateAiNotification, sendNotification } from "../api";
 
 // ─── Local icons ──────────────────────────────────────────────────────────────
 
@@ -58,6 +59,7 @@ function ChevronDownIcon() { return <svg {...S} width={13} height={13} strokeWid
 interface AINotificationModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialTopic?: string;
 }
 
 // ─── Mock generated draft ─────────────────────────────────────────────────────
@@ -341,14 +343,28 @@ function LeftPanel({
 
 // ─── Main Modal ───────────────────────────────────────────────────────────────
 
-export function AINotificationModal({ isOpen, onClose }: AINotificationModalProps) {
+export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINotificationModalProps) {
   const [recipient, setRecipient] = useState("Tất cả học viên");
-  const [topic, setTopic] = useState("");
+  const [topic, setTopic] = useState(initialTopic);
   const [activeChip, setActiveChip] = useState<string | null>(null);
-  const [draft, setDraft] = useState(MOCK_DRAFT);
+  const [draft, setDraft] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+
+  // Sync initialTopic to topic when modal opens
+  useEffect(() => {
+    if (isOpen && initialTopic) {
+      setTopic(initialTopic);
+      const matchedChip = SUGGESTION_CHIPS.find(c => c.label === initialTopic);
+      if (matchedChip) setActiveChip(initialTopic);
+      else setActiveChip(null);
+    } else if (isOpen) {
+      setTopic("");
+      setActiveChip(null);
+    }
+  }, [isOpen, initialTopic]);
 
   // Trap focus & handle ESC
   useEffect(() => {
@@ -361,11 +377,32 @@ export function AINotificationModal({ isOpen, onClose }: AINotificationModalProp
   }, [isOpen, onClose]);
 
   const handleGenerate = async () => {
+    if (!topic.trim()) return;
     setIsGenerating(true);
     setDraft("");
-    await new Promise((r) => setTimeout(r, 1800));
-    setDraft(MOCK_DRAFT);
-    setIsGenerating(false);
+    try {
+      const result = await generateAiNotification({ prompt: topic });
+      setDraft(result.generated_content);
+    } catch (err) {
+      console.error(err);
+      setDraft("Có lỗi xảy ra khi tạo dự thảo AI. Vui lòng thử lại.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSend = async () => {
+    if (!draft.trim()) return;
+    setIsSending(true);
+    try {
+      await sendNotification({ content: draft, target: recipient });
+      setSaved(true);
+      setTimeout(() => { setSaved(false); onClose(); }, 1200);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleCopy = () => {
@@ -494,10 +531,16 @@ export function AINotificationModal({ isOpen, onClose }: AINotificationModalProp
             <button
               type="button"
               id="btn-send-notification-modal"
-              disabled={!draft || isGenerating}
+              onClick={handleSend}
+              disabled={!draft || isGenerating || isSending}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40"
             >
-              Gửi thông báo
+              {isSending ? (
+                <>
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                  Đang gửi...
+                </>
+              ) : "Gửi thông báo"}
             </button>
           </div>
         </div>

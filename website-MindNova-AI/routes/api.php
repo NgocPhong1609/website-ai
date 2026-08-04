@@ -42,7 +42,7 @@ use App\Http\Controllers\Api\Instructor\QuizController;
 use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentController;
 use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscussionController;
 use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNotificationController;
-
+use App\Http\Controllers\Api\Instructor\RevenueController;
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
 // ==========================================
@@ -139,15 +139,35 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::delete('lessons/{lesson}/quiz', [QuizController::class, 'destroy']);
 
     // Students
-    Route::get('students', [InstructorStudentController::class, 'index']);
-    Route::get('students/{student}/progress', [InstructorStudentController::class, 'progress']);
+    Route::get('/students/export', [App\Http\Controllers\Api\Instructor\StudentController::class, 'exportCsv']);
+    Route::get('/students/analytics', [App\Http\Controllers\Api\Instructor\StudentController::class, 'getAnalytics']);
+    Route::get('/students/discussions', [App\Http\Controllers\Api\Instructor\StudentController::class, 'getDiscussions']);
+    Route::post('/students/ai-notification/generate', [App\Http\Controllers\Api\Instructor\StudentController::class, 'generateAiNotification']);
+    Route::post('/students/notifications', [App\Http\Controllers\Api\Instructor\StudentController::class, 'sendNotification']);
+    Route::get('/students', [App\Http\Controllers\Api\Instructor\StudentController::class, 'index']);
+
+    // Student Analytics Dashboard
+    Route::get('/student-analytics/dashboard-metrics', [\App\Http\Controllers\Api\Instructor\StudentAnalyticsController::class, 'dashboardMetrics']);
+    Route::get('/student-analytics/engagement-chart', [\App\Http\Controllers\Api\Instructor\StudentAnalyticsController::class, 'engagementChart']);
+    
+    Route::get('/students/{id}/progress', [App\Http\Controllers\Api\Instructor\StudentController::class, 'progress']);
 
     // Discussions
     Route::get('discussions', [InstructorDiscussionController::class, 'index']);
     Route::post('discussions/{discussion}/replies', [InstructorDiscussionController::class, 'reply']);
+    Route::patch('discussions/{discussion}/pin', [InstructorDiscussionController::class, 'pin']);
+    Route::patch('discussions/{discussion}/best-answer', [InstructorDiscussionController::class, 'bestAnswer']);
+    Route::patch('discussions/{discussion}/resolved', [InstructorDiscussionController::class, 'toggleResolved']);
+    Route::delete('discussions/{discussion}', [InstructorDiscussionController::class, 'destroy']);
 
     // Notifications
     Route::post('notifications', [InstructorNotificationController::class, 'store']);
+
+    // Revenue & Finance
+    Route::get('revenue/overview', [RevenueController::class, 'getOverview']);
+    Route::post('revenue/withdraw', [RevenueController::class, 'requestWithdraw']);
+    Route::get('revenue/transactions', [RevenueController::class, 'getTransactions']);
+    Route::get('revenue/sales-report', [RevenueController::class, 'getSalesReport']);
 });
 
 // ==========================================

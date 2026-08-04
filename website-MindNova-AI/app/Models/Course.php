@@ -18,6 +18,7 @@ class Course extends Model
         'price',
         'level',
         'status',
+        'views_count',
     ];
 
     protected $casts = [

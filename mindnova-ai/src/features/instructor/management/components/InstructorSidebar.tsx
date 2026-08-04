@@ -77,14 +77,15 @@ function SidebarUserProfile({ isCollapsed }: { isCollapsed: boolean }) {
 interface NavItem {
   label: string;
   href: string;
+  activePatterns?: string[];
   Icon: React.FC;
   isCollapsed?: boolean;
 }
 
-function SidebarNavItem({ label, href, Icon, isCollapsed }: NavItem) {
+function SidebarNavItem({ label, href, activePatterns, Icon, isCollapsed }: NavItem) {
   const pathname = usePathname();
-  // Mark as active if it's the exact path or a sub-path
-  const isActive = pathname === href || pathname.startsWith(href + "/");
+  // Mark as active if it's the exact path, a sub-path, or matches any activePatterns
+  const isActive = pathname === href || pathname.startsWith(href + "/") || (activePatterns && activePatterns.some(pattern => pathname.startsWith(pattern)));
 
   return (
     <li>
@@ -134,7 +135,7 @@ export function InstructorSidebar() {
   const INSTRUCTOR_NAV: NavItem[] = [
     { label: "Quản lý Khóa học", href: "/instructor/courses", Icon: CourseManagementNavIcon },
     { label: "Thảo luận & Hỏi đáp", href: "/instructor/discussions", Icon: DiscussionsNavIcon },
-    { label: "Phân tích Học viên", href: "/instructor/analytics", Icon: StudentManagementNavIcon },
+    { label: "Quản lý Học viên", href: "/instructor/students", activePatterns: ["/instructor/analytics"], Icon: StudentManagementNavIcon },
     { label: "Quản lý Doanh thu", href: "/instructor/revenue", Icon: RevenueNavIcon },
   ];
 

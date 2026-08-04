@@ -5,41 +5,8 @@ import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { SparklesIcon, TrendUpIcon, PlusIcon } from "./icons";
 
-interface Discussion {
-  id: string;
-  name: string;
-  avatarInitials: string;
-  avatarColor: string;
-  message: string;
-  time: string;
-}
-
-const DISCUSSIONS: Discussion[] = [
-  {
-    id: "d1",
-    name: "Nam Đặng",
-    avatarInitials: "NĐ",
-    avatarColor: "bg-indigo-600",
-    message: "\"Thưa thầy, làm sao để tối ưu hóa Prompt cho GPT-4 trong...\"",
-    time: "1 phút trước",
-  },
-  {
-    id: "d2",
-    name: "Phương Vy",
-    avatarInitials: "PV",
-    avatarColor: "bg-teal-600",
-    message: "\"Bài tập 3 chương 2 có lỗi logic ở phần thuật toán không ạ?\"",
-    time: "2 giờ trước",
-  },
-  {
-    id: "d3",
-    name: "Khánh Hoàng",
-    avatarInitials: "KH",
-    avatarColor: "bg-purple-600",
-    message: "\"Cảm ơn thầy và tài liệu bổ trợ hữu ích!\"",
-    time: "Hôm qua",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { getLatestDiscussions, getAnalytics } from "../api";
 
 function DiscussionAvatar({ initials, color }: { initials: string; color: string }) {
   return (
@@ -49,7 +16,15 @@ function DiscussionAvatar({ initials, color }: { initials: string; color: string
   );
 }
 
-function DiscussionPanel() {
+function DiscussionPanel({ courseId }: { courseId?: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["latest-discussions", courseId],
+    queryFn: () => getLatestDiscussions({ limit: 3 }),
+  });
+
+  const discussions = data || [];
+  const unreadCount = discussions.filter((d: any) => d.status === 'open' && !d.is_resolved).length;
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-white shadow-2xs overflow-hidden">
       <div className="flex items-center justify-between p-4 border-b border-gray-100">
@@ -57,25 +32,43 @@ function DiscussionPanel() {
           Thảo luận mới nhất
         </span>
         <span className="px-2 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-600 text-[10px] font-black">
-          3 CHƯA ĐỌC
+          {unreadCount > 0 ? `${unreadCount} CHƯA ĐỌC` : "0 CHƯA ĐỌC"}
         </span>
       </div>
 
-      <div className="divide-y divide-gray-100">
-        {DISCUSSIONS.map((d) => (
-          <div key={d.id} className="flex items-start gap-3 p-3.5 hover:bg-gray-50/80 transition-colors cursor-pointer">
-            <DiscussionAvatar initials={d.avatarInitials} color={d.avatarColor} />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-1">
-                <span className="text-xs font-extrabold text-gray-900 truncate">{d.name}</span>
-                <span className="text-[10px] text-gray-400 font-medium shrink-0">{d.time}</span>
-              </div>
-              <p className="text-xs text-gray-600 leading-relaxed line-clamp-2 mt-0.5 italic">
-                {d.message}
-              </p>
-            </div>
+      <div className="divide-y divide-gray-100 min-h-[100px]">
+        {isLoading ? (
+          <div className="flex items-center justify-center p-6">
+             <div className="w-5 h-5 border-2 border-indigo-200 border-t-[#4F46E5] rounded-full animate-spin"></div>
           </div>
-        ))}
+        ) : discussions.length === 0 ? (
+          <div className="p-4 text-center text-xs text-gray-400 font-bold">Chưa có thảo luận nào.</div>
+        ) : (
+          discussions.map((d: any) => {
+            const initials = d.student?.name ? d.student.name.split(" ").map((n: string) => n[0]).join("").substring(0, 2).toUpperCase() : "HV";
+            const color = "bg-indigo-600";
+            return (
+              <div key={d.id} className="flex items-start gap-3 p-3.5 hover:bg-gray-50/80 transition-colors cursor-pointer">
+                {d.student?.avatar_url ? (
+                  <img src={d.student.avatar_url} alt={d.student.name} className="w-8 h-8 rounded-xl shadow-2xs object-cover shrink-0" />
+                ) : (
+                  <DiscussionAvatar initials={initials} color={color} />
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="text-xs font-extrabold text-gray-900 truncate">{d.student?.name || "Học viên"}</span>
+                    <span className="text-[10px] text-gray-400 font-medium shrink-0">
+                      {new Date(d.created_at).toLocaleDateString('vi-VN')}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-600 leading-relaxed line-clamp-2 mt-0.5 italic">
+                    "{d.content}"
+                  </p>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
       <div className="p-3.5 border-t border-gray-100 text-center bg-gray-50/50">
@@ -89,7 +82,7 @@ function DiscussionPanel() {
 
 const QUICK_TAGS = ["Động viên học tập", "Nhắc lịch kiểm tra", "Cập nhật bài giảng mới"];
 
-function AIAnnouncementPanel({ onOpenModal }: { onOpenModal: () => void }) {
+function AIAnnouncementPanel({ onOpenModal }: { onOpenModal: (topic?: string) => void }) {
   const [topic, setTopic] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
@@ -134,7 +127,7 @@ function AIAnnouncementPanel({ onOpenModal }: { onOpenModal: () => void }) {
         <button
           type="button"
           id="btn-ai-announcement"
-          onClick={onOpenModal}
+          onClick={() => onOpenModal(activeTag || topic)}
           className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-extrabold text-white bg-[#4F46E5] hover:bg-[#4338CA] shadow-sm transition-all cursor-pointer mt-1"
         >
           <PlusIcon size={14} />
@@ -174,7 +167,12 @@ function StatBar({ label, value, percent, color }: StatBarProps) {
   );
 }
 
-function ProgressStatsPanel() {
+function ProgressStatsPanel({ courseId }: { courseId?: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["student-analytics", courseId],
+    queryFn: () => getAnalytics({ course_id: courseId === "TẤT CẢ" ? undefined : courseId }),
+  });
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-white shadow-2xs overflow-hidden">
       <div className="p-4 border-b border-gray-100">
@@ -184,30 +182,40 @@ function ProgressStatsPanel() {
       </div>
 
       <div className="p-4 flex flex-col gap-4">
-        <StatBar label="Tỷ lệ hoàn thành trung bình" value="68%" percent={68} color="blue" />
-        <StatBar label="Tỷ lệ rớt chứng chỉ dự kiến" value="4.2%" percent={4.2} color="red" />
-        <StatBar label="Học viên tích cực (Tuần qua)" value="1,240" percent={75} color="purple" />
+        {isLoading ? (
+           <div className="flex items-center justify-center py-6">
+             <div className="w-5 h-5 border-2 border-indigo-200 border-t-[#4F46E5] rounded-full animate-spin"></div>
+           </div>
+        ) : (
+          <>
+            <StatBar label="Tỷ lệ hoàn thành trung bình" value={`${data?.average_progress || 0}%`} percent={data?.average_progress || 0} color="blue" />
+            <StatBar label="Tỷ lệ rớt chứng chỉ dự kiến" value={`${data?.at_risk_rate || 0}%`} percent={data?.at_risk_rate || 0} color="red" />
+            <StatBar label="Học viên tích cực (Tuần qua)" value={`${data?.active_students || 0}`} percent={data?.total_students ? (data.active_students / data.total_students) * 100 : 0} color="purple" />
 
-        <div className="rounded-xl bg-emerald-50/80 border border-emerald-200 p-3.5 flex items-start gap-2.5">
-          <span className="text-emerald-600 mt-0.5 shrink-0"><TrendUpIcon size={16} /></span>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[11px] font-black text-emerald-800 uppercase tracking-wider">Gợi ý Tối ưu AI</span>
-            <p className="text-xs text-emerald-700 leading-relaxed font-medium">
-              Tỷ lệ thảo luận tăng 15%. Nên ưu tiên giải đáp các câu hỏi chưa đọc để duy trì tỷ lệ giữ chân học viên!
-            </p>
-          </div>
-        </div>
+            <div className="rounded-xl bg-emerald-50/80 border border-emerald-200 p-3.5 flex items-start gap-2.5 mt-2">
+              <span className="text-emerald-600 mt-0.5 shrink-0"><TrendUpIcon size={16} /></span>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] font-black text-emerald-800 uppercase tracking-wider">Gợi ý Tối ưu AI</span>
+                <p className="text-xs text-emerald-700 leading-relaxed font-medium">
+                  {data?.at_risk_rate > 10 
+                    ? "Tỷ lệ rớt chứng chỉ đang cao, bạn nên gửi thông báo AI khích lệ các học viên có tiến độ dưới 30%!" 
+                    : "Học viên đang duy trì tiến độ tốt. Hãy tiếp tục giải đáp thảo luận để duy trì sự tương tác!"}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-export function RightPanels({ onOpenModal }: { onOpenModal: () => void }) {
+export function RightPanels({ onOpenModal, courseId }: { onOpenModal: (topic?: string) => void, courseId?: string }) {
   return (
     <div className="flex flex-col gap-5 w-full">
-      <DiscussionPanel />
-      <AIAnnouncementPanel onOpenModal={onOpenModal} />
-      <ProgressStatsPanel />
+      <DiscussionPanel courseId={courseId} />
+      <AIAnnouncementPanel onOpenModal={() => onOpenModal()} />
+      <ProgressStatsPanel courseId={courseId} />
     </div>
   );
 }

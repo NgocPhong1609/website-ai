@@ -16,6 +16,7 @@ class DiscussionReplyResource extends JsonResource
                 'name' => $this->user->name,
             ],
             'content' => $this->content,
+            'is_best_answer' => (boolean) $this->is_best_answer,
             'created_at' => $this->created_at,
         ];
     }

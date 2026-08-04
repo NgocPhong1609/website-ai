@@ -1,4 +1,4 @@
-import { RevenueContainer } from "@/src/features/instructor/revenue";
+import { RevenueContainer } from "@features/instructor/revenue";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

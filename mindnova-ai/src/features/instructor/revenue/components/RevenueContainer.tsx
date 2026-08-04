@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
+import { useQuery } from "@tanstack/react-query";
+import { getRevenueOverview } from "../api";
 import {
   WalletIcon,
   TrendUpIcon,
@@ -85,21 +87,21 @@ function PageHeader({ onOpenWithdrawal, onToggleForecast }: { onOpenWithdrawal: 
   );
 }
 
-function StatCards() {
+function StatCards({ data }: { data: any }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-2xs flex flex-col justify-between">
         <span className="text-xs font-black text-gray-500 uppercase tracking-wide">Tổng Doanh Thu (Tháng này)</span>
-        <span className="text-2xl font-black text-gray-900 mt-2">128,450,000đ</span>
-        <div className="flex items-center gap-1.5 mt-3 text-xs font-extrabold text-emerald-600">
+        <span className="text-2xl font-black text-gray-900 mt-2">{data.total_revenue.toLocaleString('vi-VN')}đ</span>
+        <div className={twMerge("flex items-center gap-1.5 mt-3 text-xs font-extrabold", data.revenue_growth >= 0 ? "text-emerald-600" : "text-rose-600")}>
           <TrendUpIcon />
-          <span>+12.5% so với tháng trước</span>
+          <span>{data.revenue_growth >= 0 ? '+' : ''}{data.revenue_growth}% so với tháng trước</span>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-2xs flex flex-col justify-between">
         <span className="text-xs font-black text-gray-500 uppercase tracking-wide">Số Dư Khả Dụng Ngay</span>
-        <span className="text-2xl font-black text-[#4F46E5] mt-2">42,180,000đ</span>
+        <span className="text-2xl font-black text-[#4F46E5] mt-2">{data.available_balance.toLocaleString('vi-VN')}đ</span>
         <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-gray-400">
           <ClockIcon />
           <span>Đã qua hạn hoàn tiền 30 ngày</span>
@@ -108,7 +110,7 @@ function StatCards() {
 
       <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-2xs flex flex-col justify-between">
         <span className="text-xs font-black text-gray-500 uppercase tracking-wide">Quỹ Bảo Lãnh (Escrow)</span>
-        <span className="text-2xl font-black text-amber-600 mt-2">15,400,000đ</span>
+        <span className="text-2xl font-black text-amber-600 mt-2">{data.escrow_balance.toLocaleString('vi-VN')}đ</span>
         <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-amber-700">
           <InfoCircleIcon />
           <span>Tạm giữ chờ cấn trừ đơn mới</span>
@@ -117,7 +119,7 @@ function StatCards() {
 
       <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-2xs flex flex-col justify-between">
         <span className="text-xs font-black text-gray-500 uppercase tracking-wide">Tỷ Lệ Hoàn Tiền (Refund)</span>
-        <span className="text-2xl font-black text-gray-900 mt-2">0.8%</span>
+        <span className="text-2xl font-black text-gray-900 mt-2">{data.refund_rate}%</span>
         <div className="flex items-center gap-1.5 mt-3 text-xs font-extrabold text-emerald-600">
           <InfoCircleIcon />
           <span>Cực kỳ an toàn (Trung bình: 2.4%)</span>
@@ -127,7 +129,7 @@ function StatCards() {
   );
 }
 
-function AIForecastSection({ onClose }: { onClose: () => void }) {
+function AIForecastSection({ onClose, forecast }: { onClose: () => void; forecast: any }) {
   return (
     <div className="p-6 rounded-2xl bg-white border border-indigo-200 shadow-sm flex flex-col gap-5 animate-fadeIn">
       <div className="flex items-center justify-between border-b border-indigo-100 pb-4">
@@ -155,14 +157,14 @@ function AIForecastSection({ onClose }: { onClose: () => void }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 flex flex-col justify-between">
           <span className="text-xs font-bold text-gray-500 uppercase">Thu Nhập Cuối Tháng Dự Kiến</span>
-          <span className="text-xl font-black text-[#4F46E5] mt-1.5">184,500,000đ</span>
-          <span className="text-xs font-semibold text-emerald-600 mt-1">▲ Dự kiến tăng trưởng +43% so với kỳ trước</span>
+          <span className="text-xl font-black text-[#4F46E5] mt-1.5">{forecast?.expected_end_month?.toLocaleString('vi-VN')}đ</span>
+          <span className="text-xs font-semibold text-emerald-600 mt-1">▲ Dự kiến tăng trưởng +{forecast?.growth_prediction}% so với kỳ trước</span>
         </div>
         
         <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 flex flex-col justify-between">
           <span className="text-xs font-bold text-gray-500 uppercase">Khóa Học Đứng Đầu Chuyển Đổi</span>
-          <span className="text-base font-black text-gray-900 truncate mt-1.5">AI Mastery for Business</span>
-          <span className="text-xs font-semibold text-gray-500 mt-1">Chiếm 68% doanh số từ nguồn liên kết chia sẻ</span>
+          <span className="text-base font-black text-gray-900 truncate mt-1.5">{forecast?.top_course}</span>
+          <span className="text-xs font-semibold text-gray-500 mt-1">Chiếm {forecast?.top_course_percentage}% doanh số từ nguồn liên kết chia sẻ</span>
         </div>
 
         <div className="p-4 rounded-xl bg-indigo-50/60 border border-indigo-200 flex flex-col justify-between gap-3">
@@ -186,7 +188,9 @@ function AIForecastSection({ onClose }: { onClose: () => void }) {
   );
 }
 
-function RevenueChart() {
+function RevenueChart({ chartData }: { chartData: any[] }) {
+  const maxVal = Math.max(...chartData.map(d => d.revenue), 1000); // minimum scale
+
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col shadow-2xs">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -205,33 +209,51 @@ function RevenueChart() {
         </div>
       </div>
       
-      {/* Visual Bar Chart Simulation */}
+      {/* Visual Bar Chart */}
       <div className="flex-1 min-h-[200px] flex items-end justify-between gap-3 px-2 sm:px-6 pt-6 border-t border-gray-100 relative">
-        {[35, 52, 90, 60, 68, 48, 85].map((h, i) => (
-          <div key={i} className="relative flex flex-col items-center w-full max-w-[42px] group cursor-pointer">
-            <div
-              className={twMerge(
-                "w-full rounded-xl transition-all duration-300",
-                i === 2 || i === 6 ? "bg-[#4F46E5] shadow-sm" : "bg-gray-100 group-hover:bg-indigo-200"
-              )}
-              style={{ height: `${h * 2}px` }}
-            />
-            <span className={twMerge("mt-2.5 text-xs font-extrabold", i === 2 || i === 6 ? "text-[#4F46E5]" : "text-gray-400")}>
-              {["T2", "T3", "Hnay", "T5", "T6", "T7", "CN"][i]}
-            </span>
-          </div>
-        ))}
+        {chartData.map((d, i) => {
+          const h = (d.revenue / maxVal) * 160; // Max height 160px
+          const isToday = i === chartData.length - 1;
+          return (
+            <div key={i} className="relative flex flex-col items-center w-full max-w-[42px] group cursor-pointer" title={d.revenue.toLocaleString('vi-VN') + 'đ'}>
+              <div
+                className={twMerge(
+                  "w-full rounded-xl transition-all duration-300 min-h-[4px]",
+                  isToday ? "bg-[#4F46E5] shadow-sm" : "bg-gray-200 group-hover:bg-indigo-200"
+                )}
+                style={{ height: `${h}px` }}
+              />
+              <span className={twMerge("mt-2.5 text-xs font-extrabold", isToday ? "text-[#4F46E5]" : "text-gray-400")}>
+                {isToday ? "Hnay" : d.day}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-function RecentTransactions() {
-  const items = [
-    { id: "TX-921", title: "Khóa AI Mastery", detail: "Link Giới thiệu Giảng viên (Hoa hồng 85%)", amount: "+2,550,000đ", status: "KHẢ DỤNG", color: "text-emerald-700 bg-emerald-50 border-emerald-200" },
-    { id: "TX-918", title: "Khóa ML Basics", detail: "Chợ Khóa học Chung (Hoa hồng 70%)", amount: "+840,000đ", status: "ESCROW TẠM GIỮ", color: "text-amber-700 bg-amber-50 border-amber-200" },
-    { id: "TX-890", title: "Rút tiền về Ngân hàng", detail: "MB Bank - **** 1234", amount: "-15,000,000đ", status: "ĐÃ XỬ LÝ", color: "text-indigo-700 bg-indigo-50 border-indigo-200" },
-  ];
+function RecentTransactions({ transactions }: { transactions: any[] }) {
+  const getStatusStyle = (status: string, type: string) => {
+    if (type === "withdrawal") return "text-indigo-700 bg-indigo-50 border-indigo-200";
+    if (type === "refund") return "text-rose-700 bg-rose-50 border-rose-200";
+    if (status === "escrow") return "text-amber-700 bg-amber-50 border-amber-200";
+    if (status === "available" || status === "completed") return "text-emerald-700 bg-emerald-50 border-emerald-200";
+    return "text-gray-700 bg-gray-50 border-gray-200";
+  };
+
+  const getStatusText = (status: string, type: string) => {
+    if (type === "withdrawal") return "ĐÃ RÚT TIỀN";
+    if (type === "refund") return "HOÀN TIỀN";
+    if (status === "escrow") return "ESCROW TẠM GIỮ";
+    if (status === "available" || status === "completed") return "KHẢ DỤNG";
+    return status.toUpperCase();
+  };
+
+  const getAmountPrefix = (type: string) => {
+    return (type === 'withdrawal' || type === 'refund') ? '-' : '+';
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 flex flex-col shadow-2xs overflow-hidden">
@@ -243,23 +265,31 @@ function RecentTransactions() {
       </div>
 
       <div className="flex flex-col p-4 gap-2.5 flex-1">
-        {items.map((item) => (
-          <div key={item.id} className="flex items-center justify-between p-3.5 rounded-xl bg-gray-50/70 border border-gray-100 hover:border-gray-200 transition-all">
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-extrabold text-gray-900">{item.title}</span>
-                <span className="text-[11px] font-mono font-bold text-gray-400">({item.id})</span>
-              </div>
-              <p className="text-xs font-medium text-gray-500 mt-0.5">{item.detail}</p>
-            </div>
-            <div className="text-right">
-              <span className="block text-xs font-black font-mono text-gray-900">{item.amount}</span>
-              <span className={twMerge("inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-md mt-1 uppercase border", item.color)}>
-                {item.status}
-              </span>
-            </div>
+        {transactions.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-gray-400 py-8">
+            <span className="text-2xl mb-2">📭</span>
+            <span className="text-xs font-medium">Chưa có giao dịch nào</span>
           </div>
-        ))}
+        ) : (
+          transactions.map((item) => (
+            <div key={item.id} className="flex items-center justify-between p-3.5 rounded-xl bg-gray-50/70 border border-gray-100 hover:border-gray-200 transition-all">
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-extrabold text-gray-900">{item.transaction_code}</span>
+                </div>
+                <p className="text-xs font-medium text-gray-500 mt-0.5">{item.description || item.type}</p>
+              </div>
+              <div className="text-right">
+                <span className="block text-xs font-black font-mono text-gray-900">
+                  {getAmountPrefix(item.type)}{item.amount.toLocaleString('vi-VN')}đ
+                </span>
+                <span className={twMerge("inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-md mt-1 border", getStatusStyle(item.status, item.type))}>
+                  {getStatusText(item.status, item.type)}
+                </span>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <div className="p-3.5 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs font-medium text-gray-500">
@@ -273,37 +303,59 @@ export function RevenueContainer() {
   const [isWithdrawalOpen, setIsWithdrawalOpen] = useState(false);
   const [showForecast, setShowForecast] = useState(true);
 
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["revenue-overview"],
+    queryFn: getRevenueOverview,
+  });
+
   return (
     <div className="flex flex-col min-h-screen bg-[#F4F4F8] font-sans">
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col gap-6 pb-16">
           
-          {/* Top Tabs Navigation */}
           <RevenueNavigationTabs active="overview" />
 
-          {/* Page Title & Actions */}
           <PageHeader
             onOpenWithdrawal={() => setIsWithdrawalOpen(true)}
             onToggleForecast={() => setShowForecast((prev) => !prev)}
           />
 
-          {/* KPI Stat Cards */}
-          <StatCards />
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-20 text-indigo-500">
+               <svg className="animate-spin h-8 w-8 text-[#4F46E5] mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span className="text-sm font-semibold">Đang tải dữ liệu doanh thu...</span>
+            </div>
+          ) : error || !data ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <span className="text-4xl mb-3">⚠️</span>
+              <p className="text-sm font-semibold text-gray-600 mb-4">Lỗi khi tải dữ liệu. Vui lòng thử lại.</p>
+              <button onClick={() => refetch()} className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold shadow-sm">
+                Tải lại trang
+              </button>
+            </div>
+          ) : (
+            <>
+              <StatCards data={data} />
 
-          {/* AI Forecast Section */}
-          {showForecast && <AIForecastSection onClose={() => setShowForecast(false)} />}
-          
-          {/* Charts & Transaction Table */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
-            <RevenueChart />
-            <RecentTransactions />
-          </div>
+              {showForecast && <AIForecastSection forecast={data.ai_forecast} onClose={() => setShowForecast(false)} />}
+              
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
+                <RevenueChart chartData={data.chart_data} />
+                <RecentTransactions transactions={data.recent_transactions} />
+              </div>
+            </>
+          )}
         </div>
       </main>
 
       <WithdrawalModal
         isOpen={isWithdrawalOpen}
         onClose={() => setIsWithdrawalOpen(false)}
+        availableBalance={data?.available_balance || 0}
+        onSuccess={() => refetch()}
       />
     </div>
   );
