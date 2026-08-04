@@ -14,6 +14,10 @@ export interface LessonNode {
   durationSeconds?: number;
   videoUrl?: string;
   description?: string;
+  content?: string;
+  video_url?: string;
+  temp_media_ids?: number[];
+  quizData?: any;
 }
 
 export interface ChapterNode {
@@ -65,9 +69,7 @@ export function useCourseStructure(initialStatus: CoursePublishStatus = "draft")
     description: m.description,
     showAiSuggestion: m.showAiSuggestion,
     lessons: m.lessons.map((l: DraftLesson) => ({
-      id: l.id,
-      title: l.title,
-      type: l.type,
+      ...l
     }))
   }));
 

@@ -7,6 +7,8 @@ import { twMerge } from "tailwind-merge";
 import { useInstructorCourse } from "../../management/api/courses";
 import { useUpdateCourse, useUploadCourseThumbnail, useDeleteCourse, useUpdateCourseStatus } from "../api";
 import { Step1BasicInfo } from "./Step1BasicInfo";
+import { Step3SettingsPrice } from "./Step3SettingsPrice";
+import { CourseEditTabs, EditCourseTab } from "./CourseEditTabs";
 import type { CourseBasicInfo, DifficultyLevel } from "../types";
 import {
   SaveIcon,
@@ -26,6 +28,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
   const { mutateAsync: deleteCourse, isPending: isDeleting } = useDeleteCourse();
   const { mutateAsync: updateStatus, isPending: isUpdatingStatus } = useUpdateCourseStatus();
 
+  const [activeTab, setActiveTab] = useState("overview");
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [basicInfo, setBasicInfo] = useState<CourseBasicInfo>({
     title: "",
@@ -114,51 +117,46 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
 
   return (
     <div className="min-h-screen bg-[#F4F4F8] flex flex-col font-sans pb-16">
-      {/* ── Header Bar ──────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200 px-6 py-4 shadow-2xs">
+      {/* ── HEADER CẬP NHẬT ─────────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200 px-6 pt-4 pb-2 shadow-2xs">
         <div className="max-w-6xl mx-auto flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
+            
+            {/* Left Header - Breadcrumb & Title */}
             <div className="flex items-center gap-3">
               <Link
                 href="/instructor/courses"
-                className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors shadow-2xs"
-                title="Quay lại danh sách khóa học"
+                className="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-700 flex items-center justify-center transition-colors shadow-2xs border border-gray-100"
               >
                 <ArrowLeftIcon size={18} />
               </Link>
               <div>
-                <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-gray-500 mb-0.5 font-semibold">
-                  <Link href="/instructor/courses" className="hover:text-[#4F46E5] transition-colors">
+                <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs font-bold text-gray-500 mb-0.5">
+                  <Link href="/instructor/courses" className="hover:text-gray-800 transition-colors">
                     Khóa học của tôi
                   </Link>
                   <span>/</span>
-                  <span className="text-[#4F46E5] font-extrabold">
+                  <span className="text-[#4F46E5]">
                     Chỉnh sửa khóa học #{courseId}
                   </span>
                 </nav>
                 <div className="flex items-center gap-2.5">
-                  <h1 className="text-lg font-black text-gray-900 tracking-tight truncate max-w-md md:max-w-xl">
-                    {basicInfo.title || course.title}
+                  <h1 className="text-lg font-black text-gray-900 tracking-tight truncate max-w-md md:max-w-2xl">
+                    {basicInfo.title || "Tên khóa học"}
                   </h1>
-                  <span
-                    className={twMerge(
-                      "px-2.5 py-0.5 rounded-md text-[11px] font-extrabold tracking-wider uppercase border",
-                      course.status === "published"
-                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                        : "bg-amber-50 text-amber-700 border-amber-200"
-                    )}
-                  >
-                    {course.status === "published" ? "Published" : "Draft Mode"}
+                  <span className="px-2.5 py-0.5 rounded-md text-[10px] font-black tracking-wider uppercase border bg-emerald-50 text-emerald-600 border-emerald-200">
+                    {course.status === "published" ? "PUBLISHED" : "DRAFT MODE"}
                   </span>
                 </div>
               </div>
             </div>
 
+            {/* Right Header - Buttons */}
             <div className="flex items-center gap-2.5">
               <Link
                 href={`/courses/${courseId}`}
                 target="_blank"
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-700 bg-gray-50 border border-gray-200 hover:bg-white hover:border-[#4F46E5] transition-all shadow-2xs"
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-all shadow-2xs"
               >
                 <EyeIcon size={14} />
                 <span className="hidden sm:inline">Xem trước</span>
@@ -169,10 +167,8 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
                 onClick={handleSave}
                 disabled={isPending}
                 className={twMerge(
-                  "flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold text-white transition-all shadow-sm cursor-pointer",
-                  saveSuccess
-                    ? "bg-emerald-600 hover:bg-emerald-700"
-                    : "bg-[#4F46E5] hover:bg-[#4338CA] active:scale-95 disabled:bg-gray-400"
+                  "flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black text-white transition-all shadow-sm cursor-pointer",
+                  saveSuccess ? "bg-emerald-600 hover:bg-emerald-700" : "bg-[#4F46E5] hover:bg-[#4338CA] disabled:bg-gray-400"
                 )}
               >
                 {isUpdating || isUploading ? (
@@ -191,70 +187,81 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
               </button>
             </div>
           </div>
+
+          {/* Render Thanh Tabs bên trong Header */}
+          <CourseEditTabs activeTab={activeTab as EditCourseTab} onChangeTab={setActiveTab} />
         </div>
       </header>
 
-      {/* ── Studio Workspace Content ────────────────────────────────────────── */}
-      <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-8 flex flex-col gap-6">
-        <div className="flex flex-col gap-6">
-          <Step1BasicInfo data={basicInfo} onChange={handleBasicInfoChange} />
-        </div>
+      {/* ── THÂN TRANG & HIỂN THỊ THEO TAB ──────────────────────────────────── */}
+      <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-6 flex flex-col">
+        
+        {/* Nội dung render tương ứng với tab được chọn */}
+        <div className="mt-2">
+          {activeTab === "overview" && (
+            <Step1BasicInfo data={basicInfo} onChange={handleBasicInfoChange} />
+          )}
 
-        <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-2xs flex flex-col gap-6 w-full animate-fadeIn mt-4">
-          <div>
-            <h2 className="text-base font-black text-gray-900">Cấu hình & Quản lý</h2>
-            <p className="text-xs text-gray-500 mt-0.5">Quản lý trạng thái khóa học và cài đặt nâng cao.</p>
-          </div>
+          {activeTab === "pricing" && (
+            <Step3SettingsPrice 
+              courseTitle={basicInfo.title} 
+              thumbnailPreview={basicInfo.thumbnailPreview} 
+            />
+          )}
 
-          <div className="flex flex-col sm:flex-row items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/50 gap-4">
-            <div>
-              <span className="block text-sm font-bold text-gray-900">Trạng thái khóa học</span>
-              <span className="text-[12px] text-gray-500 mt-1 block">
-                Chuyển khóa học sang trạng thái <strong>{course.status === "published" ? "Bản nháp" : "Công khai"}</strong>. Khóa học dạng nháp sẽ không hiển thị trên cửa hàng.
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={handleToggleStatus}
-              disabled={isPending}
-              className={twMerge(
-                "px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all shrink-0 cursor-pointer disabled:opacity-50",
-                course.status === "published"
-                  ? "bg-amber-100 text-amber-800 hover:bg-amber-200"
-                  : "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
-              )}
-            >
-              {isUpdatingStatus ? "Đang xử lý..." : course.status === "published" ? "Chuyển về Nháp" : "Công khai khóa học"}
-            </button>
-          </div>
+          {activeTab === "advanced" && (
+             <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col gap-2">
+                <div className="flex flex-col gap-1 mb-2">
+                  <h2 className="text-[17px] font-black text-gray-900">Cấu hình Quyền học tập</h2>
+                  <p className="text-[13px] text-gray-500">Quản lý cấp chứng chỉ tự động và khóa bình luận diễn đàn.</p>
+                </div>
 
-          <div className="mt-4 pt-6 border-t border-rose-100 flex flex-col gap-4">
-            <h3 className="text-xs font-black uppercase tracking-wider text-rose-600 flex items-center gap-1.5">
-              <TrashIcon size={14} />
-              <span>Khu Vực Nguy Hiểm (Danger Zone)</span>
-            </h3>
-            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div>
-                <span className="block text-xs font-bold text-rose-950">Xóa vĩnh viễn khóa học này</span>
-                <span className="text-[11px] text-rose-800 block mt-1">
-                  Hành động này sẽ xóa vĩnh viễn khóa học cùng toàn bộ module và bài học liên quan. Không thể khôi phục!
-                </span>
-                {course.status === "published" && (
-                  <span className="block mt-1 text-[11px] font-black text-rose-900">
-                    * Vui lòng chuyển khóa học về trạng thái Nháp để có thể xóa.
-                  </span>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={isPending || course.status === "published"}
-                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs shadow-xs transition-all shrink-0 cursor-pointer disabled:bg-rose-300 disabled:cursor-not-allowed"
-              >
-                {isDeleting ? "Đang xóa..." : "Xóa bài giảng"}
-              </button>
-            </div>
-          </div>
+                <div className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 bg-gray-50/50">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">🏆</span>
+                    <div>
+                      <span className="block text-[14px] font-bold text-gray-900">Cấp Chứng Chỉ Tốt Nghiệp Tự Động (Blockchain ID)</span>
+                      <span className="text-[12px] text-gray-500 block mt-0.5">Tự động sinh mã chứng nhận khi học viên đạt trên 80% tiến độ bài giảng</span>
+                    </div>
+                  </div>
+                  <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-[#4F46E5] focus:ring-[#4F46E5] cursor-pointer" />
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 bg-gray-50/50">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">💬</span>
+                    <div>
+                      <span className="block text-[14px] font-bold text-gray-900">Hòm thư thảo luận trực tiếp</span>
+                      <span className="text-[12px] text-gray-500 block mt-0.5">Cho phép học viên đặt câu hỏi Hỏi-Đáp bên dưới từng bài video</span>
+                    </div>
+                  </div>
+                  <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-[#4F46E5] focus:ring-[#4F46E5] cursor-pointer" />
+                </div>
+
+                <div className="mt-4 pt-6 border-t border-rose-50 flex flex-col gap-4">
+                  <h3 className="text-[12px] font-black uppercase tracking-wider text-[#E11D48] flex items-center gap-1.5">
+                    <TrashIcon size={14} />
+                    <span>Khu Vực Nguy Hiểm (Danger Zone)</span>
+                  </h3>
+                  <div className="p-4 rounded-2xl bg-rose-50/50 border border-rose-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                      <span className="block text-[14px] font-bold text-rose-950">Xóa vĩnh viễn khóa học này</span>
+                      <span className="text-[12px] text-rose-700 block mt-1">
+                        Hành động này không thể hoàn tác. Toàn bộ video và dữ liệu bài giảng sẽ bị xóa.
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleDelete}
+                      disabled={isPending || isDeleting}
+                      className="px-5 py-2.5 rounded-xl bg-[#E11D48] hover:bg-rose-700 text-white font-extrabold text-[13px] shadow-sm transition-all shrink-0 cursor-pointer disabled:bg-rose-300 disabled:cursor-not-allowed"
+                    >
+                      {isDeleting ? "Đang xóa..." : "Xóa bài giảng"}
+                    </button>
+                  </div>
+                </div>
+             </div>
+          )}
         </div>
       </main>
     </div>

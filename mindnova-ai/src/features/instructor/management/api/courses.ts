@@ -47,6 +47,8 @@ export function useInstructorCourses(search?: string) {
         status: course.status,
         durationHours: 0, // Placeholder: Update backend CourseResource if needed
         totalLessons: 0,  // Placeholder: Update backend CourseResource if needed
+        price: course.price,
+        salePrice: (course as any).sale_price,
       }));
     },
   });

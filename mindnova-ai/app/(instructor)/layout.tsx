@@ -12,7 +12,7 @@ export default function InstructorLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="flex min-h-screen overflow-hidden bg-[#F4F4F8]">
+    <div className="flex h-screen overflow-hidden bg-[#F4F4F8]">
       <InstructorSidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <InstructorTopbar />

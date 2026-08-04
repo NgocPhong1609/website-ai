@@ -29,7 +29,7 @@ export function Step3SettingsPrice({ courseTitle = "Khóa học AI mới", thumb
   } = useInstructorPricing(50);
 
   useEffect(() => {
-    setSettings("basePrice", basePrice);
+    setSettings("basePrice", String(basePrice));
   }, [basePrice, setSettings]);
 
   return (

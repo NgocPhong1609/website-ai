@@ -154,14 +154,10 @@ export function LoginForm() {
   return "/"; // SỬA Ở ĐÂY: Trỏ về trang chủ "/" thay vì "/dashboard"
   };
 
-  // 2. Tự động chuyển hướng nếu đã đăng nhập
+  // 2. Xóa localStorage cũ nếu truy cập vào trang login (vì middleware không tìm thấy cookie)
   useEffect(() => {
-    const token = window.localStorage.getItem("accessToken");
-    const userInfoRaw = window.localStorage.getItem("userInfo");
-    if (token && userInfoRaw) {
-      const user = JSON.parse(userInfoRaw);
-      window.location.assign(getRedirectPath(user.roles || []));
-    }
+    window.localStorage.removeItem("accessToken");
+    window.localStorage.removeItem("userInfo");
   }, []);
 
   const handleChange = useCallback(

@@ -43,25 +43,44 @@ function EditButton({ courseId }: { courseId: string }) {
   );
 }
 
-function CourseThumbnail({ title, thumbnail }: Pick<Course, "title" | "thumbnail">) {
-  if (!thumbnail) return null;
+function PriceBadge({ course }: { course: Course }) {
+  return (
+    <div className="absolute bottom-3 right-3 px-2.5 py-1.5 rounded-lg text-[13px] font-black z-10 shadow-sm bg-gray-900/80 text-white backdrop-blur-md flex items-center gap-2 border border-white/20">
+      {!course.price || course.price === 0 ? (
+        <span className="text-emerald-400">Miễn phí</span>
+      ) : course.salePrice && course.salePrice < course.price ? (
+        <>
+          <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.salePrice)}</span>
+          <span className="text-[11px] text-gray-300 line-through font-medium">
+            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)}
+          </span>
+        </>
+      ) : (
+        <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)}</span>
+      )}
+    </div>
+  );
+}
 
+function CourseThumbnail({ title, thumbnail }: Pick<Course, "title" | "thumbnail">) {
   return (
     <div className="relative w-full aspect-[16/9] bg-gray-100 overflow-hidden border-b border-gray-100">
-      <Image
-        src={thumbnail}
-        alt={title}
-        fill
-        sizes="(max-width: 768px) 100vw, 33vw"
-        className="object-cover group-hover:scale-105 transition-transform duration-300"
-      />
+      {thumbnail && (
+        <Image
+          src={thumbnail}
+          alt={title}
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+      )}
     </div>
   );
 }
 
 function CourseActionButtons({ courseId }: { courseId: string }) {
   return (
-    <div className="grid grid-cols-2 gap-2 p-3.5 mt-auto border-t border-gray-100 bg-gray-50/50">
+    <div className="grid grid-cols-1 gap-2 p-3.5 mt-auto border-t border-gray-100 bg-gray-50/50">
       <Link
         href={`/instructor/courses/${courseId}/lessons`}
         className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#111827] bg-white border border-gray-200 hover:bg-[#EEF2FF] hover:text-[#4F46E5] hover:border-indigo-200 active:scale-98 transition-all duration-150 cursor-pointer shadow-2xs"
@@ -69,17 +88,7 @@ function CourseActionButtons({ courseId }: { courseId: string }) {
         <span className="text-[#4F46E5]">
           <BookOpenIcon />
         </span>
-        <span>Nội dung AI</span>
-      </Link>
-
-      <Link
-        href="/instructor/revenue"
-        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#111827] bg-white border border-gray-200 hover:bg-[#EEF2FF] hover:text-[#4F46E5] hover:border-indigo-200 active:scale-98 transition-all duration-150 cursor-pointer shadow-2xs"
-      >
-        <span className="text-[#4F46E5]">
-          <TagIcon />
-        </span>
-        <span>Giá & Doanh thu</span>
+        <span>Nội dung</span>
       </Link>
     </div>
   );
@@ -99,6 +108,7 @@ export function CourseCard({ course }: CourseCardProps) {
         <CourseThumbnail title={course.title} thumbnail={course.thumbnail} />
         <StatusBadge status={course.status} />
         <EditButton courseId={course.id} />
+        <PriceBadge course={course} />
       </div>
 
       <div className="p-5 flex flex-col gap-2 flex-1">
@@ -109,6 +119,7 @@ export function CourseCard({ course }: CourseCardProps) {
           <span className="text-gray-400"><ClockIcon /></span>
           <span>{course.durationHours} giờ &bull; {course.totalLessons} bài học</span>
         </p>
+
       </div>
 
       <CourseActionButtons courseId={course.id} />

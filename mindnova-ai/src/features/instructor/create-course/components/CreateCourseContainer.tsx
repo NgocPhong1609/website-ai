@@ -159,7 +159,7 @@ export function CreateCourseContainer() {
         }
       }
 
-      const priceNum = Number(settings.basePrice.replace(/[^0-9]/g, ""));
+      const priceNum = Number(String(settings.basePrice).replace(/[^0-9]/g, ""));
       await updatePrice({ courseId, price: priceNum });
 
       if (!settings.isDraft) {
@@ -276,21 +276,7 @@ export function CreateCourseContainer() {
 
         {step === 2 && (
           <div className="flex flex-col gap-6">
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div>
-                <h2 className="text-base font-black text-gray-900">Trung tâm Điều hành Chương bài &amp; Video</h2>
-                <p className="text-xs text-gray-500 mt-1">
-                  Hệ thống hỗ trợ tải lên video hàng loạt (Bulk Uploader), chia chương linh hoạt và tích hợp đề kiểm tra trắc nghiệm sinh tự động từ AI.
-                </p>
-              </div>
-              <Link
-                href={`/instructor/courses/new/lessons`}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#4F46E5] hover:bg-[#4338CA] text-white font-extrabold text-xs shadow-2xs transition-all shrink-0 cursor-pointer"
-              >
-                <BookOpenIcon size={15} />
-                <span>Mở Studio Quản Lý Bài Giảng &amp; Video ➔</span>
-              </Link>
-            </div>
+
 
             <Step2CourseStructure />
           </div>

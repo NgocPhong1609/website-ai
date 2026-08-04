@@ -4,8 +4,7 @@ import { useInstructorCourses } from "../api/courses";
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-import { AIBanner } from "./AIBanner";
-import { RevenueCard } from "./RevenueCard";
+
 import { CourseFilterTabs } from "./CourseFilterTabs";
 import { CourseCard } from "./CourseCard";
 import { CreateCourseCard } from "./CreateCourseCard";
@@ -63,11 +62,7 @@ function CourseManagementContent() {
           <CourseFilterTabs counts={counts} onFilterChange={handleFilterChange} />
         </div>
 
-        {/* ── Banner + Revenue Row ─────────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
-          <AIBanner />
-          <RevenueCard />
-        </div>
+
 
         {/* ── Course Grid ──────────────────────────────────────────────────────── */}
         <section aria-label="Danh sách khóa học">
