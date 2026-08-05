@@ -27,11 +27,11 @@ export function Step3SettingsPrice({ courseTitle = "Khóa học AI mới", thumb
     setTier,
     toggleDiscount,
     updateDiscount,
-  } = useInstructorPricing(initialPrice || 500000);
+  } = useInstructorPricing(initialPrice ?? 500000);
 
   useEffect(() => {
-    setSettings("basePrice", String(basePrice));
-  }, [basePrice, setSettings]);
+    setSettings("basePrice", String(isFree ? 0 : basePrice));
+  }, [basePrice, isFree, setSettings]);
 
   return (
     <div className="w-full flex flex-col gap-6 animate-fadeIn">

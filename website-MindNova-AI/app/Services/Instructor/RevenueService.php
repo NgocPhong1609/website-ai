@@ -233,7 +233,7 @@ class RevenueService
     /**
      * Get sales report by courses.
      */
-    public function getSalesReport(User $instructor): array
+    public function getSalesReport(User $instructor, int $days = 7): array
     {
         $now = Carbon::now();
         $startOfMonth = $now->copy()->startOfMonth();
@@ -302,29 +302,30 @@ class RevenueService
         $salesGrowth = $lastMonthSales > 0 ? (($totalSales - $lastMonthSales) / $lastMonthSales) * 100 : ($totalSales > 0 ? 100 : 0);
         $enrollmentsGrowth = $lastMonthEnrollments > 0 ? (($totalEnrollments - $lastMonthEnrollments) / $lastMonthEnrollments) * 100 : ($totalEnrollments > 0 ? 100 : 0);
         
-        // Chart Data (Last 7 Weeks)
+        // Chart Data (Last X Days)
         $chartData = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $weekStart = $now->copy()->subWeeks($i)->startOfWeek();
-            $weekEnd = $now->copy()->subWeeks($i)->endOfWeek();
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $date = $now->copy()->subDays($i);
+            $dayStart = $date->copy()->startOfDay();
+            $dayEnd = $date->copy()->endOfDay();
             
-            $weekRev = InstructorTransaction::where('instructor_id', $instructor->id)
+            $dayRev = InstructorTransaction::where('instructor_id', $instructor->id)
                 ->where('type', 'revenue')
                 ->whereIn('status', ['available', 'escrow'])
-                ->whereBetween('created_at', [$weekStart, $weekEnd])
+                ->whereBetween('created_at', [$dayStart, $dayEnd])
                 ->sum('amount');
                 
-            $weekRefund = InstructorTransaction::where('instructor_id', $instructor->id)
+            $dayRefund = InstructorTransaction::where('instructor_id', $instructor->id)
                 ->where('type', 'refund')
-                ->whereBetween('created_at', [$weekStart, $weekEnd])
+                ->whereBetween('created_at', [$dayStart, $dayEnd])
                 ->sum('amount');
                 
-            $label = $i === 0 ? "Nay" : "Tuần " . (7 - $i);
+            $label = $date->locale('vi')->isoFormat('D/M');
                 
             $chartData[] = [
                 'label' => $label,
-                'revenue' => (float) $weekRev,
-                'refund' => (float) $weekRefund
+                'revenue' => (float) $dayRev,
+                'refund' => (float) $dayRefund
             ];
         }
         

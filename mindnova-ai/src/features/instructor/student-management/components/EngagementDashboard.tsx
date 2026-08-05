@@ -92,8 +92,8 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
               ) : metrics.new_students.length === 0 ? (
                 <tr><td colSpan={4} className="p-8 text-center text-gray-400 text-sm">Chưa có học viên mới nào trong 30 ngày qua</td></tr>
               ) : (
-                metrics.new_students.map((st: any) => (
-                  <tr key={st.id} className="hover:bg-gray-50/50 transition-colors cursor-pointer group" onClick={() => onSelectStudent(st.id)}>
+                metrics.new_students.map((st: any, index: number) => (
+                  <tr key={`${st.id}-${index}`} className="hover:bg-gray-50/50 transition-colors cursor-pointer group" onClick={() => onSelectStudent(st.id)}>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">

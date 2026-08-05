@@ -102,7 +102,8 @@ class RevenueController extends Controller
         }
 
         try {
-            $data = $this->revenueService->getSalesReport($user);
+            $days = (int) request('days', 7);
+            $data = $this->revenueService->getSalesReport($user, $days);
             return response()->json(['data' => $data], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Lỗi khi lấy báo cáo bán hàng.', 'error' => $e->getMessage()], 500);

@@ -37,8 +37,9 @@ const MIN_PRICE = 100000;
 const MAX_PRICE = 100000000;
 
 export function useInstructorPricing(initialPrice = 500000): UseInstructorPricingReturn {
-  const [isFree, setIsFreeState] = useState(false);
-  const [basePrice, setBasePriceState] = useState<number>(initialPrice);
+  const isInitiallyFree = initialPrice === 0;
+  const [isFree, setIsFreeState] = useState(isInitiallyFree);
+  const [basePrice, setBasePriceState] = useState<number>(isInitiallyFree ? 500000 : initialPrice);
   const [tier, setTier] = useState<PricingTier>("standard");
   const [validationError, setValidationError] = useState<string | null>(null);
 

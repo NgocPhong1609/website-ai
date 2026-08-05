@@ -96,8 +96,47 @@ class OrderController extends Controller
         }
 
         if ($order->payment_method === 'momo') {
-            // Nếu bạn muốn bỏ Momo thì để đoạn này trả về null hoặc thông báo
-            return "Momo is disabled";
+            $partnerCode = env('MOMO_PARTNER_CODE', 'MOMO');
+            $accessKey = env('MOMO_ACCESS_KEY', 'access_key');
+            $secretKey = env('MOMO_SECRET_KEY', 'secret_key');
+            $endpoint = env('MOMO_ENDPOINT', 'https://test-payment.momo.vn/v2/gateway/api/create');
+            $redirectUrl = "http://localhost:3000/payment/callback";
+            $ipnUrl = env('APP_URL', 'http://localhost:8000') . "/api/student/payment/momo-ipn";
+            $amount = (string)$totalAmount;
+            $orderInfo = "Thanh toan don hang " . $transactionId;
+            $requestId = time() . "";
+            $extraData = "";
+            $requestType = "captureWallet";
+
+            $rawHash = "accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$transactionId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType";
+            $signature = hash_hmac('sha256', $rawHash, $secretKey);
+
+            $data = [
+                'partnerCode' => $partnerCode,
+                'partnerName' => 'MindNova',
+                'storeId' => 'MindNova',
+                'requestId' => $requestId,
+                'amount' => $amount,
+                'orderId' => $transactionId,
+                'orderInfo' => $orderInfo,
+                'redirectUrl' => $redirectUrl,
+                'ipnUrl' => $ipnUrl,
+                'lang' => 'vi',
+                'extraData' => $extraData,
+                'requestType' => $requestType,
+                'signature' => $signature
+            ];
+
+            try {
+                $response = \Illuminate\Support\Facades\Http::post($endpoint, $data);
+                if ($response->successful()) {
+                    $json = $response->json();
+                    return $json['payUrl'] ?? null;
+                }
+            } catch (\Exception $e) {
+                // Return null if Momo fails
+            }
+            return null;
         }
 
         return "https://your-website.com/banking-instruction"; // Link trang hướng dẫn banking
@@ -124,15 +163,79 @@ class OrderController extends Controller
                     // Tự động cấp quyền
                     $items = OrderItem::where('order_id', $order->id)->get();
                     foreach ($items as $item) {
-                        DB::table('enrollments')->insertOrIgnore([
+                        $inserted = DB::table('enrollments')->insertOrIgnore([
                             'user_id' => $order->user_id, 'course_id' => $item->course_id,
                             'status' => 'enrolled', 'enrolled_at' => now()
                         ]);
+                        
+                        if ($inserted) {
+                            $course = \App\Models\Course::find($item->course_id);
+                            $student = \App\Models\User::find($order->user_id);
+                            if ($course && $course->teacher && $student) {
+                                $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
+                            }
+                        }
                     }
                 }
             }
             return response()->json(['RspCode' => '00', 'Message' => 'Confirm Success']);
         }
-        return response()->json(['RspCode' => '97', 'Message' => 'Invalid signature']);
+    }
+    /**
+     * API nhận IPN Momo
+     */
+    public function momoIpn(Request $request)
+    {
+        $partnerCode = env('MOMO_PARTNER_CODE', 'MOMO');
+        $accessKey = env('MOMO_ACCESS_KEY', 'access_key');
+        $secretKey = env('MOMO_SECRET_KEY', 'secret_key');
+
+        $partnerCodeParam = $request->partnerCode;
+        $orderId = $request->orderId;
+        $requestId = $request->requestId;
+        $amount = $request->amount;
+        $orderInfo = $request->orderInfo;
+        $orderType = $request->orderType;
+        $transId = $request->transId;
+        $resultCode = $request->resultCode;
+        $message = $request->message;
+        $payType = $request->payType;
+        $responseTime = $request->responseTime;
+        $extraData = $request->extraData;
+        $signature = $request->signature;
+
+        $rawHash = "accessKey=$accessKey&amount=$amount&extraData=$extraData&message=$message&orderId=$orderId&orderInfo=$orderInfo&orderType=$orderType&partnerCode=$partnerCodeParam&payType=$payType&requestId=$requestId&responseTime=$responseTime&resultCode=$resultCode&transId=$transId";
+        
+        $mySignature = hash_hmac('sha256', $rawHash, $secretKey);
+
+        if ($mySignature === $signature) {
+            if ($resultCode == 0) {
+                // Success
+                $order = Order::where('transaction_id', $orderId)->first();
+                if ($order && $order->status === 'pending') {
+                    $order->update(['status' => 'completed']);
+                    // Tự động cấp quyền
+                    $items = OrderItem::where('order_id', $order->id)->get();
+                    foreach ($items as $item) {
+                        $inserted = DB::table('enrollments')->insertOrIgnore([
+                            'user_id' => $order->user_id, 'course_id' => $item->course_id,
+                            'status' => 'enrolled', 'enrolled_at' => now()
+                        ]);
+                        
+                        if ($inserted) {
+                            $course = \App\Models\Course::find($item->course_id);
+                            $student = \App\Models\User::find($order->user_id);
+                            if ($course && $course->teacher && $student) {
+                                $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
+                            }
+                        }
+                    }
+                }
+                return response()->json(['message' => 'Success']);
+            }
+            return response()->json(['message' => 'Payment failed']);
+        }
+
+        return response()->json(['message' => 'Invalid signature'], 400);
     }
 }

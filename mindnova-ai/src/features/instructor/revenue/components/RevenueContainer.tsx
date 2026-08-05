@@ -215,7 +215,13 @@ function RevenueChart({ chartData }: { chartData: any[] }) {
           const h = (d.revenue / maxVal) * 160; // Max height 160px
           const isToday = i === chartData.length - 1;
           return (
-            <div key={i} className="relative flex flex-col items-center w-full max-w-[42px] group cursor-pointer" title={d.revenue.toLocaleString('vi-VN') + 'đ'}>
+            <div key={i} className="relative flex flex-col items-center w-full max-w-[42px] group cursor-pointer">
+              {/* Tooltip */}
+              <div className="absolute bottom-full mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 whitespace-nowrap bg-white border border-gray-100 shadow-xl rounded-xl p-2.5 pointer-events-none">
+                <p className="text-[10px] text-gray-400 font-bold mb-1 uppercase tracking-wider">{isToday ? "Hôm nay" : d.day}</p>
+                <p className="text-xs font-black text-[#4F46E5]">Doanh thu : {d.revenue.toLocaleString('vi-VN')}đ</p>
+              </div>
+
               <div
                 className={twMerge(
                   "w-full rounded-xl transition-all duration-300 min-h-[4px]",

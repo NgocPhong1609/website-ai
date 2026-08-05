@@ -5,52 +5,63 @@ namespace App\Http\Controllers\Api\Student;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use OpenAI;
+use App\Contracts\AiProviderInterface;
+use App\DTOs\AiMessageDto;
+use App\Models\AiTutorConversation;
+use App\Models\AiTutorMessage;
+use Illuminate\Support\Facades\DB;
 
 class AiTutorController extends Controller
 {
-    public function streamChat(Request $request)
+    public function __construct(private AiProviderInterface $aiService)
     {
-        // Lấy câu hỏi từ Frontend gửi lên
-        $userMessage = $request->input('message', '');
+    }
 
-        return new StreamedResponse(function () use ($userMessage) {
-            // Khởi tạo Client, ép trỏ sang Base URL của Groq thay vì OpenAI
-            $client = OpenAI::factory()
-                ->withApiKey(env('GROQ_API_KEY'))
-                ->withBaseUri('https://api.groq.com/openai/v1')
-                ->make();
+    public function chat(Request $request)
+    {
+        $request->validate([
+            'message' => 'required|string',
+            'lesson_id' => 'nullable|exists:lessons,id'
+        ]);
 
-            // Gọi API với model miễn phí siêu tốc độ của Groq
-            $stream = $client->chat()->createStreamed([
-                'model' => 'llama-3.1-8b-instant',
-                'messages' => [
-                    [
-                        'role' => 'system',
-                        'content' => 'Bạn là Nova, một trợ lý học tập AI thân thiện, trả lời ngắn gọn, dễ hiểu và luôn dùng tiếng Việt.'
-                    ],
-                    [
-                        'role' => 'user',
-                        'content' => $userMessage
-                    ],
-                ],
-            ]);
+        $user = $request->user();
+        $userMessage = $request->input('message');
+        $lessonId = $request->input('lesson_id');
 
-            // Xử lý luồng stream trả về
-            foreach ($stream as $response) {
-                $text = $response->choices[0]->delta->content;
-                if (isset($text)) {
-                    // Đẩy từng cụm từ về Frontend
-                    echo $text;
-                    ob_flush();
-                    flush();
-                }
-            }
-        }, 200, [
-            'Content-Type' => 'text/event-stream',
-            'Cache-Control' => 'no-cache',
-            'Connection' => 'keep-alive',
-            'X-Accel-Buffering' => 'no',
+        // Tìm hoặc tạo conversation
+        $conversation = AiTutorConversation::firstOrCreate([
+            'user_id' => $user->id,
+            'lesson_id' => $lessonId
+        ]);
+
+        // Lưu tin nhắn của user
+        AiTutorMessage::create([
+            'conversation_id' => $conversation->id,
+            'sender' => 'user',
+            'message' => $userMessage
+        ]);
+
+        $messagesDto = [
+            new AiMessageDto('system', 'Bạn là trợ lý ảo MindNova.'),
+            new AiMessageDto('user', $userMessage)
+        ];
+
+        // Gọi Mock AI Service
+        $responseContent = $this->aiService->sendMessage($messagesDto, [
+            'user_id' => $user->id,
+            'feature' => 'tutor'
+        ]);
+
+        // Lưu tin nhắn của AI
+        $aiMessage = AiTutorMessage::create([
+            'conversation_id' => $conversation->id,
+            'sender' => 'ai',
+            'message' => $responseContent
+        ]);
+
+        return response()->json([
+            'message' => $aiMessage->message,
+            'conversation_id' => $conversation->id
         ]);
     }
 }

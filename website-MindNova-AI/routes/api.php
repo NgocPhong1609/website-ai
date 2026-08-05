@@ -61,6 +61,10 @@ Route::post('/student/study-plan/chat', [StudentStudyPlanController::class, 'cha
 Route::get('/student/lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
 Route::post('/student/lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
 
+// Payment IPN (Webhook) - Cần public để Momo/VNPAY gọi
+Route::get('/student/payment/vnpay-ipn', [OrderController::class, 'vnpayIpn']);
+Route::post('/student/payment/momo-ipn', [OrderController::class, 'momoIpn']);
+
 // ==========================================
 // 2. NHÓM API PRIVATE (Bắt buộc phải có Bearer Token)
 // ==========================================
@@ -89,6 +93,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // ==========================================
     Route::prefix('student')->group(function () {
         // TÍNH NĂNG AI TUTOR & Các tiện ích nâng cao khác
+        Route::post('/ai-tutor/chat', [\App\Http\Controllers\Api\Student\AiTutorController::class, 'chat']);
+        Route::post('/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'store']);
     });
 });
 
@@ -159,6 +165,12 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::post('revenue/withdraw', [RevenueController::class, 'requestWithdraw']);
     Route::get('revenue/transactions', [RevenueController::class, 'getTransactions']);
     Route::get('revenue/sales-report', [RevenueController::class, 'getSalesReport']);
+    
+    // Orders
+    Route::get('orders', [\App\Http\Controllers\Api\Instructor\OrderController::class, 'index']);
+    
+    // Reviews
+    Route::get('reviews', [\App\Http\Controllers\Api\Instructor\ReviewController::class, 'index']);
 });
 
 // ==========================================
