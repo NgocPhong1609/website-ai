@@ -18,6 +18,11 @@ use App\Http\Controllers\Api\Student\AiTutorController;
 use App\Http\Controllers\Api\Student\CourseController as StudentCourseController;
 use App\Http\Controllers\Api\StudentQuizController;
 use App\Http\Controllers\Api\Student\OnboardingController;
+use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Api\Student\StudyPlanController as StudentStudyPlanController;
+use App\Http\Controllers\Api\Student\PracticeController as StudentPracticeController;
+use App\Http\Controllers\Api\Student\ProgressController as StudentProgressController;
+use App\Http\Controllers\Api\Student\HistoryController as StudentHistoryController;
 
 // Nhóm Dùng chung
 use App\Http\Controllers\Api\RealtimeController;

@@ -190,56 +190,7 @@ export function CurriculumAccordion({ modules = [], courseId = 1 }: { modules?: 
                 newMap[String(mod.id || idx)] = !allExpanded;
               });
               setExpandedMap(newMap);
-            }}<<<<<<< backend/main
-function ModuleItem({ mod, moduleIndex }: { mod: IModule; moduleIndex: number }) {
-  // Simple heuristic for module status based on lessons
-  const isLocked = mod.lessons.every((l: ILesson) => l.status === "locked");
-  const isCompleted = mod.lessons.every((l: ILesson) => l.status === "completed");
-  const isCurrent = mod.lessons.some((l: ILesson) => l.status === "current");
-=======
-  const toggleModule = (modKey: string) => {
-    setExpandedMap((prev) => ({
-      ...prev,
-      [modKey]: !prev[modKey],
-    }));
-  };
-
-  const totalLessons = modules.reduce((sum, mod) => sum + (mod.lessons?.length || 0), 0);
->>>>>>> main
-
-  return (
-    <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 sm:p-7 shadow-2xs">
-      {/* Header section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-[#F0F0F8]">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold text-[#5052EE] bg-[#EEF2FF] px-2.5 py-0.5 rounded-full border border-[#5052EE]/20">
-              📚 Giáo trình & Học phần
-            </span>
-            <span className="w-1 h-1 rounded-full bg-[#D0D0E0]" />
-            <span className="text-xs font-medium text-[#7878A0]">Cập nhật liên tục 2026</span>
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-[#1A1A2E]">
-            Nội dung chương trình đào tạo
-          </h2>
-        </div>
-
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="px-3.5 py-1.5 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4] text-xs font-medium text-[#64647A] shadow-2xs">
-            {modules.length} Modules • <strong className="text-[#5052EE] font-semibold">{totalLessons} Bài giảng</strong>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              const allExpanded = Object.values(expandedMap).every(Boolean);
-              const newMap: Record<string, boolean> = {};
-              modules.forEach((mod, idx) => {
-                newMap[String(mod.id || idx)] = !allExpanded;
-              });
-              setExpandedMap(newMap);
             }}
-            className="text-xs font-me
             className="text-xs font-medium text-[#5052EE] hover:text-[#3738A5] hover:underline px-2.5 py-1 rounded-lg bg-[#EEF2FF]/60 transition-colors cursor-pointer"
           >
             {Object.values(expandedMap).every(Boolean) ? "Thu nhỏ tất cả" : "Mở rộng tất cả"}
