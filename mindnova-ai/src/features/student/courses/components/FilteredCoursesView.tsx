@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useDebounce } from "@/src/shared/hooks";
 import { CoursesHeader } from "./CoursesHeader";
 import { ExploreMoreCard } from "./ExploreMoreCard";
@@ -56,7 +57,6 @@ export function FilteredCoursesView({ initialCourses }: FilteredCoursesViewProps
     });
   }, [initialCourses, debouncedTab, debouncedQuery]);
 
-  const isFiltering = activeTab !== debouncedTab || searchQuery !== debouncedQuery;
 
   return (
     <div className="flex flex-col">
@@ -68,8 +68,8 @@ export function FilteredCoursesView({ initialCourses }: FilteredCoursesViewProps
         counts={counts}
       />
 
-      {/* Courses Grid with gentle opacity transition and 3-column layout from lg screen width */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12 transition-opacity duration-200 ${isFiltering ? "opacity-60" : "opacity-100"}`}>
+      {/* Courses Grid with 3-column layout from lg screen width */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
         {filteredCourses.length > 0 ? (
           filteredCourses.map((course) => (
             <MyCourseCard key={course.id} course={course} />
@@ -81,16 +81,26 @@ export function FilteredCoursesView({ initialCourses }: FilteredCoursesViewProps
             <p className="text-xs sm:text-sm font-normal text-[#64647A] max-w-md mb-5 leading-relaxed">
               Hệ thống không tìm thấy khoá học nào trong mục &quot;{TAB_LABELS[activeTab]}&quot;{searchQuery ? ` với từ khoá "${searchQuery}"` : ""}. Bạn hãy thử thay đổi tiêu chí bộ lọc hoặc tìm kiếm từ khoá khác.
             </p>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("All");
-                setSearchQuery("");
-              }}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] text-white text-xs sm:text-sm font-semibold shadow-sm hover:opacity-95 transition-all"
-            >
-              Đặt lại bộ lọc
-            </button>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab("All");
+                  setSearchQuery("");
+                }}
+                className="px-5 py-2.5 rounded-xl bg-white border border-[#EAEAF4] text-[#64647A] text-xs sm:text-sm font-semibold shadow-sm hover:bg-[#F4F4FA] transition-all"
+              >
+                Đặt lại bộ lọc
+              </button>
+              {activeTab === "All" && !searchQuery && (
+                <Link
+                  href="/explore"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] text-white text-xs sm:text-sm font-semibold shadow-sm hover:opacity-95 transition-all"
+                >
+                  Khám phá Khóa học
+                </Link>
+              )}
+            </div>
           </div>
         )}
         <ExploreMoreCard />

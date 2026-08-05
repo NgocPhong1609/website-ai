@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
-            // Dùng onDelete('restrict') để ngăn giảng viên xóa khóa học khi đã có người mua
-            $table->foreignId('course_id')->constrained('courses')->onDelete('restrict');
+            // Thay vì restrict, dùng set null để giữ lại lịch sử đơn hàng mà vẫn cho phép xóa khóa học
+            $table->foreignId('course_id')->nullable()->constrained('courses')->onDelete('set null');
             $table->decimal('price', 10, 2);
             $table->timestamps();
         });

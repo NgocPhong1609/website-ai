@@ -9,20 +9,28 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Course extends Model
 {
     protected $fillable = [
-        'teacher_id',
-        'category_id',
-        'title',
-        'slug',
-        'description',
-        'thumbnail',
-        'price',
-        'level',
-        'status',
-    ];
+    'teacher_id',
+    'category_id',
+    'title',
+    'slug',
+    'description',
+    'thumbnail',
+    'price',
+    'level',
+    'status',
+    'admin_hidden_at',
+    'views_count',
+];
 
     protected $casts = [
-        'price' => 'decimal:2',
-    ];
+    'price' => 'decimal:2',
+    'admin_hidden_at' => 'datetime',
+];
+
+    public function scopeVisibleInAdmin($query)
+    {
+        return $query->whereNull('admin_hidden_at');
+    }
 
     public function teacher(): BelongsTo
     {
@@ -53,5 +61,16 @@ class Course extends Model
     public function classes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(CourseClass::class);
+    }
+
+    public function getTotalLessonsAttribute(): int
+    {
+        return \App\Models\Lesson::whereIn('module_id', $this->modules()->select('id'))->count();
+    }
+
+    public function getDurationHoursAttribute(): float
+    {
+        $totalSeconds = \App\Models\Lesson::whereIn('module_id', $this->modules()->select('id'))->sum('duration_seconds');
+        return round($totalSeconds / 3600, 1);
     }
 }

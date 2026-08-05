@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { NoData } from "@/src/shared/components/ui/NoData";
 
 import type { AdminCategoryRow } from "@/src/features/admin/types";
 
@@ -423,8 +424,8 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
 
             {rows.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-slate-500">
-                  Chưa có dữ liệu danh mục.
+                <td colSpan={5} className="p-0">
+                  <NoData title="Không có dữ liệu" description="Chưa có dữ liệu danh mục." className="py-6" />
                 </td>
               </tr>
             )}

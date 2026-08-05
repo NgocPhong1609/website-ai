@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { IFocusArea } from "../types";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────

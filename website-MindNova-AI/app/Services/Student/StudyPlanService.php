@@ -15,67 +15,148 @@ class StudyPlanService
      */
     public function getOverview(?User $user): array
     {
-        return [
-            'active_syllabus' => [
-                'id' => 'syl-qc-01',
-                'title' => 'Quantum Computing Fundamentals',
-                'current_module_index' => 4,
-                'total_modules' => 8,
-                'module_title' => 'Module 4: Quantum Gates & Superposition Circuits',
-                'description' => 'Master the mathematics and logical architectures of superposition, quantum entanglement, and qubit gate circuits with your interactive real-time AI tutor.',
-                'progress_percentage' => 65,
-                'completed_topics' => 13,
-                'total_topics' => 20,
-                'status_badge' => 'On Track',
-            ],
-            'core_concepts' => [
-                [
-                    'id' => 'concept-1',
-                    'title' => 'Superposition (Chồng chập lượng tử)',
-                    'status' => 'Mastered',
-                    'status_color' => 'teal',
-                    'description' => 'Hệ thống tồn tại đồng thời ở nhiều trạng thái cho đến khi được quan sát hoặc đo đạc.',
-                ],
-                [
-                    'id' => 'concept-2',
-                    'title' => 'Entanglement (Vướng víu lượng tử)',
-                    'status' => 'In Progress',
-                    'status_color' => 'amber',
-                    'description' => 'Mối liên kết bất biến giữa các hạt lượng tử, bất kể khoảng cách vật lý trong không gian.',
-                ],
-                [
-                    'id' => 'concept-3',
-                    'title' => 'Qubits Architecture (Cấu trúc Qubit)',
-                    'status' => 'Queued',
-                    'status_color' => 'neutral',
-                    'description' => 'Đơn vị kiến trúc nền tảng cho xử lý thông tin toán học lượng tử nâng cao.',
-                ],
-            ],
-            'lesson_resources' => [
-                [
-                    'id' => 'res-pdf',
-                    'type' => 'pdf',
-                    'title' => 'Superposition_Notes.pdf',
-                    'meta' => 'Hướng dẫn PDF • 2.4 MB',
-                    'url' => '#resource-pdf',
-                ],
-                [
-                    'id' => 'res-video',
-                    'type' => 'video',
-                    'title' => 'Visualizing Qubits.mp4',
-                    'meta' => 'Video bài giảng • 14:20',
-                    'url' => '#resource-video',
-                ],
-            ],
-            'ai_insight' => 'Hãy hỏi Gia sư Nova mô phỏng Mặt cầu Bloch (Bloch Sphere) nếu bạn muốn có một mô hình 3D trực quan về trạng thái Qubit đa chiều.',
-            'initial_messages' => [
+        $userId = $user ? $user->id : null;
+
+        // Try to fetch real conversation history
+        $initialMessages = [];
+        if ($userId) {
+            try {
+                $recentConversation = AiTutorConversation::where('user_id', $userId)->latest()->first();
+                if ($recentConversation) {
+                    $messages = AiTutorMessage::where('conversation_id', $recentConversation->id)
+                        ->oldest()
+                        ->take(10)
+                        ->get();
+                    
+                    foreach ($messages as $msg) {
+                        $initialMessages[] = [
+                            'id' => 'msg-' . $msg->id,
+                            'sender' => $msg->sender,
+                            'timestamp' => $msg->created_at->format('h:i A'),
+                            'text' => $msg->message,
+                        ];
+                    }
+                }
+            } catch (\Exception $e) {
+                // Ignore DB errors
+            }
+        }
+
+        $activeCourse = null;
+        $activeSyllabus = null;
+        $coreConcepts = [];
+        $lessonResources = [];
+        $courseTitle = 'Chưa có khóa học';
+
+        // Get latest active enrollment
+        if ($userId && class_exists(\App\Models\Enrollment::class)) {
+            $enrollment = \App\Models\Enrollment::with('course.modules.lessons')->where('user_id', $userId)->latest('enrolled_at')->first();
+            
+            if ($enrollment && $enrollment->course) {
+                $activeCourse = $enrollment->course;
+                $courseTitle = $activeCourse->title;
+                $progressPercentage = $enrollment->progress_percentage ?? 0;
+                
+                $totalModules = $activeCourse->modules->count();
+                $currentModuleIndex = 1;
+                $currentModuleTitle = 'Bắt đầu học';
+                $completedTopics = 0;
+                $totalTopics = 0;
+                
+                $completedLessonIds = [];
+                if (class_exists(\App\Models\LessonCompletion::class)) {
+                    $completedLessonIds = \App\Models\LessonCompletion::where('user_id', $userId)->pluck('lesson_id')->toArray();
+                }
+
+                // Loop through modules to determine current module and populate concepts
+                $modIdx = 1;
+                foreach ($activeCourse->modules as $mod) {
+                    $totalTopics += $mod->lessons->count();
+                    $modCompleted = true;
+                    
+                    foreach ($mod->lessons as $les) {
+                        $isCompleted = in_array($les->id, $completedLessonIds);
+                        if ($isCompleted) {
+                            $completedTopics++;
+                        } else {
+                            $modCompleted = false;
+                        }
+                        
+                        // Extract concepts based on lessons
+                        if (count($coreConcepts) < 5) {
+                            $conceptStatus = $isCompleted ? 'Mastered' : 'Queued';
+                            $conceptColor = $isCompleted ? 'teal' : 'neutral';
+                            if (!$isCompleted && $modIdx === $currentModuleIndex && count($coreConcepts) > 0 && last($coreConcepts)['status'] === 'Mastered') {
+                                $conceptStatus = 'In Progress';
+                                $conceptColor = 'amber';
+                            }
+                            
+                            $coreConcepts[] = [
+                                'id' => 'concept-' . $les->id,
+                                'title' => mb_substr($les->title, 0, 40, 'UTF-8'),
+                                'status' => $conceptStatus,
+                                'status_color' => $conceptColor,
+                                'description' => $les->duration_seconds ? ($les->duration_seconds / 60) . ' phút học' : 'Tài nguyên bài học',
+                            ];
+                        }
+                        
+                        // Extract resources from lessons
+                        if (count($lessonResources) < 4 && $les->video_url) {
+                            $lessonResources[] = [
+                                'id' => 'res-' . $les->id,
+                                'type' => 'video',
+                                'title' => $les->title,
+                                'meta' => 'Bài giảng Video',
+                                'url' => $les->video_url,
+                            ];
+                        }
+                    }
+                    
+                    if (!$modCompleted && $currentModuleIndex === 1) {
+                        $currentModuleIndex = $modIdx;
+                        $currentModuleTitle = $mod->title;
+                    }
+                    $modIdx++;
+                }
+
+                if (empty($lessonResources)) {
+                     $lessonResources = [
+                         ['id' => 'res-fb-1', 'type' => 'pdf', 'title' => 'Tài liệu hướng dẫn', 'meta' => '1.2 MB PDF', 'url' => '#']
+                     ];
+                }
+
+                $activeSyllabus = [
+                    'id' => 'syllabus-' . $activeCourse->id,
+                    'title' => $activeCourse->title,
+                    'current_module_index' => $currentModuleIndex,
+                    'total_modules' => $totalModules,
+                    'module_title' => $currentModuleTitle,
+                    'description' => $activeCourse->description ?: 'Lộ trình học tập cá nhân hóa',
+                    'progress_percentage' => $progressPercentage,
+                    'completed_topics' => $completedTopics,
+                    'total_topics' => $totalTopics,
+                    'status_badge' => $progressPercentage >= 100 ? 'Hoàn thành' : 'Đang tiến hành',
+                ];
+            }
+        }
+
+        if (empty($initialMessages)) {
+            $initialMessages = [
                 [
                     'id' => 'msg-init',
                     'sender' => 'ai',
                     'timestamp' => now()->format('h:i A'),
-                    'text' => "Chào bạn! 👋 Mình là **Nova**, trợ lý AI Co-Pilot đồng hành cùng bạn tại MindNova AI. Hiện tại chúng ta đang học **Module 4: Quantum Computing Fundamentals**.\n\nBạn đã thành thạo khái niệm *Superposition* (Chồng trập lượng tử)! Hôm nay bạn muốn tìm hiểu sâu hơn về toán học của **Quantum Entanglement** (Vướng víu lượng tử) hay muốn chạy thử nghiệm mô phỏng mạch **Qubit Gates**?",
+                    'text' => "Chào bạn! 👋 Mình là **Nova**, trợ lý AI Co-Pilot đồng hành cùng bạn tại khóa học **{$courseTitle}**.\n\nBạn có câu hỏi gì về bài học hoặc lộ trình học tập hôm nay không?",
                 ],
-            ],
+            ];
+        }
+
+        return [
+            'active_syllabus' => $activeSyllabus,
+            'core_concepts' => $coreConcepts,
+            'lesson_resources' => $lessonResources,
+            'ai_insight' => "Hãy hỏi Gia sư Nova bất kỳ khái niệm nào bạn đang gặp khó khăn trong khóa học {$courseTitle}.",
+            'initial_messages' => $initialMessages,
         ];
     }
 

@@ -38,7 +38,7 @@ export interface Module {
 export interface Resource {
   id: number;
   title: string;
-  type: "zip" | "link" | "chat";
+  type: "zip" | "link" | "chat" | string;
   url: string;
 }
 
@@ -55,6 +55,79 @@ export interface CourseDetail extends Course {
   resources: Resource[];
   instructor: Instructor;
   lessonsLeftTime: string;
+}
+
+// ─── API Dynamic Data Structures for Course Detail ────────────────────────────
+export interface CourseDetailHeaderInfo {
+  id: number;
+  title: string;
+  level: string;
+  description: string;
+  next_lesson_title: string;
+  next_lesson_id?: number | null;
+  duration_text: string;
+  rating_text: string;
+  students_text: string;
+  category_tag: string;
+  is_enrolled?: boolean;
+  price?: number;
+}
+
+export interface CourseDetailProgressCard {
+  progress_percentage: number;
+  completed_lessons_count: number;
+  total_lessons_count: number;
+  time_left_text?: string;
+  status_tag?: string;
+}
+
+export interface CourseDetailAIInsight {
+  title: string;
+  status_tag?: string;
+  summary_text: string;
+  suggestion_text?: string;
+  action_label?: string;
+}
+
+export interface CourseDetailInstructor {
+  name: string;
+  role: string;
+  avatar_url: string;
+  bio?: string;
+}
+
+export interface CourseDetailLessonItem {
+  id: string | number;
+  order?: number;
+  title: string;
+  duration: string;
+  status: 'completed' | 'current' | 'locked' | string;
+  video_url?: string;
+}
+
+export interface CourseDetailModuleItem {
+  id: string | number;
+  order?: number;
+  title: string;
+  duration?: string;
+  lessons: CourseDetailLessonItem[];
+}
+
+export interface CourseDetailResourceItem {
+  id: string | number;
+  title: string;
+  type: 'zip' | 'link' | 'chat' | 'pdf' | string;
+  size?: string;
+  url: string;
+}
+
+export interface CourseDetailData {
+  header_info: CourseDetailHeaderInfo;
+  progress_card: CourseDetailProgressCard;
+  ai_insight: CourseDetailAIInsight;
+  instructor: CourseDetailInstructor;
+  modules: CourseDetailModuleItem[];
+  resources: CourseDetailResourceItem[];
 }
 
 // ─── Backward compatibility aliases (to prevent breaking legacy code) ─────────

@@ -15,6 +15,56 @@ interface UserRole {
   id: number;
   name?: string;
 }
+interface AuthUser {
+  roles?: UserRole[];
+  role?: string | null;
+  is_admin?: boolean;
+  isAdmin?: boolean;
+}
+
+type NormalizedRole = "admin" | "instructor" | "student";
+
+const ADMIN_ROLE_ALIASES = ["admin", "administrator", "super_admin", "super-admin"];
+const INSTRUCTOR_ROLE_ALIASES = ["instructor", "teacher", "lecturer"];
+
+function normalizeRoleName(roleName: unknown): string {
+  if (typeof roleName !== "string") return "";
+  return roleName.trim().toLowerCase().replace(/\s+/g, "_");
+}
+
+function resolveUserRole(user: AuthUser): NormalizedRole {
+  const roleNames = new Set<string>();
+
+  if (Array.isArray(user.roles)) {
+    user.roles.forEach((role) => {
+      roleNames.add(normalizeRoleName(role?.name));
+    });
+  }
+
+  roleNames.add(normalizeRoleName(user.role));
+
+  if (user.is_admin === true || user.isAdmin === true) {
+    return "admin";
+  }
+
+  const hasAdminRole = ADMIN_ROLE_ALIASES.some((alias) => roleNames.has(alias));
+  if (hasAdminRole) {
+    return "admin";
+  }
+
+  const hasInstructorRole = INSTRUCTOR_ROLE_ALIASES.some((alias) => roleNames.has(alias));
+  if (hasInstructorRole) {
+    return "instructor";
+  }
+
+  return "student";
+}
+
+function getRedirectPathFromRole(role: NormalizedRole): string {
+  if (role === "admin") return "/admin";
+  if (role === "instructor") return "/instructor/courses";
+  return "/";
+}
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 

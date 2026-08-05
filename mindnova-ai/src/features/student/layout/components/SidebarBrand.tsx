@@ -20,18 +20,20 @@ function LogoMark() {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function SidebarBrand() {
+export function SidebarBrand({ isCollapsed }: { isCollapsed?: boolean }) {
   return (
-    <Link href="/dashboard" className="flex items-center gap-3 group" aria-label="MindNova AI home">
+    <Link href="/" className="flex items-center gap-3 group" aria-label="MindNova AI home">
       <LogoMark />
-      <div className="flex flex-col leading-tight">
-        <span className="text-[14px] font-extrabold text-[#1A1A2E] tracking-tight group-hover:text-[#4648D4] transition-colors duration-150">
-          MindNova AI
-        </span>
-        <span className="text-[10px] text-[#9090B0] font-medium tracking-wide">
-          AI-Powered Learning
-        </span>
-      </div>
+      {!isCollapsed && (
+        <div className="flex flex-col leading-tight overflow-hidden whitespace-nowrap">
+          <span className="text-[14px] font-extrabold text-[#1A1A2E] tracking-tight group-hover:text-[#4648D4] transition-colors duration-150">
+            MindNova AI
+          </span>
+          <span className="text-[10px] text-[#9090B0] font-medium tracking-wide">
+            AI-Powered Learning
+          </span>
+        </div>
+      )}
     </Link>
   );
 }

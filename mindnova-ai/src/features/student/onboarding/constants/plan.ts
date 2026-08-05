@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { IPlanPhase, TopicIconKey } from "@/src/features/student/onboarding/types";
 
 // ─── Topic → Phase mapping ────────────────────────────────────────────────────

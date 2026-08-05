@@ -1,200 +1,444 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import type { QuizGradingResult } from "../../types";
+
+interface QuizReviewItem {
+  number: number;
+  question: string;
+  correctAnswer: string;
+  aiExplanation: string;
+  category: string;
+}
+
+const REVIEW_QUESTIONS_DATA: QuizReviewItem[] = [
+  {
+    number: 1,
+    category: "Cấu trúc Route Handlers",
+    question: "Trong Next.js 15 App Router, quy ước đặt tên tệp nào sau đây được bắt buộc sử dụng để định nghĩa một Route Handler chịu trách nhiệm xử lý các HTTP request (GET, POST)?",
+    correctAnswer: "A. route.ts hoặc route.js đặt bên trong một thư mục thuộc app/",
+    aiExplanation: "Trong Next.js 15 App Router, tệp route.ts được thiết kế riêng cho các API endpoint dạng RESTful hoặc Webhooks. Bạn không thể đặt trùng route.ts và page.ts trong cùng một cấp thư mục."
+  },
+  {
+    number: 2,
+    category: "Cơ chế Caching",
+    question: "Sự khác biệt căn bản về cơ chế bộ nhớ đệm (caching) giữa hàm export async function GET() và POST() trong Route Handlers là gì?",
+    correctAnswer: "A. GET có thể được cache tùy thuộc vào dynamic config, trong khi POST luôn luôn thực thi theo thời gian thực (opt-out of cache)",
+    aiExplanation: "Các yêu cầu POST mang tính chất biến đổi dữ liệu (mutation) nên mặc định Next.js sẽ không bao giờ lưu đệm (no-cache) nhằm đảm bảo dữ liệu mới nhất được ghi nhận."
+  },
+  {
+    number: 3,
+    category: "Tham số Động (Params)",
+    question: "Từ Next.js 15 trở đi, tham số động (dynamic routing parameters) trong các Route Handlers như { params } có sự thay đổi mang tính cốt lõi nào khi truy xuất?",
+    correctAnswer: "A. params là một Promise bất đồng bộ và bắt buộc phải dùng await trước khi trích xuất giá trị id",
+    aiExplanation: "Next.js 15 đã chuyển dịch params từ đối tượng đồng bộ sang Promise bất đồng bộ nhằm tối ưu hóa tiến trình serverless và khả năng chuẩn bị dữ liệu song song."
+  },
+  {
+    number: 4,
+    category: "✨ AI Golden Tip • Stream Fallback",
+    question: "Trong chiến lược Fallback giữa Google Gemini và OpenAI, khi dòng truyền streaming từ một nhà cung cấp gặp trở ngại kỹ thuật, cách quản lý đối tượng ReadableStream nào dưới đây đảm bảo không phá vỡ kết nối hiện tại của Client?",
+    correctAnswer: "A. Sử dụng TransformStream để bọc luồng dữ liệu; khi phát hiện lỗi nghẽn mạch, ngay lập tức đóng Reader hiện tại và chuyển (pipe) sang luồng ReadableStream của AI Provider dự phòng",
+    aiExplanation: "Bằng cách sử dụng TransformStream làm trung gian, client chỉ nhìn thấy một dòng chuỗi vô vần xuyên suốt. Kỹ thuật này ngăn chặn lỗi HTTP 500 và giúp trải nghiệm học viên mượt mà tuyệt hảo!"
+  },
+  {
+    number: 5,
+    category: "Cơ chế Streaming LLM",
+    question: "Để khởi tạo một luồng phát tín hiệu thời gian thực (Real-time AI Stream) trong Next.js Route Handlers, đối tượng trả về chuẩn hóa cần tuân thủ cấu trúc nào?",
+    correctAnswer: 'A. new Response(readableStream, { headers: { "Content-Type": "text/event-stream" } })',
+    aiExplanation: "Định dạng Server-Sent Events (SSE) yêu cầu kiểu nội dung text/event-stream kèm theo luồng dữ liệu nhị phân ReadableStream để trình duyệt liên tục lắng nghe token chớp nhoáng."
+  },
+  {
+    number: 6,
+    category: "Môi trường Runtime",
+    question: "Trong cấu hình tệp Route Handlers cho các dịch vụ AI Stream tốc độ cực cao, khai báo export const runtime = 'edge' mang đến sức mạnh thực thi nào?",
+    correctAnswer: "A. Thực thi trên mạng lưới Edge của Cloudflare/Vercel với độ trễ khởi động (cold start) gần như bằng 0 và sử dụng bộ API chuẩn Web V8",
+    aiExplanation: "Edge Runtime gạt bỏ những mô-đun Node.js cồng kềnh, đưa luồng tính toán đến trung tâm dữ liệu gần học viên nhất, giảm tốc độ khởi tạo xuống dưới vài milli-giây."
+  },
+  {
+    number: 7,
+    category: "✨ AI Golden Tip • Timeout Fallback",
+    question: "Để kiểm soát hiệu quả vấn đề treo kết nối khi LLM Provider không phản hồi (Header Timeout Fallback), kỹ thuật lập trình bất đồng bộ nào nên được gắn vào cấu hình Fetch API?",
+    correctAnswer: "A. Tạo đối tượng AbortController kết hợp setTimeout để tự động kích hoạt abort signal sau số giây quy định, mở đường gọi fallback lập tức",
+    aiExplanation: "Nếu máy chủ AI Provider bị nghẽn lệnh không gửi header về trong hạn định, tín hiệu signal từ AbortController sẽ chủ động dập gắt luồng gọi cũ, giúp hệ thống không bị treo vô thời hạn."
+  },
+  {
+    number: 8,
+    category: "Vercel AI SDK",
+    question: "Khi sử dụng thư viện chuyên dụng Vercel AI SDK (hoặc @ai-sdk/react) kết hợp cùng Next.js 15, hàm phương thức nào có nhiệm vụ đóng gói đầu ra của LLM thành một chuỗi dữ liệu Stream hợp lệ để trả về cho Custom Hook useChat()?",
+    correctAnswer: "A. result.toDataStreamResponse() hoặc streamText(...)",
+    aiExplanation: "Các phương thức như streamText hoặc toDataStreamResponse tự động định dạng luồng token thành giao thức tương thích trực tiếp với React Custom Hook useChat() ở phía client."
+  },
+  {
+    number: 9,
+    category: "Bảo mật & Rate Limiting",
+    question: "Để bảo vệ các điểm truy cập AI Route Handlers trong Next.js khỏi tình trạng spam requests và khai thác token tài khoản trái phép, lớp chắn bảo mật nào nên được đặt ở tiền tuyến?",
+    correctAnswer: "A. Next.js Middleware kết hợp kiểm soát Rate Limiting và Bearer Token Authentication",
+    aiExplanation: "Middleware thực thi ngay tại viền mạng trước khi request chạm vào Route Handler, cho phép từ chối ngay lập tức các IP có tần suất truy cập đáng ngờ."
+  },
+  {
+    number: 10,
+    category: "Tối ưu Tài nguyên Server",
+    question: "Khi người dùng vô tình bấm thả hoặc đóng thẻ tab trình duyệt trong khi dòng AI Streaming vẫn đang cuồn cuộn chảy trả về, phương pháp tối ưu resource nào trong Route Handlers giúp ngắt tiến trình LLM backend tức thời?",
+    correctAnswer: "A. Lắng nghe sự kiện request.signal (AbortSignal) từ HTTP request gốc, nếu client ngắt kết nối thì tự động hủy tiến trình phát streaming",
+    aiExplanation: "Việc ngắt luồng ngay khi Client rớt mạng giúp hệ thống tiết kiệm triệt để lượng Token tiêu hao và giảm chi phí hạ tầng Server cho đơn vị cung cấp dịch vụ LLM."
+  }
+];
+
 export function QuizResultContent() {
+  const [result, setResult] = useState<QuizGradingResult | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
+  const [selectedTopicFilter, setSelectedTopicFilter] = useState<string>("all");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("mindnova_last_quiz_result");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored) as QuizGradingResult;
+          setResult(parsed);
+        } catch (e) {
+          console.error("Lỗi khi đọc kết quả thi:", e);
+        }
+      }
+    }
+    setLoading(false);
+  }, []);
+
+  const displayData: QuizGradingResult = result || {
+    attempt_id: 1042,
+    module_id: "mod3",
+    score: 80,
+    total_score_max: 100,
+    accuracy: "80%",
+    passed: true,
+    correct_count: 8,
+    total_questions: 10,
+    time_taken_formatted: "4 phút 25 giây",
+    quiz_title: "Kiểm tra Thực chiến: Tích hợp API & AI Stream 🚀",
+    ai_insight: "Xuất sắc! Bạn nắm giữ tư duy kiến trúc Route Handlers và App Router cực kỳ vững chắc. Quản lý luồng ReadableStream và kỹ thuật chuyển qua lại giữa Gemini/OpenAI tại câu 4 và 7 được áp dụng chính xác.",
+    ai_coach_suggestion: "Năng lực đạt điểm tối ưu. Tự tin chinh phục Module tiếp theo về Security & Middleware!",
+    topic_performance: [
+      { id: "1", topic_title: "Cấu trúc Route Handlers & App Router", sub_title: "Khái niệm cơ bản & Quy ước tệp route.ts", score_percentage: 100, status_label: "Tốt (100%)", status_color: "indigo" },
+      { id: "2", topic_title: "Cơ chế Streaming LLM & ReadableStream", sub_title: "Xử lý luồng dữ liệu thời gian thực từ AI Provider", score_percentage: 85, status_label: "Tốt (85%)", status_color: "indigo" },
+      { id: "3", topic_title: "Xử lý Lỗi & Timeout Fallback (Q4, Q7)", sub_title: "Quản lý AbortController & tự động chuyển mạch Provider", score_percentage: 75, status_label: "Khá (75%)", status_color: "teal" },
+    ],
+    action_cards: [
+      { id: "a1", title: "Xem lại câu hỏi trắc nghiệm", description: "Soát lại từng chi tiết đáp án và lời giải trình tường tận của Gia sư AI MindNova cho 10 câu thi.", action_text: "Bắt đầu soát bài", icon_type: "review" },
+      { id: "a2", title: "Luyện tập bổ trợ AI", description: "Vào lại chế độ kiểm nghiệm với bộ đề tự động xáo trộn ngẫu nhiên 100% câu hỏi và đáp án.", action_text: "Luyện tập thêm", icon_type: "practice" },
+      { id: "a3", title: "Chuyển sang Module khác", description: "Tiến thẳng về danh mục 4 Chủ đề Thực chiến (Mạng thần kinh, React 19, Security) để bứt phá.", action_text: "Tiếp tục hành trình", icon_type: "continue" },
+    ],
+  };
+
+  const targetModuleId = displayData.module_id || "mod3";
+
+  if (loading) {
+    return (
+      <div className="flex-1 min-h-screen bg-[#F8F9FC] flex items-center justify-center p-6">
+        <div className="text-center text-[#64647A] text-sm font-medium animate-pulse">Đang tổng hợp báo cáo đánh giá năng lực từ AI...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex-1 overflow-y-auto bg-[#F8F9FB] min-h-full">
-      <div className="max-w-[1000px] mx-auto px-6 py-8 pb-20">
-        
-        {/* ─── Top Section: Score & Insight ────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Score Card */}
-          <div className="md:col-span-2 bg-[#FAFBFF] rounded-[24px] border border-[#F0F2F5] shadow-sm relative overflow-hidden p-8 flex flex-col items-center justify-center">
+    <div className="flex-1 overflow-y-auto bg-[#F8F9FC] min-h-screen relative">
+      {/* ─── Interactive Review Modal / Slide-over ─── */}
+      {isReviewModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 sm:p-6 animate-fadeIn">
+          <div className="bg-white w-full max-w-4xl rounded-2xl border border-[#EAEAF4] shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-scaleUp">
             
-            {/* Abstract Background Elements */}
-            <div className="absolute inset-0 pointer-events-none opacity-40">
-               {/* Just a simple decorative diagonal gradient background to mimic the original */}
-               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] bg-[linear-gradient(45deg,transparent_45%,#E0E7FF_50%,transparent_55%,transparent_60%,#E0E7FF_65%,transparent_70%)] opacity-30 blur-sm"></div>
+            {/* Modal Header */}
+            <div className="p-6 bg-gradient-to-r from-[#EEF2FF] via-[#F3F4FC] to-[#EAF8F5] border-b border-[#EAEAF4] flex items-center justify-between shrink-0">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-white text-xs font-semibold text-[#5052EE] border border-[#5052EE]/20">
+                  <span>💡 Soát Lỗi Chi Tiết từ Gia Sư AI Nova</span>
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-[#1A1A2E]">Bảng Đối Chiếu Đáp Án &amp; Lời Giải Thích Kỹ Thuật</h3>
+              </div>
+              <button 
+                type="button"
+                onClick={() => setIsReviewModalOpen(false)}
+                className="w-10 h-10 rounded-xl bg-white text-[#7878A0] hover:text-[#1A1A2E] hover:bg-[#F0F2F8] border border-[#EAEAF4] flex items-center justify-center font-semibold text-lg transition-colors cursor-pointer"
+                title="Đóng cửa sổ"
+              >
+                ✕
+              </button>
             </div>
 
-            {/* Passed Badge */}
-            <div className="absolute top-6 right-6 bg-[#2DD4BF] text-white px-3.5 py-1.5 rounded-full text-[13px] font-bold flex items-center gap-1.5 shadow-sm">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
-              </svg>
-              Passed
-            </div>
+            {/* Modal Content Scrollable Area */}
+            <div className="p-6 overflow-y-auto space-y-6 flex-1 bg-[#F8FAFC]">
+              <div className="flex flex-wrap gap-2 pb-2 border-b border-[#EAEAF4]">
+                <button 
+                  onClick={() => setSelectedTopicFilter("all")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${selectedTopicFilter === "all" ? "bg-[#5052EE] text-white" : "bg-white text-[#64647A] border border-[#EAEAF4]"}`}
+                >
+                  Tất cả (10 Câu)
+                </button>
+                <button 
+                  onClick={() => setSelectedTopicFilter("ai-tip")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${selectedTopicFilter === "ai-tip" ? "bg-[#0D9488] text-white" : "bg-white text-[#0D9488] border border-[#0D9488]/30"}`}
+                >
+                  ✨ Câu hỏi AI Golden Tips (Q4, Q7)
+                </button>
+              </div>
 
-            <div className="relative z-10 text-center mt-4">
-              <p className="text-[12px] font-bold tracking-[0.2em] text-gray-500 uppercase mb-2">Final Score</p>
-              <div className="flex items-baseline justify-center gap-1">
-                <span className="text-[90px] font-bold text-[#5452F6] leading-none tracking-tighter">75</span>
-                <span className="text-[32px] font-medium text-gray-400">/100</span>
+              <div className="space-y-5">
+                {REVIEW_QUESTIONS_DATA
+                  .filter(item => selectedTopicFilter === "all" ? true : (item.number === 4 || item.number === 7))
+                  .map((item) => (
+                    <div key={item.number} className="bg-white rounded-xl p-5 border border-[#EAEAF4] shadow-2xs space-y-4 hover:border-[#5052EE]/30 transition-colors">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#EEF2FF] text-[#5052EE] border border-[#5052EE]/15">
+                          Câu #{item.number} • {item.category}
+                        </span>
+                        <span className="text-xs font-medium text-[#059669] bg-[#D1FAE5] px-2.5 py-0.5 rounded-md flex items-center gap-1">
+                          ✓ Lời giải chuẩn xác
+                        </span>
+                      </div>
+
+                      <h4 className="text-sm sm:text-base font-semibold text-[#1A1A2E] leading-relaxed">
+                        {item.question}
+                      </h4>
+
+                      <div className="p-3.5 rounded-lg bg-[#EAF8F5]/60 border border-[#0D9488]/20 text-xs sm:text-sm font-semibold text-[#0D9488] flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-[#10B981] text-white flex items-center justify-center text-xs shrink-0">✓</span>
+                        <span>{item.correctAnswer}</span>
+                      </div>
+
+                      <div className="bg-[#F8FAFC] p-4 rounded-xl border border-[#EAEAF4] space-y-1.5">
+                        <p className="text-[11px] font-semibold tracking-wide text-[#5052EE] uppercase flex items-center gap-1.5">
+                          <span>🤖 Gia sư AI MindNova giải mã</span>
+                        </p>
+                        <p className="text-xs sm:text-sm text-[#374151] font-normal leading-relaxed">
+                          {item.aiExplanation}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
 
-            <div className="relative z-10 flex gap-20 mt-10 text-center">
-              <div>
-                <p className="text-[13px] font-bold text-gray-500 mb-1">Accuracy</p>
-                <p className="text-[17px] font-bold text-gray-900">8 / 10 Correct</p>
+            {/* Modal Footer */}
+            <div className="p-4 bg-white border-t border-[#EAEAF4] flex items-center justify-end gap-3 shrink-0">
+              <button 
+                type="button"
+                onClick={() => setIsReviewModalOpen(false)}
+                className="px-6 py-2.5 bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] text-white rounded-xl font-semibold text-xs sm:text-sm hover:opacity-95 transition-all shadow-2xs cursor-pointer"
+              >
+                Đã hiểu rõ &amp; Đóng bảng soát bài
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-[1020px] mx-auto px-6 py-8 pb-24 space-y-7">
+        
+        {/* Header navigation breadcrumb */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs text-[#7878A0]">
+            <Link href="/practice" className="hover:text-[#5052EE] transition-colors text-decoration-none">Trung tâm thực chiến</Link>
+            <span>➔</span>
+            <span className="text-[#1A1A2E] font-medium">Báo cáo kiểm tra Năng lực AI</span>
+          </div>
+          <span className="text-xs font-medium px-3 py-1 rounded-full bg-[#EEF2FF] text-[#5052EE] border border-[#5052EE]/15">
+            Mã định danh lượt thi: #{displayData.attempt_id}
+          </span>
+        </div>
+
+        {/* ─── Top Section: Score & AI Insight ────────────────────────────────────────── */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+          
+          {/* Score Card (7 cols) */}
+          <div className="md:col-span-7 bg-gradient-to-br from-white via-[#FAFBFF] to-[#F3F4FC] rounded-2xl border border-[#EAEAF4] shadow-2xs relative overflow-hidden p-8 flex flex-col items-center justify-center text-center transition-all duration-300 hover:shadow-sm">
+            <div className="absolute top-0 right-0 w-44 h-44 rounded-full bg-[#6B6BFF]/10 blur-2xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-44 h-44 rounded-full bg-[#4CD7F6]/10 blur-2xl pointer-events-none" />
+
+            {/* Status Badge */}
+            <div className={`absolute top-5 right-5 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-2xs border ${displayData.passed ? "bg-[#EAF8F5] text-[#0D9488] border-[#0D9488]/20" : "bg-[#FFF2F2] text-[#E11D48] border-[#E11D48]/20"}`}>
+              <span className={`w-2 h-2 rounded-full ${displayData.passed ? "bg-[#10B981]" : "bg-[#E11D48]"} animate-pulse`} />
+              {displayData.passed ? "Đạt Yêu Cầu (Passed)" : "Chưa Đạt (Need Practice)"}
+            </div>
+
+            <div className="relative z-10 mt-2 space-y-1">
+              <p className="text-xs font-semibold tracking-wider text-[#7878A0] uppercase">Điểm Thành Tích Chung</p>
+              <div className="flex items-baseline justify-center gap-1.5 my-2">
+                <span className="text-6xl sm:text-7xl font-bold bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] bg-clip-text text-transparent tracking-tight">
+                  {displayData.score}
+                </span>
+                <span className="text-2xl font-semibold text-[#7878A0]">/100</span>
               </div>
+            </div>
+
+            <p className="text-xs text-[#64647A] mt-1">Bài thi: <span className="font-medium text-[#1A1A2E]">{displayData.quiz_title || "Kiểm tra thực chiến: Tích hợp API & AI Stream"}</span></p>
+
+            <div className="relative z-10 grid grid-cols-2 gap-8 w-full max-w-xs mt-7 pt-5 border-t border-[#EAEAF4]/80">
               <div>
-                <p className="text-[13px] font-bold text-gray-500 mb-1">Time Taken</p>
-                <p className="text-[17px] font-bold text-gray-900">7m 30s</p>
+                <p className="text-xs font-normal text-[#7878A0] mb-1">Tỷ lệ chính xác</p>
+                <p className="text-sm sm:text-base font-semibold text-[#1A1A2E] flex items-center justify-center gap-1">
+                  <span className="text-[#059669]">✓ {displayData.correct_count}</span> / {displayData.total_questions} Câu
+                </p>
+              </div>
+              <div className="border-l border-[#EAEAF4]">
+                <p className="text-xs font-normal text-[#7878A0] mb-1">Thời gian làm bài</p>
+                <p className="text-sm sm:text-base font-semibold text-[#1A1A2E]">
+                  {displayData.time_taken_formatted || `${displayData.time_taken_seconds || 180} giây`}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* AI Insight Card */}
-          <div className="md:col-span-1 bg-white rounded-[24px] border-2 border-[#EEF2FF] shadow-sm p-6 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-2 text-[#5452F6] mb-6">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
-                </svg>
-                <h3 className="font-bold text-[17px]">AI Insight</h3>
+          {/* AI Insight Card (5 cols) */}
+          <div className="md:col-span-5 bg-white rounded-2xl border border-[#EAEAF4] shadow-2xs p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-sm hover:border-[#5052EE]/30">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-[#F0F2F8] pb-3.5">
+                <div className="flex items-center gap-2.5 text-[#5052EE]">
+                  <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] flex items-center justify-center font-semibold text-sm">✨</div>
+                  <h3 className="font-semibold text-base text-[#1A1A2E]">Nhận xét từ Gia sư AI</h3>
+                </div>
+                <span className="text-[11px] bg-[#EAF8F5] text-[#0D9488] px-2.5 py-0.5 rounded-full font-medium border border-[#0D9488]/15">
+                  MindNova Co-Pilot
+                </span>
               </div>
-              <p className="text-[15px] italic text-gray-600 leading-relaxed">
-                "You understand the main idea of Route Handlers, but you still need more practice with error handling and response status codes."
+
+              <p className="text-xs sm:text-sm text-[#374151] leading-relaxed font-normal bg-[#F8FAFC] p-4 rounded-xl border border-[#EAEAF4]/60">
+                &ldquo;{displayData.ai_insight || "Bạn đã nắm vững nền tảng Route Handlers cơ bản trong Next.js 15, khả năng xử lý Stream rất ấn tượng!"}&rdquo;
               </p>
             </div>
             
-            <div className="mt-8">
-              <hr className="border-[#F3F4F6] mb-5" />
-              <p className="text-[12px] font-bold text-gray-500 mb-1">AI Coach Suggestion</p>
-              <p className="text-[14px] font-bold text-[#1F2937]">Focus on HTTP 4xx errors.</p>
+            <div className="pt-4 border-t border-[#F0F2F8] mt-4 space-y-1.5">
+              <p className="text-[11px] font-semibold tracking-wide text-[#7878A0] uppercase">🎯 Chiến thuật tiếp theo</p>
+              <p className="text-xs sm:text-sm font-semibold text-[#5052EE] bg-[#EEF2FF]/50 p-3 rounded-xl border border-[#5052EE]/15">
+                {displayData.ai_coach_suggestion || "Hãy tập trung kiểm chứng sâu hơn về xử lý lỗi Header Timeout nhé."}
+              </p>
             </div>
           </div>
         </div>
 
         {/* ─── Middle Section: Topic Performance ──────────────────────────────────── */}
-        <div className="bg-white rounded-[24px] border border-[#F3F4F6] shadow-[0_2px_12px_rgb(0,0,0,0.02)] p-8 mt-6">
-          <h3 className="text-[20px] font-bold text-gray-900 mb-8">Topic Performance</h3>
+        <div className="bg-white rounded-2xl border border-[#EAEAF4] shadow-2xs p-6 sm:p-7 transition-all duration-300 hover:shadow-sm">
+          <div className="flex items-center justify-between border-b border-[#F0F2F8] pb-4 mb-6">
+            <div>
+              <h3 className="text-base sm:text-lg font-semibold text-[#1A1A2E]">Phân tích độ thành thạo theo chủ đề (Topic Mastery)</h3>
+              <p className="text-xs text-[#7878A0] mt-0.5">Trí tuệ nhân tạo phân rã mức độ thông hiểu kỹ thuật từ 10 câu hỏi của bạn</p>
+            </div>
+            <span className="text-xs text-[#5052EE] bg-[#EEF2FF]/60 px-3 py-1 rounded-full font-medium hidden sm:inline-block border border-[#5052EE]/15">
+              3 Chủ đề cốt lõi
+            </span>
+          </div>
           
-          <div className="flex flex-col gap-8">
-            {/* Topic 1 */}
-            <div>
-              <div className="flex justify-between items-end mb-3">
-                <div>
-                  <h4 className="font-bold text-[15px] text-gray-900">Basic concept</h4>
-                  <p className="text-[13px] text-gray-500 mt-0.5">Understanding API fundamentals</p>
+          <div className="flex flex-col gap-6">
+            {(displayData.topic_performance || []).map((t, idx) => (
+              <div key={t.id || idx} className="p-4 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4]/70 hover:border-[#5052EE]/20 transition-colors space-y-2.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h4 className="font-semibold text-sm sm:text-base text-[#1A1A2E]">{t.topic_title}</h4>
+                    <p className="text-xs text-[#64647A] mt-0.5">{t.sub_title}</p>
+                  </div>
+                  <span className={`self-start sm:self-center px-3 py-1 rounded-full text-xs font-medium border ${t.score_percentage >= 80 ? "bg-[#EAF8F5] text-[#0D9488] border-[#0D9488]/20" : t.score_percentage >= 60 ? "bg-[#EEF2FF] text-[#5052EE] border-[#5052EE]/20" : "bg-[#FFF2F2] text-[#E11D48] border-[#E11D48]/20"}`}>
+                    {t.status_label}
+                  </span>
                 </div>
-                <div className="bg-[#EEF2FF] text-[#5452F6] px-3.5 py-1.5 rounded-full text-[12px] font-bold">
-                  Good (100%)
-                </div>
-              </div>
-              <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full w-full bg-gradient-to-r from-[#5452F6] to-[#4648D4] rounded-full"></div>
-              </div>
-            </div>
-
-            {/* Topic 2 */}
-            <div>
-              <div className="flex justify-between items-end mb-3">
-                <div>
-                  <h4 className="font-bold text-[15px] text-gray-900">Route Handler syntax</h4>
-                  <p className="text-[13px] text-gray-500 mt-0.5">Defining GET, POST, and dynamic routes</p>
-                </div>
-                <div className="bg-[#EEF2FF] text-[#5452F6] px-3.5 py-1.5 rounded-full text-[12px] font-bold">
-                  Good (85%)
+                
+                <div className="h-2 w-full bg-[#EAEAF4] rounded-full overflow-hidden p-0.5">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-700 ${t.score_percentage >= 80 ? "bg-gradient-to-r from-[#10B981] to-[#0D9488]" : t.score_percentage >= 60 ? "bg-gradient-to-r from-[#4CD7F6] via-[#6B6BFF] to-[#5052EE]" : "bg-gradient-to-r from-[#F43F5E] to-[#E11D48]"}`}
+                    style={{ width: `${t.score_percentage}%` }}
+                  />
                 </div>
               </div>
-              <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full w-[85%] bg-gradient-to-r from-[#5452F6] to-[#06B6D4] rounded-full"></div>
-              </div>
-            </div>
-
-            {/* Topic 3 */}
-            <div>
-              <div className="flex justify-between items-end mb-3">
-                <div>
-                  <h4 className="font-bold text-[15px] text-gray-900">Error handling</h4>
-                  <p className="text-[13px] text-gray-500 mt-0.5">Try-catch blocks and status codes</p>
-                </div>
-                <div className="bg-[#FEE2E2] text-[#EF4444] px-3.5 py-1.5 rounded-full text-[12px] font-bold">
-                  Needs Practice (40%)
-                </div>
-              </div>
-              <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full w-[40%] bg-gradient-to-r from-[#DC2626] to-[#EF4444] rounded-full"></div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* ─── Bottom Section: Action Cards ─────────────────────────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        {/* ─── Bottom Section: Fully Interactive Action Cards ─────────────────────────────────────── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          {/* Card 1: Review Errors */}
-          <div className="bg-[#EEF2FF]/60 rounded-[24px] p-6 border border-[#E0E7FF] transition-all hover:shadow-md hover:-translate-y-1 cursor-pointer group">
-            <div className="w-12 h-12 rounded-xl bg-[#FEE2E2] text-[#EF4444] flex items-center justify-center">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg>
+          {/* Card 1: Open Answer Review Modal */}
+          <div 
+            onClick={() => setIsReviewModalOpen(true)}
+            className="bg-white rounded-2xl p-6 border border-[#EAEAF4] shadow-2xs transition-all duration-300 hover:shadow-md hover:border-[#5052EE]/50 hover:-translate-y-0.5 flex flex-col justify-between group cursor-pointer"
+          >
+            <div>
+              <div className="w-11 h-11 rounded-xl bg-[#FFF2F2] text-[#E11D48] border border-[#E11D48]/20 flex items-center justify-center font-semibold text-base group-hover:scale-105 transition-transform">
+                🔍
+              </div>
+              <h4 className="font-semibold text-base text-[#1A1A2E] mt-5 mb-2 group-hover:text-[#5052EE] transition-colors">
+                Xem lại câu hỏi trắc nghiệm
+              </h4>
+              <p className="text-xs sm:text-sm text-[#64647A] leading-relaxed font-normal">
+                Soát lại từng chi tiết đáp án và lời giải trình tường tận của Gia sư AI MindNova cho 10 câu thi.
+              </p>
             </div>
-            <h4 className="font-bold text-[17px] text-[#1F2937] mt-6 mb-2">Review Errors</h4>
-            <p className="text-[13.5px] text-gray-500 leading-relaxed min-h-[44px]">
-              Deep dive into the 3 questions you missed.
-            </p>
-            <div className="mt-5 flex items-center gap-1.5 text-[14px] font-bold text-[#5452F6] group-hover:gap-2.5 transition-all">
-              Start Review 
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
+
+            <div className="mt-6 pt-3 border-t border-[#F0F2F8] flex items-center justify-between text-xs font-semibold text-[#5052EE] group-hover:text-[#4648D4]">
+              <span>Bắt đầu soát bài</span>
+              <span className="group-hover:translate-x-1.5 transition-transform duration-200">➔</span>
             </div>
           </div>
 
-          {/* Card 2: Extra Practice */}
-          <div className="bg-[#EEF2FF]/60 rounded-[24px] p-6 border border-[#E0E7FF] transition-all hover:shadow-md hover:-translate-y-1 cursor-pointer group">
-            <div className="w-12 h-12 rounded-xl bg-[#CCFBF1] text-[#14B8A6] flex items-center justify-center">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19.5 12.572L12 20.072 4.5 12.572a5.5 5.5 0 0 1 7.778-7.778l-.278.278.278-.278a5.5 5.5 0 0 1 7.778 7.778z"></path>
-              </svg>
-            </div>
-            <h4 className="font-bold text-[17px] text-[#1F2937] mt-6 mb-2">Extra Practice</h4>
-            <p className="text-[13.5px] text-gray-500 leading-relaxed min-h-[44px]">
-              5 AI-generated questions focused on Error Handling.
-            </p>
-            <div className="mt-5 flex items-center gap-1.5 text-[14px] font-bold text-[#5452F6] group-hover:gap-2.5 transition-all">
-              Practice More 
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </div>
-          </div>
+          {/* Card 2: AI Practice Supplemental Link (Retake with randomized shuffled options) */}
+          <Link href={`/practice/quiz/question?lessonId=${targetModuleId}`} className="text-decoration-none block">
+            <div className="h-full bg-white rounded-2xl p-6 border border-[#EAEAF4] shadow-2xs transition-all duration-300 hover:shadow-md hover:border-[#0D9488]/50 hover:-translate-y-0.5 flex flex-col justify-between group cursor-pointer">
+              <div>
+                <div className="w-11 h-11 rounded-xl bg-[#EAF8F5] text-[#0D9488] border border-[#0D9488]/20 flex items-center justify-center font-semibold text-base group-hover:scale-105 transition-transform">
+                  🤖
+                </div>
+                <h4 className="font-semibold text-base text-[#1A1A2E] mt-5 mb-2 group-hover:text-[#0D9488] transition-colors">
+                  Luyện tập lại với đề xáo trộn mới
+                </h4>
+                <p className="text-xs sm:text-sm text-[#64647A] leading-relaxed font-normal">
+                  Vào lại chế độ kiểm nghiệm với bộ đề tự động xáo trộn ngẫu nhiên 100% thứ tự câu và đáp án A/B/C/D.
+                </p>
+              </div>
 
-          {/* Card 3: Next Lesson */}
-          <div className="bg-[#EEF2FF]/60 rounded-[24px] p-6 border border-[#E0E7FF] transition-all hover:shadow-md hover:-translate-y-1 cursor-pointer group">
-            <div className="w-12 h-12 rounded-xl bg-[#E0E7FF] text-[#5452F6] flex items-center justify-center">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-              </svg>
+              <div className="mt-6 pt-3 border-t border-[#F0F2F8] flex items-center justify-between text-xs font-semibold text-[#0D9488] group-hover:text-[#059669]">
+                <span>Luyện tập thêm</span>
+                <span className="group-hover:translate-x-1.5 transition-transform duration-200">➔</span>
+              </div>
             </div>
-            <h4 className="font-bold text-[17px] text-[#1F2937] mt-6 mb-2">Next Lesson</h4>
-            <p className="text-[13.5px] text-gray-500 leading-relaxed min-h-[44px]">
-              Move forward to Middleware and Security.
-            </p>
-            <div className="mt-5 flex items-center gap-1.5 text-[14px] font-bold text-[#5452F6] group-hover:gap-2.5 transition-all">
-              Continue 
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
+          </Link>
+
+          {/* Card 3: Switch to Other Modules on Practice Page */}
+          <Link href="/practice" className="text-decoration-none block">
+            <div className="h-full bg-white rounded-2xl p-6 border border-[#EAEAF4] shadow-2xs transition-all duration-300 hover:shadow-md hover:border-[#5052EE]/50 hover:-translate-y-0.5 flex flex-col justify-between group cursor-pointer">
+              <div>
+                <div className="w-11 h-11 rounded-xl bg-[#EEF2FF] text-[#5052EE] border border-[#5052EE]/20 flex items-center justify-center font-semibold text-base group-hover:scale-105 transition-transform">
+                  ⚡
+                </div>
+                <h4 className="font-semibold text-base text-[#1A1A2E] mt-5 mb-2 group-hover:text-[#5052EE] transition-colors">
+                  Chuyển sang Module chủ đề khác
+                </h4>
+                <p className="text-xs sm:text-sm text-[#64647A] leading-relaxed font-normal">
+                  Tiến thẳng về danh mục 4 Chủ đề Thực chiến (Mạng thần kinh, React 19, Security) để bứt phá.
+                </p>
+              </div>
+
+              <div className="mt-6 pt-3 border-t border-[#F0F2F8] flex items-center justify-between text-xs font-semibold text-[#5052EE] group-hover:text-[#4648D4]">
+                <span>Tiếp tục hành trình</span>
+                <span className="group-hover:translate-x-1.5 transition-transform duration-200">➔</span>
+              </div>
             </div>
-          </div>
+          </Link>
 
         </div>
 
         {/* ─── Footer Buttons ────────────────────────────────────────────────────── */}
-        <div className="flex justify-center items-center gap-4 mt-12">
-          <button className="px-8 py-3.5 bg-[#5452F6] hover:bg-[#4648D4] text-white rounded-xl font-bold text-[15px] shadow-[0_4px_14px_rgba(84,82,246,0.35)] hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-4 focus:ring-[#5452F6]/30">
-            Back to Dashboard
-          </button>
-          <button className="px-8 py-3.5 bg-white border border-[#D1D5DB] hover:bg-gray-50 text-gray-700 rounded-xl font-bold text-[15px] shadow-sm transition-all focus:outline-none focus:ring-4 focus:ring-gray-100">
-            Share Result
-          </button>
+        <div className="flex flex-wrap justify-center items-center gap-4 pt-4">
+          <Link href="/practice" className="text-decoration-none">
+            <button type="button" className="px-7 py-3 bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:opacity-95 text-white rounded-xl font-semibold text-xs sm:text-sm shadow-[0_6px_20px_rgba(80,82,238,0.3)] hover:-translate-y-0.5 transition-all cursor-pointer flex items-center gap-2">
+              <span>➔</span>
+              <span>Quay lại Trung tâm đánh giá</span>
+            </button>
+          </Link>
+
+          <Link href={`/practice/quiz/question?lessonId=${targetModuleId}`} className="text-decoration-none">
+            <button type="button" className="px-7 py-3 bg-white border border-[#EAEAF4] hover:bg-[#F8FAFC] text-[#374151] rounded-xl font-medium text-xs sm:text-sm shadow-2xs hover:border-[#5052EE]/30 transition-all cursor-pointer flex items-center gap-2">
+              <span>🔄</span>
+              <span>Làm lại bài với đề mới (Randomize)</span>
+            </button>
+          </Link>
         </div>
 
       </div>

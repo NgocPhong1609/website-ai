@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Avatar } from "@/src/shared/components/ui/Avatar";
 
 function SearchIcon() {
   return (
@@ -43,22 +44,7 @@ export function DashboardTopbar() {
   }, []);//không phải bị lỗi đâu đừng có xóa
 
   return (
-    <header className="sticky top-0 z-30 h-18 shrink-0 flex items-center justify-between gap-4 px-6 lg:px-8 bg-white/90 backdrop-blur-xl border-b border-[#F0F0F8] shadow-2xs transition-all duration-200">
-      {/* Interactive Luminous Search */}
-      <div className="flex-1 max-w-md relative group">
-        <div className="absolute inset-y-0 left-3.5 flex items-center text-[#9090B0] group-focus-within:text-[#4648D4] transition-colors pointer-events-none">
-          <SearchIcon />
-        </div>
-        <input
-          type="search"
-          placeholder="Search courses, lessons, or ask AI..."
-          className="w-full pl-10 pr-12 py-2.5 rounded-xl text-xs sm:text-sm bg-[#F6F6FB] border border-[#EAEAF4]/80 focus:border-[#6B6BFF] focus:bg-white focus:ring-4 focus:ring-[#6B6BFF]/15 text-[#1A1A2E] placeholder-[#9090B0] transition-all focus:outline-none shadow-inner"
-        />
-        <div className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none">
-          <span className="px-1.5 py-0.5 text-[10px] text-[#7878A0] font-mono bg-white rounded border border-[#EAEAF4] shadow-2xs">⌘K</span>
-        </div>
-      </div>
-
+    <header className="sticky top-0 z-30 h-18 shrink-0 flex items-center justify-end gap-4 px-6 lg:px-8 bg-white/90 backdrop-blur-xl border-b border-[#F0F0F8] shadow-2xs transition-all duration-200">
       {/* Right Actions & Profile */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1 bg-[#F6F6FB] p-1 rounded-xl border border-[#EAEAF4]">
@@ -93,9 +79,9 @@ export function DashboardTopbar() {
           <button
             type="button"
             aria-label="User profile"
-            className="w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-tr from-[#6B6BFF] to-[#4648D4] flex items-center justify-center text-white text-xs font-bold shadow-sm hover:shadow-[0_4px_12px_rgba(107,107,255,0.4)] hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none ring-2 ring-white"
+            className="focus:outline-none group/avatar hover:scale-105 active:scale-95 transition-transform duration-200"
           >
-            MN
+            <Avatar fallback="MN" size="md" className="ring-2 ring-white hover:shadow-[0_4px_12px_rgba(107,107,255,0.4)] transition-all duration-200" />
           </button>
           <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#10B981] border-2 border-white shadow-xs animate-pulse" title="Online" />
         </div>

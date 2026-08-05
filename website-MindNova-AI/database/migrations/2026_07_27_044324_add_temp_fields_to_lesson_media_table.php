@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('lesson_media')) {
+            return;
+        }
+
         Schema::table('lesson_media', function (Blueprint $table) {
-            $table->foreignId('lesson_id')->nullable()->change();
-            $table->boolean('is_temp')->default(false)->after('status');
+            if (!Schema::hasColumn('lesson_media', 'is_temp')) {
+                $table->boolean('is_temp')->default(false)->after('status');
+            }
         });
     }
 
@@ -22,9 +27,14 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('lesson_media')) {
+            return;
+        }
+
         Schema::table('lesson_media', function (Blueprint $table) {
-            $table->foreignId('lesson_id')->nullable(false)->change();
-            $table->dropColumn('is_temp');
+            if (Schema::hasColumn('lesson_media', 'is_temp')) {
+                $table->dropColumn('is_temp');
+            }
         });
     }
 };

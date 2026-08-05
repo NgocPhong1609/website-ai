@@ -1,8 +1,6 @@
 "use client";
 
-// ─── CoursePagination ─────────────────────────────────────────────────────────
-// Page navigation for the course grid.
-
+import React from "react";
 import { twMerge } from "tailwind-merge";
 import { ChevronLeftIcon, ChevronRightIcon } from "./icons";
 
@@ -19,30 +17,34 @@ export function CoursePagination({
   pageSize,
   onPageChange,
 }: CoursePaginationProps) {
-  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
 
-  // We show up to 5 pages for simplicity (1, 2, 3, 4, 5)
-  // Or just all pages if it's small.
+  const from = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const to = Math.min(currentPage * pageSize, totalItems);
+
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-  if (totalItems === 0) return null;
+  if (totalItems <= pageSize && totalItems !== 0) {
+    return null;
+  }
 
   return (
-    <div className="flex items-center justify-center pt-8 pb-4">
-      <div className="flex items-center gap-2.5" role="navigation" aria-label="Phân trang">
-        {/* Prev */}
+    <div className="flex items-center justify-between pt-4 mt-2 border-t border-gray-200 text-xs">
+      <p className="font-bold text-gray-500">
+        Hiển thị <span className="text-gray-900">{from}–{to}</span> trong số <span className="text-gray-900">{totalItems}</span> khóa học
+      </p>
+
+      <div className="flex items-center gap-1.5" role="navigation" aria-label="Phân trang">
         <button
           id="btn-page-prev"
           type="button"
           aria-label="Trang trước"
           disabled={currentPage === 1}
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-          className="w-11 h-11 rounded-2xl flex items-center justify-center text-[#B0B0C8] border border-[#F0F0F8] bg-white hover:bg-[#F4F4FA] hover:text-[#4648D4] hover:border-[#EAEAF4] disabled:opacity-40 disabled:pointer-events-none transition-all duration-200 shadow-sm"
+          className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-600 border border-gray-200 bg-white hover:bg-gray-50 hover:text-gray-900 disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shadow-2xs"
         >
           <ChevronLeftIcon />
         </button>
-
-        {/* Page numbers */}
         {pages.map((p) => (
           <button
             key={p}
@@ -52,24 +54,23 @@ export function CoursePagination({
             aria-current={p === currentPage ? "page" : undefined}
             onClick={() => onPageChange(p)}
             className={twMerge(
-              "w-11 h-11 rounded-2xl text-[15px] font-bold transition-all duration-300 flex items-center justify-center",
+              "w-8 h-8 rounded-xl font-extrabold transition-all cursor-pointer shadow-2xs",
               p === currentPage
-                ? "bg-[#4648D4] text-white shadow-[0_8px_20px_rgba(70,72,212,0.35)] -translate-y-0.5"
-                : "text-[#64647A] border border-[#F0F0F8] bg-white hover:bg-[#F4F4FA] hover:text-[#4648D4] hover:border-[#EAEAF4] shadow-sm",
+                ? "bg-[#4F46E5] text-white border border-[#4F46E5]"
+                : "text-gray-600 border border-gray-200 bg-white hover:bg-gray-50 hover:text-gray-900"
             )}
           >
             {p}
           </button>
         ))}
 
-        {/* Next */}
         <button
           id="btn-page-next"
           type="button"
           aria-label="Trang sau"
           disabled={currentPage === totalPages}
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-          className="w-11 h-11 rounded-2xl flex items-center justify-center text-[#B0B0C8] border border-[#F0F0F8] bg-white hover:bg-[#F4F4FA] hover:text-[#4648D4] hover:border-[#EAEAF4] disabled:opacity-40 disabled:pointer-events-none transition-all duration-200 shadow-sm"
+          className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-600 border border-gray-200 bg-white hover:bg-gray-50 hover:text-gray-900 disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shadow-2xs"
         >
           <ChevronRightIcon />
         </button>

@@ -1,4 +1,5 @@
 import type { AdminOverviewData } from "@/src/features/admin/types";
+import Link from "next/link";
 
 interface AdminRecentUsersTableProps {
   users: AdminOverviewData["users"];
@@ -36,9 +37,12 @@ export function AdminRecentUsersTable({ users }: AdminRecentUsersTableProps) {
           <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Người dùng gần đây</h2>
           <p className="text-sm text-slate-500">Danh sách thao tác mới nhất</p>
         </div>
-        <button className="rounded-full border border-cyan-100 bg-cyan-50/70 px-3 py-1.5 text-xs font-semibold text-cyan-700 transition hover:bg-cyan-100">
+        <Link
+          href="/admin/users"
+          className="rounded-full border border-cyan-100 bg-cyan-50/70 px-3 py-1.5 text-xs font-semibold text-cyan-700 transition hover:bg-cyan-100"
+        >
           Xem tất cả
-        </button>
+        </Link>
       </div>
 
       <div className="mt-4 overflow-hidden rounded-xl border border-slate-200/80">

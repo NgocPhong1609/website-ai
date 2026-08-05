@@ -7,7 +7,7 @@ import { NavItem } from "./NavItem";
  * Renders the scrollable navigation list.
  * Each NavItem resolves its own active state via usePathname internally.
  */
-export function SidebarNav() {
+export function SidebarNav({ isCollapsed }: { isCollapsed?: boolean }) {
   return (
     <nav
       className="flex-1 overflow-y-auto px-3 py-2"
@@ -20,6 +20,7 @@ export function SidebarNav() {
               label={item.label}
               iconKey={item.iconKey}
               href={item.href}
+              isCollapsed={isCollapsed}
             />
           </li>
         ))}

@@ -73,7 +73,7 @@ class CourseService
             Storage::disk('r2')->delete($oldPathR2);
         }
 
-        $path = $file->store('courses/thumbnails', 'r2');
+        $path = $file->store("Courses/{$course->id}/Thumbnails", 'r2');
         $url = Storage::disk('r2')->url($path);
 
         $course->update(['thumbnail' => $url]);

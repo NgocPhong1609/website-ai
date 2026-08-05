@@ -14,122 +14,78 @@ class DashboardService
      */
     public function getOverview(?User $user): array
     {
-        // 1. Fetch courses from DB or fallback to default learning tracks if DB is empty
-        $coursesQuery = Course::query()
-            ->latest()
-            ->take(4)
-            ->get();
+        $userId = $user ? $user->id : null;
 
-        $courses = $coursesQuery->map(function ($course, $index) {
-            $progressRates = [72, 45, 85, 30];
-            $nextLessons = ['Route Handlers & SSR', 'State Mutations & Cache', 'AI Copilot Integration', 'Advanced Middleware'];
-            $gradients = [
-                'from-[#0f0c29] via-[#302b63] to-[#24243e]',
-                'from-[#0f2027] via-[#203a43] to-[#2c5364]',
-                'from-[#1a2a6c] via-[#b21f1f] to-[#fdbb2d]',
-                'from-[#34e89e] via-[#0f3443] to-[#000000]'
-            ];
-            
-            return [
-                'id' => $course->id,
-                'title' => $course->title,
-                'next_lesson' => $nextLessons[$index % count($nextLessons)],
-                'progress' => $progressRates[$index % count($progressRates)],
-                'thumbnail_gradient' => $gradients[$index % count($gradients)],
-                'thumbnail_url' => $course->thumbnail ? url($course->thumbnail) : 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&auto=format&fit=crop',
-            ];
-        });
+        // 1. Fetch enrolled courses from DB
+        $courses = collect();
+        if ($userId && class_exists(\App\Models\Enrollment::class)) {
+            $enrollments = \App\Models\Enrollment::with('course.modules.lessons')->where('user_id', $userId)->latest('enrolled_at')->take(4)->get();
+            $courses = $enrollments->map(function ($enrollment, $index) {
+                $course = $enrollment->course;
+                if (!$course) return null;
+                
+                $gradients = [
+                    'from-[#0f0c29] via-[#302b63] to-[#24243e]',
+                    'from-[#0f2027] via-[#203a43] to-[#2c5364]',
+                    'from-[#1a2a6c] via-[#b21f1f] to-[#fdbb2d]',
+                    'from-[#34e89e] via-[#0f3443] to-[#000000]'
+                ];
+                
+                // Lấy tổng số bài học của khóa
+                $totalLessons = 0;
+                foreach ($course->modules as $module) {
+                    $totalLessons += $module->lessons->count();
+                }
 
-        // Fallback demo courses if no courses exist in database yet
-        if ($courses->isEmpty()) {
-            $courses = collect([
-                [
-                    'id' => 1,
-                    'title' => 'Next.js 15 Fullstack Architecture',
-                    'next_lesson' => 'App Router & Server Components',
-                    'progress' => 78,
-                    'thumbnail_gradient' => 'from-[#0f0c29] via-[#302b63] to-[#24243e]',
-                    'thumbnail_url' => 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&auto=format&fit=crop',
-                ],
-                [
-                    'id' => 2,
-                    'title' => 'Laravel 13 & AI Agents Mastery',
-                    'next_lesson' => 'Sanctum Token Authentication & RBAC',
-                    'progress' => 54,
-                    'thumbnail_gradient' => 'from-[#0f2027] via-[#203a43] to-[#2c5364]',
-                    'thumbnail_url' => 'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=600&auto=format&fit=crop',
-                ],
-            ]);
+                // Lấy bài học tiếp theo (nếu có logic xác định, hiện tạm thời mock)
+                $nextLesson = 'Tiếp tục học phần mới';
+
+                return [
+                    'id' => $course->id,
+                    'title' => $course->title,
+                    'next_lesson' => $nextLesson,
+                    'progress' => $enrollment->progress_percentage ?? 0,
+                    'thumbnail_gradient' => $gradients[$index % count($gradients)],
+                    'thumbnail_url' => $course->thumbnail ? url($course->thumbnail) : 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&auto=format&fit=crop',
+                ];
+            })->filter()->values();
         }
 
-        // 2. AI Recommended Focus Areas
-        $focusAreas = [
-            ['id' => 1, 'topic' => 'React Server Components (RSC)', 'accuracy' => 58, 'action' => 'review'],
-            ['id' => 2, 'topic' => 'Laravel Service Layer Design', 'accuracy' => 64, 'action' => 'practice'],
-            ['id' => 3, 'topic' => 'Sanctum Token Lifecycles', 'accuracy' => 52, 'action' => 'practice'],
-        ];
+        // Fallback for empty state (Test Case 1)
+        if ($courses->isEmpty()) {
+            $courses = collect();
+        }
+
+        // 2. AI Recommended Focus Areas (Mock based on progress)
+        $focusAreas = [];
 
         // 3. AI Suggestion Box
-        $aiSuggestion = [
-            'badge' => 'MindNova AI Suggestion',
-            'message' => 'We noticed you spent 20m on Hydration errors. Try reviewing "Server vs Client Leaf Node Components".',
-            'reason' => 'Last diagnostic score 58%',
-            'estimated' => '15 minutes',
-        ];
+        $aiSuggestion = null;
 
         // 5. Overall Stats & Streak
+        $overallProgressPct = 0;
+        if ($userId && class_exists(\App\Models\Enrollment::class)) {
+            $overallProgressPct = (int) \App\Models\Enrollment::where('user_id', $userId)->avg('progress_percentage');
+        }
+
         $overallProgress = [
-            'percent' => 74,
-            'delta' => '+3.2% vs last week',
+            'percent' => $overallProgressPct,
+            'delta' => 'Tiến trình học tập tổng quan',
         ];
+
+        // Lấy Streak thực tế từ user profile (nếu có)
+        $studyStreakDays = 0;
+        if ($user && $user->profile) {
+            $studyStreakDays = $user->profile->streak_days ?? 0;
+        }
 
         $studyStreak = [
-            'days' => 8,
-            'message' => 'Incredible consistency! 2 days until Platinum medal.',
+            'days' => $studyStreakDays,
+            'message' => $studyStreakDays > 0 ? "Bạn đang giữ chuỗi $studyStreakDays ngày!" : 'Hãy bắt đầu chuỗi học tập ngay hôm nay!',
         ];
 
-        // 6. Advanced Learning Recommendations (Các đề xuất học tập nâng cao)
-        $advancedRecommendations = [
-            [
-                'id' => 'adv-01',
-                'title' => 'Deep Dive into Multi-Agent Orchestration & RAG Pipelines',
-                'category' => 'AI & Autonomous Agents',
-                'level' => 'Advanced Specialization',
-                'duration' => '10 Weeks • 32 Hours',
-                'instructor' => 'Dr. Alex Rivera • AI Principal Engineer',
-                'rating' => 4.9,
-                'students_count' => 1420,
-                'thumbnail_url' => 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=700&auto=format&fit=crop',
-                'tags' => ['LangGraph', 'Vector DB', 'Agentic Workflows'],
-                'ai_match' => '98% AI Profile Match',
-            ],
-            [
-                'id' => 'adv-02',
-                'title' => 'Enterprise Event-Driven Architecture with Laravel & Kafka',
-                'category' => 'Fullstack Web & Cloud',
-                'level' => 'Expert Track',
-                'duration' => '8 Weeks • 24 Hours',
-                'instructor' => 'Marcus Vance • Senior Lead Cloud Architect',
-                'rating' => 4.8,
-                'students_count' => 980,
-                'thumbnail_url' => 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=700&auto=format&fit=crop',
-                'tags' => ['Kafka', 'Microservices', 'Asynchronous queues'],
-                'ai_match' => '95% AI Profile Match',
-            ],
-            [
-                'id' => 'adv-03',
-                'title' => 'Fine-Tuning Open Source Large Language Models for Production',
-                'category' => 'Data Science & NLP',
-                'level' => 'Mastery Boot-camp',
-                'duration' => '12 Weeks • 45 Hours',
-                'instructor' => 'Elena Rostova • AI Lead & Research Scientist',
-                'rating' => 5.0,
-                'students_count' => 2150,
-                'thumbnail_url' => 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=700&auto=format&fit=crop',
-                'tags' => ['LoRA/QLoRA', 'DeepSeek', 'Model Quantization'],
-                'ai_match' => '92% AI Profile Match',
-            ],
-        ];
+        // 6. Advanced Learning Recommendations
+        $advancedRecommendations = [];
 
         return [
             'user' => $user ? ['id' => $user->id, 'name' => $user->name, 'email' => $user->email] : null,

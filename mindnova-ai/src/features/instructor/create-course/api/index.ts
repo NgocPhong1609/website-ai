@@ -50,12 +50,17 @@ export function useUploadCourseThumbnail() {
 }
 
 export function useUpdateCoursePrice() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ courseId, price }: { courseId: string; price: number }) => {
       const { data } = await axiosClient.patch(`/api/instructor/courses/${courseId}/price`, {
         price,
       });
       return data.data;
+    },
+    onSuccess: (_, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId] });
     },
   });
 }
@@ -95,7 +100,7 @@ export function useUploadContentMedia() {
 }
 export function useUploadTempMedia() {
   return useMutation({
-    mutationFn: async ({ file, onUploadProgress }: { file: File; onUploadProgress?: (progressEvent: any) => void }) => {
+    mutationFn: async ({ file, onUploadProgress, signal }: { file: File; onUploadProgress?: (progressEvent: any) => void; signal?: AbortSignal }) => {
       const formData = new FormData();
       formData.append("file", file);
 
@@ -104,6 +109,7 @@ export function useUploadTempMedia() {
         formData,
         {
           onUploadProgress,
+          signal,
         }
       );
       return data;

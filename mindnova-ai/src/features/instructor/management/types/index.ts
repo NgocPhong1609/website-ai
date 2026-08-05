@@ -12,6 +12,8 @@ export interface Course {
   status: CourseStatus;
   durationHours: number;
   totalLessons: number;
+  price: number;
+  salePrice?: number;
 }
 
 export interface CourseStat {

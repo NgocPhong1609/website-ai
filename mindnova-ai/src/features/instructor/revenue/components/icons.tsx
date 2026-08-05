@@ -9,6 +9,11 @@ const B = {
   "aria-hidden": true as const,
 };
 
+type IconProps = {
+  size?: number;
+  className?: string;
+};
+
 export function SearchIcon({ size = 15 }: { size?: number }) {
   return (
     <svg {...B} width={size} height={size} strokeWidth={2}>
@@ -259,9 +264,9 @@ export function XIcon({ size = 16 }: { size?: number }) {
   );
 }
 
-export function LockIcon({ size = 14 }: { size?: number }) {
+export function LockIcon({ size = 14, className }: IconProps) {
   return (
-    <svg {...B} width={size} height={size} strokeWidth={2}>
+    <svg {...B} width={size} height={size} strokeWidth={2} className={className}>
       <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>

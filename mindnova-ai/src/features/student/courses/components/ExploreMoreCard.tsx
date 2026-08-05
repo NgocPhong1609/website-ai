@@ -3,7 +3,7 @@ import Link from "next/link";
 export function ExploreMoreCard() {
   return (
     <Link
-      href="/study-plan"
+      href="/explore"
       className="group border-2 border-dashed border-[#CBD5E1] bg-gradient-to-b from-[#F8FAFC] via-white to-[#F8FAFC] rounded-2xl flex flex-col items-center justify-center p-6 text-center h-full hover:border-[#5052EE]/60 hover:bg-gradient-to-b hover:from-[#EEF2FF]/40 hover:to-[#F8FAFC] transition-all duration-300 text-decoration-none focus:outline-none"
     >
       <div className="w-14 h-14 rounded-2xl bg-[#EEF2FF] text-[#5052EE] flex items-center justify-center mb-4 group-hover:bg-gradient-to-br group-hover:from-[#5052EE] group-hover:to-[#0D9488] group-hover:text-white transition-all duration-300 shadow-2xs group-hover:shadow-[0_4px_16px_rgba(80,82,238,0.3)] group-hover:scale-110 group-hover:rotate-3">
