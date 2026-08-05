@@ -55,7 +55,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
         difficulty: (course.level as DifficultyLevel) || "beginner",
         thumbnailPreview: course.thumbnail || null,
       }));
-      useCreateCourseStore.getState().setSettings("basePrice", String(course.price || 500000));
+      useCreateCourseStore.getState().setSettings("basePrice", String(course.price ?? 500000));
     }
   }, [course]);
 
@@ -86,9 +86,9 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
       }
 
       const storeBasePrice = useCreateCourseStore.getState().settings.basePrice;
-      if (storeBasePrice) {
+      if (storeBasePrice !== undefined && storeBasePrice !== null) {
         const priceNum = Number(String(storeBasePrice).replace(/[^0-9]/g, ""));
-        if (priceNum >= 100000) {
+        if (priceNum === 0 || priceNum >= 100000) {
           await updatePrice({ courseId, price: priceNum });
         }
       }

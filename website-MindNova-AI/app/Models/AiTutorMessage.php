@@ -10,6 +10,8 @@ class AiTutorMessage extends Model
 {
     use HasFactory;
 
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'conversation_id',
         'sender',

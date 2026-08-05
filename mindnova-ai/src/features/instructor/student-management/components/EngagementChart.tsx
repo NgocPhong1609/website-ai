@@ -1,9 +1,19 @@
 "use client";
 
 import React from "react";
+import { twMerge } from "tailwind-merge";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[], timeRange: number, setTimeRange: (val: number) => void }) {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const getRangeText = (val: number) => {
+    if (val === 7) return "7 ngày qua";
+    if (val === 14) return "14 ngày qua";
+    if (val === 30) return "30 ngày qua";
+    return `${val} ngày qua`;
+  };
+
   return (
     <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-2xs flex flex-col gap-6 w-full h-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -13,20 +23,38 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
         </div>
         
         <div className="relative">
-          <select 
-            value={timeRange} 
-            onChange={(e) => setTimeRange(Number(e.target.value))}
-            className="appearance-none bg-white border border-gray-200 text-gray-700 text-xs font-bold rounded-xl px-4 py-2 pr-8 focus:outline-none focus:border-indigo-500 cursor-pointer shadow-sm"
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center justify-between w-[130px] bg-white border border-gray-200 text-gray-700 text-xs font-bold rounded-xl px-4 py-2 hover:bg-gray-50 focus:outline-none focus:border-indigo-500 cursor-pointer shadow-sm transition-colors"
           >
-            <option value={7}>7 ngày qua</option>
-            <option value={14}>14 ngày qua</option>
-            <option value={30}>30 ngày qua</option>
-          </select>
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <span>{getRangeText(timeRange)}</span>
+            <svg className={twMerge("w-4 h-4 text-gray-500 transition-transform duration-200", isOpen ? "rotate-180" : "")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
-          </div>
+          </button>
+          
+          {isOpen && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)}></div>
+              <div className="absolute right-0 mt-2 w-[130px] bg-white border border-gray-100 rounded-xl shadow-lg z-20 overflow-hidden py-1">
+                {[7, 14, 30].map(val => (
+                  <button
+                    key={val}
+                    onClick={() => {
+                      setTimeRange(val);
+                      setIsOpen(false);
+                    }}
+                    className={twMerge(
+                      "w-full text-left px-4 py-2 text-xs font-bold cursor-pointer transition-colors",
+                      timeRange === val ? "bg-indigo-50 text-indigo-700" : "text-gray-700 hover:bg-gray-50"
+                    )}
+                  >
+                    {getRangeText(val)}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
