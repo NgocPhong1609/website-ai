@@ -26,6 +26,9 @@ class User extends Authenticatable
         'google_id',
         'avatar_url',
         'status',
+        'teacher_verification_status',
+        'teacher_verified_at',
+        'teacher_verification_note',
         'last_login_at',
         'is_locked',
         'role',
@@ -45,6 +48,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_locked' => 'boolean',
+            'teacher_verified_at' => 'datetime',
         ];
     }
 

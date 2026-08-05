@@ -66,47 +66,70 @@ function renderFormattedText(text: string) {
 }
 
 function TypewriterText({
+  id,
   text,
   animate = false,
+  isStopped = false,
   onScroll,
+  onTypingStateChange,
 }: {
+  id?: string;
   text: string;
   animate?: boolean;
-  onScroll?: () => void;
+  isStopped?: boolean;
+  onScroll?: (smooth?: boolean) => void;
+  onTypingStateChange?: (typing: boolean) => void;
 }) {
   const [displayedText, setDisplayedText] = useState(animate ? "" : text);
   const onScrollRef = useRef(onScroll);
-  onScrollRef.current = onScroll;
+  const isStoppedRef = useRef(isStopped);
+  const onTypingRef = useRef(onTypingStateChange);
+
+  useEffect(() => {
+    onScrollRef.current = onScroll;
+    isStoppedRef.current = isStopped;
+    onTypingRef.current = onTypingStateChange;
+  }, [onScroll, isStopped, onTypingStateChange]);
 
   useEffect(() => {
     if (!animate) {
       setDisplayedText(text);
+      onTypingRef.current?.(false);
       return;
     }
+
+    onTypingRef.current?.(true);
 
     let currentIndex = 0;
     const totalLen = text.length;
     let tickCount = 0;
 
     const timer = setInterval(() => {
+      if (isStoppedRef.current) {
+        clearInterval(timer);
+        setDisplayedText((prev) => prev + " ⏸️ *(Đã bị tạm dừng)*");
+        onTypingRef.current?.(false);
+        return;
+      }
+
       if (currentIndex < totalLen) {
-        // Stream small chunks of characters every 25ms to mimic real-time LLM speed
+        // Stream small chunks of characters every 25ms
         const step = Math.floor(Math.random() * 4) + 2;
         currentIndex = Math.min(totalLen, currentIndex + step);
         setDisplayedText(text.slice(0, currentIndex));
-        tickCount++;
-        if (tickCount % 5 === 0 && onScrollRef.current) {
-          onScrollRef.current();
-        }
       } else {
         clearInterval(timer);
+        onTypingRef.current?.(false);
         if (onScrollRef.current) {
-          setTimeout(() => onScrollRef.current?.(), 60);
+          setTimeout(() => onScrollRef.current?.(false), 60);
         }
       }
     }, 25);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      onTypingRef.current?.(false);
+    };
   }, [text, animate]);
 
   return <>{renderFormattedText(displayedText)}</>;
@@ -114,7 +137,16 @@ function TypewriterText({
 
 export function FloatingAiChat() {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpenState] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const setIsOpen = (open: boolean) => {
+    setIsOpenState(open);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("mindnova_floating_ai_chat_open_v1", String(open));
+    }
+  };
+
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -125,17 +157,62 @@ export function FloatingAiChat() {
     },
   ]);
 
+  // Load chat history after hydration completes to guarantee 100% SSR matching
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const stored = localStorage.getItem("mindnova_floating_ai_chat_history_v1");
+      if (stored) {
+        const parsed: Message[] = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setMessages(parsed.map((m) => ({ ...m, animate: false })));
+        }
+      }
+      const storedOpen = localStorage.getItem("mindnova_floating_ai_chat_open_v1");
+      if (storedOpen === "true") {
+        setIsOpenState(true);
+      }
+    } catch (e) {
+      console.error("Failed to read floating chat history:", e);
+    } finally {
+      setIsLoaded(true);
+    }
+  }, []);
+
+  // Save chat history to localStorage ONLY after initial hydration load has finished
+  useEffect(() => {
+    if (!isLoaded || typeof window === "undefined") return;
+    try {
+      const toSave = messages.map((m) => ({ ...m, animate: false }));
+      localStorage.setItem("mindnova_floating_ai_chat_history_v1", JSON.stringify(toSave));
+    } catch (e) {
+      console.error("Failed to save floating chat history:", e);
+    }
+  }, [messages, isLoaded]);
+
   // Drag and Drop Positioning State
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [stoppedMsgIds, setStoppedMsgIds] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const isDraggingRef = useRef(false);
 
+  const chatBoxRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  const scrollToBottom = (smooth: boolean = false) => {
+    // Direct container scrollTop assignment prevents browser window layout jumps or stuttering during typewriter animation
+    if (chatBoxRef.current) {
+      if (smooth) {
+        chatBoxRef.current.scrollTo({ top: chatBoxRef.current.scrollHeight, behavior: "smooth" });
+      } else {
+        chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+      }
+    } else if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "end" });
+    }
   };
 
   // Initialize initial coordinate position on client mount
@@ -288,15 +365,38 @@ export function FloatingAiChat() {
     },
   });
 
+  const isGenerating = chatMutation.isPending || isTyping;
+
+  const handleStop = () => {
+    if (chatMutation.isPending) {
+      chatMutation.reset();
+      const stoppedReply: Message = {
+        id: `stop-${Date.now()}`,
+        sender: "ai",
+        text: "⏸️ *(Bạn đã tạm dừng Gia sư Nova trước khi câu trả lời được hoàn thành)*",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        animate: false,
+      };
+      setMessages((prev) => [...prev, stoppedReply]);
+      setIsTyping(false);
+    } else if (isTyping) {
+      const latestAiMsg = [...messages].reverse().find((m) => m.sender === "ai");
+      if (latestAiMsg) {
+        setStoppedMsgIds((prev) => [...prev, latestAiMsg.id]);
+      }
+      setIsTyping(false);
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
-      scrollToBottom();
+      scrollToBottom(false);
     }
   }, [messages, isOpen, chatMutation.isPending]);
 
   const handleSend = (textToSend?: string) => {
     const query = (textToSend || input).trim();
-    if (!query || chatMutation.isPending) return;
+    if (!query || isGenerating) return;
 
     const userMsg: Message = {
       id: `user-${Date.now()}`,
@@ -310,6 +410,31 @@ export function FloatingAiChat() {
     
     chatMutation.mutate(query);
   };
+
+  // Listen to programmatic open triggers from anywhere in the app (e.g. course sidebar AI cards)
+  useEffect(() => {
+    const handleOpenAiChat = (e: Event) => {
+      const customEvent = e as CustomEvent<{ initialQuery?: string; autoSend?: boolean }>;
+      setIsOpen(true);
+      if (customEvent.detail?.initialQuery) {
+        const query = customEvent.detail.initialQuery;
+        if (customEvent.detail.autoSend && !chatMutation.isPending) {
+          const userMsg: Message = {
+            id: `user-${Date.now()}`,
+            sender: "user",
+            text: query,
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          };
+          setMessages((prev) => [...prev, userMsg]);
+          chatMutation.mutate(query);
+        } else {
+          setInput(query);
+        }
+      }
+    };
+    window.addEventListener("open-ai-tutor-chat", handleOpenAiChat);
+    return () => window.removeEventListener("open-ai-tutor-chat", handleOpenAiChat);
+  }, [chatMutation]);
 
   const quickSuggestions = [
     "💡 Tổng hợp tiến độ",
@@ -375,12 +500,11 @@ export function FloatingAiChat() {
       )}
 
       {/* Expanded Floating Modal Window - 5% Larger Dimensions (340px x 445px) with Draggable Header */}
-      {isOpen && (
-        <div
-          className={`w-[calc(100vw-2rem)] sm:w-[340px] h-[445px] max-h-[80vh] bg-white rounded-2xl shadow-[0_16px_48px_rgba(26,26,46,0.22)] border border-[#E4E6F0] flex flex-col overflow-hidden transition-transform duration-250 animate-in fade-in zoom-in-95 origin-bottom-right ${
-            isDragging ? "ring-2 ring-[#5052EE]/50 shadow-2xl scale-[1.01]" : ""
-          }`}
-        >
+      <div
+        className={`w-[calc(100vw-2rem)] sm:w-[340px] h-[445px] max-h-[80vh] bg-white rounded-2xl shadow-[0_16px_48px_rgba(26,26,46,0.22)] border border-[#E4E6F0] flex-col overflow-hidden transition-transform duration-250 animate-in fade-in zoom-in-95 origin-bottom-right ${
+          isDragging ? "ring-2 ring-[#5052EE]/50 shadow-2xl scale-[1.01]" : ""
+        } ${isOpen ? "flex" : "hidden"}`}
+      >
           {/* Interactive Draggable Header */}
           <header
             onMouseDown={handleMouseDown}
@@ -407,22 +531,44 @@ export function FloatingAiChat() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              aria-label="Thu nhỏ"
-              title="Thu nhỏ cửa sổ"
-              className="w-7 h-7 rounded-lg hover:bg-[#E0E5FF] text-[#64647A] hover:text-[#5052EE] flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
-            >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M18 6 6 18" />
-                <path d="m6 6 12 12" />
-              </svg>
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử trò chuyện và tạo hội thoại mới không?")) {
+                    const defaultMsg: Message = {
+                      id: `init-${Date.now()}`,
+                      sender: "ai",
+                      text: "Chào bạn! 👋 Mình là **Nova**, gia sư AI đồng hành cùng bạn 24/7. Bạn có câu hỏi hay bài tập nào cần mình hướng dẫn hôm nay không?",
+                      time: "Vừa xong",
+                    };
+                    setMessages([defaultMsg]);
+                    localStorage.setItem("mindnova_floating_ai_chat_history_v1", JSON.stringify([defaultMsg]));
+                  }
+                }}
+                aria-label="Xóa lịch sử chat"
+                title="Xóa và làm mới cuộc trò chuyện"
+                className="w-7 h-7 rounded-lg hover:bg-[#FEE2E2] text-[#64647A] hover:text-[#DC2626] flex items-center justify-center transition-colors focus:outline-none cursor-pointer text-xs font-normal"
+              >
+                🗑️
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                aria-label="Thu nhỏ"
+                title="Thu nhỏ cửa sổ"
+                className="w-7 h-7 rounded-lg hover:bg-[#E0E5FF] text-[#64647A] hover:text-[#5052EE] flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </button>
+            </div>
           </header>
 
           {/* Chat Messages Area */}
-          <div className="flex-1 overflow-y-auto p-3.5 flex flex-col gap-3 bg-[#FCFDFE]">
+          <div ref={chatBoxRef} className="flex-1 overflow-y-auto p-3.5 flex flex-col gap-3 bg-[#FCFDFE]">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -457,7 +603,14 @@ export function FloatingAiChat() {
                   >
                     {msg.sender === "ai" ? (
                       msg.animate ? (
-                        <TypewriterText text={msg.text} animate={msg.animate} onScroll={scrollToBottom} />
+                        <TypewriterText
+                          id={msg.id}
+                          text={msg.text}
+                          animate={msg.animate}
+                          isStopped={stoppedMsgIds.includes(msg.id)}
+                          onScroll={scrollToBottom}
+                          onTypingStateChange={setIsTyping}
+                        />
                       ) : (
                         renderFormattedText(msg.text)
                       )
@@ -495,7 +648,7 @@ export function FloatingAiChat() {
                 key={idx}
                 type="button"
                 onClick={() => handleSend(item)}
-                disabled={chatMutation.isPending}
+                disabled={isGenerating}
                 className="shrink-0 text-xs font-semibold bg-[#F8FAFC] hover:bg-[#EEF2FF] disabled:opacity-50 text-[#64647A] hover:text-[#5052EE] border border-[#EAEAF4] hover:border-[#5052EE]/30 rounded-xl px-3 py-1.5 transition-all duration-200 focus:outline-none cursor-pointer shadow-2xs"
               >
                 {item}
@@ -508,7 +661,7 @@ export function FloatingAiChat() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleSend();
+                if (!isGenerating) handleSend();
               }}
               className="flex items-center gap-2"
             >
@@ -516,26 +669,40 @@ export function FloatingAiChat() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                disabled={chatMutation.isPending}
-                placeholder="Nhập câu hỏi cho Nova..."
+                disabled={isGenerating}
+                placeholder={isGenerating ? "Nova đang trả lời..." : "Nhập câu hỏi cho Nova..."}
                 className="flex-1 bg-[#F8FAFC] focus:bg-white disabled:bg-gray-100 border border-[#EAEAF4] focus:border-[#5052EE] rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#1A1A2E] placeholder:text-[#9496A8] focus:outline-none focus:ring-2 focus:ring-[#5052EE]/25 transition-all duration-200"
               />
-              <button
-                type="submit"
-                aria-label="Send"
-                disabled={!input.trim() || chatMutation.isPending}
-                className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:opacity-95 disabled:opacity-50 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-sm active:scale-95 cursor-pointer"
-              >
-                <svg className="w-4 h-4 ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m22 2-7 20-4-9-9-4Z" />
-                  <path d="M22 2 11 13" />
-                </svg>
-              </button>
+              {isGenerating ? (
+                <button
+                  type="button"
+                  onClick={handleStop}
+                  aria-label="Tạm dừng AI trả lời"
+                  title="Dừng câu trả lời của AI"
+                  className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#DC2626] via-[#E11D48] to-[#EA580C] hover:opacity-95 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-[0_4px_12px_rgba(225,29,72,0.35)] animate-pulse active:scale-95 cursor-pointer"
+                >
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                    <rect x="5" y="4" width="5" height="16" rx="1.5" />
+                    <rect x="14" y="4" width="5" height="16" rx="1.5" />
+                  </svg>
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  aria-label="Gửi tin nhắn"
+                  disabled={!input.trim()}
+                  className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:opacity-95 disabled:opacity-50 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-sm active:scale-95 cursor-pointer"
+                >
+                  <svg className="w-4 h-4 ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m22 2-7 20-4-9-9-4Z" />
+                    <path d="M22 2 11 13" />
+                  </svg>
+                </button>
+              )}
             </form>
           </div>
 
         </div>
-      )}
     </div>
   );
 }

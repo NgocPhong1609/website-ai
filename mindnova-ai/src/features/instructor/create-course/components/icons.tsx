@@ -195,3 +195,21 @@ export function ArrowLeftIcon({ size = 16 }: { size?: number }) {
     </svg>
   );
 }
+
+export function CheckCircleIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" width={size} height={size}>
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+  );
+}
+
+export function PlayCircleIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" width={size} height={size}>
+      <circle cx="12" cy="12" r="10"></circle>
+      <polygon points="10 8 16 12 10 16 10 8"></polygon>
+    </svg>
+  );
+}

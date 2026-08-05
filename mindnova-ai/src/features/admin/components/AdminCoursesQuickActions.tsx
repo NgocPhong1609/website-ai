@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { NoData } from "@/src/shared/components/ui/NoData";
 
 import type { AdminCourseRow } from "@/src/features/admin/types";
 
@@ -296,7 +297,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
               <span className="font-medium">Trạng thái</span>
               <select
                 value={form.status}
-                onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
+                onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as CourseStatus }))}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-violet-500"
               >
                 <option value="draft">Bản nháp</option>
@@ -325,7 +326,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
               <span className="font-medium">Cấp độ</span>
               <select
                 value={form.level}
-                onChange={(event) => setForm((current) => ({ ...current, level: event.target.value }))}
+                onChange={(event) => setForm((current) => ({ ...current, level: event.target.value as CourseFormState["level"] }))}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-violet-500"
               >
                 <option value="beginner">Cơ bản</option>
@@ -554,8 +555,8 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
 
             {courses.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-slate-500">
-                  Chưa có dữ liệu khóa học.
+                <td colSpan={7} className="p-0">
+                  <NoData title="Không có dữ liệu" description="Chưa có dữ liệu khóa học." className="py-6" />
                 </td>
               </tr>
             )}

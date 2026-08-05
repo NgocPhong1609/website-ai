@@ -30,6 +30,29 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
     }
   }, [quiz, timeRemaining, isFinished]);
 
+  const handleSubmit = async (finalAnswers: Record<string, string | number> = answers) => {
+    if (!quiz || isSubmitting) return;
+    try {
+      const timeTaken = quiz.time_limit_minutes * 60 - timeRemaining;
+      const res: QuizGradingResult = await submitQuiz({
+        lessonId,
+        answers: finalAnswers,
+        time_taken_seconds: timeTaken > 0 ? timeTaken : 180,
+      });
+      
+      // Persist grading report for seamless SPA transition to result dashboard
+      if (typeof window !== "undefined") {
+        localStorage.setItem("mindnova_last_quiz_result", JSON.stringify(res));
+      }
+
+      setIsFinished(true);
+      router.push("/practice/quiz/result");
+    } catch (error) {
+      console.error("Lỗi khi nộp bài:", error);
+      setErrorNotice("Đã xảy ra sự cố khi kết nối đến API nộp bài. Vui lòng thử lại!");
+    }
+  };
+
   // Timer countdown
   useEffect(() => {
     if (timeRemaining <= 0 || isFinished || !quiz) return;
@@ -90,30 +113,6 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
       setCurrentIndex((prev) => prev - 1);
     }
   };
-
-  const handleSubmit = async (finalAnswers: Record<string, string | number> = answers) => {
-    if (!quiz || isSubmitting) return;
-    try {
-      const timeTaken = quiz.time_limit_minutes * 60 - timeRemaining;
-      const res: QuizGradingResult = await submitQuiz({
-        lessonId,
-        answers: finalAnswers,
-        time_taken_seconds: timeTaken > 0 ? timeTaken : 180,
-      });
-      
-      // Persist grading report for seamless SPA transition to result dashboard
-      if (typeof window !== "undefined") {
-        localStorage.setItem("mindnova_last_quiz_result", JSON.stringify(res));
-      }
-
-      setIsFinished(true);
-      router.push("/practice/quiz/result");
-    } catch (error) {
-      console.error("Lỗi khi nộp bài:", error);
-      setErrorNotice("Đã xảy ra sự cố khi kết nối đến API nộp bài. Vui lòng thử lại!");
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#F8F9FC] flex flex-col justify-between p-6">

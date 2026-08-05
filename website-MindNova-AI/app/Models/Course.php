@@ -9,21 +9,28 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Course extends Model
 {
     protected $fillable = [
-        'teacher_id',
-        'category_id',
-        'title',
-        'slug',
-        'description',
-        'thumbnail',
-        'price',
-        'level',
-        'status',
-        'views_count',
-    ];
+    'teacher_id',
+    'category_id',
+    'title',
+    'slug',
+    'description',
+    'thumbnail',
+    'price',
+    'level',
+    'status',
+    'admin_hidden_at',
+    'views_count',
+];
 
     protected $casts = [
-        'price' => 'decimal:2',
-    ];
+    'price' => 'decimal:2',
+    'admin_hidden_at' => 'datetime',
+];
+
+    public function scopeVisibleInAdmin($query)
+    {
+        return $query->whereNull('admin_hidden_at');
+    }
 
     public function teacher(): BelongsTo
     {

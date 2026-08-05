@@ -67,49 +67,71 @@ function renderFormattedText(text: string) {
 }
 
 function TypewriterText({
+  id,
   text,
   animate = false,
+  isStopped = false,
   onScroll,
+  onTypingStateChange,
 }: {
+  id?: string;
   text: string;
   animate?: boolean;
-  onScroll?: () => void;
+  isStopped?: boolean;
+  onScroll?: (smooth?: boolean) => void;
+  onTypingStateChange?: (typing: boolean) => void;
 }) {
   const [displayedText, setDisplayedText] = useState(animate ? "" : text);
   const onScrollRef = useRef(onScroll);
-  onScrollRef.current = onScroll;
+  const isStoppedRef = useRef(isStopped);
+  const onTypingRef = useRef(onTypingStateChange);
+
+  useEffect(() => {
+    onScrollRef.current = onScroll;
+    isStoppedRef.current = isStopped;
+    onTypingRef.current = onTypingStateChange;
+  }, [onScroll, isStopped, onTypingStateChange]);
 
   useEffect(() => {
     if (!animate) {
       setDisplayedText(text);
+      onTypingRef.current?.(false);
       return;
     }
+
+    onTypingRef.current?.(true);
 
     let currentIndex = 0;
     const totalLen = text.length;
     let tickCount = 0;
 
     const timer = setInterval(() => {
+      if (isStoppedRef.current) {
+        clearInterval(timer);
+        setDisplayedText((prev) => prev + " ⏸️ *(Đã bị tạm dừng)*");
+        onTypingRef.current?.(false);
+        return;
+      }
+
       if (currentIndex < totalLen) {
         // Stream small chunks of characters every 25ms
         const step = Math.floor(Math.random() * 4) + 2;
         currentIndex = Math.min(totalLen, currentIndex + step);
         setDisplayedText(text.slice(0, currentIndex));
         tickCount++;
-        // Gently scroll down while typing
-        if (tickCount % 5 === 0 && onScrollRef.current) {
-          onScrollRef.current();
-        }
       } else {
         clearInterval(timer);
-        // Smoothly scroll down after answering completes
+        onTypingRef.current?.(false);
         if (onScrollRef.current) {
-          setTimeout(() => onScrollRef.current?.(), 60);
+          setTimeout(() => onScrollRef.current?.(false), 60);
         }
       }
     }, 25);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      onTypingRef.current?.(false);
+    };
   }, [text, animate]);
 
   return <>{renderFormattedText(displayedText)}</>;
@@ -129,11 +151,45 @@ export function ChatPanel({
   externalPrompt,
   onClearExternalPrompt,
 }: ChatPanelProps) {
+  const storageKey = `mindnova_study_plan_chat_v1_${lessonId || "general"}`;
   const [messages, setMessages] = useState<AiChatMessage[]>(initialMessages);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [inputText, setInputText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [stoppedMsgIds, setStoppedMsgIds] = useState<string[]>([]);
   const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
   const [pinnedIds, setPinnedIds] = useState<string[]>([]);
+  const chatBoxRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Load chat history after hydration completes to guarantee 100% SSR matching
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        const parsed: AiChatMessage[] = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setMessages(parsed.map((m) => ({ ...m, animate: false })));
+        }
+      }
+    } catch (e) {
+      console.error("Failed to read study plan chat history:", e);
+    } finally {
+      setIsLoaded(true);
+    }
+  }, [storageKey]);
+
+  // Save chat history ONLY after initial hydration load has finished
+  useEffect(() => {
+    if (!isLoaded || typeof window === "undefined") return;
+    try {
+      const toSave = messages.map((m) => ({ ...m, animate: false }));
+      localStorage.setItem(storageKey, JSON.stringify(toSave));
+    } catch (e) {
+      console.error("Failed to save study plan chat history:", e);
+    }
+  }, [messages, storageKey, isLoaded]);
 
   const quickPrompts = [
     { id: 1, text: "Giải thích khái niệm quan trọng bằng ví dụ thực tế trong cuộc sống", query: "Hãy giải thích cho tôi các khái niệm quan trọng bằng một ví dụ thực tế trong cuộc sống cho dễ hiểu nhé", tag: "Ví dụ trực quan", color: "bg-[#EEF2FF] text-[#5052EE] border-[#5052EE]/20" },
@@ -141,13 +197,21 @@ export function ChatPanel({
     { id: 3, text: "Tóm tắt ngắn gọn những ý cốt lõi quan trọng nhất của bài học này", query: "Hãy tóm tắt ngắn gọn những ý quan trọng nhất của bài học này giúp mình với", tag: "Tóm tắt bài", color: "bg-[#FFF8EB] text-[#D97706] border-[#D97706]/20" },
   ];
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  const scrollToBottom = (smooth: boolean = false) => {
+    if (chatBoxRef.current) {
+      if (smooth) {
+        chatBoxRef.current.scrollTo({ top: chatBoxRef.current.scrollHeight, behavior: "smooth" });
+      } else {
+        chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+      }
+    } else if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "end" });
+    }
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, messagesEndRef]);
+    scrollToBottom(false);
+  }, [messages]);
 
   const chatMutation = useMutation({
     mutationFn: (messageText: string) => sendAiChatMessage(messageText, messages, lessonId),
@@ -170,9 +234,32 @@ export function ChatPanel({
     },
   });
 
+  const isGenerating = chatMutation.isPending || isTyping;
+
+  const handleStop = () => {
+    if (chatMutation.isPending) {
+      chatMutation.reset();
+      const stoppedReply: AiChatMessage = {
+        id: `stop-${Date.now()}`,
+        sender: "ai",
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        text: "⏸️ *(Bạn đã tạm dừng Gia sư Nova trước khi câu trả lời được hoàn thành)*",
+        animate: false,
+      };
+      setMessages((prev) => [...prev, stoppedReply]);
+      setIsTyping(false);
+    } else if (isTyping) {
+      const latestAiMsg = [...messages].reverse().find((m) => m.sender === "ai");
+      if (latestAiMsg) {
+        setStoppedMsgIds((prev) => [...prev, latestAiMsg.id]);
+      }
+      setIsTyping(false);
+    }
+  };
+
   const handleSend = (textToSend?: string) => {
     const text = textToSend || inputText.trim();
-    if (!text || chatMutation.isPending) return;
+    if (!text || isGenerating) return;
 
     const newUserMsg: AiChatMessage = {
       id: `msg-${Date.now()}`,
@@ -190,16 +277,16 @@ export function ChatPanel({
   };
 
   useEffect(() => {
-    if (externalPrompt && !chatMutation.isPending) {
+    if (externalPrompt && !isGenerating) {
       handleSend(externalPrompt);
       onClearExternalPrompt?.();
     }
-  }, [externalPrompt, chatMutation.isPending]);
+  }, [externalPrompt, isGenerating]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      if (!isGenerating) handleSend();
     }
   };
 
@@ -240,14 +327,30 @@ export function ChatPanel({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 bg-[#F8F9FE] px-3.5 py-1.5 rounded-xl border border-[#E2E4F0] text-xs font-semibold text-[#6B6BFF]">
-          <span>🛡️</span>
-          <span>Gemini + OpenAI Neural Hub Ready</span>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm("Bạn có chắc chắn muốn xóa lịch sử cuộc trò chuyện này để tạo hội thoại mới không?")) {
+                setMessages(initialMessages);
+                localStorage.setItem(storageKey, JSON.stringify(initialMessages));
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFF5F5] hover:bg-[#FEE2E2] border border-[#FECACA] text-[#DC2626] text-xs font-semibold transition-colors cursor-pointer"
+            title="Xóa và làm mới cuộc trò chuyện"
+          >
+            <span>🗑️</span>
+            <span>Xóa lịch sử</span>
+          </button>
+          <div className="flex items-center gap-2 bg-[#F8F9FE] px-3.5 py-1.5 rounded-xl border border-[#E2E4F0] text-xs font-semibold text-[#6B6BFF]">
+            <span>🛡️</span>
+            <span>Gemini + OpenAI Neural Hub Ready</span>
+          </div>
         </div>
       </header>
 
       {/* ─── Messages Stream with Ambient Holographic Backdrop ─── */}
-      <div className="flex-1 overflow-y-auto p-6 sm:p-8 flex flex-col gap-6 bg-gradient-to-b from-[#F9FAFF] via-[#FAFBFE] to-[#F2F5FD]">
+      <div ref={chatBoxRef} className="flex-1 overflow-y-auto p-6 sm:p-8 flex flex-col gap-6 bg-gradient-to-b from-[#F9FAFF] via-[#FAFBFE] to-[#F2F5FD]">
         {messages.map((msg) => {
           const isAi = msg.sender === "ai";
           const isPinned = pinnedIds.includes(msg.id);
@@ -269,7 +372,14 @@ export function ChatPanel({
                 </div>
                 <div className="bg-white text-[#2B2C40] px-6 py-5 rounded-2xl rounded-tl-sm border border-[#E8EAEF] border-l-4 border-l-[#6B6BFF] shadow-sm text-sm sm:text-[14.5px] leading-relaxed font-normal transition-all">
                   {msg.animate ? (
-                    <TypewriterText text={msg.text} animate={msg.animate} onScroll={scrollToBottom} />
+                    <TypewriterText
+                      id={msg.id}
+                      text={msg.text}
+                      animate={msg.animate}
+                      isStopped={stoppedMsgIds.includes(msg.id)}
+                      onScroll={scrollToBottom}
+                      onTypingStateChange={setIsTyping}
+                    />
                   ) : (
                     renderFormattedText(msg.text)
                   )}
@@ -375,7 +485,7 @@ export function ChatPanel({
                 key={prompt.id}
                 type="button"
                 onClick={() => handleSend(prompt.query)}
-                disabled={chatMutation.isPending}
+                disabled={isGenerating}
                 className="group relative text-left p-3.5 rounded-xl bg-white hover:bg-[#F8F9FE] disabled:opacity-50 border border-[#E2E4F0] hover:border-[#6B6BFF]/50 shadow-2xs hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 focus:outline-none cursor-pointer flex flex-col justify-between gap-2.5"
               >
                 <div className="flex items-center justify-between">
@@ -405,24 +515,39 @@ export function ChatPanel({
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={handleKeyDown}
-                disabled={chatMutation.isPending}
-                placeholder="Hỏi Nova bất cứ điều gì về bài tập hay lộ trình học bối rối nhé..."
+                disabled={isGenerating}
+                placeholder={isGenerating ? "Nova đang tổng hợp câu trả lời cho bạn..." : "Hỏi Nova bất cứ điều gì về bài tập hay lộ trình học bối rối nhé..."}
                 className="w-full bg-[#F8F9FE] focus:bg-white disabled:bg-gray-100 border border-[#E2E4F0] focus:border-[#6B6BFF] rounded-xl pl-4 pr-24 py-2.5 text-xs sm:text-sm text-[#1A1A2E] placeholder:text-[#9092A8] shadow-inner focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/15 transition-all duration-200 font-medium"
               />
               <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-bold text-[#9496A8] hidden sm:block">
                 <span>Enter ↵</span>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => handleSend()}
-              disabled={chatMutation.isPending || !inputText.trim()}
-              aria-label="Send message"
-              className="shrink-0 px-5 py-2.5 flex items-center justify-center bg-gradient-to-r from-[#5052EE] via-[#6669F6] to-[#4CD7F6] hover:brightness-110 disabled:opacity-50 disabled:pointer-events-none text-white rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 focus:outline-none shadow-2xs hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
-            >
-              <span>Gửi tin</span>
-              <SendIcon className="w-4 h-4 ml-1.5 transform group-hover:translate-x-0.5 transition-transform" />
-            </button>
+            {isGenerating ? (
+              <button
+                type="button"
+                onClick={handleStop}
+                aria-label="Tạm dừng câu trả lời"
+                className="shrink-0 px-5 py-2.5 flex items-center justify-center bg-gradient-to-r from-[#DC2626] via-[#E11D48] to-[#EA580C] hover:brightness-110 text-white rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 focus:outline-none shadow-[0_4px_16px_rgba(225,29,72,0.35)] animate-pulse active:scale-95 cursor-pointer gap-2"
+              >
+                <span>Tạm dừng</span>
+                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                  <rect x="5" y="4" width="5" height="16" rx="1.5" />
+                  <rect x="14" y="4" width="5" height="16" rx="1.5" />
+                </svg>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => handleSend()}
+                disabled={!inputText.trim()}
+                aria-label="Send message"
+                className="shrink-0 px-5 py-2.5 flex items-center justify-center bg-gradient-to-r from-[#5052EE] via-[#6669F6] to-[#4CD7F6] hover:brightness-110 disabled:opacity-50 disabled:pointer-events-none text-white rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 focus:outline-none shadow-2xs hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+              >
+                <span>Gửi tin</span>
+                <SendIcon className="w-4 h-4 ml-1.5 transform group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            )}
           </div>
           
           <div className="flex items-center justify-center text-xs font-normal text-[#64647A] pt-1">

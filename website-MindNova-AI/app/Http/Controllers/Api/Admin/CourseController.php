@@ -7,13 +7,14 @@ use App\Models\AdminLog;
 use App\Models\Course;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
     public function index(): JsonResponse
     {
-        $query = Course::query()->with(['teacher:id,name', 'category:id,name'])->latest();
+        $query = Course::query()->visibleInAdmin()->with(['teacher:id,name', 'category:id,name'])->latest();
 
         if (request()->filled('search')) {
             $keyword = trim((string) request()->string('search'));
@@ -108,6 +109,12 @@ class CourseController extends Controller
 
     public function destroy(Request $request, Course $course): JsonResponse
     {
+        if ($this->courseHasOrders($course)) {
+            return response()->json([
+                'message' => 'Khóa học đã phát sinh đơn hàng nên không thể xóa vĩnh viễn. Hãy chuyển trạng thái sang archived và xóa từ trang kiểm duyệt để ẩn khỏi admin.',
+            ], 422);
+        }
+
         $course->delete();
         $this->logAdminAction($request, 'delete_course', $course, 'Deleted a course.');
 
@@ -127,5 +134,12 @@ class CourseController extends Controller
                 'user_agent' => $request->userAgent(),
             ],
         ]);
+    }
+
+    private function courseHasOrders(Course $course): bool
+    {
+        return DB::table('order_items')
+            ->where('course_id', $course->id)
+            ->exists();
     }
 }

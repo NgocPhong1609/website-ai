@@ -4,12 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { label: "Tổng quan", href: "/admin", icon: "◈" },
-  { label: "Danh mục", href: "/admin/categories", icon: "◍" },
-  { label: "Khóa học", href: "/admin/courses", icon: "▣" },
-  { label: "Kiểm duyệt", href: "/admin/users", icon: "◎" },
-  { label: "Hóa đơn", href: "/admin/invoices", icon: "◌" },
-  { label: "Thông báo email", href: "/admin/notifications", icon: "✉" },
+  { label: "Dashboard", href: "/admin", icon: "◈" },
+  { label: "Người dùng", href: "/admin/users", icon: "◎" },
+  { label: "AI & Hệ thống", href: "/admin/ai-system", icon: "◌" },
+  { label: "Nội dung học tập", href: "/admin/content", icon: "▣" },
+  { label: "Thống kê", href: "/admin/analytics", icon: "◍" },
+  { label: "Moderation & Support", href: "/admin/moderation-support", icon: "✉" },
 ];
 
 export function AdminSidebar() {

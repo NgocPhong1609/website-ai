@@ -9,6 +9,11 @@ const B = {
   "aria-hidden": true as const,
 };
 
+type IconProps = {
+  size?: number;
+  className?: string;
+};
+
 export function SearchIcon({ size = 15 }: { size?: number }) {
   return (
     <svg {...B} width={size} height={size} strokeWidth={2}>
@@ -65,7 +70,7 @@ export function MoreHorizontalIcon({ size = 16 }: { size?: number }) {
   );
 }
 
-export function FileIcon({ size = 18, className }: { size?: number; className?: string }) {
+export function FileIcon({ size = 18, className }: IconProps) {
   return (
     <svg {...B} width={size} height={size} strokeWidth={2} className={className}>
       <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
@@ -77,7 +82,7 @@ export function FileIcon({ size = 18, className }: { size?: number; className?: 
 export function BoldIcon() { return <svg {...B} width={13} height={13} strokeWidth={2.5}><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" /><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" /></svg>; }
 export function ItalicIcon() { return <svg {...B} width={13} height={13} strokeWidth={2.5}><line x1="19" y1="4" x2="10" y2="4" /><line x1="14" y1="20" x2="5" y2="20" /><line x1="15" y1="4" x2="9" y2="20" /></svg>; }
 export function CodeIcon() { return <svg {...B} width={13} height={13} strokeWidth={2}><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>; }
-export function LinkIcon({ size = 13, className }: { size?: number; className?: string }) { return <svg {...B} width={size} height={size} strokeWidth={2} className={className}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>; }
+export function LinkIcon({ size = 13, className }: IconProps) { return <svg {...B} width={size} height={size} strokeWidth={2} className={className}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>; }
 export function ImageIcon() { return <svg {...B} width={13} height={13} strokeWidth={2}><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>; }
 export function PaperclipIcon() { return <svg {...B} width={13} height={13} strokeWidth={2}><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" /></svg>; }
 export function AtSignIcon() { return <svg {...B} width={13} height={13} strokeWidth={2}><circle cx="12" cy="12" r="4" /><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94" /></svg>; }

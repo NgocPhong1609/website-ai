@@ -501,7 +501,7 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
                   <span className="text-4xl">✦</span>
                   <p className="text-[12px] font-semibold text-center">
                     Nhập chủ đề và nhấn{" "}
-                    <span className="text-[#6B6BFF]">"Tạo dự thảo bằng AI"</span>
+                    <span className="text-[#6B6BFF]">&quot;Tạo dự thảo bằng AI&quot;</span>
                     <br />để xem kết quả ở đây.
                   </p>
                 </div>

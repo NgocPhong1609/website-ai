@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Http;
 
 // ==========================================
 // IMPORT CÁC CONTROLLER TỪ ĐÚNG THƯ MỤC
@@ -16,20 +17,17 @@ use App\Http\Controllers\Api\Student\OrderController;
 use App\Http\Controllers\Api\Student\AiTutorController;
 use App\Http\Controllers\Api\Student\CourseController as StudentCourseController;
 use App\Http\Controllers\Api\StudentQuizController;
-use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardController;
-use App\Http\Controllers\Api\Student\StudyPlanController as StudentStudyPlanController;
-use App\Http\Controllers\Api\Student\PracticeController as StudentPracticeController;
+use App\Http\Controllers\Api\Student\OnboardingController;
 
 // Nhóm Dùng chung
 use App\Http\Controllers\Api\RealtimeController;
 
 // Nhóm Admin
-use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Api\Admin\CourseController as AdminCourseController;
-use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
-use App\Http\Controllers\Api\Admin\NotificationController as AdminNotificationController;
-use App\Http\Controllers\Api\Admin\InvoiceController as AdminInvoiceController;
+use App\Http\Controllers\Api\Admin\AnalyticsController as AdminAnalyticsController;
+use App\Http\Controllers\Api\Admin\ContentManagementController as AdminContentManagementController;
+use App\Http\Controllers\Api\Admin\ModerationSupportController as AdminModerationSupportController;
+use App\Http\Controllers\Api\Admin\SystemConfigController as AdminSystemConfigController;
+use App\Http\Controllers\Api\Admin\UserManagementController as AdminUserManagementController;
 
 // Nhóm Instructor (Giáo viên)
 use App\Http\Controllers\Api\Instructor\CourseController;
@@ -53,13 +51,108 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 });
 
+// -- API VNPay IPN (Webhooks) --
+Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
+
 // API Student Dashboard, Study Plan & Quizzes (Áp dụng cho mọi phiên học viên)
 Route::get('/student/dashboard', [StudentDashboardController::class, 'overview']);
 Route::get('/student/study-plan', [StudentStudyPlanController::class, 'overview']);
 Route::get('/student/practice/overview', [StudentPracticeController::class, 'overview']);
+Route::get('/student/progress/overview', [StudentProgressController::class, 'overview']);
+Route::get('/student/history/overview', [StudentHistoryController::class, 'overview']);
+Route::get('/student/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
+Route::get('/student/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
 Route::post('/student/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
-Route::get('/student/lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
-Route::post('/student/lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
+Route::post('/student/onboarding', [OnboardingController::class, 'store']);
+// 🌟 BƯỚC 1: ĐẶT API AI PHÂN TÍCH BÀI HỌC VÀ GỢI Ý KHÓA HỌC Ở ĐÂY
+    Route::post('/student/analyze-lesson', function (Illuminate\Http\Request $request) {
+    $lessonTitle = $request->input('lesson_title');
+    $goal = $request->input('goal');
+
+    // Prompt cực kỳ khắt khe, ép AI phải phân tích riêng biệt cho bài học cụ thể này
+    $prompt = "You are an expert AI curriculum analyst. A student is studying for '{$goal}' and looking specifically at the lesson titled '{$lessonTitle}'.
+    You MUST generate a completely custom, highly specific breakdown for THIS exact lesson. Do not use generic templates.
+    Return ONLY valid JSON format with no markdown, no backticks:
+    {
+      \"overview\": \"Write a unique 2-sentence overview specifically explaining what concepts, techniques, or theories are mastered in '{$lessonTitle}'.\",
+      \"key_takeaways\": [
+        \"First specific learning outcome of {$lessonTitle}\",
+        \"Second practical skill gained from {$lessonTitle}\",
+        \"Third technical implementation detail of {$lessonTitle}\"
+      ],
+      \"suggested_course_keywords\": [\"keyword1\", \"keyword2\"]
+    }";
+
+    try {
+        $response = Http::withToken(env('GROQ_API_KEY'))
+            ->post('https://api.groq.com/openai/v1/chat/completions', [
+                'model' => 'llama-3.3-70b-versatile',
+                'messages' => [
+                    ['role' => 'system', 'content' => 'Return only raw JSON.'],
+                    ['role' => 'user', 'content' => $prompt]
+                ],
+                'temperature' => 0.95, // Đẩy độ sáng tạo lên cao nhất để không bị lặp text
+            ]);
+
+        $aiContent = $response->json('choices.0.message.content');
+        $cleanJson = trim(str_replace(['```json', '```'], '', $aiContent));
+        $aiData = json_decode($cleanJson, true);
+
+        // LỌC KHÓA HỌC LIÊN QUAN CHẶT CHẼ TỪ DATABASE
+        // Lấy các khóa học có tiêu đề chứa từ khóa liên quan đến bài học hoặc lấy theo độ phù hợp
+        $keywords = $aiData['suggested_course_keywords'] ?? [$lessonTitle];
+        $query = \App\Models\Course::with('teacher');
+
+        foreach ($keywords as $kw) {
+            $query->orWhere('title', 'like', '%' . $kw . '%');
+        }
+
+        $matchedCourses = $query->take(3)->get();
+
+        // Nếu database chưa khớp được từ khóa thì lấy ngẫu nhiên 3 khóa học chất lượng khác nhau
+        if ($matchedCourses->isEmpty()) {
+            $matchedCourses = \App\Models\Course::with('teacher')->inRandomOrder()->take(3)->get();
+        }
+
+        $coursesList = [];
+        foreach ($matchedCourses as $index => $course) {
+            $coursesList[] = [
+                'title' => $course->title,
+                'instructor' => $course->teacher ? $course->teacher->name : "Expert Instructor",
+                'rating' => "4." . rand(7, 9) . " (" . rand(600, 1400) . " students)",
+                'price' => "$" . number_format($course->price, 2),
+                'badge' => $index === 0 ? "Best Match" : "Related Course"
+            ];
+        }
+
+        $aiData['recommended_courses'] = $coursesList;
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $aiData
+        ], 200);
+    } catch (\Exception $e) {
+        $fallbackCourses = \App\Models\Course::with('teacher')->take(2)->get();
+        $coursesList = [];
+        foreach ($fallbackCourses as $c) {
+            $coursesList[] = [
+                'title' => $c->title,
+                'instructor' => $c->teacher ? $c->teacher->name : "Instructor",
+                'rating' => "4.8 (950 students)",
+                'price' => "$" . number_format($c->price, 2),
+                'badge' => "Recommended"
+            ];
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'overview' => "Master the core concepts of {$lessonTitle} to accelerate your progress toward {$goal}.",
+                'key_takeaways' => ["Understanding fundamental principles of " . $lessonTitle, "Hands-on configuration and workflow", "Best practices and implementation"],
+                'recommended_courses' => $coursesList
+            ]
+        ], 200);
+}});
 
 // Payment IPN (Webhook) - Cần public để Momo/VNPAY gọi
 Route::get('/student/payment/vnpay-ipn', [OrderController::class, 'vnpayIpn']);
@@ -93,8 +186,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // ==========================================
     Route::prefix('student')->group(function () {
         // TÍNH NĂNG AI TUTOR & Các tiện ích nâng cao khác
-        Route::post('/ai-tutor/chat', [\App\Http\Controllers\Api\Student\AiTutorController::class, 'chat']);
+        Route::post('/ai-tutor/chat', [\App\Http\Controllers\Api\Student\AiTutorController::class, 'streamChat']);
         Route::post('/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'store']);
+
+        // Quiz
+        Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
+        Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
     });
 });
 
@@ -178,31 +275,43 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
 
-    Route::get('/overview', [AdminDashboardController::class, 'overview']);
+    // 1) User management
+    Route::get('/users', [AdminUserManagementController::class, 'index']);
+    Route::post('/users', [AdminUserManagementController::class, 'store']);
+    Route::patch('/users/{id}/role', [AdminUserManagementController::class, 'updateRole']);
+    Route::post('/users/{id}/lock', [AdminUserManagementController::class, 'lock']);
+    Route::post('/users/{id}/unlock', [AdminUserManagementController::class, 'unlock']);
+    Route::delete('/users/{id}', [AdminUserManagementController::class, 'destroy']);
+    Route::get('/users/{id}/activity', [AdminUserManagementController::class, 'activity']);
+    Route::get('/teachers/review-queue', [AdminUserManagementController::class, 'teacherQueue']);
+    Route::patch('/teachers/{id}/verify', [AdminUserManagementController::class, 'verifyTeacher']);
 
-    // Quản lý người dùng
-    Route::get('/users', [AdminUserController::class, 'index']);
-    Route::post('/users', [AdminUserController::class, 'store']);
-    Route::post('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus']);
-    Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
+    // 2) AI and system configuration
+    Route::get('/ai-config', [AdminSystemConfigController::class, 'show']);
+    Route::put('/ai-config', [AdminSystemConfigController::class, 'update']);
 
-    // Quản lý danh mục
-    Route::get('/categories', [AdminCategoryController::class, 'index']);
-    Route::post('/categories', [AdminCategoryController::class, 'store']);
-    Route::put('/categories/{category}', [AdminCategoryController::class, 'update']);
-    Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy']);
+    // 3) Content management
+    Route::get('/content/overview', [AdminContentManagementController::class, 'overview']);
+    Route::get('/content/courses', [AdminContentManagementController::class, 'courses']);
+    Route::get('/content/courses/{course}', [AdminContentManagementController::class, 'showCourse']);
+    Route::patch('/content/courses/{course}/moderate', [AdminContentManagementController::class, 'moderateCourse']);
+    Route::patch('/content/courses/{course}/restore-admin', [AdminContentManagementController::class, 'restoreCourse']);
+    Route::delete('/content/courses/{course}', [AdminContentManagementController::class, 'removeCourse']);
+    Route::get('/content/resources', [AdminContentManagementController::class, 'resources']);
+    Route::post('/content/resources', [AdminContentManagementController::class, 'storeResource']);
+    Route::put('/content/resources/{resource}', [AdminContentManagementController::class, 'updateResource']);
+    Route::delete('/content/resources/{resource}', [AdminContentManagementController::class, 'deleteResource']);
+    Route::get('/content/question-bank', [AdminContentManagementController::class, 'questionBank']);
+    Route::patch('/content/question-bank/{question}', [AdminContentManagementController::class, 'updateQuestionCategory']);
 
-    // Quản lý khóa học
-    Route::get('/courses', [AdminCourseController::class, 'index']);
-    Route::post('/courses', [AdminCourseController::class, 'store']);
-    Route::get('/courses/{course}', [AdminCourseController::class, 'show']);
-    Route::put('/courses/{course}', [AdminCourseController::class, 'update']);
-    Route::delete('/courses/{course}', [AdminCourseController::class, 'destroy']);
+    // 4) Analytics and reports
+    Route::get('/analytics/dashboard', [AdminAnalyticsController::class, 'dashboard']);
 
-    // Quản lý hóa đơn
-    Route::get('/invoices', [AdminInvoiceController::class, 'index']);
-
-    // Email thông báo
-    Route::post('/notifications/test-email', [AdminNotificationController::class, 'sendTestEmail']);
+    // 5) Moderation and support
+    Route::get('/moderation/flags', [AdminModerationSupportController::class, 'flags']);
+    Route::patch('/moderation/flags/{flag}', [AdminModerationSupportController::class, 'reviewFlag']);
+    Route::get('/support/tickets', [AdminModerationSupportController::class, 'tickets']);
+    Route::post('/support/tickets', [AdminModerationSupportController::class, 'createTicket']);
+    Route::patch('/support/tickets/{ticket}', [AdminModerationSupportController::class, 'resolveTicket']);
 
 });

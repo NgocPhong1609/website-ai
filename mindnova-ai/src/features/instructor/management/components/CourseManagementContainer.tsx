@@ -1,9 +1,10 @@
 "use client";
 
 import { useInstructorCourses } from "../api/courses";
-import { useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-
+import React, { useState, useMemo, Suspense } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { NoData } from "@/src/shared/components/ui/NoData";
+import { Loader } from "@/src/shared/components/ui/Loader";
 
 import { CourseFilterTabs } from "./CourseFilterTabs";
 import { CourseCard } from "./CourseCard";
@@ -68,19 +69,21 @@ function CourseManagementContent() {
         <section aria-label="Danh sách khóa học">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {isLoading ? (
-              <div className="col-span-full py-12 flex items-center justify-center text-gray-500">
-                Đang tải dữ liệu...
+              <div className="col-span-full py-12 flex items-center justify-center">
+                <Loader size="md" />
               </div>
             ) : isError ? (
               <div className="col-span-full py-12 flex items-center justify-center text-red-500">
                 Lỗi khi tải danh sách khóa học
               </div>
             ) : allItems.length === 1 && allItems[0] === "CREATE_CARD" ? (
-              <div className="col-span-full flex flex-col items-center justify-center py-16 gap-4">
-                <p className="text-sm text-gray-500">
-                  {search ? `Không tìm thấy khóa học nào phù hợp với từ khóa "${search}".` : "Bạn chưa có khóa học nào. Hãy tạo khóa học đầu tiên nhé!"}
-                </p>
-                <CreateCourseCard />
+              <div className="col-span-full">
+                <NoData
+                  title="Chưa có khóa học"
+                  description={search ? `Không tìm thấy khóa học nào phù hợp với từ khóa "${search}".` : "Bạn chưa có khóa học nào. Hãy tạo khóa học đầu tiên nhé!"}
+                  action={<CreateCourseCard />}
+                  className="py-16"
+                />
               </div>
             ) : (
               <>

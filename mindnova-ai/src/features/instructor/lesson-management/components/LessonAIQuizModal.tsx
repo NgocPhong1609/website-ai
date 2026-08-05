@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
+import { Loader } from "@/src/shared/components/ui/Loader";
 import { useAIQuizGenerator, type GeneratedQuestion } from "@/src/hooks/instructor/useAIQuizGenerator";
 
 export interface LessonAIQuizModalProps {
@@ -121,7 +122,7 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
 
           {isGenerating && (
             <div className="py-20 flex flex-col items-center justify-center gap-4 text-center">
-              <div className="w-10 h-10 border-4 border-[#6B6BFF] border-t-transparent rounded-full animate-spin" />
+              <Loader size="md" />
               <h4 className="text-base font-extrabold text-[#1A1A2E]">Analyzing lesson transcript semantics...</h4>
               <p className="text-xs font-semibold text-gray-500 max-w-sm">
                 Formulating contextually accurate multiple-choice questions, true/false logic, and practical coding challenges.

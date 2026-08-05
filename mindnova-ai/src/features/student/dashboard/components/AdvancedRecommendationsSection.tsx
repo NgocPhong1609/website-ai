@@ -91,7 +91,7 @@ export function AdvancedRecommendationsSection({ recommendations = [] }: Advance
                 {/* Clean Body Content */}
                 <div className="p-5 flex-1 flex flex-col justify-between gap-3">
                   <div>
-                    <Link href="/courses/detail" className="block text-decoration-none focus:outline-none min-w-0 group/title">
+                    <Link href="/explore" className="block text-decoration-none focus:outline-none min-w-0 group/title">
                       <h3 className="text-base sm:text-lg font-bold text-[#1A1A2E] leading-snug line-clamp-2 group-hover:text-[#5052EE] group-hover/title:text-[#5052EE] transition-colors duration-200">
                         {rec.title}
                       </h3>
@@ -127,10 +127,10 @@ export function AdvancedRecommendationsSection({ recommendations = [] }: Advance
               {/* Card Footer CTA */}
               <div className="px-5 pb-5 pt-0 mt-auto">
                 <Link
-                  href="/courses/detail"
+                  href="/explore"
                   className="group/btn w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] shadow-[0_4px_14px_rgba(80,82,238,0.3)] hover:shadow-[0_6px_20px_rgba(80,82,238,0.45)] transition-all duration-200 flex items-center justify-center gap-2 hover:-translate-y-0.5 text-decoration-none"
                 >
-                  <span>Đăng ký lộ trình chuyên sâu</span>
+                  <span>Khám phá khóa học</span>
                   <span className="group-hover/btn:translate-x-1 transition-transform">➔</span>
                 </Link>
               </div>

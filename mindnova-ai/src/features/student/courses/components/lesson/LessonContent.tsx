@@ -68,7 +68,7 @@ export function LessonContent() {
             <pre className="text-sm font-mono text-gray-300">
               <code>
 <span className="text-[#FF7B72]">export</span> <span className="text-[#FF7B72]">async</span> <span className="text-[#FF7B72]">function</span> <span className="text-[#D2A8FF]">GET</span><span className="text-gray-300">(</span><span className="text-[#FFA657]">request</span><span className="text-[#FF7B72]">:</span> <span className="text-[#79C0FF]">Request</span><span className="text-gray-300">)</span> <span className="text-gray-300">{`{`}</span>{'\n'}
-{'  '}<span className="text-[#FF7B72]">return</span> <span className="text-[#FF7B72]">new</span> <span className="text-[#79C0FF]">Response</span><span className="text-gray-300">(</span><span className="text-[#A5D6FF]">'Hello, Next.js!'</span><span className="text-gray-300">, {`{`}</span>{'\n'}
+{'  '}<span className="text-[#FF7B72]">return</span> <span className="text-[#FF7B72]">new</span> <span className="text-[#79C0FF]">Response</span><span className="text-gray-300">(</span><span className="text-[#A5D6FF]">&apos;Hello, Next.js!&apos;</span><span className="text-gray-300">, {`{`}</span>{'\n'}
 {'    '}<span className="text-gray-300">status:</span> <span className="text-[#79C0FF]">200</span><span className="text-gray-300">,</span>{'\n'}
 {'  '}<span className="text-gray-300">{`}`}</span><span className="text-gray-300">)</span>{'\n'}
 <span className="text-gray-300">{`}`}</span>

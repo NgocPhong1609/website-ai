@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
+import { Loader } from "@/src/shared/components/ui/Loader";
 
 const videoMetadataCache = new Map<string, { name: string; size: string }>();
 
@@ -149,8 +150,7 @@ const CKEditorComponent = dynamic(
         return (
           <div className="prose prose-sm max-w-none ckeditor-wrapper relative">
             <CKEditor
-              // @ts-ignore
-              editor={ClassicEditor}
+              editor={ClassicEditor as any}
               data={value}
               onReady={(editor: any) => {
                 if (onEditorReady) onEditorReady(editor);
@@ -453,7 +453,7 @@ export function RichTextEditor({
 
       {isUploading && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg border border-[#EAEAF4]">
-          <div className="w-12 h-12 border-4 border-[#F4F4FA] border-t-[#4648D4] rounded-full animate-spin mb-4"></div>
+          <Loader size="lg" className="mb-4" />
           <div className="text-[#1A1A2E] font-medium mb-1">Đang tải video lên...</div>
           <div className="text-[#64647A] text-sm">{Math.round(uploadProgress)}%</div>
           <div className="w-48 h-1.5 bg-[#F4F4FA] rounded-full mt-3 overflow-hidden">

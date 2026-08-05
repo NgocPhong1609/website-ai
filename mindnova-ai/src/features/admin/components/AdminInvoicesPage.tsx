@@ -1,3 +1,5 @@
+import React from "react";
+import { NoData } from "@/src/shared/components/ui/NoData";
 import { getAdminInvoicesPageData } from "@/src/features/admin/services/admin-invoices.service";
 
 interface AdminInvoicesPageProps {
@@ -141,8 +143,8 @@ export async function AdminInvoicesPage({ filters }: AdminInvoicesPageProps) {
 
               {data.rows.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-6 text-center text-slate-500">
-                    Chưa có dữ liệu hóa đơn.
+                  <td colSpan={7} className="p-0">
+                    <NoData title="Không có dữ liệu" description="Chưa có dữ liệu hóa đơn." className="py-6" />
                   </td>
                 </tr>
               )}

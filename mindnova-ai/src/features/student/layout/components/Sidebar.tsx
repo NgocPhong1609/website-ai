@@ -1,6 +1,8 @@
-"use client"; // Bắt buộc phải có dòng này để dùng được sự kiện onClick
+"use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { twMerge } from "tailwind-merge";
 import { SidebarBrand } from "./SidebarBrand";
 import { SidebarNav } from "./SidebarNav";
 
@@ -34,9 +36,20 @@ function LogoutIcon() {
   );
 }
 
+function MenuIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+}
+
 // ─── Main Sidebar ─────────────────────────────────────────────────────────────
 
 export default function Sidebar() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   
   // Hàm xử lý Logout chuyên nghiệp
   const handleLogout = () => {
@@ -52,17 +65,44 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-60 shrink-0 h-screen flex flex-col bg-white border-r border-[#F0F0F8]">
-      {/* Brand */}
-      <div className="px-4 py-5 border-b border-[#F4F4FA]">
-        <SidebarBrand />
+    <aside className={twMerge(
+      "shrink-0 h-screen flex flex-col bg-white border-r border-[#F0F0F8] transition-all duration-300 relative group/sidebar",
+      isCollapsed ? "w-[72px]" : "w-60"
+    )}>
+      {/* Brand & Toggle */}
+      <div className={twMerge(
+        "py-[18px] border-b border-[#F4F4FA] flex items-center transition-all",
+        isCollapsed ? "px-2 flex-col justify-center gap-4" : "px-4 justify-between"
+      )}>
+        <SidebarBrand isCollapsed={isCollapsed} />
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="w-10 h-10 rounded-lg flex items-center justify-center text-[#64647A] hover:bg-[#F4F4FA] hover:text-[#5052EE] transition-all cursor-pointer shrink-0"
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <MenuIcon />
+        </button>
       </div>
 
       {/* Navigation */}
-      <SidebarNav />
+      <SidebarNav isCollapsed={isCollapsed} />
 
       {/* Bottom section */}
       <div className="px-4 py-5 border-t border-[#F4F4FA] flex flex-col gap-3">
+        
+        {/* Nút Test Onboarding (Tạo tạm để kiểm tra luồng) */}
+        <Link
+          href="/onboarding"
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-[#6B6BFF] bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-all duration-200"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+            <path d="M9 18h6"/>
+            <path d="M10 22h4"/>
+          </svg>
+          Test Onboarding
+        </Link>
+
         {/* Upgrade to Pro */}
         <button
           type="button"
@@ -82,14 +122,17 @@ export default function Sidebar() {
             <span>Help</span>
           </Link>
           
-          {/* Nút Logout đã được gán hàm handleLogout */}
           <button
             type="button"
             onClick={handleLogout}
-            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-[#64647A] hover:bg-red-50 hover:text-red-500 transition-all duration-150 w-full text-left"
+            title={isCollapsed ? "Logout" : undefined}
+            className={twMerge(
+              "flex items-center rounded-lg text-[#64647A] hover:bg-red-50 hover:text-red-500 transition-all duration-150 shrink-0 cursor-pointer",
+              isCollapsed ? "justify-center w-10 h-10 mx-auto" : "gap-2.5 px-3 py-2 text-sm w-full text-left"
+            )}
           >
             <LogoutIcon />
-            <span>Logout</span>
+            {!isCollapsed && <span>Logout</span>}
           </button>
         </div>
       </div>

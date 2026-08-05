@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { twMerge } from "tailwind-merge";
 import { BellIcon } from "./icons";
 
@@ -27,9 +28,7 @@ function HelpIcon() {
 
 function UserAvatar() {
   return (
-    <div className="w-9 h-9 rounded-xl bg-[#4F46E5] hover:bg-[#4338CA] flex items-center justify-center text-white text-[13px] font-extrabold shadow-sm shrink-0 cursor-pointer hover:scale-105 transition-all">
-      MN
-    </div>
+    <Avatar fallback="MN" size="sm" className="cursor-pointer hover:scale-105 transition-all shadow-sm shrink-0" />
   );
 }
 
