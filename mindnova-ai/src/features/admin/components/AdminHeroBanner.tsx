@@ -1,10 +1,23 @@
+"use client";
+
 import type { AdminOverviewData } from "@/src/features/admin/types";
+import { useRouter } from "next/navigation";
 
 interface AdminHeroBannerProps {
   hero: AdminOverviewData["hero"];
 }
 
 export function AdminHeroBanner({ hero }: AdminHeroBannerProps) {
+  const router = useRouter();
+
+  const handleSecondaryAction = () => {
+    router.push("/admin/analytics");
+  };
+
+  const handlePrimaryAction = () => {
+    router.push("/admin/content");
+  };
+
   return (
     <section className="mn-stagger rounded-[30px] border border-cyan-200/20 bg-[linear-gradient(125deg,#0c1837_0%,#122552_48%,#4f46e5_100%)] p-6 text-white shadow-[0_30px_70px_-30px_rgba(13,23,56,0.95)]">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -17,10 +30,18 @@ export function AdminHeroBanner({ hero }: AdminHeroBannerProps) {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <button className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20">
+          <button
+            type="button"
+            onClick={handleSecondaryAction}
+            className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20"
+          >
             {hero.secondaryAction}
           </button>
-          <button className="rounded-full bg-cyan-300 px-4 py-2 text-sm font-semibold text-[#0a1d3d] shadow-[0_10px_24px_-12px_rgba(34,211,238,0.85)] transition hover:bg-cyan-200">
+          <button
+            type="button"
+            onClick={handlePrimaryAction}
+            className="rounded-full bg-cyan-300 px-4 py-2 text-sm font-semibold text-[#0a1d3d] shadow-[0_10px_24px_-12px_rgba(34,211,238,0.85)] transition hover:bg-cyan-200"
+          >
             {hero.primaryAction}
           </button>
         </div>

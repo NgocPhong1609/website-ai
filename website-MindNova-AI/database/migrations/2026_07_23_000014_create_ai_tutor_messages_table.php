@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('ai_tutor_messages')) {
+            return;
+        }
+
         Schema::create('ai_tutor_messages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('conversation_id')->constrained('ai_tutor_conversations')->onDelete('cascade');

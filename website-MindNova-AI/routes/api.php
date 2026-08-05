@@ -26,12 +26,11 @@ use App\Http\Controllers\Api\Student\HistoryController as StudentHistoryControll
 use App\Http\Controllers\Api\RealtimeController;
 
 // Nhóm Admin
-use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Api\Admin\CourseController as AdminCourseController;
-use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
-use App\Http\Controllers\Api\Admin\NotificationController as AdminNotificationController;
-use App\Http\Controllers\Api\Admin\InvoiceController as AdminInvoiceController;
+use App\Http\Controllers\Api\Admin\AnalyticsController as AdminAnalyticsController;
+use App\Http\Controllers\Api\Admin\ContentManagementController as AdminContentManagementController;
+use App\Http\Controllers\Api\Admin\ModerationSupportController as AdminModerationSupportController;
+use App\Http\Controllers\Api\Admin\SystemConfigController as AdminSystemConfigController;
+use App\Http\Controllers\Api\Admin\UserManagementController as AdminUserManagementController;
 
 // Nhóm Instructor (Giáo viên)
 use App\Http\Controllers\Api\Instructor\CourseController;
@@ -175,31 +174,43 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
 
-    Route::get('/overview', [AdminDashboardController::class, 'overview']);
+    // 1) User management
+    Route::get('/users', [AdminUserManagementController::class, 'index']);
+    Route::post('/users', [AdminUserManagementController::class, 'store']);
+    Route::patch('/users/{id}/role', [AdminUserManagementController::class, 'updateRole']);
+    Route::post('/users/{id}/lock', [AdminUserManagementController::class, 'lock']);
+    Route::post('/users/{id}/unlock', [AdminUserManagementController::class, 'unlock']);
+    Route::delete('/users/{id}', [AdminUserManagementController::class, 'destroy']);
+    Route::get('/users/{id}/activity', [AdminUserManagementController::class, 'activity']);
+    Route::get('/teachers/review-queue', [AdminUserManagementController::class, 'teacherQueue']);
+    Route::patch('/teachers/{id}/verify', [AdminUserManagementController::class, 'verifyTeacher']);
 
-    // Quản lý người dùng
-    Route::get('/users', [AdminUserController::class, 'index']);
-    Route::post('/users', [AdminUserController::class, 'store']);
-    Route::post('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus']);
-    Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
+    // 2) AI and system configuration
+    Route::get('/ai-config', [AdminSystemConfigController::class, 'show']);
+    Route::put('/ai-config', [AdminSystemConfigController::class, 'update']);
 
-    // Quản lý danh mục
-    Route::get('/categories', [AdminCategoryController::class, 'index']);
-    Route::post('/categories', [AdminCategoryController::class, 'store']);
-    Route::put('/categories/{category}', [AdminCategoryController::class, 'update']);
-    Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy']);
+    // 3) Content management
+    Route::get('/content/overview', [AdminContentManagementController::class, 'overview']);
+    Route::get('/content/courses', [AdminContentManagementController::class, 'courses']);
+    Route::get('/content/courses/{course}', [AdminContentManagementController::class, 'showCourse']);
+    Route::patch('/content/courses/{course}/moderate', [AdminContentManagementController::class, 'moderateCourse']);
+    Route::patch('/content/courses/{course}/restore-admin', [AdminContentManagementController::class, 'restoreCourse']);
+    Route::delete('/content/courses/{course}', [AdminContentManagementController::class, 'removeCourse']);
+    Route::get('/content/resources', [AdminContentManagementController::class, 'resources']);
+    Route::post('/content/resources', [AdminContentManagementController::class, 'storeResource']);
+    Route::put('/content/resources/{resource}', [AdminContentManagementController::class, 'updateResource']);
+    Route::delete('/content/resources/{resource}', [AdminContentManagementController::class, 'deleteResource']);
+    Route::get('/content/question-bank', [AdminContentManagementController::class, 'questionBank']);
+    Route::patch('/content/question-bank/{question}', [AdminContentManagementController::class, 'updateQuestionCategory']);
 
-    // Quản lý khóa học
-    Route::get('/courses', [AdminCourseController::class, 'index']);
-    Route::post('/courses', [AdminCourseController::class, 'store']);
-    Route::get('/courses/{course}', [AdminCourseController::class, 'show']);
-    Route::put('/courses/{course}', [AdminCourseController::class, 'update']);
-    Route::delete('/courses/{course}', [AdminCourseController::class, 'destroy']);
+    // 4) Analytics and reports
+    Route::get('/analytics/dashboard', [AdminAnalyticsController::class, 'dashboard']);
 
-    // Quản lý hóa đơn
-    Route::get('/invoices', [AdminInvoiceController::class, 'index']);
-
-    // Email thông báo
-    Route::post('/notifications/test-email', [AdminNotificationController::class, 'sendTestEmail']);
+    // 5) Moderation and support
+    Route::get('/moderation/flags', [AdminModerationSupportController::class, 'flags']);
+    Route::patch('/moderation/flags/{flag}', [AdminModerationSupportController::class, 'reviewFlag']);
+    Route::get('/support/tickets', [AdminModerationSupportController::class, 'tickets']);
+    Route::post('/support/tickets', [AdminModerationSupportController::class, 'createTicket']);
+    Route::patch('/support/tickets/{ticket}', [AdminModerationSupportController::class, 'resolveTicket']);
 
 });

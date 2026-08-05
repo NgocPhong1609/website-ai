@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -68,6 +69,18 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->firstOrFail();
         $user->update(['last_login_at' => now()]);
+
+        ActivityLog::create([
+            'user_id' => $user->id,
+            'action' => 'login',
+            'subject_type' => User::class,
+            'subject_id' => $user->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata' => [
+                'guard' => 'web',
+            ],
+        ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

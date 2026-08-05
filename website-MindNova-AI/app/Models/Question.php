@@ -12,6 +12,7 @@ class Question extends Model
         'quiz_id',
         'topic_id',
         'content',
+        'question_category',
         'ai_insight',
         'order',
     ];

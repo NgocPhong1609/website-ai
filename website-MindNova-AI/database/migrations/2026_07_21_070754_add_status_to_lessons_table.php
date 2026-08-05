@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasTable('lessons') || Schema::hasColumn('lessons', 'status')) {
+            return;
+        }
+
         Schema::table('lessons', function (Blueprint $table) {
             $table->enum('status', ['draft', 'published'])->default('draft')->after('order');
         });
@@ -15,6 +19,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (!Schema::hasTable('lessons') || !Schema::hasColumn('lessons', 'status')) {
+            return;
+        }
+
         Schema::table('lessons', function (Blueprint $table) {
             $table->dropColumn('status');
         });
