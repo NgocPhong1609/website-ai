@@ -3,16 +3,30 @@
 
 import { useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Button, ArrowRightIcon } from "@shared/components/ui";
+import { Button } from "@shared/components/ui";
 import { useOnboardingStore } from "@/src/features/student/onboarding/stores/onboardingStore";
 import {
-  DEFAULT_PLAN_PHASES,
   LEVEL_PHASE_CONFIG,
   COMPLEXITY_CONFIG,
 } from "@/src/features/student/onboarding/constants";
 import { LearningPathCard } from "./LearningPathCard";
 import { PlanSummaryCard } from "./PlanSummaryCard";
 import type { IPlanPhase } from "@/src/features/student/onboarding/types";
+
+interface IAILesson {
+  name?: string;
+  title?: string;
+  lesson_name?: string;
+  text?: string;
+  duration?: string;
+}
+
+interface IAIPhase {
+  phase?: number;
+  title?: string;
+  duration?: string;
+  lessons?: IAILesson[];
+}
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -46,22 +60,23 @@ function ShieldCheckIcon() {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
-/**
- * Derives the final plan data from onboarding store state.
- * Applies phase unlocking based on skill level.
- */
 function usePlan() {
   const router = useRouter();
   const { goal, level, topics } = useOnboardingStore((s) => s.formData);
+  
+  const onboardingStore = useOnboardingStore() as unknown as { generatedPlan?: { profile?: { est_time?: string }; learning_path?: IAIPhase[] } };
+  const generatedPlan = onboardingStore.generatedPlan;
+  const aiPhases = generatedPlan?.learning_path;
 
-  // Determine how many phases to unlock based on skill level
   const unlockedPhases = useMemo(() => {
     const cfg = LEVEL_PHASE_CONFIG[level];
     return cfg?.unlockedPhases ?? 1;
   }, [level]);
 
-  // Derive estimated time from topic count
   const estimatedTime = useMemo(() => {
+    if (generatedPlan?.profile?.est_time) {
+      return generatedPlan.profile.est_time;
+    }
     const count = topics.length;
     const complexity =
       COMPLEXITY_CONFIG.find((c) => count <= c.maxTopics) ??
@@ -70,21 +85,29 @@ function usePlan() {
       0: "—", 1: "2–4 weeks", 2: "1–2 months", 3: "2–3 months", 4: "3–5 months", 5: "5–8 months",
     };
     return TIME_MAP[complexity.level] ?? "—";
-  }, [topics]);
+  }, [generatedPlan, topics]);
 
-  // Produce phases with item statuses adapted to unlock level
-  const phases = useMemo((): IPlanPhase[] =>
-    DEFAULT_PLAN_PHASES.map((phase, idx) => {
-      if (idx >= unlockedPhases) return phase; // keep locked
-      // First unlocked phase: "ready"; subsequent: "upcoming"
-      const itemStatus = idx === 0 ? ("ready" as const) : ("upcoming" as const);
-      return {
-        ...phase,
-        items: phase.items.map((item) => ({ ...item, status: itemStatus })),
-      };
-    }),
-    [unlockedPhases],
-  );
+  const phases = useMemo((): IPlanPhase[] => {
+    if (aiPhases && Array.isArray(aiPhases)) {
+      return aiPhases.map((p: IAIPhase, idx: number) => ({
+        id: p.phase || idx + 1,
+        title: p.title || `Phase ${idx + 1}`,
+        duration: p.duration || "2-4 weeks",
+        items: (p.lessons || []).map((l: IAILesson, lIdx: number) => {
+          const lessonName = l.name || l.title || l.lesson_name || l.text || `Lesson ${lIdx + 1}`;
+          return {
+            id: lIdx + 1,
+            label: lessonName,
+            title: lessonName,
+            duration: l.duration || "1 week",
+            status: idx < unlockedPhases ? (idx === 0 && lIdx === 0 ? "ready" : "upcoming") : "locked",
+          };
+        }),
+      }));
+    }
+
+    return [];
+  }, [aiPhases, unlockedPhases]);
 
   const handleStart = useCallback(() => {
     router.push("/");
@@ -97,7 +120,7 @@ function usePlan() {
   return { goal, level, topics, unlockedPhases, estimatedTime, phases, handleStart, handleBack };
 }
 
-// ─── Step Badge ───────────────────────────────────────────────────────────────
+// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function StepBadge() {
   return (
@@ -110,17 +133,13 @@ function StepBadge() {
   );
 }
 
-// ─── Celebration banner ───────────────────────────────────────────────────────
-
 function CelebrationBanner({ goal }: { goal: string }) {
   return (
     <div className="relative w-full max-w-4xl bg-gradient-to-r from-[#6B6BFF]/8 via-[#818cf8]/6 to-[#4cd7f6]/8 border border-[#6B6BFF]/15 rounded-2xl px-6 py-4 overflow-hidden">
-      {/* Decorative shimmer */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_50%,rgba(107,107,255,0.12)_0%,transparent_60%)]" aria-hidden="true" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_100%_50%,rgba(76,215,246,0.10)_0%,transparent_60%)]" aria-hidden="true" />
 
       <div className="relative flex items-center gap-4">
-        {/* Checkmark circle */}
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#6B6BFF] to-[#4648D4] flex items-center justify-center shrink-0 shadow-[0_4px_16px_rgba(107,107,255,0.45)]">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <polyline points="20 6 9 17 4 12" />
@@ -132,7 +151,7 @@ function CelebrationBanner({ goal }: { goal: string }) {
             Your personalized learning path is ready! 🎉
           </span>
           <span className="text-xs text-[#64647A]">
-            Crafted by AI based on your goal{goal ? ` — ${goal}` : ""}, skill level & selected topics.
+            Crafted dynamically by AI based on your goal{goal ? ` — ${goal}` : ""}, skill level & selected topics.
           </span>
         </div>
       </div>
@@ -142,10 +161,6 @@ function CelebrationBanner({ goal }: { goal: string }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-/**
- * Orchestrates the Plan onboarding step.
- * Displays the AI-generated learning path with phase breakdown and profile summary.
- */
 export default function PlanContainer() {
   const {
     goal, level, topics,
@@ -155,10 +170,8 @@ export default function PlanContainer() {
 
   return (
     <div className="w-full flex flex-col items-center gap-8 px-6 py-12">
-      {/* Step badge */}
       <StepBadge />
 
-      {/* Header */}
       <div className="flex flex-col items-center gap-3 text-center max-w-2xl">
         <h1 className="text-[44px] font-bold text-[#131B2E] leading-tight tracking-tight">
           Here&apos;s your{" "}
@@ -167,14 +180,12 @@ export default function PlanContainer() {
           </span>
         </h1>
         <p className="text-base text-[#64647A] leading-relaxed max-w-lg">
-          Every phase is tailored to your unique goal and expertise — start when you&apos;re ready.
+          Every phase is dynamically tailored to your unique goal and expertise — start when you&apos;re ready.
         </p>
       </div>
 
-      {/* Celebration banner */}
       <CelebrationBanner goal={goal} />
 
-      {/* ── Content: Learning Path + Summary Sidebar ── */}
       <div className="flex items-start gap-5 w-full max-w-4xl">
         <LearningPathCard phases={phases} unlockedPhases={unlockedPhases} />
         <PlanSummaryCard
@@ -185,10 +196,8 @@ export default function PlanContainer() {
         />
       </div>
 
-      {/* ── CTA ── */}
       <div className="flex flex-col items-center gap-3">
         <div className="flex items-center gap-3">
-          {/* Back button */}
           <Button
             onClick={handleBack}
             size="unstyled"
@@ -198,7 +207,6 @@ export default function PlanContainer() {
             ← Back
           </Button>
 
-          {/* Primary CTA */}
           <Button
             onClick={handleStart}
             size="unstyled"
@@ -221,8 +229,7 @@ export default function PlanContainer() {
         <p className="flex items-center gap-1.5 text-[11px] text-[#ADADC0]">
           <ShieldCheckIcon />
           <span>
-            Data-driven pathing based on{" "}
-            <span className="text-[#4648D4] font-semibold">50,000+ career trajectories</span>
+            AI-powered intelligent curriculum generation engine
           </span>
         </p>
       </div>

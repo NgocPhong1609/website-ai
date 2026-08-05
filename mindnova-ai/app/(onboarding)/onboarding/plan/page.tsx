@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { GoalContainer } from "@/src/features/student/onboarding";
+import { PlanContainer } from "@/src/features/student/onboarding/components/plan";
 
 export const metadata: Metadata = {
   title: "Your Learning Plan — MindNova AI",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function PlanPage() {
-  return <GoalContainer />;
+  return <PlanContainer />;
 }

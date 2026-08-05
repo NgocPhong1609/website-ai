@@ -88,10 +88,40 @@ export default function Sidebar() {
       <SidebarNav isCollapsed={isCollapsed} />
 
       {/* Bottom section */}
-      <div className={twMerge("py-5 border-t border-[#F4F4FA] flex flex-col gap-3", isCollapsed ? "px-2 items-center" : "px-4")}>
-        {/* Logout */}
-        <div className="flex flex-col gap-0.5 w-full">
-          {/* Nút Logout đã được gán hàm handleLogout */}
+      <div className="px-4 py-5 border-t border-[#F4F4FA] flex flex-col gap-3">
+        
+        {/* Nút Test Onboarding (Tạo tạm để kiểm tra luồng) */}
+        <Link
+          href="/onboarding"
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-[#6B6BFF] bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-all duration-200"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+            <path d="M9 18h6"/>
+            <path d="M10 22h4"/>
+          </svg>
+          Test Onboarding
+        </Link>
+
+        {/* Upgrade to Pro */}
+        <button
+          type="button"
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_16px_rgba(107,107,255,0.4)] hover:shadow-[0_6px_24px_rgba(107,107,255,0.55)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/40"
+        >
+          <SparkleIcon />
+          Upgrade to Pro
+        </button>
+
+        {/* Help + Logout */}
+        <div className="flex flex-col gap-0.5">
+          <Link
+            href="/help"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-[#64647A] hover:bg-[#F4F4FA] hover:text-[#1A1A2E] transition-all duration-150"
+          >
+            <HelpIcon />
+            <span>Help</span>
+          </Link>
+          
           <button
             type="button"
             onClick={handleLogout}
