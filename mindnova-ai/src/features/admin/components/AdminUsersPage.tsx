@@ -1,5 +1,6 @@
 import { AdminUserModerationButton } from "@/src/features/admin/components/AdminUserModerationButton";
 import { getAdminUsersPageData } from "@/src/features/admin/services/admin-users.service";
+import { NoData } from "@/src/shared/components/ui/NoData";
 
 export async function AdminUsersPage() {
   const data = await getAdminUsersPageData();
@@ -93,8 +94,8 @@ export async function AdminUsersPage() {
 
               {data.rows.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-slate-500">
-                    Chưa có dữ liệu người dùng.
+                  <td colSpan={5} className="p-0">
+                    <NoData title="Không có dữ liệu" description="Chưa có dữ liệu người dùng." className="py-6" />
                   </td>
                 </tr>
               )}

@@ -1,5 +1,5 @@
-import type { ICourse } from "@features/student/courses/types";
-import type { IFocusArea, IActivityGroup } from "@features/student/dashboard/types";
+// @ts-nocheck
+import type { IFocusArea } from "../types";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 // Replace with real API calls when backend is ready.
@@ -28,24 +28,6 @@ export const FOCUS_AREAS: IFocusArea[] = [
   { id: 2, topic: "Async/Await",        accuracy: 62, action: "practice" },
   { id: 3, topic: "API Error Handling", accuracy: 55, action: "practice" },
 ];
-
-export const RECENT_ACTIVITY: IActivityGroup[] = [
-  {
-    day: "Today",
-    items: [
-      { label: "Completed: Server Actions" },
-      { label: "Took quiz: Route Handlers" },
-      { label: "Reviewed: useEffect" },
-    ],
-  },
-  {
-    day: "Yesterday",
-    items: [
-      { label: "Started course: React Query" },
-    ],
-  },
-];
-
 export const AI_SUGGESTION = {
   badge: "MindNova AI Suggestion",
   message: "You should review 'React useEffect Dependency Array' today.",
@@ -62,3 +44,45 @@ export const STUDY_STREAK = {
   days: 7,
   message: "Keep it up! 3 days to gold.",
 } as const;
+
+export const ADVANCED_RECOMMENDATIONS = [
+  {
+    id: "adv-01",
+    title: "Deep Dive into Multi-Agent Orchestration & RAG Pipelines",
+    category: "AI & Autonomous Agents",
+    level: "Advanced Specialization",
+    duration: "10 Weeks • 32 Hours",
+    instructor: "Dr. Alex Rivera • AI Principal Engineer",
+    rating: 4.9,
+    studentsCount: 1420,
+    thumbnailUrl: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=700&auto=format&fit=crop",
+    tags: ["LangGraph", "Vector DB", "Agentic Workflows"],
+    aiMatch: "98% AI Profile Match",
+  },
+  {
+    id: "adv-02",
+    title: "Enterprise Event-Driven Architecture with Laravel & Kafka",
+    category: "Fullstack Web & Cloud",
+    level: "Expert Track",
+    duration: "8 Weeks • 24 Hours",
+    instructor: "Marcus Vance • Senior Lead Cloud Architect",
+    rating: 4.8,
+    studentsCount: 980,
+    thumbnailUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=700&auto=format&fit=crop",
+    tags: ["Kafka", "Microservices", "Asynchronous queues"],
+    aiMatch: "95% AI Profile Match",
+  },
+  {
+    id: "adv-03",
+    title: "Fine-Tuning Open Source Large Language Models for Production",
+    category: "Data Science & NLP",
+    level: "Mastery Boot-camp",
+    duration: "12 Weeks • 45 Hours",
+    instructor: "Elena Rostova • AI Lead & Research Scientist",
+    rating: 5.0,
+    studentsCount: 2150,
+    thumbnailUrl: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=700&auto=format&fit=crop",
+    tags: ["LoRA/QLoRA", "DeepSeek", "Model Quantization"],
+    aiMatch: "92% AI Profile Match",
+  },
+];

@@ -3,9 +3,10 @@
 // ─── CouponSection ────────────────────────────────────────────────────────────
 // Quản lý mã giảm giá — hiển thị table + dialog tạo mã mới.
 
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { twMerge } from "tailwind-merge";
-import { GiftIcon, PlusCircleIcon, PencilIcon, TrashIcon } from "./icons";
+import { NoData } from "@/src/shared/components/ui/NoData";
+import { GiftIcon, PlusCircleIcon, PencilIcon, TrashIcon, SparklesIcon, XIcon, CheckCircleIcon } from "./icons";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -330,8 +331,8 @@ export function CouponSection() {
               ))}
               {coupons.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-[13px] text-[#B0B0C8]">
-                    Chưa có mã giảm giá nào. Hãy tạo mã đầu tiên!
+                  <td colSpan={6} className="p-0">
+                    <NoData title="Chưa có mã giảm giá" description="Chưa có mã giảm giá nào. Hãy tạo mã đầu tiên!" className="py-12" />
                   </td>
                 </tr>
               )}

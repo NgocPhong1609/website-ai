@@ -20,7 +20,7 @@ export function UpcomingPaymentCard() {
       {/* Amount */}
       <div className="relative">
         <p className="text-4xl font-extrabold tracking-tight leading-none">
-          ${amount.toFixed(2)}
+          ${amount}
         </p>
         <p className="text-xs text-white/70 mt-1.5">Due on {dueDate}</p>
       </div>

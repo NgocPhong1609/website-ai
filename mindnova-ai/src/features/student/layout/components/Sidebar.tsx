@@ -1,6 +1,8 @@
-"use client"; // Bắt buộc phải có dòng này để dùng được sự kiện onClick
+"use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { twMerge } from "tailwind-merge";
 import { SidebarBrand } from "./SidebarBrand";
 import { SidebarNav } from "./SidebarNav";
 
@@ -34,9 +36,20 @@ function LogoutIcon() {
   );
 }
 
+function MenuIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+}
+
 // ─── Main Sidebar ─────────────────────────────────────────────────────────────
 
 export default function Sidebar() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   
   // Hàm xử lý Logout chuyên nghiệp
   const handleLogout = () => {
@@ -52,44 +65,44 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-60 shrink-0 h-screen flex flex-col bg-white border-r border-[#F0F0F8]">
-      {/* Brand */}
-      <div className="px-4 py-5 border-b border-[#F4F4FA]">
-        <SidebarBrand />
+    <aside className={twMerge(
+      "shrink-0 h-screen flex flex-col bg-white border-r border-[#F0F0F8] transition-all duration-300 relative group/sidebar",
+      isCollapsed ? "w-[72px]" : "w-60"
+    )}>
+      {/* Brand & Toggle */}
+      <div className={twMerge(
+        "py-[18px] border-b border-[#F4F4FA] flex items-center transition-all",
+        isCollapsed ? "px-2 flex-col justify-center gap-4" : "px-4 justify-between"
+      )}>
+        <SidebarBrand isCollapsed={isCollapsed} />
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="w-10 h-10 rounded-lg flex items-center justify-center text-[#64647A] hover:bg-[#F4F4FA] hover:text-[#5052EE] transition-all cursor-pointer shrink-0"
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <MenuIcon />
+        </button>
       </div>
 
       {/* Navigation */}
-      <SidebarNav />
+      <SidebarNav isCollapsed={isCollapsed} />
 
       {/* Bottom section */}
-      <div className="px-4 py-5 border-t border-[#F4F4FA] flex flex-col gap-3">
-        {/* Upgrade to Pro */}
-        <button
-          type="button"
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_16px_rgba(107,107,255,0.4)] hover:shadow-[0_6px_24px_rgba(107,107,255,0.55)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/40"
-        >
-          <SparkleIcon />
-          Upgrade to Pro
-        </button>
-
-        {/* Help + Logout */}
-        <div className="flex flex-col gap-0.5">
-          <Link
-            href="/help"
-            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-[#64647A] hover:bg-[#F4F4FA] hover:text-[#1A1A2E] transition-all duration-150"
-          >
-            <HelpIcon />
-            <span>Help</span>
-          </Link>
-          
+      <div className={twMerge("py-5 border-t border-[#F4F4FA] flex flex-col gap-3", isCollapsed ? "px-2 items-center" : "px-4")}>
+        {/* Logout */}
+        <div className="flex flex-col gap-0.5 w-full">
           {/* Nút Logout đã được gán hàm handleLogout */}
           <button
             type="button"
             onClick={handleLogout}
-            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-[#64647A] hover:bg-red-50 hover:text-red-500 transition-all duration-150 w-full text-left"
+            title={isCollapsed ? "Logout" : undefined}
+            className={twMerge(
+              "flex items-center rounded-lg text-[#64647A] hover:bg-red-50 hover:text-red-500 transition-all duration-150 shrink-0 cursor-pointer",
+              isCollapsed ? "justify-center w-10 h-10 mx-auto" : "gap-2.5 px-3 py-2 text-sm w-full text-left"
+            )}
           >
             <LogoutIcon />
-            <span>Logout</span>
+            {!isCollapsed && <span>Logout</span>}
           </button>
         </div>
       </div>

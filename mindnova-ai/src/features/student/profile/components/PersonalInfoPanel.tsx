@@ -1,25 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { SparkleIcon } from "./icons";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface PersonalInfoPanelProps {
   fullName: string;
   email: string;
   bio: string;
+  completionPercent?: number;
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function FormLabel({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
+function FormLabel({ htmlFor, children, required = false }: { htmlFor: string; children: React.ReactNode; required?: boolean }) {
   return (
     <label
       htmlFor={htmlFor}
-      className="block text-sm font-semibold text-[#1A1A2E] mb-1.5"
+      className="block text-xs sm:text-sm font-medium text-[#4A4A68] mb-1.5"
     >
       {children}
+      {required && <span className="text-[#EF4444] ml-1 font-normal">*</span>}
     </label>
   );
 }
@@ -44,40 +41,10 @@ function FormInput({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full px-4 py-2.5 rounded-xl text-sm text-[#1A1A2E] bg-white border border-[#EAEAF4] focus:outline-none focus:border-[#6B6BFF] focus:ring-4 focus:ring-[#6B6BFF]/10 placeholder-[#B0B0C8] transition-all duration-200"
+      className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm font-normal text-[#1A1A2E] bg-[#F8FAFC] focus:bg-white border border-[#E4E6F0] focus:border-[#5052EE] shadow-2xs focus:outline-none focus:ring-2 focus:ring-[#5052EE]/15 placeholder-[#989AAB] transition-all duration-200"
     />
   );
 }
-
-function AiInsightsCard({ completionPercent }: { completionPercent: number }) {
-  return (
-    <div className="mt-4 rounded-2xl border border-[#6B6BFF]/20 bg-gradient-to-br from-[#F5F5FF] to-[#EDEDFF] p-4">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="flex items-center justify-center w-5 h-5 rounded-md bg-[#6B6BFF]/15 text-[#6B6BFF]">
-          <SparkleIcon size={12} />
-        </span>
-        <p className="text-[11px] font-bold text-[#6B6BFF] uppercase tracking-widest">
-          AI Insights
-        </p>
-      </div>
-      <p className="text-sm text-[#4A4A6A] leading-relaxed">
-        Your profile is{" "}
-        <span className="font-bold text-[#4648D4]">{completionPercent}%</span>{" "}
-        complete. Adding a short bio helps our AI personalize your career
-        suggestions.
-      </p>
-      {/* Progress bar */}
-      <div className="mt-3 h-1.5 w-full rounded-full bg-[#D8D8F8]">
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] transition-all duration-700"
-          style={{ width: `${completionPercent}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export function PersonalInfoPanel({
   fullName: initialName,
@@ -105,74 +72,91 @@ export function PersonalInfoPanel({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Panel header */}
-      <div>
-        <h2 className="text-lg font-bold text-[#1A1A2E]">Personal Information</h2>
-        <p className="text-sm text-[#84849A] mt-0.5">
-          Update your public profile details and contact information.
-        </p>
+      {/* Panel Header */}
+      <div className="border-b border-[#EAEAF4] pb-4 flex items-center justify-between">
+        <div>
+          <h2 className="text-base sm:text-lg font-semibold text-[#1A1A2E] tracking-normal">Thông tin Cá nhân</h2>
+          <p className="text-xs sm:text-sm font-normal text-[#7878A0] mt-1 leading-relaxed">
+            Cập nhật định danh cá nhân và địa chỉ email chính thức sử dụng cho lộ trình rèn luyện AI.
+          </p>
+        </div>
+
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4] text-xs font-medium text-[#64647A]">
+          <span className="w-2 h-2 rounded-full bg-[#10B981]" />
+          <span>Trạng thái: Hoạt động</span>
+        </div>
       </div>
 
-      {/* Form */}
-      <div className="flex flex-col gap-4">
-        {/* Name + Email row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* Form Area */}
+      <div className="flex flex-col gap-5">
+        {/* Name + Email Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <FormLabel htmlFor="profile-fullname">Full Name</FormLabel>
+            <FormLabel htmlFor="profile-fullname" required>Họ và Tên đầy đủ</FormLabel>
             <FormInput
               id="profile-fullname"
               value={fullName}
               onChange={setFullName}
-              placeholder="Your full name"
+              placeholder="Nhập họ và tên của bạn..."
             />
           </div>
           <div>
-            <FormLabel htmlFor="profile-email">Email Address</FormLabel>
+            <FormLabel htmlFor="profile-email" required>Địa chỉ Email liên hệ</FormLabel>
             <FormInput
               id="profile-email"
               value={email}
               onChange={setEmail}
               type="email"
-              placeholder="your@email.com"
+              placeholder="nhaptentailhoan@email.com"
             />
           </div>
         </div>
 
         {/* Bio */}
         <div>
-          <FormLabel htmlFor="profile-bio">Bio</FormLabel>
+          <FormLabel htmlFor="profile-bio">Giới thiệu bản thân &amp; Định hướng chuyên sâu</FormLabel>
           <textarea
             id="profile-bio"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             rows={4}
-            placeholder="Tell us a little about yourself…"
-            className="w-full px-4 py-3 rounded-xl text-sm text-[#1A1A2E] bg-white border border-[#EAEAF4] focus:outline-none focus:border-[#6B6BFF] focus:ring-4 focus:ring-[#6B6BFF]/10 placeholder-[#B0B0C8] transition-all duration-200 resize-none leading-relaxed"
+            placeholder="Hãy chia sẻ ngắn gọn về sở trường, năng lực kỹ thuật và những mục tiêu bạn muốn Trợ lý Nova đồng hành..."
+            className="w-full px-4 py-3 rounded-xl text-xs sm:text-sm font-normal text-[#1A1A2E] bg-[#F8FAFC] focus:bg-white border border-[#E4E6F0] focus:border-[#5052EE] shadow-2xs focus:outline-none focus:ring-2 focus:ring-[#5052EE]/15 placeholder-[#989AAB] transition-all duration-200 resize-none leading-relaxed"
           />
         </div>
 
-        {/* Action buttons */}
-        <div className="flex items-center justify-end gap-3 pt-1">
+        {/* Action Buttons with soft soothing text and background */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-2">
           <button
             type="button"
             onClick={handleDiscard}
             disabled={!isDirty}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#6B6BFF] border border-[#6B6BFF]/30 bg-white hover:bg-[#F5F5FF] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150"
+            className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-[#64647A] hover:text-[#1A1A2E] border border-[#EAEAF4] bg-white hover:bg-[#F4F5FB] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer shadow-2xs flex items-center justify-center gap-1.5"
           >
-            Discard Changes
+            <span>✕</span>
+            <span>Hủy thay đổi</span>
           </button>
+          
           <button
             type="button"
             onClick={handleSave}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(107,107,255,0.4)] hover:shadow-[0_6px_22px_rgba(107,107,255,0.55)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+            className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#5052EE] via-[#6063EE] to-[#0D9488] shadow-sm hover:opacity-95 active:scale-98 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
           >
-            {saved ? "✓ Saved!" : "Save Changes"}
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              {saved ? (
+                <polyline points="20 6 9 17 4 12" />
+              ) : (
+                <>
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </>
+              )}
+            </svg>
+            <span>{saved ? "Đã cập nhật thành công!" : "Lưu thay đổi"}</span>
           </button>
         </div>
       </div>
-
-      {/* AI Insights */}
-      <AiInsightsCard completionPercent={85} />
     </div>
   );
 }

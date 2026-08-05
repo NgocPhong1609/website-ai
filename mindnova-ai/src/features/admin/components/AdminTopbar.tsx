@@ -1,4 +1,5 @@
 "use client";
+import { Avatar } from "@/src/shared/components/ui/Avatar";
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -190,7 +191,9 @@ export function AdminTopbar() {
       // Ignore backend logout errors and continue local cleanup.
     } finally {
       window.localStorage.removeItem("accessToken");
-      document.cookie = "accessToken=; Max-Age=0; path=/";
+      window.localStorage.removeItem("userInfo");
+      document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
       window.location.replace("/login");
     }
   };
@@ -268,9 +271,7 @@ export function AdminTopbar() {
         >
           Đăng xuất
         </button>
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-indigo-500 text-sm font-bold text-white shadow-[0_14px_24px_-14px_rgba(37,99,235,0.9)]">
-          A
-        </div>
+        <Avatar fallback="A" size="md" className="shadow-[0_14px_24px_-14px_rgba(37,99,235,0.9)]" />
       </div>
 
       {statusMessage && (

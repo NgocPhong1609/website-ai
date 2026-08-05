@@ -16,6 +16,8 @@ export interface CourseApiResponse {
       level: string;
       status: "published" | "draft";
       category_id: string;
+      totalLessons: number;
+      durationHours: number;
       created_at: string;
       updated_at: string;
     }[];
@@ -45,8 +47,10 @@ export function useInstructorCourses(search?: string) {
         title: course.title,
         thumbnail: course.thumbnail,
         status: course.status,
-        durationHours: 0, // Placeholder: Update backend CourseResource if needed
-        totalLessons: 0,  // Placeholder: Update backend CourseResource if needed
+        durationHours: course.durationHours || 0,
+        totalLessons: course.totalLessons || 0,
+        price: course.price,
+        salePrice: (course as any).sale_price,
       }));
     },
   });

@@ -12,24 +12,15 @@ export async function apiClient<T>(
     );
   }
 
-  // =========================================================
-  // ĐOẠN ĐÃ SỬA: Tự động ghép thêm /api nếu endpoint chưa có
-  // =========================================================
-  
-  // Xóa dấu '/' ở cuối BASE_URL (nếu có) để tránh bị lỗi 2 dấu gạch chéo
-  const safeBaseUrl = API_BASE_URL.replace(/\/$/, "");
-  
-  // Đảm bảo endpoint luôn bắt đầu bằng dấu '/'
-  const safeEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  
-  // Kiểm tra, nếu chưa có '/api' thì thêm vào
-  const finalEndpoint = safeEndpoint.startsWith("/api") 
-    ? safeEndpoint 
-    : `/api${safeEndpoint}`;
+  // Ensure base URL correctly targets the Laravel /api prefix without duplicating /api/api
+  const baseUrl = API_BASE_URL.replace(/\/+$/, "");
+  let cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  if (baseUrl.endsWith("/api") && cleanEndpoint.startsWith("/api")) {
+    cleanEndpoint = cleanEndpoint.slice(4);
+  }
+  const apiPrefix = baseUrl.endsWith("/api") || cleanEndpoint.startsWith("/api") ? "" : "/api";
 
-  // URL cuối cùng gửi đi
-  const url = `${safeBaseUrl}${finalEndpoint}`;
-  // =========================================================
+  const url = `${baseUrl}${apiPrefix}${cleanEndpoint}`;
 
   // Attach auth token from cookies (server-side only)
   const cookieStore = await cookies();
@@ -47,9 +38,9 @@ export async function apiClient<T>(
   }
 
   const response = await fetch(url, {
+    signal: options.signal ?? AbortSignal.timeout(8000), // Prevent SSR blocking/hanging
     ...options,
     headers,
-    redirect: "follow",
   });
 
   if (!response.ok) {

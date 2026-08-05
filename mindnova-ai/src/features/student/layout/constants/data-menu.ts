@@ -4,6 +4,7 @@ import type { SidebarMenuItem } from "@/src/features/student/layout/types";
 
 export const SIDEBAR_MENU: SidebarMenuItem[] = [
   { label: "Dashboard", iconKey: "dashboard", href: "/" },
+  { label: "Explore", iconKey: "explore", href: "/explore" },
   { label: "My Courses", iconKey: "courses", href: "/courses" },
   { label: "AI Study Plan", iconKey: "study-plan", href: "/study-plan" },
   { label: "Practice", iconKey: "practice", href: "/practice" },

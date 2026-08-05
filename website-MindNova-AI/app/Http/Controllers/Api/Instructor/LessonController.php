@@ -24,8 +24,10 @@ class LessonController extends Controller
     {
         Gate::authorize('manage', $module);
 
+        $lessons = $module->lessons()->with(['media', 'quiz.questions.answers'])->get();
+
         return $this->successResponse(
-            LessonResource::collection($module->lessons), 
+            LessonResource::collection($lessons), 
             'Lessons retrieved successfully.'
         );
     }

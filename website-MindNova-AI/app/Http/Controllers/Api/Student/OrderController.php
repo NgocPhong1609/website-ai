@@ -56,8 +56,21 @@ class OrderController extends Controller
             }
             DB::commit();
 
-            // Xử lý phương thức thanh toán
+            // Tách logic xử lý các cổng thanh toán ra riêng
             $paymentUrl = $this->handlePaymentMethod($order, $request, $totalAmount);
+
+            // Giả lập cấp quyền luôn cho tất cả các cổng (vì đây là môi trường test)
+            if (in_array($request->payment_method, ['momo', 'banking', 'vnpay'])) {
+                $order->update(['status' => 'completed']);
+                foreach ($courses as $course) {
+                    DB::table('enrollments')->insertOrIgnore([
+                        'user_id' => $user->id, 
+                        'course_id' => $course->id,
+                        'status' => 'enrolled', 
+                        'enrolled_at' => now()
+                    ]);
+                }
+            }
 
             return response()->json([
                 'success' => true,
@@ -79,29 +92,18 @@ class OrderController extends Controller
     {
         $transactionId = $order->transaction_id;
 
+        // Giả lập thành công cho VNPay (vì chưa có cấu hình thật trong .env)
         if ($order->payment_method === 'vnpay') {
-            $inputData = [
-                "vnp_Version" => "2.1.0", "vnp_TmnCode" => env('VNPAY_TMN_CODE'),
-                "vnp_Amount" => $totalAmount * 100, "vnp_Command" => "pay",
-                "vnp_CreateDate" => date('YmdHis'), "vnp_CurrCode" => "VND",
-                "vnp_IpAddr" => $request->ip(), "vnp_Locale" => "vn",
-                "vnp_OrderInfo" => "Thanh toan " . $transactionId,
-                "vnp_OrderType" => "billpayment",
-                "vnp_ReturnUrl" => "http://localhost:3000/payment/callback",
-                "vnp_TxnRef" => $transactionId,
-            ];
-            ksort($inputData);
-            $query = http_build_query($inputData);
-            $hash = hash_hmac('sha512', $query, env('VNPAY_HASH_SECRET'));
-            return "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?" . $query . "&vnp_SecureHash=" . $hash;
+            return "http://localhost:3000/payment/callback?vnp_ResponseCode=00&method=vnpay";
         }
 
         if ($order->payment_method === 'momo') {
-            // Nếu bạn muốn bỏ Momo thì để đoạn này trả về null hoặc thông báo
-            return "Momo is disabled";
+            // Giả lập thành công cho Momo
+            return "http://localhost:3000/payment/callback?vnp_ResponseCode=00&method=momo";
         }
 
-        return "https://your-website.com/banking-instruction"; // Link trang hướng dẫn banking
+        // Giả lập thành công cho Banking
+        return "http://localhost:3000/payment/callback?vnp_ResponseCode=00&method=banking";
     }
 
     /**

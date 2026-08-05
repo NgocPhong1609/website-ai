@@ -1,103 +1,119 @@
 "use client";
 
+import React from "react";
+import Link from "next/link";
 import { twMerge } from "tailwind-merge";
+import { useQuery } from "@tanstack/react-query";
+import { getSalesReport } from "../api";
 import {
-  SearchIcon,
-  BellIcon,
-  MessageIcon,
-  GridIcon,
   CalendarIcon,
-  ChevronDownIcon,
   DownloadIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   TrendUpIcon,
   TrendRightIcon,
 } from "./icons";
-import { AdsHourlySection } from "@features/ads-hourly";
 
-// ─── Topbar ───────────────────────────────────────────────────────────────────
-
-function Topbar() {
+function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
   return (
-    <header className="h-16 shrink-0 flex items-center gap-4 px-8 bg-white border-b border-[#F0F0F8]">
-      <h1 className="text-[15px] font-extrabold text-[#1A1A2E] tracking-tight">Detailed Sales Analytics</h1>
-      <div className="flex-1" />
-      {/* Search */}
-      <div className="relative w-[280px]">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#B0B0C8] pointer-events-none">
-          <SearchIcon size={14} />
-        </span>
-        <input
-          id="sales-search"
-          type="search"
-          placeholder="Search reports..."
-          className="w-full pl-9 pr-4 h-9 rounded-full text-[13px] text-[#1A1A2E] placeholder:text-[#B0B0C8] bg-[#F6F6FB] border border-[#EAEAF4] focus:outline-none focus:border-[#6B6BFF] focus:ring-2 focus:ring-[#6B6BFF]/10 transition-all duration-200"
-        />
-      </div>
+    <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-gray-200 shadow-2xs w-fit">
+      <Link
+        href="/instructor/revenue"
+        className={twMerge(
+          "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
+          active === "overview"
+            ? "bg-[#4F46E5] text-white shadow-sm"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        )}
+      >
+        <span>📊 Tổng quan Doanh thu</span>
+      </Link>
 
-      {/* Icons */}
-      <div className="flex items-center gap-1.5 text-[#7878A0]">
-        <button type="button" className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F4F4FA] hover:text-[#4648D4] transition-all relative">
-          <BellIcon size={17} />
-        </button>
-        <button type="button" className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F4F4FA] hover:text-[#4648D4] transition-all">
-          <MessageIcon size={17} />
-        </button>
-        <button type="button" className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F4F4FA] hover:text-[#4648D4] transition-all">
-          <GridIcon size={17} />
-        </button>
-      </div>
-    </header>
+      <Link
+        href="/instructor/revenue/sales-report"
+        className={twMerge(
+          "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
+          active === "report"
+            ? "bg-[#4F46E5] text-white shadow-sm"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        )}
+      >
+        <span>📈 Báo cáo Bán hàng</span>
+      </Link>
+
+      <Link
+        href="/instructor/revenue/history"
+        className={twMerge(
+          "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
+          active === "history"
+            ? "bg-[#4F46E5] text-white shadow-sm"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        )}
+      >
+        <span>📜 Lịch sử Giao dịch</span>
+      </Link>
+    </div>
   );
 }
 
-// ─── Header & Stats ───────────────────────────────────────────────────────────
-
 function DatePickerHeader() {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#DDDDF0] bg-white text-[13px] font-semibold text-[#464554]">
-          <CalendarIcon /> 01/10/2023 - 31/10/2023
-        </div>
-        <button className="flex items-center gap-1 text-[13px] font-bold text-[#4648D4] hover:bg-[#EEF0FF] px-3 py-2 rounded-lg transition-colors">
-          Change Range <ChevronDownIcon size={12} />
-        </button>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 className="text-xl font-black text-gray-900 tracking-tight">Báo cáo Bán hàng &amp; Chuyển đổi</h1>
+        <p className="text-xs text-gray-500 mt-1">
+          Phân tích chi tiết lượt xem, doanh số thuần và tỷ lệ chuyển đổi học viên từ các nền tảng quảng bá.
+        </p>
       </div>
-      <div className="flex items-center gap-3">
-        <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[#DDDDF0] text-[13px] font-bold text-[#464554] bg-white hover:bg-[#F4F4FA] transition-colors">
-          <DownloadIcon /> Export CSV
+      <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-700 shadow-2xs">
+          <CalendarIcon />
+          <span>Tháng hiện tại</span>
+        </div>
+        <button type="button" className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-2xs cursor-pointer">
+          <DownloadIcon />
+          <span>Xuất CSV</span>
         </button>
-        <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold text-white bg-[#4648D4] hover:bg-[#3D40C0] shadow-[0_4px_14px_rgba(70,72,212,0.3)] transition-all hover:-translate-y-0.5">
-          <DownloadIcon /> Export PDF
+        <button type="button" className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-[#4F46E5] hover:bg-[#4338CA] shadow-sm transition-all cursor-pointer">
+          <DownloadIcon />
+          <span>Xuất Báo cáo PDF</span>
         </button>
       </div>
     </div>
   );
 }
 
-function StatCards() {
+function StatCards({ overview }: { overview: any }) {
+  const getDiffText = (growth: number) => {
+    if (growth > 0) return `+${growth}%`;
+    if (growth < 0) return `${growth}%`;
+    return "0%";
+  };
+
+  const getWidth = (growth: number) => {
+    if (growth >= 100) return 100;
+    if (growth <= -100) return 0;
+    return 50 + (growth / 2); // Map -100..100 to 0..100
+  };
+
   const stats = [
-    { label: "Total Revenue", val: "$42,850", diff: "+12.5%", isUp: true, color: "bg-[#00D47E]" },
-    { label: "Net Sales", val: "$38,200", diff: "+8.2%", isUp: true, color: "bg-[#00A3FF]" },
-    { label: "Refunds", val: "$1,450", diff: "-2.1%", isUp: false, color: "bg-[#F83A3A]" },
-    { label: "Avg. Order Value", val: "$124.50", diff: "+5.4%", isUp: true, color: "bg-[#6B6BFF]" },
+    { label: "Tổng Doanh Thu", val: `${overview?.total_sales.toLocaleString('vi-VN') || 0}đ`, diff: getDiffText(overview?.sales_growth || 0), isUp: (overview?.sales_growth || 0) >= 0, color: "bg-emerald-500", width: getWidth(overview?.sales_growth || 0) },
+    { label: "Tổng Lượt Bán", val: `${overview?.total_enrollments || 0}`, diff: getDiffText(overview?.enrollments_growth || 0), isUp: (overview?.enrollments_growth || 0) >= 0, color: "bg-[#4F46E5]", width: getWidth(overview?.enrollments_growth || 0) },
+    { label: "Tổng Lượt Xem", val: `${overview?.total_views || 0}`, diff: getDiffText(overview?.views_growth || 0), isUp: (overview?.views_growth || 0) >= 0, color: "bg-rose-500", width: getWidth(overview?.views_growth || 0) },
+    { label: "Tỷ Lệ Chuyển Đổi TB", val: `${overview?.avg_conversion_rate || 0}%`, diff: getDiffText(overview?.conversion_growth || 0), isUp: (overview?.conversion_growth || 0) >= 0, color: "bg-indigo-400", width: getWidth(overview?.conversion_growth || 0) },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {stats.map((s, i) => (
-        <div key={i} className="bg-white rounded-2xl p-5 border border-[#EAEAF4] shadow-sm flex flex-col relative overflow-hidden">
-          <span className="text-[12px] font-semibold text-[#64647A] tracking-wide">{s.label}</span>
-          <div className="flex items-end gap-2 mt-2">
-            <span className="text-[20px] font-extrabold text-[#1A1A2E] leading-tight">{s.val}</span>
-            <span className={twMerge("text-[10px] font-bold mb-1", s.isUp ? "text-emerald-500" : "text-rose-500")}>
+        <div key={i} className="bg-white rounded-2xl p-5 border border-gray-200 shadow-2xs flex flex-col justify-between">
+          <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">{s.label}</span>
+          <div className="flex items-end justify-between mt-2">
+            <span className="text-xl font-black text-gray-900 leading-tight">{s.val}</span>
+            <span className={twMerge("text-xs font-black", s.isUp ? "text-emerald-600" : "text-rose-600")}>
               {s.diff}
             </span>
           </div>
-          <div className="w-full h-1 bg-[#F0F0F8] rounded-full mt-4 overflow-hidden">
-            <div className={twMerge("h-full rounded-full", s.color)} style={{ width: `${50 + Math.random() * 40}%` }} />
+          <div className="w-full h-1.5 bg-gray-100 rounded-full mt-3 overflow-hidden">
+            <div className={twMerge("h-full rounded-full transition-all duration-500", s.color)} style={{ width: `${s.width}%` }} />
           </div>
         </div>
       ))}
@@ -105,185 +121,159 @@ function StatCards() {
   );
 }
 
-// ─── Chart Section ────────────────────────────────────────────────────────────
+function RevenueVsRefundsChart({ chartData }: { chartData: any[] }) {
+  // Find max value to scale the chart bars dynamically
+  const maxVal = Math.max(...(chartData || []).map((d) => d.revenue + d.refund), 1000); // at least 1000 to avoid dividing by zero
 
-function RevenueVsRefundsChart() {
   return (
-    <div className="bg-white rounded-2xl border border-[#EAEAF4] shadow-sm p-6 mb-6 flex flex-col h-[360px]">
-      <div className="flex items-start justify-between mb-8">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-2xs p-6 flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h3 className="text-[15px] font-extrabold text-[#1A1A2E]">Revenue vs Refunds</h3>
-          <p className="text-[12px] text-[#9090B0] mt-1">Daily performance tracking for October 2023</p>
+          <h3 className="text-base font-black text-gray-900">Biểu Đồ Tương Quan Doanh Thu vs Hoàn Tiền</h3>
+          <p className="text-xs text-gray-500 mt-0.5">Theo dõi luồng dòng tiền hàng ngày và tỷ lệ giữ chân học viên.</p>
         </div>
-        <div className="flex items-center gap-5">
-          <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#4648D4]" />
-            <span className="text-[12px] font-semibold text-[#64647A]">Revenue</span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-[#4F46E5]" />
+            <span className="text-xs font-bold text-gray-700">Doanh thu bán mới</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#F83A3A]" />
-            <span className="text-[12px] font-semibold text-[#64647A]">Refunds</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-rose-500" />
+            <span className="text-xs font-bold text-gray-700">Hoàn tiền</span>
           </div>
         </div>
       </div>
 
-      {/* Mock Chart Canvas */}
-      <div className="flex-1 relative mt-2 w-full">
-        {/* Horizontal Grids */}
-        <div className="absolute inset-0 flex flex-col justify-between border-b border-[#F0F0F8]">
-          {[1, 2, 3, 4].map(i => <div key={i} className="w-full h-px bg-[#F0F0F8]" />)}
-        </div>
-        
-        {/* Lines */}
-        <svg className="w-full h-full absolute inset-0 overflow-visible" preserveAspectRatio="none" viewBox="0 0 1000 200">
-          <path d="M0,150 L100,130 L200,140 L300,100 L400,80 L500,110 L600,60 L700,50 L800,70 L900,40 L1000,50" fill="none" stroke="#4648D4" strokeWidth="2.5" />
-          <path d="M0,190 L100,188 L200,189 L300,185 L400,186 L500,184 L600,185 L700,186 L800,182 L900,180 L1000,183" fill="none" stroke="#F83A3A" strokeWidth="1.5" strokeDasharray="4 4" />
-          
-          {/* Active Data Point Tooltip */}
-          <circle cx="700" cy="50" r="4" fill="#4648D4" stroke="white" strokeWidth="2" />
-        </svg>
+      {/* Visual Chart Bars */}
+      <div className="min-h-[220px] flex items-end justify-between gap-3 pt-4 border-t border-gray-100 px-2 sm:px-6">
+        {(chartData || []).map((item, idx) => {
+          // Scale to max height of ~160px
+          const revHeight = (item.revenue / maxVal) * 160;
+          const refHeight = (item.refund / maxVal) * 160;
 
-        {/* Floating Tooltip */}
-        <div className="absolute left-[70%] top-[10%] -translate-x-1/2 -translate-y-full mb-2 bg-white rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-[#EAEAF4] p-3 w-max z-10 pointer-events-none">
-          <span className="block text-[9px] font-bold text-[#9090B0] uppercase tracking-widest mb-1">OCT 22, 2023</span>
-          <div className="flex items-center gap-3">
-            <span className="text-[14px] font-extrabold text-[#4648D4]">$2,840.00</span>
-            <span className="text-[14px] font-extrabold text-[#F83A3A]">$42.00</span>
-          </div>
-        </div>
-
-        {/* X-Axis labels */}
-        <div className="absolute left-0 right-0 -bottom-8 flex justify-between text-[11px] font-semibold text-[#B0B0C8]">
-          <span>Oct 01</span>
-          <span>Oct 08</span>
-          <span>Oct 15</span>
-          <span>Oct 22</span>
-          <span>Oct 31</span>
-        </div>
+          return (
+            <div key={idx} className="flex flex-col items-center w-full max-w-[48px] group">
+              <div className="w-full flex items-end justify-center gap-1">
+                <div 
+                  className="w-full rounded-t-lg bg-[#4F46E5] transition-all group-hover:opacity-85 relative" 
+                  style={{ height: `${Math.max(4, revHeight)}px` }}
+                  title={`Doanh thu: ${item.revenue.toLocaleString('vi-VN')}đ`}
+                />
+                <div 
+                  className="w-1.5 rounded-t-lg bg-rose-400 relative" 
+                  style={{ height: `${Math.max(4, refHeight)}px` }}
+                  title={`Hoàn tiền: ${item.refund.toLocaleString('vi-VN')}đ`}
+                />
+              </div>
+              <span className="mt-2 text-xs font-extrabold text-gray-500">
+                {item.label}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-// ─── Table Section ────────────────────────────────────────────────────────────
-
-function MarketingSourcesTable() {
-  const sources = [
-    { name: "Facebook Ads", sub: "Social Media Campaign", initials: "FB", bg: "bg-[#E6EFFF] text-[#00A3FF]", leads: "1,240", conv: "156", rate: 12.58, rev: "$18,420.00", trend: "up" },
-    { name: "Google Search", sub: "PPC & Organic", initials: "GG", bg: "bg-[#FFE8E8] text-[#F83A3A]", leads: "890", conv: "92", rate: 10.33, rev: "$12,150.00", trend: "up" },
-    { name: "Email Marketing", sub: "Monthly Newsletter", initials: "EM", bg: "bg-[#F0E6FF] text-[#9D4EDD]", leads: "2,100", conv: "48", rate: 2.28, rev: "$6,280.00", trend: "flat" },
-    { name: "Referral Program", sub: "Affiliate Partners", initials: "RF", bg: "bg-[#E6F8F0] text-[#00D47E]", leads: "320", conv: "45", rate: 14.06, rev: "$6,000.00", trend: "up" },
-  ];
-
+function CoursePerformanceTable({ courses }: { courses: any[] }) {
   return (
-    <div className="bg-white rounded-2xl border border-[#EAEAF4] shadow-sm flex flex-col overflow-hidden mb-8">
-      {/* Table Header/Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#F0F0F8] px-2 pt-2">
-        <div className="flex items-center gap-1">
-          <button className="px-5 py-3 text-[13px] font-bold text-[#4648D4] border-b-2 border-[#4648D4] bg-[#F8F8FD]">Marketing Sources</button>
-          <button className="px-5 py-3 text-[13px] font-semibold text-[#64647A] hover:text-[#1A1A2E] hover:bg-[#FAFAFE] rounded-t-lg transition-colors border-b-2 border-transparent">Demographics</button>
-          <button className="px-5 py-3 text-[13px] font-semibold text-[#64647A] hover:text-[#1A1A2E] hover:bg-[#FAFAFE] rounded-t-lg transition-colors border-b-2 border-transparent">Course Categories</button>
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-2xs flex flex-col overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border-b border-gray-100 gap-2">
+        <div>
+          <h3 className="text-sm font-black text-gray-900">Hiệu Năng Từng Khóa Học</h3>
+          <p className="text-xs text-gray-500">Dữ liệu phân bổ lượt xem và tỷ lệ chốt đơn theo từng khóa học của bạn.</p>
         </div>
-        <div className="flex items-center gap-4 px-4 py-2 sm:py-0">
-          <span className="text-[12px] font-medium text-[#9090B0]">Showing 1–10 of 24 sources</span>
-          <div className="flex items-center gap-1.5">
-            <button className="w-7 h-7 flex items-center justify-center rounded border border-[#EAEAF4] text-[#B0B0C8] hover:text-[#464554] hover:bg-[#F4F4FA]"><ChevronLeftIcon /></button>
-            <button className="w-7 h-7 flex items-center justify-center rounded border border-[#EAEAF4] text-[#464554] hover:bg-[#F4F4FA]"><ChevronRightIcon /></button>
-          </div>
-        </div>
+        <span className="text-xs font-bold text-[#4F46E5] bg-indigo-50 px-3 py-1 rounded-xl border border-indigo-100">
+          ✨ Cập nhật theo thời gian thực
+        </span>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[800px]">
+        <table className="w-full text-left border-collapse min-w-[700px]">
           <thead>
-            <tr className="border-b border-[#F0F0F8]">
-              <th className="px-6 py-4 text-[11px] font-bold text-[#9090B0] uppercase tracking-wide">Source Channel</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-[#9090B0] uppercase tracking-wide">Total Leads</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-[#9090B0] uppercase tracking-wide">Conversions</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-[#9090B0] uppercase tracking-wide">Conversion Rate</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-[#9090B0] uppercase tracking-wide">Revenue Generated</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-[#9090B0] uppercase tracking-wide">Trend</th>
+            <tr className="border-b border-gray-200 bg-gray-50/70 text-[11px] font-black text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3.5">Khóa Học</th>
+              <th className="px-6 py-3.5">Giá Bán</th>
+              <th className="px-6 py-3.5">Lượt Xem (Views)</th>
+              <th className="px-6 py-3.5">Ghi Danh (Enroll)</th>
+              <th className="px-6 py-3.5">Tỷ Lệ Chuyển Đổi</th>
+              <th className="px-6 py-3.5">Doanh Thu Tổng</th>
             </tr>
           </thead>
-          <tbody>
-            {sources.map((s, i) => (
-              <tr key={i} className="border-b border-[#F0F0F8] last:border-0 hover:bg-[#FAFAFE] transition-colors">
+          <tbody className="divide-y divide-gray-100 text-xs font-medium">
+            {courses?.length > 0 ? courses.map((c, i) => (
+              <tr key={c.course_id} className="hover:bg-gray-50/80 transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className={twMerge("w-8 h-8 rounded flex items-center justify-center text-[10px] font-bold shrink-0", s.bg)}>
-                      {s.initials}
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[13px] font-bold text-[#1A1A2E]">{s.name}</span>
-                      <span className="text-[10px] font-medium text-[#9090B0]">{s.sub}</span>
+                    <div>
+                      <div className="font-extrabold text-gray-900">{c.course_name}</div>
+                      <div className="text-[11px] text-gray-500">ID: {c.course_id}</div>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-[13px] font-semibold text-[#464554]">{s.leads}</td>
-                <td className="px-6 py-4 text-[13px] font-semibold text-[#464554]">{s.conv}</td>
+                <td className="px-6 py-4 font-bold text-gray-700">{c.price.toLocaleString('vi-VN')}đ</td>
+                <td className="px-6 py-4 font-bold text-gray-700">{c.views}</td>
+                <td className="px-6 py-4 font-extrabold text-indigo-900">{c.enrollments}</td>
                 <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[13px] font-extrabold text-[#464554] w-[45px]">{s.rate}%</span>
-                    <div className="flex-1 h-1.5 rounded-full bg-[#F0F0F8] overflow-hidden max-w-[60px]">
-                      <div className="h-full rounded-full bg-[#A3A5F8]" style={{ width: `${s.rate * 3}%` }} />
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-extrabold text-gray-900 w-12">{c.conversion_rate}%</span>
+                    <div className="w-16 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                      <div className="h-full rounded-full bg-[#4F46E5]" style={{ width: `${Math.min(100, c.conversion_rate * 5)}%` }} />
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-[13px] font-extrabold text-[#1A1A2E]">{s.rev}</td>
-                <td className="px-6 py-4 text-center">
-                  {s.trend === "up" ? (
-                    <span className="text-emerald-500 inline-block"><TrendUpIcon size={16} /></span>
-                  ) : (
-                    <span className="text-[#B0B0C8] inline-block"><TrendRightIcon size={16} /></span>
-                  )}
+                <td className="px-6 py-4 font-black font-mono text-emerald-600">{c.revenue.toLocaleString('vi-VN')}đ</td>
+              </tr>
+            )) : (
+              <tr>
+                <td colSpan={6} className="px-6 py-12 text-center text-gray-400 font-bold">
+                  Chưa có dữ liệu bán hàng.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
-      </div>
-      <div className="p-4 flex items-center justify-center border-t border-[#F0F0F8] bg-[#FAFAFE]">
-        <button className="text-[12px] font-bold text-[#6B6BFF] hover:underline">View All Channel Performance</button>
       </div>
     </div>
   );
 }
 
-// ─── Main Container ───────────────────────────────────────────────────────────
-
 export function SalesReportContainer() {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["sales-report"],
+    queryFn: getSalesReport,
+    staleTime: 5000,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-[#F4F4F8] font-sans items-center justify-center">
+        <div className="w-8 h-8 border-4 border-indigo-200 border-t-[#4F46E5] rounded-full animate-spin mb-4"></div>
+        <p className="text-gray-500 font-bold text-sm">Đang tải báo cáo bán hàng...</p>
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="flex flex-col min-h-screen bg-[#F4F4F8] font-sans items-center justify-center">
+        <p className="text-rose-500 font-bold">Đã có lỗi xảy ra khi tải dữ liệu báo cáo.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAF8FF]">
-      <Topbar />
-
+    <div className="flex flex-col min-h-screen bg-[#F4F4F8] font-sans">
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-[1200px] mx-auto px-6 lg:px-8 py-8">
+        <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col gap-6 pb-16">
+          <RevenueNavigationTabs active="report" />
           <DatePickerHeader />
-
-          {/* ── 1.1 Metric Cards + 1.2 Hourly Chart ── */}
-          <AdsHourlySection
-            onRangeSelected={(range) => {
-              // TODO: replace with real bid-schedule navigation or modal
-              console.log("[Bid Schedule] Selected range:", range);
-            }}
-          />
-
-          <StatCards />
-          <RevenueVsRefundsChart />
-          <MarketingSourcesTable />
-
-          <footer className="flex flex-col md:flex-row items-center justify-between gap-4 py-6 border-t border-[#EAEAF4] mt-8">
-            <span className="text-[11px] font-medium text-[#9090B0]">
-              © 2023 EduMaster Pro Instructor Console. All sales data is real-time.
-            </span>
-            <div className="flex items-center gap-4 text-[11px] font-medium text-[#9090B0]">
-              <a href="#" className="hover:text-[#464554] transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-[#464554] transition-colors">Data Processing Agreement</a>
-            </div>
-          </footer>
+          <StatCards overview={data.overview} />
+          <RevenueVsRefundsChart chartData={data.chart_data} />
+          <CoursePerformanceTable courses={data.courses} />
         </div>
       </main>
     </div>
   );
 }
-// ─── End of SalesReportContainer ─────────────────────────────────────────────

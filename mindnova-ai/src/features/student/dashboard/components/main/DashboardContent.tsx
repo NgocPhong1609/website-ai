@@ -1,4 +1,20 @@
+"use client";
+
+import { useGetDashboardOverview } from "../../api";
+
 export function DashboardContent() {
+  const { data: dashboardData, isLoading, error } = useGetDashboardOverview();
+
+  if (isLoading) return <div className="p-8 text-center text-gray-500">Đang tải dữ liệu bảng điều khiển...</div>;
+  if (error) return <div className="p-8 text-center text-red-500">Có lỗi xảy ra khi tải dữ liệu.</div>;
+
+  const user = dashboardData?.user;
+  const streak = dashboardData?.study_streak?.days || 0;
+  const overallProgress = dashboardData?.overall_progress?.percent || 0;
+  const progressDelta = dashboardData?.overall_progress?.delta || '';
+  const focusAreas = dashboardData?.focus_areas || [];
+  const aiSuggestion = dashboardData?.ai_suggestion;
+
   return (
     <div className="flex-1 overflow-y-auto bg-[#F8F9FB] min-h-full">
       <div className="max-w-[1100px] mx-auto p-6 lg:p-8 pb-20">
@@ -7,10 +23,10 @@ export function DashboardContent() {
         <div className="bg-gradient-to-r from-[#D6FAFF] via-[#E2E8FF] to-[#E9DDFF] rounded-[24px] p-8 lg:p-10 flex flex-col md:flex-row justify-between items-start md:items-center relative overflow-hidden shadow-sm border border-white/50">
           <div className="relative z-10">
             <h1 className="text-[28px] md:text-[32px] font-bold text-[#1F2937] leading-tight tracking-tight">
-              Fantastic work, Hieu!
+              Tuyệt vời quá, {user?.name || "Học viên"}!
             </h1>
             <p className="text-[15px] text-[#4B5563] mt-2 font-medium">
-              You've just leveled up your Next.js skills. Keep that streak alive!
+              Bạn đang làm rất tốt. Hãy tiếp tục duy trì chuỗi học tập nhé!
             </p>
           </div>
           
@@ -20,7 +36,7 @@ export function DashboardContent() {
                 <circle cx="12" cy="8" r="7"></circle>
                 <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
               </svg>
-              3 Day Streak!
+              {streak} Ngày liên tiếp!
             </div>
           </div>
         </div>
@@ -49,12 +65,12 @@ export function DashboardContent() {
                 </div>
                 
                 <div className="flex-1">
-                  <h3 className="font-bold text-[22px] text-[#1F2937] leading-tight">Smart Next Step</h3>
+                  <h3 className="font-bold text-[22px] text-[#1F2937] leading-tight">Bước tiếp theo</h3>
                   <p className="text-[15px] text-[#4B5563] mt-2 leading-relaxed max-w-lg">
-                    Great progress! You passed the Route Handlers quiz. Next, you should continue with 'Server Actions' to master data mutations.
+                    {aiSuggestion?.message || "Hãy bắt đầu một khóa học mới để phát triển kỹ năng của bạn ngay hôm nay!"}
                   </p>
                   <button className="mt-6 bg-[#5452F6] hover:bg-[#4648D4] text-white px-6 py-3 rounded-[14px] font-bold text-[14px] flex items-center gap-2 shadow-[0_4px_14px_rgba(84,82,246,0.3)] hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-4 focus:ring-[#5452F6]/30">
-                    Continue Next Lesson
+                    Tiếp tục học
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="5" y1="12" x2="19" y2="12"></line>
                       <polyline points="12 5 19 12 12 19"></polyline>
@@ -70,21 +86,21 @@ export function DashboardContent() {
               {/* Overall Progress */}
               <div className="bg-white rounded-[24px] p-6 shadow-sm border border-[#F0F2F5] flex flex-col justify-between">
                 <div className="flex justify-between items-start">
-                  <h4 className="text-[11px] font-bold text-gray-500 tracking-wider uppercase">Overall Progress</h4>
-                  <span className="text-[#5452F6] font-bold text-[14px]">+4% increase</span>
+                  <h4 className="text-[11px] font-bold text-gray-500 tracking-wider uppercase">Tiến độ chung</h4>
+                  <span className="text-[#5452F6] font-bold text-[14px]">{progressDelta}</span>
                 </div>
                 
                 <div className="mt-6 mb-8">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-[56px] font-bold text-[#5452F6] leading-none tracking-tighter">68%</span>
-                    <span className="text-[13px] font-semibold text-gray-400">Total Completion</span>
+                    <span className="text-[56px] font-bold text-[#5452F6] leading-none tracking-tighter">{overallProgress}%</span>
+                    <span className="text-[13px] font-semibold text-gray-400">Hoàn thành</span>
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-[12px] font-medium text-gray-500 mb-2">+4% from your last session</p>
+                  <p className="text-[12px] font-medium text-gray-500 mb-2">So với phiên học trước</p>
                   <div className="h-2.5 w-full bg-[#EEF2FF] rounded-full overflow-hidden">
-                    <div className="h-full w-[68%] bg-gradient-to-r from-[#5452F6] to-[#06B6D4] rounded-full"></div>
+                    <div className={`h-full bg-gradient-to-r from-[#5452F6] to-[#06B6D4] rounded-full`} style={{ width: `${overallProgress}%` }}></div>
                   </div>
                 </div>
               </div>
@@ -121,7 +137,7 @@ export function DashboardContent() {
                     </div>
                     <div>
                       <p className="font-bold text-[14px] text-[#1F2937]">Yesterday</p>
-                      <p className="text-[13px] text-gray-500 mt-0.5">Watched 'Dynamic Routing' (12m)</p>
+                      <p className="text-[13px] text-gray-500 mt-0.5">Watched &apos;Dynamic Routing&apos; (12m)</p>
                     </div>
                   </div>
                 </div>

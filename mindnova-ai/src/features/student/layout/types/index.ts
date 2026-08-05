@@ -1,5 +1,6 @@
 export type NavIconKey =
   | "dashboard"
+  | "explore"
   | "courses"
   | "study-plan"
   | "practice"

@@ -50,12 +50,17 @@ export function useUploadCourseThumbnail() {
 }
 
 export function useUpdateCoursePrice() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ courseId, price }: { courseId: string; price: number }) => {
       const { data } = await axiosClient.patch(`/api/instructor/courses/${courseId}/price`, {
         price,
       });
       return data.data;
+    },
+    onSuccess: (_, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId] });
     },
   });
 }
