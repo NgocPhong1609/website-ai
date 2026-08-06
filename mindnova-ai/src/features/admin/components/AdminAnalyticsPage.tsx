@@ -115,7 +115,7 @@ export function AdminAnalyticsPage() {
                     <CartesianGrid stroke="#dbeafe" strokeDasharray="3 3" />
                     <XAxis dataKey="date" tick={{ fill: "#64748b", fontSize: 12 }} />
                     <YAxis allowDecimals={false} tick={{ fill: "#64748b", fontSize: 12 }} />
-                    <Tooltip formatter={(value: number) => [`${value} lượt`, "Truy cập"]} />
+                    <Tooltip formatter={(value: any) => [`${value.toLocaleString()} lượt`, "Truy cập"]} />
                     <Line
                       type="monotone"
                       dataKey="total"

@@ -63,7 +63,11 @@ export default function GoalContainer() {
           size="unstyled"
           disabled={selectedId === null}
           onClick={() => router.push("/onboarding/skills")}
-          className="py-6 px-16 rounded-lg bg-[#E2E8F0] text-[#464554]/40 disabled:cursor-not-allowed"
+          className={`py-[21.6px] px-[57.6px] rounded-lg transition-colors text-[14.4px] ${
+            selectedId !== null
+              ? "bg-[#6B6BFF] text-white shadow-md hover:bg-[#5757EE]"
+              : "bg-[#E2E8F0] text-[#464554]/40 cursor-not-allowed"
+          }`}
           rightIcon={<ArrowRightIcon />}
         >
           Continue
