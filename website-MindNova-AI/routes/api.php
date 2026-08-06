@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Http;
 
 // ==========================================
 // IMPORT CÁC CONTROLLER TỪ ĐÚNG THƯ MỤC
@@ -44,6 +43,7 @@ use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentCo
 use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscussionController;
 use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNotificationController;
 use App\Http\Controllers\Api\Instructor\RevenueController;
+
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
 // ==========================================
@@ -56,110 +56,8 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 });
 
-// -- API VNPay IPN (Webhooks) --
-Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
-
-// API Student Dashboard, Study Plan & Quizzes (Áp dụng cho mọi phiên học viên)
-Route::get('/student/dashboard', [StudentDashboardController::class, 'overview']);
-Route::get('/student/study-plan', [StudentStudyPlanController::class, 'overview']);
-Route::get('/student/practice/overview', [StudentPracticeController::class, 'overview']);
-Route::get('/student/progress/overview', [StudentProgressController::class, 'overview']);
-Route::get('/student/history/overview', [StudentHistoryController::class, 'overview']);
-Route::get('/student/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
-Route::get('/student/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
-Route::post('/student/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
-Route::post('/student/onboarding', [OnboardingController::class, 'store']);
-// 🌟 BƯỚC 1: ĐẶT API AI PHÂN TÍCH BÀI HỌC VÀ GỢI Ý KHÓA HỌC Ở ĐÂY
-    Route::post('/student/analyze-lesson', function (Illuminate\Http\Request $request) {
-    $lessonTitle = $request->input('lesson_title');
-    $goal = $request->input('goal');
-
-    // Prompt cực kỳ khắt khe, ép AI phải phân tích riêng biệt cho bài học cụ thể này
-    $prompt = "You are an expert AI curriculum analyst. A student is studying for '{$goal}' and looking specifically at the lesson titled '{$lessonTitle}'.
-    You MUST generate a completely custom, highly specific breakdown for THIS exact lesson. Do not use generic templates.
-    Return ONLY valid JSON format with no markdown, no backticks:
-    {
-      \"overview\": \"Write a unique 2-sentence overview specifically explaining what concepts, techniques, or theories are mastered in '{$lessonTitle}'.\",
-      \"key_takeaways\": [
-        \"First specific learning outcome of {$lessonTitle}\",
-        \"Second practical skill gained from {$lessonTitle}\",
-        \"Third technical implementation detail of {$lessonTitle}\"
-      ],
-      \"suggested_course_keywords\": [\"keyword1\", \"keyword2\"]
-    }";
-
-    try {
-        $response = Http::withToken(env('GROQ_API_KEY'))
-            ->post('https://api.groq.com/openai/v1/chat/completions', [
-                'model' => 'llama-3.3-70b-versatile',
-                'messages' => [
-                    ['role' => 'system', 'content' => 'Return only raw JSON.'],
-                    ['role' => 'user', 'content' => $prompt]
-                ],
-                'temperature' => 0.95, // Đẩy độ sáng tạo lên cao nhất để không bị lặp text
-            ]);
-
-        $aiContent = $response->json('choices.0.message.content');
-        $cleanJson = trim(str_replace(['```json', '```'], '', $aiContent));
-        $aiData = json_decode($cleanJson, true);
-
-        // LỌC KHÓA HỌC LIÊN QUAN CHẶT CHẼ TỪ DATABASE
-        // Lấy các khóa học có tiêu đề chứa từ khóa liên quan đến bài học hoặc lấy theo độ phù hợp
-        $keywords = $aiData['suggested_course_keywords'] ?? [$lessonTitle];
-        $query = \App\Models\Course::with('teacher');
-
-        foreach ($keywords as $kw) {
-            $query->orWhere('title', 'like', '%' . $kw . '%');
-        }
-
-        $matchedCourses = $query->take(3)->get();
-
-        // Nếu database chưa khớp được từ khóa thì lấy ngẫu nhiên 3 khóa học chất lượng khác nhau
-        if ($matchedCourses->isEmpty()) {
-            $matchedCourses = \App\Models\Course::with('teacher')->inRandomOrder()->take(3)->get();
-        }
-
-        $coursesList = [];
-        foreach ($matchedCourses as $index => $course) {
-            $coursesList[] = [
-                'title' => $course->title,
-                'instructor' => $course->teacher ? $course->teacher->name : "Expert Instructor",
-                'rating' => "4." . rand(7, 9) . " (" . rand(600, 1400) . " students)",
-                'price' => "$" . number_format($course->price, 2),
-                'badge' => $index === 0 ? "Best Match" : "Related Course"
-            ];
-        }
-
-        $aiData['recommended_courses'] = $coursesList;
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $aiData
-        ], 200);
-    } catch (\Exception $e) {
-        $fallbackCourses = \App\Models\Course::with('teacher')->take(2)->get();
-        $coursesList = [];
-        foreach ($fallbackCourses as $c) {
-            $coursesList[] = [
-                'title' => $c->title,
-                'instructor' => $c->teacher ? $c->teacher->name : "Instructor",
-                'rating' => "4.8 (950 students)",
-                'price' => "$" . number_format($c->price, 2),
-                'badge' => "Recommended"
-            ];
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'overview' => "Master the core concepts of {$lessonTitle} to accelerate your progress toward {$goal}.",
-                'key_takeaways' => ["Understanding fundamental principles of " . $lessonTitle, "Hands-on configuration and workflow", "Best practices and implementation"],
-                'recommended_courses' => $coursesList
-            ]
-        ], 200);
-}});
-
 // Payment IPN (Webhook) - Cần public để Momo/VNPAY gọi
+Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
 Route::get('/student/payment/vnpay-ipn', [OrderController::class, 'vnpayIpn']);
 Route::post('/student/payment/momo-ipn', [OrderController::class, 'momoIpn']);
 
@@ -187,11 +85,28 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders', [OrderController::class, 'store']);
 
     // ==========================================
-    // 3. NHÓM API HỌC SINH (Student) - Các tiện ích cần xác thực
+    // 3. NHÓM API HỌC SINH (Student)
     // ==========================================
     Route::prefix('student')->group(function () {
+
+        // 🌟 TÍNH NĂNG ONBOARDING & AI PHÂN TÍCH BÀI HỌC
+        // Toàn bộ logic đã được đóng gói gọn gàng vào OnboardingController
+        Route::post('/onboarding', [OnboardingController::class, 'store']);
+        Route::get('/available-topics', [OnboardingController::class, 'getAvailableTopics']);
+        Route::post('/analyze-lesson', [OnboardingController::class, 'analyzeLesson']);
+
+        // Dashboard, Study Plan & Quizzes
+        Route::get('/dashboard', [StudentDashboardController::class, 'overview']);
+        Route::get('/study-plan', [StudentStudyPlanController::class, 'overview']);
+        Route::get('/practice/overview', [StudentPracticeController::class, 'overview']);
+        Route::get('/progress/overview', [StudentProgressController::class, 'overview']);
+        Route::get('/history/overview', [StudentHistoryController::class, 'overview']);
+        Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
+        Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
+        Route::post('/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
+
         // TÍNH NĂNG AI TUTOR & Các tiện ích nâng cao khác
-        Route::post('/ai-tutor/chat', [\App\Http\Controllers\Api\Student\AiTutorController::class, 'streamChat']);
+        Route::post('/ai-tutor/chat', [AiTutorController::class, 'streamChat']);
         Route::post('/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'store']);
 
         // Quiz
@@ -238,26 +153,12 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::delete('lessons/{lesson}/quiz', [QuizController::class, 'destroy']);
 
     // Students
-    Route::get('/students/export', [App\Http\Controllers\Api\Instructor\StudentController::class, 'exportCsv']);
-    Route::get('/students/analytics', [App\Http\Controllers\Api\Instructor\StudentController::class, 'getAnalytics']);
-    Route::get('/students/discussions', [App\Http\Controllers\Api\Instructor\StudentController::class, 'getDiscussions']);
-    Route::post('/students/ai-notification/generate', [App\Http\Controllers\Api\Instructor\StudentController::class, 'generateAiNotification']);
-    Route::post('/students/notifications', [App\Http\Controllers\Api\Instructor\StudentController::class, 'sendNotification']);
-    Route::get('/students', [App\Http\Controllers\Api\Instructor\StudentController::class, 'index']);
-
-    // Student Analytics Dashboard
-    Route::get('/student-analytics/dashboard-metrics', [\App\Http\Controllers\Api\Instructor\StudentAnalyticsController::class, 'dashboardMetrics']);
-    Route::get('/student-analytics/engagement-chart', [\App\Http\Controllers\Api\Instructor\StudentAnalyticsController::class, 'engagementChart']);
-    
-    Route::get('/students/{id}/progress', [App\Http\Controllers\Api\Instructor\StudentController::class, 'progress']);
+    Route::get('students', [InstructorStudentController::class, 'index']);
+    Route::get('students/{student}/progress', [InstructorStudentController::class, 'progress']);
 
     // Discussions
     Route::get('discussions', [InstructorDiscussionController::class, 'index']);
     Route::post('discussions/{discussion}/replies', [InstructorDiscussionController::class, 'reply']);
-    Route::patch('discussions/{discussion}/pin', [InstructorDiscussionController::class, 'pin']);
-    Route::patch('discussions/{discussion}/best-answer', [InstructorDiscussionController::class, 'bestAnswer']);
-    Route::patch('discussions/{discussion}/resolved', [InstructorDiscussionController::class, 'toggleResolved']);
-    Route::delete('discussions/{discussion}', [InstructorDiscussionController::class, 'destroy']);
 
     // Notifications
     Route::post('notifications', [InstructorNotificationController::class, 'store']);
@@ -267,10 +168,10 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::post('revenue/withdraw', [RevenueController::class, 'requestWithdraw']);
     Route::get('revenue/transactions', [RevenueController::class, 'getTransactions']);
     Route::get('revenue/sales-report', [RevenueController::class, 'getSalesReport']);
-    
+
     // Orders
     Route::get('orders', [\App\Http\Controllers\Api\Instructor\OrderController::class, 'index']);
-    
+
     // Reviews
     Route::get('reviews', [\App\Http\Controllers\Api\Instructor\ReviewController::class, 'index']);
 });
