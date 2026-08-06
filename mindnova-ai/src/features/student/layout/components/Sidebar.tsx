@@ -53,14 +53,9 @@ export default function Sidebar() {
   
   // Hàm xử lý Logout chuyên nghiệp
   const handleLogout = () => {
-    // 1. Xóa sạch dữ liệu lưu trong trình duyệt
     window.localStorage.clear();
-    
-    // 2. Xóa các Cookie bằng cách đặt thời gian hết hạn về quá khứ
     document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    
-    // 3. Chuyển hướng về trang Login
     window.location.assign("/login");
   };
 
@@ -89,9 +84,55 @@ export default function Sidebar() {
 
       {/* Bottom section */}
       <div className={twMerge("py-5 border-t border-[#F4F4FA] flex flex-col gap-3", isCollapsed ? "px-2 items-center" : "px-4")}>
-        {/* Logout */}
+        
+        {/* Nút Test Onboarding */}
+        <Link
+          href="/onboarding"
+          title={isCollapsed ? "Test Onboarding" : undefined}
+          className={twMerge(
+            "flex items-center justify-center transition-all duration-200 text-[#6B6BFF] bg-blue-50 border border-blue-200 hover:bg-blue-100",
+            isCollapsed 
+              ? "w-10 h-10 rounded-xl" 
+              : "w-full gap-2 py-3 px-4 rounded-xl text-sm font-semibold"
+          )}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+            <path d="M9 18h6"/>
+            <path d="M10 22h4"/>
+          </svg>
+          {!isCollapsed && <span>Test Onboarding</span>}
+        </Link>
+
+        {/* Upgrade to Pro */}
+        <button
+          type="button"
+          title={isCollapsed ? "Upgrade to Pro" : undefined}
+          className={twMerge(
+            "flex items-center justify-center transition-all duration-200 text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] focus:outline-none focus:ring-2 focus:ring-[#6B6BFF]/40",
+            isCollapsed
+              ? "w-10 h-10 rounded-xl shadow-[0_4px_16px_rgba(107,107,255,0.4)]"
+              : "w-full gap-2 py-3 px-4 rounded-xl text-sm font-semibold shadow-[0_4px_16px_rgba(107,107,255,0.4)] hover:shadow-[0_6px_24px_rgba(107,107,255,0.55)] hover:-translate-y-0.5 active:translate-y-0"
+          )}
+        >
+          <SparkleIcon />
+          {!isCollapsed && <span>Upgrade to Pro</span>}
+        </button>
+
+        {/* Help + Logout */}
         <div className="flex flex-col gap-0.5 w-full">
-          {/* Nút Logout đã được gán hàm handleLogout */}
+          <Link
+            href="/help"
+            title={isCollapsed ? "Help" : undefined}
+            className={twMerge(
+              "flex items-center rounded-lg text-[#64647A] hover:bg-[#F4F4FA] hover:text-[#1A1A2E] transition-all duration-150 shrink-0",
+              isCollapsed ? "justify-center w-10 h-10 mx-auto" : "gap-2.5 px-3 py-2 text-sm w-full text-left"
+            )}
+          >
+            <HelpIcon />
+            {!isCollapsed && <span>Help</span>}
+          </Link>
+          
           <button
             type="button"
             onClick={handleLogout}
