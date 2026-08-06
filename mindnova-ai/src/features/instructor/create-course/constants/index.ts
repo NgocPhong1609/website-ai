@@ -16,6 +16,7 @@ export const COURSE_FIELDS = [
   "Marketing số",
   "Kinh doanh",
   "Ngoại ngữ",
+  "Toán học",
   "Khác",
 ] as const;
 

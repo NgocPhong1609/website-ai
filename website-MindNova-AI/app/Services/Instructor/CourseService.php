@@ -83,20 +83,15 @@ class CourseService
 
     public function updateStatus(Course $course, string $status): Course
     {
-        if ($status === 'published' && $course->status === 'draft') {
-            // Need to check for modules and lessons in real scenario
-            // $moduleCount = $course->modules()->count();
-            // $lessonCount = $course->lessons()->count();
-            // if ($moduleCount === 0 || $lessonCount === 0) {
-            //    throw new \Exception("Cannot publish a course without modules and lessons.");
-            // }
-        }
-
-        // if ($status === 'draft' && $course->status === 'published') {
-        //     throw new \Exception("Cannot change a published course back to draft.");
-        // }
+        $wasDraft = $course->status === 'draft';
 
         $course->update(['status' => $status]);
+
+        if ($status === 'published' && $wasDraft) {
+            if ($course->teacher) {
+                $course->teacher->notify(new \App\Notifications\CoursePublished($course));
+            }
+        }
 
         return $course;
     }

@@ -12,6 +12,8 @@ import {
   TrendRightIcon,
 } from "./icons";
 
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
 function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
   return (
     <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-gray-200 shadow-2xs w-fit">
@@ -121,9 +123,17 @@ function StatCards({ overview }: { overview: any }) {
   );
 }
 
-function RevenueVsRefundsChart({ chartData }: { chartData: any[] }) {
+function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartData: any[], timeRange?: number, setTimeRange?: (val: number) => void }) {
   // Find max value to scale the chart bars dynamically
   const maxVal = Math.max(...(chartData || []).map((d) => d.revenue + d.refund), 1000); // at least 1000 to avoid dividing by zero
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const getRangeText = (val: number) => {
+    if (val === 7) return "7 ngày qua";
+    if (val === 14) return "14 ngày qua";
+    if (val === 30) return "30 ngày qua";
+    return `${val} ngày qua`;
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-2xs p-6 flex flex-col gap-6">
@@ -132,45 +142,114 @@ function RevenueVsRefundsChart({ chartData }: { chartData: any[] }) {
           <h3 className="text-base font-black text-gray-900">Biểu Đồ Tương Quan Doanh Thu vs Hoàn Tiền</h3>
           <p className="text-xs text-gray-500 mt-0.5">Theo dõi luồng dòng tiền hàng ngày và tỷ lệ giữ chân học viên.</p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-[#4F46E5]" />
-            <span className="text-xs font-bold text-gray-700">Doanh thu bán mới</span>
+        
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-[#4F46E5]" />
+              <span className="text-xs font-bold text-gray-700">Doanh thu bán mới</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-rose-500" />
+              <span className="text-xs font-bold text-gray-700">Hoàn tiền</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-rose-500" />
-            <span className="text-xs font-bold text-gray-700">Hoàn tiền</span>
-          </div>
+          
+          {setTimeRange && timeRange && (
+            <div className="relative">
+              <button 
+                onClick={() => setIsOpen(!isOpen)}
+                className="flex items-center justify-between w-[130px] bg-white border border-gray-200 text-gray-700 text-xs font-bold rounded-xl px-4 py-2 hover:bg-gray-50 focus:outline-none focus:border-indigo-500 cursor-pointer shadow-sm transition-colors"
+              >
+                <span>{getRangeText(timeRange)}</span>
+                <svg className={twMerge("w-4 h-4 text-gray-500 transition-transform duration-200", isOpen ? "rotate-180" : "")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {isOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)}></div>
+                  <div className="absolute right-0 mt-2 w-[130px] bg-white border border-gray-100 rounded-xl shadow-lg z-20 overflow-hidden py-1">
+                    {[7, 14, 30].map(val => (
+                      <button
+                        key={val}
+                        onClick={() => {
+                          setTimeRange(val);
+                          setIsOpen(false);
+                        }}
+                        className={twMerge(
+                          "w-full text-left px-4 py-2 text-xs font-bold cursor-pointer transition-colors",
+                          timeRange === val ? "bg-indigo-50 text-indigo-700" : "text-gray-700 hover:bg-gray-50"
+                        )}
+                      >
+                        {getRangeText(val)}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Visual Chart Bars */}
-      <div className="min-h-[220px] flex items-end justify-between gap-3 pt-4 border-t border-gray-100 px-2 sm:px-6">
-        {(chartData || []).map((item, idx) => {
-          // Scale to max height of ~160px
-          const revHeight = (item.revenue / maxVal) * 160;
-          const refHeight = (item.refund / maxVal) * 160;
-
-          return (
-            <div key={idx} className="flex flex-col items-center w-full max-w-[48px] group">
-              <div className="w-full flex items-end justify-center gap-1">
-                <div 
-                  className="w-full rounded-t-lg bg-[#4F46E5] transition-all group-hover:opacity-85 relative" 
-                  style={{ height: `${Math.max(4, revHeight)}px` }}
-                  title={`Doanh thu: ${item.revenue.toLocaleString('vi-VN')}đ`}
-                />
-                <div 
-                  className="w-1.5 rounded-t-lg bg-rose-400 relative" 
-                  style={{ height: `${Math.max(4, refHeight)}px` }}
-                  title={`Hoàn tiền: ${item.refund.toLocaleString('vi-VN')}đ`}
-                />
-              </div>
-              <span className="mt-2 text-xs font-extrabold text-gray-500">
-                {item.label}
-              </span>
-            </div>
-          );
-        })}
+      {/* Visual Line Chart */}
+      <div className="h-[250px] w-full pt-4 border-t border-gray-100 mt-4">
+        {chartData && chartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#4F46E5" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="colorRefund" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+              <XAxis 
+                dataKey="label" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 11, fill: '#9ca3af', fontWeight: 600 }}
+                dy={10}
+              />
+              <Tooltip 
+                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
+                itemStyle={{ fontWeight: 'bold' }}
+                labelStyle={{ color: '#6b7280', marginBottom: '4px', fontSize: '12px' }}
+                formatter={(value: any, name: string) => [`${value.toLocaleString('vi-VN')}đ`, name === 'revenue' ? 'Doanh thu bán mới' : 'Hoàn tiền']}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="revenue" 
+                name="revenue"
+                stroke="#4F46E5" 
+                strokeWidth={3}
+                fillOpacity={1} 
+                fill="url(#colorRevenue)" 
+                activeDot={{ r: 6, fill: "#4F46E5", stroke: "#fff", strokeWidth: 2 }}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="refund" 
+                name="refund"
+                stroke="#f43f5e" 
+                strokeWidth={3}
+                fillOpacity={1} 
+                fill="url(#colorRefund)" 
+                activeDot={{ r: 6, fill: "#f43f5e", stroke: "#fff", strokeWidth: 2 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-400">
+            Chưa có dữ liệu
+          </div>
+        )}
       </div>
     </div>
   );
@@ -240,9 +319,11 @@ function CoursePerformanceTable({ courses }: { courses: any[] }) {
 }
 
 export function SalesReportContainer() {
+  const [timeRange, setTimeRange] = React.useState(7);
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["sales-report"],
-    queryFn: getSalesReport,
+    queryKey: ["sales-report", timeRange],
+    queryFn: () => getSalesReport({ days: timeRange }),
     staleTime: 5000,
   });
 
@@ -270,7 +351,7 @@ export function SalesReportContainer() {
           <RevenueNavigationTabs active="report" />
           <DatePickerHeader />
           <StatCards overview={data.overview} />
-          <RevenueVsRefundsChart chartData={data.chart_data} />
+          <RevenueVsRefundsChart chartData={data.chart_data} timeRange={timeRange} setTimeRange={setTimeRange} />
           <CoursePerformanceTable courses={data.courses} />
         </div>
       </main>

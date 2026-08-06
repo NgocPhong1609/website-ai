@@ -15,7 +15,7 @@ export const getTransactions = async (params?: { type?: string; status?: string;
   return data;
 };
 
-export const getSalesReport = async () => {
-  const { data } = await axiosClient.get("/api/instructor/revenue/sales-report");
+export const getSalesReport = async (params?: { days?: number }) => {
+  const { data } = await axiosClient.get("/api/instructor/revenue/sales-report", { params });
   return data.data;
 };
