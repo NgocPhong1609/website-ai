@@ -20,11 +20,23 @@ class Course extends Model
     'status',
     'admin_hidden_at',
     'views_count',
+    'sale_price',
+    'sale_start_date',
+    'sale_end_date',
+    'is_flash_sale',
 ];
 
     protected $casts = [
     'price' => 'decimal:2',
+    'sale_price' => 'decimal:2',
+    'sale_start_date' => 'datetime',
+    'sale_end_date' => 'datetime',
+    'is_flash_sale' => 'boolean',
     'admin_hidden_at' => 'datetime',
+];
+
+    protected $appends = [
+    'current_price',
 ];
 
     public function scopeVisibleInAdmin($query)
@@ -72,5 +84,13 @@ class Course extends Model
     {
         $totalSeconds = \App\Models\Lesson::whereIn('module_id', $this->modules()->select('id'))->sum('duration_seconds');
         return round($totalSeconds / 3600, 1);
+    }
+
+    public function getCurrentPriceAttribute()
+    {
+        if ($this->is_flash_sale && $this->sale_price > 0 && now()->between($this->sale_start_date, $this->sale_end_date)) {
+            return (float) $this->sale_price;
+        }
+        return (float) $this->price;
     }
 }

@@ -34,12 +34,17 @@ export const getLatestDiscussions = async (params?: { limit?: number }) => {
   return data;
 };
 
-export const generateAiNotification = async (payload: { prompt: string; course_id?: number | string }) => {
+export const generateAiNotification = async (payload: { prompt: string; tone?: string; course_id?: number | string }) => {
   const { data } = await axiosClient.post("/api/instructor/students/ai-notification/generate", payload);
   return data;
 };
 
-export const sendNotification = async (payload: { content: string; target: string; course_id?: number | string }) => {
+export const getNotificationOptions = async () => {
+  const { data } = await axiosClient.get("/api/instructor/students/notification-options");
+  return data;
+};
+
+export const sendNotification = async (payload: { content: string; course_ids: (string | number)[]; schedule?: string }) => {
   const { data } = await axiosClient.post("/api/instructor/students/notifications", payload);
   return data;
 };

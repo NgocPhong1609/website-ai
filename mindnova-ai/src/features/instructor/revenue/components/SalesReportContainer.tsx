@@ -221,7 +221,7 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
                 itemStyle={{ fontWeight: 'bold' }}
                 labelStyle={{ color: '#6b7280', marginBottom: '4px', fontSize: '12px' }}
-                formatter={(value: any, name: string) => [`${value.toLocaleString('vi-VN')}đ`, name === 'revenue' ? 'Doanh thu bán mới' : 'Hoàn tiền']}
+                formatter={(value: any, name: any) => [`${value.toLocaleString('vi-VN')} đ`, name === 'revenue' ? 'Doanh thu' : 'Hoàn tiền']}
               />
               <Area 
                 type="monotone" 

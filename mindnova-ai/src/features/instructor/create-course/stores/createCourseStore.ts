@@ -118,6 +118,7 @@ interface ICreateCourseState {
   setCourseInfo: <K extends keyof CourseBasicInfo>(key: K, value: CourseBasicInfo[K]) => void;
 
   // Module CRUD (Step 2)
+  setModules: (modules: DraftModule[]) => void;
   addModule: (title: string, description: string) => void;
   updateModule: (id: string, updates: Partial<Pick<DraftModule, "title" | "description">>) => void;
   deleteModule: (id: string) => void;
@@ -185,6 +186,11 @@ export const useCreateCourseStore = create<ICreateCourseState>((set, get) => ({
   },
 
   // ── Module CRUD ─────────────────────────────────────────────────────────────
+
+  setModules: (modules) => {
+    set({ modules });
+    saveToSession(get());
+  },
 
   addModule: (title, description) => {
     set((state) => {

@@ -7,7 +7,9 @@
 import { useState, useEffect, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 import { SparklesIcon, PlusIcon } from "./icons";
-import { generateAiNotification, sendNotification } from "../api";
+import { generateAiNotification, sendNotification, getNotificationOptions } from "../api";
+import { MultiSelect } from "@/src/shared/components/ui/MultiSelect";
+import { SingleSelect } from "@/src/shared/components/ui/SingleSelect";
 
 // ─── Local icons ──────────────────────────────────────────────────────────────
 
@@ -237,26 +239,32 @@ function GeneratingShimmer() {
 // ─── Left Panel ───────────────────────────────────────────────────────────────
 
 function LeftPanel({
-  recipient, setRecipient,
+  courseIds, setCourseIds,
+  options, isLoadingOptions,
   topic, setTopic,
+  tone, setTone,
   activeChip, setActiveChip,
   onGenerate, isGenerating,
 }: {
-  recipient: string;
-  setRecipient: (v: string) => void;
+  courseIds: (string | number)[];
+  setCourseIds: (v: (string | number)[]) => void;
+  options: { value: string | number; label: string }[];
+  isLoadingOptions: boolean;
   topic: string;
   setTopic: (v: string) => void;
+  tone: string;
+  setTone: (v: string) => void;
   activeChip: string | null;
   setActiveChip: (v: string | null) => void;
   onGenerate: () => void;
   isGenerating: boolean;
 }) {
-  const RECIPIENTS = [
-    "Tất cả học viên",
-    "Lớp AI Foundations",
-    "Lớp Data Science AI",
-    "Lớp Prompt Engineering",
-    "Học viên chưa hoàn thành",
+
+  const TONE_OPTIONS = [
+    { value: "friendly", label: "Thân thiện" },
+    { value: "professional", label: "Chuyên nghiệp" },
+    { value: "urgent", label: "Khẩn cấp" },
+    { value: "encouraging", label: "Khích lệ" },
   ];
 
   return (
@@ -267,19 +275,28 @@ function LeftPanel({
           Gửi đến:
         </label>
         <div className="relative">
-          <select
-            id="recipient-select"
-            value={recipient}
-            onChange={(e) => setRecipient(e.target.value)}
-            className="w-full appearance-none h-10 px-3 pr-9 rounded-xl border border-[#DDDDF0] bg-[#FAFAFE] text-sm text-[#1A1A2E] focus:outline-none focus:border-[#6B6BFF] focus:ring-2 focus:ring-[#6B6BFF]/15 transition-all duration-150 cursor-pointer"
-          >
-            {RECIPIENTS.map((r) => (
-              <option key={r} value={r}>{r}</option>
-            ))}
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#9090B0]">
-            <ChevronDownIcon />
-          </div>
+          <MultiSelect
+            options={options}
+            value={courseIds}
+            onChange={setCourseIds}
+            placeholder="Chọn khóa học để gửi..."
+            loading={isLoadingOptions}
+            emptyText="Chưa có khóa học nào có học viên."
+          />
+        </div>
+      </div>
+      
+      {/* Tone input */}
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="tone-select" className="text-[12px] font-semibold text-[#464554]">
+          Giọng điệu:
+        </label>
+        <div className="relative">
+          <SingleSelect
+            options={TONE_OPTIONS}
+            value={tone}
+            onChange={setTone}
+          />
         </div>
       </div>
 
@@ -344,14 +361,31 @@ function LeftPanel({
 // ─── Main Modal ───────────────────────────────────────────────────────────────
 
 export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINotificationModalProps) {
-  const [recipient, setRecipient] = useState("Tất cả học viên");
+  const [courseIds, setCourseIds] = useState<(string | number)[]>([]);
+  const [options, setOptions] = useState<{ value: string | number; label: string }[]>([]);
+  const [isLoadingOptions, setIsLoadingOptions] = useState(false);
+  
   const [topic, setTopic] = useState(initialTopic);
+  const [tone, setTone] = useState("friendly");
   const [activeChip, setActiveChip] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [isSending, setIsSending] = useState(false);
+
+  // Fetch course options when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setIsLoadingOptions(true);
+      getNotificationOptions()
+        .then((data) => setOptions(data))
+        .catch((err) => console.error("Failed to fetch notification options:", err))
+        .finally(() => setIsLoadingOptions(false));
+    } else {
+      setCourseIds([]); // reset when closed
+    }
+  }, [isOpen]);
 
   // Sync initialTopic to topic when modal opens
   useEffect(() => {
@@ -381,7 +415,7 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
     setIsGenerating(true);
     setDraft("");
     try {
-      const result = await generateAiNotification({ prompt: topic });
+      const result = await generateAiNotification({ prompt: topic, tone, course_id: 1 });
       setDraft(result.generated_content);
     } catch (err) {
       console.error(err);
@@ -392,10 +426,10 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
   };
 
   const handleSend = async () => {
-    if (!draft.trim()) return;
+    if (!draft.trim() || courseIds.length === 0) return;
     setIsSending(true);
     try {
-      await sendNotification({ content: draft, target: recipient });
+      await sendNotification({ content: draft, course_ids: courseIds });
       setSaved(true);
       setTimeout(() => { setSaved(false); onClose(); }, 1200);
     } catch (err) {
@@ -463,10 +497,14 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
             {/* Left form */}
             <div className="px-5 py-5 overflow-y-auto">
               <LeftPanel
-                recipient={recipient}
-                setRecipient={setRecipient}
+                courseIds={courseIds}
+                setCourseIds={setCourseIds}
+                options={options}
+                isLoadingOptions={isLoadingOptions}
                 topic={topic}
                 setTopic={setTopic}
+                tone={tone}
+                setTone={setTone}
                 activeChip={activeChip}
                 setActiveChip={setActiveChip}
                 onGenerate={handleGenerate}
@@ -532,7 +570,7 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
               type="button"
               id="btn-send-notification-modal"
               onClick={handleSend}
-              disabled={!draft || isGenerating || isSending}
+              disabled={!draft || isGenerating || isSending || courseIds.length === 0}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40"
             >
               {isSending ? (

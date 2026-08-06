@@ -94,9 +94,24 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
                 <span className="flex items-center gap-1.5">
                   ⏱️ {course.duration_hours ? `${course.duration_hours} giờ` : 'Đang cập nhật'}
                 </span>
-                <span className="text-[#10B981] flex items-center gap-1">
-                   {course.price ? `${course.price.toLocaleString()} VND` : 'Miễn phí'}
-                </span>
+                  <div className="flex flex-col items-end">
+                    {Number(course.price) === 0 ? (
+                      <span className="text-[#10B981] font-bold">Miễn phí</span>
+                    ) : (course.current_price !== undefined && course.current_price < course.price) ? (
+                      <>
+                        <span className="text-[#10B981] font-bold">
+                          {Number(course.current_price).toLocaleString()} VND
+                        </span>
+                        <span className="text-[10px] text-gray-400 line-through">
+                          {Number(course.price).toLocaleString()} VND
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-[#10B981] font-bold">
+                        {Number(course.price).toLocaleString()} VND
+                      </span>
+                    )}
+                  </div>
               </div>
             </div>
 

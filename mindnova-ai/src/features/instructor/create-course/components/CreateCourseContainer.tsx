@@ -66,7 +66,55 @@ export function CreateCourseContainer() {
     [setCourseInfo],
   );
 
-  const handleApplyOutline = useCallback((_outline: any) => {
+  const handleApplyOutline = useCallback((outline: any) => {
+    const uid = () => Math.random().toString(36).slice(2, 9);
+    if (outline && outline.chapters && Array.isArray(outline.chapters)) {
+      const newModules = outline.chapters.map((ch: any, cIdx: number) => ({
+        id: uid(),
+        title: ch.title,
+        description: "",
+        order: cIdx + 1,
+        expanded: true,
+        showAiSuggestion: false,
+        lessons: ch.lessons.map((lesson: any, lIdx: number) => {
+          const lessonTitle = typeof lesson === "string" ? lesson : lesson.title;
+          const lessonType = typeof lesson === "string" ? "document" : (lesson.type === "quiz" ? "quiz" : "document");
+
+          const draftLesson: any = {
+            id: uid(),
+            title: lessonTitle,
+            type: lessonType as "video" | "quiz" | "document",
+            order: lIdx + 1,
+          };
+
+          // Gắn nội dung HTML cho bài tài liệu
+          if (lessonType === "document" && typeof lesson === "object" && lesson.content) {
+            draftLesson.content = lesson.content;
+          }
+
+          // Gắn câu hỏi trắc nghiệm cho bài quiz
+          if (lessonType === "quiz" && typeof lesson === "object" && Array.isArray(lesson.questions)) {
+            draftLesson.quizData = {
+              title: lessonTitle,
+              time_limit_minutes: 15,
+              passing_score: 80,
+              questions: lesson.questions.map((q: any) => ({
+                id: uid(),
+                content: q.content,
+                answers: (q.answers || []).map((a: any) => ({
+                  id: uid(),
+                  content: a.content,
+                  is_correct: a.is_correct === true,
+                })),
+              })),
+            };
+          }
+
+          return draftLesson;
+        }),
+      }));
+      useCreateCourseStore.getState().setModules(newModules);
+    }
     setIsOutlineOpen(false);
   }, []);
 
@@ -163,7 +211,14 @@ export function CreateCourseContainer() {
       }
 
       const priceNum = Number(String(settings.basePrice).replace(/[^0-9]/g, ""));
-      await updatePrice({ courseId, price: priceNum });
+      await updatePrice({ 
+        courseId, 
+        price: priceNum,
+        is_flash_sale: priceNum === 0 ? false : settings.isFlashSale,
+        sale_price: priceNum === 0 ? undefined : (settings.salePrice ? Number(String(settings.salePrice).replace(/[^0-9]/g, "")) : undefined),
+        sale_start_date: priceNum === 0 ? undefined : settings.saleStartDate,
+        sale_end_date: priceNum === 0 ? undefined : settings.saleEndDate
+      });
 
       if (!settings.isDraft) {
         await updateStatus({ courseId, status: "published" });

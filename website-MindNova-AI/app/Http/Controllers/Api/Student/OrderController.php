@@ -22,7 +22,7 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'course_ids'     => 'required|array|min:1',
             'course_ids.*'   => 'required|integer|exists:courses,id',
-            'payment_method' => 'required|string|in:vnpay,momo,banking'
+            'payment_method' => 'required|string|in:vnpay,momo,banking,free'
         ]);
 
         if ($validator->fails()) {
@@ -53,6 +53,32 @@ class OrderController extends Controller
             foreach ($courses as $course) {
                 OrderItem::create(['order_id' => $order->id, 'course_id' => $course->id, 'price' => $course->price]);
             }
+
+            if ($totalAmount <= 0) {
+                $order->update(['status' => 'completed']);
+                foreach ($courses as $course) {
+                    $inserted = DB::table('enrollments')->insertOrIgnore([
+                        'user_id' => $user->id, 'course_id' => $course->id,
+                        'status' => 'enrolled', 'enrolled_at' => now()
+                    ]);
+                    
+                    if ($inserted) {
+                        $student = \App\Models\User::find($order->user_id);
+                        if ($course && $course->teacher && $student) {
+                            $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
+                        }
+                    }
+                }
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Đăng ký khóa học miễn phí thành công!',
+                    'data' => $order->load('orderItems'),
+                    'payment_url' => null
+                ], 201);
+            }
+
             DB::commit();
 
             // Xử lý phương thức thanh toán

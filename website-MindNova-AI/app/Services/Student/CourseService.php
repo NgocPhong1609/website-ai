@@ -18,6 +18,7 @@ class CourseService
         $title = "Chưa có tiêu đề";
         $level = "Beginner";
         $description = "Chưa có mô tả khóa học.";
+        $thumbnail = null;
         
         $modules = [];
         $resources = [];
@@ -52,6 +53,7 @@ class CourseService
                     $title = $dbCourse->title ?: $title;
                     $level = $dbCourse->level ?: $level;
                     $description = $dbCourse->description ?: $description;
+                    $thumbnail = $dbCourse->thumbnail ?: $thumbnail;
                     $categoryName = $dbCourse->category ? $dbCourse->category->name : $categoryName;
                     
                     if ($dbCourse->teacher) {
@@ -160,6 +162,7 @@ class CourseService
                 'title' => $title,
                 'level' => $level,
                 'description' => $description,
+                'thumbnail' => $thumbnail,
                 'next_lesson_title' => $nextLessonTitle,
                 'next_lesson_id' => $nextLessonId,
                 'duration_text' => ($totalLessons * 15) . ' Phút tổng cộng',

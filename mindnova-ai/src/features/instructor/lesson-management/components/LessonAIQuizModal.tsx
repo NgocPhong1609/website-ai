@@ -17,6 +17,7 @@ export interface LessonAIQuizModalProps {
 export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Actions", isOpen, onClose, onConfirmDecks }: LessonAIQuizModalProps) {
   const {
     isGenerating,
+    error,
     questions,
     transcriptSource,
     setTranscriptSource,
@@ -91,24 +92,29 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
           {/* Transcript Source Box */}
           {questions.length === 0 && (
             <div className="p-6 rounded-3xl bg-white border border-[#EAEAF4] shadow-xs flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-extrabold text-[#1A1A2E] flex items-center gap-2">
-                  <span>📜 Video Transcript / Lesson Text Source</span>
-                </h4>
-                <span className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">
-                  Auto-populated from upload stream
-                </span>
+              <div className="flex flex-col gap-4 animate-fadeIn">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-xl bg-indigo-100 flex items-center justify-center text-[#4F46E5]">
+                    📜
+                  </span>
+                  <span className="text-sm font-black text-[#1A1A2E]">Source Material</span>
+                </div>
+                <p className="text-xs text-gray-500">
+                  The AI analyzes semantic vocabulary, code blocks, and architectural concepts in your text to generate highly accurate assessment rubrics.
+                </p>
+                {error && (
+                  <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs font-bold">
+                    {error}
+                  </div>
+                )}
+                <textarea
+                  value={transcriptSource}
+                  onChange={(e) => setTranscriptSource(e.target.value)}
+                  rows={5}
+                  className="w-full p-4 rounded-2xl border border-indigo-200 bg-[#F8F9FF] text-xs font-medium text-gray-700 leading-relaxed focus:outline-none focus:border-[#6B6BFF] transition-colors"
+                  placeholder="Paste lesson transcript or markdown notes here..."
+                />
               </div>
-              <p className="text-xs text-gray-500">
-                The AI analyzes semantic vocabulary, code blocks, and architectural concepts in your text to generate highly accurate assessment rubrics.
-              </p>
-              <textarea
-                value={transcriptSource}
-                onChange={(e) => setTranscriptSource(e.target.value)}
-                rows={5}
-                className="w-full p-4 rounded-2xl border border-indigo-200 bg-[#F8F9FF] text-xs font-medium text-gray-700 leading-relaxed focus:outline-none focus:border-[#6B6BFF] transition-colors"
-                placeholder="Paste lesson transcript or markdown notes here..."
-              />
               <button
                 type="button"
                 onClick={() => generateFromTranscript(lessonTitle)}

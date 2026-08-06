@@ -36,7 +36,13 @@ export interface UseInstructorPricingReturn {
 const MIN_PRICE = 100000;
 const MAX_PRICE = 100000000;
 
-export function useInstructorPricing(initialPrice = 500000): UseInstructorPricingReturn {
+export function useInstructorPricing(
+  initialPrice = 500000,
+  initialFlashSale = false,
+  initialSalePrice?: number,
+  initialStartDate?: string,
+  initialEndDate?: string
+): UseInstructorPricingReturn {
   const isInitiallyFree = initialPrice === 0;
   const [isFree, setIsFreeState] = useState(isInitiallyFree);
   const [basePrice, setBasePriceState] = useState<number>(isInitiallyFree ? 500000 : initialPrice);
@@ -47,10 +53,10 @@ export function useInstructorPricing(initialPrice = 500000): UseInstructorPricin
     const defaultStart = new Date().toISOString().slice(0, 10);
     const defaultEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
     return {
-      isEnabled: false,
-      discountPrice: Math.max(MIN_PRICE, Math.floor(initialPrice * 0.7)),
-      startDate: defaultStart,
-      endDate: defaultEnd,
+      isEnabled: initialFlashSale,
+      discountPrice: initialSalePrice || Math.max(MIN_PRICE, Math.floor(initialPrice * 0.7)),
+      startDate: initialStartDate || defaultStart,
+      endDate: initialEndDate || defaultEnd,
     };
   });
 

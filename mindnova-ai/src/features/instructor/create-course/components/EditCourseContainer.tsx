@@ -56,6 +56,10 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
         thumbnailPreview: course.thumbnail || null,
       }));
       useCreateCourseStore.getState().setSettings("basePrice", String(course.price ?? 500000));
+      useCreateCourseStore.getState().setSettings("isFlashSale", course.is_flash_sale);
+      useCreateCourseStore.getState().setSettings("salePrice", String(course.sale_price ?? ""));
+      useCreateCourseStore.getState().setSettings("saleStartDate", course.sale_start_date ? course.sale_start_date.split('T')[0] : "");
+      useCreateCourseStore.getState().setSettings("saleEndDate", course.sale_end_date ? course.sale_end_date.split('T')[0] : "");
     }
   }, [course]);
 
@@ -85,11 +89,18 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
         await uploadThumbnail({ courseId, file: basicInfo.thumbnailFile });
       }
 
-      const storeBasePrice = useCreateCourseStore.getState().settings.basePrice;
-      if (storeBasePrice !== undefined && storeBasePrice !== null) {
-        const priceNum = Number(String(storeBasePrice).replace(/[^0-9]/g, ""));
+      const storeSettings = useCreateCourseStore.getState().settings;
+      if (storeSettings.basePrice !== undefined && storeSettings.basePrice !== null) {
+        const priceNum = Number(String(storeSettings.basePrice).replace(/[^0-9]/g, ""));
         if (priceNum === 0 || priceNum >= 100000) {
-          await updatePrice({ courseId, price: priceNum });
+          await updatePrice({ 
+            courseId, 
+            price: priceNum,
+            is_flash_sale: priceNum === 0 ? false : storeSettings.isFlashSale,
+            sale_price: priceNum === 0 ? undefined : (storeSettings.salePrice ? Number(String(storeSettings.salePrice).replace(/[^0-9]/g, "")) : undefined),
+            sale_start_date: priceNum === 0 ? undefined : storeSettings.saleStartDate,
+            sale_end_date: priceNum === 0 ? undefined : storeSettings.saleEndDate
+          });
         }
       }
 
@@ -218,6 +229,10 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
               courseTitle={basicInfo.title} 
               thumbnailPreview={basicInfo.thumbnailPreview} 
               initialPrice={course?.price}
+              initialFlashSale={course?.is_flash_sale}
+              initialSalePrice={course?.sale_price}
+              initialSaleStartDate={course?.sale_start_date ? course.sale_start_date.split('T')[0] : null}
+              initialSaleEndDate={course?.sale_end_date ? course.sale_end_date.split('T')[0] : null}
             />
           )}
 

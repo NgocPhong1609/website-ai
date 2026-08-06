@@ -30,13 +30,19 @@ export function CheckoutView({ courseId }: { courseId: number }) {
   }
 
   const { header_info } = data;
+  const isFree = Number(header_info.price) === 0;
 
   const handleCheckout = async () => {
     try {
       setIsProcessing(true);
-      const res = await checkoutService.createOrder([courseId], paymentMethod);
-      if (res.success && res.payment_url) {
-        window.location.href = res.payment_url;
+      const methodToUse = isFree ? "free" : paymentMethod;
+      const res = await checkoutService.createOrder([courseId], methodToUse);
+      if (res.success) {
+        if (isFree || !res.payment_url) {
+           router.push('/study-plan');
+        } else {
+           window.location.href = res.payment_url;
+        }
       } else {
         alert(res.message || "Có lỗi xảy ra khi tạo thanh toán.");
         setIsProcessing(false);
@@ -58,7 +64,13 @@ export function CheckoutView({ courseId }: { courseId: number }) {
           </h2>
           
           <div className="flex gap-4 mb-6">
-            <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-[#1E1B4B] to-[#4648D4] shrink-0" />
+            {header_info.thumbnail ? (
+              <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 relative">
+                <Image src={header_info.thumbnail} alt={header_info.title} fill className="object-cover" />
+              </div>
+            ) : (
+              <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-[#1E1B4B] to-[#4648D4] shrink-0" />
+            )}
             <div>
               <h3 className="text-base font-bold text-[#1A1A2E] leading-snug mb-1">
                 {header_info.title}
@@ -72,7 +84,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
           <div className="space-y-4 border-t border-[#F0F0F8] pt-4">
             <div className="flex justify-between text-sm text-[#64647A]">
               <span>Giá khóa học</span>
-              <span className="font-semibold">{header_info.price ? `${header_info.price.toLocaleString()} VND` : "Miễn phí"}</span>
+              <span className="font-semibold">{isFree ? "Miễn phí" : `${Number(header_info.price).toLocaleString()} VND`}</span>
             </div>
             <div className="flex justify-between text-sm text-[#64647A]">
               <span>Khuyến mãi (Giảm 0%)</span>
@@ -80,7 +92,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
             </div>
             <div className="flex justify-between text-lg font-bold text-[#1A1A2E] pt-2 border-t border-[#EAEAF4]">
               <span>Tổng thanh toán</span>
-              <span className="text-[#5052EE]">{header_info.price ? `${header_info.price.toLocaleString()} VND` : "0 VND"}</span>
+              <span className="text-[#5052EE]">{isFree ? "Miễn phí" : `${Number(header_info.price).toLocaleString()} VND`}</span>
             </div>
           </div>
         </div>
@@ -89,34 +101,57 @@ export function CheckoutView({ courseId }: { courseId: number }) {
       {/* Cột phải: Phương thức thanh toán */}
       <div className="w-full lg:w-[400px] shrink-0 space-y-6">
         <div className="bg-white rounded-2xl border border-[#EAEAF4] p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-[#1A1A2E] mb-6 border-b border-[#F0F0F8] pb-4">
-            Phương thức thanh toán
-          </h2>
-          
-          <div className="space-y-3 mb-6">
-            <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'vnpay' ? 'border-[#5052EE] bg-[#EEF2FF]/50 ring-1 ring-[#5052EE]/30' : 'border-[#EAEAF4] hover:bg-[#F8FAFC]'}`}>
-              <input type="radio" name="paymentMethod" value="vnpay" checked={paymentMethod === 'vnpay'} onChange={() => setPaymentMethod('vnpay')} className="w-4 h-4 text-[#5052EE]" />
-              <div className="font-semibold text-sm text-[#1A1A2E]">Thanh toán qua VNPay</div>
-            </label>
-            <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'momo' ? 'border-[#5052EE] bg-[#EEF2FF]/50 ring-1 ring-[#5052EE]/30' : 'border-[#EAEAF4] hover:bg-[#F8FAFC]'}`}>
-              <input type="radio" name="paymentMethod" value="momo" checked={paymentMethod === 'momo'} onChange={() => setPaymentMethod('momo')} className="w-4 h-4 text-[#5052EE]" />
-              <div className="font-semibold text-sm text-[#1A1A2E]">Ví điện tử Momo</div>
-            </label>
-            <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'banking' ? 'border-[#5052EE] bg-[#EEF2FF]/50 ring-1 ring-[#5052EE]/30' : 'border-[#EAEAF4] hover:bg-[#F8FAFC]'}`}>
-              <input type="radio" name="paymentMethod" value="banking" checked={paymentMethod === 'banking'} onChange={() => setPaymentMethod('banking')} className="w-4 h-4 text-[#5052EE]" />
-              <div className="font-semibold text-sm text-[#1A1A2E]">Chuyển khoản Ngân hàng</div>
-            </label>
-          </div>
+          {isFree ? (
+            <>
+              <h2 className="text-lg font-bold text-[#1A1A2E] mb-6 border-b border-[#F0F0F8] pb-4">
+                Nhận khóa học
+              </h2>
+              <div className="mb-6 space-y-2">
+                <p className="text-[#64647A] text-sm">Khóa học này hoàn toàn miễn phí.</p>
+                <p className="text-[#64647A] text-sm">Nhấn nút bên dưới để thêm khóa học vào tài khoản của bạn.</p>
+              </div>
+              <button
+                type="button"
+                onClick={handleCheckout}
+                disabled={isProcessing}
+                className="w-full py-3.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] shadow-md hover:shadow-lg disabled:opacity-60 transition-all flex justify-center items-center gap-2"
+              >
+                {isProcessing ? "Đang xử lý..." : "Nhận khóa học"}
+                {!isProcessing && <span>➔</span>}
+              </button>
+            </>
+          ) : (
+            <>
+              <h2 className="text-lg font-bold text-[#1A1A2E] mb-6 border-b border-[#F0F0F8] pb-4">
+                Phương thức thanh toán
+              </h2>
+              
+              <div className="space-y-3 mb-6">
+                <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'vnpay' ? 'border-[#5052EE] bg-[#EEF2FF]/50 ring-1 ring-[#5052EE]/30' : 'border-[#EAEAF4] hover:bg-[#F8FAFC]'}`}>
+                  <input type="radio" name="paymentMethod" value="vnpay" checked={paymentMethod === 'vnpay'} onChange={() => setPaymentMethod('vnpay')} className="w-4 h-4 text-[#5052EE]" />
+                  <div className="font-semibold text-sm text-[#1A1A2E]">Thanh toán qua VNPay</div>
+                </label>
+                <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'momo' ? 'border-[#5052EE] bg-[#EEF2FF]/50 ring-1 ring-[#5052EE]/30' : 'border-[#EAEAF4] hover:bg-[#F8FAFC]'}`}>
+                  <input type="radio" name="paymentMethod" value="momo" checked={paymentMethod === 'momo'} onChange={() => setPaymentMethod('momo')} className="w-4 h-4 text-[#5052EE]" />
+                  <div className="font-semibold text-sm text-[#1A1A2E]">Ví điện tử Momo</div>
+                </label>
+                <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'banking' ? 'border-[#5052EE] bg-[#EEF2FF]/50 ring-1 ring-[#5052EE]/30' : 'border-[#EAEAF4] hover:bg-[#F8FAFC]'}`}>
+                  <input type="radio" name="paymentMethod" value="banking" checked={paymentMethod === 'banking'} onChange={() => setPaymentMethod('banking')} className="w-4 h-4 text-[#5052EE]" />
+                  <div className="font-semibold text-sm text-[#1A1A2E]">Chuyển khoản Ngân hàng</div>
+                </label>
+              </div>
 
-          <button
-            type="button"
-            onClick={handleCheckout}
-            disabled={isProcessing || !header_info.price}
-            className="w-full py-3.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] shadow-md hover:shadow-lg disabled:opacity-60 transition-all flex justify-center items-center gap-2"
-          >
-            {isProcessing ? "Đang xử lý..." : "Xác nhận Thanh toán"}
-            {!isProcessing && <span>➔</span>}
-          </button>
+              <button
+                type="button"
+                onClick={handleCheckout}
+                disabled={isProcessing}
+                className="w-full py-3.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] shadow-md hover:shadow-lg disabled:opacity-60 transition-all flex justify-center items-center gap-2"
+              >
+                {isProcessing ? "Đang xử lý..." : "Xác nhận Thanh toán"}
+                {!isProcessing && <span>➔</span>}
+              </button>
+            </>
+          )}
           <button
             type="button"
             onClick={() => router.back()}

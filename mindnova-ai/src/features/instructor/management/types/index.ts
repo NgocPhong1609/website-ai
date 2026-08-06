@@ -14,6 +14,10 @@ export interface Course {
   totalLessons: number;
   price: number;
   salePrice?: number;
+  currentPrice?: number;
+  isFlashSale?: boolean;
+  saleStartDate?: string;
+  saleEndDate?: string;
 }
 
 export interface CourseStat {

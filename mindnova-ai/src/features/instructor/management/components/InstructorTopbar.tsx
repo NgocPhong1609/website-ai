@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { twMerge } from "tailwind-merge";
+import { axiosClient } from "@/src/shared/lib/axios";
 import { BellIcon } from "./icons";
 
 const NAV_SVG = {
@@ -27,8 +28,81 @@ function HelpIcon() {
 }
 
 function UserAvatar() {
+  const [user, setUser] = useState<any>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    try {
+      const userInfoRaw = window.localStorage.getItem("userInfo");
+      if (userInfoRaw) {
+        setUser(JSON.parse(userInfoRaw));
+      }
+    } catch (e) {
+      console.error("Error parsing user info", e);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await axiosClient.post("/api/logout");
+    } catch (error) {
+      console.error("Logout API failed", error);
+    } finally {
+      window.localStorage.removeItem("accessToken");
+      window.localStorage.removeItem("userInfo");
+      document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      window.location.replace("/login");
+    }
+  };
+
+  const getInitial = (name: string) => {
+    if (!name) return "U";
+    return name.charAt(0).toUpperCase();
+  };
+
+  const name = user?.name || "Teacher";
+  const avatarUrl = user?.avatar || user?.profile_image || null;
+  const initial = getInitial(name);
+
   return (
-    <Avatar fallback="MN" size="sm" className="cursor-pointer hover:scale-105 transition-all shadow-sm shrink-0" />
+    <div className="relative" ref={dropdownRef}>
+      <button 
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        className="block focus:outline-none"
+      >
+        <Avatar src={avatarUrl} fallback={initial} size="sm" className="cursor-pointer hover:scale-105 transition-all shadow-sm shrink-0" />
+      </button>
+
+      {isDropdownOpen && (
+        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg py-1 z-50">
+          <Link
+            href="/instructor/profile"
+            onClick={() => setIsDropdownOpen(false)}
+            className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#4F46E5] transition-colors"
+          >
+            Thông tin tài khoản
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="w-full text-left px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 

@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\Student\StudyPlanController as StudentStudyPlanCont
 use App\Http\Controllers\Api\Student\PracticeController as StudentPracticeController;
 use App\Http\Controllers\Api\Student\ProgressController as StudentProgressController;
 use App\Http\Controllers\Api\Student\HistoryController as StudentHistoryController;
+use App\Http\Controllers\Api\Student\NotificationController as StudentNotificationController;
 
 // Nhóm Dùng chung
 use App\Http\Controllers\Api\RealtimeController;
@@ -44,6 +45,7 @@ use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentCo
 use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscussionController;
 use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNotificationController;
 use App\Http\Controllers\Api\Instructor\RevenueController;
+use App\Http\Controllers\Api\Instructor\CourseOutlineController;
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
 // ==========================================
@@ -197,6 +199,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // Quiz
         Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
         Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
+
+        // Notifications
+        Route::get('/notifications', [StudentNotificationController::class, 'index']);
+        Route::patch('/notifications/{notification}/read', [StudentNotificationController::class, 'markRead']);
     });
 });
 
@@ -243,6 +249,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::get('/students/discussions', [App\Http\Controllers\Api\Instructor\StudentController::class, 'getDiscussions']);
     Route::post('/students/ai-notification/generate', [App\Http\Controllers\Api\Instructor\StudentController::class, 'generateAiNotification']);
     Route::post('/students/notifications', [App\Http\Controllers\Api\Instructor\StudentController::class, 'sendNotification']);
+    Route::get('/students/notification-options', [App\Http\Controllers\Api\Instructor\StudentController::class, 'getNotificationOptions']);
     Route::get('/students', [App\Http\Controllers\Api\Instructor\StudentController::class, 'index']);
 
     // Student Analytics Dashboard
@@ -273,6 +280,10 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     
     // Reviews
     Route::get('reviews', [\App\Http\Controllers\Api\Instructor\ReviewController::class, 'index']);
+
+    // AI Course Outline
+    Route::post('courses/ai-outline/generate', [CourseOutlineController::class, 'generate']);
+    Route::post('courses/{course}/ai-outline/save', [CourseOutlineController::class, 'save']);
 });
 
 // ==========================================

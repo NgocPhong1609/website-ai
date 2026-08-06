@@ -13,8 +13,21 @@ class UpdateCoursePriceRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'price' => 'required|numeric|min:0|max:100000000',
+            'is_flash_sale' => 'sometimes|boolean',
+            'sale_start_date' => 'nullable|date',
+            'sale_end_date' => 'nullable|date|after:sale_start_date',
         ];
+
+        // Only enforce sale_price < price when the course is paid (price > 0).
+        // For free courses (price = 0), sale_price is simply ignored/nullable.
+        if ($this->input('price') > 0) {
+            $rules['sale_price'] = 'nullable|numeric|min:0|lt:price';
+        } else {
+            $rules['sale_price'] = 'nullable';
+        }
+
+        return $rules;
     }
 }

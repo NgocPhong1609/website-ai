@@ -5,6 +5,7 @@ export interface AvailableCourse {
   description: string;
   thumbnail?: string;
   price?: number;
+  current_price?: number;
   level: string;
   duration_hours?: number;
   status: string;
