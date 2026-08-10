@@ -1,5 +1,5 @@
 import { DashboardTopbar } from "@/src/features/student/dashboard";
-import { Sidebar } from "@/src/features/student/layout";
+import { Sidebar, FloatingAiChat } from "@/src/features/student/layout";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -18,6 +18,7 @@ export default function InstructorLayout({
         <DashboardTopbar />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
+      <FloatingAiChat />
     </div>
   );
 }
