@@ -55,4 +55,19 @@ class CourseController extends Controller
             'Course detail retrieved successfully.'
         );
     }
+
+    /**
+     * Retrieve all enrolled courses for the student with progress metrics.
+     */
+    public function enrolledCourses(Request $request): JsonResponse
+    {
+        $user = $request->user('sanctum') ?? $request->user();
+
+        $enrolledCourses = $this->courseService->getEnrolledCourses($user);
+
+        return $this->successResponse(
+            $enrolledCourses,
+            'Enrolled courses retrieved successfully.'
+        );
+    }
 }

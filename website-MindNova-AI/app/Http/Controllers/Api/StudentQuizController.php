@@ -181,11 +181,51 @@ class StudentQuizController extends Controller
                     'user_id' => $user->id,
                     'quiz_id' => $quiz->id,
                     'score' => $score,
-                    'accuracy' => $accuracy,
+                    'accuracy' => $score, // Store as integer, not string
                     'time_taken_seconds' => $timeTaken,
                     'status' => $passed ? 'passed' : 'failed',
                 ]);
                 $attemptId = $attempt->id;
+
+                // Auto-complete the lesson if passed
+                if ($passed && $quiz->lesson_id) {
+                    $lesson = Lesson::find($quiz->lesson_id);
+                    if ($lesson) {
+                        \App\Models\LessonCompletion::firstOrCreate(
+                            ['user_id' => $user->id, 'lesson_id' => $lesson->id],
+                            ['completed_at' => now()]
+                        );
+
+                        // Update enrollment progress
+                        $courseId = $lesson->module?->course_id;
+                        if ($courseId) {
+                            $enrollment = \App\Models\Enrollment::where('user_id', $user->id)
+                                ->where('course_id', $courseId)
+                                ->first();
+                            if ($enrollment) {
+                                $course = \App\Models\Course::with('modules.lessons')->find($courseId);
+                                $totalLessons = 0;
+                                $completedLessonIds = \App\Models\LessonCompletion::where('user_id', $user->id)
+                                    ->pluck('lesson_id')->toArray();
+                                $completedCount = 0;
+                                if ($course && $course->modules) {
+                                    foreach ($course->modules as $mod) {
+                                        foreach ($mod->lessons as $les) {
+                                            $totalLessons++;
+                                            if (in_array($les->id, $completedLessonIds)) {
+                                                $completedCount++;
+                                            }
+                                        }
+                                    }
+                                }
+                                $enrollment->progress_percentage = $totalLessons > 0
+                                    ? round(($completedCount / $totalLessons) * 100) : 0;
+                                $enrollment->updated_at = now();
+                                $enrollment->save();
+                            }
+                        }
+                    }
+                }
             } catch (\Exception $e) {
                 // Safe dev mode fallback
             }

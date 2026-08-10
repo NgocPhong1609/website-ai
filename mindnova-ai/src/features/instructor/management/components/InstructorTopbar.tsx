@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { twMerge } from "tailwind-merge";
@@ -151,6 +151,48 @@ const INITIAL_ALERTS: AlertItem[] = [
 export function InstructorTopbar() {
   const [alerts, setAlerts] = useState<AlertItem[]>(INITIAL_ALERTS);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [unansweredDiscussionsCount, setUnansweredDiscussionsCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnansweredCount = async () => {
+      try {
+        const res = await axiosClient.get("/api/instructor/discussions", {
+          params: { filter: "needs_attention", per_page: 1 }
+        });
+        const total = res.data?.data?.meta?.total || 0;
+        setUnansweredDiscussionsCount(total);
+        
+        setAlerts((prev) => {
+          const filtered = prev.filter(a => a.id !== "alt-1");
+          if (total > 0) {
+            return [
+              {
+                id: "alt-1",
+                title: "Thảo luận cần phản hồi (Mentoring SLA)",
+                desc: `${total} học viên đặt câu hỏi đang chờ phản hồi từ bạn.`,
+                type: "urgent",
+                timestamp: "Vừa cập nhật",
+                actionText: "Mở Hòm thư Hỏi đáp ➔",
+                actionHref: "/instructor/discussions?filter=needs_attention",
+                read: false,
+              },
+              ...filtered
+            ];
+          }
+          return filtered;
+        });
+      } catch (e) {}
+    };
+
+    fetchUnansweredCount();
+
+    const handleUpdate = () => {
+      fetchUnansweredCount();
+    };
+    
+    window.addEventListener("discussion-updated", handleUpdate);
+    return () => window.removeEventListener("discussion-updated", handleUpdate);
+  }, []);
 
   const unreadCount = alerts.filter((a) => !a.read).length;
 
@@ -185,15 +227,14 @@ export function InstructorTopbar() {
       <div className="flex items-center gap-3">
         
         {/* Proactive SLA Badge (Clean style per Rule #7) */}
-        {unreadCount > 0 && (
-          <button
-            type="button"
-            onClick={() => setIsAlertOpen((p) => !p)}
-            className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gray-50 text-[#111827] border border-gray-200 hover:bg-[#EEF2FF] hover:text-[#4F46E5] hover:border-indigo-100 text-xs font-bold transition-all cursor-pointer"
+        {unansweredDiscussionsCount > 0 && (
+          <Link
+            href="/instructor/discussions?filter=needs_attention"
+            className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gray-50 text-[#111827] border border-gray-200 hover:bg-[#EEF2FF] hover:text-[#4F46E5] hover:border-indigo-100 text-xs font-bold transition-all cursor-pointer text-decoration-none"
           >
-            <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
-            <span>{unreadCount} thảo luận mới</span>
-          </button>
+            <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0 animate-pulse" />
+            <span>{unansweredDiscussionsCount} thảo luận mới</span>
+          </Link>
         )}
 
         {/* Bell Button */}
@@ -243,41 +284,63 @@ export function InstructorTopbar() {
                     Bạn không có thông báo mới nào.
                   </div>
                 ) : (
-                  alerts.map((item) => (
-                    <div
-                      key={item.id}
-                      className={twMerge(
-                        "p-3.5 rounded-xl border transition-all flex flex-col gap-1.5 relative",
-                        !item.read ? "bg-[#F8FAFC] border-indigo-100 shadow-2xs" : "bg-white border-gray-100 opacity-70"
-                      )}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <span className="text-xs font-bold text-[#111827] leading-snug">{item.title}</span>
-                        <button
-                          type="button"
-                          onClick={() => dismissAlert(item.id)}
-                          className="text-[#6B7280] hover:text-red-600 font-bold text-xs px-1 cursor-pointer"
-                        >
-                          ✕
-                        </button>
-                      </div>
-
-                      <p className="text-xs text-[#6B7280] leading-relaxed">{item.desc}</p>
-                      
-                      <div className="flex items-center justify-between pt-1">
-                        <span className="text-[10px] font-bold text-gray-400">{item.timestamp}</span>
-                        {item.actionText && item.actionHref && (
-                          <Link
-                            href={item.actionHref}
-                            onClick={() => setIsAlertOpen(false)}
-                            className="text-[11px] font-bold text-[#4F46E5] hover:underline flex items-center gap-1"
+                  alerts.map((item) => {
+                    const content = (
+                      <>
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-xs font-bold text-[#111827] leading-snug">{item.title}</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              dismissAlert(item.id);
+                            }}
+                            className="text-[#6B7280] hover:text-red-600 font-bold text-xs px-1 cursor-pointer relative z-10"
                           >
-                            {item.actionText}
-                          </Link>
+                            ✕
+                          </button>
+                        </div>
+  
+                        <p className="text-xs text-[#6B7280] leading-relaxed">{item.desc}</p>
+                        
+                        <div className="flex items-center justify-between pt-1">
+                          <span className="text-[10px] font-bold text-gray-400">{item.timestamp}</span>
+                          {item.actionText && item.actionHref && (
+                            <span
+                              className="text-[11px] font-bold text-[#4F46E5] flex items-center gap-1 group-hover:underline"
+                            >
+                              {item.actionText}
+                            </span>
+                          )}
+                        </div>
+                      </>
+                    );
+
+                    return item.actionHref ? (
+                      <Link
+                        key={item.id}
+                        href={item.actionHref}
+                        onClick={() => setIsAlertOpen(false)}
+                        className={twMerge(
+                          "group p-3.5 rounded-xl border transition-all flex flex-col gap-1.5 relative block",
+                          !item.read ? "bg-[#F8FAFC] border-indigo-100 shadow-2xs hover:bg-[#F1F5F9]" : "bg-white border-gray-100 opacity-70 hover:opacity-100"
                         )}
+                      >
+                        {content}
+                      </Link>
+                    ) : (
+                      <div
+                        key={item.id}
+                        className={twMerge(
+                          "p-3.5 rounded-xl border transition-all flex flex-col gap-1.5 relative",
+                          !item.read ? "bg-[#F8FAFC] border-indigo-100 shadow-2xs" : "bg-white border-gray-100 opacity-70"
+                        )}
+                      >
+                        {content}
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 

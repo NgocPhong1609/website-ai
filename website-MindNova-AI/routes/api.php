@@ -192,6 +192,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // 3. NHÓM API HỌC SINH (Student) - Các tiện ích cần xác thực
     // ==========================================
     Route::prefix('student')->group(function () {
+        // Enrolled Courses
+        Route::get('/courses/enrolled', [\App\Http\Controllers\Api\Student\CourseController::class, 'enrolledCourses']);
+
         // TÍNH NĂNG AI TUTOR & Các tiện ích nâng cao khác
         Route::post('/ai-tutor/chat', [\App\Http\Controllers\Api\Student\AiTutorController::class, 'streamChat']);
         Route::post('/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'store']);
@@ -200,9 +203,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
         Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
 
+        // Lesson — Video URL, Completion, Quiz Answer Check
+        Route::get('lessons/{lesson}/video-url', [\App\Http\Controllers\Api\Student\LessonController::class, 'videoUrl']);
+        Route::post('lessons/{lesson}/complete', [\App\Http\Controllers\Api\Student\LessonController::class, 'complete']);
+        Route::post('lessons/{lesson}/quiz/check-answer', [\App\Http\Controllers\Api\Student\LessonController::class, 'checkAnswer']);
+
         // Notifications
         Route::get('/notifications', [StudentNotificationController::class, 'index']);
         Route::patch('/notifications/{notification}/read', [StudentNotificationController::class, 'markRead']);
+        Route::delete('/notifications/read', [StudentNotificationController::class, 'deleteRead']);
+
+        // Discussions
+        Route::get('lessons/{lesson}/discussions', [\App\Http\Controllers\Api\Student\DiscussionController::class, 'index']);
+        Route::post('lessons/{lesson}/discussions', [\App\Http\Controllers\Api\Student\DiscussionController::class, 'store']);
     });
 });
 

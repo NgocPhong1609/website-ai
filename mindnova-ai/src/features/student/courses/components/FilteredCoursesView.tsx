@@ -6,6 +6,7 @@ import { useDebounce } from "@/src/shared/hooks";
 import { CoursesHeader } from "./CoursesHeader";
 import { ExploreMoreCard } from "./ExploreMoreCard";
 import { MyCourseCard } from "./MyCourseCard";
+import { useGetMyCourses } from "../api";
 import type { CourseTabStatus, MyCourse } from "../types";
 
 const TAB_LABELS: Record<CourseTabStatus, string> = {
@@ -15,11 +16,8 @@ const TAB_LABELS: Record<CourseTabStatus, string> = {
   "Not Started": "Chưa bắt đầu",
 };
 
-interface FilteredCoursesViewProps {
-  initialCourses: MyCourse[];
-}
-
-export function FilteredCoursesView({ initialCourses }: FilteredCoursesViewProps) {
+export function FilteredCoursesView() {
+  const { data: initialCourses = [], isLoading, isError } = useGetMyCourses();
   const [activeTab, setActiveTab] = useState<CourseTabStatus>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -57,6 +55,23 @@ export function FilteredCoursesView({ initialCourses }: FilteredCoursesViewProps
     });
   }, [initialCourses, debouncedTab, debouncedQuery]);
 
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 min-h-[400px]">
+        <div className="w-10 h-10 border-4 border-[#4648D4] border-t-transparent rounded-full animate-spin"></div>
+        <p className="mt-4 text-[#64647A] font-medium">Đang tải khoá học...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 min-h-[400px]">
+        <p className="text-red-500 font-medium">Đã xảy ra lỗi khi tải khoá học. Vui lòng thử lại sau.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col">

@@ -74,4 +74,16 @@ class NotificationController extends Controller
 
         return response()->json(['message' => 'Notification deleted.']);
     }
+
+    public function deleteRead(Request $request): JsonResponse
+    {
+        $deleted = Notification::where('user_id', $request->user()->id)
+            ->where('is_read', true)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Read notifications deleted.',
+            'deleted_count' => $deleted
+        ]);
+    }
 }

@@ -97,7 +97,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
                   <div className="flex flex-col items-end">
                     {Number(course.price) === 0 ? (
                       <span className="text-[#10B981] font-bold">Miễn phí</span>
-                    ) : (course.current_price !== undefined && course.current_price < course.price) ? (
+                    ) : (course.current_price !== undefined && course.price !== undefined && course.current_price < course.price) ? (
                       <>
                         <span className="text-[#10B981] font-bold">
                           {Number(course.current_price).toLocaleString()} VND

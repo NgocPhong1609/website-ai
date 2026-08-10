@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { axiosClient } from "@/src/shared/lib/axios";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -26,17 +27,18 @@ export interface CommentThread {
 // ─── Main Discussion Reply Container (Section 3.2) ─────────────────────────────
 
 export function DiscussionReplyContainer() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [threads, setThreads] = useState<CommentThread[]>([]);
-  const [filter, setFilter] = useState<"all" | "unanswered" | "needs_attention">("all");
-  const [activeTab, setActiveTab] = useState<"inbox" | "announcements">("inbox");
+  const [filter, setFilter] = useState<"all" | "unanswered" | "needs_attention">(() => {
+    const f = searchParams.get("filter");
+    if (f === "needs_attention" || f === "unanswered") return f as any;
+    return "all";
+  });
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState<any>(null);
-
-  // Announcement WYSIWYG & Rate Limiting State (Section 3.2)
-  const [announcementSubject, setAnnouncementSubject] = useState("");
-  const [announcementBody, setAnnouncementBody] = useState("");
-  const [sentCountThisWeek, setSentCountThisWeek] = useState(1); // Max 2 emails per week to prevent spam
-  const [announcementNotice, setAnnouncementNotice] = useState<string | null>(null);
   
   const [draftReplies, setDraftReplies] = useState<Record<string, string>>({});
 
@@ -101,6 +103,7 @@ export function DiscussionReplyContainer() {
     try {
       await axiosClient.patch(`/api/instructor/discussions/${id}/resolved`);
       setThreads((prev) => prev.map((t) => (t.id === id ? { ...t, isResolved: !currentStatus, needsAttention: currentStatus } : t)));
+      window.dispatchEvent(new Event("discussion-updated"));
     } catch (e) {
       console.error("Resolve error", e);
     }
@@ -111,6 +114,7 @@ export function DiscussionReplyContainer() {
       try {
         await axiosClient.delete(`/api/instructor/discussions/${id}`);
         setThreads((prev) => prev.filter((t) => t.id !== id));
+        window.dispatchEvent(new Event("discussion-updated"));
       } catch (e) {
         console.error("Delete error", e);
       }
@@ -125,20 +129,13 @@ export function DiscussionReplyContainer() {
         prev.map((t) => (t.id === id ? { ...t, replyText: reply, isResolved: false, needsAttention: false } : t))
       );
       setDraftReplies((prev) => ({ ...prev, [id]: "" }));
+      window.dispatchEvent(new Event("discussion-updated"));
     } catch (e) {
       console.error("Reply error", e);
     }
   };
 
-  const handleSendAnnouncement = () => {
-    if (sentCountThisWeek >= 2) {
-      setAnnouncementNotice("⚠️ Đang áp dụng giới hạn chống spam: Để tránh spam, thông báo giới hạn 2 lần/tuần.");
-      return;
-    }
-    setSentCountThisWeek((prev) => prev + 1);
-    setAnnouncementNotice("✓ Gửi thông báo thành công! Thông báo sẽ được gửi trong 5 phút tới.");
-    setTimeout(() => setAnnouncementNotice(null), 6000);
-  };
+
 
   const filteredThreads = threads;
 
@@ -155,34 +152,9 @@ export function DiscussionReplyContainer() {
                 Quản lý hộp thư giải đáp thắc mắc, đánh dấu câu trả lời hay nhất và gửi thông báo chống spam cho lớp học.
               </p>
             </div>
-
-            {/* Feature Tab Selector */}
-            <div className="flex items-center gap-2 p-1 rounded-2xl bg-white border border-[#EAEAF4] shadow-xs">
-              <button
-                type="button"
-                onClick={() => setActiveTab("inbox")}
-                className={twMerge(
-                  "px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer",
-                  activeTab === "inbox" ? "bg-[#4F46E5] text-white shadow-2xs" : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
-                )}
-              >
-                Hộp thư Hỏi đáp
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("announcements")}
-                className={twMerge(
-                  "px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer",
-                  activeTab === "announcements" ? "bg-[#4F46E5] text-white shadow-2xs" : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
-                )}
-              >
-                Thông báo Lớp học
-              </button>
-            </div>
           </div>
 
-          {activeTab === "inbox" ? (
-            /* Tab 1: Q&A Unified Inbox */
+          {/* Q&A Unified Inbox */}
             <div className="flex flex-col gap-6 animate-fadeIn">
               {/* Inbox Filters */}
               <div className="flex items-center justify-between flex-wrap gap-4">
@@ -194,7 +166,12 @@ export function DiscussionReplyContainer() {
                     <button
                       key={tab.id}
                       type="button"
-                      onClick={() => setFilter(tab.id as any)}
+                      onClick={() => {
+                        setFilter(tab.id as any);
+                        const newParams = new URLSearchParams(searchParams.toString());
+                        newParams.set("filter", tab.id);
+                        router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
+                      }}
                       className={twMerge(
                         "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer",
                         filter === tab.id
@@ -326,92 +303,6 @@ export function DiscussionReplyContainer() {
                 </div>
               )}
             </div>
-          ) : (
-            /* Tab 2: Cohort Announcer & Rate Limiting (Section 3.2) */
-            <div className="flex flex-col gap-6 animate-fadeIn max-w-3xl mx-auto w-full">
-              <div className="p-7 rounded-3xl bg-white border border-[#EAEAF4] shadow-xs flex flex-col gap-6">
-                
-                <div className="flex items-center justify-between border-b border-gray-100 pb-5">
-                  <div className="flex items-center gap-3">
-                    <span className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#6B6BFF] flex items-center justify-center font-black text-2xl">
-                      📢
-                    </span>
-                    <div>
-                      <h3 className="text-base font-black text-[#1A1A2E]">Soạn thông báo cho toàn bộ lớp</h3>
-                      <p className="text-xs text-gray-400">Gửi các thông báo quan trọng về chương trình học đến toàn bộ học viên.</p>
-                    </div>
-                  </div>
-
-                  {/* Spam Rate-Limit Meter (Section 3.2) */}
-                  <div className="text-right">
-                    <span className={twMerge("px-3 py-1 rounded-xl text-xs font-black font-mono border", sentCountThisWeek >= 2 ? "bg-rose-50 text-rose-700 border-rose-200" : "bg-emerald-50 text-emerald-700 border-emerald-200")}>
-                      Hạn mức gửi hàng tuần: {sentCountThisWeek} / 2
-                    </span>
-                    <p className="text-[10px] font-bold text-gray-400 mt-1">Đang áp dụng giới hạn chống spam</p>
-                  </div>
-                </div>
-
-                {announcementNotice && (
-                  <div className={twMerge("p-4 rounded-2xl font-bold text-xs flex items-center gap-2", sentCountThisWeek >= 2 ? "bg-amber-50 border border-amber-300 text-amber-900" : "bg-emerald-50 border border-emerald-300 text-emerald-800")}>
-                    <span>💡</span>
-                    <span>{announcementNotice}</span>
-                  </div>
-                )}
-
-                {/* WYSIWYG Editor Simulation */}
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <label className="block text-xs font-black text-gray-700 uppercase tracking-wide mb-1.5">Tiêu đề thông báo</label>
-                    <input
-                      type="text"
-                      value={announcementSubject}
-                      onChange={(e) => setAnnouncementSubject(e.target.value)}
-                      className="w-full px-4 py-3 rounded-2xl border-2 border-indigo-200 text-sm font-black text-[#1A1A2E] focus:outline-none focus:border-[#6B6BFF]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-black text-gray-700 uppercase tracking-wide mb-1.5">Nội dung thông báo</label>
-                    <div className="border border-gray-300 rounded-2xl overflow-hidden bg-white">
-                      {/* Fake WYSIWYG Toolbar */}
-                      <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-200 text-gray-600 text-xs font-bold">
-                        <span className="px-2 py-0.5 rounded bg-white border cursor-pointer"><b>B</b></span>
-                        <span className="px-2 py-0.5 rounded bg-white border cursor-pointer"><i>I</i></span>
-                        <span className="px-2 py-0.5 rounded bg-white border cursor-pointer"><u>U</u></span>
-                        <span className="h-4 w-px bg-gray-300 mx-1" />
-                        <span className="px-2 py-0.5 rounded bg-white border cursor-pointer">🔗 Liên kết</span>
-                        <span className="px-2 py-0.5 rounded bg-white border cursor-pointer">🖼️ Hình ảnh</span>
-                        <span className="px-2 py-0.5 rounded bg-white border cursor-pointer">📝 Khối mã</span>
-                      </div>
-                      <textarea
-                        rows={6}
-                        value={announcementBody}
-                        onChange={(e) => setAnnouncementBody(e.target.value)}
-                        className="w-full p-4 text-xs font-medium text-[#1A1A2E] leading-relaxed focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Broadcast Footer Button */}
-                <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <p className="text-xs text-gray-400 font-semibold">
-                    Học viên sẽ nhận được thông báo trực tiếp trong hệ thống và qua email đã xác thực.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleSendAnnouncement}
-                    disabled={sentCountThisWeek >= 2}
-                    className="px-8 py-3.5 bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] hover:opacity-95 text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl shadow-lg transition-all disabled:opacity-50 cursor-pointer"
-                  >
-                    🚀 Gửi thông báo cho toàn lớp
-                  </button>
-                </div>
-
-              </div>
-            </div>
-          )}
-
         </div>
       </main>
     </div>

@@ -1,4 +1,4 @@
-import { FilteredCoursesView, MY_COURSES } from "@/src/features/student/courses";
+import { FilteredCoursesView } from "@/src/features/student/courses";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function MyCoursesPage() {
   return (
     <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col">
-      <FilteredCoursesView initialCourses={MY_COURSES} />
+      <FilteredCoursesView />
     </div>
   );
 }

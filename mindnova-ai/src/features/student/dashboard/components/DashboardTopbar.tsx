@@ -61,6 +61,17 @@ export function DashboardTopbar() {
     }
   };
 
+  const handleDeleteRead = async () => {
+    if (window.confirm("Bạn có chắc muốn xóa tất cả thông báo đã đọc?")) {
+      try {
+        await axiosClient.delete("/student/notifications/read");
+        setNotifications((prev) => prev.filter((n) => !n.is_read));
+      } catch (error) {
+        console.error("Failed to delete read notifications", error);
+      }
+    }
+  };
+
   const markAsRead = async (id: number) => {
     try {
       await axiosClient.patch(`/student/notifications/${id}/read`);
@@ -74,7 +85,7 @@ export function DashboardTopbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 h-18 shrink-0 flex items-center justify-end gap-4 px-6 lg:px-8 bg-white/90 backdrop-blur-xl border-b border-[#F0F0F8] shadow-2xs transition-all duration-200">
+      <header className="sticky top-0 z-50 h-18 shrink-0 flex items-center justify-end gap-4 px-6 lg:px-8 bg-white/90 backdrop-blur-xl border-b border-[#F0F0F8] shadow-2xs transition-all duration-200">
         {/* Right Actions & Profile */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1 bg-[#F6F6FB] p-1 rounded-xl border border-[#EAEAF4]">
@@ -98,7 +109,7 @@ export function DashboardTopbar() {
             {showNotif && (
               <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
                 <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                  <h3 className="text-sm font-semibold text-gray-800">Thông báo</h3>
+                  <h3 className="text-sm font-semibold text-gray-800">Thông báo ({notifications.length}/50)</h3>
                   {unreadCount > 0 && (
                     <span className="text-[10px] font-medium bg-[#6B6BFF]/10 text-[#6B6BFF] px-2 py-0.5 rounded-full">
                       {unreadCount} mới
@@ -124,7 +135,11 @@ export function DashboardTopbar() {
                             key={notif.id}
                             onClick={() => {
                               if (!notif.is_read) markAsRead(notif.id);
-                              setSelectedNotification(notif);
+                              if (notif.action_url) {
+                                window.location.href = notif.action_url;
+                              } else {
+                                setSelectedNotification(notif);
+                              }
                               setShowNotif(false);
                             }}
                             className={twMerge(
@@ -165,6 +180,16 @@ export function DashboardTopbar() {
                       })}
                     </div>
                   )}
+                </div>
+                {/* Footer action */}
+                <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-center bg-gray-50/50">
+                  <button
+                    onClick={handleDeleteRead}
+                    disabled={notifications.filter((n) => n.is_read).length === 0}
+                    className="text-xs font-semibold text-red-600 hover:text-red-700 disabled:text-gray-400 transition-colors"
+                  >
+                    Xóa thông báo đã đọc
+                  </button>
                 </div>
               </div>
             )}

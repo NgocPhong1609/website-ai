@@ -89,13 +89,26 @@ class CourseService
                                         }
                                     }
 
+                                    // Determine duration: prefer duration_seconds, fallback to duration_minutes * 60
+                                    $durationSec = $les->duration_seconds ?? (($les->duration_minutes ?? 0) * 60);
+                                    $durationMinutes = $durationSec > 0 ? round($durationSec / 60) : 0;
+                                    $durationText = $durationMinutes > 0 ? $durationMinutes . ' phút' : '1 phút';
+
+                                    // Determine lesson type
+                                    $lessonType = $les->type ?? 'video';
+
+                                    // Build lesson item
                                     $mLessons[] = [
                                         'id' => $les->id,
                                         'order' => $les->order ?: $lOrder,
                                         'title' => $les->title,
-                                        'duration' => $les->duration_seconds ? round($les->duration_seconds / 60) . ' phút' : '15 phút',
+                                        'type' => $lessonType,
+                                        'duration' => $durationText,
+                                        'duration_seconds' => $durationSec,
                                         'status' => $status,
                                         'video_url' => $les->video_url,
+                                        'has_uploaded_video' => $les->media()->where('media_type', 'video')->where('status', 'ready')->exists(),
+                                        'content' => $lessonType === 'article' ? $les->content : null,
                                     ];
                                     
                                     // Extract resource from lesson if it has video
@@ -195,5 +208,68 @@ class CourseService
             'modules' => $modules,
             'resources' => $resources,
         ];
+    }
+
+    /**
+     * Retrieve all enrolled courses for the student with progress metrics.
+     */
+    public function getEnrolledCourses(?User $user): array
+    {
+        $userId = $user ? $user->id : null;
+        if (!$userId || !class_exists(\App\Models\Enrollment::class)) {
+            return [];
+        }
+
+        $enrollments = \App\Models\Enrollment::with('course.modules.lessons')
+            ->where('user_id', $userId)
+            ->latest('enrolled_at')
+            ->get();
+
+        $gradients = [
+            'from-[#0f0c29] via-[#302b63] to-[#24243e]',
+            'from-[#0f2027] via-[#203a43] to-[#2c5364]',
+            'from-[#141E30] to-[#243B55]',
+            'from-[#232526] to-[#414345]',
+            'from-[#1D4ED8] to-[#1E40AF]',
+            'from-[#312E81] to-[#1E1B4B]',
+            'from-[#047857] via-[#064E3B] to-[#111827]'
+        ];
+
+        return $enrollments->map(function ($enrollment, $index) use ($gradients) {
+            $course = $enrollment->course;
+            if (!$course) return null;
+
+            $totalLessons = 0;
+            $progress = $enrollment->progress_percentage ?? 0;
+
+            if ($course->modules) {
+                foreach ($course->modules as $mod) {
+                    $totalLessons += $mod->lessons ? $mod->lessons->count() : 0;
+                }
+            }
+            
+            $completedLessons = round(($progress / 100) * $totalLessons);
+            $nextLesson = 'Tiếp tục học phần mới';
+
+            $status = 'not-started';
+            if ($progress >= 100) {
+                $status = 'completed';
+                $nextLesson = 'Đã hoàn thành khóa học 🎉';
+            } elseif ($progress > 0) {
+                $status = 'in-progress';
+            }
+
+            return [
+                'id' => $course->id,
+                'title' => $course->title,
+                'nextLesson' => $nextLesson,
+                'progress' => $progress,
+                'thumbnailGradient' => $gradients[$index % count($gradients)],
+                'thumbnailUrl' => $course->thumbnail ? url($course->thumbnail) : 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&auto=format&fit=crop',
+                'status' => $status,
+                'lessonsCompleted' => $completedLessons,
+                'totalLessons' => $totalLessons,
+            ];
+        })->filter()->values()->toArray();
     }
 }

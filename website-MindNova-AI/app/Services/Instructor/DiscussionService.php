@@ -20,12 +20,21 @@ class DiscussionService
             
             // Notify student
             if ($discussion->student_id !== $teacherId) {
+                $lesson = $discussion->lesson;
+                $module = $lesson->module;
+                $course = $module->course;
+                
                 \App\Models\Notification::create([
                     'user_id' => $discussion->student_id,
                     'type' => 'discussion_reply',
                     'title' => 'Bạn có phản hồi mới',
-                    'body' => 'Giảng viên đã trả lời câu hỏi của bạn trong thảo luận: ' . $discussion->title,
-                    'metadata' => ['discussion_id' => $discussion->id],
+                    'body' => "Bình luận ở bài \"{$lesson->title}\", chương \"{$module->title}\", khóa \"{$course->title}\" đã được phản hồi.",
+                    'metadata' => [
+                        'discussion_id' => $discussion->id,
+                        'course_id' => $course->id,
+                        'lesson_id' => $lesson->id,
+                        'action_url' => "/courses/lesson?courseId={$course->id}&lessonId={$lesson->id}",
+                    ],
                 ]);
             }
 
