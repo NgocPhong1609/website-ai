@@ -64,22 +64,6 @@ interface AINotificationModalProps {
   initialTopic?: string;
 }
 
-// ─── Mock generated draft ─────────────────────────────────────────────────────
-
-const MOCK_DRAFT = `🚀 **Chào mừng các bạn đến với giai đoạn bứt phá!**
-
-Chào các bạn học viên lớp AI Foundations,
-
-Tôi nhận thấy tinh thần học tập của lớp chúng ta trong tuần qua vô cùng ấn tượng. Để tiếp thêm động lực cho các bạn chuẩn bị bước vào chương cuối của khóa học, tôi đã mở thêm một số tài liệu tham khảo nâng cao trong phần tài nguyên.
-
-Đừng quên:
-
-• Hoàn thành bài tập Lab số 4 trước thứ Sáu.
-• Tham gia buổi Q&A trực tuyến vào tối thứ Tư.
-• Xem lại video tóm tắt Module 3 trước khi lên lớp.
-
-Chúc các bạn học tập hiệu quả và đạt kết quả tốt nhất! 💪`;
-
 // ─── Suggestion Chip ──────────────────────────────────────────────────────────
 
 const SUGGESTION_CHIPS = [

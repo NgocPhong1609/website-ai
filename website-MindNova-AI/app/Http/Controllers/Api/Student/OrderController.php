@@ -38,7 +38,7 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            $courses = Course::whereIn('id', $request->course_ids)->get();
+            $courses = Course::with('teacher')->whereIn('id', $request->course_ids)->get();
             $totalAmount = $courses->sum('price');
             $transactionId = 'ORD-' . strtoupper(Str::random(6));
 
@@ -56,6 +56,7 @@ class OrderController extends Controller
 
             if ($totalAmount <= 0) {
                 $order->update(['status' => 'completed']);
+                $student = \App\Models\User::find($order->user_id);
                 foreach ($courses as $course) {
                     $inserted = DB::table('enrollments')->insertOrIgnore([
                         'user_id' => $user->id, 'course_id' => $course->id,
@@ -63,7 +64,6 @@ class OrderController extends Controller
                     ]);
                     
                     if ($inserted) {
-                        $student = \App\Models\User::find($order->user_id);
                         if ($course && $course->teacher && $student) {
                             $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
                         }
@@ -187,7 +187,8 @@ class OrderController extends Controller
                 if ($inputData['vnp_ResponseCode'] == '00') {
                     $order->update(['status' => 'completed']);
                     // Tự động cấp quyền
-                    $items = OrderItem::where('order_id', $order->id)->get();
+                    $items = OrderItem::with('course.teacher')->where('order_id', $order->id)->get();
+                    $student = \App\Models\User::find($order->user_id);
                     foreach ($items as $item) {
                         $inserted = DB::table('enrollments')->insertOrIgnore([
                             'user_id' => $order->user_id, 'course_id' => $item->course_id,
@@ -195,8 +196,7 @@ class OrderController extends Controller
                         ]);
                         
                         if ($inserted) {
-                            $course = \App\Models\Course::find($item->course_id);
-                            $student = \App\Models\User::find($order->user_id);
+                            $course = $item->course;
                             if ($course && $course->teacher && $student) {
                                 $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
                             }
@@ -243,7 +243,8 @@ class OrderController extends Controller
                 if ($order && $order->status === 'pending') {
                     $order->update(['status' => 'completed']);
                     // Tự động cấp quyền
-                    $items = OrderItem::where('order_id', $order->id)->get();
+                    $items = OrderItem::with('course.teacher')->where('order_id', $order->id)->get();
+                    $student = \App\Models\User::find($order->user_id);
                     foreach ($items as $item) {
                         $inserted = DB::table('enrollments')->insertOrIgnore([
                             'user_id' => $order->user_id, 'course_id' => $item->course_id,
@@ -251,8 +252,7 @@ class OrderController extends Controller
                         ]);
                         
                         if ($inserted) {
-                            $course = \App\Models\Course::find($item->course_id);
-                            $student = \App\Models\User::find($order->user_id);
+                            $course = $item->course;
                             if ($course && $course->teacher && $student) {
                                 $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
                             }

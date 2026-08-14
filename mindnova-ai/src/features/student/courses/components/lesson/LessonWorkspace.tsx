@@ -6,8 +6,9 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGetCourseDetail, useInvalidateCourseDetail, fetchVideoUrl, completeLesson, fetchQuiz, checkQuizAnswer, submitQuiz, useGetDiscussions, useCreateDiscussion } from "../../api";
+import { useGetCourseDetail, useInvalidateCourseDetail, completeLesson, fetchQuiz, checkQuizAnswer, submitQuiz, useGetDiscussions, useCreateDiscussion } from "../../api";
 import type { CourseDetailLessonItem, CourseDetailData } from "../../types";
+import { CustomVideoPlayer } from "./CustomVideoPlayer";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 function CheckIcon() {
@@ -36,7 +37,7 @@ function ChevronIcon({ className }: { className?: string }) {
 }
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
-interface LessonData {
+export interface LessonData {
   id: string;
   title: string;
   type: 'video' | 'article' | 'quiz_module' | string;
@@ -98,147 +99,6 @@ function getLessonTypeColor(type: string): string {
     case 'quiz_module': return 'bg-[#FFF7ED] text-[#EA580C]';
     default: return 'bg-[#F3F4F6] text-[#4B5563]';
   }
-}
-
-// ─── Video Player Component ──────────────────────────────────────────────────
-function VideoPlayer({
-  lesson,
-  onComplete,
-}: {
-  lesson: LessonData;
-  onComplete: () => void;
-}) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [signedUrl, setSignedUrl] = useState<string>("");
-  const [isExternal, setIsExternal] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>("");
-  const completedRef = useRef(false);
-
-  useEffect(() => {
-    completedRef.current = false;
-    setError("");
-    setLoading(true);
-
-    // Check if video_url is a YouTube/external URL
-    const externalUrl = lesson.videoUrl;
-    if (externalUrl && (externalUrl.includes('youtube.com') || externalUrl.includes('youtu.be') || externalUrl.includes('vimeo.com'))) {
-      setIsExternal(true);
-      setSignedUrl(externalUrl);
-      setLoading(false);
-      return;
-    }
-
-    // Fetch signed URL for uploaded video
-    if (lesson.hasUploadedVideo) {
-      fetchVideoUrl(lesson.id)
-        .then((result) => {
-          if (result.source === 'external') {
-            setIsExternal(true);
-          }
-          setSignedUrl(result.signed_url);
-          setLoading(false);
-        })
-        .catch(() => {
-          // Fallback to video_url if available
-          if (lesson.videoUrl) {
-            setSignedUrl(lesson.videoUrl);
-            setIsExternal(true);
-          } else {
-            setError("Không thể tải video. Vui lòng thử lại sau.");
-          }
-          setLoading(false);
-        });
-    } else if (lesson.videoUrl) {
-      setSignedUrl(lesson.videoUrl);
-      setIsExternal(true);
-      setLoading(false);
-    } else {
-      setError("Video chưa được tải lên.");
-      setLoading(false);
-    }
-  }, [lesson.id, lesson.videoUrl, lesson.hasUploadedVideo]);
-
-  // Track playback position for uploaded videos
-  const handleTimeUpdate = useCallback(() => {
-    if (completedRef.current || !videoRef.current) return;
-    const video = videoRef.current;
-    const threshold = Math.max(video.duration - 10, 0);
-    if (video.currentTime >= threshold && video.duration > 0) {
-      completedRef.current = true;
-      onComplete();
-    }
-  }, [onComplete]);
-
-  if (loading) {
-    return (
-      <div className="relative w-full aspect-video bg-[#0f172a] rounded-2xl overflow-hidden flex items-center justify-center border border-[#E5E7EB]">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-3 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm text-gray-400 font-medium">Đang tải video...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="relative w-full aspect-video bg-[#F9FAFB] rounded-2xl overflow-hidden flex items-center justify-center border border-[#E5E7EB]">
-        <div className="flex flex-col items-center gap-3 text-gray-400">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <rect x="2" y="4" width="20" height="16" rx="2" />
-            <path d="M10 9l5 3-5 3V9z" />
-          </svg>
-          <span className="text-sm font-medium">{error}</span>
-        </div>
-      </div>
-    );
-  }
-
-  // External / YouTube
-  if (isExternal) {
-    // Convert YouTube watch URL to embed URL
-    let embedUrl = signedUrl;
-    if (signedUrl.includes('youtube.com/watch')) {
-      const url = new URL(signedUrl);
-      const videoId = url.searchParams.get('v');
-      if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
-    } else if (signedUrl.includes('youtu.be/')) {
-      const videoId = signedUrl.split('youtu.be/')[1]?.split('?')[0];
-      if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
-    }
-
-    return (
-      <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-sm border border-[#E5E7EB]">
-        <iframe
-          src={embedUrl}
-          title={lesson.title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          className="w-full h-full border-0 absolute inset-0"
-        />
-      </div>
-    );
-  }
-
-  // Uploaded video with <video> element — prevents source URL copying
-  return (
-    <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-sm border border-[#E5E7EB]">
-      <video
-        ref={videoRef}
-        src={signedUrl}
-        controls
-        controlsList="nodownload noremoteplayback"
-        disablePictureInPicture
-        onContextMenu={(e) => e.preventDefault()}
-        onTimeUpdate={handleTimeUpdate}
-        className="w-full h-full absolute inset-0 object-contain"
-        playsInline
-      >
-        Trình duyệt không hỗ trợ thẻ video.
-      </video>
-    </div>
-  );
 }
 
 // ─── Text/Article Renderer ────────────────────────────────────────────────────
@@ -930,7 +790,7 @@ function LessonWorkspaceContent() {
 
           {/* ─── Content by Type ─── */}
           {activeLesson.type === 'video' && (
-            <VideoPlayer lesson={activeLesson} onComplete={handleLessonComplete} />
+            <CustomVideoPlayer lesson={activeLesson} onComplete={handleLessonComplete} />
           )}
 
           {activeLesson.type === 'article' && (
@@ -943,7 +803,7 @@ function LessonWorkspaceContent() {
 
           {/* Fallback for unknown type — show as video */}
           {!['video', 'article', 'quiz_module'].includes(activeLesson.type) && (
-            <VideoPlayer lesson={activeLesson} onComplete={handleLessonComplete} />
+            <CustomVideoPlayer lesson={activeLesson} onComplete={handleLessonComplete} />
           )}
 
           {/* ─── Tabs: Content Info / AI / Discussion ─── */}

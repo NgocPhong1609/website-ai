@@ -4,10 +4,10 @@ import { useState } from "react";
 import { ProfileSidebar } from "./ProfileSidebar";
 import { PersonalInfoPanel } from "./PersonalInfoPanel";
 import { SecurityPanel, SettingsPanel } from "./OtherPanels";
-import { USER_PROFILE } from "../constants";
-import type { ProfileTab } from "../types";
+import { useGetProfile } from "../api";
+import type { ProfileTab, UserProfile } from "../types";
 
-function ActivePanel({ tab, profile }: { tab: ProfileTab; profile: typeof USER_PROFILE }) {
+function ActivePanel({ tab, profile }: { tab: ProfileTab; profile: UserProfile }) {
   if (tab === "security") return <SecurityPanel />;
   if (tab === "settings") return <SettingsPanel />;
   return (
@@ -22,6 +22,13 @@ function ActivePanel({ tab, profile }: { tab: ProfileTab; profile: typeof USER_P
 
 export default function ProfileContainer() {
   const [activeTab, setActiveTab] = useState<ProfileTab>("personal-info");
+  const { data: profile, isLoading } = useGetProfile();
+
+  if (isLoading) {
+    return <div className="p-8 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-[#4648D4] border-t-transparent rounded-full" /></div>;
+  }
+
+  if (!profile) return null;
 
   return (
     <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-8">
@@ -59,7 +66,7 @@ export default function ProfileContainer() {
 
             <div className="text-3xl font-bold text-[#1A1A2E] my-1 flex items-baseline justify-between gap-6">
               <div>
-                <span className="text-[#4648D4]">{USER_PROFILE.completionPercent}%</span>
+                <span className="text-[#4648D4]">{profile.completionPercent}%</span>
                 <span className="text-xs font-medium text-[#9090B0] ml-1.5">hoàn tất</span>
               </div>
               <span className="text-xs font-semibold text-[#64647A]">
@@ -70,7 +77,7 @@ export default function ProfileContainer() {
             <div className="w-full h-2 bg-[#F4F4FA] rounded-full mt-2 overflow-hidden p-0.5 border border-[#EAEAF4]/80">
               <div
                 className="h-full bg-gradient-to-r from-[#4CD7F6] via-[#6B6BFF] to-[#10B981] rounded-full shadow-[0_0_8px_rgba(107,107,255,0.4)] transition-all duration-1000 group-hover:brightness-110"
-                style={{ width: `${USER_PROFILE.completionPercent}%` }}
+                style={{ width: `${profile.completionPercent}%` }}
               />
             </div>
 
@@ -90,8 +97,8 @@ export default function ProfileContainer() {
             <ProfileSidebar
               activeTab={activeTab}
               onTabChange={setActiveTab}
-              fullName={USER_PROFILE.fullName}
-              major={USER_PROFILE.major}
+              fullName={profile.fullName}
+              major={profile.major}
             />
           </div>
         </div>
@@ -99,7 +106,7 @@ export default function ProfileContainer() {
         {/* Right Column (Active Panel) */}
         <div className="flex flex-col gap-6 flex-1 min-w-0 w-full">
           <div className="rounded-2xl bg-white border border-[#EAEAF4] shadow-2xs p-6 sm:p-8 flex-1 transition-all duration-300 hover:shadow-sm">
-            <ActivePanel tab={activeTab} profile={USER_PROFILE} />
+            <ActivePanel tab={activeTab} profile={profile} />
           </div>
         </div>
       </div>

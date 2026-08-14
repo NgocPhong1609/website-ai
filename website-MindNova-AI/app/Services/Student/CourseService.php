@@ -9,6 +9,61 @@ use App\Models\CourseModule;
 class CourseService
 {
     /**
+     * Helper to calculate accurate progress dynamically for a student in a course
+     */
+    public function calculateStudentProgress(Course $course, int $userId): array
+    {
+        $completedLessonIds = [];
+        if (class_exists(\App\Models\LessonCompletion::class)) {
+            $completedLessonIds = \App\Models\LessonCompletion::where('user_id', $userId)
+                ->pluck('lesson_id')
+                ->toArray();
+        }
+
+        $totalLessons = 0;
+        $completedLessonsCount = 0;
+        $nextLessonId = null;
+        $nextLessonTitle = null;
+
+        $sortedModules = $course->modules->sortBy('order');
+        foreach ($sortedModules as $module) {
+            $sortedLessons = $module->lessons->sortBy('order');
+            foreach ($sortedLessons as $lesson) {
+                $totalLessons++;
+                $isCompleted = in_array($lesson->id, $completedLessonIds);
+                
+                if ($isCompleted) {
+                    $completedLessonsCount++;
+                } else if ($nextLessonTitle === null) {
+                    $nextLessonId = $lesson->id;
+                    $nextLessonTitle = $lesson->title;
+                }
+            }
+        }
+
+        $progressPercentage = 0;
+        if ($totalLessons > 0) {
+            $progressPercentage = (int) round(($completedLessonsCount / $totalLessons) * 100);
+        }
+
+        if ($totalLessons === 0) {
+            $nextLessonText = 'Chưa có bài học';
+        } elseif ($completedLessonsCount === $totalLessons) {
+            $nextLessonText = 'Đã hoàn thành khóa học 🎉';
+        } else {
+            $nextLessonText = $nextLessonTitle ?: 'Tiếp tục bài học';
+        }
+
+        return [
+            'total_lessons' => $totalLessons,
+            'completed_lessons' => $completedLessonsCount,
+            'progress_percentage' => $progressPercentage,
+            'next_lesson_id' => $nextLessonId,
+            'next_lesson_title' => $nextLessonText,
+        ];
+    }
+
+    /**
      * Retrieve complete course detail information, module curriculum, AI tutor tips, and student progress.
      */
     public function getCourseDetail($courseId = 1, ?User $user = null): array
@@ -63,41 +118,36 @@ class CourseService
                         $instructorBio = "Chuyên gia giàu kinh nghiệm trong lĩnh vực {$categoryName}.";
                     }
 
+                    $progressData = $this->calculateStudentProgress($dbCourse, $userId);
+                    $totalLessons = $progressData['total_lessons'];
+                    $completedLessons = $progressData['completed_lessons'];
+                    $nextLessonId = $progressData['next_lesson_id'];
+                    $nextLessonTitle = $progressData['next_lesson_title'];
+
                     if ($dbCourse->modules && $dbCourse->modules->isNotEmpty()) {
                         $modOrder = 1;
-                        $foundCurrent = false;
-
-                        foreach ($dbCourse->modules as $mod) {
+                        foreach ($dbCourse->modules->sortBy('order') as $mod) {
                             $mLessons = [];
                             if ($mod->lessons && $mod->lessons->isNotEmpty()) {
                                 $lOrder = 1;
-                                foreach ($mod->lessons as $les) {
-                                    $totalLessons++;
+                                foreach ($mod->lessons->sortBy('order') as $les) {
                                     $isCompleted = in_array($les->id, $completedLessonIds);
                                     
                                     if ($isCompleted) {
                                         $status = 'completed';
-                                        $completedLessons++;
                                     } else {
-                                        if (!$foundCurrent) {
+                                        if ($les->id === $nextLessonId) {
                                             $status = 'current';
-                                            $foundCurrent = true;
-                                            $nextLessonId = $les->id;
-                                            $nextLessonTitle = $les->title;
                                         } else {
                                             $status = 'locked';
                                         }
                                     }
 
-                                    // Determine duration: prefer duration_seconds, fallback to duration_minutes * 60
                                     $durationSec = $les->duration_seconds ?? (($les->duration_minutes ?? 0) * 60);
                                     $durationMinutes = $durationSec > 0 ? round($durationSec / 60) : 0;
                                     $durationText = $durationMinutes > 0 ? $durationMinutes . ' phút' : '1 phút';
-
-                                    // Determine lesson type
                                     $lessonType = $les->type ?? 'video';
 
-                                    // Build lesson item
                                     $mLessons[] = [
                                         'id' => $les->id,
                                         'order' => $les->order ?: $lOrder,
@@ -111,7 +161,6 @@ class CourseService
                                         'content' => $lessonType === 'article' ? $les->content : null,
                                     ];
                                     
-                                    // Extract resource from lesson if it has video
                                     if ($les->video_url && count($resources) < 3) {
                                         $resources[] = [
                                             'id' => 'res-vid-' . $les->id,
@@ -121,7 +170,6 @@ class CourseService
                                             'url' => $les->video_url
                                         ];
                                     }
-
                                     $lOrder++;
                                 }
                             }
@@ -235,26 +283,26 @@ class CourseService
             'from-[#047857] via-[#064E3B] to-[#111827]'
         ];
 
-        return $enrollments->map(function ($enrollment, $index) use ($gradients) {
+        return $enrollments->map(function ($enrollment, $index) use ($gradients, $userId) {
             $course = $enrollment->course;
             if (!$course) return null;
 
-            $totalLessons = 0;
-            $progress = $enrollment->progress_percentage ?? 0;
+            // Use the shared exact calculation instead of enrollment progress
+            $progressData = $this->calculateStudentProgress($course, $userId);
+            $totalLessons = $progressData['total_lessons'];
+            $completedLessons = $progressData['completed_lessons'];
+            $progress = $progressData['progress_percentage'];
+            $nextLesson = $progressData['next_lesson_title'];
 
-            if ($course->modules) {
-                foreach ($course->modules as $mod) {
-                    $totalLessons += $mod->lessons ? $mod->lessons->count() : 0;
-                }
+            // Sync enrollment progress if out of sync
+            if ($enrollment->progress_percentage !== $progress) {
+                $enrollment->progress_percentage = $progress;
+                $enrollment->save();
             }
-            
-            $completedLessons = round(($progress / 100) * $totalLessons);
-            $nextLesson = 'Tiếp tục học phần mới';
 
             $status = 'not-started';
             if ($progress >= 100) {
                 $status = 'completed';
-                $nextLesson = 'Đã hoàn thành khóa học 🎉';
             } elseif ($progress > 0) {
                 $status = 'in-progress';
             }

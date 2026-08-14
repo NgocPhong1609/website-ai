@@ -17,7 +17,7 @@ class GeminiAiService extends AbstractAiService
     public function sendMessage(array $messages, array $options = []): string
     {
         $apiKey = config("services.gemini.api_key");
-        $model = config("services.gemini.model", "gemini-3.5-flash");
+        $model = config("services.gemini.model", "gemini-1.5-flash");
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
         // Chuyen doi messages tu AiMessageDto sang format cua Gemini
@@ -51,14 +51,20 @@ class GeminiAiService extends AbstractAiService
             $payload["systemInstruction"] = $systemInstruction;
         }
 
-        $maxRetries = 3;
+        if (!empty($options['response_mime_type'])) {
+            $payload['generationConfig'] = [
+                'responseMimeType' => $options['response_mime_type']
+            ];
+        }
+
+        $maxRetries = 4;
         $lastException = null;
 
         for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
             try {
                 $response = Http::withHeaders([
                     "Content-Type" => "application/json",
-                ])->timeout(60)->post($url, $payload);
+                ])->timeout(90)->post($url, $payload);
 
                 if ($response->successful()) {
                     $data = $response->json();
@@ -83,7 +89,7 @@ class GeminiAiService extends AbstractAiService
 
                 // Neu gap loi 503 (Service Unavailable) hoac 429 (Rate Limit), retry
                 if (in_array($response->status(), [503, 429, 500]) && $attempt < $maxRetries) {
-                    $waitSeconds = pow(2, $attempt); // 2s, 4s
+                    $waitSeconds = pow(2, $attempt - 1); // 1s, 2s, 4s
                     Log::warning("Gemini API returned {$response->status()}, retrying in {$waitSeconds}s (attempt {$attempt}/{$maxRetries})");
                     sleep($waitSeconds);
                     continue;
@@ -98,7 +104,7 @@ class GeminiAiService extends AbstractAiService
                     throw $e;
                 }
                 if ($attempt < $maxRetries) {
-                    $waitSeconds = pow(2, $attempt);
+                    $waitSeconds = pow(2, $attempt - 1);
                     Log::warning("Gemini API Exception on attempt {$attempt}: {$e->getMessage()}, retrying in {$waitSeconds}s");
                     sleep($waitSeconds);
                     continue;

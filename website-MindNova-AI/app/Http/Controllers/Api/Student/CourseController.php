@@ -24,7 +24,7 @@ class CourseController extends Controller
      */
     public function getAvailableCourses(Request $request): JsonResponse
     {
-        $query = Course::where('status', 'published');
+        $query = Course::with(['teacher', 'category'])->where('status', 'published');
         $courses = $query->get();
 
         $user = $request->user('sanctum') ?? $request->user();

@@ -33,14 +33,14 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
   const { generate, isGenerating, error } = useGenerateOutline();
 
   const handleGenerate = useCallback(async () => {
-    if (!topic.trim()) return;
+    if (!topic.trim() || isGenerating) return;
     setStep("preview");
 
     const result = await generate({ topic, targetAudience, skillLevel, methodology });
     if (result) {
       setOutline(result);
     }
-  }, [topic, targetAudience, skillLevel, methodology, generate]);
+  }, [topic, targetAudience, skillLevel, methodology, generate, isGenerating]);
 
   const handleApply = () => {
     if (onApply && outline.chapters.length > 0) {
@@ -179,7 +179,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
               ) : error ? (
                 <div className="py-20 flex flex-col items-center justify-center gap-4 text-center text-red-500">
                   <h4 className="text-sm font-extrabold">{error}</h4>
-                  <button onClick={handleGenerate} className="px-4 py-2 bg-red-100 text-red-600 rounded-xl font-bold hover:bg-red-200">
+                  <button disabled={isGenerating} onClick={handleGenerate} className="px-4 py-2 bg-red-100 text-red-600 rounded-xl font-bold hover:bg-red-200 disabled:opacity-50">
                     Thử lại
                   </button>
                 </div>

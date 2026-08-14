@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { DashboardCourse } from "../types";
-import { DASHBOARD_COURSES } from "../constants";
 
 function PlayCircleIcon() {
   return (
@@ -71,7 +70,7 @@ function CourseCard({ course }: { course: DashboardCourse }) {
         </div>
 
         <Link
-          href="/courses/lesson"
+          href={`/courses/lesson?courseId=${course.id}`}
           className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-[#5052EE] bg-[#EEF2FF] hover:bg-gradient-to-r hover:from-[#4648D4] hover:to-[#0D9488] hover:text-white border border-[#5052EE]/20 hover:border-transparent transition-all duration-200 shadow-2xs flex items-center justify-center gap-2 group/btn mt-auto text-decoration-none"
         >
           <span>Vào học tiếp</span>
@@ -86,8 +85,52 @@ interface ContinueLearningProps {
   courses?: DashboardCourse[];
 }
 
-export function ContinueLearning({ courses = DASHBOARD_COURSES as unknown as DashboardCourse[] }: ContinueLearningProps) {
-  const items = courses && courses.length > 0 ? courses : (DASHBOARD_COURSES as unknown as DashboardCourse[]);
+export function ContinueLearning({ courses = [] }: ContinueLearningProps) {
+  const items = courses || [];
+
+  if (items.length === 0) {
+    return (
+      <section aria-labelledby="continue-learning-heading" className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-[#F0F0F8] pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-2 h-6 rounded-full bg-gradient-to-b from-[#4648D4] via-[#5052EE] to-[#0D9488]" />
+            <div>
+              <h2
+                id="continue-learning-heading"
+                className="text-lg sm:text-xl font-bold tracking-tight text-[#1A1A2E]"
+              >
+                Tiếp tục học tập
+              </h2>
+              <p className="text-xs font-normal text-[#64647A]">Nhanh chóng quay lại các học phần bạn đang theo đuổi</p>
+            </div>
+          </div>
+          
+          <Link
+            href="/courses"
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold text-[#5052EE] bg-[#EEF2FF] hover:bg-[#E0E0FF] border border-[#5052EE]/20 transition-all text-decoration-none w-fit shrink-0"
+          >
+            <span>Khám phá khoá học ➔</span>
+          </Link>
+        </div>
+
+        <div className="w-full bg-white border border-[#EAEAF4] rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-sm">
+          <div className="w-16 h-16 rounded-full bg-[#EEF2FF] text-[#5052EE] flex items-center justify-center mb-4">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-bold text-[#1A1A2E] mb-2">Bạn chưa bắt đầu khóa học nào</h3>
+          <p className="text-sm text-[#64647A] max-w-md mb-6">Hãy khám phá thư viện khóa học của chúng tôi và bắt đầu hành trình học tập của bạn ngay hôm nay.</p>
+          <Link
+            href="/courses"
+            className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#4648D4] to-[#0D9488] hover:shadow-md hover:opacity-90 transition-all text-decoration-none"
+          >
+            Tìm khóa học
+          </Link>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section aria-labelledby="continue-learning-heading" className="space-y-4">
