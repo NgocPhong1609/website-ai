@@ -29,7 +29,7 @@ class InstructorPayoutService
             $adminShareAmount = round($grossAmount * $commissionRate, 2);
             $teacherAmount = round($grossAmount - $adminShareAmount, 2);
 
-            TeacherPayout::firstOrCreate(
+            $payout = TeacherPayout::firstOrCreate(
                 [
                     'order_id' => $order->id,
                     'course_id' => $course->id,
@@ -48,6 +48,21 @@ class InstructorPayoutService
                     ],
                 ]
             );
+
+            // Create InstructorTransaction for Revenue Dashboard
+            if ($payout->wasRecentlyCreated) {
+                \App\Models\InstructorTransaction::create([
+                    'instructor_id' => $course->teacher_id,
+                    'type' => 'revenue',
+                    'amount' => $teacherAmount,
+                    'status' => 'available',
+                    'reference_type' => 'App\Models\OrderItem',
+                    'reference_id' => $item->id,
+                    'description' => 'Doanh thu từ khóa học: ' . $course->title,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
     }
 }

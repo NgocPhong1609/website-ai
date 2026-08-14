@@ -27,16 +27,30 @@ class RevenueService
             ->whereBetween('created_at', [$startOfMonth, $now])
             ->sum('amount');
 
+        $currentMonthRefund = InstructorTransaction::where('instructor_id', $instructor->id)
+            ->where('type', 'refund')
+            ->whereBetween('created_at', [$startOfMonth, $now])
+            ->sum('amount');
+            
+        $currentMonthNetRevenue = max(0, $currentMonthRevenue - $currentMonthRefund);
+
         // Total revenue last month
         $lastMonthRevenue = InstructorTransaction::where('instructor_id', $instructor->id)
             ->where('type', 'revenue')
             ->whereIn('status', ['available', 'escrow'])
             ->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
             ->sum('amount');
+            
+        $lastMonthRefund = InstructorTransaction::where('instructor_id', $instructor->id)
+            ->where('type', 'refund')
+            ->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
+            ->sum('amount');
+            
+        $lastMonthNetRevenue = max(0, $lastMonthRevenue - $lastMonthRefund);
 
         $revenueGrowth = 0;
-        if ($lastMonthRevenue > 0) {
-            $revenueGrowth = (($currentMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100;
+        if ($lastMonthNetRevenue > 0) {
+            $revenueGrowth = (($currentMonthNetRevenue - $lastMonthNetRevenue) / $lastMonthNetRevenue) * 100;
         }
 
         // 2. Available balance
@@ -49,7 +63,11 @@ class RevenueService
             ->whereIn('status', ['processing', 'completed'])
             ->sum('amount');
             
-        $availableBalance = max(0, $availableRevenue - $totalWithdrawn);
+        $totalRefund = InstructorTransaction::where('instructor_id', $instructor->id)
+            ->where('type', 'refund')
+            ->sum('amount');
+            
+        $availableBalance = max(0, $availableRevenue - $totalWithdrawn - $totalRefund);
 
         // 3. Escrow balance
         $escrowBalance = InstructorTransaction::where('instructor_id', $instructor->id)
@@ -107,14 +125,14 @@ class RevenueService
 
         // 7. Mock AI Forecast
         $aiForecast = [
-            'expected_end_month' => $currentMonthRevenue * 1.5,
+            'expected_end_month' => $currentMonthNetRevenue * 1.5,
             'growth_prediction' => 43,
             'top_course' => 'AI Mastery for Business', 
             'top_course_percentage' => 68
         ];
 
         return [
-            'total_revenue' => (float) $currentMonthRevenue,
+            'total_revenue' => (float) $currentMonthNetRevenue,
             'revenue_growth' => round($revenueGrowth, 1),
             'available_balance' => (float) $availableBalance,
             'escrow_balance' => (float) $escrowBalance,
@@ -142,7 +160,12 @@ class RevenueService
                 ->lockForUpdate()
                 ->sum('amount');
                 
-            $availableBalance = $availableRevenue - $totalWithdrawn;
+            $totalRefunds = InstructorTransaction::where('instructor_id', $instructor->id)
+                ->where('type', 'refund')
+                ->lockForUpdate()
+                ->sum('amount');
+                
+            $availableBalance = $availableRevenue - $totalWithdrawn - $totalRefunds;
 
             if ($amount > $availableBalance) {
                 throw new \Exception('Số dư khả dụng không đủ để rút tiền.');
@@ -267,6 +290,14 @@ class RevenueService
                     $q->where('course_id', $course->id);
                 })->sum('amount');
                 
+            $refund = InstructorTransaction::where('instructor_id', $instructor->id)
+                ->where('type', 'refund')
+                ->whereHasMorph('reference', [\App\Models\OrderItem::class, \App\Models\Enrollment::class], function ($q) use ($course) {
+                    $q->where('course_id', $course->id);
+                })->sum('amount');
+                
+            $revenue = max(0, $revenue - $refund);
+                
             $lastMonthRev = InstructorTransaction::where('instructor_id', $instructor->id)
                 ->where('type', 'revenue')
                 ->whereIn('status', ['available', 'escrow'])
@@ -274,6 +305,15 @@ class RevenueService
                 ->whereHasMorph('reference', [\App\Models\OrderItem::class, \App\Models\Enrollment::class], function ($q) use ($course) {
                     $q->where('course_id', $course->id);
                 })->sum('amount');
+                
+            $lastMonthRefund = InstructorTransaction::where('instructor_id', $instructor->id)
+                ->where('type', 'refund')
+                ->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
+                ->whereHasMorph('reference', [\App\Models\OrderItem::class, \App\Models\Enrollment::class], function ($q) use ($course) {
+                    $q->where('course_id', $course->id);
+                })->sum('amount');
+                
+            $lastMonthRev = max(0, $lastMonthRev - $lastMonthRefund);
                 
             $views = (int) $course->views_count;
             $conversionRate = $views > 0 ? ($enrollmentsCount / $views) * 100 : 0;

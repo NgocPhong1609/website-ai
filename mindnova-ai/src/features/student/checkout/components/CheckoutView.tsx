@@ -38,8 +38,23 @@ export function CheckoutView({ courseId }: { courseId: number }) {
       const methodToUse = isFree ? "free" : paymentMethod;
       const res = await checkoutService.createOrder([courseId], methodToUse);
       if (res.success) {
-        if (isFree || !res.payment_url) {
+        if (isFree) {
            router.push(`/courses/lesson?courseId=${courseId}`);
+        } else if (!res.payment_url && process.env.NODE_ENV === "development") {
+           // Dev environment mock payment
+           try {
+             // @ts-ignore
+             await checkoutService.devCompleteOrder(res.data.id);
+             // @ts-ignore
+             router.push(`/payment/callback?orderId=${res.data.transaction_id}&course_id=${courseId}`);
+           } catch(e) {
+             console.error("Mock payment failed:", e);
+             alert("Lỗi Dev mock payment");
+             setIsProcessing(false);
+           }
+        } else if (!res.payment_url) {
+           alert("Lỗi không lấy được URL thanh toán. Vui lòng thử lại.");
+           setIsProcessing(false);
         } else {
            window.location.href = res.payment_url;
         }

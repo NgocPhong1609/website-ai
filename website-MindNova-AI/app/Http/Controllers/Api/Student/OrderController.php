@@ -345,4 +345,62 @@ class OrderController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+    /**
+     * Dev Endpoint to force refund an order for testing
+     */
+    public function devRefundOrder(Request $request, $orderId)
+    {
+        if (!app()->environment('local', 'testing')) {
+            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+        }
+
+        $order = Order::find($orderId);
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Order not found'], 404);
+        }
+
+        if ($order->status !== 'completed') {
+            return response()->json(['success' => false, 'message' => 'Order is not completed'], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            $order->update(['status' => 'refunded']);
+            $items = OrderItem::with('course.teacher')->where('order_id', $order->id)->get();
+            
+            foreach ($items as $item) {
+                DB::table('enrollments')->where('user_id', $order->user_id)->where('course_id', $item->course_id)->delete();
+                
+                $course = $item->course;
+                if ($course && $course->teacher_id) {
+                    $grossAmount = (float) $item->price;
+                    $commissionRate = 0.10;
+                    $teacherAmount = round($grossAmount - ($grossAmount * $commissionRate), 2);
+                    
+                    \App\Models\InstructorTransaction::create([
+                        'instructor_id' => $course->teacher_id,
+                        'type' => 'refund',
+                        'amount' => $teacherAmount,
+                        'status' => 'completed',
+                        'reference_type' => 'App\Models\OrderItem',
+                        'reference_id' => $item->id,
+                        'description' => 'Hoàn tiền cho khóa học: ' . $course->title,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    
+                    \App\Models\TeacherPayout::where('order_id', $order->id)->where('course_id', $course->id)->update(['status' => 'refunded']);
+                }
+            }
+            
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Order forcefully refunded for testing'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
 }
