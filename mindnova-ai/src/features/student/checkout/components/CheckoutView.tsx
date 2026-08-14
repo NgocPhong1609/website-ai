@@ -39,7 +39,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
       const res = await checkoutService.createOrder([courseId], methodToUse);
       if (res.success) {
         if (isFree || !res.payment_url) {
-           router.push('/study-plan');
+           router.push(`/courses/lesson?courseId=${courseId}`);
         } else {
            window.location.href = res.payment_url;
         }

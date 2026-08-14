@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeftIcon, ChevronRightIcon } from "./icons";
-import { getStudents, exportStudentsCSV } from "../api";
+import { getStudents, exportStudentsCSV, getNotificationOptions } from "../api";
 import { DownloadIcon } from "./icons"; // Import if needed for export button inside table header
 
 export type ProgressStatus = "Hoàn tất" | "Đang học" | "Chưa bắt đầu" | "Nguy cơ trễ";
@@ -165,6 +165,22 @@ export function StudentTable({
     staleTime: 5000,
   });
 
+  const { data: coursesData } = useQuery({
+    queryKey: ["instructorCoursesFilter"],
+    queryFn: () => getNotificationOptions(),
+    staleTime: 60000,
+  });
+
+  const coursesArray = Array.isArray(coursesData) ? coursesData : (coursesData?.data || []);
+
+  const courseOptions = [
+    { id: "TẤT CẢ", name: "TẤT CẢ KHÓA HỌC" },
+    ...coursesArray.map((c: any) => ({
+      id: String(c.value || c.id),
+      name: c.title,
+    })),
+  ];
+
   return (
     <div className="w-full flex flex-col gap-5 animate-fadeIn">
 
@@ -186,10 +202,7 @@ export function StudentTable({
               setFilterCourse(val);
               setPage(1);
             }}
-            options={[
-              { id: "TẤT CẢ", name: "TẤT CẢ KHÓA HỌC" },
-              { id: "48", name: "Cha giàu & cha nghèo" }
-            ]}
+            options={courseOptions}
           />
         </div>
       </div>

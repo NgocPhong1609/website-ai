@@ -112,6 +112,9 @@ Route::middleware('auth:sanctum')->group(function () {
         // Enrolled Courses
         Route::get('/courses/enrolled', [\App\Http\Controllers\Api\Student\CourseController::class, 'enrolledCourses']);
 
+        // Check Order Status by Transaction ID
+        Route::get('/orders/transaction/{transactionId}', [OrderController::class, 'showByTransaction']);
+
         // TÍNH NĂNG AI TUTOR & Các tiện ích nâng cao khác
         Route::post('/ai-tutor/chat', [\App\Http\Controllers\Api\Student\AiTutorController::class, 'streamChat']);
         Route::post('/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'store']);
@@ -282,3 +285,10 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::patch('/reviews/deletion-requests/{deletionRequest}/reject', [AdminReviewController::class, 'rejectDeletion']);
 
 });
+
+// ==========================================
+// 6. DEV / TEST ENDPOINTS
+// ==========================================
+if (app()->environment('local', 'testing')) {
+    Route::post('/dev/orders/{orderId}/complete', [App\Http\Controllers\Api\Student\OrderController::class, 'devCompleteOrder']);
+}

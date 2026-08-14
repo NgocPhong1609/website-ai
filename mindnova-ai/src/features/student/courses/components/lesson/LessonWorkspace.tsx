@@ -580,9 +580,15 @@ function LessonWorkspaceContent() {
   const initialLessonParam = searchParams.get("lessonId");
 
   const parsedCourseId = courseIdParam ? Number(courseIdParam) : 1;
-  const { data: apiDetail, isLoading } = useGetCourseDetail(parsedCourseId);
+  const { data: apiDetail, isLoading, error } = useGetCourseDetail(parsedCourseId);
   const invalidateCourseDetail = useInvalidateCourseDetail();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (error && (error as any).response?.status === 403) {
+      window.location.href = `/courses/detail?courseId=${parsedCourseId}`;
+    }
+  }, [error, parsedCourseId]);
 
   const [activeLessonId, setActiveLessonId] = useState<string>("");
   const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({});

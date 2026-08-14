@@ -82,7 +82,7 @@ class OrderController extends Controller
             DB::commit();
 
             // Xử lý phương thức thanh toán
-            $paymentUrl = $this->handlePaymentMethod($order, $request, $totalAmount);
+            $paymentUrl = $this->handlePaymentMethod($order, $request, $totalAmount, $courses);
 
             return response()->json([
                 'success' => true,
@@ -100,9 +100,11 @@ class OrderController extends Controller
     /**
      * Tách logic xử lý các cổng thanh toán ra riêng
      */
-    private function handlePaymentMethod($order, $request, $totalAmount)
+    private function handlePaymentMethod($order, $request, $totalAmount, $courses = null)
     {
         $transactionId = $order->transaction_id;
+        $courseId = $courses ? $courses->first()->id : '';
+        $returnUrl = "http://localhost:3000/payment/callback" . ($courseId ? "?course_id=" . $courseId : "");
 
         if ($order->payment_method === 'vnpay') {
             $inputData = [
@@ -112,7 +114,7 @@ class OrderController extends Controller
                 "vnp_IpAddr" => $request->ip(), "vnp_Locale" => "vn",
                 "vnp_OrderInfo" => "Thanh toan " . $transactionId,
                 "vnp_OrderType" => "billpayment",
-                "vnp_ReturnUrl" => "http://localhost:3000/payment/callback",
+                "vnp_ReturnUrl" => $returnUrl,
                 "vnp_TxnRef" => $transactionId,
             ];
             ksort($inputData);
@@ -126,7 +128,7 @@ class OrderController extends Controller
             $accessKey = env('MOMO_ACCESS_KEY', 'access_key');
             $secretKey = env('MOMO_SECRET_KEY', 'secret_key');
             $endpoint = env('MOMO_ENDPOINT', 'https://test-payment.momo.vn/v2/gateway/api/create');
-            $redirectUrl = "http://localhost:3000/payment/callback";
+            $redirectUrl = $returnUrl;
             $ipnUrl = env('APP_URL', 'http://localhost:8000') . "/api/student/payment/momo-ipn";
             $amount = (string)$totalAmount;
             $orderInfo = "Thanh toan don hang " . $transactionId;
@@ -267,5 +269,80 @@ class OrderController extends Controller
         }
 
         return response()->json(['message' => 'Invalid signature'], 400);
+    }
+
+    /**
+     * API for fetching order status securely by transaction ID
+     */
+    public function showByTransaction(Request $request, $transactionId)
+    {
+        $order = Order::with('orderItems.course')->where('transaction_id', $transactionId)->first();
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Order not found'], 404);
+        }
+        
+        // Ensure user can only check their own order
+        if ($order->user_id !== $request->user()->id) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $order
+        ]);
+    }
+
+    /**
+     * Dev Endpoint to force complete an order for testing
+     */
+    public function devCompleteOrder(Request $request, $orderId)
+    {
+        if (!app()->environment('local', 'testing')) {
+            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+        }
+
+        $order = Order::find($orderId);
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Order not found'], 404);
+        }
+
+        if ($order->status !== 'pending') {
+            return response()->json(['success' => false, 'message' => 'Order is not pending'], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            $order->update(['status' => 'completed']);
+            $items = OrderItem::with('course.teacher')->where('order_id', $order->id)->get();
+            $student = \App\Models\User::find($order->user_id);
+            
+            foreach ($items as $item) {
+                $inserted = DB::table('enrollments')->insertOrIgnore([
+                    'user_id' => $order->user_id, 'course_id' => $item->course_id,
+                    'status' => 'enrolled', 'enrolled_at' => now()
+                ]);
+                
+                if ($inserted) {
+                    $course = $item->course;
+                    if ($course && $course->teacher && $student) {
+                        $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
+                    }
+                }
+            }
+            
+            if (class_exists(\App\Services\Instructor\InstructorPayoutService::class)) {
+                app(\App\Services\Instructor\InstructorPayoutService::class)->createForOrder($order);
+            }
+            
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Order forcefully completed for testing',
+                'data' => $order->load('orderItems')
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 }
