@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Api\Instructor\CourseController;
 use App\Http\Controllers\Api\Instructor\CourseModuleController;
 use App\Http\Controllers\Api\Instructor\LessonController;
+use App\Http\Controllers\Api\Student\AiTutorController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -40,12 +41,18 @@ Route::middleware('auth:sanctum')->group(function () {
     // -- Đăng xuất --
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    // -- AI hỗ trợ học tập (Học sinh, Giáo viên, Admin đều dùng chung) --
+    Route::post('/ai-chat', [AiTutorController::class, 'chat']);
+
     // -- Quản lý Hồ sơ Cá nhân (Học sinh & Giáo viên dùng chung) --
     Route::prefix('profile')->group(function () {
         Route::get('/', [UserController::class, 'getProfile']);
         Route::post('/update', [UserController::class, 'updateProfile']);
         Route::post('/change-password', [UserController::class, 'changePassword']);
         Route::post('/avatar', [UserController::class, 'uploadAvatar']);
+        Route::post('/cv', [UserController::class, 'uploadCv']);
+        Route::post('/credentials', [UserController::class, 'uploadCredential']);
+        Route::delete('/credentials/{credentialId}', [UserController::class, 'deleteCredential']);
         // -- Nhóm API Đơn hàng (Orders) --
         Route::get('/orders', [OrderController::class, 'index']);
         Route::post('/orders', [OrderController::class, 'store']);
@@ -64,31 +71,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus']);
         Route::delete('/users/{id}', [AdminUserController::class, 'destroy']);
 
-        // Quản lý danh mục
-        Route::get('/categories', [AdminCategoryController::class, 'index']);
-        Route::post('/categories', [AdminCategoryController::class, 'store']);
-        Route::put('/categories/{category}', [AdminCategoryController::class, 'update']);
-        Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy']);
+        // Admin modules required by the dashboard scope
+        Route::get('/teacher-approvals', [AdminDashboardController::class, 'teacherApprovals']);
+        Route::get('/ai-system', [AdminDashboardController::class, 'aiSystem']);
+        Route::get('/content', [AdminDashboardController::class, 'content']);
+        Route::get('/revenue', [AdminDashboardController::class, 'revenue']);
+        Route::get('/analytics', [AdminDashboardController::class, 'analytics']);
+        Route::get('/moderation-support', [AdminDashboardController::class, 'moderationSupport']);
 
-        // Quản lý khóa học
-        Route::get('/courses', [AdminCourseController::class, 'index']);
-        Route::post('/courses', [AdminCourseController::class, 'store']);
-        Route::get('/courses/{course}', [AdminCourseController::class, 'show']);
-        Route::put('/courses/{course}', [AdminCourseController::class, 'update']);
-        Route::delete('/courses/{course}', [AdminCourseController::class, 'destroy']);
-
-        // Quản lý mã giảm giá khóa học
         Route::get('/coupons', [AdminCouponController::class, 'index']);
         Route::post('/coupons', [AdminCouponController::class, 'store']);
         Route::put('/coupons/{coupon}', [AdminCouponController::class, 'update']);
         Route::delete('/coupons/{coupon}', [AdminCouponController::class, 'destroy']);
-
-        // Quản lý hóa đơn
-        Route::get('/invoices', [AdminInvoiceController::class, 'index']);
-
-        // Email thông báo
-        Route::post('/notifications/test-email', [AdminNotificationController::class, 'sendTestEmail']);
-
     });
 
     // ==========================================

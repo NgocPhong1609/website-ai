@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { axiosClient } from "@/src/shared/lib/axios";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -64,15 +65,6 @@ const QUICK_ACTIONS = [
   { label: "🧠 Kiểm tra kiến thức", prompt: "Hãy kiểm tra kiến thức của tôi" },
 ];
 
-const DEMO_RESPONSES: Record<string, string> = {
-  default:
-    "Tôi đã nhận được câu hỏi của bạn! 🤔 Đây là chức năng demo — trong phiên bản thực tế, Nova sẽ kết nối với AI để trả lời chi tiết dựa trên nội dung khóa học của bạn.",
-  "Tổng hợp tiến độ học tập của tôi":
-    "📊 **Tổng hợp tiến độ học tập:**\n\nDựa trên dữ liệu của bạn:\n• Bạn đang học **3 khóa học** đang tiến hành\n• Tiến độ trung bình: **~60%**\n• Bài học tiếp theo được đề xuất: Route Handlers & Server Actions\n\nHãy duy trì đà học tập này! 🚀",
-  "Hãy kiểm tra kiến thức của tôi":
-    "🧠 **Câu hỏi kiểm tra:**\n\nTrong Next.js, **Server Components** và **Client Components** khác nhau như thế nào?\n\nA) Server Components chạy trên server, Client Components chạy trên browser\nB) Không có sự khác biệt\nC) Server Components chỉ dùng cho API routes\n\nHãy chọn đáp án bạn cho là đúng!",
-};
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function FloatingAiChat() {
@@ -104,11 +96,21 @@ export function FloatingAiChat() {
     setInput("");
     setIsTyping(true);
 
-    // Simulate response delay
-    await new Promise((r) => setTimeout(r, 1200 + Math.random() * 600));
+    const history = messages
+      .slice(-10)
+      .map(({ role, content }) => ({ role, content }));
 
-    const responseText =
-      DEMO_RESPONSES[trimmed] ?? DEMO_RESPONSES["default"];
+    let responseText: string;
+    try {
+      const { data } = await axiosClient.post<{ reply: string }>("/ai-chat", {
+        message: trimmed,
+        history,
+      });
+      responseText = data.reply;
+    } catch {
+      responseText =
+        "Xin lỗi, Nova hiện không thể kết nối tới dịch vụ AI. Vui lòng thử lại sau. 🙏";
+    }
 
     const assistantMsg: Message = {
       id: (Date.now() + 1).toString(),

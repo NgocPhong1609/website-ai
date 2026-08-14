@@ -10,16 +10,31 @@ export function AdminStatsGrid({ stats }: AdminStatsGridProps) {
       {stats.map((item) => (
         <article
           key={item.label}
-          className="mn-stagger rounded-2xl border border-cyan-100/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)] transition hover:-translate-y-1 hover:shadow-[0_24px_45px_-26px_rgba(14,23,52,0.55)]"
+          className="rounded-[24px] border border-slate-200 bg-white/90 p-5 shadow-[0_20px_40px_-32px_rgba(15,23,42,0.7)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_24px_50px_-30px_rgba(14,165,233,0.4)]"
         >
           <div className="flex items-center justify-between text-sm text-slate-500">
             <span>{item.label}</span>
-            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-600 ring-1 ring-emerald-100">
+            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-600 ring-1 ring-emerald-100">
               {item.trend}
             </span>
           </div>
-          <div className="mt-5 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{item.value}</div>
-          <div className="mt-2 text-sm text-slate-500">{item.note}</div>
+
+          <div className="mt-5 flex items-end justify-between gap-3">
+            <div className="text-[30px] font-semibold leading-none text-slate-900 [font-family:var(--font-admin-head)]">
+              {item.value}
+            </div>
+            <div className="flex h-10 w-16 items-end gap-1 rounded-xl bg-slate-100 p-2">
+              {[28, 40, 32, 48, 36, 60, 50].map((height, index) => (
+                <span
+                  key={`${item.label}-${index}`}
+                  className="w-full rounded-t-md bg-gradient-to-t from-cyan-500 to-indigo-400"
+                  style={{ height: `${height}%` }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4 text-sm text-slate-500">{item.note}</div>
         </article>
       ))}
     </section>

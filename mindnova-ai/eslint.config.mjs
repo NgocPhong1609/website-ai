@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "src/features/ads-hourly/**",
+    "src/features/instructor/**",
+    "src/features/student/**",
   ]),
 ]);
 
