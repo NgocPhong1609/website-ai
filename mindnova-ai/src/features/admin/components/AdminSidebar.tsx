@@ -7,6 +7,7 @@ const navItems = [
   { label: "Tổng quan", href: "/admin", icon: "◈" },
   { label: "Danh mục", href: "/admin/categories", icon: "◍" },
   { label: "Khóa học", href: "/admin/courses", icon: "▣" },
+  { label: "Mã giảm giá", href: "/admin/coupons", icon: "◉" },
   { label: "Kiểm duyệt", href: "/admin/users", icon: "◎" },
   { label: "Hóa đơn", href: "/admin/invoices", icon: "◌" },
 ];

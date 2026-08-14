@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardControll
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Api\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\Api\Admin\InvoiceController as AdminInvoiceController;
 
@@ -75,6 +76,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/courses/{course}', [AdminCourseController::class, 'show']);
         Route::put('/courses/{course}', [AdminCourseController::class, 'update']);
         Route::delete('/courses/{course}', [AdminCourseController::class, 'destroy']);
+
+        // Quản lý mã giảm giá khóa học
+        Route::get('/coupons', [AdminCouponController::class, 'index']);
+        Route::post('/coupons', [AdminCouponController::class, 'store']);
+        Route::put('/coupons/{coupon}', [AdminCouponController::class, 'update']);
+        Route::delete('/coupons/{coupon}', [AdminCouponController::class, 'destroy']);
 
         // Quản lý hóa đơn
         Route::get('/invoices', [AdminInvoiceController::class, 'index']);
