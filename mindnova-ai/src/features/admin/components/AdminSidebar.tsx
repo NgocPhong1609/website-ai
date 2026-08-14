@@ -7,7 +7,7 @@ const navItems = [
   { label: "Dashboard", href: "/admin", icon: "◈" },
   { label: "Người dùng", href: "/admin/users", icon: "◎" },
   { label: "AI & Hệ thống", href: "/admin/ai-system", icon: "◌" },
-  { label: "Nội dung học tập", href: "/admin/content", icon: "▣" },
+  { label: "Quản lý khóa học", href: "/admin/content", icon: "▣" },
   { label: "Thống kê", href: "/admin/analytics", icon: "◍" },
   { label: "Moderation & Support", href: "/admin/moderation-support", icon: "✉" },
 ];

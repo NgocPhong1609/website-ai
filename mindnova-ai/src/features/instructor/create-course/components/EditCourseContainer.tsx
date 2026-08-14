@@ -125,13 +125,14 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
     }
   };
 
-  const handleToggleStatus = async () => {
-    const newStatus = course.status === "published" ? "draft" : "published";
+  const handleSubmitReview = async () => {
+    if (!confirm("Bạn có chắc chắn muốn gửi khóa học này để quản trị viên xét duyệt?")) return;
     try {
-      await updateStatus({ courseId, status: newStatus });
-      alert(`Đã chuyển trạng thái khóa học sang ${newStatus === "published" ? "Công khai (Published)" : "Bản nháp (Draft)"}`);
-    } catch (error) {
-      alert("Cập nhật trạng thái thất bại!");
+      await updateStatus({ courseId, status: "pending_review" });
+      alert("Khóa học đã được gửi xét duyệt thành công!");
+      router.refresh();
+    } catch (error: any) {
+      alert(error?.response?.data?.message || "Gửi xét duyệt thất bại!");
     }
   };
 
@@ -166,8 +167,8 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
                   <h1 className="text-lg font-black text-gray-900 tracking-tight truncate max-w-md md:max-w-2xl">
                     {basicInfo.title || "Tên khóa học"}
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-md text-[10px] font-black tracking-wider uppercase border bg-emerald-50 text-emerald-600 border-emerald-200">
-                    {course.status === "published" ? "PUBLISHED" : "DRAFT MODE"}
+                  <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black tracking-wider uppercase border ${course.status === "published" ? "bg-emerald-50 text-emerald-600 border-emerald-200" : course.status === "pending_review" ? "bg-sky-50 text-sky-600 border-sky-200" : "bg-slate-50 text-slate-600 border-slate-200"}`}>
+                    {course.status === "published" ? "ĐÃ CÔNG KHAI" : course.status === "pending_review" ? "ĐANG CHỜ DUYỆT" : "BẢN NHÁP"}
                   </span>
                 </div>
               </div>
@@ -183,6 +184,27 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
                 <EyeIcon size={14} />
                 <span className="hidden sm:inline">Xem trước</span>
               </Link>
+
+              {course.status === "draft" && (
+                <button
+                  type="button"
+                  onClick={handleSubmitReview}
+                  disabled={isPending}
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-sky-500 hover:bg-sky-600 transition-all shadow-sm disabled:bg-gray-400"
+                >
+                  <span className="hidden sm:inline">Gửi xét duyệt</span>
+                </button>
+              )}
+
+              {course.status === "pending_review" && (
+                <button
+                  type="button"
+                  disabled
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200 cursor-not-allowed shadow-sm"
+                >
+                  <span className="hidden sm:inline">Đang chờ duyệt</span>
+                </button>
+              )}
 
               <button
                 type="button"

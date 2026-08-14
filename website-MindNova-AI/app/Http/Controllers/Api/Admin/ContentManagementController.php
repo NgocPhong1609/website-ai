@@ -97,11 +97,10 @@ class ContentManagementController extends Controller
     public function moderateCourse(Request $request, Course $course): JsonResponse
     {
         $data = $request->validate([
-            'status' => ['required', 'string', 'in:archived,draft'],
+            'status' => ['required', 'string', 'in:archived,draft,published'],
         ]);
 
-        // Admin can only use archive/draft for direct moderation.
-        // Publishing must go through the review workflow.
+        // Quick moderation without review workflow (direct approve)
         $oldStatus = $course->status;
         $course->status = $data['status'];
         $course->save();
