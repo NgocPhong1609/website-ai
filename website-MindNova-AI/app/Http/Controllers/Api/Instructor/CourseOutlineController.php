@@ -14,7 +14,7 @@ use App\Models\Lesson;
 
 class CourseOutlineController extends Controller
 {
-    public function __construct(private readonly AiProviderInterface $aiService)
+    public function __construct(private readonly \App\Services\Ai\AiRouterService $aiRouter)
     {
     }
 
@@ -77,43 +77,17 @@ class CourseOutlineController extends Controller
         }";
 
         try {
-            $responseJson = $this->aiService->sendMessage([
+            $messages = [
                 new AiMessageDto("system", $systemPrompt),
                 new AiMessageDto("user", "Tạo đề cương khóa học ngay. Chỉ trả về JSON.")
-            ], ['response_mime_type' => 'application/json']);
-        } catch (Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('[CourseOutline Fallback] Gemini API failed: ' . $e->getMessage() . '. Attempting OpenAI Fallback.');
-            $openAiKey = env('OPENAI_API_KEY') ?: config('services.openai.key');
+            ];
+
+            $responseResult = $this->aiRouter->sendMessageWithFallback($messages, [
+                'response_mime_type' => 'application/json'
+            ]);
             
-            if (empty($openAiKey)) {
-                // If no fallback key, throw a descriptive exception to be caught below
-                throw new Exception("AI đang quá tải (503) và không có cấu hình Fallback. Lỗi gốc: " . $e->getMessage());
-            }
-
-            // Perform OpenAI fallback
-            $model = env('OPENAI_MODEL') ?: config('services.openai.model', 'gpt-4o-mini');
-            $response = \Illuminate\Support\Facades\Http::withToken($openAiKey)
-                ->timeout(90)
-                ->post('https://api.openai.com/v1/chat/completions', [
-                    'model' => $model,
-                    'messages' => [
-                        ['role' => 'system', 'content' => $systemPrompt],
-                        ['role' => 'user', 'content' => "Tạo đề cương khóa học ngay. Chỉ trả về JSON."]
-                    ],
-                    'response_format' => ['type' => 'json_object'],
-                    'temperature' => 0.7,
-                ]);
-
-            if ($response->successful()) {
-                $responseJson = $response->json('choices.0.message.content');
-                \Illuminate\Support\Facades\Log::info('[CourseOutline Fallback] Successfully generated outline using OpenAI.');
-            } else {
-                \Illuminate\Support\Facades\Log::error('[CourseOutline Fallback] OpenAI failed: ' . $response->body());
-                throw new Exception("Cả hệ thống AI chính và dự phòng đều đang quá tải.");
-            }
-        }
-
-        try {
+            $responseJson = $responseResult['content'];
+            $meta = $responseResult['meta'];
 
             // Parse response
             // AI might return with markdown ```json ... ```, so we should clean it if needed
@@ -126,7 +100,8 @@ class CourseOutlineController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $outline
+                'data' => $outline,
+                'meta' => $meta
             ]);
         } catch (Exception $e) {
             return response()->json([

@@ -57,14 +57,20 @@ class GeminiAiService extends AbstractAiService
             ];
         }
 
-        $maxRetries = 4;
+        $maxRetries = $options['max_retries'] ?? 4;
         $lastException = null;
 
         for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
             try {
-                $response = Http::withHeaders([
-                    "Content-Type" => "application/json",
-                ])->timeout(90)->post($url, $payload);
+                // Simulate failure in development
+                if (env('AI_FORCE_PRIMARY_FAILURE', false)) {
+                    Log::warning("AI_FORCE_PRIMARY_FAILURE is true, simulating 503 error.");
+                    $response = Http::response('Service Unavailable', 503);
+                } else {
+                    $response = Http::withHeaders([
+                        "Content-Type" => "application/json",
+                    ])->timeout(90)->post($url, $payload);
+                }
 
                 if ($response->successful()) {
                     $data = $response->json();
@@ -87,12 +93,24 @@ class GeminiAiService extends AbstractAiService
                     return $responseContent;
                 }
 
-                // Neu gap loi 503 (Service Unavailable) hoac 429 (Rate Limit), retry
-                if (in_array($response->status(), [503, 429, 500]) && $attempt < $maxRetries) {
-                    $waitSeconds = pow(2, $attempt - 1); // 1s, 2s, 4s
-                    Log::warning("Gemini API returned {$response->status()}, retrying in {$waitSeconds}s (attempt {$attempt}/{$maxRetries})");
-                    sleep($waitSeconds);
-                    continue;
+                // Neu gap loi 503 (Service Unavailable) hoac 429 (Rate Limit) hoac timeout, retry
+                if (in_array($response->status(), [503, 429, 500, 502, 504]) && $attempt <= $maxRetries) {
+                    if ($attempt < $maxRetries) {
+                        $waitSeconds = pow(2, $attempt - 1); // 1s, 2s, 4s
+                        Log::warning("Gemini API returned {$response->status()}, retrying in {$waitSeconds}s (attempt {$attempt}/{$maxRetries})");
+                        sleep($waitSeconds);
+                        continue;
+                    } else {
+                        // Thrown on max attempts reached
+                        Log::error("Gemini API Error: Transient error {$response->status()} after {$maxRetries} attempts. " . $response->body());
+                        throw new \App\Exceptions\AiTransientException("Gemini transient error: " . $response->status());
+                    }
+                }
+                
+                // 404 is usually a wrong model name, but we should fallback to Backup AI to not disrupt user experience
+                if ($response->status() === 404) {
+                    Log::error("Gemini API Error 404: Model not found. Throwing transient exception to trigger fallback immediately. " . $response->body());
+                    throw new \App\Exceptions\AiTransientException("Gemini model not found (404)");
                 }
 
                 Log::error("Gemini API Error: " . $response->body());
@@ -100,15 +118,26 @@ class GeminiAiService extends AbstractAiService
                 
             } catch (Exception $e) {
                 $lastException = $e;
+                if ($e instanceof \App\Exceptions\AiTransientException) {
+                    throw $e;
+                }
                 if (str_contains($e->getMessage(), 'Loi khi goi Gemini API') && $attempt >= $maxRetries) {
                     throw $e;
                 }
-                if ($attempt < $maxRetries) {
-                    $waitSeconds = pow(2, $attempt - 1);
-                    Log::warning("Gemini API Exception on attempt {$attempt}: {$e->getMessage()}, retrying in {$waitSeconds}s");
-                    sleep($waitSeconds);
-                    continue;
+                
+                // If it's a network error (like ConnectionException), we can treat it as transient
+                $isNetworkError = $e instanceof \Illuminate\Http\Client\ConnectionException || str_contains($e->getMessage(), 'cURL error');
+                if ($isNetworkError && $attempt <= $maxRetries) {
+                    if ($attempt < $maxRetries) {
+                        $waitSeconds = pow(2, $attempt - 1);
+                        Log::warning("Gemini API Network Exception on attempt {$attempt}: {$e->getMessage()}, retrying in {$waitSeconds}s");
+                        sleep($waitSeconds);
+                        continue;
+                    } else {
+                        throw new \App\Exceptions\AiTransientException("Gemini network transient error: " . $e->getMessage());
+                    }
                 }
+                
                 Log::error("Gemini API Exception after {$maxRetries} attempts: " . $e->getMessage());
                 throw $e;
             }

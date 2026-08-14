@@ -62,10 +62,10 @@ export function useGenerateOutline() {
       } else if (status === 429) {
         vietnameseError = "Bạn đã gửi quá nhiều yêu cầu. Vui lòng chờ một lát rồi thử lại.";
       } else if (status === 500) {
-        if (serverMsg && (serverMsg.includes("quá tải") || serverMsg.includes("503"))) {
-          vietnameseError = "Hiện tại AI chưa thể tạo đề cương do quá tải. Vui lòng thử lại sau ít phút.";
+        if (serverMsg) {
+            vietnameseError = serverMsg;
         } else {
-          vietnameseError = "Hiện tại AI chưa thể tạo đề cương. Vui lòng thử lại sau ít phút.";
+            vietnameseError = "Hiện tại AI chưa thể tạo đề cương. Vui lòng thử lại sau ít phút.";
         }
       } else if (err.code === "ERR_NETWORK" || err.message === "Network Error") {
         vietnameseError = "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.";

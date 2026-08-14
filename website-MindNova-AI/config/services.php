@@ -52,6 +52,11 @@ return [
         'model' => env('GEMINI_MODEL', 'gemini-1.5-flash'),
     ],
     
+    'backup_ai' => [
+        'api_key' => env('BACKUP_AI_API_KEY'),
+        'model' => env('BACKUP_AI_MODEL', 'gpt-4o-mini'),
+    ],
+    
     'momo' => [
         'partner_code' => env('MOMO_PARTNER_CODE'),
         'access_key' => env('MOMO_ACCESS_KEY'),
