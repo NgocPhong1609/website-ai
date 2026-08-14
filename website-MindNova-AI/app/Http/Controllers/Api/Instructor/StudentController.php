@@ -31,7 +31,7 @@ class StudentController extends Controller
 
         $query = $this->studentService->getStudentsForInstructor($teacherId, $courseId, $search);
 
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', $request->input('limit', 10));
         $enrollments = $query->paginate($perPage);
 
         // Map results to include average quiz score and proper status

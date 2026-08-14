@@ -60,7 +60,7 @@ class StudentAnalyticsController extends Controller
                     'email' => $enrollment->user->email,
                     'course_name' => $enrollment->course->title,
                     'status' => $isActive ? 'ĐANG HOẠT ĐỘNG' : 'TẠM VẮNG MẶT',
-                    'enrolled_at' => $enrollment->enrolled_at->format('Y-m-d')
+                    'enrolled_at' => $enrollment->enrolled_at ? $enrollment->enrolled_at->format('Y-m-d') : null
                 ];
             });
 
