@@ -94,7 +94,7 @@ class CourseController extends Controller
         Gate::authorize('update', $course);
 
         try {
-            $course = $this->courseService->updateStatus($course, $request->status);
+            $course = $this->courseService->updateStatus($course, $request->status, $request->user());
             return $this->successResponse(new CourseResource($course), 'Course status updated.');
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 422);

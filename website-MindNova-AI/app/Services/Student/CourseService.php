@@ -9,7 +9,9 @@ use App\Models\CourseModule;
 class CourseService
 {
     /**
-     * Helper to calculate accurate progress dynamically for a student in a course
+     * Helper to calculate accurate progress dynamically for a student in a course.
+     * 
+     * SECURITY: Only counts published lessons toward progress.
      */
     public function calculateStudentProgress(Course $course, int $userId): array
     {
@@ -29,6 +31,11 @@ class CourseService
         foreach ($sortedModules as $module) {
             $sortedLessons = $module->lessons->sortBy('order');
             foreach ($sortedLessons as $lesson) {
+                // ── RULE 6 & 14: Only count PUBLISHED lessons ──
+                if ($lesson->status !== 'published' || $lesson->published_version_id === null) {
+                    continue;
+                }
+
                 $totalLessons++;
                 $isCompleted = in_array($lesson->id, $completedLessonIds);
                 
@@ -65,6 +72,8 @@ class CourseService
 
     /**
      * Retrieve complete course detail information, module curriculum, AI tutor tips, and student progress.
+     *
+     * SECURITY: Only shows published lessons. Draft/pending/rejected lessons are completely filtered out.
      */
     public function getCourseDetail($courseId = 1, ?User $user = null): array
     {
@@ -96,11 +105,18 @@ class CourseService
         // Query real database course
         try {
             if (class_exists(Course::class)) {
-                // Fetch course with teacher and category
-                $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])->find($courseId);
+                // ── SECURITY: Only fetch published courses ──
+                $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])
+                    ->where('status', 'published')
+                    ->whereNotNull('published_version_id')
+                    ->find($courseId);
                 
                 if (!$dbCourse) {
-                    $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])->first();
+                    // Fallback to first published course
+                    $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])
+                        ->where('status', 'published')
+                        ->whereNotNull('published_version_id')
+                        ->first();
                 }
 
                 if ($dbCourse) {
@@ -131,6 +147,11 @@ class CourseService
                             if ($mod->lessons && $mod->lessons->isNotEmpty()) {
                                 $lOrder = 1;
                                 foreach ($mod->lessons->sortBy('order') as $les) {
+                                    // ── RULE 6, 14, 15: ONLY show PUBLISHED lessons ──
+                                    if ($les->status !== 'published' || $les->published_version_id === null) {
+                                        continue; // Skip draft/pending/rejected lessons entirely
+                                    }
+
                                     $isCompleted = in_array($les->id, $completedLessonIds);
                                     
                                     if ($isCompleted) {
@@ -173,13 +194,17 @@ class CourseService
                                     $lOrder++;
                                 }
                             }
-                            $modules[] = [
-                                'id' => $mod->id,
-                                'order' => $mod->order ?: $modOrder,
-                                'title' => $mod->title ?: "Module 0{$modOrder}",
-                                'duration' => 'Nhiều bài học',
-                                'lessons' => $mLessons,
-                            ];
+
+                            // Only include modules that have published lessons
+                            if (!empty($mLessons)) {
+                                $modules[] = [
+                                    'id' => $mod->id,
+                                    'order' => $mod->order ?: $modOrder,
+                                    'title' => $mod->title ?: "Module 0{$modOrder}",
+                                    'duration' => 'Nhiều bài học',
+                                    'lessons' => $mLessons,
+                                ];
+                            }
                             $modOrder++;
                         }
                     }
@@ -260,6 +285,8 @@ class CourseService
 
     /**
      * Retrieve all enrolled courses for the student with progress metrics.
+     *
+     * SECURITY: Only shows courses that are published with valid versions.
      */
     public function getEnrolledCourses(?User $user): array
     {

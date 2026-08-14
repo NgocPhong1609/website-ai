@@ -220,16 +220,14 @@ export function CreateCourseContainer() {
         sale_end_date: priceNum === 0 ? undefined : settings.saleEndDate
       });
 
-      if (!settings.isDraft) {
-        await updateStatus({ courseId, status: "published" });
-      }
+      await updateStatus({ courseId, status: "draft" });
 
       resetDraft();
-      alert("🎉 Xuất bản khóa học thành công!");
+      alert("🎉 Tạo khóa học thành công!");
       window.location.href = "/instructor/courses";
     } catch (error: any) {
       console.error("Publish failed:", error);
-      let errorMsg = "Có lỗi xảy ra khi xuất bản. Vui lòng thử lại.";
+      let errorMsg = "Có lỗi xảy ra khi tạo khóa học. Vui lòng thử lại.";
       if (error.response?.data?.message) {
         errorMsg = `Lỗi: ${error.response.data.message}`;
       } else if (error.message) {
@@ -292,14 +290,7 @@ export function CreateCourseContainer() {
             </div>
 
             <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                id="btn-save-draft"
-                onClick={() => alert("Đã lưu bản nháp của bạn!")}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-gray-700 border border-gray-200 bg-white hover:bg-gray-50 transition-all cursor-pointer shadow-2xs"
-              >
-                💾 Lưu nháp
-              </button>
+
               <button
                 type="button"
                 id="btn-finish-publish"
@@ -367,7 +358,7 @@ export function CreateCourseContainer() {
             {step === 3 ? (
               <>
                 <SparklesIcon size={14} />
-                <span>{isPublishing ? "Đang xử lý..." : "Hoàn tất & Đăng khóa học"}</span>
+                <span>{isPublishing ? "Đang xử lý..." : "Hoàn tất & Tạo khóa học"}</span>
               </>
             ) : (
               <>

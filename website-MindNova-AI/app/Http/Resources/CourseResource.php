@@ -31,6 +31,11 @@ class CourseResource extends JsonResource
             'category_id' => $this->category_id,
             'totalLessons' => $this->total_lessons,
             'durationHours' => $this->duration_hours,
+            // ── Versioning info ──
+            'current_version' => $this->current_version,
+            'published_version_id' => $this->published_version_id,
+            'is_published' => $this->isPublished(),
+            'has_pending_submission' => $this->hasPendingSubmission(),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

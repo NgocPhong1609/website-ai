@@ -46,6 +46,10 @@ use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscus
 use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNotificationController;
 use App\Http\Controllers\Api\Instructor\RevenueController;
 use App\Http\Controllers\Api\Instructor\CourseOutlineController;
+use App\Http\Controllers\Api\Instructor\ContentReviewController as InstructorContentReviewController;
+
+// Nhóm Admin Review
+use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
 // ==========================================
@@ -210,6 +214,13 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     // AI Course Outline
     Route::post('courses/ai-outline/generate', [CourseOutlineController::class, 'generate']);
     Route::post('courses/{course}/ai-outline/save', [CourseOutlineController::class, 'save']);
+
+    // ── Content Review Workflow ──
+    Route::post('courses/{course}/submit-review', [InstructorContentReviewController::class, 'submitForReview']);
+    Route::get('courses/{course}/versions', [InstructorContentReviewController::class, 'versions']);
+    Route::get('courses/{course}/submissions', [InstructorContentReviewController::class, 'submissions']);
+    Route::get('submissions/{submission}', [InstructorContentReviewController::class, 'showSubmission']);
+    Route::post('lessons/{lesson}/request-deletion', [InstructorContentReviewController::class, 'requestLessonDeletion']);
 });
 
 // ==========================================
@@ -255,5 +266,19 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/support/tickets', [AdminModerationSupportController::class, 'tickets']);
     Route::post('/support/tickets', [AdminModerationSupportController::class, 'createTicket']);
     Route::patch('/support/tickets/{ticket}', [AdminModerationSupportController::class, 'resolveTicket']);
+
+    // 6) Content Review Workflow
+    Route::get('/reviews', [AdminReviewController::class, 'index']);
+    Route::get('/reviews/deletion-requests', [AdminReviewController::class, 'deletionRequests']);
+    Route::get('/reviews/audit-log', [AdminReviewController::class, 'auditLog']);
+    Route::get('/reviews/{submission}', [AdminReviewController::class, 'show']);
+    Route::get('/reviews/{submission}/diff', [AdminReviewController::class, 'diff']);
+    Route::patch('/reviews/{submission}/start', [AdminReviewController::class, 'startReview']);
+    Route::patch('/reviews/{submission}/approve', [AdminReviewController::class, 'approve']);
+    Route::patch('/reviews/{submission}/reject', [AdminReviewController::class, 'reject']);
+    Route::patch('/reviews/{submission}/request-fixes', [AdminReviewController::class, 'requestFixes']);
+    Route::post('/reviews/{submission}/comments', [AdminReviewController::class, 'addComment']);
+    Route::patch('/reviews/deletion-requests/{deletionRequest}/approve', [AdminReviewController::class, 'approveDeletion']);
+    Route::patch('/reviews/deletion-requests/{deletionRequest}/reject', [AdminReviewController::class, 'rejectDeletion']);
 
 });

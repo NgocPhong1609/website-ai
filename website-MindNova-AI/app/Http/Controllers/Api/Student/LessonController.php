@@ -29,6 +29,11 @@ class LessonController extends Controller
             return $this->unauthorizedResponse('Bạn cần đăng nhập.');
         }
 
+        // ── RULE 6 & 15: Verify lesson is PUBLISHED ──
+        if ($lesson->status !== 'published' || $lesson->published_version_id === null) {
+            return $this->notFoundResponse('Không tìm thấy bài học.');
+        }
+
         // Verify enrollment
         $courseId = $lesson->module?->course_id;
         if ($courseId && !Enrollment::where('user_id', $user->id)->where('course_id', $courseId)->exists()) {
@@ -76,6 +81,11 @@ class LessonController extends Controller
         $user = $request->user('sanctum') ?? $request->user();
         if (!$user) {
             return $this->unauthorizedResponse('Bạn cần đăng nhập.');
+        }
+
+        // ── RULE 6: Cannot complete a non-published lesson ──
+        if ($lesson->status !== 'published' || $lesson->published_version_id === null) {
+            return $this->notFoundResponse('Không tìm thấy bài học.');
         }
 
         // Verify enrollment

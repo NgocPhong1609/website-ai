@@ -77,9 +77,12 @@ class LessonController extends Controller
     {
         Gate::authorize('manage', $lesson);
 
-        $this->lessonService->deleteLesson($lesson);
-
-        return $this->noContentResponse();
+        try {
+            $this->lessonService->deleteLesson($lesson);
+            return $this->noContentResponse();
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 422);
+        }
     }
 
     public function uploadVideo(Request $request, Lesson $lesson)

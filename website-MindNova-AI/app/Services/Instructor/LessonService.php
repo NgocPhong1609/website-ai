@@ -2,14 +2,23 @@
 
 namespace App\Services\Instructor;
 
+use App\Models\ContentVersion;
 use App\Models\CourseModule;
+use App\Models\DeletionRequest;
 use App\Models\Lesson;
 use App\Models\LessonMedia;
+use App\Services\ContentAuditService;
+use App\Services\ContentReviewService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class LessonService
 {
+    public function __construct(
+        private readonly ContentAuditService $auditService,
+        private readonly ContentReviewService $reviewService,
+    ) {}
+
     public function createLesson(CourseModule $module, array $data): Lesson
     {
         $data['module_id'] = $module->id;
@@ -18,6 +27,10 @@ class LessonService
             $maxOrder = $module->lessons()->max('order') ?? 0;
             $data['order'] = $maxOrder + 1;
         }
+
+        // ── RULE 4: New lessons ALWAYS start as draft ──
+        $data['status'] = 'draft';
+        $data['current_version'] = 1;
 
         if ($data['type'] === 'article' && isset($data['content'])) {
             $content = $data['content'] ?? '';
@@ -36,11 +49,28 @@ class LessonService
             $this->saveQuizData($lesson, $data['quizData']);
         }
 
+        // Mark pending submissions as stale if course is published
+        $course = $module->course;
+        if ($course && $course->isPublished()) {
+            $this->reviewService->markSubmissionsStale($course);
+        }
+
         return $lesson;
     }
 
+    /**
+     * Update a lesson with version awareness.
+     *
+     * RULE 5: If lesson is published, teacher edits go to the working copy
+     * but published_version_id stays the same — students see old version.
+     */
     public function updateLesson(Lesson $lesson, array $data): Lesson
     {
+        // ── RULE 3: Cannot directly modify published version's snapshot ──
+        // The teacher edits the live lesson record (working draft),
+        // but the published snapshot in content_versions remains unchanged.
+        // Students always read from the published_version's snapshot_data.
+
         $lesson->fill($data);
 
         if ($lesson->type === 'article') {
@@ -53,6 +83,13 @@ class LessonService
             $lesson->duration_seconds = (int) $data['quizData']['time_limit_minutes'] * 60;
         }
 
+        // If lesson was published, mark it as having a draft revision
+        // but keep the published_version_id so students see old version
+        if ($lesson->isPublished() && $lesson->status === 'published') {
+            // Change status to draft to indicate there's a working revision
+            $lesson->status = 'draft';
+        }
+
         $lesson->save();
 
         // Save Quiz Data if present
@@ -60,17 +97,40 @@ class LessonService
             $this->saveQuizData($lesson, $data['quizData']);
         }
 
+        // Mark pending submissions as stale
+        $course = $lesson->module?->course;
+        if ($course) {
+            $this->reviewService->markSubmissionsStale($course);
+        }
+
         return $lesson;
     }
 
+    /**
+     * Delete a lesson with version awareness.
+     *
+     * RULE 9: If lesson is published, create deletion request instead.
+     */
     public function deleteLesson(Lesson $lesson): void
     {
+        if ($lesson->isPublished()) {
+            throw new \Exception('Không thể xóa trực tiếp bài học đang public. Hãy tạo yêu cầu xóa.');
+        }
+
         // Delete associated media from R2
         foreach ($lesson->media as $media) {
             Storage::disk('r2')->delete($media->r2_key);
         }
 
         $lesson->delete();
+    }
+
+    /**
+     * Request deletion of a published lesson.
+     */
+    public function requestDeletion(Lesson $lesson, \App\Models\User $user, ?string $reason = null): DeletionRequest
+    {
+        return $this->reviewService->requestLessonDeletion($lesson, $user, $reason);
     }
 
     public function uploadVideo(Lesson $lesson, UploadedFile $file): array
