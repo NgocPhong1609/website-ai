@@ -92,7 +92,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
               
               <div className="flex items-center justify-between text-xs font-semibold text-[#8888A8] border-t border-[#F0F0F8] pt-4 mt-auto">
                 <span className="flex items-center gap-1.5">
-                  ⏱️ {course.duration_hours ? `${course.duration_hours} giờ` : 'Đang cập nhật'}
+                  ⏱️ {course.duration_hours !== undefined ? `${course.duration_hours} giờ` : 'Đang cập nhật'}
                 </span>
                   <div className="flex flex-col items-end">
                     {Number(course.price) === 0 ? (
@@ -100,15 +100,15 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
                     ) : (course.current_price !== undefined && course.price !== undefined && course.current_price < course.price) ? (
                       <>
                         <span className="text-[#10B981] font-bold">
-                          {Number(course.current_price).toLocaleString()} VND
+                          {Number(course.current_price).toLocaleString('vi-VN')} VND
                         </span>
                         <span className="text-[10px] text-gray-400 line-through">
-                          {Number(course.price).toLocaleString()} VND
+                          {Number(course.price).toLocaleString('vi-VN')} VND
                         </span>
                       </>
                     ) : (
                       <span className="text-[#10B981] font-bold">
-                        {Number(course.price).toLocaleString()} VND
+                        {Number(course.price).toLocaleString('vi-VN')} VND
                       </span>
                     )}
                   </div>

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { useInstructorCourse } from "../../management/api/courses";
 import { useCreateCourseStore } from "../stores/createCourseStore";
-import { useUpdateCourse, useUploadCourseThumbnail, useDeleteCourse, useUpdateCourseStatus, useUpdateCoursePrice } from "../api";
+import { useUpdateCourse, useUploadCourseThumbnail, useDeleteCourse, useUpdateCourseStatus, useUpdateCoursePrice, useSubmitForReview } from "../api";
 import { Step1BasicInfo } from "./Step1BasicInfo";
 import { Step3SettingsPrice } from "./Step3SettingsPrice";
 import { CourseEditTabs, EditCourseTab } from "./CourseEditTabs";
@@ -29,6 +29,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
   const { mutateAsync: uploadThumbnail, isPending: isUploading } = useUploadCourseThumbnail();
   const { mutateAsync: deleteCourse, isPending: isDeleting } = useDeleteCourse();
   const { mutateAsync: updateStatus, isPending: isUpdatingStatus } = useUpdateCourseStatus();
+  const { mutateAsync: submitForReview, isPending: isSubmittingReview } = useSubmitForReview();
 
   const [activeTab, setActiveTab] = useState("overview");
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -128,7 +129,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
   const handleSubmitReview = async () => {
     if (!confirm("Bạn có chắc chắn muốn gửi khóa học này để quản trị viên xét duyệt?")) return;
     try {
-      await updateStatus({ courseId, status: "pending_review" });
+      await submitForReview({ courseId });
       alert("Khóa học đã được gửi xét duyệt thành công!");
       router.refresh();
     } catch (error: any) {
@@ -136,7 +137,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
     }
   };
 
-  const isPending = isUpdating || isUploading || isDeleting || isUpdatingStatus || isUpdatingPrice;
+  const isPending = isUpdating || isUploading || isDeleting || isUpdatingStatus || isUpdatingPrice || isSubmittingReview;
 
   return (
     <div className="min-h-screen bg-[#F4F4F8] flex flex-col font-sans pb-16">

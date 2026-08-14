@@ -100,8 +100,46 @@ class ContentManagementController extends Controller
             'status' => ['required', 'string', 'in:archived,draft,published'],
         ]);
 
-        // Quick moderation without review workflow (direct approve)
-        $oldStatus = $course->status;
+        if ($data['status'] === 'published') {
+            $reviewService = app(\App\Services\ContentReviewService::class);
+            $admin = $request->user();
+            
+            // Check if there is an active submission
+            $submission = \App\Models\ReviewSubmission::where('course_id', $course->id)
+                ->whereIn('status', ['pending', 'under_review'])
+                ->latest()
+                ->first();
+                
+            if (!$submission) {
+                // Self-healing: if no submission exists but we are publishing,
+                // force create one so the course can be published properly with snapshots.
+                $teacher = $course->teacher ?? $admin;
+                
+                try {
+                    // Update status to draft first so submitForReview allows it
+                    $course->update(['status' => 'draft']);
+                    $submission = $reviewService->submitForReview($course, $teacher);
+                } catch (\Exception $e) {
+                    return response()->json(['message' => 'Lỗi tạo snapshot: ' . $e->getMessage()], 422);
+                }
+            }
+            
+            try {
+                if ($submission->status === 'pending') {
+                    $submission = $reviewService->startReview($submission, $admin);
+                }
+                $reviewService->approveSubmission($submission, $admin);
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Lỗi duyệt khóa học: ' . $e->getMessage()], 422);
+            }
+            
+            return response()->json([
+                'message' => 'Duyệt khóa học và tạo phiên bản thành công.',
+                'data' => $course->fresh(),
+            ]);
+        }
+
+        // For archived and draft
         $course->status = $data['status'];
         $course->save();
 

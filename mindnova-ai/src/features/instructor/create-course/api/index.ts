@@ -99,6 +99,20 @@ export function useUpdateCourseStatus() {
   });
 }
 
+export function useSubmitForReview() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ courseId }: { courseId: string }) => {
+      const { data } = await axiosClient.post(`/api/instructor/courses/${courseId}/submit-review`);
+      return data.data;
+    },
+    onSuccess: (_, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId] });
+    },
+  });
+}
+
 export function useUploadContentMedia() {
   return useMutation({
     mutationFn: async ({ lessonId, file, onUploadProgress }: { lessonId: string | number; file: File; onUploadProgress?: (progressEvent: any) => void }) => {

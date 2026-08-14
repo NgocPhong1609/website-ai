@@ -41,6 +41,7 @@ class Course extends Model
 
     protected $appends = [
     'current_price',
+    'duration_hours',
 ];
 
     // ─── Scopes ────────────────────────────────────────────────
