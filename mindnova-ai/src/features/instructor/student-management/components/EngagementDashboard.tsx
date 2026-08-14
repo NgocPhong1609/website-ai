@@ -90,7 +90,15 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
               {metricsLoading ? (
                 <tr><td colSpan={4} className="p-8 text-center text-gray-400 text-sm">Đang tải dữ liệu...</td></tr>
               ) : metrics.new_students.length === 0 ? (
-                <tr><td colSpan={4} className="p-8 text-center text-gray-400 text-sm">Chưa có học viên mới nào trong 30 ngày qua</td></tr>
+                <tr>
+                  <td colSpan={4} className="p-12 text-center text-gray-400">
+                    <div className="flex flex-col items-center justify-center">
+                      <span className="text-4xl mb-3 opacity-50 grayscale">🧑‍🎓</span>
+                      <span className="text-sm font-bold text-gray-600">Chưa có học viên mới nào</span>
+                      <span className="text-xs font-medium text-gray-400 mt-1">Học viên ghi danh trong 30 ngày qua sẽ xuất hiện ở đây</span>
+                    </div>
+                  </td>
+                </tr>
               ) : (
                 metrics.new_students.map((st: any, index: number) => (
                   <tr key={`${st.id}-${index}`} className="hover:bg-gray-50/50 transition-colors cursor-pointer group" onClick={() => onSelectStudent(st.id)}>

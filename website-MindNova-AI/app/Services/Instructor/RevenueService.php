@@ -101,7 +101,7 @@ class RevenueService
                 
             $chartData[] = [
                 'date' => $date->format('Y-m-d'),
-                'day' => $date->locale('vi')->isoFormat('ddd'),
+                'day' => $date->format('d/m/Y'),
                 'revenue' => (float) $dailyRevenue
             ];
         }
@@ -137,7 +137,7 @@ class RevenueService
             'available_balance' => (float) $availableBalance,
             'escrow_balance' => (float) $escrowBalance,
             'refund_rate' => round($refundRate, 1),
-            'chart_data' => array_reverse($chartData),
+            'chart_data' => $chartData,
             'recent_transactions' => $recentTransactions,
             'ai_forecast' => $aiForecast
         ];
