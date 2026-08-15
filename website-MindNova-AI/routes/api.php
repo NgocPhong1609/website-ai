@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\Student\NotificationController as StudentNotificati
 
 // Nhóm Dùng chung
 use App\Http\Controllers\Api\RealtimeController;
+use App\Http\Controllers\Api\ChatController;
 
 // Nhóm Admin
 use App\Http\Controllers\Api\Admin\AnalyticsController as AdminAnalyticsController;
@@ -86,12 +87,22 @@ Route::post('/student/payment/momo-ipn', [OrderController::class, 'momoIpn']);
 // 2. NHÓM API PRIVATE (Bắt buộc phải có Bearer Token)
 // ==========================================
 Route::middleware('auth:sanctum')->group(function () {
+    \Illuminate\Support\Facades\Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
     // -- Đăng xuất --
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // -- Gửi tin nhắn Realtime (Dùng chung) --
     Route::post('/realtime/send', [RealtimeController::class, 'send']);
+
+    // -- Chat & Messaging System --
+    Route::prefix('chat')->group(function () {
+        Route::get('/conversations', [ChatController::class, 'index']);
+        Route::get('/conversations/{id}/messages', [ChatController::class, 'messages']);
+        Route::post('/conversations/{id}/messages', [ChatController::class, 'sendMessage']);
+        Route::post('/conversations/{id}/messages/{messageId}/recall', [ChatController::class, 'recallMessage']);
+        Route::post('/conversations/{id}/read', [ChatController::class, 'markAsRead']);
+    });
 
     // -- Quản lý Hồ sơ Cá nhân --
     Route::prefix('profile')->group(function () {

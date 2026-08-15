@@ -152,6 +152,17 @@ export function DiscussionReplyContainer() {
                 Quản lý hộp thư giải đáp thắc mắc, đánh dấu câu trả lời hay nhất và gửi thông báo chống spam cho lớp học.
               </p>
             </div>
+            
+            <button
+              type="button"
+              onClick={() => router.push('/instructor/messages')}
+              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              Mở phòng trao đổi
+            </button>
           </div>
 
           {/* Q&A Unified Inbox */}

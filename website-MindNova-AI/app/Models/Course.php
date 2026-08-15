@@ -44,6 +44,26 @@ class Course extends Model
     'duration_hours',
 ];
 
+    // ─── Events ────────────────────────────────────────────────
+    protected static function booted()
+    {
+        static::created(function ($course) {
+            $conversation = \App\Models\ChatConversation::create([
+                'course_id' => $course->id,
+                'title' => $course->title,
+                'type' => 'course'
+            ]);
+
+            if ($course->teacher_id) {
+                \App\Models\ChatConversationMember::create([
+                    'chat_conversation_id' => $conversation->id,
+                    'user_id' => $course->teacher_id,
+                    'joined_at' => now(),
+                ]);
+            }
+        });
+    }
+
     // ─── Scopes ────────────────────────────────────────────────
 
     public function scopeVisibleInAdmin($query)

@@ -89,6 +89,18 @@ export function DashboardTopbar() {
         {/* Right Actions & Profile */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1 bg-[#F6F6FB] p-1 rounded-xl border border-[#EAEAF4]">
+          {/* Chat Button */}
+          <a
+            href="/messages"
+            aria-label="Messages"
+            className="group/chat relative w-9 h-9 rounded-lg flex items-center justify-center text-[#64647A] hover:text-[#4648D4] hover:bg-white hover:shadow-2xs transition-all duration-200 focus:outline-none"
+          >
+            <div className="group-hover/chat:scale-110 transition-transform duration-200">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+          </a>
           {/* Notifications with lively pulse */}
           <div className="relative">
             <button
