@@ -1,22 +1,18 @@
 import type { Metadata } from "next";
-import { CourseHeader, CurriculumAccordion, CourseSidebar } from "@features/courses";
+import { CourseDetailWorkspace } from "@/src/features/student/courses/components/course-detail";
 
 export const metadata: Metadata = {
-  title: "Course Detail | MindNova AI",
-  description: "View course curriculum and progress.",
+  title: "Chi tiết Khóa học AI & Neural Networks | MindNova AI",
+  description: "Khởi động hành trình rèn luyện chuyên môn cùng Gia sư Trí tuệ AI Nova.",
 };
 
-export default function CourseDetailPage() {
-  return (
-    <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col lg:flex-row items-start gap-8">
-      {/* Main Content (Left) */}
-      <div className="flex-1 w-full min-w-0">
-        <CourseHeader />
-        <CurriculumAccordion />
-      </div>
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
 
-      {/* Sidebar (Right) */}
-      <CourseSidebar />
-    </div>
-  );
+export default async function CourseDetailPage({ searchParams }: Props) {
+  const resolvedParams = await searchParams;
+  const courseIdStr = resolvedParams.courseId;
+  const courseId = courseIdStr ? parseInt(courseIdStr as string, 10) : 1;
+  return <CourseDetailWorkspace courseId={courseId} />;
 }

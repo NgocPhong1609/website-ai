@@ -9,6 +9,7 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
+        channels: __DIR__.'/../routes/channels.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
@@ -19,5 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->renderable(function (\Illuminate\Http\Exceptions\ThrottleRequestsException $e, $request) {
+            if ($request->is('api/*') || $request->wantsJson() || $request->is('*student/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => '⏳ Gia sư đang bận xíu hoặc bạn đã gửi câu hỏi quá nhanh (> 5 câu/phút). Bạn vui lòng chờ khoảng 1 phút rồi thử lại nhé! 😊',
+                ], 429);
+            }
+        });
     })->create();

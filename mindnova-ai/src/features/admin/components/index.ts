@@ -9,6 +9,7 @@ export * from "./AdminUsersPage";
 export * from "./AdminCoursesPage";
 export * from "./AdminCategoriesPage";
 export * from "./AdminInvoicesPage";
+export * from "./AdminNotificationsPage";
 export * from "./AdminSidebar";
 export * from "./AdminTopbar";
 export * from "./AdminTeacherApprovalsPage";

@@ -13,9 +13,16 @@ export interface CourseApiResponse {
       description: string;
       thumbnail: string | null;
       price: number;
+      sale_price?: number;
+      current_price?: number;
+      is_flash_sale?: boolean;
+      sale_start_date?: string;
+      sale_end_date?: string;
       level: string;
       status: "published" | "draft";
       category_id: string;
+      totalLessons: number;
+      durationHours: number;
       created_at: string;
       updated_at: string;
     }[];
@@ -29,11 +36,14 @@ export interface CourseApiResponse {
   };
 }
 
-export function useInstructorCourses() {
+export function useInstructorCourses(search?: string) {
   return useQuery({
-    queryKey: ["instructor", "courses"],
+    queryKey: ["instructor", "courses", search],
     queryFn: async (): Promise<Course[]> => {
-      const response = await axiosClient.get<CourseApiResponse>("/api/instructor/courses");
+      const params = new URLSearchParams();
+      if (search) params.append("search", search);
+      const url = `/api/instructor/courses${params.toString() ? `?${params.toString()}` : ""}`;
+      const response = await axiosClient.get<CourseApiResponse>(url);
       
       // Map API data to our Frontend UI types
       const courses = response.data.data.data;
@@ -42,8 +52,14 @@ export function useInstructorCourses() {
         title: course.title,
         thumbnail: course.thumbnail,
         status: course.status,
-        durationHours: 0, // Placeholder: Update backend CourseResource if needed
-        totalLessons: 0,  // Placeholder: Update backend CourseResource if needed
+        durationHours: course.durationHours || 0,
+        totalLessons: course.totalLessons || 0,
+        price: course.price,
+        salePrice: course.sale_price,
+        currentPrice: course.current_price,
+        isFlashSale: course.is_flash_sale,
+        saleStartDate: course.sale_start_date,
+        saleEndDate: course.sale_end_date,
       }));
     },
   });

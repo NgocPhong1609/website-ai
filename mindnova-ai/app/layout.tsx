@@ -30,8 +30,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi">
-      <body className={plusJakartaSans.variable}>
+    <html lang="vi" suppressHydrationWarning>
+      <body className={plusJakartaSans.variable} suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

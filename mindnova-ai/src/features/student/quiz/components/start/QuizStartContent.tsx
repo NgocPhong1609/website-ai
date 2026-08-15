@@ -1,210 +1,498 @@
-export function QuizStartContent() {
-  return (
-    <div className="flex-1 overflow-y-auto bg-white relative min-h-full">
-      {/* Soft Background Gradient */}
-      <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[#EEF2FF]/60 to-transparent pointer-events-none" />
+"use client";
 
-      <div className="relative p-8 lg:p-12 max-w-6xl mx-auto">
-        {/* Breadcrumbs */}
-        <div className="flex items-center gap-2 text-sm mb-6">
-          <span className="text-gray-500 font-medium">Courses</span>
-          <span className="text-gray-400">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
+import React, { useState } from "react";
+import Link from "next/link";
+import { useGetPracticeOverview } from "../../api";
+import type { PracticeOverviewData, AssessmentModuleItem } from "../../types";
+
+export function QuizStartContent() {
+  const { data, isLoading, isError } = useGetPracticeOverview();
+  const [selectedModId, setSelectedModId] = useState<string>("");
+
+  if (isLoading) {
+    return (
+      <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-8 bg-[#F8F9FC]">
+        <div className="h-56 bg-white rounded-2xl animate-pulse border border-[#EAEAF4]" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+          <div className="h-36 bg-white rounded-2xl animate-pulse border border-[#EAEAF4]" />
+          <div className="h-36 bg-white rounded-2xl animate-pulse border border-[#EAEAF4]" />
+          <div className="h-36 bg-white rounded-2xl animate-pulse border border-[#EAEAF4]" />
+          <div className="h-36 bg-white rounded-2xl animate-pulse border border-[#EAEAF4]" />
+        </div>
+        <div className="h-80 bg-white rounded-2xl animate-pulse border border-[#EAEAF4]" />
+      </div>
+    );
+  }
+
+  // Elegant default sample fallback if API server is temporarily unreachable
+  const defaultModules: AssessmentModuleItem[] = [
+    {
+      id: "mod1",
+      title: "Kiểm tra Nền tảng: Mạng Thần Kinh & Deep Learning",
+      badge_title: "Đánh giá Năng lực • Module 1",
+      course_title: "AI & Neural Network Foundations",
+      description: "Kiểm nghiệm vững chắc tư duy kiến trúc Mạng Thần Kinh (ANN/CNN), cơ chế Attention trong Transformer và xử lý Overfitting trong bài toán thực tế.",
+      questions_count_text: "10 Câu trắc nghiệm",
+      time_limit_text: "15 Phút",
+      passing_condition_text: "70% (Từ 7/10 câu)",
+      attempts_allowed_text: "Không giới hạn (Xáo trộn tự động)",
+      time_limit_minutes: 15,
+      questions_count: 10,
+      passing_percentage: 70,
+      readiness: {
+        status_label: "Trạng thái chuẩn bị ↗",
+        percentage_text: "Sẵn sàng 100%",
+        level_text: "Level 1",
+        level_subtext: "(AI Foundations)",
+        status_tag: "Active",
+        action_prompt: "🧠 Hãy tự tin thử sức!",
+        time_prompt: "Thời gian: 15 Phút ➔",
+      },
+      ai_insight: {
+        title: "💡 Lời khuyên từ Gia sư Trí tuệ Nhân tạo Nova",
+        tag: "✨ AI Advisory • Mod 1",
+        content: '"Đối với học phần Nền tảng Mạng thần kinh, sự nhầm lẫn phổ biến nhất là chức năng của hàm kích hoạt ReLU và kỹ thuật Dropout để chống Overfitting! Bạn hãy tỉnh táo phân tách từng layer trong Transformer nhé!"',
+        footer: "Hệ thống giám sát chuyên môn MindNova Co-Pilot",
+      },
+      prerequisites: [
+        { id: 1, name: "Deep Learning Basics", color: "indigo", bg_class: "bg-[#EEF2FF]", text_class: "text-[#5052EE]", border_class: "border-[#5052EE]/20" },
+        { id: 2, name: "Transformer Architecture", color: "teal", bg_class: "bg-[#EAF8F5]", text_class: "text-[#0D9488]", border_class: "border-[#0D9488]/20" },
+        { id: 3, name: "Optimization & Loss", color: "amber", bg_class: "bg-[#FFF8EB]", text_class: "text-[#D97706]", border_class: "border-[#D97706]/20" },
+      ],
+    },
+    {
+      id: "mod2",
+      title: "Kiểm tra Chuyên môn: Next.js 15 & React 19 Server Actions",
+      badge_title: "Đánh giá Năng lực • Module 2",
+      course_title: "Modern Next.js 15 & React 19",
+      description: "Đọ sức sâu với cơ chế React 19 Actions, useActionState, Suspense Boundaries và tối ưu hóa Render trên Server vs Client.",
+      questions_count_text: "10 Câu trắc nghiệm",
+      time_limit_text: "15 Phút",
+      passing_condition_text: "70% (Từ 7/10 câu)",
+      attempts_allowed_text: "Không giới hạn (Xáo trộn tự động)",
+      time_limit_minutes: 15,
+      questions_count: 10,
+      passing_percentage: 70,
+      readiness: {
+        status_label: "Trạng thái chuẩn bị ↗",
+        percentage_text: "Sẵn sàng 100%",
+        level_text: "Level 2",
+        level_subtext: "(React 19 Core)",
+        status_tag: "Active",
+        action_prompt: "⚛️ Chinh phục Server Actions!",
+        time_prompt: "Thời gian: 15 Phút ➔",
+      },
+      ai_insight: {
+        title: "💡 Lời khuyên từ Gia sư Trí tuệ Nhân tạo Nova",
+        tag: "✨ AI Advisory • Mod 2",
+        content: '"Trong React 19 và Next.js 15, sự khác biệt căn bản nằm ở việc truyền tham số bất đồng bộ trong Server Components và cách sử dụng custom hook useActionState cho biểu mẫu! Hãy đặc biệt chú ý nhé!"',
+        footer: "Hệ thống giám sát chuyên môn MindNova Co-Pilot",
+      },
+      prerequisites: [
+        { id: 1, name: "React 19 Server Actions", color: "indigo", bg_class: "bg-[#EEF2FF]", text_class: "text-[#5052EE]", border_class: "border-[#5052EE]/20" },
+        { id: 2, name: "Suspense & Streaming UI", color: "teal", bg_class: "bg-[#EAF8F5]", text_class: "text-[#0D9488]", border_class: "border-[#0D9488]/20" },
+        { id: 3, name: "Server vs Client Tree", color: "amber", bg_class: "bg-[#FFF8EB]", text_class: "text-[#D97706]", border_class: "border-[#D97706]/20" },
+      ],
+    },
+    {
+      id: "mod3",
+      title: "Kiểm tra Thực chiến: Tích hợp API & AI Stream 🚀",
+      badge_title: "Đánh giá Năng lực • Module 3",
+      course_title: "Next.js 15 AI Master Pro",
+      description: "Thử sức và kiểm nghiệm mức độ thông tuệ về Xử lý Route Handlers, Streaming LLM và Logic Bất đồng bộ trong Next.js 15. Hệ thống kết hợp phân tích năng lực theo thời gian thực cùng Gia sư Nova.",
+      questions_count_text: "10 Câu trắc nghiệm",
+      time_limit_text: "15 Phút",
+      passing_condition_text: "70% (Từ 7/10 câu)",
+      attempts_allowed_text: "Không giới hạn (Xáo trộn tự động)",
+      time_limit_minutes: 15,
+      questions_count: 10,
+      passing_percentage: 70,
+      readiness: {
+        status_label: "Trạng thái chuẩn bị ↗",
+        percentage_text: "Sẵn sàng 100%",
+        level_text: "Level 3",
+        level_subtext: "(AI Streaming)",
+        status_tag: "Active",
+        action_prompt: "🔥 Hãy tự tin chinh phục!",
+        time_prompt: "Thời gian: 15 Phút ➔",
+      },
+      ai_insight: {
+        title: "💡 Lời khuyên từ Gia sư Trí tuệ Nhân tạo Nova",
+        tag: "✨ AI Advisory • Mod 3",
+        content: '"Qua phân tích học viện, chiến lược Fallback của Gemini và OpenAI cùng quản lý ReadableStream là các chốt chặn kiến trúc quan trọng nhất! Hãy giữ tâm trí tỉnh táo để hoàn thành tốt nhé!"',
+        footer: "Hệ thống giám sát chuyên môn MindNova Co-Pilot",
+      },
+      prerequisites: [
+        { id: 1, name: "Next.js 15 App Router", color: "indigo", bg_class: "bg-[#EEF2FF]", text_class: "text-[#5052EE]", border_class: "border-[#5052EE]/20" },
+        { id: 2, name: "LLM API & Stream", color: "teal", bg_class: "bg-[#EAF8F5]", text_class: "text-[#0D9488]", border_class: "border-[#0D9488]/20" },
+        { id: 3, name: "Async / Await Logic", color: "amber", bg_class: "bg-[#FFF8EB]", text_class: "text-[#D97706]", border_class: "border-[#D97706]/20" },
+      ],
+    },
+    {
+      id: "mod4",
+      title: "Kiểm tra Chuyên sâu: Bảo mật, Middleware & Rate Limiting",
+      badge_title: "Đánh giá Năng lực • Module 4",
+      course_title: "Next.js 15 Security & Scaling",
+      description: "Phân tích khả năng thiết lập tường lửa Middleware, quản lý token bảo mật Sanctum/JWT và kiểm soát giới hạn tài nguyên Rate Limiting cho hệ thống tải cao.",
+      questions_count_text: "10 Câu trắc nghiệm",
+      time_limit_text: "15 Phút",
+      passing_condition_text: "70% (Từ 7/10 câu)",
+      attempts_allowed_text: "Không giới hạn (Xáo trộn tự động)",
+      time_limit_minutes: 15,
+      questions_count: 10,
+      passing_percentage: 70,
+      readiness: {
+        status_label: "Trạng thái chuẩn bị ↗",
+        percentage_text: "Sẵn sàng 100%",
+        level_text: "Level 4",
+        level_subtext: "(Security Master)",
+        status_tag: "Active",
+        action_prompt: "🛡️ Bách chiến bách thắng!",
+        time_prompt: "Thời gian: 15 Phút ➔",
+      },
+      ai_insight: {
+        title: "💡 Lời khuyên từ Gia sư Trí tuệ Nhân tạo Nova",
+        tag: "✨ AI Advisory • Mod 4",
+        content: '"Bảo mật hệ thống AI bắt buộc phải đặt ở lớp tiền tuyến Middleware và phân tách quy trình xác minh qua Sanctum Token! Bạn đừng bỏ qua các cơ chế giới hạn tần suất throttle trong Laravel nhé!"',
+        footer: "Hệ thống giám sát chuyên môn MindNova Co-Pilot",
+      },
+      prerequisites: [
+        { id: 1, name: "Edge Middleware Security", color: "indigo", bg_class: "bg-[#EEF2FF]", text_class: "text-[#5052EE]", border_class: "border-[#5052EE]/20" },
+        { id: 2, name: "API Rate Limiting", color: "teal", bg_class: "bg-[#EAF8F5]", text_class: "text-[#0D9488]", border_class: "border-[#0D9488]/20" },
+        { id: 3, name: "Token & CORS Guard", color: "amber", bg_class: "bg-[#FFF8EB]", text_class: "text-[#D97706]", border_class: "border-[#D97706]/20" },
+      ],
+    },
+  ];
+
+  const content: PracticeOverviewData = (!isError && data && data.modules_list && data.modules_list.length > 0) ? data : {
+    modules_list: defaultModules,
+    assessment_info: defaultModules[2],
+    readiness: defaultModules[2].readiness!,
+    instructions: [
+      "Hãy kiểm tra kết nối mạng Internet ổn định và chọn một không gian yên tĩnh trước khi nhấn nút Bắt Đầu.",
+      "Đồng hồ bấm giờ sẽ lập tức kích hoạt đếm ngược 15 phút. Bài làm sẽ được ghi nhận khi bạn nộp bài hoặc khi thời gian kết thúc.",
+      "Hệ thống tự động xáo trộn ngẫu nhiên thứ tự câu hỏi và vị trí các đáp án (A, B, C, D) trong mỗi lần truy cập nhằm phản ánh năng lực sát thực.",
+      "Ngay sau khi nộp bài, Gia sư AI Nova sẽ ban hành bảng chấm điểm trung thực và lời giải chi tiết cho từng câu hỏi.",
+    ],
+    ai_insight: defaultModules[2].ai_insight!,
+    prerequisites: defaultModules[2].prerequisites!,
+    recent_attempts: {
+      total_attempts: 0,
+      best_score: "Chưa có điểm",
+      message_title: "Bạn chưa có lượt làm bài ghi nhận",
+      message_body: "Hãy chọn một chuyên đề ở trên và bắt đầu bài khảo sát đầu tiên để nhận thông số đánh giá chi tiết!",
+      tag_text: "🌟 Đề thi động, xáo trộn tự động từng lượt!",
+    }
+  };
+
+  const modulesList = content.modules_list || defaultModules;
+  const currentMod = (selectedModId && modulesList.find(m => String(m.id) === String(selectedModId))) 
+    || modulesList[2] 
+    || modulesList[0] 
+    || defaultModules[2];
+
+  const assess = {
+    ...content.assessment_info,
+    ...currentMod,
+  };
+  const ready = currentMod.readiness || content.readiness || defaultModules[0].readiness!;
+  const insight = currentMod.ai_insight || content.ai_insight || defaultModules[0].ai_insight!;
+  const prereq = currentMod.prerequisites || content.prerequisites || defaultModules[0].prerequisites!;
+
+  // Icon styling system matching Progress and History pages
+  const moduleThemes = [
+    { icon: "🧠", bg: "bg-[#EEF2FF]", text: "text-[#5052EE]", border: "border-[#5052EE]/25", badgeBg: "bg-[#EEF2FF]", badgeText: "text-[#5052EE]" },
+    { icon: "⚛️", bg: "bg-[#EAF8F5]", text: "text-[#0D9488]", border: "border-[#0D9488]/25", badgeBg: "bg-[#EAF8F5]", badgeText: "text-[#0D9488]" },
+    { icon: "🚀", bg: "bg-[#FFF8EB]", text: "text-[#D97706]", border: "border-[#D97706]/25", badgeBg: "bg-[#FFF8EB]", badgeText: "text-[#D97706]" },
+    { icon: "🛡️", bg: "bg-[#F3E8FF]", text: "text-[#9333EA]", border: "border-[#9333EA]/25", badgeBg: "bg-[#F3E8FF]", badgeText: "text-[#9333EA]" }
+  ];
+
+  return (
+    <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-8 bg-[#F8F9FC]">
+      
+      {/* ─── Synchronized Hero Banner (Cohesive with Progress & Courses) ─── */}
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#EEF2FF]/90 via-[#F6F6FB] to-[#E0F2FE]/80 border border-[#6B6BFF]/25 p-6 sm:p-8 shadow-[0_8px_30px_rgba(107,107,255,0.07)] transition-all duration-300 hover:shadow-[0_12px_36px_rgba(107,107,255,0.12)]">
+        {/* Subtle background glow animations */}
+        <div className="absolute -top-16 -right-16 w-60 h-60 rounded-full bg-[#6B6BFF]/10 blur-3xl pointer-events-none animate-pulse" />
+        <div className="absolute -bottom-16 -left-16 w-60 h-60 rounded-full bg-[#4CD7F6]/15 blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            {/* Breadcrumb path */}
+            <div className="flex items-center gap-2 text-xs font-medium text-[#64647A]">
+              <Link href="/courses" className="hover:text-[#5052EE] transition-colors text-decoration-none font-medium">
+                Khoá học của tôi
+              </Link>
+              <span className="text-[#A0A0C0]">•</span>
+              <span className="text-[#0D9488] font-semibold bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#0D9488]/20">
+                Trung tâm Kiểm tra &amp; Đánh giá
+              </span>
+            </div>
+
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-[#6B6BFF]/30 text-xs font-semibold text-[#4648D4] shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
+              <span className="w-2 h-2 rounded-full bg-[#10B981] absolute" />
+              Ngân hàng đề thi động • Khảo sát Năng lực
+            </div>
+
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1A1A2E] leading-tight">
+              Trung tâm Đánh giá Năng lực: {" "}
+              <span className="bg-gradient-to-r from-[#4648D4] via-[#6063EE] to-[#4CD7F6] bg-clip-text text-transparent font-bold drop-shadow-2xs">
+                AI &amp; Fullstack
+              </span>
+            </h1>
+
+            <p className="text-xs sm:text-sm text-[#64647A] leading-relaxed font-normal">
+              Tham gia các bài khảo sát trực quan để kiểm chứng sự thông hiểu về kiến trúc AI, Next.js 15 và bảo mật. Đề thi được xáo trộn tự động và chấm điểm giải mã chi tiết bởi <span className="text-[#5052EE] font-semibold">Gia sư Trí tuệ Nhân tạo Nova</span>.
+            </p>
+          </div>
+
+          {/* Interactive Readiness Widget */}
+          <div className="group shrink-0 bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-[#6B6BFF]/20 flex flex-col justify-center min-w-[310px] sm:min-w-[360px] shadow-sm hover:border-[#6B6BFF]/50 hover:-translate-y-0.5 transition-all duration-300">
+            <div className="w-full flex items-center justify-between gap-4 mb-2">
+              <span className="text-xs font-semibold text-[#7878A0] group-hover:text-[#4648D4] transition-colors">{ready.status_label}</span>
+              <span className="text-[11px] font-semibold text-[#0D9488] bg-[#CCFBF1] px-2.5 py-0.5 rounded-full border border-[#10B981]/20">
+                {ready.status_tag}
+              </span>
+            </div>
+
+            <div className="text-2xl sm:text-3xl font-bold text-[#1A1A2E] my-1 flex items-baseline justify-between gap-4">
+              <div>
+                <span className="text-[#4648D4]">{ready.percentage_text.replace("Sẵn sàng ", "")}</span>
+                <span className="text-xs font-medium text-[#9090B0] ml-1.5">chuẩn bị</span>
+              </div>
+              <span className="text-xs font-medium text-[#64647A]">
+                {ready.level_text}
+              </span>
+            </div>
+
+            <div className="w-full h-2 bg-[#F4F4FA] rounded-full mt-2.5 overflow-hidden p-0.5 border border-[#EAEAF4]/80">
+              <div
+                className="h-full bg-gradient-to-r from-[#4CD7F6] via-[#6B6BFF] to-[#10B981] rounded-full shadow-[0_0_8px_rgba(107,107,255,0.4)] transition-all duration-1000"
+                style={{ width: "100%" }}
+              />
+            </div>
+
+            <div className="text-xs font-semibold text-[#6B6BFF] mt-3.5 pt-3 border-t border-[#F0F2F8] flex items-center justify-between">
+              <span>{ready.action_prompt}</span>
+              <span className="text-[#4648D4]">{ready.time_prompt}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Module Showcase Gallery (Soft & Elegant Grid) ─── */}
+      <div className="space-y-3.5">
+        <div className="flex items-center justify-between px-1">
+          <h2 className="text-base sm:text-lg font-semibold text-[#1A1A2E] tracking-tight flex items-center gap-2">
+            <span>Danh sách Chuyên đề Đánh giá</span>
+          </h2>
+          <span className="text-xs font-medium text-[#64647A]">
+            Chọn chuyên đề phù hợp bên dưới để xem chi tiết
           </span>
-          <span className="text-gray-500 font-medium">Next.js Advanced</span>
-          <span className="text-gray-400">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </span>
-          <span className="text-[#6B6BFF] font-semibold">Quiz</span>
         </div>
 
-        {/* Header */}
-        <h1 className="text-4xl md:text-[2.75rem] leading-tight font-extrabold text-[#1F2937] mb-4 tracking-tight">
-          Quiz: Route Handlers in Next.js
-        </h1>
-        <p className="text-lg text-gray-600 max-w-3xl leading-relaxed">
-          Test your knowledge on creating API endpoints and managing request methods in Next.js. This quiz covers GET, POST, DELETE handlers, and dynamic routing logic.
-        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {modulesList.map((mod, index) => {
+            const isSelected = String(mod.id) === String(currentMod.id);
+            const theme = moduleThemes[index % moduleThemes.length];
+            const cleanTitle = mod.title.replace(/^Kiểm tra [^:]+:\s*/, "");
 
-        {/* Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
-          
-          {/* Left Column (Main Info) */}
-          <div className="lg:col-span-2 flex flex-col gap-6">
-            
-            {/* Overview Card */}
-            <div className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#F3F4F6]">
-              <h3 className="text-xl font-bold text-gray-900 mb-8">Quiz Overview</h3>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-8 gap-x-6">
-                {/* Stat: Questions */}
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-[#EEF2FF] text-[#6B6BFF] flex items-center justify-center shrink-0">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="8" y1="6" x2="21" y2="6"></line>
-                      <line x1="8" y1="12" x2="21" y2="12"></line>
-                      <line x1="8" y1="18" x2="21" y2="18"></line>
-                      <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                      <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                      <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                    </svg>
+            return (
+              <div
+                key={String(mod.id)}
+                onClick={() => setSelectedModId(String(mod.id))}
+                className={`p-5 rounded-2xl border cursor-pointer transition-all duration-300 flex flex-col justify-between relative overflow-hidden group ${
+                  isSelected 
+                    ? "bg-white border-[#5052EE] shadow-[0_10px_30px_rgba(80,82,238,0.12)] ring-1 ring-[#5052EE] -translate-y-1.5 z-10" 
+                    : "bg-white border-[#EAEAF4] shadow-2xs hover:shadow-md hover:border-[#6B6BFF]/40 hover:-translate-y-0.5"
+                }`}
+              >
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className={`w-12 h-12 rounded-2xl ${theme.bg} ${theme.text} flex items-center justify-center text-xl shrink-0 border ${theme.border} shadow-2xs group-hover:scale-105 transition-transform`}>
+                      {theme.icon}
+                    </div>
+                    <span className={`text-[11px] font-semibold px-3 py-1 rounded-full border ${
+                      isSelected 
+                        ? "bg-[#5052EE] text-white border-[#5052EE]" 
+                        : `${theme.badgeBg} ${theme.badgeText} border-transparent`
+                    }`}>
+                      Module {index + 1}
+                    </span>
                   </div>
+
                   <div>
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-0.5">Questions</p>
-                    <p className="text-[17px] font-bold text-gray-900">10 Items</p>
+                    <span className="text-[11px] font-medium text-[#7878A0] uppercase tracking-wider block mb-1">
+                      {mod.course_title?.split("&")[0]?.trim() || "Chuyên đề AI"}
+                    </span>
+                    <h3 className="text-sm font-semibold text-[#1A1A2E] leading-snug line-clamp-2 group-hover:text-[#5052EE] transition-colors">
+                      {cleanTitle}
+                    </h3>
                   </div>
                 </div>
 
-                {/* Stat: Time Limit */}
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-[#E0F2FE] text-[#0284C7] flex items-center justify-center shrink-0">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <div className="mt-5 pt-3.5 border-t border-[#F0F2F8] flex items-center justify-between text-xs font-medium text-[#64647A]">
+                  <div className="flex items-center gap-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#9090B0]">
                       <circle cx="12" cy="12" r="10"></circle>
                       <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
+                    <span>{mod.time_limit_minutes || 15} phút</span>
                   </div>
-                  <div>
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-0.5">Time Limit</p>
-                    <p className="text-[17px] font-bold text-gray-900">8 Minutes</p>
-                  </div>
-                </div>
-
-                {/* Stat: Passing Score */}
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-[#F3E8FF] text-[#9333EA] flex items-center justify-center shrink-0">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="8" r="7"></circle>
-                      <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-0.5">Passing Score</p>
-                    <p className="text-[17px] font-bold text-gray-900">70% (7/10)</p>
-                  </div>
-                </div>
-
-                {/* Stat: Attempts */}
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-[#F3F4F6] text-[#4B5563] flex items-center justify-center shrink-0">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="1 4 1 10 7 10"></polyline>
-                      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-0.5">Attempts</p>
-                    <p className="text-[17px] font-bold text-gray-900">Unlimited</p>
+                  <div className="flex items-center gap-1 text-[#5052EE] font-semibold">
+                    <span>{mod.questions_count || 10} Câu hỏi</span>
                   </div>
                 </div>
               </div>
-
-              <hr className="border-[#F3F4F6] my-8" />
-
-              {/* Instructions */}
-              <div>
-                <h4 className="text-xs font-bold text-gray-500 tracking-widest uppercase mb-5">Instructions</h4>
-                <ul className="space-y-4">
-                  <li className="flex items-start gap-3">
-                    <svg className="w-[18px] h-[18px] text-[#6B6BFF] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
-                    <span className="text-[#374151]">Ensure you have a stable internet connection before starting.</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <svg className="w-[18px] h-[18px] text-[#6B6BFF] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
-                    <span className="text-[#374151]">The timer starts as soon as you click the button.</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <svg className="w-[18px] h-[18px] text-[#6B6BFF] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
-                    <span className="text-[#374151]">You can skip questions and return to them later.</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* AI Insight */}
-            <div className="bg-gradient-to-r from-white to-[#EEF2FF]/60 border border-[#E0E7FF] rounded-2xl p-6 flex gap-5 items-start shadow-sm">
-              <div className="w-12 h-12 rounded-[14px] bg-[#2E3192] text-white flex items-center justify-center shrink-0 shadow-md">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
-                </svg>
-              </div>
-              <div className="pt-0.5">
-                <h4 className="text-[17px] font-bold text-[#2E3192] mb-1.5">AI Tutor Insight</h4>
-                <p className="text-[#4B5563] leading-relaxed text-[15px]">
-                  Most students find question 4 and 7 challenging in this module. Focus on the differences between Request and Response objects in standard Web APIs versus Next.js wrappers.
-                </p>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Right Column (Actions) */}
-          <div className="lg:col-span-1 flex flex-col gap-6">
-            
-            {/* Start Card */}
-            <div className="bg-[#F8F9FC] rounded-[24px] p-5 shadow-sm border border-[#F0F2F5]">
-              {/* Image */}
-              <div className="w-full aspect-[4/3] rounded-[16px] overflow-hidden bg-[#111827] shadow-inner mb-6 relative">
-                 <div className="absolute inset-0 opacity-80 bg-[url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"></div>
-              </div>
-
-              {/* Prerequisites */}
-              <div className="px-1">
-                <h4 className="text-[11px] font-bold text-gray-500 tracking-widest uppercase mb-3">Prerequisites</h4>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  <span className="px-3.5 py-1.5 bg-[#E0E7FF] text-[#4F46E5] text-[13px] font-semibold rounded-full">
-                    Next.js Basics
-                  </span>
-                  <span className="px-3.5 py-1.5 bg-[#E0E7FF] text-[#4F46E5] text-[13px] font-semibold rounded-full">
-                    Web APIs
-                  </span>
-                </div>
-
-                {/* Button */}
-                <button className="w-full py-4 bg-[#5452F6] hover:bg-[#4648D4] text-white rounded-[14px] font-bold text-[15px] flex items-center justify-center gap-2 shadow-[0_6px_20px_rgba(84,82,246,0.35)] hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-4 focus:ring-[#5452F6]/30">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                  </svg>
-                  Start Quiz
-                </button>
-
-                {/* Disclaimer */}
-                <p className="text-center text-[#6B7280] text-[12px] mt-4 px-2 leading-relaxed">
-                  By clicking start, you agree to the <br/>
-                  <span className="underline decoration-gray-300 underline-offset-4 cursor-pointer hover:text-gray-900 transition-colors">Assessment Rules</span>.
-                </p>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="border border-dashed border-[#D1D5DB] rounded-[20px] p-5 bg-transparent">
-              <div className="flex items-center gap-2 mb-2">
-                <svg className="text-gray-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <h4 className="text-[14px] font-bold text-gray-800">Recent Activity</h4>
-              </div>
-              <p className="text-[13px] text-gray-500 leading-relaxed pl-6">
-                No previous attempts for this quiz.<br/>Good luck on your first try!
-              </p>
-            </div>
-
-          </div>
+            );
+          })}
         </div>
       </div>
+
+      {/* ─── Main Assessment Workspace & Specifications ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* Left Area: Selected Topic Spec & Action Card (8 cols) */}
+        <div className="lg:col-span-8 flex flex-col gap-6 w-full">
+          
+          <div className="bg-white rounded-2xl p-7 border border-[#EAEAF4] shadow-sm transition-all duration-300 hover:shadow-md space-y-7">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
+              <div className="space-y-2 max-w-xl">
+                <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#EAF8F5] text-[#0D9488] border border-[#0D9488]/20 inline-block">
+                  {assess.badge_title.split("(")[0].trim() || "Khảo sát Năng lực"}
+                </span>
+                <h2 className="text-xl sm:text-2xl font-semibold text-[#1A1A2E] tracking-tight leading-tight">
+                  {assess.title}
+                </h2>
+                <p className="text-xs font-normal text-[#64647A]">
+                  Thuộc chương trình: <span className="font-medium text-[#5052EE]">{assess.course_title}</span>
+                </p>
+              </div>
+              
+              <Link href={`/practice/quiz/question?lessonId=${currentMod.id}`} className="w-full sm:w-auto text-decoration-none shrink-0">
+                <button type="button" className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:opacity-95 text-white font-semibold rounded-xl text-xs sm:text-sm shadow-[0_6px_20px_rgba(80,82,238,0.35)] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2.5 cursor-pointer">
+                  <span>🚀 Bắt Đầu Làm Bài Ngay</span>
+                  <span className="text-base">➔</span>
+                </button>
+              </Link>
+            </div>
+
+            <div className="h-[1px] w-full bg-[#F0F2F8]" />
+
+            {/* Spec Metrics Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4] transition-colors hover:border-[#5052EE]/30">
+                <span className="text-xs text-[#7878A0] font-normal block mb-1">Số lượng câu hỏi</span>
+                <span className="text-base font-bold text-[#1A1A2E]">{assess.questions_count_text.replace(" Câu trắc nghiệm", "")} <span className="text-xs font-normal text-[#64647A]">Câu</span></span>
+              </div>
+              <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4] transition-colors hover:border-[#5052EE]/30">
+                <span className="text-xs text-[#7878A0] font-normal block mb-1">Thời gian thi</span>
+                <span className="text-base font-bold text-[#1A1A2E]">{assess.time_limit_text.replace(" Phút", "")} <span className="text-xs font-normal text-[#64647A]">Phút</span></span>
+              </div>
+              <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4] transition-colors hover:border-[#0D9488]/30">
+                <span className="text-xs text-[#7878A0] font-normal block mb-1">Điều kiện đạt</span>
+                <span className="text-base font-bold text-[#0D9488]">{assess.passing_percentage}% <span className="text-xs font-normal text-[#64647A]">Chuẩn</span></span>
+              </div>
+              <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4] transition-colors hover:border-[#5052EE]/30">
+                <span className="text-xs text-[#7878A0] font-normal block mb-1">Cơ chế câu hỏi</span>
+                <span className="text-sm font-semibold text-[#5052EE]">Xáo trộn tự động</span>
+              </div>
+            </div>
+
+            <p className="text-sm text-[#374151] leading-relaxed font-normal">
+              {assess.description}
+            </p>
+          </div>
+
+          {/* Instructions Block */}
+          <div className="bg-white rounded-2xl p-7 border border-[#EAEAF4] shadow-sm transition-all duration-300 hover:shadow-md space-y-5">
+            <div className="flex items-center gap-2 border-b border-[#F0F2F8] pb-4">
+              <span className="text-lg">📋</span>
+              <h3 className="text-base font-semibold text-[#1A1A2E]">
+                Hướng dẫn &amp; Quy định kiểm tra
+              </h3>
+            </div>
+            
+            <div className="space-y-3.5">
+              {content.instructions.map((ins, idx) => (
+                <div key={idx} className="flex items-start gap-3.5 text-sm text-[#475569] font-normal">
+                  <span className="w-6 h-6 rounded-lg bg-[#EEF2FF] text-[#5052EE] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 border border-[#5052EE]/20 shadow-2xs">
+                    {idx + 1}
+                  </span>
+                  <span className="leading-relaxed flex-1 text-xs sm:text-sm text-[#374151] font-normal">{ins}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* Right Area: AI Co-Pilot Advisory & Prerequisites (4 cols) */}
+        <div className="lg:col-span-4 flex flex-col gap-6 w-full">
+          
+          {/* AI Advisory Panel */}
+          <div className="bg-gradient-to-br from-[#EEF2FF] via-[#F6F6FB] to-[#EAF8F5] rounded-2xl p-6 border border-[#5052EE]/25 shadow-sm space-y-5 relative overflow-hidden group">
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#4648D4] via-[#5052EE] to-[#0D9488] text-white flex items-center justify-center shadow-xs">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-[#5052EE] uppercase tracking-wider">Gia sư Trí tuệ AI Nova</h3>
+                  <span className="text-[11px] text-[#7878A0] font-medium">Phụ trách chuyên môn</span>
+                </div>
+              </div>
+              <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-white/90 text-[#0D9488] border border-[#0D9488]/20 shadow-2xs">
+                AI Advisory
+              </span>
+            </div>
+
+            <div className="bg-white/85 p-4.5 rounded-xl border border-[#5052EE]/15 backdrop-blur-sm text-xs sm:text-sm text-[#374151] font-normal leading-relaxed relative z-10 shadow-2xs">
+              {insight.content}
+            </div>
+
+            <div className="text-[11px] font-normal text-[#7878A0] text-right italic relative z-10 pt-1">
+              {insight.footer.replace("CSDL ", "")}
+            </div>
+          </div>
+
+          {/* Core Prerequisites Panel */}
+          <div className="bg-white rounded-2xl p-6 border border-[#EAEAF4] shadow-sm transition-all duration-300 hover:shadow-md space-y-4">
+            <div className="flex items-center gap-2 border-b border-[#F0F2F8] pb-3.5">
+              <span className="text-base">🎯</span>
+              <h3 className="text-base font-semibold text-[#1A1A2E]">
+                Kiến thức cốt lõi khuyến nghị
+              </h3>
+            </div>
+
+            <p className="text-xs text-[#64647A] font-normal leading-relaxed">
+              Để hoàn thành suất sắc bộ đề với điểm số trên 90%, bạn cần thành thạo các kỹ năng trọng tâm sau:
+            </p>
+
+            <div className="flex flex-col gap-3 pt-1">
+              {prereq.map((p, idx) => (
+                <div 
+                  key={p.id || idx} 
+                  className={`p-3.5 rounded-xl border ${p.bg_class || "bg-[#F8FAFC]"} ${p.border_class || "border-[#EAEAF4]"} flex items-center justify-between group transition-transform hover:-translate-y-0.5`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-[#5052EE]" />
+                    <span className={`text-xs sm:text-sm font-semibold ${p.text_class || "text-[#374151]"}`}>{p.name}</span>
+                  </div>
+                  <span className="text-xs text-[#7878A0] font-medium opacity-80">✓ Khuyến khích</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
   );
 }

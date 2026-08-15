@@ -28,6 +28,15 @@ function DashboardIcon() {
   );
 }
 
+function ExploreIcon() {
+  return (
+    <svg {...SVG_PROPS}>
+      <circle cx="12" cy="12" r="10" />
+      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+    </svg>
+  );
+}
+
 function CoursesIcon() {
   return (
     <svg {...SVG_PROPS}>
@@ -96,6 +105,7 @@ function BillingIcon() {
 
 export const NAV_ICON_MAP: Record<NavIconKey, React.FC> = {
   dashboard: DashboardIcon,
+  explore: ExploreIcon,
   courses: CoursesIcon,
   "study-plan": StudyPlanIcon,
   practice: PracticeIcon,

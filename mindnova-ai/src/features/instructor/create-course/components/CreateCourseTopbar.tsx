@@ -2,6 +2,7 @@
 // Minimal topbar for the course-creation flow (no sidebar).
 
 import Link from "next/link";
+import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { HelpCircleIcon, BellIcon } from "./icons";
 
 function LogoMark() {
@@ -75,9 +76,9 @@ export function CreateCourseTopbar() {
         <button
           type="button"
           aria-label="Tài khoản"
-          className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-orange-400/40 ml-1"
+          className="ml-1 focus:outline-none focus:ring-2 focus:ring-orange-400/40 rounded-full"
         >
-          <span className="text-white text-xs font-bold">N</span>
+          <Avatar fallback="N" size="sm" className="hover:shadow-md transition-all duration-150" />
         </button>
       </nav>
     </header>

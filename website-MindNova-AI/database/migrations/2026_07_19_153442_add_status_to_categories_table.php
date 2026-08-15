@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('categories') || Schema::hasColumn('categories', 'status')) {
+            return;
+        }
+
         Schema::table('categories', function (Blueprint $table) {
             $table->string('status')->default('active');
         });
@@ -18,6 +22,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (!Schema::hasTable('categories') || !Schema::hasColumn('categories', 'status')) {
+            return;
+        }
+
         Schema::table('categories', function (Blueprint $table) {
             $table->dropColumn('status');
         });

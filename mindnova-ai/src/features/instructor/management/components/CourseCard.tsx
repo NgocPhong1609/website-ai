@@ -1,32 +1,28 @@
 "use client";
 
 // ─── CourseCard ───────────────────────────────────────────────────────────────
-// Individual course card with thumbnail, status badge, action buttons.
+// Individual course card with minimalist white card, crisp border, and indigo actions (Rule #7).
 
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import { twMerge } from "tailwind-merge";
 import type { Course } from "../types";
 import {
   PencilIcon,
-  UploadIcon,
   BookOpenIcon,
-  LayersIcon,
   TagIcon,
   ClockIcon,
 } from "./icons";
-
-// ─── Status Badge ─────────────────────────────────────────────────────────────
 
 function StatusBadge({ status }: { status: Course["status"] }) {
   const isPublished = status === "published";
   return (
     <span
       className={twMerge(
-        "absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[11px] font-bold tracking-wide z-10",
+        "absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[11px] font-extrabold tracking-wide z-10 shadow-2xs",
         isPublished
-          ? "bg-emerald-500/90 text-white backdrop-blur-sm"
-          : "bg-[#1A1A2E]/70 text-white/90 backdrop-blur-sm",
+          ? "bg-emerald-600 text-white"
+          : "bg-gray-800 text-white/90",
       )}
     >
       {isPublished ? "Published" : "Draft"}
@@ -34,112 +30,109 @@ function StatusBadge({ status }: { status: Course["status"] }) {
   );
 }
 
-// ─── Edit Button ─────────────────────────────────────────────────────────────
-
 function EditButton({ courseId }: { courseId: string }) {
   return (
     <Link
-      href={`/instructor/create-course`}
+      href={`/instructor/courses/${courseId}/edit`}
       id={`btn-edit-course-${courseId}`}
       aria-label="Chỉnh sửa khóa học"
-      className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#4648D4] shadow-sm hover:bg-white hover:shadow-md hover:scale-110 active:scale-95 transition-all duration-150 z-10"
+      className="absolute top-3 right-3 w-8 h-8 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center text-[#4F46E5] shadow-sm hover:bg-white hover:text-[#4338CA] hover:scale-105 active:scale-95 transition-all duration-150 z-10 cursor-pointer border border-gray-100"
     >
       <PencilIcon />
     </Link>
   );
 }
 
-// ─── Thumbnail ────────────────────────────────────────────────────────────────
-
-function CourseThumbnail({ title, thumbnail }: Pick<Course, "title" | "thumbnail">) {
-  if (!thumbnail) return null;
-
+function PriceBadge({ course }: { course: Course }) {
   return (
-    <div className="relative w-full aspect-[16/9] bg-gradient-to-br from-[#4648D4]/20 to-[#6B6BFF]/20 overflow-hidden">
-      <Image
-        src={thumbnail}
-        alt={title}
-        fill
-        sizes="(max-width: 768px) 100vw, 33vw"
-        className="object-cover"
-        onError={(e) => {
-          // Graceful fallback to gradient placeholder
-          (e.currentTarget as HTMLImageElement).style.display = "none";
-        }}
-      />
-      {/* Gradient overlay for readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A2E]/30 via-transparent to-transparent" />
+    <div className="absolute bottom-3 right-3 px-2.5 py-1.5 rounded-lg text-[13px] font-black z-10 shadow-sm bg-gray-900/80 text-white backdrop-blur-md flex items-center gap-2 border border-white/20">
+      {!course.price || course.price === 0 ? (
+        <span className="text-emerald-400">Miễn phí</span>
+      ) : course.currentPrice && course.currentPrice < course.price ? (
+        <>
+          <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.currentPrice)}</span>
+          <span className="text-[11px] text-gray-300 line-through font-medium">
+            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)}
+          </span>
+        </>
+      ) : (
+        <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)}</span>
+      )}
     </div>
   );
 }
 
-// ─── Action Buttons Row ───────────────────────────────────────────────────────
-
-interface ActionBtn {
-  id: string;
-  label: string;
-  Icon: React.FC;
-  href: string;
+function CourseThumbnail({ title, thumbnail }: Pick<Course, "title" | "thumbnail">) {
+  return (
+    <div className="relative w-full aspect-[16/9] bg-gray-100 overflow-hidden border-b border-gray-100">
+      {thumbnail && (
+        <Image
+          src={thumbnail}
+          alt={title}
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+      )}
+    </div>
+  );
 }
 
 function CourseActionButtons({ courseId }: { courseId: string }) {
-  const ACTIONS: ActionBtn[] = [
-    { id: `btn-upload-${courseId}`, label: "Upload", Icon: UploadIcon, href: `/instructor/create-course` },
-    { id: `btn-lessons-${courseId}`, label: "Bài học", Icon: BookOpenIcon, href: `/instructor/courses/${courseId}/lessons` },
-    { id: `btn-curriculum-${courseId}`, label: "Chương học", Icon: LayersIcon, href: `/instructor/courses/${courseId}/lessons` },
-    { id: `btn-pricing-${courseId}`, label: "Đặt giá", Icon: TagIcon, href: `/instructor/courses/${courseId}/pricing` },
-  ];
-
   return (
-    <div className="grid grid-cols-2 gap-2 p-4 pt-0">
-      {ACTIONS.map(({ id, label, Icon, href }) => (
-        <Link
-          key={id}
-          href={href}
-          id={id}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-[#64647A] bg-[#F6F6FB] border border-[#EAEAF4] hover:bg-[#EEF0FF] hover:text-[#4648D4] hover:border-[#C5C6FF] active:scale-95 transition-all duration-150"
-        >
-          <span className="text-[#9090B0]">
-            <Icon />
-          </span>
-          {label}
-        </Link>
-      ))}
+    <div className="grid grid-cols-1 gap-2 p-3.5 mt-auto border-t border-gray-100 bg-gray-50/50">
+      <Link
+        href={`/instructor/courses/${courseId}/lessons`}
+        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#111827] bg-white border border-gray-200 hover:bg-[#EEF2FF] hover:text-[#4F46E5] hover:border-indigo-200 active:scale-98 transition-all duration-150 cursor-pointer shadow-2xs"
+      >
+        <span className="text-[#4F46E5]">
+          <BookOpenIcon />
+        </span>
+        <span>Nội dung</span>
+      </Link>
     </div>
   );
 }
-
-// ─── Main CourseCard ──────────────────────────────────────────────────────────
 
 interface CourseCardProps {
   course: Course;
 }
 
 export function CourseCard({ course }: CourseCardProps) {
+  const formatDuration = (hours: number) => {
+    if (!hours) return "0 phút";
+    if (hours < 1) {
+      return `${Math.round(hours * 60)} phút`;
+    }
+    const h = Math.floor(hours);
+    const m = Math.round((hours - h) * 60);
+    if (m === 0) return `${h} giờ`;
+    return `${h} giờ ${m} phút`;
+  };
+
   return (
     <article
       aria-label={`Khóa học: ${course.title}`}
-      className="group relative flex flex-col rounded-2xl bg-white border border-[#EAEAF4] overflow-hidden hover:border-[#C5C6FF] hover:shadow-[0_8px_30px_rgba(107,107,255,0.12)] transition-all duration-200"
+      className="group relative flex flex-col rounded-2xl bg-white border border-gray-200 overflow-hidden hover:border-gray-300 hover:shadow-md transition-all duration-200 shadow-2xs h-full"
     >
-      {/* Thumbnail */}
       <div className="relative">
         <CourseThumbnail title={course.title} thumbnail={course.thumbnail} />
         <StatusBadge status={course.status} />
         <EditButton courseId={course.id} />
+        <PriceBadge course={course} />
       </div>
 
-      {/* Info */}
-      <div className="px-4 pt-3 pb-1 flex flex-col gap-1">
-        <h3 className="text-[14px] font-semibold text-[#1A1A2E] line-clamp-2 group-hover:text-[#4648D4] transition-colors duration-150">
+      <div className="p-5 flex flex-col gap-2 flex-1">
+        <h3 className="text-[16px] font-bold text-[#111827] line-clamp-2 group-hover:text-[#4F46E5] transition-colors duration-150 leading-snug">
           {course.title}
         </h3>
-        <p className="flex items-center gap-1 text-[12px] text-[#9090B0]">
-          <ClockIcon />
-          {course.durationHours} giờ · {course.totalLessons} bài học
+        <p className="flex items-center gap-1.5 text-[13px] text-[#6B7280] font-medium mt-auto">
+          <span className="text-gray-400"><ClockIcon /></span>
+          <span>{formatDuration(course.durationHours)} &bull; {course.totalLessons} bài học</span>
         </p>
+
       </div>
 
-      {/* Actions */}
       <CourseActionButtons courseId={course.id} />
     </article>
   );

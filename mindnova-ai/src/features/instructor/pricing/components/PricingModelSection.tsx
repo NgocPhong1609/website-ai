@@ -171,62 +171,102 @@ function ModelCard({
 
 function PriceInputs({
   basePrice,
-  salePrice,
   onBaseChange,
-  onSaleChange,
 }: {
   basePrice: string;
-  salePrice: string;
   onBaseChange: (v: string) => void;
-  onSaleChange: (v: string) => void;
 }) {
   return (
-    <div className="flex items-start gap-4 flex-wrap">
-      {/* Base price */}
-      <div className="flex flex-col gap-1.5 flex-1 min-w-[160px]">
-        <label htmlFor="base-price" className="text-[12px] font-semibold text-[#464554]">
-          Giá cơ bản
-        </label>
-        <div className="flex items-center gap-0 rounded-xl border border-[#DDDDF0] bg-[#FAFAFE] overflow-hidden focus-within:border-[#6B6BFF] focus-within:ring-2 focus-within:ring-[#6B6BFF]/15 transition-all duration-150">
-          <input
-            id="base-price"
-            type="text"
-            value={basePrice}
-            onChange={(e) => onBaseChange(e.target.value)}
-            placeholder="0"
-            className="flex-1 h-10 px-3 text-sm font-semibold text-[#1A1A2E] bg-transparent focus:outline-none placeholder:text-[#C4C4D8]"
-          />
-          <span className="h-10 flex items-center px-3 text-[12px] font-bold text-[#4648D4] border-l border-[#DDDDF0] bg-[#F0F0FF]">
-            VND
-          </span>
-        </div>
+    <div className="flex flex-col gap-1.5 flex-1 min-w-[160px]">
+      <label htmlFor="base-price" className="text-[12px] font-semibold text-[#464554] uppercase tracking-wide">
+        Giá bán niêm yết (100,000 - 100,000,000 VNĐ)
+      </label>
+      <div className="flex items-center gap-0 rounded-xl border border-[#DDDDF0] bg-[#FAFAFE] overflow-hidden focus-within:border-[#6B6BFF] focus-within:ring-2 focus-within:ring-[#6B6BFF]/15 transition-all duration-150">
+        <span className="h-10 flex items-center px-3 text-[14px] font-bold text-[#9090B0] bg-[#FAFAFE]">
+          đ
+        </span>
+        <input
+          id="base-price"
+          type="text"
+          value={basePrice}
+          onChange={(e) => onBaseChange(e.target.value)}
+          placeholder="0"
+          className="flex-1 h-10 px-1 text-sm font-semibold text-[#1A1A2E] bg-transparent focus:outline-none placeholder:text-[#C4C4D8]"
+        />
+        <span className="h-10 flex items-center px-3 text-[12px] font-bold text-[#4648D4] border-l border-[#DDDDF0] bg-[#F0F0FF]">
+          VNĐ
+        </span>
       </div>
+    </div>
+  );
+}
 
-      {/* Sale price */}
-      <div className="flex flex-col gap-1.5 flex-1 min-w-[160px]">
-        <label htmlFor="sale-price" className="text-[12px] font-semibold text-[#464554]">
-          Giá khuyến mãi <span className="font-normal text-[#9090B0]">(Tùy chọn)</span>
-        </label>
-        <div className="flex items-center gap-0 rounded-xl border border-[#DDDDF0] bg-[#FAFAFE] overflow-hidden focus-within:border-[#6B6BFF] focus-within:ring-2 focus-within:ring-[#6B6BFF]/15 transition-all duration-150">
-          <input
-            id="sale-price"
-            type="text"
-            value={salePrice}
-            onChange={(e) => onSaleChange(e.target.value)}
-            placeholder="Nhập giá ưu đãi..."
-            className="flex-1 h-10 px-3 text-sm text-[#1A1A2E] bg-transparent focus:outline-none placeholder:text-[#C4C4D8]"
-          />
-          <span className="h-10 flex items-center px-3 text-[12px] font-bold text-[#4648D4] border-l border-[#DDDDF0] bg-[#F0F0FF]">
-            VND
-          </span>
+function FlashSaleInputs({
+  isFlashSale,
+  setIsFlashSale,
+  salePrice,
+  onSaleChange,
+  saleStartDate,
+  setSaleStartDate,
+  saleEndDate,
+  setSaleEndDate,
+}: {
+  isFlashSale: boolean;
+  setIsFlashSale: (v: boolean) => void;
+  salePrice: string;
+  onSaleChange: (v: string) => void;
+  saleStartDate: string;
+  setSaleStartDate: (v: string) => void;
+  saleEndDate: string;
+  setSaleEndDate: (v: string) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-4 mt-2 p-4 rounded-xl border border-[#EAEAF4] bg-[#FAFAFE]">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-[#F59E0B]">⚡</span>
+          <span className="text-[13px] font-bold text-[#1A1A2E]">Lên Lịch Giảm Giá & Khuyến Mãi Flash Sale</span>
         </div>
-        {salePrice && (
-          <p className="flex items-center gap-1 text-[11px] text-[#9090B0]">
-            <InfoIcon size={11} />
-            Giá này sẽ được hiển thị kèm giá gốc gạch ngang.
-          </p>
-        )}
+        <input
+          type="checkbox"
+          checked={isFlashSale}
+          onChange={(e) => setIsFlashSale(e.target.checked)}
+          className="w-4 h-4 text-[#6B6BFF] rounded border-[#DDDDF0] focus:ring-[#6B6BFF]"
+        />
       </div>
+      <p className="text-[11px] text-[#9090B0] mt-[-8px]">Tăng tỷ lệ chuyển đổi học viên bằng các đợt giảm giá ngắn hạn hấp dẫn.</p>
+      
+      {isFlashSale && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold text-[#464554] uppercase tracking-wide">Giá khuyến mãi (VNĐ)</label>
+            <input
+              type="text"
+              value={salePrice}
+              onChange={(e) => onSaleChange(e.target.value)}
+              className="h-10 px-3 rounded-xl border border-[#DDDDF0] text-sm text-[#059669] font-bold focus:outline-none focus:border-[#6B6BFF]"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold text-[#464554] uppercase tracking-wide">Ngày bắt đầu</label>
+            <input
+              type="date"
+              value={saleStartDate}
+              onChange={(e) => setSaleStartDate(e.target.value)}
+              className="h-10 px-3 rounded-xl border border-[#DDDDF0] text-sm text-[#1A1A2E] focus:outline-none focus:border-[#6B6BFF]"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold text-[#464554] uppercase tracking-wide">Ngày kết thúc (Tối đa 7 ngày)</label>
+            <input
+              type="date"
+              value={saleEndDate}
+              onChange={(e) => setSaleEndDate(e.target.value)}
+              className="h-10 px-3 rounded-xl border border-[#DDDDF0] text-sm text-[#1A1A2E] focus:outline-none focus:border-[#6B6BFF]"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -245,25 +285,13 @@ function AIBadge() {
 // ─── Main Section ─────────────────────────────────────────────────────────────
 
 export function PricingModelSection({
-  initialPrice,
-  onPriceChange,
-}: {
-  initialPrice: number;
-  onPriceChange: (price: number) => void;
-}) {
-  const [model, setModel] = useState<PricingModel>(initialPrice > 0 ? "paid" : "free");
-  // Format initial price with thousand separators
-  const [basePrice, setBasePrice] = useState(
-    initialPrice > 0 ? initialPrice.toLocaleString("vi-VN") : "0"
-  );
-  const [salePrice, setSalePrice] = useState("");
-
-  // Handle base price change and propagate to parent
-  const handleBasePriceChange = (v: string) => {
-    setBasePrice(v);
-    const num = Number(v.replace(/[^0-9]/g, ""));
-    onPriceChange(num);
-  };
+  basePrice, setBasePrice,
+  salePrice, setSalePrice,
+  isFlashSale, setIsFlashSale,
+  saleStartDate, setSaleStartDate,
+  saleEndDate, setSaleEndDate
+}: any) {
+  const [model, setModel] = useState<PricingModel>("paid");
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-4">
@@ -297,12 +325,23 @@ export function PricingModelSection({
 
         {/* Price inputs */}
         {model !== "free" && (
-          <PriceInputs
-            basePrice={basePrice}
-            salePrice={salePrice}
-            onBaseChange={handleBasePriceChange}
-            onSaleChange={setSalePrice}
-          />
+          <>
+            <PriceInputs
+              basePrice={basePrice}
+              onBaseChange={setBasePrice}
+            />
+            
+            <FlashSaleInputs
+              isFlashSale={isFlashSale}
+              setIsFlashSale={setIsFlashSale}
+              salePrice={salePrice}
+              onSaleChange={setSalePrice}
+              saleStartDate={saleStartDate}
+              setSaleStartDate={setSaleStartDate}
+              saleEndDate={saleEndDate}
+              setSaleEndDate={setSaleEndDate}
+            />
+          </>
         )}
 
         {model === "free" && (
@@ -317,7 +356,7 @@ export function PricingModelSection({
 
       {/* Right: AI panels */}
       <div className="flex flex-col gap-3">
-        <AIInsightPanel onApply={(p) => { handleBasePriceChange(p); setModel("paid"); }} />
+        <AIInsightPanel onApply={(p) => { setBasePrice(p); setModel("paid"); }} />
         <RevenueStatPanel />
       </div>
     </div>

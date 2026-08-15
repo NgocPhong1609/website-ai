@@ -20,7 +20,7 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@features/*": ["./src/features/*"],
+      "@features/*": ["./src/features/*", "./src/features/student/*"],
       "@shared/*": ["./src/shared/*"]
     }
   },
@@ -32,5 +32,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "RichTextEditor_recovered.tsx"]
 }

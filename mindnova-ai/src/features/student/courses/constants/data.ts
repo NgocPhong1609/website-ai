@@ -1,10 +1,10 @@
-import type { IMyCourse } from "@features/courses/types";
+import type { MyCourse } from "../types";
 
-export const MY_COURSES: IMyCourse[] = [
+export const MY_COURSES: MyCourse[] = [
   {
     id: 1,
-    title: "Next.js Fullstack",
-    nextLesson: "Route Handlers",
+    title: "Lập trình Next.js 15 Fullstack",
+    nextLesson: "Route Handlers & Server Actions",
     progress: 72,
     thumbnailGradient: "from-[#0f0c29] via-[#302b63] to-[#24243e]",
     thumbnailUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600&auto=format&fit=crop",
@@ -14,8 +14,8 @@ export const MY_COURSES: IMyCourse[] = [
   },
   {
     id: 2,
-    title: "React Query Mastery",
-    nextLesson: "Mutations",
+    title: "Làm chủ TanStack React Query",
+    nextLesson: "Quản lý Mutations & Caching",
     progress: 45,
     thumbnailGradient: "from-[#0f2027] via-[#203a43] to-[#2c5364]",
     thumbnailUrl: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=600&auto=format&fit=crop",
@@ -26,8 +26,8 @@ export const MY_COURSES: IMyCourse[] = [
   },
   {
     id: 3,
-    title: "JavaScript Advanced",
-    nextLesson: "Prototypes & Closures",
+    title: "JavaScript Chuyên Sâu & Tối Ưu",
+    nextLesson: "Prototypes, Closures & Event Loop",
     progress: 80,
     thumbnailGradient: "from-[#141E30] to-[#243B55]",
     thumbnailUrl: "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?q=80&w=600&auto=format&fit=crop",
@@ -37,13 +37,46 @@ export const MY_COURSES: IMyCourse[] = [
   },
   {
     id: 4,
-    title: "Node.js Backend",
-    nextLesson: "Express Middleware",
+    title: "Kiến Trúc Node.js & Microservices",
+    nextLesson: "Express Middleware & JWT Auth",
     progress: 35,
     thumbnailGradient: "from-[#232526] to-[#414345]",
     thumbnailUrl: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=600&auto=format&fit=crop",
     status: "in-progress",
     lessonsCompleted: 7,
     totalLessons: 20,
+  },
+  {
+    id: 5,
+    title: "Thiết Kế Hệ Thống Tailwind CSS",
+    nextLesson: "Đã hoàn thành khóa học 🎉",
+    progress: 100,
+    thumbnailGradient: "from-[#1D4ED8] to-[#1E40AF]",
+    thumbnailUrl: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=600&auto=format&fit=crop",
+    status: "completed",
+    lessonsCompleted: 15,
+    totalLessons: 15,
+  },
+  {
+    id: 6,
+    title: "Nền Tảng TypeScript Thực Chiến",
+    nextLesson: "Đã hoàn thành khóa học 🎉",
+    progress: 100,
+    thumbnailGradient: "from-[#312E81] to-[#1E1B4B]",
+    thumbnailUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop",
+    status: "completed",
+    lessonsCompleted: 12,
+    totalLessons: 12,
+  },
+  {
+    id: 7,
+    title: "Ứng Dụng AI Prompt & Copilots",
+    nextLesson: "Giới thiệu về LLMs & RAG",
+    progress: 0,
+    thumbnailGradient: "from-[#047857] via-[#064E3B] to-[#111827]",
+    thumbnailUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop",
+    status: "not-started",
+    lessonsCompleted: 0,
+    totalLessons: 10,
   },
 ];

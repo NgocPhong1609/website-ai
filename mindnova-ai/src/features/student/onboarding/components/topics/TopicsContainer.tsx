@@ -1,28 +1,16 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button, ArrowRightIcon } from "@shared/components/ui";
 import { useOnboardingStore } from "@/src/features/student/onboarding/stores/onboardingStore";
-import { ONBOARDING_TOPICS } from "@/src/features/student/onboarding/constants";
-import { TopicsGrid } from "./TopicsGrid";
 import { AiProjectionCard } from "./AiProjectionCard";
-import type { ITopic } from "@/src/features/student/onboarding/types";
 
 // ─── Static Icons ─────────────────────────────────────────────────────────────
 
 function SparkleIcon() {
   return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
     </svg>
   );
@@ -30,17 +18,7 @@ function SparkleIcon() {
 
 function ShieldCheckIcon() {
   return (
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
       <path d="M9 12l2 2 4-4" />
     </svg>
@@ -49,42 +27,94 @@ function ShieldCheckIcon() {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
-import { useRouter } from "next/navigation";
-
-/**
- * Encapsulates topic-selection logic and store integration.
- * Returns derived state and handlers ready to pass to child components.
- */
 function useTopicsSelection() {
   const router = useRouter();
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const selectTopics = useOnboardingStore((s) => s.selectTopics);
+  // Chuyển sang dùng string thay vì ID vì lấy trực tiếp tên danh mục từ API
+  const [selectedTopics, setSelectedTopics] = useState<Set<string>>(new Set());
+  const selectTopicsToStore = useOnboardingStore((s) => s.selectTopics);
 
-  const toggleTopic = useCallback((topic: ITopic) => {
-    setSelectedIds((prev) => {
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [customCategory, setCustomCategory] = useState("");
+  const [isLoadingCats, setIsLoadingCats] = useState(true);
+
+  // Gọi API lấy Categories khi load trang
+  useEffect(() => {
+    // 1. Chuẩn bị sẵn một danh sách mồi nếu API sập
+    const fallbackCategories = [
+      "Web Development", "Mobile Apps", "UI/UX Design", 
+      "Data Science", "Artificial Intelligence", "DevOps"
+    ];
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+    fetch(`${apiUrl}/api/student/available-topics`)
+      .then(async (res) => {
+        // 2. Chặn lỗi từ vòng gửi xe: Kiểm tra xem server có trả về HTML thay vì JSON không
+        const contentType = res.headers.get("content-type");
+        if (!res.ok || !contentType || !contentType.includes("application/json")) {
+          throw new Error("Backend không trả về JSON hợp lệ.");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        // 3. Có JSON rồi nhưng vẫn kiểm tra xem dữ liệu có rỗng không
+        if (data && data.status === "success" && data.topics && data.topics.length > 0) {
+          setAvailableCategories(data.topics);
+        } else {
+          setAvailableCategories(fallbackCategories);
+        }
+      })
+      .catch((err) => {
+        // 4. Nếu có bất kỳ lỗi gì (sập server, mất mạng, lỗi parse), cứ âm thầm dùng danh sách mồi
+        console.warn("Đang dùng dữ liệu dự phòng do lỗi API:", err.message);
+        setAvailableCategories(fallbackCategories); 
+      })
+      .finally(() => setIsLoadingCats(false));
+  }, []);
+
+  const toggleTopic = useCallback((topic: string) => {
+    setSelectedTopics((prev) => {
       const next = new Set(prev);
-      next.has(topic.id) ? next.delete(topic.id) : next.add(topic.id);
+      next.has(topic) ? next.delete(topic) : next.add(topic);
       return next;
     });
   }, []);
 
-  const handleGenerate = useCallback(() => {
-    const topicLabelMap = new Map(
-      ONBOARDING_TOPICS.map((t) => [t.id, t.label]),
+  const handleAddCustomCategory = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = customCategory.trim();
+    if (!trimmed) return;
+
+    setAvailableCategories((prev) => 
+      prev.includes(trimmed) ? prev : [...prev, trimmed]
     );
-    const labels = [...selectedIds]
-      .map((id) => topicLabelMap.get(id))
-      .filter((label): label is string => label !== undefined);
-    selectTopics(labels);
+
+    setSelectedTopics((prev) => {
+      const next = new Set(prev);
+      next.add(trimmed);
+      return next;
+    });
+
+    setCustomCategory("");
+  }, [customCategory]);
+
+  const handleGenerate = useCallback(() => {
+    const labels = Array.from(selectedTopics);
+    selectTopicsToStore(labels);
     router.push("/onboarding/generating");
-  }, [selectedIds, selectTopics, router]);
+  }, [selectedTopics, selectTopicsToStore, router]);
 
   return {
-    selectedIds,
-    selectedCount: selectedIds.size,
-    canGenerate: selectedIds.size > 0,
+    selectedTopics,
+    selectedCount: selectedTopics.size,
+    canGenerate: selectedTopics.size > 0,
     toggleTopic,
     handleGenerate,
+    availableCategories,
+    customCategory,
+    setCustomCategory,
+    isLoadingCats,
+    handleAddCustomCategory
   };
 }
 
@@ -103,17 +133,18 @@ function StepBadge() {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-/**
- * Orchestrates the Topics onboarding step.
- * Owns state via `useTopicsSelection` and passes controlled props to children.
- */
 export default function TopicsContainer() {
   const {
-    selectedIds,
+    selectedTopics,
     selectedCount,
     canGenerate,
     toggleTopic,
     handleGenerate,
+    availableCategories,
+    customCategory,
+    setCustomCategory,
+    isLoadingCats,
+    handleAddCustomCategory
   } = useTopicsSelection();
 
   return (
@@ -140,7 +171,58 @@ export default function TopicsContainer() {
 
       {/* Content: topics grid + AI sidebar */}
       <div className="flex items-start gap-5 w-full max-w-4xl">
-        <TopicsGrid selectedIds={selectedIds} onToggle={toggleTopic} />
+        
+        {/* KHU VỰC TRÁI: Box chứa Categories và Input (Thay thế TopicsGrid tĩnh) */}
+        <div className="flex-1 bg-white border border-[#E8E8F0] rounded-3xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col gap-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#6B6BFF]" />
+            <h3 className="text-xs font-bold text-[#84849A] uppercase tracking-wider">Available Topics</h3>
+          </div>
+
+          <div className="flex flex-wrap gap-2.5 min-h-[120px] content-start">
+            {isLoadingCats ? (
+              <span className="text-sm text-gray-400 w-full text-center mt-4">Loading topics from database...</span>
+            ) : (
+              availableCategories.map((topic) => {
+                const isSelected = selectedTopics.has(topic);
+                return (
+                  <button
+                    key={topic} // Dùng luôn tên topic làm key thay vì idx
+                    type="button"
+                    onClick={() => toggleTopic(topic)}
+                    className={`px-4 py-2.5 flex items-center gap-2 rounded-xl text-[13px] font-semibold transition-all border ${
+                      isSelected
+                        ? "bg-[#6B6BFF] text-white border-[#6B6BFF] shadow-md"
+                        : "bg-white text-[#464554] border-[#E8E8F0] hover:border-[#C7C4D7] hover:bg-[#F8F8FF]"
+                    }`}
+                  >
+                    <span>{isSelected ? "✓" : "+"}</span>
+                    {topic}
+                  </button>
+                );
+              })
+            )}
+          </div>
+
+          {/* Ô input thêm Category tùy chỉnh */}
+          <form onSubmit={handleAddCustomCategory} className="flex gap-3 mt-2 border-t border-[#F0F0F7] pt-5">
+            <input
+              type="text"
+              value={customCategory}
+              onChange={(e) => setCustomCategory(e.target.value)}
+              placeholder="Can't find it? Add a custom category..."
+              className="flex-1 px-4 py-2.5 rounded-xl border border-[#E8E8F0] text-sm focus:outline-none focus:border-[#6B6BFF] transition-colors"
+            />
+            <button
+              type="submit"
+              className="px-5 py-2.5 bg-[#F5F5F8] text-[#464554] text-xs font-bold rounded-xl hover:bg-[#E8E8F0] transition-colors cursor-pointer"
+            >
+              Add
+            </button>
+          </form>
+        </div>
+
+        {/* KHU VỰC PHẢI: Giữ nguyên Card tĩnh */}
         <AiProjectionCard selectedCount={selectedCount} />
       </div>
 

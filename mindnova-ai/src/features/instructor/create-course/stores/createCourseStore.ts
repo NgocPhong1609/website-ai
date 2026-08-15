@@ -43,6 +43,7 @@ const INITIAL_SETTINGS: Step3Data = {
 
 // ─── Serialization ────────────────────────────────────────────────────────────
 // thumbnailFile (File object) cannot be serialized, so we exclude it.
+// pendingVideos (Map<string, File>) also cannot be serialized.
 
 interface SerializableState {
   step: StepKey;
@@ -81,6 +82,7 @@ function loadFromSession(): Partial<ICreateCourseState> | null {
       courseInfo: {
         ...parsed.courseInfo,
         thumbnailFile: null, // Cannot restore File from session
+        thumbnailPreview: null, // Clear preview as well since we need the File object to upload
       },
       modules: parsed.modules,
       settings: parsed.settings,
@@ -116,6 +118,7 @@ interface ICreateCourseState {
   setCourseInfo: <K extends keyof CourseBasicInfo>(key: K, value: CourseBasicInfo[K]) => void;
 
   // Module CRUD (Step 2)
+  setModules: (modules: DraftModule[]) => void;
   addModule: (title: string, description: string) => void;
   updateModule: (id: string, updates: Partial<Pick<DraftModule, "title" | "description">>) => void;
   deleteModule: (id: string) => void;
@@ -183,6 +186,11 @@ export const useCreateCourseStore = create<ICreateCourseState>((set, get) => ({
   },
 
   // ── Module CRUD ─────────────────────────────────────────────────────────────
+
+  setModules: (modules) => {
+    set({ modules });
+    saveToSession(get());
+  },
 
   addModule: (title, description) => {
     set((state) => {

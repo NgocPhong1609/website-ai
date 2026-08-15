@@ -10,6 +10,7 @@ export const MOCK_COURSES: Course[] = [
     thumbnail: "/thumbnails/generative-ai.jpg",
     status: "published",
     durationHours: 12,
+    price: 0,
     totalLessons: 45,
   },
   {
@@ -18,6 +19,7 @@ export const MOCK_COURSES: Course[] = [
     thumbnail: "/thumbnails/deep-learning.jpg",
     status: "draft",
     durationHours: 24,
+    price: 0,
     totalLessons: 82,
   },
   {
@@ -26,6 +28,7 @@ export const MOCK_COURSES: Course[] = [
     thumbnail: "/thumbnails/prompt.jpg",
     status: "published",
     durationHours: 8,
+    price: 0,
     totalLessons: 30,
   },
   {
@@ -34,6 +37,7 @@ export const MOCK_COURSES: Course[] = [
     thumbnail: "/thumbnails/python-ds.jpg",
     status: "published",
     durationHours: 30,
+    price: 0,
     totalLessons: 120,
   },
   {
@@ -42,6 +46,7 @@ export const MOCK_COURSES: Course[] = [
     thumbnail: "/thumbnails/ethics-ai.jpg",
     status: "draft",
     durationHours: 10,
+    price: 0,
     totalLessons: 25,
   },
 ];

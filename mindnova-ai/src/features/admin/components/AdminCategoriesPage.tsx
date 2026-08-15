@@ -1,15 +1,9 @@
 import { AdminCategoriesQuickActions } from "@/src/features/admin/components/AdminCategoriesQuickActions";
 import { getAdminCategoriesPageData } from "@/src/features/admin/services/admin-categories.service";
+import { AdminCategoriesQuickActions } from "@/src/features/admin/components/AdminCategoriesQuickActions";
 
 export async function AdminCategoriesPage() {
   const data = await getAdminCategoriesPageData();
-
-  const toStatusLabel = (status: string) => {
-    const value = status.toLowerCase();
-    if (value.includes("active")) return "Đang hoạt động";
-    if (value.includes("inactive")) return "Ngưng hoạt động";
-    return status;
-  };
 
   return (
     <div className="space-y-6 p-6 lg:p-8 [font-family:var(--font-admin-body)]">
@@ -26,6 +20,7 @@ export async function AdminCategoriesPage() {
           <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Danh sách danh mục</h2>
           <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700 ring-1 ring-teal-100">{data.rows.length} danh mục</span>
         </div>
+<<<<<<< HEAD
 
         <div className="mb-4">
           <AdminCategoriesQuickActions />
@@ -61,6 +56,9 @@ export async function AdminCategoriesPage() {
             </tbody>
           </table>
         </div>
+=======
+        <AdminCategoriesQuickActions rows={data.rows} />
+>>>>>>> origin/main
       </section>
     </div>
   );

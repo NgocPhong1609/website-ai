@@ -1,4 +1,5 @@
 import { getAdminCoursesPageData } from "@/src/features/admin/services/admin-courses.service";
+import { AdminCoursesQuickActions } from "@/src/features/admin/components/AdminCoursesQuickActions";
 
 interface AdminCoursesPageProps {
   filters?: {
@@ -10,23 +11,6 @@ interface AdminCoursesPageProps {
 
 export async function AdminCoursesPage({ filters }: AdminCoursesPageProps) {
   const data = await getAdminCoursesPageData(filters);
-
-  const toLevelLabel = (level: string) => {
-    const value = level.toLowerCase();
-    if (value.includes("beginner")) return "Cơ bản";
-    if (value.includes("intermediate")) return "Trung cấp";
-    if (value.includes("advanced")) return "Nâng cao";
-    return level;
-  };
-
-  const toStatusLabel = (status: string) => {
-    const value = status.toLowerCase();
-    if (value.includes("publish")) return "Đã xuất bản";
-    if (value.includes("draft")) return "Bản nháp";
-    if (value.includes("review")) return "Chờ duyệt";
-    if (value.includes("archive")) return "Đã lưu trữ";
-    return status;
-  };
 
   return (
     <div className="space-y-6 p-6 lg:p-8 [font-family:var(--font-admin-body)]">
@@ -112,43 +96,7 @@ export async function AdminCoursesPage({ filters }: AdminCoursesPageProps) {
             {data.rows.length} khóa học
           </span>
         </div>
-
-        <div className="overflow-hidden rounded-xl border border-slate-200/80">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-slate-50/80 text-slate-600">
-              <tr>
-                <th className="px-4 py-3 font-medium">Khóa học</th>
-                <th className="px-4 py-3 font-medium">Danh mục</th>
-                <th className="px-4 py-3 font-medium">Cấp độ</th>
-                <th className="px-4 py-3 font-medium">Giá</th>
-                <th className="px-4 py-3 font-medium">Trạng thái</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.rows.map((course) => (
-                <tr key={`${course.id}-${course.title}`} className="border-t border-slate-200 bg-white hover:bg-cyan-50/35">
-                  <td className="px-4 py-3 font-medium text-slate-900">{course.title}</td>
-                  <td className="px-4 py-3 text-slate-600">{course.category}</td>
-                  <td className="px-4 py-3 text-slate-600">{toLevelLabel(course.level)}</td>
-                  <td className="px-4 py-3 text-slate-600">{course.price.toFixed(2)} USD</td>
-                  <td className="px-4 py-3">
-                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
-                      {toStatusLabel(course.status)}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-
-              {data.rows.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-slate-500">
-                    Chưa có dữ liệu khóa học.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <AdminCoursesQuickActions categories={data.filters.categories} courses={data.rows} />
       </section>
     </div>
   );

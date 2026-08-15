@@ -41,6 +41,7 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+<<<<<<< HEAD
     // AI trả lời câu hỏi / hỗ trợ học sinh (chat)
     'groq' => [
         'key' => env('GROQ_API_KEY'),
@@ -52,6 +53,28 @@ return [
         'key' => env('GEMINI_API_KEY'),
         'model' => env('GEMINI_MODEL', 'gemini-1.5-flash'),
     ],
+=======
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+        'organization' => env('OPENAI_ORGANIZATION'),
+        'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
+    ],
+
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-1.5-flash'),
+    ],
+    
+    'backup_ai' => [
+        'api_key' => env('BACKUP_AI_API_KEY'),
+        'model' => env('BACKUP_AI_MODEL', 'gpt-4o-mini'),
+    ],
+    
+    'momo' => [
+        'partner_code' => env('MOMO_PARTNER_CODE'),
+        'access_key' => env('MOMO_ACCESS_KEY'),
+        'secret_key' => env('MOMO_SECRET_KEY'),
+        'endpoint' => env('MOMO_ENDPOINT', 'https://test-payment.momo.vn/v2/gateway/api/create'),
+    ],
+>>>>>>> origin/main
 ];
-
-

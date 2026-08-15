@@ -1,67 +1,56 @@
 // ─── AIBanner ─────────────────────────────────────────────────────────────────
-// Promotional AI banner at the top of the course management page.
+// Promotional AI banner at the top of the course management page (Minimalist Rule #7)
 
+import Link from "next/link";
 import { SparklesIcon } from "./icons";
 
 export function AIBanner() {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#4648D4] via-[#5B5DE8] to-[#6B6BFF] p-6 flex items-center justify-between min-h-[120px]">
-      {/* Decorative blobs */}
-      <div
-        aria-hidden="true"
-        className="absolute -top-8 -left-8 w-40 h-40 rounded-full bg-white/5 blur-2xl pointer-events-none"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute -bottom-10 right-32 w-56 h-56 rounded-full bg-[#4CD7F6]/10 blur-3xl pointer-events-none"
-      />
-
+    <div className="relative overflow-hidden rounded-2xl bg-white border border-gray-200 p-6 flex items-center justify-between shadow-2xs">
       {/* Left content */}
-      <div className="relative z-10 flex flex-col gap-2 max-w-sm">
-        <h2 className="text-white font-bold text-xl leading-snug">
-          Hỗ trợ AI: Sinh đề cương
+      <div className="relative z-10 flex flex-col gap-3 max-w-lg">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EEF2FF] text-[#4F46E5] text-xs font-bold w-fit border border-indigo-100">
+          <SparklesIcon />
+          <span>MindNova AI Assistant</span>
+        </div>
+        <h2 className="text-[#111827] font-extrabold text-xl tracking-tight">
+          Hỗ trợ AI: Sinh đề cương tự động
         </h2>
-        <p className="text-white/75 text-sm leading-relaxed">
-          Sử dụng MindNova AI để tự động tạo cấu trúc chương học dựa trên
-          tiêu đề khóa học của bạn chỉ trong vài giây.
+        <p className="text-[#6B7280] text-sm leading-relaxed font-medium">
+          Sử dụng Trí tuệ Nhân tạo để tự động tạo cấu trúc chương học logic và toàn diện dựa trên tiêu đề khóa học chỉ trong vài giây.
         </p>
-        <button
+        <Link
           id="btn-ai-banner-cta"
-          type="button"
-          className="mt-1 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-[#4648D4] bg-white hover:bg-white/90 active:bg-white/80 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 w-fit"
+          href="/instructor/create-course"
+          className="mt-2 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#4F46E5] hover:bg-[#4338CA] active:bg-[#3730A3] shadow-2xs hover:shadow-sm transition-all duration-150 w-fit cursor-pointer"
         >
           <SparklesIcon />
-          Thử ngay bây giờ
-        </button>
+          <span>Thử ngay bây giờ</span>
+        </Link>
       </div>
 
-      {/* Right decorative illustration */}
+      {/* Right decorative graphic (Minimalist Indigo) */}
       <div
         aria-hidden="true"
-        className="relative z-10 hidden md:flex items-center justify-center w-28 h-28 mr-4"
+        className="relative z-10 hidden md:flex items-center justify-center w-32 h-32 mr-4 shrink-0 bg-[#F8FAFC] rounded-2xl border border-gray-100 p-4"
       >
-        <svg viewBox="0 0 120 120" fill="none" className="w-full h-full opacity-80">
-          {/* Brain / neural network illustration */}
-          <circle cx="60" cy="60" r="40" stroke="white" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.3" />
-          <circle cx="60" cy="60" r="28" stroke="white" strokeWidth="1" opacity="0.2" />
-          <circle cx="60" cy="60" r="12" fill="white" opacity="0.15" />
-          {/* Nodes */}
-          <circle cx="60" cy="32" r="4" fill="white" opacity="0.7" />
-          <circle cx="84" cy="48" r="4" fill="white" opacity="0.7" />
-          <circle cx="84" cy="72" r="4" fill="white" opacity="0.7" />
-          <circle cx="60" cy="88" r="4" fill="white" opacity="0.7" />
-          <circle cx="36" cy="72" r="4" fill="white" opacity="0.7" />
-          <circle cx="36" cy="48" r="4" fill="white" opacity="0.7" />
-          {/* Connections */}
-          <line x1="60" y1="32" x2="84" y2="48" stroke="white" strokeWidth="1" opacity="0.4" />
-          <line x1="84" y1="48" x2="84" y2="72" stroke="white" strokeWidth="1" opacity="0.4" />
-          <line x1="84" y1="72" x2="60" y2="88" stroke="white" strokeWidth="1" opacity="0.4" />
-          <line x1="60" y1="88" x2="36" y2="72" stroke="white" strokeWidth="1" opacity="0.4" />
-          <line x1="36" y1="72" x2="36" y2="48" stroke="white" strokeWidth="1" opacity="0.4" />
-          <line x1="36" y1="48" x2="60" y2="32" stroke="white" strokeWidth="1" opacity="0.4" />
-          {/* Center glow */}
-          <circle cx="60" cy="60" r="6" fill="white" opacity="0.9" />
-          <circle cx="60" cy="60" r="3" fill="white" />
+        <svg viewBox="0 0 120 120" fill="none" className="w-full h-full text-[#4F46E5]">
+          <circle cx="60" cy="60" r="44" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.2" />
+          <circle cx="60" cy="60" r="30" stroke="currentColor" strokeWidth="1.5" opacity="0.3" />
+          <circle cx="60" cy="32" r="5" fill="currentColor" opacity="0.9" />
+          <circle cx="84" cy="48" r="5" fill="currentColor" opacity="0.7" />
+          <circle cx="84" cy="72" r="5" fill="currentColor" opacity="0.7" />
+          <circle cx="60" cy="88" r="5" fill="currentColor" opacity="0.9" />
+          <circle cx="36" cy="72" r="5" fill="currentColor" opacity="0.7" />
+          <circle cx="36" cy="48" r="5" fill="currentColor" opacity="0.7" />
+          <line x1="60" y1="32" x2="84" y2="48" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
+          <line x1="84" y1="48" x2="84" y2="72" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
+          <line x1="84" y1="72" x2="60" y2="88" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
+          <line x1="60" y1="88" x2="36" y2="72" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
+          <line x1="36" y1="72" x2="36" y2="48" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
+          <line x1="36" y1="48" x2="60" y2="32" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
+          <circle cx="60" cy="60" r="8" fill="currentColor" opacity="0.15" />
+          <circle cx="60" cy="60" r="4" fill="currentColor" />
         </svg>
       </div>
     </div>

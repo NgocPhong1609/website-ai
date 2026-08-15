@@ -7,6 +7,9 @@
 import { useState, useEffect, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 import { SparklesIcon, PlusIcon } from "./icons";
+import { generateAiNotification, sendNotification, getNotificationOptions } from "../api";
+import { MultiSelect } from "@/src/shared/components/ui/MultiSelect";
+import { SingleSelect } from "@/src/shared/components/ui/SingleSelect";
 
 // ─── Local icons ──────────────────────────────────────────────────────────────
 
@@ -58,23 +61,8 @@ function ChevronDownIcon() { return <svg {...S} width={13} height={13} strokeWid
 interface AINotificationModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialTopic?: string;
 }
-
-// ─── Mock generated draft ─────────────────────────────────────────────────────
-
-const MOCK_DRAFT = `🚀 **Chào mừng các bạn đến với giai đoạn bứt phá!**
-
-Chào các bạn học viên lớp AI Foundations,
-
-Tôi nhận thấy tinh thần học tập của lớp chúng ta trong tuần qua vô cùng ấn tượng. Để tiếp thêm động lực cho các bạn chuẩn bị bước vào chương cuối của khóa học, tôi đã mở thêm một số tài liệu tham khảo nâng cao trong phần tài nguyên.
-
-Đừng quên:
-
-• Hoàn thành bài tập Lab số 4 trước thứ Sáu.
-• Tham gia buổi Q&A trực tuyến vào tối thứ Tư.
-• Xem lại video tóm tắt Module 3 trước khi lên lớp.
-
-Chúc các bạn học tập hiệu quả và đạt kết quả tốt nhất! 💪`;
 
 // ─── Suggestion Chip ──────────────────────────────────────────────────────────
 
@@ -235,26 +223,32 @@ function GeneratingShimmer() {
 // ─── Left Panel ───────────────────────────────────────────────────────────────
 
 function LeftPanel({
-  recipient, setRecipient,
+  courseIds, setCourseIds,
+  options, isLoadingOptions,
   topic, setTopic,
+  tone, setTone,
   activeChip, setActiveChip,
   onGenerate, isGenerating,
 }: {
-  recipient: string;
-  setRecipient: (v: string) => void;
+  courseIds: (string | number)[];
+  setCourseIds: (v: (string | number)[]) => void;
+  options: { value: string | number; label: string }[];
+  isLoadingOptions: boolean;
   topic: string;
   setTopic: (v: string) => void;
+  tone: string;
+  setTone: (v: string) => void;
   activeChip: string | null;
   setActiveChip: (v: string | null) => void;
   onGenerate: () => void;
   isGenerating: boolean;
 }) {
-  const RECIPIENTS = [
-    "Tất cả học viên",
-    "Lớp AI Foundations",
-    "Lớp Data Science AI",
-    "Lớp Prompt Engineering",
-    "Học viên chưa hoàn thành",
+
+  const TONE_OPTIONS = [
+    { value: "friendly", label: "Thân thiện" },
+    { value: "professional", label: "Chuyên nghiệp" },
+    { value: "urgent", label: "Khẩn cấp" },
+    { value: "encouraging", label: "Khích lệ" },
   ];
 
   return (
@@ -265,19 +259,28 @@ function LeftPanel({
           Gửi đến:
         </label>
         <div className="relative">
-          <select
-            id="recipient-select"
-            value={recipient}
-            onChange={(e) => setRecipient(e.target.value)}
-            className="w-full appearance-none h-10 px-3 pr-9 rounded-xl border border-[#DDDDF0] bg-[#FAFAFE] text-sm text-[#1A1A2E] focus:outline-none focus:border-[#6B6BFF] focus:ring-2 focus:ring-[#6B6BFF]/15 transition-all duration-150 cursor-pointer"
-          >
-            {RECIPIENTS.map((r) => (
-              <option key={r} value={r}>{r}</option>
-            ))}
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#9090B0]">
-            <ChevronDownIcon />
-          </div>
+          <MultiSelect
+            options={options}
+            value={courseIds}
+            onChange={setCourseIds}
+            placeholder="Chọn khóa học để gửi..."
+            loading={isLoadingOptions}
+            emptyText="Chưa có khóa học nào có học viên."
+          />
+        </div>
+      </div>
+      
+      {/* Tone input */}
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="tone-select" className="text-[12px] font-semibold text-[#464554]">
+          Giọng điệu:
+        </label>
+        <div className="relative">
+          <SingleSelect
+            options={TONE_OPTIONS}
+            value={tone}
+            onChange={setTone}
+          />
         </div>
       </div>
 
@@ -341,14 +344,45 @@ function LeftPanel({
 
 // ─── Main Modal ───────────────────────────────────────────────────────────────
 
-export function AINotificationModal({ isOpen, onClose }: AINotificationModalProps) {
-  const [recipient, setRecipient] = useState("Tất cả học viên");
-  const [topic, setTopic] = useState("");
+export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINotificationModalProps) {
+  const [courseIds, setCourseIds] = useState<(string | number)[]>([]);
+  const [options, setOptions] = useState<{ value: string | number; label: string }[]>([]);
+  const [isLoadingOptions, setIsLoadingOptions] = useState(false);
+  
+  const [topic, setTopic] = useState(initialTopic);
+  const [tone, setTone] = useState("friendly");
   const [activeChip, setActiveChip] = useState<string | null>(null);
-  const [draft, setDraft] = useState(MOCK_DRAFT);
+  const [draft, setDraft] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+
+  // Fetch course options when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setIsLoadingOptions(true);
+      getNotificationOptions()
+        .then((data) => setOptions(data))
+        .catch((err) => console.error("Failed to fetch notification options:", err))
+        .finally(() => setIsLoadingOptions(false));
+    } else {
+      setCourseIds([]); // reset when closed
+    }
+  }, [isOpen]);
+
+  // Sync initialTopic to topic when modal opens
+  useEffect(() => {
+    if (isOpen && initialTopic) {
+      setTopic(initialTopic);
+      const matchedChip = SUGGESTION_CHIPS.find(c => c.label === initialTopic);
+      if (matchedChip) setActiveChip(initialTopic);
+      else setActiveChip(null);
+    } else if (isOpen) {
+      setTopic("");
+      setActiveChip(null);
+    }
+  }, [isOpen, initialTopic]);
 
   // Trap focus & handle ESC
   useEffect(() => {
@@ -361,11 +395,32 @@ export function AINotificationModal({ isOpen, onClose }: AINotificationModalProp
   }, [isOpen, onClose]);
 
   const handleGenerate = async () => {
+    if (!topic.trim()) return;
     setIsGenerating(true);
     setDraft("");
-    await new Promise((r) => setTimeout(r, 1800));
-    setDraft(MOCK_DRAFT);
-    setIsGenerating(false);
+    try {
+      const result = await generateAiNotification({ prompt: topic, tone, course_id: 1 });
+      setDraft(result.generated_content);
+    } catch (err) {
+      console.error(err);
+      setDraft("Có lỗi xảy ra khi tạo dự thảo AI. Vui lòng thử lại.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSend = async () => {
+    if (!draft.trim() || courseIds.length === 0) return;
+    setIsSending(true);
+    try {
+      await sendNotification({ content: draft, course_ids: courseIds });
+      setSaved(true);
+      setTimeout(() => { setSaved(false); onClose(); }, 1200);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleCopy = () => {
@@ -426,10 +481,14 @@ export function AINotificationModal({ isOpen, onClose }: AINotificationModalProp
             {/* Left form */}
             <div className="px-5 py-5 overflow-y-auto">
               <LeftPanel
-                recipient={recipient}
-                setRecipient={setRecipient}
+                courseIds={courseIds}
+                setCourseIds={setCourseIds}
+                options={options}
+                isLoadingOptions={isLoadingOptions}
                 topic={topic}
                 setTopic={setTopic}
+                tone={tone}
+                setTone={setTone}
                 activeChip={activeChip}
                 setActiveChip={setActiveChip}
                 onGenerate={handleGenerate}
@@ -464,7 +523,7 @@ export function AINotificationModal({ isOpen, onClose }: AINotificationModalProp
                   <span className="text-4xl">✦</span>
                   <p className="text-[12px] font-semibold text-center">
                     Nhập chủ đề và nhấn{" "}
-                    <span className="text-[#6B6BFF]">"Tạo dự thảo bằng AI"</span>
+                    <span className="text-[#6B6BFF]">&quot;Tạo dự thảo bằng AI&quot;</span>
                     <br />để xem kết quả ở đây.
                   </p>
                 </div>
@@ -494,10 +553,16 @@ export function AINotificationModal({ isOpen, onClose }: AINotificationModalProp
             <button
               type="button"
               id="btn-send-notification-modal"
-              disabled={!draft || isGenerating}
+              onClick={handleSend}
+              disabled={!draft || isGenerating || isSending || courseIds.length === 0}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/40"
             >
-              Gửi thông báo
+              {isSending ? (
+                <>
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                  Đang gửi...
+                </>
+              ) : "Gửi thông báo"}
             </button>
           </div>
         </div>

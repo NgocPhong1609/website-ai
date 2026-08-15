@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = process.env.BACKEND_URL || "http://127.0.0.1:8000";
 
 export async function apiClient<T>(
   endpoint: string,
@@ -8,11 +8,19 @@ export async function apiClient<T>(
 ): Promise<T> {
   if (!API_BASE_URL) {
     throw new Error(
-      "[apiClient] NEXT_PUBLIC_API_URL is not set. Check your .env file."
+      "[apiClient] BACKEND_URL is not set. Check your .env file."
     );
   }
 
-  const url = `${API_BASE_URL}${endpoint}`;
+  // Ensure base URL correctly targets the Laravel /api prefix without duplicating /api/api
+  const baseUrl = API_BASE_URL.replace(/\/+$/, "");
+  let cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  if (baseUrl.endsWith("/api") && cleanEndpoint.startsWith("/api")) {
+    cleanEndpoint = cleanEndpoint.slice(4);
+  }
+  const apiPrefix = baseUrl.endsWith("/api") || cleanEndpoint.startsWith("/api") ? "" : "/api";
+
+  const url = `${baseUrl}${apiPrefix}${cleanEndpoint}`;
 
   // Attach auth token from cookies (server-side only)
   const cookieStore = await cookies();
@@ -30,9 +38,9 @@ export async function apiClient<T>(
   }
 
   const response = await fetch(url, {
+    signal: options.signal ?? AbortSignal.timeout(8000), // Prevent SSR blocking/hanging
     ...options,
     headers,
-    redirect: "follow",
   });
 
   if (!response.ok) {

@@ -9,6 +9,7 @@ interface IOnboardingState {
   isAuthenticated: boolean;
   progressData: number;
   formData: OnboardingFormData;
+  generatedPlan: unknown; // Thêm trường lưu kết quả từ AI
 
   // Actions
   setStep: (step: OnboardingStep) => void;
@@ -19,6 +20,7 @@ interface IOnboardingState {
   selectTopics: (topics: string[]) => void;
   completeSignUp: () => void;
   resetOnboarding: () => void;
+  setGeneratedPlan: (plan: unknown) => void; // Thêm action lưu kết quả AI
 }
 
 const INITIAL_FORM_DATA: OnboardingFormData = {
@@ -32,6 +34,7 @@ export const useOnboardingStore = create<IOnboardingState>((set, get) => ({
   isAuthenticated: false,
   progressData: 0,
   formData: INITIAL_FORM_DATA,
+  generatedPlan: null, // Khởi tạo ban đầu là null
 
   setStep: (step) => set({ currentStep: step }),
   setAuth: (isAuth) => set({ isAuthenticated: isAuth }),
@@ -61,10 +64,14 @@ export const useOnboardingStore = create<IOnboardingState>((set, get) => ({
     set({ isAuthenticated: true, currentStep: "generating" });
   },
 
+  // Action lưu kết quả AI vào store
+  setGeneratedPlan: (plan) => set({ generatedPlan: plan }),
+
   resetOnboarding: () =>
     set({
       currentStep: "welcome",
       progressData: 0,
       formData: INITIAL_FORM_DATA,
+      generatedPlan: null,
     }),
 }));

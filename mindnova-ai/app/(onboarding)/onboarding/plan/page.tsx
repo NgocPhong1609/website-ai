@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PlanContainer } from "@/src/features/student/onboarding";
+import { PlanContainer } from "@/src/features/student/onboarding/components/plan";
 
 export const metadata: Metadata = {
   title: "Your Learning Plan — MindNova AI",

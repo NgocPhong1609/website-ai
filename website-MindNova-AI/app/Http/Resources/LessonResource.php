@@ -10,16 +10,47 @@ class LessonResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $quizData = null;
+        if ($this->type === 'quiz_module' && $this->quiz) {
+            $quizData = [
+                'id' => $this->quiz->id,
+                'title' => $this->quiz->title,
+                'time_limit_minutes' => $this->quiz->time_limit_minutes,
+                'passing_score' => $this->quiz->passing_score,
+                'questions' => $this->quiz->questions->map(function ($q) {
+                    return [
+                        'id' => $q->id,
+                        'content' => $q->content,
+                        'order' => $q->order,
+                        'answers' => $q->answers->map(function ($a) {
+                            return [
+                                'id' => $a->id,
+                                'content' => $a->content,
+                                'is_correct' => (bool) $a->is_correct,
+                            ];
+                        })->toArray(),
+                    ];
+                })->toArray(),
+            ];
+        }
+
         return [
             'id' => $this->id,
             'module_id' => $this->module_id,
             'title' => $this->title,
             'type' => $this->type,
             'content' => $this->content,
+            'video_url' => $this->video_url,
             'signed_url' => $this->getSignedUrl(),
-            'duration_minutes' => $this->duration_minutes,
+            'duration_seconds' => $this->duration_seconds,
             'order' => $this->order,
             'status' => $this->status,
+            'quizData' => $quizData,
+            // ── Versioning info ──
+            'current_version' => $this->current_version,
+            'published_version_id' => $this->published_version_id,
+            'is_published' => $this->isPublished(),
+            'has_pending_revision' => $this->status !== 'published' && $this->published_version_id !== null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

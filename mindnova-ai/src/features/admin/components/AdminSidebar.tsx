@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
+<<<<<<< HEAD
   { label: "Tổng quan", href: "/admin", icon: "⌂" },
   { label: "Người dùng", href: "/admin/users", icon: "◌" },
   { label: "Duyệt giáo viên", href: "/admin/teacher-approvals", icon: "✦" },
@@ -13,6 +14,14 @@ const navItems = [
   { label: "Doanh thu", href: "/admin/revenue", icon: "◍" },
   { label: "Báo cáo", href: "/admin/analytics", icon: "▣" },
   { label: "Kiểm duyệt", href: "/admin/moderation-support", icon: "⚑" },
+=======
+  { label: "Dashboard", href: "/admin", icon: "◈" },
+  { label: "Người dùng", href: "/admin/users", icon: "◎" },
+  { label: "AI & Hệ thống", href: "/admin/ai-system", icon: "◌" },
+  { label: "Quản lý khóa học", href: "/admin/content", icon: "▣" },
+  { label: "Thống kê", href: "/admin/analytics", icon: "◍" },
+  { label: "Moderation & Support", href: "/admin/moderation-support", icon: "✉" },
+>>>>>>> origin/main
 ];
 
 export function AdminSidebar() {
