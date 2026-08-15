@@ -38,34 +38,56 @@ class PaymentService
     public function processCallback(string $provider, array $params): ?Payment
     {
         $service = match (strtolower($provider)) {
-            'momo' => $this->momoService, // Dùng service Momo
-            'vnpay' => $this->vnPayService, // Dùng service VNPay
-            'zalopay' => $this->zaloPayService, // Dùng service ZaloPay
+            'momo' => $this->momoService,
+            'vnpay' => $this->vnPayService,
+            'zalopay' => $this->zaloPayService,
             default => null,
         };
 
         if (! $service) {
-            return null; // Nếu provider không hợp lệ
+            return null;
         }
 
-        $result = $service->verifyCallback($params); // Xác thực callback
+        $result = $service->verifyCallback($params);
 
         if (! $result['valid'] || empty($result['payment_id'])) {
-            return null; // Nếu callback không hợp lệ hoặc thiếu ID
+            return null;
         }
 
-        $payment = Payment::find($result['payment_id']); // Tìm payment theo ID
+        $payment = Payment::find($result['payment_id']);
 
         if (! $payment) {
-            return null; // Nếu không tìm thấy payment
+            return null;
         }
 
         $payment->update([
-            'status' => $result['status'], // Cập nhật trạng thái mới
-            'transaction_id' => $result['transaction_id'] ?? $payment->transaction_id, // Cập nhật transaction_id nếu có
-            'metadata' => array_merge($payment->metadata ?? [], $result['metadata'] ?? []), // Gộp metadata mới
+            'status' => $result['status'],
+            'transaction_id' => $result['transaction_id'] ?? $payment->transaction_id,
+            'metadata' => array_merge($payment->metadata ?? [], $result['metadata'] ?? []),
         ]);
 
-        return $payment; // Trả về payment đã cập nhật
+        if ($payment->status === 'completed' && ! empty($payment->metadata['course_ids'] ?? [])) {
+            $courseIds = array_map('intval', (array) $payment->metadata['course_ids']);
+
+            foreach ($courseIds as $courseId) {
+                $alreadyEnrolled = \App\Models\Enrollment::where('user_id', $payment->user_id)
+                    ->where('course_id', $courseId)
+                    ->exists();
+
+                if ($alreadyEnrolled) {
+                    continue;
+                }
+
+                \App\Models\Enrollment::create([
+                    'user_id' => $payment->user_id,
+                    'course_id' => $courseId,
+                    'progress_percentage' => 0,
+                    'enrolled_at' => now(),
+                    'status' => 'enrolled',
+                ]);
+            }
+        }
+
+        return $payment;
     }
 }

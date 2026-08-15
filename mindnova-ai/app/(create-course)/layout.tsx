@@ -1,4 +1,5 @@
 import { CreateCourseTopbar } from "@/src/features/instructor/create-course";
+import { FloatingAiChat } from "@/src/features/student/layout";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,6 +15,7 @@ export default function CreateCourseLayout({
     <div className="min-h-screen bg-[#F8F8FD] flex flex-col">
       <CreateCourseTopbar />
       <main className="flex-1">{children}</main>
+      <FloatingAiChat />
     </div>
   );
 }

@@ -92,6 +92,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // -- Đăng xuất --
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    // -- AI hỗ trợ học tập (Học sinh, Giáo viên, Admin đều dùng chung) --
+    Route::post('/ai-chat', [AiTutorController::class, 'chat']);
+
     // -- Gửi tin nhắn Realtime (Dùng chung) --
     Route::post('/realtime/send', [RealtimeController::class, 'send']);
 
