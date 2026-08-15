@@ -29,12 +29,14 @@ export default function AdminLayout({
     <div className={`${sora.variable} ${spaceGrotesk.variable}`}>
       <AdminAuthGuard />
       <AdminDashboardShell>
-        <div className="mn-reveal flex h-[calc(100vh-1rem)] overflow-hidden rounded-[30px] border border-cyan-100/60 bg-white/70 shadow-[0_30px_90px_-35px_rgba(12,19,43,0.45)] backdrop-blur-2xl">
+        <div className="flex h-[calc(100vh-1.5rem)] overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/75 shadow-[0_35px_90px_-40px_rgba(15,23,42,0.5)] backdrop-blur-xl">
           <AdminSidebar />
 
           <div className="flex flex-1 flex-col overflow-hidden">
             <AdminTopbar />
-            <main className="flex-1 overflow-y-auto">{children}</main>
+            <main className="flex-1 overflow-y-auto bg-[linear-gradient(180deg,rgba(255,255,255,0.3),rgba(241,245,249,0.5))]">
+              {children}
+            </main>
           </div>
         </div>
       </AdminDashboardShell>

@@ -13,6 +13,11 @@ export interface CourseApiResponse {
       description: string;
       thumbnail: string | null;
       price: number;
+      sale_price?: number;
+      current_price?: number;
+      is_flash_sale?: boolean;
+      sale_start_date?: string;
+      sale_end_date?: string;
       level: string;
       status: "published" | "draft";
       category_id: string;
@@ -50,7 +55,11 @@ export function useInstructorCourses(search?: string) {
         durationHours: course.durationHours || 0,
         totalLessons: course.totalLessons || 0,
         price: course.price,
-        salePrice: (course as any).sale_price,
+        salePrice: course.sale_price,
+        currentPrice: course.current_price,
+        isFlashSale: course.is_flash_sale,
+        saleStartDate: course.sale_start_date,
+        saleEndDate: course.sale_end_date,
       }));
     },
   });

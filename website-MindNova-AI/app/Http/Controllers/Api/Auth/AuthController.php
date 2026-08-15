@@ -23,6 +23,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'role' => 'nullable|string|in:student,teacher',
         ]);
 
         if ($validator->fails()) {
@@ -39,7 +40,8 @@ class AuthController extends Controller
                 'status' => 'active',
             ]);
 
-            DB::table('role_user')->insert(['user_id' => $user->id, 'role_id' => 3]);
+            $roleId = ($request->role === 'teacher') ? 2 : 3;
+            DB::table('role_user')->insert(['user_id' => $user->id, 'role_id' => $roleId]);
             DB::table('user_profiles')->insert(['user_id' => $user->id, 'created_at' => now(), 'updated_at' => now()]);
             DB::table('user_streaks')->insert(['user_id' => $user->id, 'updated_at' => now()]);
 

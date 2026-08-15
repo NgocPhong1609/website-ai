@@ -46,6 +46,11 @@ class LessonResource extends JsonResource
             'order' => $this->order,
             'status' => $this->status,
             'quizData' => $quizData,
+            // ── Versioning info ──
+            'current_version' => $this->current_version,
+            'published_version_id' => $this->published_version_id,
+            'is_published' => $this->isPublished(),
+            'has_pending_revision' => $this->status !== 'published' && $this->published_version_id !== null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

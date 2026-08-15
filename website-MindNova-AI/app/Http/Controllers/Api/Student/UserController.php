@@ -119,4 +119,65 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Không tìm thấy file ảnh'], 400);
     }
+
+    // 5. Upload CV (dành cho giáo viên gửi hồ sơ xét duyệt)
+    public function uploadCv(Request $request)
+    {
+        $request->validate([
+            'cv' => 'required|mimes:pdf,doc,docx|max:5120',
+        ]);
+
+        $user = $request->user();
+        $profile = $user->profile;
+
+        if ($profile && $profile->cv_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($profile->cv_path);
+        }
+
+        $path = $request->file('cv')->store('teacher-cv', 'public');
+
+        $user->profile()->updateOrCreate(['user_id' => $user->id], ['cv_path' => $path]);
+
+        return response()->json([
+            'message' => 'Tải lên CV thành công',
+            'cv_url' => asset('storage/' . $path),
+        ], 200);
+    }
+
+    // 6. Upload ảnh bằng cấp / chứng chỉ (có thể tải lên nhiều ảnh)
+    public function uploadCredential(Request $request)
+    {
+        $request->validate([
+            'credential' => 'required|image|mimes:jpeg,png,jpg,webp|max:4096',
+            'title' => 'sometimes|string|max:255',
+        ]);
+
+        $user = $request->user();
+        $path = $request->file('credential')->store('teacher-credentials', 'public');
+
+        $credential = $user->credentials()->create([
+            'title' => $request->input('title'),
+            'file_path' => $path,
+        ]);
+
+        return response()->json([
+            'message' => 'Tải lên bằng cấp thành công',
+            'data' => [
+                'id' => $credential->id,
+                'title' => $credential->title,
+                'file_url' => asset('storage/' . $credential->file_path),
+            ],
+        ], 201);
+    }
+
+    // 7. Xoá ảnh bằng cấp / chứng chỉ
+    public function deleteCredential(Request $request, int $credentialId)
+    {
+        $credential = $request->user()->credentials()->where('id', $credentialId)->firstOrFail();
+
+        \Illuminate\Support\Facades\Storage::disk('public')->delete($credential->file_path);
+        $credential->delete();
+
+        return response()->json(['message' => 'Xoá bằng cấp thành công'], 200);
+    }
 }

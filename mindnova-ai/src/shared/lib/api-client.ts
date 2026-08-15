@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = process.env.BACKEND_URL || "http://127.0.0.1:8000";
 
 export async function apiClient<T>(
   endpoint: string,
@@ -8,7 +8,7 @@ export async function apiClient<T>(
 ): Promise<T> {
   if (!API_BASE_URL) {
     throw new Error(
-      "[apiClient] NEXT_PUBLIC_API_URL is not set. Check your .env file."
+      "[apiClient] BACKEND_URL is not set. Check your .env file."
     );
   }
 

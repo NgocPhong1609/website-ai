@@ -48,9 +48,9 @@ function PriceBadge({ course }: { course: Course }) {
     <div className="absolute bottom-3 right-3 px-2.5 py-1.5 rounded-lg text-[13px] font-black z-10 shadow-sm bg-gray-900/80 text-white backdrop-blur-md flex items-center gap-2 border border-white/20">
       {!course.price || course.price === 0 ? (
         <span className="text-emerald-400">Miễn phí</span>
-      ) : course.salePrice && course.salePrice < course.price ? (
+      ) : course.currentPrice && course.currentPrice < course.price ? (
         <>
-          <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.salePrice)}</span>
+          <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.currentPrice)}</span>
           <span className="text-[11px] text-gray-300 line-through font-medium">
             {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)}
           </span>

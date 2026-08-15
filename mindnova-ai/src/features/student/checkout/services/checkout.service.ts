@@ -9,4 +9,8 @@ export const checkoutService = {
     });
     return data;
   },
+  devCompleteOrder: async (orderId: number) => {
+    const { data } = await axiosClient.post(`/api/dev/orders/${orderId}/complete`);
+    return data;
+  }
 };

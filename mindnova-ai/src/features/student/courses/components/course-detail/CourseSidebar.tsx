@@ -245,7 +245,7 @@ function EnrollCard({ price, courseId }: { price?: number, courseId?: string | n
       <div className="flex items-center justify-between gap-2 mb-3">
         <div>
           <span className="text-xs font-semibold text-[#10B981] uppercase tracking-wider block">Phí Đăng Ký</span>
-          <h3 className="text-2xl font-bold text-[#1A1A2E] mt-0.5">{price ? `${price.toLocaleString()} VND` : 'Miễn phí'}</h3>
+          <h3 className="text-2xl font-bold text-[#1A1A2E] mt-0.5">{Number(price) === 0 ? 'Miễn phí' : `${Number(price).toLocaleString()} VND`}</h3>
         </div>
       </div>
       <p className="text-xs text-[#64647A] mb-4 leading-relaxed">

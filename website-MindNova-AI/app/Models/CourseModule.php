@@ -12,6 +12,7 @@ class CourseModule extends Model
         'course_id',
         'title',
         'order',
+        'status',
     ];
 
     public function course(): BelongsTo
@@ -22,5 +23,12 @@ class CourseModule extends Model
     public function lessons(): HasMany
     {
         return $this->hasMany(Lesson::class, 'module_id')->orderBy('order');
+    }
+
+    // ─── Scopes ────────────────────────────────────────────────
+
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published');
     }
 }

@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { PricingModelSection } from "./PricingModelSection";
 import { CouponSection } from "./CouponSection";
 import { SaveIcon, ChevronRightIcon } from "./icons";
+import { useUpdateCoursePrice } from "../../create-course/api";
+import { useInstructorCourse } from "../../management/api/courses";
 
 const TABS = [
   { id: "pricing", label: "Giá & Kiếm tiền" },
@@ -100,9 +102,48 @@ export function PricingContainer({ courseId }: { courseId?: string }) {
   const [activeTab, setActiveTab] = useState<TabId>("pricing");
   const [toastVisible, setToastVisible] = useState(false);
 
+  const [basePrice, setBasePrice] = useState("1200000");
+  const [salePrice, setSalePrice] = useState("");
+  const [isFlashSale, setIsFlashSale] = useState(false);
+  const [saleStartDate, setSaleStartDate] = useState("");
+  const [saleEndDate, setSaleEndDate] = useState("");
+
+  const { data: course, isLoading } = useInstructorCourse(courseId || "1");
+  const updateCoursePrice = useUpdateCoursePrice();
+
+  useEffect(() => {
+    if (course) {
+      setBasePrice(course.price ? course.price.toString() : "1200000");
+      setIsFlashSale(course.is_flash_sale || false);
+      setSalePrice(course.sale_price ? course.sale_price.toString() : "");
+      
+      if (course.sale_start_date) {
+        setSaleStartDate(new Date(course.sale_start_date).toISOString().split('T')[0]);
+      }
+      
+      if (course.sale_end_date) {
+        setSaleEndDate(new Date(course.sale_end_date).toISOString().split('T')[0]);
+      }
+    }
+  }, [course]);
+
   const handleSave = () => {
-    setToastVisible(true);
-    setTimeout(() => setToastVisible(false), 2800);
+    updateCoursePrice.mutate(
+      {
+        courseId: courseId || "1",
+        price: Number(basePrice.replace(/\D/g, "")),
+        is_flash_sale: isFlashSale,
+        sale_price: salePrice ? Number(salePrice.replace(/\D/g, "")) : undefined,
+        sale_start_date: saleStartDate || undefined,
+        sale_end_date: saleEndDate || undefined,
+      },
+      {
+        onSuccess: () => {
+          setToastVisible(true);
+          setTimeout(() => setToastVisible(false), 2800);
+        }
+      }
+    );
   };
 
   return (
@@ -117,7 +158,13 @@ export function PricingContainer({ courseId }: { courseId?: string }) {
       <div className="flex-1 overflow-y-auto px-6 py-8">
         {activeTab === "pricing" && (
           <div className="max-w-[900px] mx-auto flex flex-col gap-6 pb-12 animate-fadeIn">
-            <PricingModelSection />
+            <PricingModelSection
+              basePrice={basePrice} setBasePrice={setBasePrice}
+              salePrice={salePrice} setSalePrice={setSalePrice}
+              isFlashSale={isFlashSale} setIsFlashSale={setIsFlashSale}
+              saleStartDate={saleStartDate} setSaleStartDate={setSaleStartDate}
+              saleEndDate={saleEndDate} setSaleEndDate={setSaleEndDate}
+            />
             <CouponSection />
           </div>
         )}

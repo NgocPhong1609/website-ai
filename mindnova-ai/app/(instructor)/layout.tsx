@@ -1,5 +1,6 @@
 import { InstructorSidebar } from "@/src/features/instructor/management/components/InstructorSidebar";
 import { InstructorTopbar } from "@/src/features/instructor/management/components/InstructorTopbar";
+import { FloatingAiChat } from "@/src/features/student/layout";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -18,6 +19,7 @@ export default function InstructorLayout({
         <InstructorTopbar />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
+      <FloatingAiChat />
     </div>
   );
 }

@@ -11,9 +11,16 @@ use App\Models\ActivityLog;
 use App\Models\LessonCompletion;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Contracts\AiProviderInterface;
+use App\DTOs\AiMessageDto;
+use Exception;
 
 class StudentAnalyticsController extends Controller
 {
+    public function __construct(private readonly AiProviderInterface $aiService)
+    {
+    }
+
     public function dashboardMetrics()
     {
         $teacherId = auth()->id();
@@ -53,7 +60,7 @@ class StudentAnalyticsController extends Controller
                     'email' => $enrollment->user->email,
                     'course_name' => $enrollment->course->title,
                     'status' => $isActive ? 'ĐANG HOẠT ĐỘNG' : 'TẠM VẮNG MẶT',
-                    'enrolled_at' => $enrollment->enrolled_at->format('Y-m-d')
+                    'enrolled_at' => $enrollment->enrolled_at ? $enrollment->enrolled_at->format('Y-m-d') : null
                 ];
             });
 
@@ -101,5 +108,57 @@ class StudentAnalyticsController extends Controller
             'success' => true,
             'data' => $chartData
         ]);
+    }
+
+    public function aiInsights()
+    {
+        $teacherId = auth()->id();
+        
+        // Gather some basic stats for the prompt to have context
+        // E.g. low engagement students, drop off rates, etc.
+        // For now, we will simulate a prompt with basic data.
+        
+        $totalStudents = Enrollment::whereHas('course', function ($q) use ($teacherId) {
+            $q->where('teacher_id', $teacherId);
+        })->count();
+
+        $systemPrompt = "You are an AI Education Assistant. Given the instructor's data (Total Students: {$totalStudents}), generate 2 actionable insights for the instructor to improve student engagement.
+        Return ONLY a JSON array with this exact structure:
+        [
+            {
+                \"id\": \"string\",
+                \"title\": \"Insight Title\",
+                \"description\": \"Detailed explanation\",
+                \"priority\": \"high\" | \"medium\" | \"low\",
+                \"type\": \"warning\" | \"suggestion\" | \"trend\",
+                \"metrics\": {\"label\": \"value\", \"label2\": \"value2\"},
+                \"actionPlan\": [\"Step 1\", \"Step 2\"]
+            }
+        ]
+        Do NOT wrap in ```json block.";
+
+        try {
+            $responseJson = $this->aiService->sendMessage([
+                new AiMessageDto("system", $systemPrompt),
+                new AiMessageDto("user", "Generate insights now.")
+            ], ['response_mime_type' => 'application/json']);
+
+            $cleanJson = preg_replace('/```json|```/', '', $responseJson);
+            $insights = json_decode(trim($cleanJson), true);
+
+            if (!is_array($insights)) {
+                throw new Exception("Invalid JSON structure returned by AI");
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $insights
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate AI insights: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

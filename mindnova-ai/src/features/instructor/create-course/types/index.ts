@@ -81,6 +81,9 @@ export interface Step3Data {
   currency: string;
   basePrice: string;
   salePrice: string;
+  isFlashSale?: boolean;
+  saleStartDate?: string;
+  saleEndDate?: string;
 }
 
 export interface CourseDraft {

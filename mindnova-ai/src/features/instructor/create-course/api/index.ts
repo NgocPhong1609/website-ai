@@ -52,9 +52,27 @@ export function useUploadCourseThumbnail() {
 export function useUpdateCoursePrice() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ courseId, price }: { courseId: string; price: number }) => {
+    mutationFn: async ({ 
+      courseId, 
+      price,
+      is_flash_sale,
+      sale_price,
+      sale_start_date,
+      sale_end_date 
+    }: { 
+      courseId: string; 
+      price: number;
+      is_flash_sale?: boolean;
+      sale_price?: number;
+      sale_start_date?: string;
+      sale_end_date?: string;
+    }) => {
       const { data } = await axiosClient.patch(`/api/instructor/courses/${courseId}/price`, {
         price,
+        is_flash_sale,
+        sale_price,
+        sale_start_date,
+        sale_end_date
       });
       return data.data;
     },
@@ -72,6 +90,20 @@ export function useUpdateCourseStatus() {
       const { data } = await axiosClient.patch(`/api/instructor/courses/${courseId}/status`, {
         status,
       });
+      return data.data;
+    },
+    onSuccess: (_, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId] });
+    },
+  });
+}
+
+export function useSubmitForReview() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ courseId }: { courseId: string }) => {
+      const { data } = await axiosClient.post(`/api/instructor/courses/${courseId}/submit-review`);
       return data.data;
     },
     onSuccess: (_, { courseId }) => {

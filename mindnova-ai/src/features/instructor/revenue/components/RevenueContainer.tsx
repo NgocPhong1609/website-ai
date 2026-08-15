@@ -211,30 +211,38 @@ function RevenueChart({ chartData }: { chartData: any[] }) {
       
       {/* Visual Bar Chart */}
       <div className="flex-1 min-h-[200px] flex items-end justify-between gap-3 px-2 sm:px-6 pt-6 border-t border-gray-100 relative">
-        {chartData.map((d, i) => {
-          const h = (d.revenue / maxVal) * 160; // Max height 160px
-          const isToday = i === chartData.length - 1;
-          return (
-            <div key={i} className="relative flex flex-col items-center w-full max-w-[42px] group cursor-pointer">
-              {/* Tooltip */}
-              <div className="absolute bottom-full mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 whitespace-nowrap bg-white border border-gray-100 shadow-xl rounded-xl p-2.5 pointer-events-none">
-                <p className="text-[10px] text-gray-400 font-bold mb-1 uppercase tracking-wider">{isToday ? "Hôm nay" : d.day}</p>
-                <p className="text-xs font-black text-[#4F46E5]">Doanh thu : {d.revenue.toLocaleString('vi-VN')}đ</p>
-              </div>
+        {chartData.length === 0 ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 py-8 mt-6">
+            <span className="text-4xl mb-3 opacity-50 grayscale">📉</span>
+            <span className="text-sm font-bold text-gray-600">Chưa có dữ liệu doanh thu</span>
+            <span className="text-xs font-medium text-gray-400 mt-1">Biểu đồ sẽ xuất hiện khi có phát sinh giao dịch</span>
+          </div>
+        ) : (
+          chartData.map((d, i) => {
+            const h = (d.revenue / maxVal) * 160; // Max height 160px
+            const isToday = i === chartData.length - 1;
+            return (
+              <div key={i} className="relative flex flex-col items-center w-full max-w-[42px] group cursor-pointer">
+                {/* Tooltip */}
+                <div className="absolute bottom-full mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 whitespace-nowrap bg-white border border-gray-100 shadow-xl rounded-xl p-2.5 pointer-events-none">
+                  <p className="text-[10px] text-gray-400 font-bold mb-1 uppercase tracking-wider">{isToday ? "Hôm nay" : d.day}</p>
+                  <p className="text-xs font-black text-[#4F46E5]">Doanh thu : {d.revenue.toLocaleString('vi-VN')}đ</p>
+                </div>
 
-              <div
-                className={twMerge(
-                  "w-full rounded-xl transition-all duration-300 min-h-[4px]",
-                  isToday ? "bg-[#4F46E5] shadow-sm" : "bg-gray-200 group-hover:bg-indigo-200"
-                )}
-                style={{ height: `${h}px` }}
-              />
-              <span className={twMerge("mt-2.5 text-xs font-extrabold", isToday ? "text-[#4F46E5]" : "text-gray-400")}>
-                {isToday ? "Hnay" : d.day}
-              </span>
-            </div>
-          );
-        })}
+                <div
+                  className={twMerge(
+                    "w-full rounded-xl transition-all duration-300 min-h-[4px]",
+                    isToday ? "bg-[#4F46E5] shadow-sm" : "bg-gray-200 group-hover:bg-indigo-200"
+                  )}
+                  style={{ height: `${h}px` }}
+                />
+                <span className={twMerge("mt-2.5 text-xs font-extrabold", isToday ? "text-[#4F46E5]" : "text-gray-400")}>
+                  {isToday ? "Hnay" : d.day}
+                </span>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

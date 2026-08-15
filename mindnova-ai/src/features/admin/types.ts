@@ -105,3 +105,116 @@ export type AdminOverviewData = {
   users: AdminUserRow[];
   quickActions: string[];
 };
+
+export type AdminTeacherCredentialItem = {
+  id: number;
+  title: string | null;
+  fileUrl: string;
+};
+
+export type AdminTeacherApprovalRow = {
+  id: number;
+  name: string;
+  email: string;
+  avatarUrl: string | null;
+  cvUrl: string | null;
+  expertise: string;
+  status: "pending" | "approved" | "rejected";
+  submittedAt: string;
+  experience: string;
+  credentialCount: number;
+  credentials: AdminTeacherCredentialItem[];
+  rating: number;
+};
+
+export type AdminTeacherApprovalData = {
+  rows: AdminTeacherApprovalRow[];
+};
+
+export type AiProviderConfig = {
+  provider: string;
+  model: string;
+  status: "connected" | "warning" | "offline";
+  apiKeyHint: string;
+};
+
+export type AiQuotaConfig = {
+  label: string;
+  limit: number;
+  used: number;
+};
+
+export type SystemPromptItem = {
+  id: number;
+  name: string;
+  purpose: string;
+  status: "active" | "draft";
+  updatedAt: string;
+};
+
+export type AdminAiConfigData = {
+  providers: AiProviderConfig[];
+  quotas: AiQuotaConfig[];
+  systemPrompts: SystemPromptItem[];
+};
+
+export type AdminContentRow = {
+  id: number;
+  title: string;
+  type: string;
+  instructor: string;
+  status: "approved" | "pending" | "rejected";
+  submittedAt: string;
+  score: number;
+};
+
+export type AdminContentData = {
+  rows: AdminContentRow[];
+};
+
+export type AdminAnalyticsMetric = {
+  label: string;
+  value: string;
+  change: string;
+};
+
+export type AdminAnalyticsChartPoint = {
+  label: string;
+  value: number;
+};
+
+export type AdminAnalyticsData = {
+  metrics: AdminAnalyticsMetric[];
+  traffic: AdminAnalyticsChartPoint[];
+  subjects: AdminAnalyticsChartPoint[];
+  conversion: AdminAnalyticsChartPoint[];
+};
+
+export type AdminRevenueCourseRow = {
+  courseId: number;
+  courseTitle: string;
+  instructorName: string;
+  revenue: number;
+  students: number;
+  conversionRate: number;
+};
+
+export type AdminRevenueData = {
+  totalRevenue: number;
+  courseCount: number;
+  courses: AdminRevenueCourseRow[];
+};
+
+export type AdminModerationRow = {
+  id: number;
+  type: string;
+  title: string;
+  reporter: string;
+  severity: "low" | "medium" | "high";
+  status: "open" | "in_review" | "resolved";
+  createdAt: string;
+};
+
+export type AdminModerationData = {
+  rows: AdminModerationRow[];
+};

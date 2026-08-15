@@ -22,9 +22,11 @@ use App\Http\Controllers\Api\Student\StudyPlanController as StudentStudyPlanCont
 use App\Http\Controllers\Api\Student\PracticeController as StudentPracticeController;
 use App\Http\Controllers\Api\Student\ProgressController as StudentProgressController;
 use App\Http\Controllers\Api\Student\HistoryController as StudentHistoryController;
+use App\Http\Controllers\Api\Student\NotificationController as StudentNotificationController;
 
 // Nhóm Dùng chung
 use App\Http\Controllers\Api\RealtimeController;
+use App\Http\Controllers\Api\ChatController;
 
 // Nhóm Admin
 use App\Http\Controllers\Api\Admin\AnalyticsController as AdminAnalyticsController;
@@ -32,6 +34,7 @@ use App\Http\Controllers\Api\Admin\ContentManagementController as AdminContentMa
 use App\Http\Controllers\Api\Admin\ModerationSupportController as AdminModerationSupportController;
 use App\Http\Controllers\Api\Admin\SystemConfigController as AdminSystemConfigController;
 use App\Http\Controllers\Api\Admin\UserManagementController as AdminUserManagementController;
+use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
 
 // Nhóm Instructor (Giáo viên)
 use App\Http\Controllers\Api\Instructor\CourseController;
@@ -43,6 +46,8 @@ use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentCo
 use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscussionController;
 use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNotificationController;
 use App\Http\Controllers\Api\Instructor\RevenueController;
+use App\Http\Controllers\Api\Instructor\CourseOutlineController;
+use App\Http\Controllers\Api\Instructor\ContentReviewController as InstructorContentReviewController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -65,12 +70,25 @@ Route::post('/student/payment/momo-ipn', [OrderController::class, 'momoIpn']);
 // 2. NHÓM API PRIVATE (Bắt buộc phải có Bearer Token)
 // ==========================================
 Route::middleware('auth:sanctum')->group(function () {
+    \Illuminate\Support\Facades\Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
     // -- Đăng xuất --
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    // -- AI hỗ trợ học tập (Học sinh, Giáo viên, Admin đều dùng chung) --
+    Route::post('/ai-chat', [AiTutorController::class, 'chat']);
+
     // -- Gửi tin nhắn Realtime (Dùng chung) --
     Route::post('/realtime/send', [RealtimeController::class, 'send']);
+
+    // -- Chat & Messaging System --
+    Route::prefix('chat')->group(function () {
+        Route::get('/conversations', [ChatController::class, 'index']);
+        Route::get('/conversations/{id}/messages', [ChatController::class, 'messages']);
+        Route::post('/conversations/{id}/messages', [ChatController::class, 'sendMessage']);
+        Route::post('/conversations/{id}/messages/{messageId}/recall', [ChatController::class, 'recallMessage']);
+        Route::post('/conversations/{id}/read', [ChatController::class, 'markAsRead']);
+    });
 
     // -- Quản lý Hồ sơ Cá nhân --
     Route::prefix('profile')->group(function () {
@@ -90,7 +108,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('student')->group(function () {
 
         // 🌟 TÍNH NĂNG ONBOARDING & AI PHÂN TÍCH BÀI HỌC
-        // Toàn bộ logic đã được đóng gói gọn gàng vào OnboardingController
         Route::post('/onboarding', [OnboardingController::class, 'store']);
         Route::get('/available-topics', [OnboardingController::class, 'getAvailableTopics']);
         Route::post('/analyze-lesson', [OnboardingController::class, 'analyzeLesson']);
@@ -105,6 +122,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
         Route::post('/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
 
+        // Enrolled Courses
+        Route::get('/courses/enrolled', [\App\Http\Controllers\Api\Student\CourseController::class, 'enrolledCourses']);
+
+        // Check Order Status by Transaction ID
+        Route::get('/orders/transaction/{transactionId}', [OrderController::class, 'showByTransaction']);
+
         // TÍNH NĂNG AI TUTOR & Các tiện ích nâng cao khác
         Route::post('/ai-tutor/chat', [AiTutorController::class, 'streamChat']);
         Route::post('/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'store']);
@@ -112,6 +135,20 @@ Route::middleware('auth:sanctum')->group(function () {
         // Quiz
         Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
         Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
+
+        // Lesson — Video URL, Completion, Quiz Answer Check
+        Route::get('lessons/{lesson}/video-url', [\App\Http\Controllers\Api\Student\LessonController::class, 'videoUrl']);
+        Route::post('lessons/{lesson}/complete', [\App\Http\Controllers\Api\Student\LessonController::class, 'complete']);
+        Route::post('lessons/{lesson}/quiz/check-answer', [\App\Http\Controllers\Api\Student\LessonController::class, 'checkAnswer']);
+
+        // Notifications
+        Route::get('/notifications', [StudentNotificationController::class, 'index']);
+        Route::patch('/notifications/{notification}/read', [StudentNotificationController::class, 'markRead']);
+        Route::delete('/notifications/read', [StudentNotificationController::class, 'deleteRead']);
+
+        // Discussions
+        Route::get('lessons/{lesson}/discussions', [\App\Http\Controllers\Api\Student\DiscussionController::class, 'index']);
+        Route::post('lessons/{lesson}/discussions', [\App\Http\Controllers\Api\Student\DiscussionController::class, 'store']);
     });
 });
 
@@ -153,8 +190,18 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::delete('lessons/{lesson}/quiz', [QuizController::class, 'destroy']);
 
     // Students
+    Route::get('students/export', [InstructorStudentController::class, 'exportCsv']);
+    Route::get('students/analytics', [InstructorStudentController::class, 'getAnalytics']);
+    Route::get('students/discussions', [InstructorStudentController::class, 'getDiscussions']);
+    Route::post('students/ai-notification/generate', [InstructorStudentController::class, 'generateAiNotification']);
+    Route::post('students/notifications', [InstructorStudentController::class, 'sendNotification']);
+    Route::get('students/notification-options', [InstructorStudentController::class, 'getNotificationOptions']);
     Route::get('students', [InstructorStudentController::class, 'index']);
     Route::get('students/{student}/progress', [InstructorStudentController::class, 'progress']);
+
+    // Student Analytics Dashboard
+    Route::get('student-analytics/dashboard-metrics', [\App\Http\Controllers\Api\Instructor\StudentAnalyticsController::class, 'dashboardMetrics']);
+    Route::get('student-analytics/engagement-chart', [\App\Http\Controllers\Api\Instructor\StudentAnalyticsController::class, 'engagementChart']);
 
     // Discussions
     Route::get('discussions', [InstructorDiscussionController::class, 'index']);
@@ -174,6 +221,17 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
 
     // Reviews
     Route::get('reviews', [\App\Http\Controllers\Api\Instructor\ReviewController::class, 'index']);
+
+    // AI Course Outline
+    Route::post('courses/ai-outline/generate', [CourseOutlineController::class, 'generate']);
+    Route::post('courses/{course}/ai-outline/save', [CourseOutlineController::class, 'save']);
+
+    // ── Content Review Workflow ──
+    Route::post('courses/{course}/submit-review', [InstructorContentReviewController::class, 'submitForReview']);
+    Route::get('courses/{course}/versions', [InstructorContentReviewController::class, 'versions']);
+    Route::get('courses/{course}/submissions', [InstructorContentReviewController::class, 'submissions']);
+    Route::get('submissions/{submission}', [InstructorContentReviewController::class, 'showSubmission']);
+    Route::post('lessons/{lesson}/request-deletion', [InstructorContentReviewController::class, 'requestLessonDeletion']);
 });
 
 // ==========================================
@@ -220,4 +278,26 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/support/tickets', [AdminModerationSupportController::class, 'createTicket']);
     Route::patch('/support/tickets/{ticket}', [AdminModerationSupportController::class, 'resolveTicket']);
 
+    // 6) Content Review Workflow
+    Route::get('/reviews', [AdminReviewController::class, 'index']);
+    Route::get('/reviews/deletion-requests', [AdminReviewController::class, 'deletionRequests']);
+    Route::get('/reviews/audit-log', [AdminReviewController::class, 'auditLog']);
+    Route::get('/reviews/{submission}', [AdminReviewController::class, 'show']);
+    Route::get('/reviews/{submission}/diff', [AdminReviewController::class, 'diff']);
+    Route::patch('/reviews/{submission}/start', [AdminReviewController::class, 'startReview']);
+    Route::patch('/reviews/{submission}/approve', [AdminReviewController::class, 'approve']);
+    Route::patch('/reviews/{submission}/reject', [AdminReviewController::class, 'reject']);
+    Route::patch('/reviews/{submission}/request-fixes', [AdminReviewController::class, 'requestFixes']);
+    Route::post('/reviews/{submission}/comments', [AdminReviewController::class, 'addComment']);
+    Route::patch('/reviews/deletion-requests/{deletionRequest}/approve', [AdminReviewController::class, 'approveDeletion']);
+    Route::patch('/reviews/deletion-requests/{deletionRequest}/reject', [AdminReviewController::class, 'rejectDeletion']);
+
 });
+
+// ==========================================
+// 6. DEV / TEST ENDPOINTS
+// ==========================================
+if (app()->environment('local', 'testing')) {
+    Route::post('/dev/orders/{orderId}/complete', [App\Http\Controllers\Api\Student\OrderController::class, 'devCompleteOrder']);
+    Route::post('/dev/orders/{orderId}/refund', [App\Http\Controllers\Api\Student\OrderController::class, 'devRefundOrder']);
+}
