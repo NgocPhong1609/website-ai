@@ -2,20 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-<<<<<<< HEAD
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\OrderController;
-use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Api\Admin\CourseController as AdminCourseController;
-use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
-use App\Http\Controllers\Api\Admin\CouponController as AdminCouponController;
-use App\Http\Controllers\Api\Admin\NotificationController as AdminNotificationController;
-use App\Http\Controllers\Api\Admin\InvoiceController as AdminInvoiceController;
-=======
 use Illuminate\Support\Facades\Http;
->>>>>>> origin/main
 
 // ==========================================
 // IMPORT CÁC CONTROLLER TỪ ĐÚNG THƯ MỤC
@@ -53,9 +40,6 @@ use App\Http\Controllers\Api\Admin\UserManagementController as AdminUserManageme
 use App\Http\Controllers\Api\Instructor\CourseController;
 use App\Http\Controllers\Api\Instructor\CourseModuleController;
 use App\Http\Controllers\Api\Instructor\LessonController;
-<<<<<<< HEAD
-use App\Http\Controllers\Api\Student\AiTutorController;
-=======
 use App\Http\Controllers\Api\Instructor\MediaController;
 use App\Http\Controllers\Api\Instructor\QuizController;
 use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentController;
@@ -64,7 +48,6 @@ use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNoti
 use App\Http\Controllers\Api\Instructor\RevenueController;
 use App\Http\Controllers\Api\Instructor\CourseOutlineController;
 use App\Http\Controllers\Api\Instructor\ContentReviewController as InstructorContentReviewController;
->>>>>>> origin/main
 
 // Nhóm Admin Review
 use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
@@ -109,12 +92,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // -- Đăng xuất --
     Route::post('/logout', [AuthController::class, 'logout']);
 
-<<<<<<< HEAD
     // -- AI hỗ trợ học tập (Học sinh, Giáo viên, Admin đều dùng chung) --
     Route::post('/ai-chat', [AiTutorController::class, 'chat']);
 
-    // -- Quản lý Hồ sơ Cá nhân (Học sinh & Giáo viên dùng chung) --
-=======
     // -- Gửi tin nhắn Realtime (Dùng chung) --
     Route::post('/realtime/send', [RealtimeController::class, 'send']);
 
@@ -128,21 +108,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // -- Quản lý Hồ sơ Cá nhân --
->>>>>>> origin/main
     Route::prefix('profile')->group(function () {
         Route::get('/', [UserController::class, 'getProfile']);
         Route::post('/update', [UserController::class, 'updateProfile']);
         Route::post('/change-password', [UserController::class, 'changePassword']);
         Route::post('/avatar', [UserController::class, 'uploadAvatar']);
-<<<<<<< HEAD
-        Route::post('/cv', [UserController::class, 'uploadCv']);
-        Route::post('/credentials', [UserController::class, 'uploadCredential']);
-        Route::delete('/credentials/{credentialId}', [UserController::class, 'deleteCredential']);
-        // -- Nhóm API Đơn hàng (Orders) --
-        Route::get('/orders', [OrderController::class, 'index']);
-        Route::post('/orders', [OrderController::class, 'store']);
-=======
->>>>>>> origin/main
     });
 
     // -- Nhóm API Đơn hàng (Orders) --
@@ -163,20 +133,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/ai-tutor/chat', [\App\Http\Controllers\Api\Student\AiTutorController::class, 'streamChat']);
         Route::post('/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'store']);
 
-<<<<<<< HEAD
-        // Admin modules required by the dashboard scope
-        Route::get('/teacher-approvals', [AdminDashboardController::class, 'teacherApprovals']);
-        Route::get('/ai-system', [AdminDashboardController::class, 'aiSystem']);
-        Route::get('/content', [AdminDashboardController::class, 'content']);
-        Route::get('/revenue', [AdminDashboardController::class, 'revenue']);
-        Route::get('/analytics', [AdminDashboardController::class, 'analytics']);
-        Route::get('/moderation-support', [AdminDashboardController::class, 'moderationSupport']);
-
-        Route::get('/coupons', [AdminCouponController::class, 'index']);
-        Route::post('/coupons', [AdminCouponController::class, 'store']);
-        Route::put('/coupons/{coupon}', [AdminCouponController::class, 'update']);
-        Route::delete('/coupons/{coupon}', [AdminCouponController::class, 'destroy']);
-=======
         // Quiz
         Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
         Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
@@ -194,7 +150,6 @@ Route::middleware('auth:sanctum')->group(function () {
         // Discussions
         Route::get('lessons/{lesson}/discussions', [\App\Http\Controllers\Api\Student\DiscussionController::class, 'index']);
         Route::post('lessons/{lesson}/discussions', [\App\Http\Controllers\Api\Student\DiscussionController::class, 'store']);
->>>>>>> origin/main
     });
 });
 

@@ -217,13 +217,6 @@ export function AdminTopbar() {
       </div>
 
       <div className="flex items-center gap-3">
-<<<<<<< HEAD
-        <button className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700">
-          Xuất báo cáo
-        </button>
-        <button className="rounded-2xl bg-gradient-to-r from-sky-500 via-cyan-500 to-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_18px_32px_-16px_rgba(14,165,233,0.9)] transition hover:brightness-110">
-          Làm mới dữ liệu
-=======
         <div className="relative" ref={exportMenuRef}>
           <button
             type="button"
@@ -271,7 +264,6 @@ export function AdminTopbar() {
           className="rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_-15px_rgba(79,70,229,0.9)] transition hover:from-cyan-400 hover:to-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isRefreshing ? "Đang làm mới..." : "Làm mới dữ liệu"}
->>>>>>> origin/main
         </button>
 
         <button
@@ -290,20 +282,7 @@ export function AdminTopbar() {
         >
           Đăng xuất
         </button>
-<<<<<<< HEAD
-
-        <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-2 py-1.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-sm font-bold text-white">
-            A
-          </div>
-          <div className="pr-1 text-left leading-tight">
-            <p className="text-sm font-semibold text-slate-900">Admin</p>
-            <p className="text-[11px] text-slate-500">Operations</p>
-          </div>
-        </div>
-=======
         <Avatar fallback="A" size="md" className="shadow-[0_14px_24px_-14px_rgba(37,99,235,0.9)]" />
->>>>>>> origin/main
       </div>
 
       {statusMessage && (

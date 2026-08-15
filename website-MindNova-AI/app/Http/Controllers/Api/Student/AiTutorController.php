@@ -3,35 +3,6 @@
 namespace App\Http\Controllers\Api\Student;
 
 use App\Http\Controllers\Controller;
-<<<<<<< HEAD
-use App\Services\Student\AiTutorService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use RuntimeException;
-
-class AiTutorController extends Controller
-{
-    public function __construct(private readonly AiTutorService $aiTutorService)
-    {
-    }
-
-    public function chat(Request $request): JsonResponse
-    {
-        $data = $request->validate([
-            'message' => ['required', 'string', 'max:2000'],
-            'history' => ['sometimes', 'array', 'max:20'],
-            'history.*.role' => ['required_with:history', 'in:user,assistant'],
-            'history.*.content' => ['required_with:history', 'string', 'max:2000'],
-        ]);
-
-        try {
-            $reply = $this->aiTutorService->ask($data['message'], $data['history'] ?? []);
-        } catch (RuntimeException $e) {
-            return response()->json(['message' => $e->getMessage()], 502);
-        }
-
-        return response()->json(['reply' => $reply]);
-=======
 use App\Models\ActivityLog;
 use App\Models\AdminSetting;
 use App\Models\AiModerationFlag;
@@ -295,6 +266,5 @@ class AiTutorController extends Controller
     {
         $setting = AdminSetting::where('key', $key)->first();
         return $setting?->value ?? $default;
->>>>>>> origin/main
     }
 }

@@ -32,13 +32,6 @@ export function AdminHeroBanner({ hero }: AdminHeroBannerProps) {
           <p className="mt-3 max-w-xl text-sm text-slate-200/90">{hero.description}</p>
         </div>
 
-<<<<<<< HEAD
-        <div className="flex flex-wrap items-center gap-3">
-          <button className="rounded-full border border-white/20 bg-white/8 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/12">
-            {hero.secondaryAction}
-          </button>
-          <button className="rounded-full bg-gradient-to-r from-cyan-300 via-sky-300 to-indigo-400 px-4 py-2 text-sm font-semibold text-slate-900 shadow-[0_18px_35px_-18px_rgba(56,189,248,0.9)] transition hover:brightness-110">
-=======
         <div className="flex flex-wrap gap-3">
           <button
             type="button"
@@ -52,7 +45,6 @@ export function AdminHeroBanner({ hero }: AdminHeroBannerProps) {
             onClick={handlePrimaryAction}
             className="rounded-full bg-cyan-300 px-4 py-2 text-sm font-semibold text-[#0a1d3d] shadow-[0_10px_24px_-12px_rgba(34,211,238,0.85)] transition hover:bg-cyan-200"
           >
->>>>>>> origin/main
             {hero.primaryAction}
           </button>
         </div>

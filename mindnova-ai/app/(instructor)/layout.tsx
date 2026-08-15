@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-import { DashboardTopbar } from "@/src/features/student/dashboard";
-import { Sidebar, FloatingAiChat } from "@/src/features/student/layout";
-=======
 import { InstructorSidebar } from "@/src/features/instructor/management/components/InstructorSidebar";
 import { InstructorTopbar } from "@/src/features/instructor/management/components/InstructorTopbar";
->>>>>>> origin/main
+import { FloatingAiChat } from "@/src/features/student/layout";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

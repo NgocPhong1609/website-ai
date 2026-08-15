@@ -23,14 +23,9 @@ export default function DashboardLayout({
           <main className="flex-1 overflow-y-auto overflow-x-hidden">{children}</main>
         </div>
       </div>
-<<<<<<< HEAD
-      <FloatingAiChat />
-    </div>
-=======
 
       {/* Global Student Floating AI Co-Pilot Icon & Modal - Absolute top level in DOM to prevent z-index or overflow clipping */}
       <FloatingAiChat />
     </>
->>>>>>> origin/main
   );
 }
