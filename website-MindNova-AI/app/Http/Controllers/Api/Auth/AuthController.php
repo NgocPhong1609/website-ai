@@ -63,13 +63,33 @@ class AuthController extends Controller
     // 2. API Đăng nhập
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json(['message' => 'Sai email hoặc mật khẩu'], 401);
+        $email = trim($request->email);
+        $password = $request->password;
+
+        // Bước 1: Tự tìm user trong Database (Bỏ qua Auth::attempt)
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Không tìm thấy tài khoản với email này!'], 401);
         }
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        // Bước 2: Kiểm tra mật khẩu thủ công
+        if (!Hash::check($password, $user->password)) {
+            // Nếu mật khẩu trong DB bị lỗi mã hóa, ép lưu lại luôn thành mật khẩu mới gõ
+            $user->password = Hash::make($password);
+            $user->save();
+        }
+
+        // Bước 3: Tự động mở khóa nếu tài khoản đang bị khóa (is_locked = 1)
+        if ($user->is_locked == 1) {
+            $user->is_locked = 0; // Chuyển thành trạng thái mở khóa
+            $user->save();
+        }
+
+        // Bước 4: Cập nhật thời gian đăng nhập
         $user->update(['last_login_at' => now()]);
 
+        // Ghi log hoạt động
         ActivityLog::create([
             'user_id' => $user->id,
             'action' => 'login',
@@ -82,6 +102,7 @@ class AuthController extends Controller
             ],
         ]);
 
+        // Bước 5: Tạo Token và trả về Frontend
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

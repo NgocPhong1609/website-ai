@@ -258,7 +258,7 @@ export function LoginForm() {
           "Accept": "application/json",
         },
         body: JSON.stringify({
-          email: values.email,
+          email: values.email.trim(), 
           password: values.password,
         }),
       });
