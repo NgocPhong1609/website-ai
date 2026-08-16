@@ -17,23 +17,39 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
     [localRows, selectedRow],
   );
 
-  const handleDecision = (decision: "approved" | "rejected") => {
-    if (!selectedRow) {
+  const [isPending, setIsPending] = useState(false);
+
+  const handleDecision = async (decision: "approved" | "rejected") => {
+    if (!selectedRow || isPending) {
       return;
     }
 
-    setLocalRows((currentRows) =>
-      currentRows.map((row) =>
-        row.id === selectedRow.id
-          ? {
-              ...row,
-              status: decision,
-            }
-          : row,
-      ),
-    );
+    try {
+      setIsPending(true);
+      
+      // Call server action to update the database
+      const { verifyTeacher } = await import("@/src/features/admin/actions/teacher-approval.actions");
+      await verifyTeacher(selectedRow.id, decision);
 
-    setSelectedRow(null);
+      // Update local UI state
+      setLocalRows((currentRows) =>
+        currentRows.map((row) =>
+          row.id === selectedRow.id
+            ? {
+                ...row,
+                status: decision,
+              }
+            : row,
+        ),
+      );
+
+      setSelectedRow(null);
+    } catch (error) {
+      console.error("Failed to verify teacher", error);
+      alert("Đã xảy ra lỗi khi duyệt giáo viên. Vui lòng thử lại sau.");
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -245,17 +261,19 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
                 <div className="space-y-3 pt-2">
                   <button
                     type="button"
+                    disabled={isPending}
                     onClick={() => handleDecision("approved")}
-                    className="w-full rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600"
+                    className="w-full rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Duyệt giáo viên
+                    {isPending ? "Đang xử lý..." : "Duyệt giáo viên"}
                   </button>
                   <button
                     type="button"
+                    disabled={isPending}
                     onClick={() => handleDecision("rejected")}
-                    className="w-full rounded-xl bg-rose-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-rose-600"
+                    className="w-full rounded-xl bg-rose-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Không duyệt
+                    {isPending ? "Đang xử lý..." : "Không duyệt"}
                   </button>
                 </div>
 
