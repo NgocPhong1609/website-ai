@@ -4,7 +4,7 @@ import { ChatHeader } from './ChatHeader';
 import { ChatMessageBubble } from './ChatMessageBubble';
 import { ChatInput } from './ChatInput';
 import { useRealtimeChat } from '../../../hooks/useRealtimeChat';
-import axios from 'axios';
+import { axiosClient } from '@/src/shared/lib/axios';
 
 interface ChatAreaProps {
     conversation: Conversation;
@@ -41,16 +41,11 @@ export const ChatArea: React.FC<ChatAreaProps> = ({ conversation, currentUserId,
         const fetchMessages = async () => {
             try {
                 setIsLoading(true);
-                const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conversation.id}/messages`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                loadInitialMessages(res.data.data);
-                
+                const res = await axiosClient.get(`/api/chat/conversations/${conversation.id}/messages`);
+                loadInitialMessages(res.data?.data || []);
                 
                 // Mark as read
-                await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conversation.id}/read`, {}, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await axiosClient.post(`/api/chat/conversations/${conversation.id}/read`);
                 
                 // Force scroll to bottom on initial load
                 setTimeout(() => scrollToBottom(true), 100);
@@ -102,15 +97,9 @@ export const ChatArea: React.FC<ChatAreaProps> = ({ conversation, currentUserId,
         addOptimisticMessage(tempMessage);
 
         try {
-            const res = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conversation.id}/messages`,
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'multipart/form-data',
-                    }
-                }
+            const res = await axiosClient.post(
+                `/api/chat/conversations/${conversation.id}/messages`,
+                formData
             );
             // Replace the optimistic temp message with the actual saved message to prevent duplicates from WebSocket
             if (res.data && res.data.data) {
@@ -124,10 +113,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({ conversation, currentUserId,
 
     const handleRecallMessage = async (messageId: number) => {
         try {
-            await axios.post(
-                `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conversation.id}/messages/${messageId}/recall`,
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
+            await axiosClient.post(
+                `/api/chat/conversations/${conversation.id}/messages/${messageId}/recall`
             );
             recallMessageLocally(messageId);
         } catch (error) {
