@@ -270,11 +270,16 @@ function QuizRenderer({
       const res = await submitQuiz(lesson.id, currentAnswers, timeTaken);
       setQuizResult(res);
       setPhase('result');
+      
+      // Báo hiệu hoàn thành để Component cha cập nhật Progress / Sidebar
+      if (res.passed) {
+        onComplete();
+      }
     } catch (err) {
       setError("Lỗi khi nộp bài. Vui lòng tải lại trang.");
     }
     setSubmittingFinal(false);
-  }, [quizData, lesson.id, timeLeft]);
+  }, [quizData, lesson.id, timeLeft, onComplete]);
 
   // Timer
   useEffect(() => {
@@ -678,7 +683,7 @@ function LessonWorkspaceContent() {
       const response = await completeLesson(activeLesson.id, payload);
 
       // Instant UI Update: Modify the TanStack Query Cache directly!
-      queryClient.setQueryData(["student", "courses", "detail", parsedCourseId], (oldData: CourseDetailData | undefined) => {
+      queryClient.setQueryData(["student", "courses", "detail", String(parsedCourseId)], (oldData: CourseDetailData | undefined) => {
         if (!oldData) return oldData;
         return {
           ...oldData,
