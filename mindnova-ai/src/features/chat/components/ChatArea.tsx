@@ -154,7 +154,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({ conversation, currentUserId,
                     </div>
                 ) : (
                     messages.map((msg, idx) => {
-                        const isOwn = msg.sender_id === currentUserId;
+                        const isOwn = Number(msg.sender_id) === Number(currentUserId);
                         
                         const currentDt = new Date(msg.created_at);
                         const prevMsg = idx > 0 ? messages[idx - 1] : null;
@@ -190,8 +190,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({ conversation, currentUserId,
                         const nextDt = nextMsg ? new Date(nextMsg.created_at) : null;
                         const diffToNext = nextDt ? (nextDt.getTime() - currentDt.getTime()) / (1000 * 60) : 0;
                         
-                        const isFirstInGroup = !prevMsg || prevMsg.sender_id !== msg.sender_id || showSeparator;
-                        const isLastInGroup = !nextMsg || nextMsg.sender_id !== msg.sender_id || diffToNext >= 10 || nextDt?.toDateString() !== currentDt.toDateString();
+                        const isFirstInGroup = !prevMsg || Number(prevMsg.sender_id) !== Number(msg.sender_id) || showSeparator;
+                        const isLastInGroup = !nextMsg || Number(nextMsg.sender_id) !== Number(msg.sender_id) || diffToNext >= 10 || nextDt?.toDateString() !== currentDt.toDateString();
 
                         return (
                             <React.Fragment key={msg.id || msg.tempId}>

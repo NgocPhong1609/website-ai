@@ -85,7 +85,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
                             const isCurrentlyActive = activeIdRef.current === conv.id;
                             
                             // If active and it's from another user, mark as read immediately via API
-                            if (isCurrentlyActive && e.sender_id !== currentUserId) {
+                            if (isCurrentlyActive && Number(e.sender_id) !== Number(currentUserId)) {
                                 axios.post(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conv.id}/read`, {}, {
                                     headers: { Authorization: `Bearer ${token}` }
                                 }).catch(console.error);
@@ -95,7 +95,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
                                 ...c, 
                                 last_message: e,
                                 // Only increment unread if not the active conversation and message not sent by current user
-                                unread_count: (!isCurrentlyActive && e.sender_id !== currentUserId) ? c.unread_count + 1 : c.unread_count
+                                unread_count: (!isCurrentlyActive && Number(e.sender_id) !== Number(currentUserId)) ? c.unread_count + 1 : c.unread_count
                             };
                         }
                         return c;

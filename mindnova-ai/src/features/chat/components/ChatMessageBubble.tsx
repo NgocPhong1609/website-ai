@@ -66,7 +66,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, i
                             onRecall(message.id);
                         }
                     }}
-                    className="hidden group-hover:flex mr-2 mt-auto mb-1 text-gray-400 hover:text-red-500 items-center justify-center p-1 rounded-full bg-white shadow-sm border border-gray-100"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 mr-2 mt-auto mb-1 text-gray-400 hover:text-red-500 flex items-center justify-center p-1.5 rounded-full bg-white shadow-md border border-gray-200 cursor-pointer"
                     title="Thu hồi tin nhắn"
                 >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
