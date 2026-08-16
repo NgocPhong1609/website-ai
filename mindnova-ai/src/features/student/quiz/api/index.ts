@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosClient } from "../../../../shared/lib/axios";
 import type { PracticeOverviewData, QuizGradingResult } from "../types";
 
@@ -46,6 +46,7 @@ export function useGetStudentQuiz(lessonId: string | number) {
 }
 
 export function useSubmitQuiz() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({
       lessonId,
@@ -61,6 +62,12 @@ export function useSubmitQuiz() {
         time_taken_seconds,
       });
       return data.data;
+    },
+    onSuccess: () => {
+      // Đảm bảo dữ liệu UI toàn hệ thống (sidebar, progress) được cập nhật đồng bộ sau khi nộp
+      queryClient.invalidateQueries({ queryKey: ["student", "practice", "overview"] });
+      queryClient.invalidateQueries({ queryKey: ["student", "courses", "detail"] });
+      queryClient.invalidateQueries({ queryKey: ["student", "courses", "enrolled"] });
     },
   });
 }

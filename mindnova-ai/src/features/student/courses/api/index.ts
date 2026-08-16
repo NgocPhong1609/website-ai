@@ -3,10 +3,11 @@ import { axiosClient } from "../../../../shared/lib/axios";
 import type { CourseDetailData, MyCourse } from "../types";
 
 export function useGetCourseDetail(courseId: string | number = 1) {
+  const normalizedId = String(courseId);
   return useQuery({
-    queryKey: ["student", "courses", "detail", courseId],
+    queryKey: ["student", "courses", "detail", normalizedId],
     queryFn: async (): Promise<CourseDetailData> => {
-      const { data } = await axiosClient.get(`/api/student/courses/detail/${courseId}`);
+      const { data } = await axiosClient.get(`/api/student/courses/detail/${normalizedId}`);
       return data.data;
     },
     staleTime: 5 * 60 * 1000,
@@ -108,7 +109,7 @@ export async function submitQuiz(
 export function useInvalidateCourseDetail() {
   const queryClient = useQueryClient();
   return (courseId: string | number) => {
-    queryClient.invalidateQueries({ queryKey: ["student", "courses", "detail", courseId] });
+    queryClient.invalidateQueries({ queryKey: ["student", "courses", "detail", String(courseId)] });
     queryClient.invalidateQueries({ queryKey: ["student", "courses", "enrolled"] });
   };
 }

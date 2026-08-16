@@ -18,7 +18,10 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
     const handleSelectConversation = (id: number) => {
         setActiveId(id);
         activeIdRef.current = id;
+        window.localStorage.setItem('activeChatConversationId', id.toString());
         setConversations(prev => prev.map(c => c.id === id ? { ...c, unread_count: 0 } : c));
+        // Trigger global unread update when marked as read
+        window.dispatchEvent(new Event('chat-messages-read'));
     };
 
     const handleUpdateLastMessage = useCallback((conversationId: number, lastMessage: any) => {
@@ -43,8 +46,10 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
                     const firstId = res.data.data[0].id;
                     setActiveId(firstId);
                     activeIdRef.current = firstId;
+                    window.localStorage.setItem('activeChatConversationId', firstId.toString());
                     // Also clear its unread count since it's immediately opened
                     setConversations(res.data.data.map((c: any) => c.id === firstId ? { ...c, unread_count: 0 } : c));
+                    window.dispatchEvent(new Event('chat-messages-read'));
                 } else {
                     setConversations(res.data.data);
                 }
@@ -67,18 +72,25 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
         // Use a dynamic import or require if getEchoInstance is exported
         const { getEchoInstance } = require('@/src/hooks/useRealtimeChat');
         const echo = getEchoInstance(token);
-        const channelNames: string[] = [];
+        const listeners: { channel: any, callback: any }[] = [];
 
         conversations.forEach(conv => {
             const channelName = `chat.conversation.${conv.id}`;
-            channelNames.push(channelName);
             const channel = echo.private(channelName);
             
-            channel.listen('ChatMessageSent', (e: any) => {
+            const onMessageSent = (e: any) => {
                 setConversations(prev => {
                     const newConversations = prev.map(c => {
                         if (c.id === conv.id) {
                             const isCurrentlyActive = activeIdRef.current === conv.id;
+                            
+                            // If active and it's from another user, mark as read immediately via API
+                            if (isCurrentlyActive && e.sender_id !== currentUserId) {
+                                axios.post(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conv.id}/read`, {}, {
+                                    headers: { Authorization: `Bearer ${token}` }
+                                }).catch(console.error);
+                            }
+
                             return { 
                                 ...c, 
                                 last_message: e,
@@ -96,13 +108,24 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
                         return dateB - dateA;
                     });
                 });
-            });
+            };
+            
+            channel.listen('ChatMessageSent', onMessageSent);
+            listeners.push({ channel, callback: onMessageSent });
         });
 
         return () => {
-            channelNames.forEach(name => echo.leave(name));
+            listeners.forEach(({ channel, callback }) => {
+                channel.stopListening('ChatMessageSent', callback);
+            });
         };
     }, [conversations.length, token, currentUserId]);
+
+    useEffect(() => {
+        return () => {
+            window.localStorage.removeItem('activeChatConversationId');
+        };
+    }, []);
 
     const activeConversation = conversations.find(c => c.id === activeId);
 

@@ -234,7 +234,7 @@ class StudentController extends Controller
         $meta = json_encode([
             'sender_id' => $teacherId,
             'course_ids' => $courseIds,
-            'action_url' => count($courseIds) === 1 ? "/student/courses/{$courseIds[0]}" : "/student/dashboard"
+            'action_url' => count($courseIds) === 1 ? "/courses/detail?courseId={$courseIds[0]}" : "/"
         ]);
         
         foreach ($studentIds as $sId) {

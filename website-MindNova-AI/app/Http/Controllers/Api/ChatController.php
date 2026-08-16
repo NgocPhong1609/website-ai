@@ -198,4 +198,37 @@ class ChatController extends Controller
 
         return response()->json(['status' => 'success', 'data' => $message]);
     }
+    /**
+     * Get the total unread message count for the authenticated user.
+     */
+    public function unreadCount(Request $request): JsonResponse
+    {
+        $userId = $request->user()->id;
+
+        $conversations = ChatConversation::whereHas('members', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
+
+        $totalUnread = 0;
+
+        foreach ($conversations as $conversation) {
+            $lastReadMessageId = DB::table('chat_conversation_members')
+                ->where('chat_conversation_id', $conversation->id)
+                ->where('user_id', $userId)
+                ->value('last_read_message_id');
+
+            $unreadInConv = ChatMessage::where('chat_conversation_id', $conversation->id)
+                ->where('id', '>', $lastReadMessageId ?? 0)
+                ->count();
+                
+            $totalUnread += $unreadInConv;
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'unread_count' => $totalUnread
+            ]
+        ]);
+    }
 }

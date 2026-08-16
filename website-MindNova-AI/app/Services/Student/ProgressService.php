@@ -151,7 +151,7 @@ class ProgressService
                         'color_scheme' => 'teal',
                         'content' => 'Kiến thức về Đạo hàm và giải thuật Lan truyền ngược (Backpropagation) sẽ là xương sống cho bài trắc nghiệm tiếp theo.',
                         'action_label' => '📖 Mở bài học ôn tập ngay ➔',
-                        'action_url' => '/courses/lesson?courseId=1&lessonId=l1-1'
+                        'action_url' => "/courses/lesson?courseId={$courseId}&lessonId=l1-1"
                     ],
                     [
                         'id' => 'rec-2',
@@ -160,7 +160,7 @@ class ProgressService
                         'color_scheme' => 'indigo',
                         'content' => 'Hoàn tất bài Quiz Đánh giá Module 2 trong tuần này để kích hoạt huy hiệu Quantum Pioneer và duy trì phong độ!',
                         'action_label' => '📝 Làm Khảo sát năng lực ➔',
-                        'action_url' => '/practice/quiz/question?lessonId=mod1'
+                        'action_url' => "/practice/quiz/question?lessonId=mod1"
                     ],
                 ],
                 'performance_stats' => [

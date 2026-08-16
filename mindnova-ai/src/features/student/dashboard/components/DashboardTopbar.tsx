@@ -5,6 +5,7 @@ import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { twMerge } from "tailwind-merge";
 import { NotificationModal } from "./NotificationModal";
+import { useChatGlobalUnread } from "@/src/hooks/useChatGlobalUnread";
 
 function SearchIcon() {
   return (
@@ -40,15 +41,30 @@ export function DashboardTopbar() {
   const [showNotif, setShowNotif] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<any | null>(null);
 
+  // Initialize token & userId from localStorage
+  const [token, setToken] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
+
   // Kiểm tra trạng thái đăng nhập khi component được tải lên trình duyệt
   useEffect(() => {
     setIsMounted(true);
-    const token = window.localStorage.getItem("accessToken");
-    if (token) {
+    const storedToken = window.localStorage.getItem("accessToken");
+    setToken(storedToken);
+    
+    const userInfoRaw = window.localStorage.getItem("userInfo");
+    if (userInfoRaw) {
+      try {
+        setUserId(JSON.parse(userInfoRaw).id);
+      } catch(e) {}
+    }
+
+    if (storedToken) {
       setIsLoggedIn(true);
       fetchNotifications();
     }
   }, []);//không phải bị lỗi đâu đừng có xóa
+
+  const chatUnreadCount = useChatGlobalUnread(token, userId);
 
   const fetchNotifications = async () => {
     try {
@@ -100,6 +116,9 @@ export function DashboardTopbar() {
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
             </div>
+            {chatUnreadCount > 0 && (
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse ring-2 ring-white" />
+            )}
           </a>
           {/* Notifications with lively pulse */}
           <div className="relative">

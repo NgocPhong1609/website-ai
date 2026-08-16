@@ -55,10 +55,9 @@ class Course extends Model
             ]);
 
             if ($course->teacher_id) {
-                \App\Models\ChatConversationMember::create([
+                \App\Models\ChatConversationMember::firstOrCreate([
                     'chat_conversation_id' => $conversation->id,
                     'user_id' => $course->teacher_id,
-                    'joined_at' => now(),
                 ]);
             }
         });

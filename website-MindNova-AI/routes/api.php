@@ -83,6 +83,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // -- Chat & Messaging System --
     Route::prefix('chat')->group(function () {
+        Route::get('/unread-count', [ChatController::class, 'unreadCount']);
         Route::get('/conversations', [ChatController::class, 'index']);
         Route::get('/conversations/{id}/messages', [ChatController::class, 'messages']);
         Route::post('/conversations/{id}/messages', [ChatController::class, 'sendMessage']);
