@@ -67,6 +67,24 @@ class OrderController extends Controller
                         if ($course && $course->teacher && $student) {
                             $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
                         }
+
+                        // Add student to chat conversation
+                        $conversation = \App\Models\ChatConversation::firstOrCreate(
+                            ['course_id' => $course->id],
+                            ['title' => $course->title, 'type' => 'course']
+                        );
+
+                        if ($course->teacher_id) {
+                            \App\Models\ChatConversationMember::firstOrCreate([
+                                'chat_conversation_id' => $conversation->id,
+                                'user_id' => $course->teacher_id
+                            ]);
+                        }
+
+                        \App\Models\ChatConversationMember::firstOrCreate([
+                            'chat_conversation_id' => $conversation->id,
+                            'user_id' => $student->id
+                        ]);
                     }
                 }
                 DB::commit();
@@ -202,6 +220,26 @@ class OrderController extends Controller
                             if ($course && $course->teacher && $student) {
                                 $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
                             }
+
+                            // Add student to chat conversation
+                            if ($course) {
+                                $conversation = \App\Models\ChatConversation::firstOrCreate(
+                                    ['course_id' => $course->id],
+                                    ['title' => $course->title, 'type' => 'course']
+                                );
+
+                                if ($course->teacher_id) {
+                                    \App\Models\ChatConversationMember::firstOrCreate([
+                                        'chat_conversation_id' => $conversation->id,
+                                        'user_id' => $course->teacher_id
+                                    ]);
+                                }
+
+                                \App\Models\ChatConversationMember::firstOrCreate([
+                                    'chat_conversation_id' => $conversation->id,
+                                    'user_id' => $order->user_id
+                                ]);
+                            }
                         }
                     }
                     
@@ -257,6 +295,26 @@ class OrderController extends Controller
                             $course = $item->course;
                             if ($course && $course->teacher && $student) {
                                 $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
+                            }
+
+                            // Add student to chat conversation
+                            if ($course) {
+                                $conversation = \App\Models\ChatConversation::firstOrCreate(
+                                    ['course_id' => $course->id],
+                                    ['title' => $course->title, 'type' => 'course']
+                                );
+
+                                if ($course->teacher_id) {
+                                    \App\Models\ChatConversationMember::firstOrCreate([
+                                        'chat_conversation_id' => $conversation->id,
+                                        'user_id' => $course->teacher_id
+                                    ]);
+                                }
+
+                                \App\Models\ChatConversationMember::firstOrCreate([
+                                    'chat_conversation_id' => $conversation->id,
+                                    'user_id' => $order->user_id
+                                ]);
                             }
                         }
                     }
@@ -327,6 +385,26 @@ class OrderController extends Controller
                     if ($course && $course->teacher && $student) {
                         $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
                     }
+
+                    // Add student to chat conversation
+                    if ($course) {
+                        $conversation = \App\Models\ChatConversation::firstOrCreate(
+                            ['course_id' => $course->id],
+                            ['title' => $course->title, 'type' => 'course']
+                        );
+
+                        if ($course->teacher_id) {
+                            \App\Models\ChatConversationMember::firstOrCreate([
+                                'chat_conversation_id' => $conversation->id,
+                                'user_id' => $course->teacher_id
+                            ]);
+                        }
+
+                        \App\Models\ChatConversationMember::firstOrCreate([
+                            'chat_conversation_id' => $conversation->id,
+                            'user_id' => $order->user_id
+                        ]);
+                    }
                 }
             }
             
@@ -370,6 +448,13 @@ class OrderController extends Controller
             
             foreach ($items as $item) {
                 DB::table('enrollments')->where('user_id', $order->user_id)->where('course_id', $item->course_id)->delete();
+                
+                $conversation = \App\Models\ChatConversation::where('course_id', $item->course_id)->first();
+                if ($conversation) {
+                    \App\Models\ChatConversationMember::where('chat_conversation_id', $conversation->id)
+                        ->where('user_id', $order->user_id)
+                        ->delete();
+                }
                 
                 $course = $item->course;
                 if ($course && $course->teacher_id) {

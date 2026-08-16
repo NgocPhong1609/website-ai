@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Conversation } from '../types';
 import { ChatSidebar } from './ChatSidebar';
 import { ChatArea } from './ChatArea';
-import axios from 'axios';
+import { axiosClient } from '@/src/shared/lib/axios';
 
 interface ChatLayoutProps {
     token: string;
@@ -39,10 +39,8 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
     useEffect(() => {
         const fetchConversations = async () => {
             try {
-                const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                if (res.data.data.length > 0) {
+                const res = await axiosClient.get('/api/chat/conversations');
+                if (res.data?.data?.length > 0) {
                     const firstId = res.data.data[0].id;
                     setActiveId(firstId);
                     activeIdRef.current = firstId;
@@ -51,7 +49,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
                     setConversations(res.data.data.map((c: any) => c.id === firstId ? { ...c, unread_count: 0 } : c));
                     window.dispatchEvent(new Event('chat-messages-read'));
                 } else {
-                    setConversations(res.data.data);
+                    setConversations(res.data?.data || []);
                 }
             } catch (error) {
                 console.error("Failed to fetch conversations", error);
@@ -86,9 +84,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
                             
                             // If active and it's from another user, mark as read immediately via API
                             if (isCurrentlyActive && Number(e.sender_id) !== Number(currentUserId)) {
-                                axios.post(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conv.id}/read`, {}, {
-                                    headers: { Authorization: `Bearer ${token}` }
-                                }).catch(console.error);
+                                axiosClient.post(`/api/chat/conversations/${conv.id}/read`).catch(console.error);
                             }
 
                             return { 
