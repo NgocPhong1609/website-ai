@@ -172,7 +172,7 @@ class ChatController extends Controller
      */
     public function recallMessage(Request $request, $conversationId, $messageId): JsonResponse
     {
-        $userId = $request->user()->id;
+        $userId = (int) $request->user()->id;
 
         // Check permission for conversation
         $conversation = ChatConversation::whereHas('members', function ($query) use ($userId) {
@@ -182,11 +182,15 @@ class ChatController extends Controller
         $message = ChatMessage::where('chat_conversation_id', $conversationId)
             ->findOrFail($messageId);
 
-        if ($message->sender_id !== $userId) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        if ((int) $message->sender_id !== $userId) {
+            return response()->json(['message' => 'Unauthorized. You can only recall your own messages.'], 403);
         }
 
-        if ($message->created_at->diffInHours(now()) >= 1) {
+        if ($message->is_recalled) {
+            return response()->json(['message' => 'Message is already recalled.'], 400);
+        }
+
+        if ($message->created_at->diffInMinutes(now()) >= 60) {
             return response()->json(['message' => 'Message is too old to be recalled'], 400);
         }
 

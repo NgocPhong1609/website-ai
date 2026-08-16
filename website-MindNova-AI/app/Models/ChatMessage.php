@@ -9,6 +9,8 @@ class ChatMessage extends Model
     protected $fillable = ['chat_conversation_id', 'sender_id', 'content', 'type', 'is_recalled'];
 
     protected $casts = [
+        'sender_id' => 'integer',
+        'chat_conversation_id' => 'integer',
         'is_recalled' => 'boolean',
     ];
 
