@@ -39,7 +39,7 @@ export const useRealtimeChat = (conversationId: number, token: string | null) =>
         
         const channel = echo.private(channelName);
 
-        channel.listen('ChatMessageSent', (e: any) => {
+        const onMessageSent = (e: any) => {
             // Check if message is already in state (e.g. from optimistic UI)
             setMessages(prev => {
                 const exists = prev.find(m => m.id === e.id);
@@ -48,14 +48,19 @@ export const useRealtimeChat = (conversationId: number, token: string | null) =>
                 }
                 return [...prev, { ...e, status: 'sent' }];
             });
-        });
+        };
 
-        channel.listen('ChatMessageRecalled', (e: any) => {
+        const onMessageRecalled = (e: any) => {
             setMessages(prev => prev.map(m => m.id === e.message.id ? { ...m, is_recalled: true } : m));
-        });
+        };
+
+        channel.listen('ChatMessageSent', onMessageSent);
+        channel.listen('ChatMessageRecalled', onMessageRecalled);
 
         return () => {
-            echo.leave(channelName);
+            channel.stopListening('ChatMessageSent', onMessageSent);
+            channel.stopListening('ChatMessageRecalled', onMessageRecalled);
+            // Do not call echo.leave(channelName) here because ChatLayout is also listening to this channel for unread updates!
         };
     }, [conversationId, token]);
 

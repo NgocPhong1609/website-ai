@@ -6,6 +6,7 @@ import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { twMerge } from "tailwind-merge";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { BellIcon } from "./icons";
+import { useChatGlobalUnread } from "@/src/hooks/useChatGlobalUnread";
 
 const NAV_SVG = {
   viewBox: "0 0 24 24",
@@ -153,6 +154,22 @@ export function InstructorTopbar() {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [unansweredDiscussionsCount, setUnansweredDiscussionsCount] = useState(0);
 
+  // Initialize token & userId from localStorage
+  const [token, setToken] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
+  
+  useEffect(() => {
+    setToken(window.localStorage.getItem("accessToken"));
+    const userInfoRaw = window.localStorage.getItem("userInfo");
+    if (userInfoRaw) {
+      try {
+        setUserId(JSON.parse(userInfoRaw).id);
+      } catch(e) {}
+    }
+  }, []);
+
+  const chatUnreadCount = useChatGlobalUnread(token, userId);
+
   useEffect(() => {
     const fetchUnansweredCount = async () => {
       try {
@@ -245,6 +262,11 @@ export function InstructorTopbar() {
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
+          {chatUnreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center border-2 border-white px-0.5 animate-pulse">
+              {chatUnreadCount}
+            </span>
+          )}
         </Link>
 
         {/* Bell Button */}

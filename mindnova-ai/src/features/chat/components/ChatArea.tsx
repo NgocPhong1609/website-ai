@@ -18,8 +18,22 @@ export const ChatArea: React.FC<ChatAreaProps> = ({ conversation, currentUserId,
     const [isLoading, setIsLoading] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const scrollToBottom = (force: boolean = false) => {
+        if (!messagesEndRef.current) return;
+        
+        if (force) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+            return;
+        }
+
+        // Smart scroll: only scroll down if we are already near the bottom (within 150px)
+        const container = messagesEndRef.current.parentElement;
+        if (container) {
+            const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+            if (isNearBottom) {
+                messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
     };
 
     useEffect(() => {
@@ -32,10 +46,14 @@ export const ChatArea: React.FC<ChatAreaProps> = ({ conversation, currentUserId,
                 });
                 loadInitialMessages(res.data.data);
                 
+                
                 // Mark as read
                 await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conversation.id}/read`, {}, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
+                
+                // Force scroll to bottom on initial load
+                setTimeout(() => scrollToBottom(true), 100);
             } catch (error) {
                 console.error("Failed to fetch messages", error);
             } finally {
@@ -54,8 +72,9 @@ export const ChatArea: React.FC<ChatAreaProps> = ({ conversation, currentUserId,
     }, [messages, conversation.id, onUpdateLastMessage]);
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+        // When new messages arrive, use smart auto-scroll
+        scrollToBottom(false);
+    }, [messages.length]);
 
     const handleSendMessage = async (content: string, file?: File | null) => {
         const formData = new FormData();
@@ -136,14 +155,50 @@ export const ChatArea: React.FC<ChatAreaProps> = ({ conversation, currentUserId,
                 ) : (
                     messages.map((msg, idx) => {
                         const isOwn = msg.sender_id === currentUserId;
-                        const showDate = idx === 0 || new Date(messages[idx - 1].created_at).toDateString() !== new Date(msg.created_at).toDateString();
                         
+                        const currentDt = new Date(msg.created_at);
+                        const prevMsg = idx > 0 ? messages[idx - 1] : null;
+                        const nextMsg = idx < messages.length - 1 ? messages[idx + 1] : null;
+                        
+                        let showSeparator = false;
+                        let separatorText = '';
+                        
+                        if (!prevMsg) {
+                            showSeparator = true;
+                            separatorText = currentDt.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                        } else {
+                            const prevDt = new Date(prevMsg.created_at);
+                            const diffMinutes = (currentDt.getTime() - prevDt.getTime()) / (1000 * 60);
+                            
+                            const isDifferentDate = currentDt.toDateString() !== prevDt.toDateString();
+                            const isDifferentYear = currentDt.getFullYear() !== prevDt.getFullYear();
+                            
+                            if (isDifferentDate) {
+                                showSeparator = true;
+                                separatorText = currentDt.toLocaleDateString('vi-VN', { 
+                                    weekday: 'long', 
+                                    month: 'long', 
+                                    day: 'numeric',
+                                    year: isDifferentYear ? 'numeric' : undefined
+                                });
+                            } else if (diffMinutes >= 10) {
+                                showSeparator = true;
+                                separatorText = currentDt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                            }
+                        }
+
+                        const nextDt = nextMsg ? new Date(nextMsg.created_at) : null;
+                        const diffToNext = nextDt ? (nextDt.getTime() - currentDt.getTime()) / (1000 * 60) : 0;
+                        
+                        const isFirstInGroup = !prevMsg || prevMsg.sender_id !== msg.sender_id || showSeparator;
+                        const isLastInGroup = !nextMsg || nextMsg.sender_id !== msg.sender_id || diffToNext >= 10 || nextDt?.toDateString() !== currentDt.toDateString();
+
                         return (
                             <React.Fragment key={msg.id || msg.tempId}>
-                                {showDate && (
-                                    <div className="flex justify-center my-4">
-                                        <span className="bg-gray-200 text-gray-600 text-xs px-3 py-1 rounded-full font-medium">
-                                            {new Date(msg.created_at).toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                                {showSeparator && (
+                                    <div className="flex justify-center my-6">
+                                        <span className="text-gray-500 text-[11px] font-medium px-2 py-0.5 rounded-md bg-gray-100">
+                                            {separatorText}
                                         </span>
                                     </div>
                                 )}
@@ -151,6 +206,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({ conversation, currentUserId,
                                     message={msg} 
                                     isOwn={isOwn} 
                                     onRecall={handleRecallMessage}
+                                    isFirstInGroup={isFirstInGroup}
+                                    isLastInGroup={isLastInGroup}
                                 />
                             </React.Fragment>
                         );
