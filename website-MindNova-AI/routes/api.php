@@ -35,6 +35,8 @@ use App\Http\Controllers\Api\Admin\ModerationSupportController as AdminModeratio
 use App\Http\Controllers\Api\Admin\SystemConfigController as AdminSystemConfigController;
 use App\Http\Controllers\Api\Admin\UserManagementController as AdminUserManagementController;
 use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Api\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
 
 // Nhóm Instructor (Giáo viên)
 use App\Http\Controllers\Api\Instructor\CourseController;
@@ -249,6 +251,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::delete('/users/{id}', [AdminUserManagementController::class, 'destroy']);
     Route::get('/users/{id}/activity', [AdminUserManagementController::class, 'activity']);
     Route::get('/teachers/review-queue', [AdminUserManagementController::class, 'teacherQueue']);
+    Route::get('/teacher-approvals', [AdminUserManagementController::class, 'teacherQueue']);
     Route::patch('/teachers/{id}/verify', [AdminUserManagementController::class, 'verifyTeacher']);
 
     // 2) AI and system configuration
@@ -271,6 +274,10 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
 
     // 4) Analytics and reports
     Route::get('/analytics/dashboard', [AdminAnalyticsController::class, 'dashboard']);
+    Route::get('/revenue', [AdminDashboardController::class, 'revenue']);
+
+    // 4.5) Coupons
+    Route::apiResource('/coupons', AdminCouponController::class);
 
     // 5) Moderation and support
     Route::get('/moderation/flags', [AdminModerationSupportController::class, 'flags']);
