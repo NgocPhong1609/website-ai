@@ -140,7 +140,7 @@ class CourseService
                     
                     if ($dbCourse->teacher) {
                         $instructorName = $dbCourse->teacher->name;
-                        $instructorAvatar = $dbCourse->teacher->avatar ?? '/avatar-placeholder.png';
+                        $instructorAvatar = $dbCourse->teacher->avatar_url ?? $dbCourse->teacher->avatar ?? '/avatar-placeholder.png';
                         // Fallback role/bio for user if it doesn't exist
                         $instructorBio = "Chuyên gia giàu kinh nghiệm trong lĩnh vực {$categoryName}.";
                     }

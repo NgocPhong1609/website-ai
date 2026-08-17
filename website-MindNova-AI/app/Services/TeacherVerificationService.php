@@ -329,6 +329,15 @@ class TeacherVerificationService
             $certificate->verification_note = $note;
             $certificate->save();
 
+            // Notification
+            Notification::create([
+                'user_id' => $certificate->teacher_id,
+                'type' => 'certificate_approved',
+                'title' => 'Chứng chỉ đã được duyệt ✓',
+                'body' => "Chứng chỉ \"{$certificate->certificate_name}\" của bạn đã được Admin xác minh và phê duyệt.",
+                'is_read' => false,
+            ]);
+
             $this->logAction($certificate->teacher_id, $admin->id, $certificate->id, 'approve_certificate', $oldStatus, 'approved', $note);
 
             return $certificate;
@@ -350,6 +359,15 @@ class TeacherVerificationService
             $certificate->verification_status = 'rejected';
             $certificate->verification_note = $reason;
             $certificate->save();
+
+            // Notification
+            Notification::create([
+                'user_id' => $certificate->teacher_id,
+                'type' => 'certificate_rejected',
+                'title' => 'Chứng chỉ chưa được chấp thuận',
+                'body' => "Chứng chỉ \"{$certificate->certificate_name}\" của bạn chưa được phê duyệt. Lý do: {$reason}",
+                'is_read' => false,
+            ]);
 
             $this->logAction($certificate->teacher_id, $admin->id, $certificate->id, 'reject_certificate', $oldStatus, 'rejected', $reason);
 
@@ -387,7 +405,7 @@ class TeacherVerificationService
                 'user_id' => $teacher->id,
                 'type' => 'teacher_verification_approved',
                 'title' => 'Xác minh thành công ✦✓',
-                'message' => 'Hồ sơ của bạn đã được xác minh thành công. Bạn đã được cấp tích xanh trên toàn hệ thống MindNova AI.',
+                'body' => 'Hồ sơ giáo viên của bạn đã được xác minh. Bạn đã được cấp tích xanh.',
                 'is_read' => false,
             ]);
 
@@ -402,7 +420,8 @@ class TeacherVerificationService
      */
     public function rejectTeacherVerification(User $admin, User $teacher, string $reason): User
     {
-        if (empty(trim($reason))) {
+        $reason = trim($reason);
+        if (empty($reason)) {
             throw new InvalidArgumentException('Bắt buộc phải nhập lý do khi từ chối cấp tích xanh.');
         }
 
@@ -429,7 +448,7 @@ class TeacherVerificationService
                 'user_id' => $teacher->id,
                 'type' => 'teacher_verification_rejected',
                 'title' => 'Yêu cầu xác minh bị từ chối',
-                'message' => "Hồ sơ xác minh của bạn chưa được chấp thuận. Lý do: {$reason}",
+                'body' => "Yêu cầu xác minh giáo viên của bạn đã bị từ chối.\nLý do: {$reason}",
                 'is_read' => false,
             ]);
 
@@ -444,7 +463,8 @@ class TeacherVerificationService
      */
     public function revokeTeacherVerification(User $admin, User $teacher, string $reason): User
     {
-        if (empty(trim($reason))) {
+        $reason = trim($reason);
+        if (empty($reason)) {
             throw new InvalidArgumentException('Bắt buộc phải nhập lý do khi thu hồi tích xanh.');
         }
 
@@ -470,7 +490,7 @@ class TeacherVerificationService
                 'user_id' => $teacher->id,
                 'type' => 'teacher_verification_revoked',
                 'title' => 'Tích xanh bị thu hồi',
-                'message' => "Tích xanh của bạn đã bị thu hồi. Lý do: {$reason}",
+                'body' => "Tích xanh của bạn đã bị thu hồi.\nLý do: {$reason}",
                 'is_read' => false,
             ]);
 

@@ -202,21 +202,26 @@ function ResourcesCard({ resources = [] }: { resources?: CourseDetailResourceIte
 }
 
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
+import { Avatar } from "@/src/shared/components/ui/Avatar";
 
-function InstructorCard({ instructor }: { instructor?: CourseDetailInstructor & { is_verified?: boolean } }) {
+function InstructorCard({ instructor }: { instructor?: CourseDetailInstructor & { is_verified?: boolean; avatar_url?: string } }) {
   const name = instructor?.name || "TS. Nguyễn Ngọc Phong";
   const role = instructor?.role || "Chuyên gia Kiến trúc Trí tuệ Nhân tạo";
   const bio = instructor?.bio || "Hơn 12 năm kinh nghiệm thiết kế mô hình AI và dẫn dắt các dự án điện toán đám mây thế hệ mới tại các học viện công nghệ hàng đầu.";
   const isVerified = instructor?.is_verified ?? true;
+  const avatarSrc = instructor?.avatar_url || (instructor as any)?.avatar || null;
 
   return (
     <div className="bg-white rounded-2xl border border-[#EAEAF4] p-5 shadow-2xs flex flex-col items-center text-center relative overflow-hidden group hover:border-[#6B6BFF]/30 transition-all">
       <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-r from-[#EEF2FF] via-[#E0F2FE] to-[#EEF2FF] border-b border-[#EAEAF4]" />
 
-      <div className="relative z-10 w-20 h-20 rounded-full bg-gradient-to-tr from-[#5052EE] to-[#4CD7F6] p-1 shadow-md mb-3 mt-3">
-        <div className="w-full h-full rounded-full bg-white flex items-center justify-center font-bold text-xl text-[#5052EE]">
-          NP
-        </div>
+      <div className="relative z-10 mb-3 mt-3">
+        <Avatar
+          src={avatarSrc}
+          fallback={name}
+          size="xl"
+          className="w-20 h-20 text-xl font-bold shadow-md border-2 border-white ring-2 ring-[#5052EE]"
+        />
       </div>
 
       <span className="text-[11px] font-medium text-[#5052EE] bg-[#EEF2FF] px-2.5 py-0.5 rounded-full border border-[#5052EE]/20 mb-1">

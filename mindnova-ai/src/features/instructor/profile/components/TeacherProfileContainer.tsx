@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 import { VerificationRequestModal } from "./VerificationRequestModal";
+import { writeStoredUser } from "@/src/shared/lib/userStorage";
 
 export function TeacherProfileContainer() {
   const [profileData, setProfileData] = useState<any>(null);
@@ -38,6 +39,16 @@ export function TeacherProfileContainer() {
         expertise: data.profile?.skill_level || "",
         experience: data.profile?.learning_goal || "",
       });
+
+      if (data) {
+        writeStoredUser({
+          id: data.id,
+          name: data.name,
+          avatar_url: data.avatar_url,
+          avatar: data.avatar_url,
+          is_verified: data.is_verified,
+        } as any);
+      }
     } catch (error) {
       console.error("Failed to load teacher profile", error);
     } finally {
@@ -63,6 +74,13 @@ export function TeacherProfileContainer() {
       const res = await axiosClient.post("/api/instructor/avatar", body, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      if (res.data?.data?.avatar_url) {
+        writeStoredUser({
+          avatar_url: res.data.data.avatar_url,
+          avatar: res.data.data.avatar_url,
+        });
+      }
 
       setMsg({ type: "success", text: "Cập nhật ảnh đại diện thành công!" });
       fetchProfile();

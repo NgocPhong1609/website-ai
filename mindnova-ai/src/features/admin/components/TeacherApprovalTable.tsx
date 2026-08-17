@@ -35,25 +35,44 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
     });
   }, [localRows, activeTab]);
 
+  const [showApproveConfirmModal, setShowApproveConfirmModal] = useState(false);
+  const [actionError, setActionError] = useState("");
+
   const handleTeacherDecision = async (status: "approved" | "rejected" | "revoked", reason?: string) => {
     if (!selectedRow || isPendingAction) return;
 
     try {
       setIsPendingAction(true);
+      setActionError("");
 
       if (status === "revoked") {
+        const cleanReason = reason?.trim();
+        if (!cleanReason) {
+          setActionError("Vui lòng nhập lý do thu hồi tích xanh.");
+          return;
+        }
         await axiosClient.post(`/api/admin/teachers/${selectedRow.id}/revoke-verification`, {
-          reason: reason || "Thu hồi tích xanh theo quyết định của Admin",
+          reason: cleanReason,
+        });
+      } else if (status === "rejected") {
+        const cleanReason = reason?.trim();
+        if (!cleanReason) {
+          setActionError("Vui lòng nhập lý do từ chối xác minh.");
+          return;
+        }
+        await axiosClient.patch(`/api/admin/teachers/${selectedRow.id}/verify`, {
+          status: "rejected",
+          reason: cleanReason,
+          note: cleanReason,
         });
       } else {
         await axiosClient.patch(`/api/admin/teachers/${selectedRow.id}/verify`, {
-          status,
-          reason,
-          note: reason,
+          status: "approved",
+          note: reason || "Đã thẩm định và cấp tích xanh thành công",
         });
       }
 
-      // Update local state
+      // Update local state immediately
       setLocalRows((current) =>
         current.map((r) =>
           r.id === selectedRow.id
@@ -61,7 +80,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
                 ...r,
                 is_verified: status === "approved",
                 teacher_verification_status: status,
-                teacher_verification_note: reason || r.teacher_verification_note,
+                teacher_verification_note: reason?.trim() || r.teacher_verification_note,
               }
             : r
         )
@@ -73,17 +92,19 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
               ...prev,
               is_verified: status === "approved",
               teacher_verification_status: status,
-              teacher_verification_note: reason || prev.teacher_verification_note,
+              teacher_verification_note: reason?.trim() || prev.teacher_verification_note,
             }
           : null
       );
 
       setShowReasonModal(null);
+      setShowApproveConfirmModal(false);
       setReasonInput("");
-      alert(`Đã cập nhật trạng thái xác minh giáo viên thành [${status.toUpperCase()}] thành công!`);
     } catch (err: any) {
       console.error("Failed teacher decision", err);
-      alert(err.response?.data?.message || "Thao tác thất bại. Vui lòng thử lại.");
+      const serverMsg = err.response?.data?.message || err.message || "Thao tác thất bại. Vui lòng thử lại.";
+      setActionError(serverMsg);
+      alert(`[LỖI]: ${serverMsg}`);
     } finally {
       setIsPendingAction(false);
     }
@@ -94,17 +115,23 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
 
     try {
       setIsPendingAction(true);
+      setActionError("");
 
       if (status === "approved") {
         await axiosClient.post(`/api/admin/certificates/${certId}/approve`);
       } else {
-        await axiosClient.post(`/api/admin/certificates/${certId}/reject`, { reason });
+        const cleanReason = reason?.trim();
+        if (!cleanReason) {
+          setActionError("Vui lòng nhập lý do từ chối chứng chỉ.");
+          return;
+        }
+        await axiosClient.post(`/api/admin/certificates/${certId}/reject`, { reason: cleanReason });
       }
 
       // Update local cert list
       if (selectedRow) {
         const updatedCerts = selectedRow.certificates.map((c) =>
-          c.id === certId ? { ...c, verification_status: status, verification_note: reason || null } : c
+          c.id === certId ? { ...c, verification_status: status, verification_note: reason?.trim() || null } : c
         );
 
         setSelectedRow({ ...selectedRow, certificates: updatedCerts });
@@ -117,7 +144,9 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
       setReasonInput("");
     } catch (err: any) {
       console.error("Failed cert decision", err);
-      alert(err.response?.data?.message || "Thao tác thất bại.");
+      const serverMsg = err.response?.data?.message || err.message || "Thao tác thất bại.";
+      setActionError(serverMsg);
+      alert(`[LỖI]: ${serverMsg}`);
     } finally {
       setIsPendingAction(false);
     }
@@ -384,8 +413,11 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
                     <button
                       type="button"
                       disabled={isPendingAction}
-                      onClick={() => handleTeacherDecision("approved")}
-                      className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md transition-all"
+                      onClick={() => {
+                        setActionError("");
+                        setShowApproveConfirmModal(true);
+                      }}
+                      className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md transition-all flex items-center justify-center gap-1.5"
                     >
                       ✦ CẤP TÍCH XANH SỐ XÁC MINH
                     </button>
@@ -393,7 +425,10 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
                     <button
                       type="button"
                       disabled={isPendingAction}
-                      onClick={() => setShowReasonModal({ type: "revoke_teacher" })}
+                      onClick={() => {
+                        setActionError("");
+                        setShowReasonModal({ type: "revoke_teacher" });
+                      }}
                       className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-black shadow-md transition-all"
                     >
                       🚫 THU HỒI TÍCH XANH
@@ -404,7 +439,10 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
                     <button
                       type="button"
                       disabled={isPendingAction}
-                      onClick={() => setShowReasonModal({ type: "reject_teacher" })}
+                      onClick={() => {
+                        setActionError("");
+                        setShowReasonModal({ type: "reject_teacher" });
+                      }}
                       className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow-sm transition-all"
                     >
                       ❌ TỪ CHỐI YÊU CẦU XÁC MINH
@@ -536,7 +574,10 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
                           <button
                             type="button"
                             disabled={isPendingAction}
-                            onClick={() => setShowReasonModal({ type: "reject_cert", certId: cert.id })}
+                            onClick={() => {
+                              setActionError("");
+                              setShowReasonModal({ type: "reject_cert", certId: cert.id });
+                            }}
                             className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow-xs transition-all"
                           >
                             Từ chối chứng chỉ
@@ -556,10 +597,65 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
         </div>
       )}
 
+      {/* Approval Confirmation Modal */}
+      {showApproveConfirmModal && selectedRow && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-md">
+          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in duration-200">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl font-bold">
+              ✦✓
+            </div>
+            <div>
+              <h3 className="text-lg font-black text-slate-900">Xác nhận cấp tích xanh</h3>
+              <p className="text-xs font-semibold text-slate-600 mt-1 leading-relaxed">
+                Bạn có chắc chắn muốn cấp tích xanh xác minh cho giáo viên <strong className="text-slate-900">{selectedRow.name}</strong>?
+              </p>
+              <p className="text-[11px] font-medium text-slate-500 mt-2 bg-emerald-50 p-2.5 rounded-xl border border-emerald-100 leading-relaxed">
+                ✨ Sau khi xác nhận, giáo viên sẽ được hiển thị trạng thái đã xác minh ✦✓ trên toàn hệ thống MindNova AI.
+              </p>
+            </div>
+
+            {actionError && (
+              <div className="p-2.5 rounded-xl bg-red-50 text-xs font-bold text-red-700">
+                ⚠️ {actionError}
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                disabled={isPendingAction}
+                onClick={() => {
+                  setShowApproveConfirmModal(false);
+                  setActionError("");
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                disabled={isPendingAction}
+                onClick={() => handleTeacherDecision("approved")}
+                className="px-5 py-2 rounded-xl text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/30 transition-all disabled:opacity-50 flex items-center gap-1.5"
+              >
+                {isPendingAction ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Đang xử lý...</span>
+                  </>
+                ) : (
+                  "Xác nhận cấp tích xanh ✦"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Reason Input Modal */}
       {showReasonModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-md">
-          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-100 space-y-4">
+          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in duration-200">
             <h3 className="text-lg font-black text-slate-900">
               {showReasonModal.type === "revoke_teacher"
                 ? "Thu hồi tích xanh xác minh"
@@ -572,23 +668,34 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
               Bắt buộc nhập lý do chi tiết để gửi thông báo cho giáo viên.
             </p>
 
+            {actionError && (
+              <div className="p-2.5 rounded-xl bg-red-50 text-xs font-bold text-red-700">
+                ⚠️ {actionError}
+              </div>
+            )}
+
             <textarea
               rows={3}
               required
-              placeholder="Nhập lý do..."
+              placeholder="Nhập lý do chi tiết..."
               value={reasonInput}
-              onChange={(e) => setReasonInput(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500"
+              onChange={(e) => {
+                setReasonInput(e.target.value);
+                if (actionError) setActionError("");
+              }}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 bg-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500"
             />
 
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 type="button"
+                disabled={isPendingAction}
                 onClick={() => {
                   setShowReasonModal(null);
                   setReasonInput("");
+                  setActionError("");
                 }}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors"
               >
                 Hủy
               </button>
@@ -596,6 +703,10 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
                 type="button"
                 disabled={!reasonInput.trim() || isPendingAction}
                 onClick={() => {
+                  if (!reasonInput.trim()) {
+                    setActionError("Vui lòng nhập lý do.");
+                    return;
+                  }
                   if (showReasonModal.type === "revoke_teacher") {
                     handleTeacherDecision("revoked", reasonInput);
                   } else if (showReasonModal.type === "reject_teacher") {
@@ -604,9 +715,16 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
                     handleCertDecision(showReasonModal.certId, "rejected", reasonInput);
                   }
                 }}
-                className="px-5 py-2 rounded-xl text-xs font-black text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50"
+                className="px-5 py-2 rounded-xl text-xs font-black text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 shadow-md shadow-rose-600/30 transition-all flex items-center gap-1.5"
               >
-                Xác nhận
+                {isPendingAction ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Đang xử lý...</span>
+                  </>
+                ) : (
+                  "Xác nhận từ chối"
+                )}
               </button>
             </div>
           </div>

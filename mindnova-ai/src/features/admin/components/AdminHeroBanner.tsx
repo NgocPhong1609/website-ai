@@ -19,7 +19,7 @@ export function AdminHeroBanner({ hero }: AdminHeroBannerProps) {
   };
 
   return (
-    <section className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-[linear-gradient(120deg,#08162d_0%,#122a49_35%,#1b3f6b_70%,#244f84_100%)] p-6 text-white shadow-[0_30px_70px_-35px_rgba(15,23,42,0.8)] lg:p-7">
+    <section className="relative overflow-hidden rounded-[24px] border border-slate-200 bg-[linear-gradient(120deg,#08162d_0%,#122a49_35%,#1b3f6b_70%,#244f84_100%)] py-4 px-5 lg:py-5 lg:px-6 text-white shadow-[0_20px_50px_-30px_rgba(15,23,42,0.8)]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.26),transparent_20%),radial-gradient(circle_at_bottom_left,rgba(99,102,241,0.28),transparent_30%)]" />
       <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-2xl">
