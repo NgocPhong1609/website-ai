@@ -44,7 +44,39 @@ class DashboardService
         // 3. AI Suggestion Box
         $aiSuggestion = null;
 
-        // 5. Overall Stats & Streak
+        // Daily Goal
+        $dailyTarget = 3; // Default daily goal
+        $completedToday = 0;
+        $weeklyActivity = [
+            'T2' => false, 'T3' => false, 'T4' => false, 'T5' => false, 
+            'T6' => false, 'T7' => false, 'CN' => false
+        ];
+        
+        if ($userId && class_exists(\App\Models\LessonCompletion::class)) {
+            $completedToday = \App\Models\LessonCompletion::where('user_id', $userId)
+                ->whereDate('completed_at', \Carbon\Carbon::today())
+                ->count();
+                
+            // Weekly activity
+            $startOfWeek = \Carbon\Carbon::now()->startOfWeek();
+            $completionsThisWeek = \App\Models\LessonCompletion::where('user_id', $userId)
+                ->whereBetween('completed_at', [$startOfWeek, \Carbon\Carbon::now()->endOfWeek()])
+                ->get();
+                
+            foreach ($completionsThisWeek as $completion) {
+                $dayOfWeek = \Carbon\Carbon::parse($completion->completed_at)->dayOfWeekIso; // 1 (Mon) to 7 (Sun)
+                $map = [1 => 'T2', 2 => 'T3', 3 => 'T4', 4 => 'T5', 5 => 'T6', 6 => 'T7', 7 => 'CN'];
+                $weeklyActivity[$map[$dayOfWeek]] = true;
+            }
+        }
+
+        $dailyGoal = [
+            'target' => $dailyTarget,
+            'completed' => $completedToday,
+            'percentage' => $dailyTarget > 0 ? min(100, round(($completedToday / $dailyTarget) * 100)) : 0
+        ];
+
+        // Overall Stats & Streak
         $overallProgressPct = 0;
         if ($userId && class_exists(\App\Models\Enrollment::class)) {
             $overallProgressPct = (int) \App\Models\Enrollment::where('user_id', $userId)->avg('progress_percentage');
@@ -76,6 +108,8 @@ class DashboardService
             'ai_suggestion' => $aiSuggestion,
             'overall_progress' => $overallProgress,
             'study_streak' => $studyStreak,
+            'daily_goal' => $dailyGoal,
+            'weekly_activity' => $weeklyActivity,
             'advanced_recommendations' => $advancedRecommendations,
         ];
     }

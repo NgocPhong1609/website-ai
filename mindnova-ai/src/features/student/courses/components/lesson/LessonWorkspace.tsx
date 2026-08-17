@@ -743,6 +743,30 @@ function LessonWorkspaceContent() {
   // Course title from API
   const courseTitle = apiDetail?.header_info?.title || "Khóa học";
 
+  // Render check for enrollment
+  if (apiDetail && !apiDetail.header_info?.is_enrolled) {
+    return (
+      <div className="w-full h-screen flex flex-col items-center justify-center bg-[#F9FAFB] p-6">
+        <div className="bg-white p-8 rounded-3xl shadow-sm max-w-md w-full text-center border border-[#E5E7EB]">
+          <div className="w-16 h-16 bg-[#FEE2E2] rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-[#111827] mb-2">Bạn chưa đăng ký khóa học này</h2>
+          <p className="text-sm text-[#6B7280] mb-6">Hãy đăng ký khóa học để bắt đầu học và trải nghiệm toàn bộ nội dung.</p>
+          <Link
+            href={`/courses/detail?courseId=${parsedCourseId}`}
+            className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-[#4F46E5] hover:bg-[#4338CA] text-white font-semibold transition-all shadow-sm"
+          >
+            Xem khóa học
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-white pb-24 relative">
       {/* ─── Top Header & Breadcrumb ─── */}

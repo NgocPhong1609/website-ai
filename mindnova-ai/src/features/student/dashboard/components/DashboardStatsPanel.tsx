@@ -65,9 +65,17 @@ function OverallProgressCard({ data }: { data: OverallProgress }) {
 
 // ─── Study Streak Card (Compact & Cohesive) ─────────────────────────────────
 
-function StudyStreakCard({ data }: { data: StudyStreak }) {
+function StudyStreakCard({ data, weeklyActivity }: { data: StudyStreak, weeklyActivity?: Record<string, boolean> }) {
   const { days, message } = data;
   const weekDays = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+  const defaultActivity: Record<string, boolean> = {
+    "T2": true, "T3": true, "T4": true, "T5": true, "T6": false, "T7": false, "CN": false
+  };
+  const activeDays = weeklyActivity || defaultActivity;
+
+  // Find today's index roughly by getting current day
+  const today = new Date().getDay();
+  const todayIndex = today === 0 ? 6 : today - 1; // 0 is Sunday in JS, map it to 6 (CN)
 
   return (
     <Link 
@@ -99,15 +107,15 @@ function StudyStreakCard({ data }: { data: StudyStreak }) {
         </div>
 
         <p className="text-xs text-[#64647A] font-normal leading-relaxed line-clamp-1">
-          Chỉ còn 2 ngày nữa để mở khóa huy chương Bạch Kim.
+          {message}
         </p>
       </div>
 
       {/* Rewarding Weekday Indicator (Compact & Soothing) */}
       <div className="grid grid-cols-7 gap-1.5 pt-3 border-t border-[#F0F0F8] mt-auto">
         {weekDays.map((d, i) => {
-          const isDone = i < 5;
-          const isToday = i === 4;
+          const isDone = activeDays[d] === true;
+          const isToday = i === todayIndex;
           return (
             <div key={i} className="flex flex-col items-center gap-1 group/day">
               <span className="text-[10px] font-medium text-[#7878A0]">{d}</span>
@@ -198,17 +206,19 @@ interface DashboardStatsPanelProps {
   overallProgress?: OverallProgress;
   studyStreak?: StudyStreak;
   focusAreas?: FocusAreaType[];
+  weeklyActivity?: Record<string, boolean>;
 }
 
 export function DashboardStatsPanel({
   overallProgress = OVERALL_PROGRESS,
   studyStreak = STUDY_STREAK,
   focusAreas = FOCUS_AREAS,
+  weeklyActivity,
 }: DashboardStatsPanelProps) {
   return (
     <section className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-label="Thống kê tổng quan học tập và trọng tâm AI">
       <OverallProgressCard data={overallProgress} />
-      <StudyStreakCard data={studyStreak} />
+      <StudyStreakCard data={studyStreak} weeklyActivity={weeklyActivity} />
       <FocusAreasCard areas={focusAreas} />
     </section>
   );

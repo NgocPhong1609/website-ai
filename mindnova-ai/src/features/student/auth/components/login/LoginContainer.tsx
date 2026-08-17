@@ -1,11 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { LoginForm } from "./LoginForm";
 import { RegisterForm } from "./RegisterForm";
 
 export default function LoginContainer() {
-  const [isFlipped, setIsFlipped] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  
+  const mode = searchParams?.get("mode");
+  const [isFlipped, setIsFlipped] = useState(mode === "register");
+
+  useEffect(() => {
+    setIsFlipped(mode === "register");
+  }, [mode]);
+
+  const handleFlipToRegister = () => {
+    setIsFlipped(true);
+    const newParams = new URLSearchParams(searchParams?.toString() || "");
+    newParams.set("mode", "register");
+    router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
+  };
+
+  const handleFlipToLogin = () => {
+    setIsFlipped(false);
+    const newParams = new URLSearchParams(searchParams?.toString() || "");
+    newParams.set("mode", "login");
+    router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
+  };
 
   return (
     <main
@@ -33,7 +57,7 @@ export default function LoginContainer() {
               zIndex: isFlipped ? 0 : 1,
             }}
           >
-            <LoginForm onFlipToRegister={() => setIsFlipped(true)} />
+            <LoginForm onFlipToRegister={handleFlipToRegister} />
           </div>
 
           {/* Back (Register) */}
@@ -47,7 +71,7 @@ export default function LoginContainer() {
               zIndex: !isFlipped ? 0 : 1,
             }}
           >
-            <RegisterForm onFlipToLogin={() => setIsFlipped(false)} />
+            <RegisterForm onFlipToLogin={handleFlipToLogin} />
           </div>
         </div>
       </div>

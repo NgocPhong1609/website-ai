@@ -164,7 +164,7 @@ export function ExploreCourses() {
         const headers: Record<string, string> = { "Content-Type": "application/json" };
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
-        const res = await fetch("/api/courses/available", { headers });
+        const res = await fetch("/api/student/courses/available", { headers });
         const data = await res.json();
         setCourses(Array.isArray(data) ? data : []);
       } catch (error: unknown) {
@@ -182,7 +182,7 @@ export function ExploreCourses() {
     <section className="mt-8">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-[18px] font-bold text-[#111827]">Explore Courses</h2>
-        <Link href="/courses" className="text-[13px] font-semibold text-[#4F46E5] hover:underline flex items-center gap-1">
+        <Link href="/explore" className="text-[13px] font-semibold text-[#4F46E5] hover:underline flex items-center gap-1">
           View All
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
         </Link>
