@@ -29,6 +29,7 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|max:255|unique:users,email,' . $user->id,
             'learning_goal' => 'sometimes|string|max:255',
             'skill_level' => 'sometimes|in:beginner,intermediate,advanced',
             'bio' => 'sometimes|string',
@@ -40,13 +41,20 @@ class UserController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Cập nhật bảng users (nếu có gửi lên name)
+        $userData = [];
+
         if ($request->has('name')) {
-            $user->update(['name' => $request->name]);
+            $userData['name'] = $request->name;
         }
 
-        // Cập nhật bảng user_profiles
-        // Sử dụng updateOrCreate để phòng trường hợp user chưa có record trong bảng profiles
+        if ($request->has('email')) {
+            $userData['email'] = $request->email;
+        }
+
+        if (!empty($userData)) {
+            $user->update($userData);
+        }
+
         $user->profile()->updateOrCreate(
             ['user_id' => $user->id],
             $request->only(['learning_goal', 'skill_level', 'bio', 'phone', 'address'])
@@ -54,7 +62,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'Cập nhật hồ sơ thành công',
-            'data' => $user->load('profile')
+            'data' => $user->fresh()->load('profile')
         ], 200);
     }
 

@@ -250,9 +250,24 @@ class CourseService
             $isEnrolled = \App\Models\Enrollment::where('user_id', $userId)->where('course_id', $courseId)->exists();
         }
 
+        $reviewCount = class_exists(\App\Models\Review::class)
+            ? \App\Models\Review::where('course_id', $courseId)->count()
+            : 0;
+        $averageRating = class_exists(\App\Models\Review::class)
+            ? \App\Models\Review::where('course_id', $courseId)->avg('rating')
+            : 0;
+        $averageRating = $averageRating !== null ? (float) $averageRating : 0.0;
+        $studentsCount = class_exists(\App\Models\Enrollment::class)
+            ? \App\Models\Enrollment::where('course_id', $courseId)->count()
+            : 0;
+
         $progressPercentage = ($totalLessons > 0) ? round(($completedLessons / $totalLessons) * 100) : 0;
         $timeLeftText = ($totalLessons - $completedLessons) * 15; // Giả định mỗi bài 15 phút
         $timeLeftTextStr = $timeLeftText > 0 ? floor($timeLeftText / 60) . 'h ' . ($timeLeftText % 60) . 'm thời lượng còn lại' : 'Đã hoàn thành khóa học';
+        $ratingText = $reviewCount > 0
+            ? number_format($averageRating, 1, '.', '') . ' ⭐ (' . $reviewCount . ' Đánh giá)'
+            : '0.0 ⭐ (0 Đánh giá)';
+        $studentsText = $studentsCount . ' Học viên tích cực';
 
         return [
             'header_info' => [
@@ -264,8 +279,8 @@ class CourseService
                 'next_lesson_title' => $nextLessonTitle,
                 'next_lesson_id' => $nextLessonId,
                 'duration_text' => ($totalLessons * 15) . ' Phút tổng cộng',
-                'rating_text' => '4.9 ⭐ (' . rand(100, 500) . ' Đánh giá)',
-                'students_text' => rand(500, 2000) . ' Học viên tích cực',
+                'rating_text' => $ratingText,
+                'students_text' => $studentsText,
                 'category_tag' => $categoryName,
                 'is_enrolled' => $isEnrolled,
                 'price' => isset($dbCourse) ? $dbCourse->price : 0,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { axiosClient } from "@/src/shared/lib/axios";
 import { MonitorIcon } from "./icons";
 
 function ActiveSessionsBox() {
