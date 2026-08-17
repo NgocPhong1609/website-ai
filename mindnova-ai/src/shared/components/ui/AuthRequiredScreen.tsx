@@ -10,7 +10,7 @@ interface AuthRequiredScreenProps {
 
 export default function AuthRequiredScreen({ intendedUrl = "/progress" }: AuthRequiredScreenProps) {
   const loginUrl = intendedUrl ? `/login?callbackUrl=${encodeURIComponent(intendedUrl)}` : "/login";
-  const registerUrl = intendedUrl ? `/register?callbackUrl=${encodeURIComponent(intendedUrl)}` : "/register";
+  const registerUrl = intendedUrl ? `/login?mode=register&callbackUrl=${encodeURIComponent(intendedUrl)}` : "/login?mode=register";
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 w-full h-full text-center">

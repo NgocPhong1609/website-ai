@@ -18,7 +18,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Nếu đã login mà vào trang login, đẩy về trang tương ứng
-  const authRoutes = ['/login', '/register'];
+  const authRoutes = ['/login'];
   if (authRoutes.includes(pathname) && token) {
     if (role === 'admin') return NextResponse.redirect(new URL('/admin', request.url));
     if (role === 'instructor') return NextResponse.redirect(new URL('/instructor/courses', request.url));
@@ -29,5 +29,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/instructor/:path*', '/admin/:path*', '/login', '/register'], // Bỏ /dashboard ở đây
+  matcher: ['/instructor/:path*', '/admin/:path*', '/login'], // Bỏ /dashboard ở đây
 };

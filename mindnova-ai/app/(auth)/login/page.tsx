@@ -7,6 +7,12 @@ export const metadata: Metadata = {
     "Sign in to MindNova AI and continue your personalized AI-powered learning journey.",
 };
 
+import { Suspense } from "react";
+
 export default function LoginPage() {
-  return <LoginContainer />;
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <LoginContainer />
+    </Suspense>
+  );
 }
