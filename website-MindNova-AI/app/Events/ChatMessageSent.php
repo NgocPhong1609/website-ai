@@ -6,11 +6,11 @@ use App\Models\ChatMessage;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ChatMessageSent implements ShouldBroadcast
+class ChatMessageSent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -31,9 +31,20 @@ class ChatMessageSent implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        return [
+        $channels = [
             new PrivateChannel('chat.conversation.' . $this->message->chat_conversation_id),
         ];
+
+        // Broadcast to other members' global user channel for unread notification
+        $members = \App\Models\ChatConversationMember::where('chat_conversation_id', $this->message->chat_conversation_id)
+            ->where('user_id', '!=', $this->message->sender_id)
+            ->get();
+
+        foreach ($members as $member) {
+            $channels[] = new PrivateChannel('App.Models.User.' . $member->user_id);
+        }
+
+        return $channels;
     }
     
     /**

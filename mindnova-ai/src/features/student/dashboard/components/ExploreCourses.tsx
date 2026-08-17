@@ -130,7 +130,7 @@ export function ExploreCourses() {
 
     setProcessingId(courseId); // Bật loading riêng cho nút này
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/orders", {
+      const response = await fetch("/api/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -164,7 +164,7 @@ export function ExploreCourses() {
         const headers: Record<string, string> = { "Content-Type": "application/json" };
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
-        const res = await fetch("http://127.0.0.1:8000/api/courses/available", { headers });
+        const res = await fetch("/api/courses/available", { headers });
         const data = await res.json();
         setCourses(Array.isArray(data) ? data : []);
       } catch (error: unknown) {

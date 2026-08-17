@@ -32,8 +32,36 @@ class ChatMessageRecalled implements ShouldBroadcastNow
      */
     public function broadcastOn(): array
     {
-        return [
+        $channels = [
             new PrivateChannel('chat.conversation.' . $this->message->chat_conversation_id),
         ];
+
+        // Broadcast to other members' global user channel
+        $members = \App\Models\ChatConversationMember::where('chat_conversation_id', $this->message->chat_conversation_id)
+            ->where('user_id', '!=', $this->message->sender_id)
+            ->get();
+
+        foreach ($members as $member) {
+            $channels[] = new PrivateChannel('App.Models.User.' . $member->user_id);
+        }
+
+        return $channels;
     }
+
+    /**
+     * Get the data to broadcast.
+     *
+     * @return array<string, mixed>
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'message' => [
+                'id' => $this->message->id,
+                'chat_conversation_id' => $this->message->chat_conversation_id,
+                'is_recalled' => true,
+            ]
+        ];
+    }
+
 }

@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Http;
 
 // ==========================================
 // IMPORT CÁC CONTROLLER TỪ ĐÚNG THƯ MỤC
@@ -35,6 +34,9 @@ use App\Http\Controllers\Api\Admin\ContentManagementController as AdminContentMa
 use App\Http\Controllers\Api\Admin\ModerationSupportController as AdminModerationSupportController;
 use App\Http\Controllers\Api\Admin\SystemConfigController as AdminSystemConfigController;
 use App\Http\Controllers\Api\Admin\UserManagementController as AdminUserManagementController;
+use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Api\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
 
 // Nhóm Instructor (Giáo viên)
 use App\Http\Controllers\Api\Instructor\CourseController;
@@ -49,8 +51,6 @@ use App\Http\Controllers\Api\Instructor\RevenueController;
 use App\Http\Controllers\Api\Instructor\CourseOutlineController;
 use App\Http\Controllers\Api\Instructor\ContentReviewController as InstructorContentReviewController;
 
-// Nhóm Admin Review
-use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
 // ==========================================
@@ -63,6 +63,7 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 });
 
+<<<<<<< HEAD
 // -- API VNPay IPN (Webhooks) --
 Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
 
@@ -80,7 +81,10 @@ Route::post('/student/onboarding', [OnboardingController::class, 'store']);
 // 🌟 BƯỚC 1: ĐẶT API AI PHÂN TÍCH BÀI HỌC VÀ GỢI Ý KHÓA HỌC Ở ĐÂY
 Route::post('/student/analyze-lesson', [\App\Http\Controllers\Api\Student\AnalyzeLessonController::class, 'analyze']);
 
+=======
+>>>>>>> e340ed07a201fdd23988545e9dc40b471e7686da
 // Payment IPN (Webhook) - Cần public để Momo/VNPAY gọi
+Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
 Route::get('/student/payment/vnpay-ipn', [OrderController::class, 'vnpayIpn']);
 Route::post('/student/payment/momo-ipn', [OrderController::class, 'momoIpn']);
 
@@ -101,6 +105,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // -- Chat & Messaging System --
     Route::prefix('chat')->group(function () {
+        Route::get('/unread-count', [ChatController::class, 'unreadCount']);
         Route::get('/conversations', [ChatController::class, 'index']);
         Route::get('/conversations/{id}/messages', [ChatController::class, 'messages']);
         Route::post('/conversations/{id}/messages', [ChatController::class, 'sendMessage']);
@@ -121,9 +126,25 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders', [OrderController::class, 'store']);
 
     // ==========================================
-    // 3. NHÓM API HỌC SINH (Student) - Các tiện ích cần xác thực
+    // 3. NHÓM API HỌC SINH (Student)
     // ==========================================
     Route::prefix('student')->group(function () {
+
+        // 🌟 TÍNH NĂNG ONBOARDING & AI PHÂN TÍCH BÀI HỌC
+        Route::post('/onboarding', [OnboardingController::class, 'store']);
+        Route::get('/available-topics', [OnboardingController::class, 'getAvailableTopics']);
+        Route::post('/analyze-lesson', [OnboardingController::class, 'analyzeLesson']);
+
+        // Dashboard, Study Plan & Quizzes
+        Route::get('/dashboard', [StudentDashboardController::class, 'overview']);
+        Route::get('/study-plan', [StudentStudyPlanController::class, 'overview']);
+        Route::get('/practice/overview', [StudentPracticeController::class, 'overview']);
+        Route::get('/progress/overview', [StudentProgressController::class, 'overview']);
+        Route::get('/history/overview', [StudentHistoryController::class, 'overview']);
+        Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
+        Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
+        Route::post('/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
+
         // Enrolled Courses
         Route::get('/courses/enrolled', [\App\Http\Controllers\Api\Student\CourseController::class, 'enrolledCourses']);
 
@@ -131,7 +152,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/orders/transaction/{transactionId}', [OrderController::class, 'showByTransaction']);
 
         // TÍNH NĂNG AI TUTOR & Các tiện ích nâng cao khác
-        Route::post('/ai-tutor/chat', [\App\Http\Controllers\Api\Student\AiTutorController::class, 'streamChat']);
+        Route::post('/ai-tutor/chat', [AiTutorController::class, 'streamChat']);
         Route::post('/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'store']);
         Route::put('/courses/{course}/reviews/{review}', [\App\Http\Controllers\Api\Student\ReviewController::class, 'update']);
         Route::delete('/courses/{course}/reviews/{review}', [\App\Http\Controllers\Api\Student\ReviewController::class, 'destroy']);
@@ -194,27 +215,22 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::delete('lessons/{lesson}/quiz', [QuizController::class, 'destroy']);
 
     // Students
-    Route::get('/students/export', [App\Http\Controllers\Api\Instructor\StudentController::class, 'exportCsv']);
-    Route::get('/students/analytics', [App\Http\Controllers\Api\Instructor\StudentController::class, 'getAnalytics']);
-    Route::get('/students/discussions', [App\Http\Controllers\Api\Instructor\StudentController::class, 'getDiscussions']);
-    Route::post('/students/ai-notification/generate', [App\Http\Controllers\Api\Instructor\StudentController::class, 'generateAiNotification']);
-    Route::post('/students/notifications', [App\Http\Controllers\Api\Instructor\StudentController::class, 'sendNotification']);
-    Route::get('/students/notification-options', [App\Http\Controllers\Api\Instructor\StudentController::class, 'getNotificationOptions']);
-    Route::get('/students', [App\Http\Controllers\Api\Instructor\StudentController::class, 'index']);
+    Route::get('students/export', [InstructorStudentController::class, 'exportCsv']);
+    Route::get('students/analytics', [InstructorStudentController::class, 'getAnalytics']);
+    Route::get('students/discussions', [InstructorStudentController::class, 'getDiscussions']);
+    Route::post('students/ai-notification/generate', [InstructorStudentController::class, 'generateAiNotification']);
+    Route::post('students/notifications', [InstructorStudentController::class, 'sendNotification']);
+    Route::get('students/notification-options', [InstructorStudentController::class, 'getNotificationOptions']);
+    Route::get('students', [InstructorStudentController::class, 'index']);
+    Route::get('students/{student}/progress', [InstructorStudentController::class, 'progress']);
 
     // Student Analytics Dashboard
-    Route::get('/student-analytics/dashboard-metrics', [\App\Http\Controllers\Api\Instructor\StudentAnalyticsController::class, 'dashboardMetrics']);
-    Route::get('/student-analytics/engagement-chart', [\App\Http\Controllers\Api\Instructor\StudentAnalyticsController::class, 'engagementChart']);
-    
-    Route::get('/students/{id}/progress', [App\Http\Controllers\Api\Instructor\StudentController::class, 'progress']);
+    Route::get('student-analytics/dashboard-metrics', [\App\Http\Controllers\Api\Instructor\StudentAnalyticsController::class, 'dashboardMetrics']);
+    Route::get('student-analytics/engagement-chart', [\App\Http\Controllers\Api\Instructor\StudentAnalyticsController::class, 'engagementChart']);
 
     // Discussions
     Route::get('discussions', [InstructorDiscussionController::class, 'index']);
     Route::post('discussions/{discussion}/replies', [InstructorDiscussionController::class, 'reply']);
-    Route::patch('discussions/{discussion}/pin', [InstructorDiscussionController::class, 'pin']);
-    Route::patch('discussions/{discussion}/best-answer', [InstructorDiscussionController::class, 'bestAnswer']);
-    Route::patch('discussions/{discussion}/resolved', [InstructorDiscussionController::class, 'toggleResolved']);
-    Route::delete('discussions/{discussion}', [InstructorDiscussionController::class, 'destroy']);
 
     // Notifications
     Route::post('notifications', [InstructorNotificationController::class, 'store']);
@@ -224,10 +240,10 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::post('revenue/withdraw', [RevenueController::class, 'requestWithdraw']);
     Route::get('revenue/transactions', [RevenueController::class, 'getTransactions']);
     Route::get('revenue/sales-report', [RevenueController::class, 'getSalesReport']);
-    
+
     // Orders
     Route::get('orders', [\App\Http\Controllers\Api\Instructor\OrderController::class, 'index']);
-    
+
     // Reviews
     Route::get('reviews', [\App\Http\Controllers\Api\Instructor\ReviewController::class, 'index']);
 
@@ -257,6 +273,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::delete('/users/{id}', [AdminUserManagementController::class, 'destroy']);
     Route::get('/users/{id}/activity', [AdminUserManagementController::class, 'activity']);
     Route::get('/teachers/review-queue', [AdminUserManagementController::class, 'teacherQueue']);
+    Route::get('/teacher-approvals', [AdminUserManagementController::class, 'teacherQueue']);
     Route::patch('/teachers/{id}/verify', [AdminUserManagementController::class, 'verifyTeacher']);
 
     // 2) AI and system configuration
@@ -279,6 +296,10 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
 
     // 4) Analytics and reports
     Route::get('/analytics/dashboard', [AdminAnalyticsController::class, 'dashboard']);
+    Route::get('/revenue', [AdminDashboardController::class, 'revenue']);
+
+    // 4.5) Coupons
+    Route::apiResource('/coupons', AdminCouponController::class);
 
     // 5) Moderation and support
     Route::get('/moderation/flags', [AdminModerationSupportController::class, 'flags']);

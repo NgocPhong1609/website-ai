@@ -31,8 +31,6 @@ class Enrollment extends Model
                 \App\Models\ChatConversationMember::firstOrCreate([
                     'chat_conversation_id' => $conversation->id,
                     'user_id' => $enrollment->user_id
-                ], [
-                    'joined_at' => now(),
                 ]);
             }
         });

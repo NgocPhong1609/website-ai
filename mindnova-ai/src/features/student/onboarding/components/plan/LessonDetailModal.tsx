@@ -35,7 +35,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
         setLoading(true);
         setDetails(null); // Reset dữ liệu cũ ngay lập tức để hiện vòng tròn loading
         try {
-          const res = await fetch("http://localhost:8000/api/student/analyze-lesson", {
+          const res = await fetch("/api/student/analyze-lesson", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

@@ -172,7 +172,7 @@ class ChatController extends Controller
      */
     public function recallMessage(Request $request, $conversationId, $messageId): JsonResponse
     {
-        $userId = $request->user()->id;
+        $userId = (int) $request->user()->id;
 
         // Check permission for conversation
         $conversation = ChatConversation::whereHas('members', function ($query) use ($userId) {
@@ -182,11 +182,15 @@ class ChatController extends Controller
         $message = ChatMessage::where('chat_conversation_id', $conversationId)
             ->findOrFail($messageId);
 
-        if ($message->sender_id !== $userId) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        if ((int) $message->sender_id !== $userId) {
+            return response()->json(['message' => 'Unauthorized. You can only recall your own messages.'], 403);
         }
 
-        if ($message->created_at->diffInHours(now()) >= 1) {
+        if ($message->is_recalled) {
+            return response()->json(['message' => 'Message is already recalled.'], 400);
+        }
+
+        if ($message->created_at->diffInMinutes(now()) >= 60) {
             return response()->json(['message' => 'Message is too old to be recalled'], 400);
         }
 
@@ -197,5 +201,38 @@ class ChatController extends Controller
         broadcast(new \App\Events\ChatMessageRecalled($message))->toOthers();
 
         return response()->json(['status' => 'success', 'data' => $message]);
+    }
+    /**
+     * Get the total unread message count for the authenticated user.
+     */
+    public function unreadCount(Request $request): JsonResponse
+    {
+        $userId = $request->user()->id;
+
+        $conversations = ChatConversation::whereHas('members', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
+
+        $totalUnread = 0;
+
+        foreach ($conversations as $conversation) {
+            $lastReadMessageId = DB::table('chat_conversation_members')
+                ->where('chat_conversation_id', $conversation->id)
+                ->where('user_id', $userId)
+                ->value('last_read_message_id');
+
+            $unreadInConv = ChatMessage::where('chat_conversation_id', $conversation->id)
+                ->where('id', '>', $lastReadMessageId ?? 0)
+                ->count();
+                
+            $totalUnread += $unreadInConv;
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'unread_count' => $totalUnread
+            ]
+        ]);
     }
 }
