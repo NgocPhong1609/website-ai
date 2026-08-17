@@ -5,12 +5,12 @@ export async function AdminCategoriesPage() {
   const data = await getAdminCategoriesPageData();
 
   return (
-    <div className="space-y-6 p-6 lg:p-8 [font-family:var(--font-admin-body)]">
-      <section className="mn-stagger rounded-[30px] border border-cyan-200/20 bg-[linear-gradient(125deg,#10223f_0%,#0f3f5f_50%,#0f766e_100%)] p-6 text-white shadow-[0_30px_70px_-30px_rgba(13,23,56,0.95)]">
+    <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+      <section className="mn-stagger rounded-2xl border border-cyan-200/20 bg-[linear-gradient(125deg,#10223f_0%,#0f3f5f_50%,#0f766e_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
         <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-cyan-100/70">Danh mục khóa học</p>
-          <h1 className="mt-2 text-3xl font-semibold [font-family:var(--font-admin-head)]">Kiểm duyệt danh mục khóa học</h1>
-          <p className="mt-2 text-sm text-slate-200/90">Theo dõi trạng thái danh mục để đảm bảo nội dung hiển thị đúng tiêu chuẩn kiểm duyệt.</p>
+          <p className="text-[10px] uppercase tracking-[0.35em] text-cyan-100/70">Danh mục khóa học</p>
+          <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Kiểm duyệt danh mục khóa học</h1>
+          <p className="mt-1 text-xs text-slate-200/90">Theo dõi trạng thái danh mục để đảm bảo nội dung hiển thị đúng tiêu chuẩn kiểm duyệt.</p>
         </div>
       </section>
 

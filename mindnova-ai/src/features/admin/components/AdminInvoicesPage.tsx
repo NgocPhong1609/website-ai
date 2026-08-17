@@ -39,11 +39,11 @@ export async function AdminInvoicesPage({ filters }: AdminInvoicesPageProps) {
   const data = await getAdminInvoicesPageData(filters);
 
   return (
-    <div className="space-y-6 p-6 lg:p-8 [font-family:var(--font-admin-body)]">
-      <section className="mn-stagger rounded-[30px] border border-cyan-200/20 bg-[linear-gradient(125deg,#0d1d3f_0%,#17386d_48%,#0f766e_100%)] p-6 text-white shadow-[0_30px_70px_-30px_rgba(13,23,56,0.95)]">
-        <p className="text-xs uppercase tracking-[0.35em] text-cyan-100/70">Hóa đơn</p>
-        <h1 className="mt-2 text-3xl font-semibold [font-family:var(--font-admin-head)]">Danh sách hóa đơn</h1>
-        <p className="mt-2 text-sm text-slate-200/90">Theo dõi tình trạng hóa đơn, phương thức thanh toán và tổng tiền đơn hàng.</p>
+    <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+      <section className="mn-stagger rounded-2xl border border-cyan-200/20 bg-[linear-gradient(125deg,#0d1d3f_0%,#17386d_48%,#0f766e_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
+        <p className="text-[10px] uppercase tracking-[0.35em] text-cyan-100/70">Hóa đơn</p>
+        <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Danh sách hóa đơn</h1>
+        <p className="mt-1 text-xs text-slate-200/90">Theo dõi tình trạng hóa đơn, phương thức thanh toán và tổng tiền đơn hàng.</p>
       </section>
 
       <section className="rounded-2xl border border-cyan-100/80 bg-white/95 p-4 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">

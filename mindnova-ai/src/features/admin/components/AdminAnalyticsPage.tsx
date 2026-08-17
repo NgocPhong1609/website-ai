@@ -70,12 +70,12 @@ export function AdminAnalyticsPage() {
   }, [period]);
 
   return (
-    <div className="space-y-6 p-6 lg:p-8 [font-family:var(--font-admin-body)]">
-      <section className="rounded-[28px] border border-cyan-200/20 bg-[linear-gradient(120deg,#0c1f36_0%,#1d4ed8_46%,#0f766e_100%)] p-6 text-white shadow-[0_30px_70px_-35px_rgba(7,18,45,0.8)]">
+    <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+      <section className="rounded-2xl border border-cyan-200/20 bg-[linear-gradient(120deg,#0c1f36_0%,#1d4ed8_46%,#0f766e_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.8)]">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.34em] text-cyan-100/70">Analytics & Dashboard</p>
-            <h1 className="mt-2 text-3xl font-semibold [font-family:var(--font-admin-head)]">Báo cáo tài chính, học tập và hệ thống</h1>
+            <p className="text-[10px] uppercase tracking-[0.34em] text-cyan-100/70">Analytics & Dashboard</p>
+            <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Báo cáo tài chính, học tập và hệ thống</h1>
           </div>
 
           <select value={period} onChange={(event) => setPeriod(event.target.value)} className="rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-sm text-white backdrop-blur">
