@@ -164,7 +164,7 @@ export function ExploreCourses() {
         const headers: Record<string, string> = { "Content-Type": "application/json" };
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
-        const res = await fetch("/api/courses/available", { headers });
+        const res = await fetch("/api/student/courses/available", { headers });
         const data = await res.json();
         setCourses(Array.isArray(data) ? data : []);
       } catch (error: unknown) {

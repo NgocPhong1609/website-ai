@@ -43,18 +43,10 @@ export function SecurityPanel() {
     setIsLoading(true);
     setErrorMsg(null);
     try {
-      const token = window.localStorage.getItem("accessToken");
-      const res = await fetch("/api/profile/change-password/request-otp", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Không thể gửi OTP.");
+      const res = await axiosClient.post("/api/profile/change-password/request-otp");
       setStep("VERIFY");
     } catch (err: any) {
-      setErrorMsg(err.message);
+      setErrorMsg(err.response?.data?.message || err.message || "Không thể gửi OTP.");
     } finally {
       setIsLoading(false);
     }
@@ -65,17 +57,11 @@ export function SecurityPanel() {
     setIsLoading(true);
     setErrorMsg(null);
     try {
-      const token = window.localStorage.getItem("accessToken");
-      const res = await fetch("/api/profile/change-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({ otp, new_password: newPw, new_password_confirmation: confirmPw })
+      const res = await axiosClient.post("/api/profile/change-password", {
+        otp,
+        new_password: newPw,
+        new_password_confirmation: confirmPw,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Đổi mật khẩu thất bại.");
       setStep("SUCCESS");
       setTimeout(() => {
         setStep("REQUEST");
@@ -84,7 +70,7 @@ export function SecurityPanel() {
         setConfirmPw("");
       }, 3000);
     } catch (err: any) {
-      setErrorMsg(err.message);
+      setErrorMsg(err.response?.data?.message || err.message || "Đổi mật khẩu thất bại.");
     } finally {
       setIsLoading(false);
     }

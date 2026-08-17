@@ -250,7 +250,8 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     // Reviews
     Route::get('reviews', [\App\Http\Controllers\Api\Instructor\ReviewController::class, 'index']);
 
-    // AI Course Outline
+    // AI Quiz & Course Outline
+    Route::post('ai-quiz/generate', [CourseOutlineController::class, 'generateQuiz']);
     Route::post('courses/ai-outline/generate', [CourseOutlineController::class, 'generate']);
     Route::post('courses/{course}/ai-outline/save', [CourseOutlineController::class, 'save']);
 
