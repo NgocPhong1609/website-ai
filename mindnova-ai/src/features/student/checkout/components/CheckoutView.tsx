@@ -35,36 +35,54 @@ export function CheckoutView({ courseId }: { courseId: number }) {
   const handleCheckout = async () => {
     try {
       setIsProcessing(true);
+
+      const hasToken = typeof window !== "undefined" && !!(window.localStorage.getItem("accessToken") || document.cookie.includes("accessToken="));
+      if (!hasToken) {
+        setIsProcessing(false);
+        alert("Bạn cần đăng nhập để nhận khóa học hoặc thanh toán.");
+        router.push("/login");
+        return;
+      }
+
       const methodToUse = isFree ? "free" : paymentMethod;
       const res = await checkoutService.createOrder([courseId], methodToUse);
+
       if (res.success) {
         if (isFree) {
-           router.push(`/courses/lesson?courseId=${courseId}`);
-        } else if (!res.payment_url && process.env.NODE_ENV === "development") {
-           // Dev environment mock payment
-           try {
-             // @ts-ignore
-             await checkoutService.devCompleteOrder(res.data.id);
-             // @ts-ignore
-             router.push(`/payment/callback?orderId=${res.data.transaction_id}&course_id=${courseId}`);
-           } catch(e) {
-             console.error("Mock payment failed:", e);
-             alert("Lỗi Dev mock payment");
-             setIsProcessing(false);
-           }
-        } else if (!res.payment_url) {
-           alert("Lỗi không lấy được URL thanh toán. Vui lòng thử lại.");
-           setIsProcessing(false);
-        } else {
-           window.location.href = res.payment_url;
+          router.replace(`/courses/detail?courseId=${courseId}`);
+          return;
         }
-      } else {
-        alert(res.message || "Có lỗi xảy ra khi tạo thanh toán.");
-        setIsProcessing(false);
+
+        if (!res.payment_url && process.env.NODE_ENV === "development") {
+          try {
+            // @ts-ignore
+            await checkoutService.devCompleteOrder(res.data.id);
+            // @ts-ignore
+            router.push(`/payment/callback?orderId=${res.data.transaction_id}&course_id=${courseId}`);
+            return;
+          } catch (e) {
+            console.error("Mock payment failed:", e);
+            alert("Lỗi Dev mock payment");
+            setIsProcessing(false);
+            return;
+          }
+        }
+
+        if (!res.payment_url) {
+          alert("Lỗi không lấy được URL thanh toán. Vui lòng thử lại.");
+          setIsProcessing(false);
+          return;
+        }
+
+        window.location.href = res.payment_url;
+        return;
       }
+
+      alert(res.message || "Có lỗi xảy ra khi tạo thanh toán.");
+      setIsProcessing(false);
     } catch (err) {
       console.error(err);
-      alert("Lỗi kết nối đến cổng thanh toán.");
+      alert("Lỗi kết nối đến cổng thanh toán. Vui lòng thử lại sau.");
       setIsProcessing(false);
     }
   };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { axiosClient } from "@/src/shared/lib/axios";
 import { MonitorIcon } from "./icons";
 
 function ActiveSessionsBox() {
@@ -35,15 +36,27 @@ export function SecurityPanel() {
 
   const canSave = currentPw.length > 0 && newPw.length >= 6 && newPw === confirmPw;
 
-  function handleUpdate() {
+  async function handleUpdate() {
     if (!canSave) return;
-    setUpdated(true);
-    setTimeout(() => {
-      setUpdated(false);
-      setCurrentPw("");
-      setNewPw("");
-      setConfirmPw("");
-    }, 2500);
+
+    try {
+      await axiosClient.post("/api/profile/change-password", {
+        current_password: currentPw,
+        new_password: newPw,
+        new_password_confirmation: confirmPw,
+      });
+
+      setUpdated(true);
+      setTimeout(() => {
+        setUpdated(false);
+        setCurrentPw("");
+        setNewPw("");
+        setConfirmPw("");
+      }, 2500);
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.response?.data?.errors?.new_password?.[0] || "Không thể đổi mật khẩu. Vui lòng thử lại.";
+      alert(message);
+    }
   }
 
   return (

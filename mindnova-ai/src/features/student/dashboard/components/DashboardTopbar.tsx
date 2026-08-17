@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { axiosClient } from "@/src/shared/lib/axios";
+import { readStoredUser } from "@/src/shared/lib/userStorage";
 import { twMerge } from "tailwind-merge";
 import { NotificationModal } from "./NotificationModal";
 
@@ -34,25 +36,22 @@ function SettingsIcon() {
 }
 
 export function DashboardTopbar() {
+  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotif, setShowNotif] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<any | null>(null);
+  const [user, setUser] = useState<any>(null);
 
-  // Kiểm tra trạng thái đăng nhập khi component được tải lên trình duyệt
-  useEffect(() => {
-    setIsMounted(true);
-    const token = window.localStorage.getItem("accessToken");
-    if (token) {
-      setIsLoggedIn(true);
-      fetchNotifications();
-    }
-  }, []);//không phải bị lỗi đâu đừng có xóa
+  const syncUserFromStorage = () => {
+    const storedUser = readStoredUser();
+    setUser(storedUser ?? null);
+  };
 
   const fetchNotifications = async () => {
     try {
-      const res = await axiosClient.get("/student/notifications");
+      const res = await axiosClient.get("/api/student/notifications");
       if (res.data && res.data.data) {
         setNotifications(res.data.data);
       }
@@ -61,10 +60,24 @@ export function DashboardTopbar() {
     }
   };
 
+  useEffect(() => {
+    setIsMounted(true);
+    syncUserFromStorage();
+    const token = window.localStorage.getItem("accessToken");
+    if (token) {
+      setIsLoggedIn(true);
+      fetchNotifications();
+    }
+
+    const handleUserUpdated = () => syncUserFromStorage();
+    window.addEventListener("user:updated", handleUserUpdated);
+    return () => window.removeEventListener("user:updated", handleUserUpdated);
+  }, []);
+
   const handleDeleteRead = async () => {
     if (window.confirm("Bạn có chắc muốn xóa tất cả thông báo đã đọc?")) {
       try {
-        await axiosClient.delete("/student/notifications/read");
+        await axiosClient.delete("/api/student/notifications/read");
         setNotifications((prev) => prev.filter((n) => !n.is_read));
       } catch (error) {
         console.error("Failed to delete read notifications", error);
@@ -74,7 +87,7 @@ export function DashboardTopbar() {
 
   const markAsRead = async (id: number) => {
     try {
-      await axiosClient.patch(`/student/notifications/${id}/read`);
+      await axiosClient.patch(`/api/student/notifications/${id}/read`);
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: 1 } : n));
     } catch (error) {
       console.error("Failed to mark as read", error);
@@ -222,16 +235,25 @@ export function DashboardTopbar() {
         <span className="w-px h-6 bg-[#EAEAF4] hidden sm:block" />
 
         {/* Dynamic Interactive Avatar */}
-        <div className="relative group">
-          <button
-            type="button"
-            aria-label="User profile"
-            className="focus:outline-none group/avatar hover:scale-105 active:scale-95 transition-transform duration-200"
-          >
-            <Avatar fallback="MN" size="md" className="ring-2 ring-white hover:shadow-[0_4px_12px_rgba(107,107,255,0.4)] transition-all duration-200" />
-          </button>
+        <button
+          type="button"
+          onClick={() => router.push("/profile")}
+          className="relative group flex items-center gap-2 cursor-pointer focus:outline-none hover:opacity-90"
+          aria-label="Đi tới trang cá nhân"
+        >
+          <div className="group/avatar hover:scale-105 active:scale-95 transition-transform duration-200">
+            <Avatar
+              src={user?.avatar_url || user?.avatar || null}
+              fallback={((user?.name || "MN").trim().split(/\s+/).slice(-2).map((part: string) => part[0]).join("") || "MN").toUpperCase()}
+              size="md"
+              className="ring-2 ring-white hover:shadow-[0_4px_12px_rgba(107,107,255,0.4)] transition-all duration-200"
+            />
+          </div>
+          {user?.name && (
+            <span className="hidden md:inline text-sm font-semibold text-[#1A1A2E]">{user.name}</span>
+          )}
           <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#10B981] border-2 border-white shadow-xs animate-pulse" title="Online" />
-        </div>
+        </button>
       </div>
       </header>
 

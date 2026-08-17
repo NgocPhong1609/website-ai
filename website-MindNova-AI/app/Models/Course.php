@@ -157,8 +157,12 @@ class Course extends Model
 
     public function getDurationHoursAttribute(): float
     {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('lessons') || !\Illuminate\Support\Facades\Schema::hasColumn('lessons', 'duration_seconds')) {
+            return 0.0;
+        }
+
         $totalSeconds = \App\Models\Lesson::whereIn('module_id', $this->modules()->select('id'))->sum('duration_seconds');
-        return round($totalSeconds / 3600, 1);
+        return round((float) ($totalSeconds ?? 0) / 3600, 1);
     }
 
     public function getCurrentPriceAttribute()

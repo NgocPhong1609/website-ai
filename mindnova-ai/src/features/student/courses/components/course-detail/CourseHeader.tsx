@@ -1,23 +1,47 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import type { CourseDetailHeaderInfo } from "../../types";
 
+const SAVED_COURSES_KEY = "mindnova_saved_courses_v1";
+
 export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
   const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    if (!info?.id) return;
+
+    try {
+      const raw = window.localStorage.getItem(SAVED_COURSES_KEY);
+      const savedIds = raw ? (JSON.parse(raw) as Array<string | number>) : [];
+      setIsSaved(savedIds.some((id) => String(id) === String(info.id)));
+    } catch {
+      setIsSaved(false);
+    }
+  }, [info?.id]);
 
   const title = info?.title || "AI & Neural Networks • Fullstack Next.js 15";
   const level = info?.level || "Intermediate";
   const description = info?.description || "Chuyên đề đào tạo toàn diện: từ kiến trúc mạng Nơ-ron lượng tử, thuật toán tối ưu hóa cho đến mô hình Transformers tạo sinh trong các hệ thống phần mềm thực tế.";
   const nextLesson = info?.next_lesson_title || "RMSprop Optimization & Adam Optimizer";
   const nextLessonId = info?.next_lesson_id || "l1-2";
-  const durationText = info?.duration_text || "32 Giờ tổng cộng";
-  const ratingText = info?.rating_text || "4.9 ⭐ (315 Đánh giá)";
-  const studentsText = info?.students_text || "1,248 Học viên tích cực";
+  const durationText = info?.duration_text || "0 Phút tổng cộng";
+  const ratingText = info?.rating_text || "0.0 ⭐ (0 Đánh giá)";
+  const studentsText = info?.students_text || "0 Học viên tích cực";
   const categoryTag = info?.category_tag || "Chuyên đề Core AI • Kỳ II";
 
   const handleSaveToggle = () => {
+    if (!info?.id) return;
+
+    const courseId = String(info.id);
+    const raw = window.localStorage.getItem(SAVED_COURSES_KEY);
+    const savedIds: Array<string | number> = raw ? JSON.parse(raw) : [];
+    const nextSavedIds = isSaved
+      ? savedIds.filter((id) => String(id) !== courseId)
+      : [...savedIds.filter((id) => String(id) !== courseId), courseId];
+
+    window.localStorage.setItem(SAVED_COURSES_KEY, JSON.stringify(nextSavedIds));
     setIsSaved(!isSaved);
     alert(!isSaved ? "🔖 Đã lưu khóa học vào danh sách quan tâm của bạn!" : "Đã bỏ lưu khóa học.");
   };

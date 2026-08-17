@@ -162,3 +162,92 @@ export function useCreateDiscussion() {
     },
   });
 }
+
+// ─── Course Review APIs ────────────────────────────────────────────────────────
+
+export interface CourseReviewItem {
+  id: number | string;
+  user_id?: number | string;
+  rating: number;
+  comment: string;
+  created_at?: string;
+  user?: {
+    id?: number | string;
+    name?: string;
+    avatar_url?: string | null;
+  };
+}
+
+export interface CourseReviewsResponse {
+  count: number;
+  average_rating: number;
+  reviews: CourseReviewItem[];
+}
+
+export function useGetCourseReviews(courseId: string | number) {
+  return useQuery({
+    queryKey: ["student", "courses", courseId, "reviews"],
+    queryFn: async (): Promise<CourseReviewsResponse> => {
+      const { data } = await axiosClient.get(`/api/student/courses/${courseId}/reviews`);
+      return data.data;
+    },
+    enabled: !!courseId,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    retry: 1,
+  });
+}
+
+export function useCreateCourseReview() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ courseId, rating, comment }: { courseId: string | number; rating: number; comment: string }) => {
+      const { data } = await axiosClient.post(`/api/student/courses/${courseId}/reviews`, { rating, comment });
+      return data.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.removeQueries({
+        queryKey: ["student", "courses", variables.courseId, "reviews"],
+        exact: true,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["student", "courses", variables.courseId, "reviews"],
+      });
+    },
+  });
+}
+
+export function useUpdateCourseReview() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ courseId, reviewId, rating, comment }: { courseId: string | number; reviewId: string | number; rating: number; comment: string }) => {
+      const { data } = await axiosClient.put(`/api/student/courses/${courseId}/reviews/${reviewId}`, { rating, comment });
+      return data.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["student", "courses", variables.courseId, "reviews"],
+      });
+    },
+  });
+}
+
+export function useDeleteCourseReview() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ courseId, reviewId }: { courseId: string | number; reviewId: string | number }) => {
+      const { data } = await axiosClient.delete(`/api/student/courses/${courseId}/reviews/${reviewId}`);
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["student", "courses", variables.courseId, "reviews"],
+      });
+    },
+  });
+}

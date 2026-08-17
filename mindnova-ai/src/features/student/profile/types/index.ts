@@ -16,5 +16,6 @@ export interface UserProfile {
   bio: string;
   major: string;
   avatarInitials: string;
+  avatarUrl?: string | null;
   completionPercent: number;
 }

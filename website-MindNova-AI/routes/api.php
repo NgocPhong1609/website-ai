@@ -74,6 +74,7 @@ Route::get('/student/progress/overview', [StudentProgressController::class, 'ove
 Route::get('/student/history/overview', [StudentHistoryController::class, 'overview']);
 Route::get('/student/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
 Route::get('/student/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
+Route::get('/student/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'index']);
 Route::post('/student/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
 Route::post('/student/onboarding', [OnboardingController::class, 'store']);
 // 🌟 BƯỚC 1: ĐẶT API AI PHÂN TÍCH BÀI HỌC VÀ GỢI Ý KHÓA HỌC Ở ĐÂY
@@ -132,6 +133,8 @@ Route::middleware('auth:sanctum')->group(function () {
         // TÍNH NĂNG AI TUTOR & Các tiện ích nâng cao khác
         Route::post('/ai-tutor/chat', [\App\Http\Controllers\Api\Student\AiTutorController::class, 'streamChat']);
         Route::post('/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'store']);
+        Route::put('/courses/{course}/reviews/{review}', [\App\Http\Controllers\Api\Student\ReviewController::class, 'update']);
+        Route::delete('/courses/{course}/reviews/{review}', [\App\Http\Controllers\Api\Student\ReviewController::class, 'destroy']);
 
         // Quiz
         Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
