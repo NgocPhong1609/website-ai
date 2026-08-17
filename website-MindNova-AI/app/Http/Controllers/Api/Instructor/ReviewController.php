@@ -17,7 +17,7 @@ class ReviewController extends Controller
         $reviews = Review::whereHas('course', function ($q) use ($user) {
             $q->where('teacher_id', $user->id);
         })
-        ->with(['user:id,name,email,avatar', 'course:id,title,thumbnail'])
+        ->with(['user:id,name,email,avatar_url', 'course:id,title,thumbnail'])
         ->orderBy('created_at', 'desc')
         ->paginate(15);
 

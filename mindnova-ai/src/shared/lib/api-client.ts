@@ -38,7 +38,7 @@ export async function apiClient<T>(
   }
 
   const response = await fetch(url, {
-    signal: options.signal ?? AbortSignal.timeout(8000), // Prevent SSR blocking/hanging
+    signal: options.signal ?? AbortSignal.timeout(15000), // Prevent SSR blocking/hanging (15s limit)
     ...options,
     headers,
   });

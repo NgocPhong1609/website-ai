@@ -33,7 +33,7 @@ function UserAvatar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  const loadUser = React.useCallback(() => {
     try {
       const userInfoRaw = window.localStorage.getItem("userInfo");
       if (userInfoRaw) {
@@ -43,6 +43,16 @@ function UserAvatar() {
       console.error("Error parsing user info", e);
     }
   }, []);
+
+  React.useEffect(() => {
+    loadUser();
+    window.addEventListener("user:updated", loadUser);
+    window.addEventListener("storage", loadUser);
+    return () => {
+      window.removeEventListener("user:updated", loadUser);
+      window.removeEventListener("storage", loadUser);
+    };
+  }, [loadUser]);
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -74,7 +84,7 @@ function UserAvatar() {
   };
 
   const name = user?.name || "Teacher";
-  const avatarUrl = user?.avatar || user?.profile_image || null;
+  const avatarUrl = user?.avatar_url || user?.avatar || user?.profile_image || null;
   const initial = getInitial(name);
 
   return (

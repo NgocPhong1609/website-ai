@@ -106,25 +106,68 @@ export type AdminOverviewData = {
   quickActions: string[];
 };
 
-export type AdminTeacherCredentialItem = {
+export type AdminTeacherEvidenceItem = {
   id: number;
-  title: string | null;
-  fileUrl: string;
+  evidence_type: string;
+  original_name: string | null;
+  file_size: number | null;
+  mime_type: string | null;
+  created_at: string;
+};
+
+export type AdminTeacherCertificateItem = {
+  id: number;
+  teacher_id: number;
+  certificate_name: string;
+  issuing_organization: string | null;
+  certificate_number: string | null;
+  specialization: string | null;
+  issue_date: string | null;
+  expiry_date: string | null;
+  description: string | null;
+  certificate_image: string | null;
+  verification_url: string | null;
+  verification_status: "pending" | "approved" | "rejected" | "expired" | "revoked" | string;
+  verification_note: string | null;
+  verified_at: string | null;
+  is_public: boolean;
+  evidences?: AdminTeacherEvidenceItem[];
 };
 
 export type AdminTeacherApprovalRow = {
   id: number;
   name: string;
   email: string;
-  avatarUrl: string | null;
-  cvUrl: string | null;
-  expertise: string;
-  status: "pending" | "approved" | "rejected";
-  submittedAt: string;
-  experience: string;
-  credentialCount: number;
-  credentials: AdminTeacherCredentialItem[];
-  rating: number;
+  avatar_url: string | null;
+  role: string;
+  is_verified: boolean;
+  teacher_verification_status: "none" | "pending" | "approved" | "rejected" | "revoked" | string;
+  teacher_verification_note: string | null;
+  teacher_verified_at: string | null;
+  profile: {
+    bio: string | null;
+    phone: string | null;
+    address: string | null;
+    skill_level: string | null;
+    learning_goal: string | null;
+    cv_path: string | null;
+  } | null;
+  certificates: AdminTeacherCertificateItem[];
+  verification_request: {
+    id: number;
+    status: string;
+    submitted_at: string;
+    reviewed_at: string | null;
+    rejection_reason: string | null;
+  } | null;
+  // Fallbacks for backwards compatibility
+  avatarUrl?: string | null;
+  cvUrl?: string | null;
+  credentials?: AdminTeacherCertificateItem[];
+  status?: string;
+  expertise?: string;
+  experience?: string;
+  submittedAt?: string;
 };
 
 export type AdminTeacherApprovalData = {

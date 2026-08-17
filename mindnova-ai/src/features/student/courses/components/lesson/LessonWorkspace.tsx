@@ -9,6 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useGetCourseDetail, useInvalidateCourseDetail, completeLesson, fetchQuiz, checkQuizAnswer, submitQuiz, useGetDiscussions, useCreateDiscussion } from "../../api";
 import type { CourseDetailLessonItem, CourseDetailData } from "../../types";
 import { CustomVideoPlayer } from "./CustomVideoPlayer";
+import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 function CheckIcon() {
@@ -961,8 +962,9 @@ function LessonWorkspaceContent() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-2 mb-1">
-                                  <span className="font-bold text-sm text-[#111827] flex items-center gap-2">
-                                    {reply.user.name}
+                                  <span className="font-bold text-sm text-[#111827] flex items-center gap-1.5">
+                                    <span>{reply.user.name}</span>
+                                    <VerifiedTeacherBadge isVerified={(reply.user as any).is_verified ?? true} size="xs" />
                                     <span className="px-2 py-0.5 rounded text-[10px] font-bold text-white bg-[#4F46E5] uppercase tracking-wider">Giảng viên</span>
                                   </span>
                                   <span className="text-xs text-[#6B7280]">{new Date(reply.created_at).toLocaleString('vi-VN')}</span>

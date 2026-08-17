@@ -3,11 +3,11 @@ import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 
 // Setup Laravel Echo instance
-let echoInstance: Echo | null = null;
+let echoInstance: any = null;
 
 export const getEchoInstance = (token: string) => {
     if (!echoInstance) {
-        window.Pusher = Pusher;
+        (window as any).Pusher = Pusher;
         Pusher.logToConsole = true; // Enable debugging
         echoInstance = new Echo({
             broadcaster: 'reverb',

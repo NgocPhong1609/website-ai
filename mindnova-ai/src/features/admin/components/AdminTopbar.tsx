@@ -199,7 +199,7 @@ export function AdminTopbar() {
   };
 
   return (
-    <header className="flex h-24 shrink-0 items-center gap-4 border-b border-slate-200 bg-white/80 px-5 backdrop-blur-xl">
+    <header className="flex h-14 shrink-0 items-center gap-4 border-b border-slate-200 bg-white/80 px-5 backdrop-blur-xl">
       <div className="flex flex-1 items-center gap-4">
         <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold text-emerald-700">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
