@@ -102,21 +102,32 @@ class CourseService
             $completedLessonIds = \App\Models\LessonCompletion::where('user_id', $userId)->pluck('lesson_id')->toArray();
         }
 
+        $isEnrolled = false;
+        if ($userId && class_exists(\App\Models\Enrollment::class) && isset($dbCourse)) {
+            $isEnrolled = \App\Models\Enrollment::where('user_id', $userId)->where('course_id', $dbCourse->id)->exists();
+        }
+
         // Query real database course
         try {
             if (class_exists(Course::class)) {
                 // ── SECURITY: Only fetch published courses ──
-                $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])
-                    ->where('status', 'published')
-                    ->whereNotNull('published_version_id')
-                    ->find($courseId);
-                
-                if (!$dbCourse) {
-                    // Fallback to first published course
+                if (!isset($dbCourse)) {
                     $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])
                         ->where('status', 'published')
                         ->whereNotNull('published_version_id')
-                        ->first();
+                        ->find($courseId);
+                    
+                    if (!$dbCourse) {
+                        // Fallback to first published course
+                        $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])
+                            ->where('status', 'published')
+                            ->whereNotNull('published_version_id')
+                            ->first();
+                    }
+
+                    if ($dbCourse && $userId && class_exists(\App\Models\Enrollment::class)) {
+                        $isEnrolled = \App\Models\Enrollment::where('user_id', $userId)->where('course_id', $dbCourse->id)->exists();
+                    }
                 }
 
                 if ($dbCourse) {
@@ -177,12 +188,13 @@ class CourseService
                                         'duration' => $durationText,
                                         'duration_seconds' => $durationSec,
                                         'status' => $status,
-                                        'video_url' => $les->video_url,
-                                        'has_uploaded_video' => $les->media()->where('media_type', 'video')->where('status', 'ready')->exists(),
-                                        'content' => $lessonType === 'article' ? $les->content : null,
+                                        // ── RULE 2: Protect content if not enrolled ──
+                                        'video_url' => $isEnrolled ? $les->video_url : null,
+                                        'has_uploaded_video' => $isEnrolled ? $les->media()->where('media_type', 'video')->where('status', 'ready')->exists() : false,
+                                        'content' => ($isEnrolled && $lessonType === 'article') ? $les->content : null,
                                     ];
                                     
-                                    if ($les->video_url && count($resources) < 3) {
+                                    if ($isEnrolled && $les->video_url && count($resources) < 3) {
                                         $resources[] = [
                                             'id' => 'res-vid-' . $les->id,
                                             'title' => 'Tài liệu video: ' . mb_substr($les->title, 0, 30),

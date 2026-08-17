@@ -58,6 +58,7 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/forgot-password/verify-otp', [AuthController::class, 'verifyResetOtp']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
@@ -67,6 +68,12 @@ Route::middleware('throttle:30,1')->group(function () {
 Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
 Route::get('/student/payment/vnpay-ipn', [OrderController::class, 'vnpayIpn']);
 Route::post('/student/payment/momo-ipn', [OrderController::class, 'momoIpn']);
+
+// API Student Public
+Route::prefix('student')->group(function () {
+    Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
+    Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
+});
 
 // ==========================================
 // 2. NHÓM API PRIVATE (Bắt buộc phải có Bearer Token)
@@ -97,6 +104,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('profile')->group(function () {
         Route::get('/', [UserController::class, 'getProfile']);
         Route::post('/update', [UserController::class, 'updateProfile']);
+        Route::post('/change-password/request-otp', [UserController::class, 'requestChangePasswordOtp']);
         Route::post('/change-password', [UserController::class, 'changePassword']);
         Route::post('/avatar', [UserController::class, 'uploadAvatar']);
     });
@@ -121,8 +129,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/practice/overview', [StudentPracticeController::class, 'overview']);
         Route::get('/progress/overview', [StudentProgressController::class, 'overview']);
         Route::get('/history/overview', [StudentHistoryController::class, 'overview']);
-        Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
-        Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
         Route::post('/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
 
         // Enrolled Courses

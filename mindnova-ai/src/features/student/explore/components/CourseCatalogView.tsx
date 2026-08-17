@@ -131,7 +131,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
               <div className="px-5 pb-5 pt-0 mt-auto">
                 {course.is_enrolled ? (
                   <Link
-                    href={`/study-plan`}
+                    href={`/courses/lesson?courseId=${course.id}`}
                     className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-[#10B981] bg-[#D1FAE5] border border-[#10B981]/30 hover:bg-[#A7F3D0] transition-all"
                   >
                     <span>Đã đăng ký - Vào học</span>

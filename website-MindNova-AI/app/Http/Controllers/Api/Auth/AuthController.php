@@ -128,16 +128,64 @@ class AuthController extends Controller
         $request->validate(['email' => 'required|email|exists:users,email']);
         $otp = str_pad(random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
 
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $request->email],
-            ['token' => $otp, 'created_at' => now()]
+        // Check cooldown
+        $lastOtp = \App\Models\PasswordOtp::where('email', $request->email)
+            ->where('type', 'forgot_password')
+            ->orderBy('id', 'desc')
+            ->first();
+        
+        if ($lastOtp && $lastOtp->created_at->diffInSeconds(now()) < 60) {
+            return response()->json(['message' => 'Vui lòng đợi 60 giây để yêu cầu mã mới.'], 429);
+        }
+
+        \App\Models\PasswordOtp::updateOrCreate(
+            ['email' => $request->email, 'type' => 'forgot_password'],
+            [
+                'otp_hash' => Hash::make($otp),
+                'expires_at' => now()->addMinutes(5),
+                'verified_at' => null,
+                'attempts' => 0
+            ]
         );
 
-        Mail::raw("Mã OTP khôi phục mật khẩu là: $otp", function ($message) use ($request) {
+        Mail::raw("MindNova AI\n\nMã xác nhận của bạn là:\n\n$otp\n\nMã có hiệu lực trong 5 phút.\nNếu bạn không thực hiện yêu cầu này, hãy bỏ qua email.", function ($message) use ($request) {
             $message->to($request->email)->subject('MindNova AI - Mã OTP');
         });
 
         return response()->json(['message' => 'Đã gửi mã OTP.'], 200);
+    }
+
+    // 4.1 API Xác nhận OTP (Forgot Password)
+    public function verifyResetOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'otp' => 'required|digits:6',
+        ]);
+
+        $otpRecord = \App\Models\PasswordOtp::where('email', $request->email)
+            ->where('type', 'forgot_password')
+            ->first();
+
+        if (!$otpRecord) return response()->json(['message' => 'Mã OTP không hợp lệ.'], 400);
+
+        if ($otpRecord->attempts >= 5) {
+            $otpRecord->delete();
+            return response()->json(['message' => 'Quá số lần thử. Vui lòng yêu cầu mã mới.'], 400);
+        }
+
+        if (now()->greaterThan($otpRecord->expires_at)) {
+            return response()->json(['message' => 'Mã xác nhận đã hết hạn. Vui lòng yêu cầu mã mới.'], 400);
+        }
+
+        if (!Hash::check($request->otp, $otpRecord->otp_hash)) {
+            $otpRecord->increment('attempts');
+            return response()->json(['message' => 'Mã xác nhận không chính xác.'], 400);
+        }
+
+        $otpRecord->update(['verified_at' => now()]);
+
+        return response()->json(['message' => 'Mã OTP hợp lệ.'], 200);
     }
 
     // 5. API Đặt lại mật khẩu
@@ -149,18 +197,19 @@ class AuthController extends Controller
             'password' => 'required|min:6|confirmed',
         ]);
 
-        $resetRecord = DB::table('password_reset_tokens')
-            ->where('email', $request->email)
-            ->where('token', $request->otp)
+        $otpRecord = \App\Models\PasswordOtp::where('email', $request->email)
+            ->where('type', 'forgot_password')
             ->first();
 
-        if (!$resetRecord) return response()->json(['message' => 'Mã OTP không hợp lệ.'], 400);
+        if (!$otpRecord || !Hash::check($request->otp, $otpRecord->otp_hash) || !$otpRecord->verified_at) {
+            return response()->json(['message' => 'Yêu cầu không hợp lệ. Vui lòng xác thực lại OTP.'], 400);
+        }
 
         $user = User::where('email', $request->email)->first();
         $user->update(['password' => Hash::make($request->password)]);
-        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+        $otpRecord->delete();
 
-        return response()->json(['message' => 'Đặt lại mật khẩu thành công.'], 200);
+        return response()->json(['message' => 'Mật khẩu đã được thay đổi thành công.'], 200);
     }
 
     // 6. API Google Redirect

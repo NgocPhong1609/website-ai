@@ -87,19 +87,33 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap items-center gap-4 pt-2">
-            <Link 
-              href={`/courses/lesson?courseId=${info?.id || 1}&lessonId=${nextLessonId}`}
-              className="text-decoration-none"
-            >
-              <button
-                type="button"
-                className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:brightness-110 transition-all shadow-[0_4px_15px_rgba(80,82,238,0.35)] hover:shadow-[0_6px_22px_rgba(80,82,238,0.45)] hover:-translate-y-0.5 cursor-pointer"
+            {info?.is_enrolled ? (
+              <Link 
+                href={`/courses/lesson?courseId=${info?.id || 1}&lessonId=${nextLessonId}`}
+                className="text-decoration-none"
               >
-                <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
-                <span className="w-2 h-2 rounded-full bg-[#10B981] absolute" />
-                <span>▶ Tiếp tục bài học: <strong className="underline decoration-white/50">{nextLesson}</strong></span>
-              </button>
-            </Link>
+                <button
+                  type="button"
+                  className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:brightness-110 transition-all shadow-[0_4px_15px_rgba(80,82,238,0.35)] hover:shadow-[0_6px_22px_rgba(80,82,238,0.45)] hover:-translate-y-0.5 cursor-pointer"
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-[#10B981] absolute" />
+                  <span>▶ Tiếp tục bài học: <strong className="underline decoration-white/50">{nextLesson}</strong></span>
+                </button>
+              </Link>
+            ) : (
+              <Link 
+                href={`/checkout?courseId=${info?.id || 1}`}
+                className="text-decoration-none"
+              >
+                <button
+                  type="button"
+                  className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:brightness-110 transition-all shadow-[0_4px_15px_rgba(80,82,238,0.35)] hover:shadow-[0_6px_22px_rgba(80,82,238,0.45)] hover:-translate-y-0.5 cursor-pointer"
+                >
+                  <span>🛒 Đăng ký khóa học ngay: <strong className="underline decoration-white/50">{Number(info?.price ? info?.price : 0).toLocaleString('vi-VN')} VND</strong></span>
+                </button>
+              </Link>
+            )}
 
             <button
               type="button"
