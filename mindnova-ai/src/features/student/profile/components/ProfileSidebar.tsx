@@ -16,9 +16,10 @@ interface ProfileSidebarProps {
   onTabChange: (tab: ProfileTab) => void;
   fullName: string;
   major: string;
+  avatarUrl?: string | null;
 }
 
-function ProfileAvatar({ name }: { name: string }) {
+function ProfileAvatar({ name, avatarUrl }: { name: string; avatarUrl?: string | null }) {
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -31,9 +32,22 @@ function ProfileAvatar({ name }: { name: string }) {
       {/* Soft elegant avatar sphere */}
       <div className="w-full h-full rounded-2xl bg-gradient-to-tr from-[#5052EE] via-[#6063EE] to-[#0D9488] p-[2px] shadow-2xs transition-all duration-300 group-hover:shadow-sm group-hover:-translate-y-0.5">
         <div className="w-full h-full rounded-2xl bg-[#F8FAFC] flex items-center justify-center relative overflow-hidden">
-          {/* Subtle gradient overlay */}
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={name}
+              className="h-full w-full object-cover rounded-[14px]"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                e.currentTarget.parentElement?.querySelector("span")?.removeAttribute("style");
+              }}
+            />
+          ) : null}
           <div className="absolute inset-0 bg-gradient-to-br from-[#5052EE]/10 to-[#0D9488]/10" />
-          <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#4648D4] to-[#0D9488] bg-clip-text text-transparent select-none relative z-10">
+          <span
+            className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#4648D4] to-[#0D9488] bg-clip-text text-transparent select-none relative z-10"
+            style={avatarUrl ? { display: "none" } : undefined}
+          >
             {initials || "NP"}
           </span>
 
@@ -110,12 +124,13 @@ export function ProfileSidebar({
   onTabChange,
   fullName,
   major,
+  avatarUrl,
 }: ProfileSidebarProps) {
   return (
     <div className="flex flex-col gap-6">
       {/* Avatar + Name */}
       <div className="flex flex-col items-center gap-3 pt-1">
-        <ProfileAvatar name={fullName} />
+        <ProfileAvatar name={fullName} avatarUrl={avatarUrl} />
         <div className="text-center space-y-1.5 mt-1">
           <p className="text-base font-semibold text-[#1A1A2E] leading-tight tracking-normal">{fullName}</p>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAF8F5] border border-[#0D9488]/20 text-[#0D9488]">

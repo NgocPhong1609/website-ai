@@ -7,15 +7,63 @@ use App\Models\Course;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 
 class ReviewController extends Controller
 {
+    public function index(Course $course)
+    {
+        if (!Schema::hasTable('reviews')) {
+            return response()->json([
+                'message' => 'Danh sách đánh giá khóa học.',
+                'data' => [
+                    'count' => 0,
+                    'average_rating' => 0,
+                    'reviews' => [],
+                ],
+            ]);
+        }
+
+        $reviews = Review::with('user:id,name,avatar_url')
+            ->where('course_id', $course->id)
+            ->latest()
+            ->get()
+            ->map(function ($review) {
+                return [
+                    'id' => $review->id,
+                    'user_id' => $review->user_id,
+                    'user' => [
+                        'id' => $review->user?->id,
+                        'name' => $review->user?->name ?? 'Học viên',
+                        'avatar_url' => $review->user?->avatar_url ?? null,
+                    ],
+                    'rating' => (int) $review->rating,
+                    'comment' => $review->comment,
+                    'created_at' => $review->created_at?->toISOString(),
+                ];
+            });
+
+        $averageRating = $reviews->isNotEmpty() ? round($reviews->avg('rating'), 1) : 0;
+
+        return response()->json([
+            'message' => 'Danh sách đánh giá khóa học.',
+            'data' => [
+                'count' => $reviews->count(),
+                'average_rating' => $averageRating,
+                'reviews' => $reviews,
+            ],
+        ]);
+    }
+
     public function store(Request $request, Course $course)
     {
         $user = $request->user();
 
-        // Check if user is enrolled
+        if (!$user) {
+            return response()->json(['message' => 'Bạn cần đăng nhập để đánh giá khóa học.'], 401);
+        }
+
         $isEnrolled = DB::table('enrollments')
             ->where('user_id', $user->id)
             ->where('course_id', $course->id)
@@ -34,7 +82,6 @@ class ReviewController extends Controller
             return response()->json(['message' => 'Dữ liệu không hợp lệ.', 'errors' => $validator->errors()], 422);
         }
 
-        // Check if already reviewed
         if (Review::where('user_id', $user->id)->where('course_id', $course->id)->exists()) {
             return response()->json(['message' => 'Bạn đã đánh giá khóa học này rồi.'], 400);
         }
@@ -46,11 +93,94 @@ class ReviewController extends Controller
             'comment' => $request->comment
         ]);
 
-        // Notify teacher
         if ($course->teacher) {
             $course->teacher->notify(new \App\Notifications\NewReview($review));
         }
 
-        return response()->json(['message' => 'Đánh giá thành công!', 'data' => $review], 201);
+        return response()->json([
+            'message' => 'Đánh giá thành công!',
+            'data' => [
+                'id' => $review->id,
+                'user_id' => $user->id,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'avatar_url' => $user->avatar_url ?? null,
+                ],
+                'rating' => (int) $review->rating,
+                'comment' => $review->comment,
+                'created_at' => $review->created_at?->toISOString(),
+            ]
+        ], 201);
+    }
+
+    public function update(Request $request, Course $course, Review $review)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Bạn cần đăng nhập để sửa đánh giá.'], 401);
+        }
+
+        if ($review->course_id !== $course->id) {
+            return response()->json(['message' => 'Đánh giá không thuộc khóa học này.'], 404);
+        }
+
+        if ((int) $review->user_id !== (int) $user->id) {
+            return response()->json(['message' => 'Bạn chỉ có thể sửa đánh giá của chính mình.'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Dữ liệu không hợp lệ.', 'errors' => $validator->errors()], 422);
+        }
+
+        $review->update([
+            'rating' => $request->rating,
+            'comment' => $request->comment,
+        ]);
+
+        return response()->json([
+            'message' => 'Cập nhật đánh giá thành công!',
+            'data' => [
+                'id' => $review->id,
+                'user_id' => $user->id,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'avatar_url' => $user->avatar_url ?? null,
+                ],
+                'rating' => (int) $review->rating,
+                'comment' => $review->comment,
+                'created_at' => $review->created_at?->toISOString(),
+            ],
+        ]);
+    }
+
+    public function destroy(Request $request, Course $course, Review $review)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Bạn cần đăng nhập để xoá đánh giá.'], 401);
+        }
+
+        if ($review->course_id !== $course->id) {
+            return response()->json(['message' => 'Đánh giá không thuộc khóa học này.'], 404);
+        }
+
+        if ((int) $review->user_id !== (int) $user->id) {
+            return response()->json(['message' => 'Bạn chỉ có thể xoá đánh giá của chính mình.'], 403);
+        }
+
+        $review->delete();
+
+        return response()->json([
+            'message' => 'Xoá đánh giá thành công.',
+        ]);
     }
 }

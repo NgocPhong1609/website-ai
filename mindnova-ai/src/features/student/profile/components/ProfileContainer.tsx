@@ -99,6 +99,7 @@ export default function ProfileContainer() {
               onTabChange={setActiveTab}
               fullName={profile.fullName}
               major={profile.major}
+              avatarUrl={profile.avatarUrl}
             />
           </div>
         </div>
