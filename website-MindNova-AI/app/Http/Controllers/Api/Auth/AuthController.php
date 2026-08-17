@@ -148,9 +148,15 @@ class AuthController extends Controller
             ]
         );
 
-        Mail::raw("MindNova AI\n\nMã xác nhận của bạn là:\n\n$otp\n\nMã có hiệu lực trong 5 phút.\nNếu bạn không thực hiện yêu cầu này, hãy bỏ qua email.", function ($message) use ($request) {
-            $message->to($request->email)->subject('MindNova AI - Mã OTP');
-        });
+        try {
+            Mail::raw("MindNova AI\n\nMã xác nhận của bạn là:\n\n$otp\n\nMã có hiệu lực trong 5 phút.\nNếu bạn không thực hiện yêu cầu này, hãy bỏ qua email.", function ($message) use ($request) {
+                $message->to($request->email)->subject('MindNova AI - Mã OTP');
+            });
+        } catch (\Exception $e) {
+            // Xóa OTP vừa tạo nếu gửi email thất bại để user có thể thử lại ngay lập tức
+            \App\Models\PasswordOtp::where('email', $request->email)->where('type', 'forgot_password')->delete();
+            return response()->json(['message' => 'Lỗi cấu hình Email: Không thể gửi mã OTP. Vui lòng liên hệ Admin hoặc thử lại sau.', 'error' => $e->getMessage()], 500);
+        }
 
         return response()->json(['message' => 'Đã gửi mã OTP.'], 200);
     }
