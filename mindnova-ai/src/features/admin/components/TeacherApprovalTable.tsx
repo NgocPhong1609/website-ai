@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
-
-import type { AdminTeacherApprovalRow } from "@/src/features/admin/types";
+import React, { useMemo, useState } from "react";
+import type { AdminTeacherApprovalRow, AdminTeacherCertificateItem } from "@/src/features/admin/types";
+import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
+import { axiosClient } from "@/src/shared/lib/axios";
 
 interface TeacherApprovalTableProps {
   rows: AdminTeacherApprovalRow[];
@@ -10,283 +11,647 @@ interface TeacherApprovalTableProps {
 
 export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
   const [selectedRow, setSelectedRow] = useState<AdminTeacherApprovalRow | null>(null);
-  const [localRows, setLocalRows] = useState(rows);
+  const [localRows, setLocalRows] = useState<AdminTeacherApprovalRow[]>(rows);
+  const [activeTab, setActiveTab] = useState<string>("all");
+  const [isPendingAction, setIsPendingAction] = useState(false);
+  const [reasonInput, setReasonInput] = useState("");
+  const [showReasonModal, setShowReasonModal] = useState<{
+    type: "reject_teacher" | "revoke_teacher" | "reject_cert";
+    certId?: number;
+  } | null>(null);
 
-  const selectedIndex = useMemo(
-    () => localRows.findIndex((row) => row.id === selectedRow?.id),
-    [localRows, selectedRow],
-  );
+  const [evidenceViewer, setEvidenceViewer] = useState<{
+    signedUrl: string;
+    name: string;
+    mime: string;
+  } | null>(null);
 
-  const [isPending, setIsPending] = useState(false);
+  const filteredRows = useMemo(() => {
+    if (activeTab === "all") return localRows;
+    return localRows.filter((r) => {
+      const st = r.teacher_verification_status || r.status || "pending";
+      if (activeTab === "verified") return r.is_verified || st === "approved";
+      return st === activeTab;
+    });
+  }, [localRows, activeTab]);
 
-  const handleDecision = async (decision: "approved" | "rejected") => {
-    if (!selectedRow || isPending) {
-      return;
-    }
+  const handleTeacherDecision = async (status: "approved" | "rejected" | "revoked", reason?: string) => {
+    if (!selectedRow || isPendingAction) return;
 
     try {
-      setIsPending(true);
-      
-      // Call server action to update the database
-      const { verifyTeacher } = await import("@/src/features/admin/actions/teacher-approval.actions");
-      await verifyTeacher(selectedRow.id, decision);
+      setIsPendingAction(true);
 
-      // Update local UI state
-      setLocalRows((currentRows) =>
-        currentRows.map((row) =>
-          row.id === selectedRow.id
+      if (status === "revoked") {
+        await axiosClient.post(`/api/admin/teachers/${selectedRow.id}/revoke-verification`, {
+          reason: reason || "Thu hồi tích xanh theo quyết định của Admin",
+        });
+      } else {
+        await axiosClient.patch(`/api/admin/teachers/${selectedRow.id}/verify`, {
+          status,
+          reason,
+          note: reason,
+        });
+      }
+
+      // Update local state
+      setLocalRows((current) =>
+        current.map((r) =>
+          r.id === selectedRow.id
             ? {
-                ...row,
-                status: decision,
+                ...r,
+                is_verified: status === "approved",
+                teacher_verification_status: status,
+                teacher_verification_note: reason || r.teacher_verification_note,
               }
-            : row,
-        ),
+            : r
+        )
       );
 
-      setSelectedRow(null);
-    } catch (error) {
-      console.error("Failed to verify teacher", error);
-      alert("Đã xảy ra lỗi khi duyệt giáo viên. Vui lòng thử lại sau.");
+      setSelectedRow((prev) =>
+        prev
+          ? {
+              ...prev,
+              is_verified: status === "approved",
+              teacher_verification_status: status,
+              teacher_verification_note: reason || prev.teacher_verification_note,
+            }
+          : null
+      );
+
+      setShowReasonModal(null);
+      setReasonInput("");
+      alert(`Đã cập nhật trạng thái xác minh giáo viên thành [${status.toUpperCase()}] thành công!`);
+    } catch (err: any) {
+      console.error("Failed teacher decision", err);
+      alert(err.response?.data?.message || "Thao tác thất bại. Vui lòng thử lại.");
     } finally {
-      setIsPending(false);
+      setIsPendingAction(false);
+    }
+  };
+
+  const handleCertDecision = async (certId: number, status: "approved" | "rejected", reason?: string) => {
+    if (isPendingAction) return;
+
+    try {
+      setIsPendingAction(true);
+
+      if (status === "approved") {
+        await axiosClient.post(`/api/admin/certificates/${certId}/approve`);
+      } else {
+        await axiosClient.post(`/api/admin/certificates/${certId}/reject`, { reason });
+      }
+
+      // Update local cert list
+      if (selectedRow) {
+        const updatedCerts = selectedRow.certificates.map((c) =>
+          c.id === certId ? { ...c, verification_status: status, verification_note: reason || null } : c
+        );
+
+        setSelectedRow({ ...selectedRow, certificates: updatedCerts });
+        setLocalRows((current) =>
+          current.map((r) => (r.id === selectedRow.id ? { ...r, certificates: updatedCerts } : r))
+        );
+      }
+
+      setShowReasonModal(null);
+      setReasonInput("");
+    } catch (err: any) {
+      console.error("Failed cert decision", err);
+      alert(err.response?.data?.message || "Thao tác thất bại.");
+    } finally {
+      setIsPendingAction(false);
+    }
+  };
+
+  const handleFetchEvidence = async (evidenceId: number) => {
+    try {
+      const res = await axiosClient.get(`/api/admin/certificates/evidence/${evidenceId}`);
+      const data = res.data.data;
+      if (data?.signed_url) {
+        setEvidenceViewer({
+          signedUrl: data.signed_url,
+          name: data.original_name || "Tài liệu minh chứng",
+          mime: data.mime_type || "application/octet-stream",
+        });
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || "Không thể tải tài liệu minh chứng.");
     }
   };
 
   return (
-    <>
-      <section className="rounded-2xl border border-cyan-100/80 bg-white/95 p-4 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
-        <div className="overflow-hidden rounded-xl border border-slate-200/80">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-slate-50/80 text-slate-600">
+    <div className="space-y-6">
+      {/* Filter Tabs */}
+      <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-slate-100 border border-slate-200">
+        {[
+          { id: "all", label: "Tất cả" },
+          { id: "pending", label: "⏳ Chờ xét duyệt" },
+          { id: "verified", label: "✦✓ Đã cấp tích xanh" },
+          { id: "rejected", label: "❌ Từ chối" },
+          { id: "revoked", label: "🚫 Đã thu hồi" },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
+              activeTab === tab.id
+                ? "bg-white text-slate-900 shadow-md border border-slate-200"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Main Table */}
+      <section className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm border-collapse">
+            <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 text-xs font-black uppercase tracking-wider">
               <tr>
-                <th className="px-4 py-3 font-medium">Giáo viên</th>
-                <th className="px-4 py-3 font-medium">Chuyên môn</th>
-                <th className="px-4 py-3 font-medium">Kinh nghiệm</th>
-                <th className="px-4 py-3 font-medium">Trạng thái</th>
-                <th className="px-4 py-3 font-medium">Ngày nộp</th>
-                <th className="px-4 py-3 font-medium text-right">Hành động</th>
+                <th className="px-6 py-4">Giáo viên</th>
+                <th className="px-6 py-4">Chuyên môn</th>
+                <th className="px-6 py-4">Số chứng chỉ</th>
+                <th className="px-6 py-4">Trạng thái</th>
+                <th className="px-6 py-4">Ngày nộp</th>
+                <th className="px-6 py-4 text-right">Hành động</th>
               </tr>
             </thead>
-            <tbody>
-              {localRows.map((row) => (
-                <tr key={row.id} className="border-t border-slate-200 bg-white hover:bg-cyan-50/35">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      {row.avatarUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={row.avatarUrl}
-                          alt={row.name}
-                          className="h-9 w-9 shrink-0 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-100 text-xs font-semibold text-cyan-700">
-                          {row.name.charAt(0).toUpperCase()}
+            <tbody className="divide-y divide-slate-100">
+              {filteredRows.length > 0 ? (
+                filteredRows.map((row) => {
+                  const avatar = row.avatar_url || row.avatarUrl;
+                  const isVer = row.is_verified || row.teacher_verification_status === "approved";
+                  const statusLabel = isVer
+                    ? "Đã cấp tích xanh"
+                    : row.teacher_verification_status === "rejected"
+                    ? "Từ chối"
+                    : row.teacher_verification_status === "revoked"
+                    ? "Đã thu hồi"
+                    : "Chờ xét duyệt";
+
+                  const certCount = row.certificates?.length || 0;
+                  const approvedCerts = row.certificates?.filter((c) => c.verification_status === "approved").length || 0;
+
+                  return (
+                    <tr key={row.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-cyan-100 text-[#4648D4] flex items-center justify-center font-black overflow-hidden border border-cyan-200 shrink-0">
+                            {avatar ? (
+                              <img src={avatar} alt={row.name} className="w-full h-full object-cover" />
+                            ) : (
+                              row.name?.charAt(0).toUpperCase()
+                            )}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-1 font-bold text-slate-900">
+                              <span>{row.name}</span>
+                              <VerifiedTeacherBadge isVerified={isVer} size="xs" />
+                            </div>
+                            <div className="text-xs text-slate-500">{row.email}</div>
+                          </div>
                         </div>
-                      )}
-                      <div>
-                        <div className="font-medium text-slate-900">{row.name}</div>
-                        <div className="text-xs text-slate-500">{row.email}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{row.expertise}</td>
-                  <td className="px-4 py-3 text-slate-600">{row.experience}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                        row.status === "approved"
-                          ? "bg-emerald-50 text-emerald-700"
-                          : row.status === "rejected"
-                            ? "bg-rose-100 text-rose-700"
-                            : "bg-amber-50 text-amber-700"
-                      }`}
-                    >
-                      {row.status === "approved" ? "Đã duyệt" : row.status === "rejected" ? "Từ chối" : "Chờ xét duyệt"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{row.submittedAt}</td>
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedRow(row)}
-                      className="rounded-xl border border-cyan-200 bg-cyan-50 px-3 py-2 text-xs font-semibold text-cyan-700 transition hover:border-cyan-300 hover:bg-cyan-100"
-                    >
-                      Xem chi tiết
-                    </button>
+                      </td>
+
+                      <td className="px-6 py-4 text-slate-600 font-semibold">
+                        {row.profile?.skill_level || row.expertise || "Chưa cập nhật"}
+                      </td>
+
+                      <td className="px-6 py-4 font-semibold text-slate-700">
+                        <span className="px-2.5 py-1 rounded-lg bg-slate-100 border text-xs font-bold">
+                          {certCount} bằng ({approvedCerts} đã duyệt)
+                        </span>
+                      </td>
+
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border ${
+                            isVer
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : row.teacher_verification_status === "rejected"
+                              ? "bg-rose-50 text-rose-700 border-rose-200"
+                              : row.teacher_verification_status === "revoked"
+                              ? "bg-slate-100 text-slate-700 border-slate-300"
+                              : "bg-amber-50 text-amber-700 border-amber-200"
+                          }`}
+                        >
+                          {statusLabel}
+                        </span>
+                      </td>
+
+                      <td className="px-6 py-4 text-slate-500 text-xs font-semibold">
+                        {row.verification_request?.submitted_at
+                          ? new Date(row.verification_request.submitted_at).toLocaleDateString("vi-VN")
+                          : row.submittedAt || "-"}
+                      </td>
+
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedRow(row)}
+                          className="px-4 py-2 rounded-xl border border-cyan-300 bg-cyan-50 text-cyan-800 text-xs font-black hover:bg-cyan-100 transition-all shadow-xs"
+                        >
+                          Xem hồ sơ & Thẩm định
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-slate-400 font-semibold">
+                    Không có giáo viên nào phù hợp với bộ lọc.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
       </section>
 
-      {selectedRow ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-3xl rounded-[28px] border border-slate-200 bg-white shadow-[0_35px_85px_-30px_rgba(15,23,42,0.65)]">
-            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Teacher profile</p>
-                <h3 className="mt-1 text-2xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">
-                  Hồ sơ giáo viên
-                </h3>
+      {/* Detail Modal / Drawer */}
+      {selectedRow && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm overflow-y-auto">
+          <div className="relative w-full max-w-4xl rounded-[32px] border border-slate-200 bg-white shadow-2xl my-8 overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 px-8 py-5 bg-slate-50">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-cyan-100 text-[#4648D4] font-black text-lg flex items-center justify-center overflow-hidden border border-cyan-200">
+                  {selectedRow.avatar_url || selectedRow.avatarUrl ? (
+                    <img
+                      src={selectedRow.avatar_url || selectedRow.avatarUrl!}
+                      alt={selectedRow.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    selectedRow.name.charAt(0).toUpperCase()
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl font-black text-slate-900">{selectedRow.name}</h3>
+                    <VerifiedTeacherBadge isVerified={selectedRow.is_verified} size="sm" />
+                  </div>
+                  <p className="text-xs text-slate-500 font-semibold">{selectedRow.email}</p>
+                </div>
               </div>
+
               <button
                 type="button"
                 onClick={() => setSelectedRow(null)}
-                className="rounded-full border border-slate-200 px-3 py-1.5 text-sm text-slate-600 transition hover:bg-slate-100"
+                className="w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-500 hover:bg-slate-100 flex items-center justify-center font-bold"
               >
-                Đóng
+                ✕
               </button>
             </div>
 
-            <div className="grid gap-6 p-6 lg:grid-cols-[1.2fr_0.8fr]">
-              <div className="space-y-5">
-                <div className="rounded-2xl bg-slate-50 p-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      {selectedRow.avatarUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={selectedRow.avatarUrl}
-                          alt={selectedRow.name}
-                          className="h-14 w-14 shrink-0 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-cyan-100 text-lg font-semibold text-cyan-700">
-                          {selectedRow.name.charAt(0).toUpperCase()}
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-sm text-slate-500">Tên giáo viên</p>
-                        <h4 className="mt-1 text-xl font-semibold text-slate-900">{selectedRow.name}</h4>
-                      </div>
-                    </div>
+            {/* Modal Content Grid */}
+            <div className="p-8 grid grid-cols-1 lg:grid-cols-3 gap-8 max-h-[75vh] overflow-y-auto">
+              {/* Left Column: Teacher Profile Info */}
+              <div className="lg:col-span-1 space-y-5 border-r border-slate-100 pr-0 lg:pr-6">
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+                  <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                    Trạng thái hiện tại
+                  </span>
+                  <div className="flex items-center gap-2">
                     <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                        selectedRow.status === "approved"
-                          ? "bg-emerald-50 text-emerald-700"
-                          : selectedRow.status === "rejected"
-                            ? "bg-rose-100 text-rose-700"
-                            : "bg-amber-50 text-amber-700"
+                      className={`px-3 py-1 rounded-full text-xs font-black border ${
+                        selectedRow.is_verified
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : selectedRow.teacher_verification_status === "rejected"
+                          ? "bg-rose-50 text-rose-700 border-rose-200"
+                          : selectedRow.teacher_verification_status === "revoked"
+                          ? "bg-slate-200 text-slate-800 border-slate-300"
+                          : "bg-amber-50 text-amber-700 border-amber-200"
                       }`}
                     >
-                      {selectedRow.status === "approved" ? "Đã duyệt" : selectedRow.status === "rejected" ? "Từ chối" : "Chờ xét duyệt"}
+                      {selectedRow.is_verified ? "✦✓ Đã cấp tích xanh" : selectedRow.teacher_verification_status}
                     </span>
                   </div>
-                  <p className="mt-3 text-sm text-slate-600">{selectedRow.email}</p>
+                  {selectedRow.teacher_verification_note && (
+                    <p className="text-xs text-slate-600 italic pt-1">
+                      Ghi chú: "{selectedRow.teacher_verification_note}"
+                    </p>
+                  )}
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-2xl border border-slate-200 p-4">
-                    <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Chuyên môn</p>
-                    <p className="mt-2 text-base font-semibold text-slate-900">{selectedRow.expertise}</p>
+                <div className="space-y-3 text-xs">
+                  <div>
+                    <span className="font-extrabold uppercase text-slate-400">Chuyên môn</span>
+                    <p className="font-bold text-slate-900 mt-0.5">
+                      {selectedRow.profile?.skill_level || selectedRow.expertise || "Chưa cập nhật"}
+                    </p>
                   </div>
-                  <div className="rounded-2xl border border-slate-200 p-4">
-                    <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Kinh nghiệm</p>
-                    <p className="mt-2 text-base font-semibold text-slate-900">{selectedRow.experience}</p>
+
+                  <div>
+                    <span className="font-extrabold uppercase text-slate-400">Kinh nghiệm</span>
+                    <p className="font-bold text-slate-900 mt-0.5">
+                      {selectedRow.profile?.learning_goal || selectedRow.experience || "Chưa cập nhật"}
+                    </p>
                   </div>
-                  <div className="rounded-2xl border border-slate-200 p-4">
-                    <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Số bằng cấp</p>
-                    <p className="mt-2 text-base font-semibold text-slate-900">{selectedRow.credentialCount}</p>
+
+                  <div>
+                    <span className="font-extrabold uppercase text-slate-400">Số điện thoại</span>
+                    <p className="font-bold text-slate-900 mt-0.5">
+                      {selectedRow.profile?.phone || "Chưa có"}
+                    </p>
                   </div>
-                  <div className="rounded-2xl border border-slate-200 p-4">
-                    <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Đánh giá</p>
-                    <p className="mt-2 text-base font-semibold text-slate-900">{selectedRow.rating}/5.0</p>
+
+                  <div>
+                    <span className="font-extrabold uppercase text-slate-400">Địa chỉ</span>
+                    <p className="font-bold text-slate-900 mt-0.5">
+                      {selectedRow.profile?.address || "Chưa có"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="font-extrabold uppercase text-slate-400">Giới thiệu (Bio)</span>
+                    <p className="font-semibold text-slate-700 mt-0.5 leading-relaxed">
+                      {selectedRow.profile?.bio || "Chưa nhập giới thiệu."}
+                    </p>
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 p-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs uppercase tracking-[0.2em] text-slate-500">CV giáo viên</p>
-                    {selectedRow.cvUrl ? (
-                      <a
-                        href={selectedRow.cvUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="rounded-lg border border-cyan-200 bg-cyan-50 px-3 py-1.5 text-xs font-semibold text-cyan-700 transition hover:border-cyan-300 hover:bg-cyan-100"
-                      >
-                        Xem CV
-                      </a>
-                    ) : (
-                      <span className="text-xs text-slate-400">Chưa nộp CV</span>
-                    )}
-                  </div>
-                </div>
+                {/* Admin Actions for Verification Status */}
+                <div className="pt-4 border-t border-slate-200 space-y-2">
+                  <span className="text-xs font-black uppercase text-slate-500 block mb-2">
+                    Quyết định Cấp / Thu hồi Tích Xanh
+                  </span>
 
-                <div className="rounded-2xl border border-slate-200 p-4">
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Ảnh bằng cấp / chứng chỉ</p>
-                  {selectedRow.credentials.length > 0 ? (
-                    <div className="mt-3 grid grid-cols-3 gap-2">
-                      {selectedRow.credentials.map((credential) => (
-                        <a
-                          key={credential.id}
-                          href={credential.fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block overflow-hidden rounded-xl border border-slate-200"
-                          title={credential.title ?? undefined}
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={credential.fileUrl}
-                            alt={credential.title ?? "Bằng cấp"}
-                            className="h-20 w-full object-cover"
-                          />
-                        </a>
-                      ))}
-                    </div>
+                  {!selectedRow.is_verified ? (
+                    <button
+                      type="button"
+                      disabled={isPendingAction}
+                      onClick={() => handleTeacherDecision("approved")}
+                      className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md transition-all"
+                    >
+                      ✦ CẤP TÍCH XANH SỐ XÁC MINH
+                    </button>
                   ) : (
-                    <p className="mt-2 text-sm text-slate-400">Chưa có ảnh bằng cấp nào được nộp.</p>
+                    <button
+                      type="button"
+                      disabled={isPendingAction}
+                      onClick={() => setShowReasonModal({ type: "revoke_teacher" })}
+                      className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-black shadow-md transition-all"
+                    >
+                      🚫 THU HỒI TÍCH XANH
+                    </button>
+                  )}
+
+                  {!selectedRow.is_verified && (
+                    <button
+                      type="button"
+                      disabled={isPendingAction}
+                      onClick={() => setShowReasonModal({ type: "reject_teacher" })}
+                      className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow-sm transition-all"
+                    >
+                      ❌ TỪ CHỐI YÊU CẦU XÁC MINH
+                    </button>
                   )}
                 </div>
               </div>
 
-              <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              {/* Right Column: Certificates & Private Evidence Documents */}
+              <div className="lg:col-span-2 space-y-6">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Ngày nộp</p>
-                  <p className="mt-2 text-base font-semibold text-slate-900">{selectedRow.submittedAt}</p>
-                </div>
-
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Tóm tắt hồ sơ</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Giáo viên này đã nộp hồ sơ chuyên môn với mức kinh nghiệm {selectedRow.experience},
-                    {" "}có {selectedRow.credentialCount} bằng cấp và đạt điểm đánh giá {selectedRow.rating}/5.0.
-                    {" "}Admin có thể xem xét kỹ trước khi phê duyệt hoặc từ chối quyền giảng dạy.
+                  <h4 className="text-base font-black text-slate-900">
+                    Bằng cấp & Minh chứng xác minh ({selectedRow.certificates?.length || 0})
+                  </h4>
+                  <p className="text-xs font-semibold text-slate-500">
+                    Admin có thể kiểm tra từng chứng chỉ, link xác minh và xem tài liệu công chứng riêng tư.
                   </p>
                 </div>
 
-                <div className="space-y-3 pt-2">
-                  <button
-                    type="button"
-                    disabled={isPending}
-                    onClick={() => handleDecision("approved")}
-                    className="w-full rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isPending ? "Đang xử lý..." : "Duyệt giáo viên"}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isPending}
-                    onClick={() => handleDecision("rejected")}
-                    className="w-full rounded-xl bg-rose-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isPending ? "Đang xử lý..." : "Không duyệt"}
-                  </button>
-                </div>
+                {selectedRow.certificates?.length > 0 ? (
+                  <div className="space-y-4">
+                    {selectedRow.certificates.map((cert) => (
+                      <div
+                        key={cert.id}
+                        className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-3"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h5 className="text-base font-extrabold text-slate-900">
+                              {cert.certificate_name}
+                            </h5>
+                            <p className="text-xs font-semibold text-slate-500">
+                              Đơn vị cấp: {cert.issuing_organization || "Chưa nhập"}
+                            </p>
+                          </div>
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-black border ${
+                              cert.verification_status === "approved"
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : cert.verification_status === "rejected"
+                                ? "bg-rose-50 text-rose-700 border-rose-200"
+                                : "bg-amber-50 text-amber-700 border-amber-200"
+                            }`}
+                          >
+                            {cert.verification_status === "approved" ? "✓ Đã duyệt" : cert.verification_status}
+                          </span>
+                        </div>
 
-                {selectedIndex >= 0 ? (
-                  <p className="text-xs text-slate-500">
-                    Hồ sơ đang xem: {selectedIndex + 1}/{localRows.length}
-                  </p>
-                ) : null}
+                        <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 bg-white p-3 rounded-xl border border-slate-100">
+                          <div><span className="font-bold text-slate-400">Số VB:</span> {cert.certificate_number || "-"}</div>
+                          <div><span className="font-bold text-slate-400">Chuyên môn:</span> {cert.specialization || "-"}</div>
+                          <div><span className="font-bold text-slate-400">Ngày cấp:</span> {cert.issue_date || "-"}</div>
+                          <div><span className="font-bold text-slate-400">Ngày hết hạn:</span> {cert.expiry_date || "Vĩnh viễn"}</div>
+                        </div>
+
+                        {/* Public Certificate Image */}
+                        {cert.certificate_image && (
+                          <div>
+                            <span className="text-[11px] font-black uppercase text-slate-400 block mb-1">
+                              📷 Ảnh bằng cấp public:
+                            </span>
+                            <a
+                              href={cert.certificate_image}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-block rounded-xl overflow-hidden border border-slate-200 max-h-36 bg-slate-100"
+                            >
+                              <img
+                                src={cert.certificate_image}
+                                alt={cert.certificate_name}
+                                className="max-h-36 object-contain"
+                              />
+                            </a>
+                          </div>
+                        )}
+
+                        {/* Verification Official Link */}
+                        {cert.verification_url && (
+                          <div>
+                            <a
+                              href={cert.verification_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 text-[#4648D4] border border-indigo-100 text-xs font-bold hover:underline"
+                            >
+                              🔗 Mở trang xác minh chính thức ↗
+                            </a>
+                          </div>
+                        )}
+
+                        {/* Private Evidence Documents */}
+                        {cert.evidences && cert.evidences.length > 0 && (
+                          <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200 space-y-2">
+                            <span className="text-xs font-extrabold text-amber-900 block">
+                              🔒 Tài liệu minh chứng riêng tư (Chỉ Admin xem được):
+                            </span>
+                            <div className="space-y-1.5">
+                              {cert.evidences.map((ev) => (
+                                <div
+                                  key={ev.id}
+                                  className="flex items-center justify-between p-2 rounded-lg bg-white border border-amber-100 text-xs"
+                                >
+                                  <span className="font-semibold text-slate-800 truncate max-w-xs">
+                                    {ev.original_name || `Minh chứng #${ev.id}`}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleFetchEvidence(ev.id)}
+                                    className="px-3 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] shadow-xs"
+                                  >
+                                    Xem minh chứng 🔑
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Cert Approve / Reject Buttons */}
+                        <div className="flex items-center gap-2 pt-2 border-t border-slate-200/50">
+                          <button
+                            type="button"
+                            disabled={isPendingAction}
+                            onClick={() => handleCertDecision(cert.id, "approved")}
+                            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-xs transition-all"
+                          >
+                            ✓ Duyệt chứng chỉ này
+                          </button>
+                          <button
+                            type="button"
+                            disabled={isPendingAction}
+                            onClick={() => setShowReasonModal({ type: "reject_cert", certId: cert.id })}
+                            className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow-xs transition-all"
+                          >
+                            Từ chối chứng chỉ
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-8 rounded-2xl border border-dashed border-slate-300 text-center text-slate-400 font-semibold">
+                    Giáo viên này chưa thêm chứng chỉ nào.
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
-      ) : null}
-    </>
+      )}
+
+      {/* Reason Input Modal */}
+      {showReasonModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-md">
+          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-100 space-y-4">
+            <h3 className="text-lg font-black text-slate-900">
+              {showReasonModal.type === "revoke_teacher"
+                ? "Thu hồi tích xanh xác minh"
+                : showReasonModal.type === "reject_teacher"
+                ? "Từ chối xác minh giáo viên"
+                : "Từ chối chứng chỉ"}
+            </h3>
+
+            <p className="text-xs font-semibold text-slate-500">
+              Bắt buộc nhập lý do chi tiết để gửi thông báo cho giáo viên.
+            </p>
+
+            <textarea
+              rows={3}
+              required
+              placeholder="Nhập lý do..."
+              value={reasonInput}
+              onChange={(e) => setReasonInput(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-rose-500"
+            />
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowReasonModal(null);
+                  setReasonInput("");
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                disabled={!reasonInput.trim() || isPendingAction}
+                onClick={() => {
+                  if (showReasonModal.type === "revoke_teacher") {
+                    handleTeacherDecision("revoked", reasonInput);
+                  } else if (showReasonModal.type === "reject_teacher") {
+                    handleTeacherDecision("rejected", reasonInput);
+                  } else if (showReasonModal.type === "reject_cert" && showReasonModal.certId) {
+                    handleCertDecision(showReasonModal.certId, "rejected", reasonInput);
+                  }
+                }}
+                className="px-5 py-2 rounded-xl text-xs font-black text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50"
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Private Evidence Secure Viewer Modal */}
+      {evidenceViewer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md">
+          <div className="w-full max-w-3xl rounded-3xl bg-white p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h4 className="text-base font-black text-slate-900">
+                🔒 Minh chứng riêng tư: {evidenceViewer.name}
+              </h4>
+              <button
+                onClick={() => setEvidenceViewer(null)}
+                className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-auto rounded-2xl bg-slate-100 p-2 min-h-[350px] flex items-center justify-center">
+              {evidenceViewer.mime.includes("pdf") ? (
+                <iframe src={evidenceViewer.signedUrl} className="w-full h-[500px] rounded-xl" />
+              ) : (
+                <img
+                  src={evidenceViewer.signedUrl}
+                  alt={evidenceViewer.name}
+                  className="max-h-[500px] object-contain rounded-xl"
+                />
+              )}
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => setEvidenceViewer(null)}
+                className="px-5 py-2 rounded-xl text-xs font-black bg-slate-800 text-white hover:bg-slate-900"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

@@ -50,6 +50,7 @@ use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNoti
 use App\Http\Controllers\Api\Instructor\RevenueController;
 use App\Http\Controllers\Api\Instructor\CourseOutlineController;
 use App\Http\Controllers\Api\Instructor\ContentReviewController as InstructorContentReviewController;
+use App\Http\Controllers\Api\Instructor\TeacherProfileController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -261,6 +262,17 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::get('courses/{course}/submissions', [InstructorContentReviewController::class, 'submissions']);
     Route::get('submissions/{submission}', [InstructorContentReviewController::class, 'showSubmission']);
     Route::post('lessons/{lesson}/request-deletion', [InstructorContentReviewController::class, 'requestLessonDeletion']);
+
+    // ── Teacher Profile & Verification ──
+    Route::get('profile', [TeacherProfileController::class, 'getProfile']);
+    Route::put('profile', [TeacherProfileController::class, 'updateProfile']);
+    Route::post('avatar', [TeacherProfileController::class, 'uploadAvatar']);
+    Route::get('certificates', [TeacherProfileController::class, 'getCertificates']);
+    Route::post('certificates', [TeacherProfileController::class, 'storeCertificate']);
+    Route::put('certificates/{id}', [TeacherProfileController::class, 'updateCertificate']);
+    Route::delete('certificates/{id}', [TeacherProfileController::class, 'destroyCertificate']);
+    Route::post('verification/request', [TeacherProfileController::class, 'submitVerificationRequest']);
+    Route::get('verification/status', [TeacherProfileController::class, 'getVerificationStatus']);
 });
 
 // ==========================================
@@ -268,7 +280,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
 
-    // 1) User management
+    // 1) User management & Teacher Verification Review
     Route::get('/users', [AdminUserManagementController::class, 'index']);
     Route::post('/users', [AdminUserManagementController::class, 'store']);
     Route::patch('/users/{id}/role', [AdminUserManagementController::class, 'updateRole']);
@@ -278,7 +290,12 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/users/{id}/activity', [AdminUserManagementController::class, 'activity']);
     Route::get('/teachers/review-queue', [AdminUserManagementController::class, 'teacherQueue']);
     Route::get('/teacher-approvals', [AdminUserManagementController::class, 'teacherQueue']);
+    Route::get('/teacher-approvals/{id}', [AdminUserManagementController::class, 'showTeacherVerificationDetail']);
     Route::patch('/teachers/{id}/verify', [AdminUserManagementController::class, 'verifyTeacher']);
+    Route::post('/teachers/{id}/revoke-verification', [AdminUserManagementController::class, 'revokeVerification']);
+    Route::post('/certificates/{certId}/approve', [AdminUserManagementController::class, 'approveCertificate']);
+    Route::post('/certificates/{certId}/reject', [AdminUserManagementController::class, 'rejectCertificate']);
+    Route::get('/certificates/evidence/{evidenceId}', [AdminUserManagementController::class, 'getEvidenceSignedUrl']);
 
     // 2) AI and system configuration
     Route::get('/ai-config', [AdminSystemConfigController::class, 'show']);

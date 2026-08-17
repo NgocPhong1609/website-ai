@@ -1,6 +1,5 @@
 import { AdminCategoriesQuickActions } from "@/src/features/admin/components/AdminCategoriesQuickActions";
 import { getAdminCategoriesPageData } from "@/src/features/admin/services/admin-categories.service";
-import { AdminCategoriesQuickActions } from "@/src/features/admin/components/AdminCategoriesQuickActions";
 
 export async function AdminCategoriesPage() {
   const data = await getAdminCategoriesPageData();

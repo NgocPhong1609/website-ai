@@ -29,6 +29,7 @@ class User extends Authenticatable
         'teacher_verification_status',
         'teacher_verified_at',
         'teacher_verification_note',
+        'is_verified',
         'last_login_at',
         'is_locked',
         'role',
@@ -48,6 +49,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_locked' => 'boolean',
+            'is_verified' => 'boolean',
             'teacher_verified_at' => 'datetime',
         ];
     }
@@ -71,6 +73,21 @@ class User extends Authenticatable
     public function credentials(): HasMany
     {
         return $this->hasMany(TeacherCredential::class);
+    }
+
+    public function teacherCertificates(): HasMany
+    {
+        return $this->hasMany(TeacherCertificate::class, 'teacher_id');
+    }
+
+    public function teacherVerifications(): HasMany
+    {
+        return $this->hasMany(TeacherVerification::class, 'teacher_id');
+    }
+
+    public function teacherVerificationLogs(): HasMany
+    {
+        return $this->hasMany(TeacherVerificationLog::class, 'teacher_id');
     }
 
     public function subscriptions(): HasMany

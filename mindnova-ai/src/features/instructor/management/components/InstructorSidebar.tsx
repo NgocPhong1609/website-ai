@@ -15,6 +15,8 @@ import {
   DiscussionsNavIcon,
 } from "./icons";
 
+import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function LogoMark() {
@@ -135,8 +137,9 @@ function SidebarUserProfile({ isCollapsed }: { isCollapsed: boolean }) {
       )}
 
       {!isCollapsed && (
-        <Link href="/instructor/profile" className="flex flex-col min-w-0 leading-tight group cursor-pointer">
+        <Link href="/instructor/profile" className="flex items-center gap-1 min-w-0 leading-tight group cursor-pointer">
           <span className="text-sm font-black text-gray-900 truncate group-hover:text-[#4648D4] transition-colors">{name}</span>
+          {user?.is_verified && <VerifiedTeacherBadge isVerified={true} size="xs" />}
         </Link>
       )}
     </div>
@@ -203,7 +206,12 @@ export function InstructorSidebar() {
 
   const INSTRUCTOR_NAV: NavItem[] = [
     { label: "Quản lý Khóa học", href: "/instructor/courses", Icon: CourseManagementNavIcon },
-    { label: "Thảo luận & Hỏi đáp", href: "/instructor/discussions", Icon: DiscussionsNavIcon },
+    { 
+      label: "Thảo luận & Hỏi đáp", 
+      href: "/instructor/discussions", 
+      activePatterns: ["/instructor/discussions", "/instructor/messages", "/instructor/chat", "/chat"],
+      Icon: DiscussionsNavIcon 
+    },
     { label: "Quản lý Học viên", href: "/instructor/students", activePatterns: ["/instructor/analytics"], Icon: StudentManagementNavIcon },
     { label: "Quản lý Doanh thu", href: "/instructor/revenue", Icon: RevenueNavIcon },
   ];

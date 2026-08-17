@@ -206,58 +206,161 @@ class UserManagementController extends Controller
     public function teacherQueue(Request $request): JsonResponse
     {
         $query = User::query()
-            ->with('profile')
+            ->with(['profile', 'teacherCertificates.evidences'])
             ->where(function ($builder) {
                 $builder->where('role', 'teacher')
                     ->orWhereHas('roles', fn ($q) => $q->where('name', 'teacher'));
             })
-            ->where('teacher_verification_status', '!=', 'approved')
             ->latest();
 
-        if ($request->filled('status')) {
+        if ($request->filled('status') && $request->string('status') !== 'all') {
             $query->where('teacher_verification_status', (string) $request->string('status'));
         }
 
+        $verificationService = app(\App\Services\TeacherVerificationService::class);
+
         return response()->json([
-            'data' => $query->get()->map(function (User $user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'status' => $user->teacher_verification_status ?? 'pending',
-                    'note' => $user->teacher_verification_note,
-                    'bio' => $user->profile?->bio,
-                    'phone' => $user->profile?->phone,
-                    'address' => $user->profile?->address,
-                    'created_at' => $user->created_at,
-                ];
+            'data' => $query->get()->map(function (User $user) use ($verificationService) {
+                return $verificationService->getTeacherProfileData($user);
             })->values(),
+        ]);
+    }
+
+    public function showTeacherVerificationDetail(int $id): JsonResponse
+    {
+        $user = User::where(function ($builder) {
+            $builder->where('role', 'teacher')
+                ->orWhereHas('roles', fn ($q) => $q->where('name', 'teacher'));
+        })->findOrFail($id);
+
+        $verificationService = app(\App\Services\TeacherVerificationService::class);
+        $data = $verificationService->getTeacherProfileData($user);
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
         ]);
     }
 
     public function verifyTeacher(Request $request, int $id): JsonResponse
     {
         $data = $request->validate([
-            'status' => ['required', 'string', 'in:approved,rejected,pending'],
+            'status' => ['required', 'string', 'in:approved,rejected,pending,revoked'],
             'note' => ['nullable', 'string', 'max:1000'],
+            'reason' => ['nullable', 'string', 'max:1000'],
         ]);
 
         $user = User::findOrFail($id);
+        $admin = Auth::user();
+        $verificationService = app(\App\Services\TeacherVerificationService::class);
 
-        $user->teacher_verification_status = $data['status'];
-        $user->teacher_verification_note = $data['note'] ?? null;
-        $user->teacher_verified_at = $data['status'] === 'approved' ? now() : null;
-        $user->save();
+        if ($data['status'] === 'approved') {
+            $user = $verificationService->approveTeacherVerification($admin, $user, $data['note'] ?? null);
+        } elseif ($data['status'] === 'rejected') {
+            $reason = $data['reason'] ?? $data['note'] ?? 'Không đáp ứng đủ yêu cầu xác minh.';
+            $user = $verificationService->rejectTeacherVerification($admin, $user, $reason);
+        } elseif ($data['status'] === 'revoked') {
+            $reason = $data['reason'] ?? $data['note'] ?? 'Thu hồi tích xanh theo quyết định của Admin.';
+            $user = $verificationService->revokeTeacherVerification($admin, $user, $reason);
+        } else {
+            $user->teacher_verification_status = 'pending';
+            $user->save();
+        }
 
         $this->writeActivity((int) Auth::id(), 'teacher_verification_reviewed', User::class, $user->id, [
             'status' => $data['status'],
-            'note' => $data['note'] ?? null,
+            'note' => $data['note'] ?? $data['reason'] ?? null,
         ]);
 
         return response()->json([
-            'message' => 'Da cap nhat trang thai xac thuc giao vien.',
-            'data' => $user,
+            'success' => true,
+            'message' => 'Đã cập nhật trạng thái xác minh giáo viên.',
+            'data' => $verificationService->getTeacherProfileData($user),
         ]);
+    }
+
+    public function revokeVerification(Request $request, int $id): JsonResponse
+    {
+        $data = $request->validate([
+            'reason' => ['required', 'string', 'max:1000'],
+        ]);
+
+        $user = User::findOrFail($id);
+        $admin = Auth::user();
+        $verificationService = app(\App\Services\TeacherVerificationService::class);
+
+        $updatedUser = $verificationService->revokeTeacherVerification($admin, $user, $data['reason']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã thu hồi tích xanh của giáo viên.',
+            'data' => $verificationService->getTeacherProfileData($updatedUser),
+        ]);
+    }
+
+    public function approveCertificate(Request $request, int $certId): JsonResponse
+    {
+        $data = $request->validate([
+            'note' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $cert = \App\Models\TeacherCertificate::findOrFail($certId);
+        $admin = Auth::user();
+        $verificationService = app(\App\Services\TeacherVerificationService::class);
+
+        $approvedCert = $verificationService->approveCertificate($admin, $cert, $data['note'] ?? null);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã duyệt bằng cấp/chứng chỉ.',
+            'data' => $verificationService->formatCertificateData($approvedCert->load('evidences'), true),
+        ]);
+    }
+
+    public function rejectCertificate(Request $request, int $certId): JsonResponse
+    {
+        $data = $request->validate([
+            'reason' => ['required', 'string', 'max:1000'],
+        ]);
+
+        $cert = \App\Models\TeacherCertificate::findOrFail($certId);
+        $admin = Auth::user();
+        $verificationService = app(\App\Services\TeacherVerificationService::class);
+
+        $rejectedCert = $verificationService->rejectCertificate($admin, $cert, $data['reason']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã từ chối bằng cấp/chứng chỉ.',
+            'data' => $verificationService->formatCertificateData($rejectedCert->load('evidences'), true),
+        ]);
+    }
+
+    public function getEvidenceSignedUrl(Request $request, int $evidenceId): JsonResponse
+    {
+        $evidence = \App\Models\TeacherCertificateEvidence::with('certificate')->findOrFail($evidenceId);
+        $admin = Auth::user();
+        $verificationService = app(\App\Services\TeacherVerificationService::class);
+
+        try {
+            $signedUrl = $verificationService->getEvidenceSignedUrl($admin, $evidence);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'signed_url' => $signedUrl,
+                    'original_name' => $evidence->original_name,
+                    'mime_type' => $evidence->mime_type,
+                    'file_size' => $evidence->file_size,
+                    'evidence_type' => $evidence->evidence_type,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 403);
+        }
     }
 
     public function activity(int $id): JsonResponse

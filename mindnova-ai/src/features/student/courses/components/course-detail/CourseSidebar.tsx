@@ -201,10 +201,13 @@ function ResourcesCard({ resources = [] }: { resources?: CourseDetailResourceIte
   );
 }
 
-function InstructorCard({ instructor }: { instructor?: CourseDetailInstructor }) {
+import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
+
+function InstructorCard({ instructor }: { instructor?: CourseDetailInstructor & { is_verified?: boolean } }) {
   const name = instructor?.name || "TS. Nguyễn Ngọc Phong";
   const role = instructor?.role || "Chuyên gia Kiến trúc Trí tuệ Nhân tạo";
   const bio = instructor?.bio || "Hơn 12 năm kinh nghiệm thiết kế mô hình AI và dẫn dắt các dự án điện toán đám mây thế hệ mới tại các học viện công nghệ hàng đầu.";
+  const isVerified = instructor?.is_verified ?? true;
 
   return (
     <div className="bg-white rounded-2xl border border-[#EAEAF4] p-5 shadow-2xs flex flex-col items-center text-center relative overflow-hidden group hover:border-[#6B6BFF]/30 transition-all">
@@ -220,7 +223,10 @@ function InstructorCard({ instructor }: { instructor?: CourseDetailInstructor })
         Giảng viên Chủ trì • Chuyên gia AI
       </span>
 
-      <h3 className="text-base font-bold text-[#1A1A2E]">{name}</h3>
+      <div className="flex items-center gap-1">
+        <h3 className="text-base font-bold text-[#1A1A2E]">{name}</h3>
+        <VerifiedTeacherBadge isVerified={isVerified} size="sm" />
+      </div>
       <p className="text-xs text-[#0D9488] font-semibold mb-2">{role}</p>
       <p className="text-xs text-[#64647A] leading-relaxed max-w-xs font-normal mb-4">
         {bio}
