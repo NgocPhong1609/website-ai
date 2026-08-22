@@ -168,7 +168,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose }: Step5SaveAndAttachMod
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
-                  { key: "capability_assessment", label: "📝 Khảo sát Năng lực (3 tín)", icon: "📝" },
+                  { key: "capability_assessment", label: "📝 Kiểm tra tổng quát (3 tín)", icon: "📝" },
                   { key: "end_of_course", label: "🏁 Cuối khóa học", icon: "🏁" },
                   { key: "in_module", label: "📂 Trong một Module", icon: "📂" },
                   { key: "after_lesson", label: "📖 Sau bài học cụ thể", icon: "📖" },

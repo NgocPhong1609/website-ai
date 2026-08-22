@@ -43,7 +43,9 @@ class GenerateAiQuizRequest extends FormRequest
 
             if ($this->filled('course_id')) {
                 $course = \App\Models\Course::find($this->input('course_id'));
-                if (!$course || (int) $course->teacher_id !== (int) $this->user()->id) {
+                if (!$course) {
+                    $validator->errors()->add('course_id', 'Khóa học không tồn tại.');
+                } elseif ((int) $course->teacher_id !== (int) $this->user()->id && !$this->user()->hasRole('admin')) {
                     $validator->errors()->add(
                         'course_id',
                         'Bạn không có quyền quản lý khóa học này.'
@@ -51,5 +53,18 @@ class GenerateAiQuizRequest extends FormRequest
                 }
             }
         });
+    }
+
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        throw new \Illuminate\Http\Exceptions\HttpResponseException(
+            response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'error_code' => 'VALIDATION_ERROR',
+                'errorCode' => 'VALIDATION_ERROR',
+                'errors' => $validator->errors(),
+            ], 422)
+        );
     }
 }

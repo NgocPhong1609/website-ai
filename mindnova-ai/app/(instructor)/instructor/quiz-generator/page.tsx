@@ -35,13 +35,13 @@ export default function InstructorQuizListPage() {
     fetchQuizzes();
   }, []);
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = async (force: boolean = false) => {
     if (!quizToDelete) return;
     setIsDeleting(true);
     setDeleteError(null);
 
     try {
-      await quizGeneratorApi.deleteQuiz(quizToDelete.id);
+      await quizGeneratorApi.deleteQuiz(quizToDelete.id, force);
       // Remove quiz from state immediately without full page reload
       setQuizzes((prev) => prev.filter((item) => item.id !== quizToDelete.id));
       setToastMessage(`Đã xóa thành công bài kiểm tra "${quizToDelete.title}".`);
@@ -223,8 +223,18 @@ export default function InstructorQuizListPage() {
             </div>
 
             {deleteError && (
-              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold">
-                ⚠️ {deleteError}
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold space-y-2">
+                <div>⚠️ {deleteError}</div>
+                {deleteError.includes("gắn vào khóa học") && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteConfirm(true)}
+                    disabled={isDeleting}
+                    className="mt-2 w-full py-2.5 px-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <span>⚡ Gỡ khỏi khóa học &amp; Xóa ngay</span>
+                  </button>
+                )}
               </div>
             )}
 

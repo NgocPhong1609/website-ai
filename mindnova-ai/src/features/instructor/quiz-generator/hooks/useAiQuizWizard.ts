@@ -27,6 +27,8 @@ export function useAiQuizWizard() {
 
   const [questions, setQuestions] = useState<GeneratedQuestion[]>([]);
 
+  const [errorInfo, setErrorInfo] = useState<{ message: string; errorCode: string } | null>(null);
+
   // Update Config
   const updateConfig = useCallback((fields: Partial<QuizConfig>) => {
     setConfig((prev) => {
@@ -39,6 +41,7 @@ export function useAiQuizWizard() {
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     setError(null);
+    setErrorInfo(null);
     setStep(3); // Transition to generating step
 
     try {
@@ -58,8 +61,21 @@ export function useAiQuizWizard() {
         throw new Error(response.message || "Không thể sinh câu hỏi bằng AI");
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || "Đã xảy ra lỗi khi tạo câu hỏi bằng AI");
-      setStep(2); // Fallback to step 2 on error
+      console.error("AI Quiz Generator error:", err);
+      const apiData = err.response?.data;
+      const errorCode = apiData?.error_code || apiData?.errorCode || "AI_GENERATION_FAILED";
+
+      let msg = apiData?.message || err.message;
+      if (!msg || typeof msg !== "string" || msg.includes("status code 500") || msg.includes("AxiosError")) {
+        msg = "Hệ thống AI đang gặp lỗi khi tạo câu hỏi. Vui lòng thử lại.";
+      }
+
+      setErrorInfo({
+        message: msg,
+        errorCode,
+      });
+      setError(msg);
+      setStep(2); // Fallback to step 2 on error so user can adjust & retry
     } finally {
       setIsGenerating(false);
     }
@@ -134,7 +150,10 @@ export function useAiQuizWizard() {
 
   const approvedCount = questions.filter((q) => q.reviewStatus === "approved" || q.reviewStatus === "edited").length;
 
-  const clearError = useCallback(() => setError(null), []);
+  const clearError = useCallback(() => {
+    setError(null);
+    setErrorInfo(null);
+  }, []);
 
   return {
     step,
@@ -145,6 +164,7 @@ export function useAiQuizWizard() {
     isGenerating,
     isSaving,
     error,
+    errorInfo,
     setError,
     clearError,
     savedQuiz,

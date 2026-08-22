@@ -84,6 +84,10 @@ Route::post('/student/onboarding', [OnboardingController::class, 'store']);
 // 🌟 BƯỚC 1: ĐẶT API AI PHÂN TÍCH BÀI HỌC VÀ GỢI Ý KHÓA HỌC Ở ĐÂY
 Route::post('/student/analyze-lesson', [\App\Http\Controllers\Api\Student\AnalyzeLessonController::class, 'analyze']);
 
+// 🧠 API AI ĐÁNH GIÁ NĂNG LỰC (Self-Assessment)
+Route::post('/student/courses/{courseId}/self-assessment/generate', [\App\Http\Controllers\Api\Student\SelfAssessmentController::class, 'generate']);
+Route::post('/student/self-assessment/submit', [\App\Http\Controllers\Api\Student\SelfAssessmentController::class, 'submit']);
+
 // Payment IPN (Webhook) - Cần public để Momo/VNPAY gọi
 Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
 Route::get('/student/payment/vnpay-ipn', [OrderController::class, 'vnpayIpn']);

@@ -31,15 +31,55 @@ class QuizGeneratorController extends Controller
     public function generate(GenerateAiQuizRequest $request)
     {
         set_time_limit(180);
+        $user = $request->user();
+        $payload = $request->validated();
+
+        \Illuminate\Support\Facades\Log::info("[QUIZ_GEN STEP 1] Request Received", [
+            'instructor_id' => $user ? $user->id : null,
+            'email' => $user ? $user->email : null,
+            'payload' => $payload,
+        ]);
+
         try {
-            $quizData = $this->aiQuizGeneratorService->generateQuiz($request->user(), $request->validated());
+            $quizData = $this->aiQuizGeneratorService->generateQuiz($user, $payload);
+
+            \Illuminate\Support\Facades\Log::info("[QUIZ_GEN STEP 11] Controller returning success response", [
+                'questions_generated' => count($quizData['questions'] ?? []),
+                'title' => $quizData['title'] ?? null,
+            ]);
 
             return $this->successResponse($quizData, 'Quiz generated successfully.');
-        } catch (Exception $e) {
-            \Illuminate\Support\Facades\Log::error("[QuizGeneratorController] generate error: " . $e->getMessage(), [
-                'exception' => $e
+        } catch (\App\Exceptions\AiQuizGeneratorException $e) {
+            \Illuminate\Support\Facades\Log::warning("[QUIZ_GEN ERROR DomainException]", [
+                'message' => $e->getMessage(),
+                'error_code' => $e->getErrorCode(),
+                'status_code' => $e->getStatusCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => array_slice(explode("\n", $e->getTraceAsString()), 0, 5),
             ]);
-            return $this->errorResponse('Không thể tạo bài kiểm tra bằng AI: ' . $e->getMessage(), 500);
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'error_code' => $e->getErrorCode(),
+                'errorCode' => $e->getErrorCode(),
+            ], $e->getStatusCode());
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("[QUIZ_GEN ERROR UnexpectedException]", [
+                'message' => $e->getMessage(),
+                'class' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => array_slice(explode("\n", $e->getTraceAsString()), 0, 5),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Hệ thống AI đang gặp sự cố khi tạo bài kiểm tra: ' . $e->getMessage(),
+                'error_code' => 'AI_GENERATION_FAILED',
+                'errorCode' => 'AI_GENERATION_FAILED',
+            ], 500);
         }
     }
 
@@ -122,11 +162,14 @@ class QuizGeneratorController extends Controller
      * DELETE /api/instructor/ai-quiz/{quiz}
      * Delete quiz.
      */
-    public function destroy(Quiz $quiz)
+    public function destroy(Request $request, Quiz $quiz)
     {
         Gate::authorize('delete', $quiz);
 
-        if ($quiz->attachments()->exists() || $quiz->lesson_id !== null) {
+        $isAttached = $quiz->attachments()->exists() || $quiz->lesson_id !== null;
+        $force = $request->boolean('force');
+
+        if ($isAttached && !$force) {
             return $this->errorResponse('Không thể xóa đề kiểm tra này vì đề đang được gắn vào khóa học.', 422);
         }
 
@@ -136,10 +179,14 @@ class QuizGeneratorController extends Controller
                 $question->delete();
             }
             $quiz->attachments()->delete();
+            if ($quiz->lesson_id) {
+                $quiz->lesson_id = null;
+                $quiz->save();
+            }
             $quiz->delete();
         });
 
-        return $this->successResponse(null, 'Đã xóa bài kiểm tra thành công.');
+        return $this->successResponse(null, $force ? 'Đã gỡ bài thi khỏi khóa học và xóa thành công.' : 'Đã xóa bài kiểm tra thành công.');
     }
 
     /**

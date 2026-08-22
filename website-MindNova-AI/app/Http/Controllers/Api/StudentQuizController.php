@@ -20,6 +20,8 @@ class StudentQuizController extends Controller
      */
     private function resolveQuizFromParam($param): ?Quiz
     {
+        $numericId = is_numeric($param) ? (int) $param : (str_starts_with(strtolower((string)$param), 'mod') ? (int) filter_var($param, FILTER_SANITIZE_NUMBER_INT) : null);
+
         // 1. If numeric, first try finding a Lesson that owns a Quiz
         if (is_numeric($param)) {
             $lesson = Lesson::with(['quiz', 'module.course'])->find($param);
@@ -33,45 +35,43 @@ class StudentQuizController extends Controller
             }
         }
 
-        // 2. If strings like 'mod67', 'mod1' were sent by course lesson routes, map to Course Capability Assessment or attached Quiz
-        if (is_string($param) && str_starts_with(strtolower($param), 'mod')) {
-            $courseId = (int) filter_var($param, FILTER_SANITIZE_NUMBER_INT);
-            if ($courseId > 0) {
-                // First try finding a quiz attached specifically as 'capability_assessment' to this course
-                $capAttachment = \App\Models\QuizCourseAttachment::where('course_id', $courseId)
-                    ->where('position', 'capability_assessment')
-                    ->with(['quiz.questions.answers'])
-                    ->first();
-                if ($capAttachment && $capAttachment->quiz) {
-                    return $capAttachment->quiz;
-                }
-
-                // Second try finding a capability_assessment type quiz associated with this course
-                $capQuiz = Quiz::where('type', 'capability_assessment')
-                    ->where(function($q) use ($courseId) {
-                        $q->whereHas('attachments', fn($att) => $att->where('course_id', $courseId))
-                          ->orWhereHas('lesson.module', fn($m) => $m->where('course_id', $courseId));
-                    })
-                    ->with(['questions.answers'])
-                    ->first();
-                if ($capQuiz) {
-                    return $capQuiz;
-                }
-
-                // Third try finding ANY quiz attached to this course
-                $anyAttachment = \App\Models\QuizCourseAttachment::where('course_id', $courseId)
-                    ->with(['quiz.questions.answers'])
-                    ->first();
-                if ($anyAttachment && $anyAttachment->quiz) {
-                    return $anyAttachment->quiz;
-                }
+        // 2. Try resolving as a Course ID (passed as 67 or mod67)
+        if ($numericId && $numericId > 0) {
+            // First try finding a quiz attached specifically as 'capability_assessment' to this course
+            $capAttachment = \App\Models\QuizCourseAttachment::where('course_id', $numericId)
+                ->where('position', 'capability_assessment')
+                ->with(['quiz.questions.answers'])
+                ->first();
+            if ($capAttachment && $capAttachment->quiz) {
+                return $capAttachment->quiz;
             }
 
-            $num = (int) filter_var($param, FILTER_SANITIZE_NUMBER_INT);
-            $index = ($num >= 1 && $num <= 10) ? ($num - 1) : 2; // default fallback index
-            $allQuizzes = Quiz::with(['lesson', 'lesson.module', 'lesson.module.course'])->orderBy('id')->get();
-            if ($allQuizzes->isNotEmpty()) {
-                return $allQuizzes[$index] ?? $allQuizzes->first();
+            // Second try finding a capability_assessment type quiz associated with this course
+            $capQuiz = Quiz::where('type', 'capability_assessment')
+                ->where(function($q) use ($numericId) {
+                    $q->whereHas('attachments', fn($att) => $att->where('course_id', $numericId))
+                      ->orWhereHas('lesson.module', fn($m) => $m->where('course_id', $numericId));
+                })
+                ->with(['questions.answers'])
+                ->first();
+            if ($capQuiz) {
+                return $capQuiz;
+            }
+
+            // Third try finding ANY quiz attached to this course
+            $anyAttachment = \App\Models\QuizCourseAttachment::where('course_id', $numericId)
+                ->with(['quiz.questions.answers'])
+                ->first();
+            if ($anyAttachment && $anyAttachment->quiz) {
+                return $anyAttachment->quiz;
+            }
+
+            // Fourth try finding any quiz in a module of this course
+            $modQuiz = Quiz::whereHas('lesson.module', fn($m) => $m->where('course_id', $numericId))
+                ->with(['questions.answers'])
+                ->first();
+            if ($modQuiz) {
+                return $modQuiz;
             }
         }
 

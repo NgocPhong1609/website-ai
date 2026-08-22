@@ -2,6 +2,7 @@
 
 namespace App\Services\Instructor;
 
+use App\Exceptions\AiQuizGeneratorException;
 use App\Services\Ai\AiRouterService;
 use App\DTOs\AiMessageDto;
 use App\Models\AiGenerationLog;
@@ -29,6 +30,16 @@ class AiQuizGeneratorService
         $mcCount = (int) $data['multiple_choice_count'];
         $essayCount = (int) $data['essay_count'];
 
+        Log::info("[QUIZ_GEN STEP 2] Start generateQuiz", [
+            'instructor_id' => $instructor->id,
+            'source_type' => $sourceType,
+            'course_id' => $courseId,
+            'difficulty' => $difficulty,
+            'total_questions' => $total,
+            'mc_count' => $mcCount,
+            'essay_count' => $essayCount,
+        ]);
+
         $courseTitle = null;
         $moduleCount = 0;
         $lessonCount = 0;
@@ -41,11 +52,11 @@ class AiQuizGeneratorService
             $course = $courseQuery->where('id', $courseId)->first();
 
             if (!$course) {
-                throw new Exception("Không tìm thấy khóa học với ID {$courseId}.");
+                throw new AiQuizGeneratorException("Không tìm thấy khóa học với ID {$courseId}.", "COURSE_NOT_FOUND", 404);
             }
 
-            if ((int) $course->teacher_id !== (int) $instructor->id) {
-                throw new Exception("Bạn không có quyền quản lý khóa học '{$course->title}'.");
+            if ((int) $course->teacher_id !== (int) $instructor->id && !$instructor->hasRole('admin')) {
+                throw new AiQuizGeneratorException("Bạn không có quyền quản lý khóa học '{$course->title}'.", "UNAUTHORIZED_COURSE_ACCESS", 403);
             }
 
             $courseTitle = $course->title;
@@ -98,6 +109,17 @@ class AiQuizGeneratorService
             if (empty(trim($aggregatedContent))) {
                 $aggregatedContent = "Khóa học '{$courseTitle}' với {$moduleCount} Module và {$lessonCount} Bài học. Mô tả: {$course->description}";
             }
+
+            Log::info("[QUIZ_GEN STEP 3] Course Lookup & Auth Success", [
+                'course_id' => $course->id,
+                'course_title' => $courseTitle,
+                'teacher_id' => $course->teacher_id,
+                'instructor_id' => $instructor->id,
+                'module_count' => $moduleCount,
+                'lesson_count' => $lessonCount,
+                'aggregated_content_length' => strlen($aggregatedContent),
+                'content_snippet' => substr($aggregatedContent, 0, 150),
+            ]);
 
             $sourceDescription = "Nội dung kiến thức bài học của Khóa học: '{$courseTitle}' (Gồm {$moduleCount} Module, {$lessonCount} Bài học):\n\n{$aggregatedContent}";
         } elseif ($sourceType === 'content') {
@@ -163,16 +185,33 @@ CẤU TRÚC JSON MẪU:
                 new AiMessageDto('user', "Hãy tạo đề kiểm tra ngay bây giờ. Trả về đúng JSON theo yêu cầu.")
             ];
 
+            Log::info("[QUIZ_GEN STEP 4] Dispatching AI Request", [
+                'prompt_length' => strlen($systemPrompt),
+            ]);
+
             $aiResult = $this->aiRouter->sendMessageWithFallback($messages, [
                 'response_mime_type' => 'application/json',
                 'user_id' => $instructor->id,
                 'feature' => 'ai_quiz_generator'
             ]);
 
+            Log::info("[QUIZ_GEN STEP 5] AI Response Received", [
+                'provider' => $aiResult['meta']['provider'] ?? 'unknown',
+                'fallbackUsed' => $aiResult['meta']['fallbackUsed'] ?? false,
+                'durationMs' => $aiResult['meta']['durationMs'] ?? 0,
+                'content_length' => strlen($aiResult['content'] ?? ''),
+                'raw_snippet' => substr($aiResult['content'] ?? '', 0, 150),
+            ]);
+
             $parsed = $this->cleanAndParseJson($aiResult['content']);
 
+            Log::info("[QUIZ_GEN STEP 6] JSON Parsed Successfully", [
+                'parsed_title' => $parsed['title'] ?? null,
+                'questions_count' => count($parsed['questions'] ?? []),
+            ]);
+
             if (!isset($parsed['questions']) || !is_array($parsed['questions'])) {
-                throw new Exception("Dữ liệu JSON trả về từ AI không chứa mảng câu hỏi 'questions'.");
+                throw new AiQuizGeneratorException("Dữ liệu JSON trả về từ AI không chứa mảng câu hỏi 'questions'.", "AI_INVALID_RESPONSE", 422);
             }
 
             // Standardize output
@@ -245,6 +284,20 @@ CẤU TRÚC JSON MẪU:
                 'meta' => $aiResult['meta'] ?? []
             ];
 
+        } catch (AiQuizGeneratorException $e) {
+            Log::warning("[AiQuizGeneratorService] Generator exception: " . $e->getMessage(), [
+                'errorCode' => $e->getErrorCode(),
+                'statusCode' => $e->getStatusCode()
+            ]);
+
+            AiGenerationLog::create([
+                'instructor_id' => $instructor->id,
+                'feature' => 'ai_quiz_generator',
+                'status' => 'failed',
+                'error_message' => $e->getMessage()
+            ]);
+
+            throw $e;
         } catch (Exception $e) {
             Log::error("[AiQuizGeneratorService] Failed: " . $e->getMessage());
 
@@ -255,7 +308,8 @@ CẤU TRÚC JSON MẪU:
                 'error_message' => $e->getMessage()
             ]);
 
-            throw new Exception("Không thể tạo đề kiểm tra bằng AI: " . $e->getMessage());
+            $code = str_contains($e->getMessage(), 'AI') ? 'AI_PROVIDER_ERROR' : 'AI_GENERATION_FAILED';
+            throw new AiQuizGeneratorException("Không thể tạo đề kiểm tra bằng AI: " . $e->getMessage(), $code, 500, $e);
         }
     }
 
@@ -370,6 +424,10 @@ Trả về CHỈ JSON theo định dạng:
         }
 
         Log::error("[AiQuizGeneratorService] JSON decode failed: " . json_last_error_msg() . " | Raw: " . substr($rawResponse, 0, 500));
-        throw new Exception("Không thể parse dữ liệu JSON từ AI (Lỗi: " . json_last_error_msg() . ").");
+        throw new AiQuizGeneratorException(
+            "AI không trả về dữ liệu câu hỏi hợp lệ (Lỗi định dạng JSON).",
+            "AI_INVALID_RESPONSE",
+            422
+        );
     }
 }

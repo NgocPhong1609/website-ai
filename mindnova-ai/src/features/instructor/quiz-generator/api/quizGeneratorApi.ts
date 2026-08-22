@@ -6,7 +6,7 @@ export const quizGeneratorApi = {
   generateQuiz: async (config: QuizConfig) => {
     const payload = {
       source_type: config.source_type,
-      course_id: config.source_type === "course" ? config.course_id : undefined,
+      course_id: config.source_type === "course" && config.course_id ? Number(config.course_id) : undefined,
       content: config.source_type === "content" ? config.source_content : undefined,
       topic: config.source_type === "topic" ? config.topic : undefined,
       difficulty: config.difficulty,
@@ -83,9 +83,11 @@ export const quizGeneratorApi = {
     return res.data?.data || res.data;
   },
 
-  // Delete quiz
-  deleteQuiz: async (quizId: number) => {
-    const res = await axiosClient.delete(`/api/instructor/ai-quiz/${quizId}`);
+  // Delete quiz (supports optional force parameter to un-attach attached quizzes)
+  deleteQuiz: async (quizId: number, force: boolean = false) => {
+    const res = await axiosClient.delete(`/api/instructor/ai-quiz/${quizId}`, {
+      params: force ? { force: 1 } : {},
+    });
     return res.data;
   },
 

@@ -73,20 +73,23 @@ class StudentController extends Controller
                              ($quiz->relationLoaded('attachments') && $quiz->attachments->contains('position', 'capability_assessment')) ||
                              \App\Models\QuizCourseAttachment::where('quiz_id', $quiz->id)->where('position', 'capability_assessment')->exists();
 
-                    $credits = $isCap ? 3 : 1;
+                    $isSelfAssessment = $quiz->type === 'self_assessment';
+                    $credits = $isSelfAssessment ? 0 : ($isCap ? 3 : 1);
                     $bestScore = (int) round($quizAttempts->max('score'));
-                    $quizType = $isCap ? 'capability_assessment' : 'normal';
+                    $quizType = $isSelfAssessment ? 'self_assessment' : ($isCap ? 'capability_assessment' : 'normal');
 
                     $quizScores[] = [
                         'quiz_id' => $quiz->id,
-                        'title' => $isCap && !str_contains($quiz->title, 'Khảo sát Năng lực') ? "📝 Khảo sát Năng lực ({$quiz->title})" : $quiz->title,
+                        'title' => $isCap && !str_contains($quiz->title, 'Kiểm tra tổng quát') ? "📝 Kiểm tra tổng quát ({$quiz->title})" : ($isSelfAssessment ? "🧠 Đánh giá năng lực ({$quiz->title})" : $quiz->title),
                         'score' => $bestScore,
                         'credits' => $credits,
                         'type' => $quizType,
                     ];
 
-                    $totalCredits += $credits;
-                    $weightedScoreSum += ($bestScore * $credits);
+                    if (!$isSelfAssessment) {
+                        $totalCredits += $credits;
+                        $weightedScoreSum += ($bestScore * $credits);
+                    }
                 }
             }
 
@@ -167,11 +170,14 @@ class StudentController extends Controller
                              ($quiz->relationLoaded('attachments') && $quiz->attachments->contains('position', 'capability_assessment')) ||
                              \App\Models\QuizCourseAttachment::where('quiz_id', $quiz->id)->where('position', 'capability_assessment')->exists();
 
-                    $credits = $isCap ? 3 : 1;
-                    $bestScore = (int) round($quizAttempts->max('score'));
+                    $isSelfAssessment = $quiz->type === 'self_assessment';
+                    if (!$isSelfAssessment) {
+                        $credits = $isCap ? 3 : 1;
+                        $bestScore = (int) round($quizAttempts->max('score'));
 
-                    $totalCredits += $credits;
-                    $weightedScoreSum += ($bestScore * $credits);
+                        $totalCredits += $credits;
+                        $weightedScoreSum += ($bestScore * $credits);
+                    }
                 }
             }
 

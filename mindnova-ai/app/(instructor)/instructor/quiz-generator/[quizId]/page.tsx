@@ -51,12 +51,12 @@ export default function QuizDetailPage() {
       .finally(() => setLoading(false));
   }, [quizId]);
 
-  const handleDelete = async () => {
+  const handleDelete = async (force: boolean = false) => {
     setIsDeleting(true);
     setDeleteError(null);
 
     try {
-      await quizGeneratorApi.deleteQuiz(quizId);
+      await quizGeneratorApi.deleteQuiz(quizId, force);
       router.push("/instructor/quiz-generator");
     } catch (err: any) {
       console.error("Delete quiz error:", err);
@@ -367,8 +367,18 @@ export default function QuizDetailPage() {
             </div>
 
             {deleteError && (
-              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold">
-                ⚠️ {deleteError}
+              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold space-y-2">
+                <div>⚠️ {deleteError}</div>
+                {deleteError.includes("gắn vào khóa học") && (
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(true)}
+                    disabled={isDeleting}
+                    className="mt-2 w-full py-2.5 px-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <span>⚡ Gỡ khỏi khóa học &amp; Xóa ngay</span>
+                  </button>
+                )}
               </div>
             )}
 

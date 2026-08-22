@@ -8,9 +8,10 @@ interface Step2ConfigFormProps {
   onChangeConfig: (fields: Partial<QuizConfig>) => void;
   onBack: () => void;
   onGenerate: () => void;
+  isGenerating?: boolean;
 }
 
-export function Step2ConfigForm({ config, onChangeConfig, onBack, onGenerate }: Step2ConfigFormProps) {
+export function Step2ConfigForm({ config, onChangeConfig, onBack, onGenerate, isGenerating = false }: Step2ConfigFormProps) {
   const mc = config.multiple_choice_count;
   const essay = config.essay_count;
   const total = config.total_questions;
@@ -128,14 +129,14 @@ export function Step2ConfigForm({ config, onChangeConfig, onBack, onGenerate }: 
           </div>
         </div>
 
-        {/* Right Column: Question Counts Breakdown Widget */}
-        <div className="p-6 rounded-2xl bg-gradient-to-br from-[#1E233E] to-[#121626] text-white flex flex-col justify-between shadow-lg">
+        {/* Right Column: Question Counts Breakdown Widget (Light Theme) */}
+        <div className="p-6 rounded-3xl bg-[#F5F4FE] border border-indigo-100/90 text-[#1A1A2E] flex flex-col justify-between shadow-xs">
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+              <h3 className="text-xs font-black text-[#1A1A2E] uppercase tracking-wider flex items-center gap-2">
                 <span>⚙️ Cân Bằng Cấu Trúc Đề</span>
               </h3>
-              <span className="px-3 py-1 rounded-xl bg-white/10 text-indigo-300 text-xs font-mono font-bold border border-white/10">
+              <span className="px-3 py-1 rounded-xl bg-white text-indigo-700 text-xs font-mono font-black border border-indigo-200 shadow-2xs">
                 Tổng: {total} câu
               </span>
             </div>
@@ -143,8 +144,8 @@ export function Step2ConfigForm({ config, onChangeConfig, onBack, onGenerate }: 
             {/* Total Questions Slider */}
             <div>
               <div className="flex justify-between text-xs font-bold mb-1">
-                <span className="text-gray-300">Tổng số câu hỏi mong muốn</span>
-                <span className="text-indigo-400 font-extrabold">{total} câu</span>
+                <span className="text-gray-700">Tổng số câu hỏi mong muốn</span>
+                <span className="text-[#4F46E5] font-black">{total} câu</span>
               </div>
               <input
                 type="range"
@@ -157,44 +158,44 @@ export function Step2ConfigForm({ config, onChangeConfig, onBack, onGenerate }: 
                   const newEssay = newTotal - newMc;
                   onChangeConfig({ total_questions: newTotal, multiple_choice_count: newMc, essay_count: newEssay });
                 }}
-                className="w-full accent-[#4F46E5] cursor-pointer"
+                className="w-full accent-[#4F46E5] cursor-pointer h-2 bg-indigo-100 rounded-lg"
               />
             </div>
 
-            {/* MCQ & Essay Inputs */}
+            {/* MCQ & Essay Inputs (Light Theme - White BG & Dark Readable Text) */}
             <div className="grid grid-cols-2 gap-3 pt-2">
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex flex-col gap-1">
-                <label className="text-[11px] font-bold text-indigo-300 uppercase">Số câu trắc nghiệm</label>
+              <div className="p-3.5 rounded-2xl bg-white border border-indigo-200/80 shadow-2xs flex flex-col gap-1.5">
+                <label className="text-[11px] font-black text-indigo-700 uppercase tracking-wider">Số câu trắc nghiệm</label>
                 <input
                   type="number"
                   min={0}
                   max={total}
                   value={mc}
                   onChange={(e) => onChangeConfig({ multiple_choice_count: parseInt(e.target.value) || 0 })}
-                  className="w-full p-2 rounded-lg bg-black/40 border border-indigo-500/30 text-white font-extrabold text-sm focus:outline-none focus:border-indigo-400"
+                  className="w-full p-2.5 rounded-xl bg-[#FAF9FF] border border-indigo-200 text-[#1A1A2E] font-black text-sm focus:outline-none focus:border-[#4F46E5] focus:bg-white"
                 />
               </div>
 
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex flex-col gap-1">
-                <label className="text-[11px] font-bold text-purple-300 uppercase">Số câu tự luận</label>
+              <div className="p-3.5 rounded-2xl bg-white border border-purple-200/80 shadow-2xs flex flex-col gap-1.5">
+                <label className="text-[11px] font-black text-purple-700 uppercase tracking-wider">Số câu tự luận</label>
                 <input
                   type="number"
                   min={0}
                   max={total}
                   value={essay}
                   onChange={(e) => onChangeConfig({ essay_count: parseInt(e.target.value) || 0 })}
-                  className="w-full p-2 rounded-lg bg-black/40 border border-purple-500/30 text-white font-extrabold text-sm focus:outline-none focus:border-purple-400"
+                  className="w-full p-2.5 rounded-xl bg-[#FAF9FF] border border-purple-200 text-[#1A1A2E] font-black text-sm focus:outline-none focus:border-[#7C3AED] focus:bg-white"
                 />
               </div>
             </div>
 
             {/* Realtime Balance Progress Bar */}
             <div className="mt-2 flex flex-col gap-2">
-              <div className="flex justify-between text-[11px] font-extrabold text-gray-300">
-                <span className="text-indigo-400">Trắc nghiệm: {mc} ({mcPercent}%)</span>
-                <span className="text-purple-400">Tự luận: {essay} ({essayPercent}%)</span>
+              <div className="flex justify-between text-[11px] font-black">
+                <span className="text-indigo-700">Trắc nghiệm: {mc} ({mcPercent}%)</span>
+                <span className="text-purple-700">Tự luận: {essay} ({essayPercent}%)</span>
               </div>
-              <div className="w-full h-3 rounded-full bg-gray-800 overflow-hidden flex border border-white/10">
+              <div className="w-full h-3 rounded-full bg-indigo-100 overflow-hidden flex border border-indigo-200/60">
                 <div
                   style={{ width: `${mcPercent}%` }}
                   className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 transition-all duration-300"
@@ -210,14 +211,14 @@ export function Step2ConfigForm({ config, onChangeConfig, onBack, onGenerate }: 
           {/* Realtime Validation Message */}
           <div className="mt-4">
             {isValidBalance ? (
-              <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-2">
+              <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 shadow-2xs">
                 <span>✓</span>
                 <span>Cấu trúc đề hợp lệ: {mc} trắc nghiệm + {essay} tự luận = {total} câu.</span>
               </div>
             ) : (
-              <div className="p-3 rounded-xl bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-bold flex items-center gap-2">
+              <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2 shadow-2xs">
                 <span>⚠️</span>
-                <span>Chưa khớp: {mc} + {essay} = {sum} (Yêu cầu bằng tổng {total} câu).</span>
+                <span>Chưa khớp: Bạn đang chọn {mc} trắc nghiệm + {essay} tự luận = {sum} câu, nhưng tổng số câu yêu cầu là {total}.</span>
               </div>
             )}
           </div>
@@ -229,7 +230,8 @@ export function Step2ConfigForm({ config, onChangeConfig, onBack, onGenerate }: 
         <button
           type="button"
           onClick={onBack}
-          className="px-6 py-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold text-xs transition-all cursor-pointer"
+          disabled={isGenerating}
+          className="px-6 py-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold text-xs transition-all cursor-pointer disabled:opacity-50"
         >
           🠔 Quay lại
         </button>
@@ -237,10 +239,14 @@ export function Step2ConfigForm({ config, onChangeConfig, onBack, onGenerate }: 
         <button
           type="button"
           onClick={onGenerate}
-          disabled={!isValidBalance || !config.title.trim()}
+          disabled={!isValidBalance || !config.title.trim() || isGenerating}
           className="px-8 py-3 bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#4338CA] hover:to-[#6D28D9] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 cursor-pointer flex items-center gap-2"
         >
-          <span>⚡ Tạo {total} câu hỏi bằng AI</span>
+          {isGenerating ? (
+            <span>⚡ Đang tạo câu hỏi...</span>
+          ) : (
+            <span>⚡ Tạo {total} câu hỏi bằng AI</span>
+          )}
         </button>
       </div>
     </div>
