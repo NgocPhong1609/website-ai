@@ -152,13 +152,27 @@ class QuizService
      */
     public function attachQuizToCourse(Quiz $quiz, array $attachData): QuizCourseAttachment
     {
+        $position = $attachData['position'] ?? 'end_of_course';
+
+        if ($position === 'capability_assessment') {
+            $quiz->update([
+                'type' => 'capability_assessment',
+                'credits' => 3,
+            ]);
+        } else {
+            $quiz->update([
+                'type' => $quiz->type === 'capability_assessment' ? 'normal' : $quiz->type,
+                'credits' => $quiz->type === 'capability_assessment' ? 1 : ($quiz->credits ?? 1),
+            ]);
+        }
+
         return QuizCourseAttachment::updateOrCreate(
             ['quiz_id' => $quiz->id],
             [
                 'course_id' => $attachData['course_id'],
                 'module_id' => $attachData['module_id'] ?? null,
                 'after_lesson_id' => $attachData['after_lesson_id'] ?? null,
-                'position' => $attachData['position'] ?? 'end_of_course',
+                'position' => $position,
             ]
         );
     }

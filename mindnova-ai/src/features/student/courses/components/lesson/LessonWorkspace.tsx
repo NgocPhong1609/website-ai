@@ -1157,9 +1157,10 @@ function LessonWorkspaceContent() {
           <div className="flex items-center gap-3">
             <Link
               href={`/practice/quiz/question?lessonId=mod${parsedCourseId}`}
-              className="px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-[#4B5563] bg-white border border-[#E5E7EB] hover:bg-gray-50 transition-all text-decoration-none shadow-sm block"
+              className="flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-[#4B5563] bg-white border border-[#E5E7EB] hover:bg-gray-50 transition-all text-decoration-none shadow-sm block"
             >
-              📝 Khảo sát Năng lực
+              <span>📝 Khảo sát Năng lực</span>
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-300">3 tín</span>
             </Link>
             <button
               onClick={handleGoNext}

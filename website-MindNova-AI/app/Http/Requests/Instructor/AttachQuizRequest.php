@@ -15,7 +15,7 @@ class AttachQuizRequest extends FormRequest
     {
         return [
             'course_id' => 'required|exists:courses,id',
-            'position' => 'required|in:end_of_course,in_module,after_lesson',
+            'position' => 'required|in:capability_assessment,end_of_course,in_module,after_lesson',
             'module_id' => 'required_if:position,in_module|nullable|exists:course_modules,id',
             'after_lesson_id' => 'required_if:position,after_lesson|nullable|exists:lessons,id',
         ];

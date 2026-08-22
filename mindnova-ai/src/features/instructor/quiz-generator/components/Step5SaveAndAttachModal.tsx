@@ -15,7 +15,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose }: Step5SaveAndAttachMod
   const [courses, setCourses] = useState<any[]>([]);
   const [targetCourse, setTargetCourse] = useState<any>(null);
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
-  const [position, setPosition] = useState<"end_of_course" | "in_module" | "after_lesson">("end_of_course");
+  const [position, setPosition] = useState<"capability_assessment" | "end_of_course" | "in_module" | "after_lesson">("capability_assessment");
   const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
   const [selectedLessonId, setSelectedLessonId] = useState<number | null>(null);
   const [isAttaching, setIsAttaching] = useState(false);
@@ -166,24 +166,25 @@ export function Step5SaveAndAttachModal({ quiz, onClose }: Step5SaveAndAttachMod
               <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">
                 2. Chọn vị trí xuất hiện bài kiểm tra trong khóa học
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
-                  { key: "end_of_course", label: "Cuối khóa học", icon: "🏁" },
-                  { key: "in_module", label: "Trong một Module", icon: "📂" },
-                  { key: "after_lesson", label: "Sau bài học cụ thể", icon: "📖" },
+                  { key: "capability_assessment", label: "📝 Khảo sát Năng lực (3 tín)", icon: "📝" },
+                  { key: "end_of_course", label: "🏁 Cuối khóa học", icon: "🏁" },
+                  { key: "in_module", label: "📂 Trong một Module", icon: "📂" },
+                  { key: "after_lesson", label: "📖 Sau bài học cụ thể", icon: "📖" },
                 ].map((pos) => (
                   <button
                     key={pos.key}
                     type="button"
                     onClick={() => setPosition(pos.key as any)}
-                    className={`p-3.5 rounded-xl border text-xs font-extrabold flex flex-col items-center gap-1 transition-all cursor-pointer ${
+                    className={`p-3 rounded-xl border text-[11px] font-extrabold flex flex-col items-center gap-1 transition-all cursor-pointer text-center ${
                       position === pos.key
-                        ? "border-[#4F46E5] bg-indigo-50 text-[#4F46E5] shadow-xs"
+                        ? "border-[#4F46E5] bg-indigo-50 text-[#4F46E5] shadow-xs ring-1 ring-[#4F46E5]/30"
                         : "border-gray-200 text-gray-600 hover:border-gray-300 bg-white"
                     }`}
                   >
-                    <span className="text-lg">{pos.icon}</span>
-                    <span>{pos.label}</span>
+                    <span className="text-base">{pos.icon}</span>
+                    <span className="leading-tight">{pos.label}</span>
                   </button>
                 ))}
               </div>

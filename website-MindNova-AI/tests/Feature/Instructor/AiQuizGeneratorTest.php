@@ -402,3 +402,48 @@ test('instructor cannot delete another instructor quiz', function () {
 
     $response->assertStatus(403);
 });
+
+test('instructor can attach quiz as capability_assessment with 3 credits', function () {
+    $quiz = Quiz::create([
+        'instructor_id' => $this->teacher->id,
+        'title' => 'Đề thi Khảo sát Năng lực mới',
+        'total_questions' => 2,
+        'status' => 'published'
+    ]);
+
+    $course = Course::create([
+        'teacher_id' => $this->teacher->id,
+        'title' => 'Khóa học Test Capability Assessment',
+        'slug' => 'khoa-hoc-test-capability',
+        'description' => 'Mô tả',
+        'price' => 100
+    ]);
+
+    $response = $this->actingAs($this->teacher)
+        ->postJson("/api/instructor/ai-quiz/{$quiz->id}/attach", [
+            'course_id' => $course->id,
+            'position' => 'capability_assessment'
+        ]);
+
+    $response->assertSuccessful()
+        ->assertJsonPath('success', true);
+
+    $this->assertDatabaseHas('quiz_course_attachments', [
+        'quiz_id' => $quiz->id,
+        'course_id' => $course->id,
+        'position' => 'capability_assessment'
+    ]);
+
+    $this->assertDatabaseHas('quizzes', [
+        'id' => $quiz->id,
+        'type' => 'capability_assessment',
+        'credits' => 3
+    ]);
+
+    $student = \App\Models\User::factory()->create(['role' => 'student']);
+    $res = $this->actingAs($student)
+        ->getJson("/api/student/lessons/mod{$course->id}/quiz");
+
+    $res->assertStatus(200)
+        ->assertJsonPath('data.quiz_id', $quiz->id);
+});

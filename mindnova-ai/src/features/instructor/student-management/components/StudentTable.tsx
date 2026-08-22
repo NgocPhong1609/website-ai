@@ -52,7 +52,7 @@ function Avatar({ name, avatarUrl }: { name: string; avatarUrl?: string }) {
   );
 }
 
-const COLS = ["Hồ Sơ Học Viên", "Khóa Học Ghi Danh", "Tiến Độ & Trạng Thái", "Điểm Kiểm Tra", "Ngày Ghi Danh"];
+const COLS = ["Hồ Sơ Học Viên", "Khóa Học Ghi Danh", "Tiến Độ & Trạng Thái", "Điểm & Tín Chỉ", "Ngày Ghi Danh"];
 
 // ─── Custom Select Component ──────────────────────────────────────────────────
 function CustomSelect({
@@ -261,9 +261,31 @@ export function StudentTable({
                       <ProgressBadge progress={st.progress} status={st.status} />
                     </td>
                     <td className="px-6 py-4">
-                      <span className={twMerge("font-mono text-xs font-black px-2.5 py-1 rounded-lg border", st.average_score >= 80 ? "text-emerald-700 bg-emerald-50 border-emerald-200" : (st.average_score !== null ? "text-amber-700 bg-amber-50 border-amber-200" : "text-gray-500 bg-gray-50 border-gray-200"))}>
-                        {st.average_score !== null ? `${st.average_score}/100` : "Chưa có"}
-                      </span>
+                      <div className="flex flex-col gap-1.5 items-start">
+                        <div className="flex items-center gap-2">
+                          <span className={twMerge("font-mono text-xs font-black px-2.5 py-1 rounded-lg border shadow-2xs", st.average_score >= 80 ? "text-emerald-700 bg-emerald-50 border-emerald-200" : (st.average_score !== null ? "text-amber-700 bg-amber-50 border-amber-200" : "text-gray-500 bg-gray-50 border-gray-200"))}>
+                            {st.average_score !== null ? `${st.average_score}/100` : "Chưa có"}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-black font-mono">
+                            {st.total_credits ? `${st.total_credits} tín` : "0 tín"}
+                          </span>
+                        </div>
+
+                        {/* Quiz Breakdown Tooltip / List */}
+                        {Array.isArray(st.quiz_scores) && st.quiz_scores.length > 0 && (
+                          <div className="flex flex-col gap-1 mt-0.5">
+                            {st.quiz_scores.map((q: any) => (
+                              <div key={q.quiz_id} className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-600">
+                                <span className="truncate max-w-[140px]" title={q.title}>{q.title}:</span>
+                                <span className="font-mono font-bold text-gray-900">{q.score}/100</span>
+                                <span className={`px-1.5 py-0.2 rounded font-black text-[9px] ${q.type === 'capability_assessment' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-gray-100 text-gray-700'}`}>
+                                  {q.credits} tín
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-xs font-bold text-gray-500">
                       {st.enrolled_at ? new Date(st.enrolled_at).toLocaleDateString("vi-VN") : "N/A"}

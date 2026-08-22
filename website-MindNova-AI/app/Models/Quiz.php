@@ -15,6 +15,8 @@ class Quiz extends Model
         'description',
         'source_type',
         'source_content',
+        'type', // normal, capability_assessment
+        'credits', // 1 for normal, 3 for capability_assessment
         'difficulty',
         'total_questions',
         'mc_questions_count',
@@ -26,6 +28,7 @@ class Quiz extends Model
     ];
 
     protected $casts = [
+        'credits' => 'integer',
         'time_limit_minutes' => 'integer',
         'passing_score' => 'integer',
         'total_questions' => 'integer',
@@ -33,6 +36,17 @@ class Quiz extends Model
         'essay_questions_count' => 'integer',
         'total_points' => 'float',
     ];
+
+    public function getCreditsAttribute(): int
+    {
+        if ($this->attributes['type'] ?? '' === 'capability_assessment') {
+            return 3;
+        }
+        if ($this->relationLoaded('attachments') && $this->attachments->contains('position', 'capability_assessment')) {
+            return 3;
+        }
+        return (int) ($this->attributes['credits'] ?? 1);
+    }
 
     public function instructor(): BelongsTo
     {

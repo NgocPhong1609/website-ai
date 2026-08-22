@@ -35,7 +35,7 @@ export interface QuizConfig {
 
 export interface QuizAttachmentPayload {
   course_id: number;
-  position: "end_of_course" | "in_module" | "after_lesson";
+  position: "capability_assessment" | "end_of_course" | "in_module" | "after_lesson";
   module_id?: number | null;
   after_lesson_id?: number | null;
 }

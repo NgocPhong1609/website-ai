@@ -50,12 +50,47 @@ class StudentController extends Controller
                 $status = 'Nguy cơ trễ';
             }
 
-            // Calculate quiz score for this specific course
-            $avgScore = \App\Models\UserQuizAttempt::where('user_id', $student->id)
-                ->whereHas('quiz.lesson.module', function($q) use ($enrollment) {
-                    $q->where('course_id', $enrollment->course_id);
+            // Calculate quiz scores, credits, and weighted average score for this specific course
+            $attempts = \App\Models\UserQuizAttempt::where('user_id', $student->id)
+                ->whereHas('quiz', function($q) use ($enrollment) {
+                    $q->whereHas('attachments', fn($att) => $att->where('course_id', $enrollment->course_id))
+                      ->orWhereHas('lesson.module', fn($m) => $m->where('course_id', $enrollment->course_id));
                 })
-                ->avg('score');
+                ->with(['quiz.attachments'])
+                ->get();
+
+            $quizScores = [];
+            $totalCredits = 0;
+            $weightedScoreSum = 0;
+
+            if ($attempts->isNotEmpty()) {
+                $grouped = $attempts->groupBy('quiz_id');
+                foreach ($grouped as $quizId => $quizAttempts) {
+                    $quiz = $quizAttempts->first()->quiz;
+                    if (!$quiz) continue;
+
+                    $isCap = $quiz->type === 'capability_assessment' || 
+                             ($quiz->relationLoaded('attachments') && $quiz->attachments->contains('position', 'capability_assessment')) ||
+                             \App\Models\QuizCourseAttachment::where('quiz_id', $quiz->id)->where('position', 'capability_assessment')->exists();
+
+                    $credits = $isCap ? 3 : 1;
+                    $bestScore = (int) round($quizAttempts->max('score'));
+                    $quizType = $isCap ? 'capability_assessment' : 'normal';
+
+                    $quizScores[] = [
+                        'quiz_id' => $quiz->id,
+                        'title' => $isCap && !str_contains($quiz->title, 'Khảo sát Năng lực') ? "📝 Khảo sát Năng lực ({$quiz->title})" : $quiz->title,
+                        'score' => $bestScore,
+                        'credits' => $credits,
+                        'type' => $quizType,
+                    ];
+
+                    $totalCredits += $credits;
+                    $weightedScoreSum += ($bestScore * $credits);
+                }
+            }
+
+            $avgScore = $totalCredits > 0 ? round($weightedScoreSum / $totalCredits) : null;
 
             return [
                 'id' => $student->id,
@@ -69,7 +104,9 @@ class StudentController extends Controller
                 ],
                 'progress' => $progress,
                 'status' => $status,
-                'average_score' => $avgScore ? round($avgScore) : null,
+                'average_score' => $avgScore,
+                'total_credits' => $totalCredits,
+                'quiz_scores' => $quizScores,
                 'enrolled_at' => $enrollment->enrolled_at ? $enrollment->enrolled_at->toIso8601String() : null,
             ];
         });
@@ -92,7 +129,7 @@ class StudentController extends Controller
         $query = $this->studentService->getStudentsForInstructor($teacherId, $courseId, $search);
         $enrollments = $query->get();
 
-        $csvData = "ID,Họ tên,Email,Khóa học,Tiến độ (%),Trạng thái,Điểm TB,Ngày ghi danh\n";
+        $csvData = "ID,Họ tên,Email,Khóa học,Tiến độ (%),Trạng thái,Điểm TB,Tổng tín chỉ,Ngày ghi danh\n";
         
         // Use UTF-8 BOM for Excel
         $csvData = "\xEF\xBB\xBF" . $csvData;
@@ -110,17 +147,41 @@ class StudentController extends Controller
                 $status = 'Nguy cơ trễ';
             }
 
-            $avgScore = \App\Models\UserQuizAttempt::where('user_id', $student->id)
-                ->whereHas('quiz.lesson.module', function($q) use ($enrollment) {
-                    $q->where('course_id', $enrollment->course_id);
+            $attempts = \App\Models\UserQuizAttempt::where('user_id', $student->id)
+                ->whereHas('quiz', function($q) use ($enrollment) {
+                    $q->whereHas('attachments', fn($att) => $att->where('course_id', $enrollment->course_id))
+                      ->orWhereHas('lesson.module', fn($m) => $m->where('course_id', $enrollment->course_id));
                 })
-                ->avg('score');
-            $avgScoreFormatted = $avgScore ? round($avgScore) : 'N/A';
+                ->with(['quiz.attachments'])
+                ->get();
+
+            $totalCredits = 0;
+            $weightedScoreSum = 0;
+            if ($attempts->isNotEmpty()) {
+                $grouped = $attempts->groupBy('quiz_id');
+                foreach ($grouped as $quizId => $quizAttempts) {
+                    $quiz = $quizAttempts->first()->quiz;
+                    if (!$quiz) continue;
+
+                    $isCap = $quiz->type === 'capability_assessment' || 
+                             ($quiz->relationLoaded('attachments') && $quiz->attachments->contains('position', 'capability_assessment')) ||
+                             \App\Models\QuizCourseAttachment::where('quiz_id', $quiz->id)->where('position', 'capability_assessment')->exists();
+
+                    $credits = $isCap ? 3 : 1;
+                    $bestScore = (int) round($quizAttempts->max('score'));
+
+                    $totalCredits += $credits;
+                    $weightedScoreSum += ($bestScore * $credits);
+                }
+            }
+
+            $avgScore = $totalCredits > 0 ? round($weightedScoreSum / $totalCredits) : null;
+            $avgScoreFormatted = $avgScore !== null ? "{$avgScore}/100" : 'N/A';
             
             $enrolledAt = $enrollment->enrolled_at ? $enrollment->enrolled_at->format('Y-m-d H:i:s') : 'N/A';
 
             $csvData .= sprintf(
-                "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+                "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
                 $student->id,
                 str_replace('"', '""', $student->name),
                 str_replace('"', '""', $student->email),
@@ -128,6 +189,7 @@ class StudentController extends Controller
                 $progress,
                 $status,
                 $avgScoreFormatted,
+                $totalCredits,
                 $enrolledAt
             );
         }

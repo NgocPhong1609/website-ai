@@ -33,10 +33,42 @@ class StudentQuizController extends Controller
             }
         }
 
-        // 2. If strings like 'mod1', 'mod2', 'mod3', 'mod4' were sent by legacy routes, map to N-th Quiz in DB
+        // 2. If strings like 'mod67', 'mod1' were sent by course lesson routes, map to Course Capability Assessment or attached Quiz
         if (is_string($param) && str_starts_with(strtolower($param), 'mod')) {
+            $courseId = (int) filter_var($param, FILTER_SANITIZE_NUMBER_INT);
+            if ($courseId > 0) {
+                // First try finding a quiz attached specifically as 'capability_assessment' to this course
+                $capAttachment = \App\Models\QuizCourseAttachment::where('course_id', $courseId)
+                    ->where('position', 'capability_assessment')
+                    ->with(['quiz.questions.answers'])
+                    ->first();
+                if ($capAttachment && $capAttachment->quiz) {
+                    return $capAttachment->quiz;
+                }
+
+                // Second try finding a capability_assessment type quiz associated with this course
+                $capQuiz = Quiz::where('type', 'capability_assessment')
+                    ->where(function($q) use ($courseId) {
+                        $q->whereHas('attachments', fn($att) => $att->where('course_id', $courseId))
+                          ->orWhereHas('lesson.module', fn($m) => $m->where('course_id', $courseId));
+                    })
+                    ->with(['questions.answers'])
+                    ->first();
+                if ($capQuiz) {
+                    return $capQuiz;
+                }
+
+                // Third try finding ANY quiz attached to this course
+                $anyAttachment = \App\Models\QuizCourseAttachment::where('course_id', $courseId)
+                    ->with(['quiz.questions.answers'])
+                    ->first();
+                if ($anyAttachment && $anyAttachment->quiz) {
+                    return $anyAttachment->quiz;
+                }
+            }
+
             $num = (int) filter_var($param, FILTER_SANITIZE_NUMBER_INT);
-            $index = ($num >= 1 && $num <= 10) ? ($num - 1) : 2; // default 3rd quiz
+            $index = ($num >= 1 && $num <= 10) ? ($num - 1) : 2; // default fallback index
             $allQuizzes = Quiz::with(['lesson', 'lesson.module', 'lesson.module.course'])->orderBy('id')->get();
             if ($allQuizzes->isNotEmpty()) {
                 return $allQuizzes[$index] ?? $allQuizzes->first();
