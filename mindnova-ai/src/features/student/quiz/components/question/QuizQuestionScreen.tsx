@@ -17,11 +17,28 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
   const { mutateAsync: submitQuiz, isPending: isSubmitting } = useSubmitQuiz();
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  // Store all selected answers mapped by Question ID (as strings to guarantee strict comparison accuracy)
+  // Store all selected/typed answers mapped by Question ID
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [errorNotice, setErrorNotice] = useState<string | null>(null);
+
+  // Restore draft answers from localStorage on load
+  useEffect(() => {
+    if (quiz && typeof window !== "undefined") {
+      try {
+        const savedDraft = localStorage.getItem(`mindnova_draft_quiz_${lessonId}`);
+        if (savedDraft) {
+          const parsed = JSON.parse(savedDraft);
+          if (parsed && typeof parsed === "object") {
+            setAnswers(parsed);
+          }
+        }
+      } catch (e) {
+        console.error("Lỗi khi khôi phục bản nháp bài làm:", e);
+      }
+    }
+  }, [quiz, lessonId]);
 
   // Initialize timer once quiz data loads
   useEffect(() => {
@@ -29,6 +46,18 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
       setTimeRemaining(quiz.time_limit_minutes * 60);
     }
   }, [quiz, timeRemaining, isFinished]);
+
+  const updateAnswer = (questionId: string | number, val: string | number) => {
+    setAnswers((prev) => {
+      const updated = { ...prev, [String(questionId)]: val };
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem(`mindnova_draft_quiz_${lessonId}`, JSON.stringify(updated));
+        } catch (e) {}
+      }
+      return updated;
+    });
+  };
 
   const handleSubmit = async (finalAnswers: Record<string, string | number> = answers) => {
     if (!quiz || isSubmitting) return;
@@ -40,8 +69,9 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
         time_taken_seconds: timeTaken > 0 ? timeTaken : 180,
       });
       
-      // Persist grading report for seamless SPA transition to result dashboard
+      // Clear draft on successful submission
       if (typeof window !== "undefined") {
+        localStorage.removeItem(`mindnova_draft_quiz_${lessonId}`);
         localStorage.setItem("mindnova_last_quiz_result", JSON.stringify(res));
       }
 
@@ -75,17 +105,23 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  // Guarantee string saving for consistent exact matching across render cycles
   const handleSelectAnswer = (questionId: string | number, answerId: string | number) => {
-    setAnswers((prev) => ({ ...prev, [String(questionId)]: String(answerId) }));
+    updateAnswer(questionId, String(answerId));
+  };
+
+  const handleEssayChange = (questionId: string | number, text: string) => {
+    updateAnswer(questionId, text);
   };
 
   const handleUserInitiatedSubmit = () => {
     if (!quiz) return;
-    const currentAnswered = Object.keys(answers).filter(key => answers[key] != null && answers[key] !== "").length;
+    const currentAnswered = Object.keys(answers).filter(key => {
+      const val = answers[key];
+      return val != null && String(val).trim() !== "";
+    }).length;
 
     if (currentAnswered === 0) {
-      if (!confirm("⚠️ Bạn chưa chọn bất kỳ câu trả lời nào! Bạn có chắc chắn muốn nộp bài trắng (nhận 0 điểm) ngay bây giờ không?")) {
+      if (!confirm("⚠️ Bạn chưa chọn hoặc viết bất kỳ câu trả lời nào! Bạn có chắc chắn muốn nộp bài trắng (nhận 0 điểm) ngay bây giờ không?")) {
         return;
       }
     } else if (currentAnswered < quiz.questions.length) {
@@ -113,6 +149,7 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
       setCurrentIndex((prev) => prev - 1);
     }
   };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#F8F9FC] flex flex-col justify-between p-6">
@@ -148,13 +185,39 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
 
   const question = quiz.questions[currentIndex];
   const progress = Math.round(((currentIndex + 1) / quiz.questions.length) * 100);
-  const selectedAnswerId = answers[String(question?.id)];
+  const currentAnswerVal = answers[String(question?.id)];
+  const isEssay = question?.type === 'essay';
 
-  // Calculate answered count to give user clear confidence in state preservation
-  const answeredCount = Object.keys(answers).filter(key => answers[key] != null && answers[key] !== "").length;
+  // Calculate answered count accurately for both MCQ & Essay
+  const answeredCount = Object.keys(answers).filter(key => {
+    const val = answers[key];
+    return val != null && String(val).trim() !== "";
+  }).length;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FC] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F8F9FC] flex flex-col font-sans relative">
+      
+      {/* ─── AI Grading Fullscreen Overlay Modal ─── */}
+      {isSubmitting && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-6 animate-fadeIn">
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full border border-[#EAEAF4] shadow-2xl text-center space-y-6 animate-scaleUp">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#4648D4] via-[#5052EE] to-[#0D9488] text-white flex items-center justify-center mx-auto text-2xl shadow-lg animate-bounce">
+              🤖
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-[#1A1A2E]">Gia sư AI Nova đang thẩm định bài làm...</h3>
+              <p className="text-xs text-[#64647A] leading-relaxed">
+                Hệ thống AI đang phân tích bài thi trắc nghiệm &amp; chấm điểm chi tiết từng câu tự luận dựa trên Rubric và Đáp án mẫu. Vui lòng chờ trong giây lát!
+              </p>
+            </div>
+            <div className="w-full bg-[#F0F2F8] h-2 rounded-full overflow-hidden p-0.5">
+              <div className="h-full bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] rounded-full animate-pulse" style={{ width: "85%" }}></div>
+            </div>
+            <p className="text-[11px] font-semibold text-[#5052EE] uppercase tracking-wider">MindNova AI Co-Pilot Grading Engine</p>
+          </div>
+        </div>
+      )}
+
       {/* ─── Topbar ────────────────────────────────────────────────────────── */}
       <header className="h-18 bg-white/95 backdrop-blur-md border-b border-[#EAEAF4] flex items-center justify-between px-6 shrink-0 sticky top-0 z-20 shadow-2xs">
         <div className="flex items-center gap-4">
@@ -200,14 +263,16 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
           <div className="mb-7 bg-white p-4.5 rounded-2xl border border-[#EAEAF4] shadow-2xs">
             <div className="flex items-center justify-between mb-3 text-xs">
               <span className="font-semibold text-[#1A1A2E] flex items-center gap-1.5">
-                <span>📍 Bảng chọn nhanh câu hỏi (Các câu đã chọn được bảo lưu tuyệt đối):</span>
+                <span>📍 Bảng chọn nhanh câu hỏi (Nội dung tự luận &amp; trắc nghiệm được bảo lưu tuyệt đối):</span>
               </span>
               <span className="text-[#7878A0]">Nhấp vào số bất kỳ để di chuyển</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {quiz.questions.map((q, idx) => {
-                const isAnswered = answers[String(q.id)] != null;
+                const qAns = answers[String(q.id)];
+                const isAnswered = qAns != null && String(qAns).trim() !== "";
                 const isCurrent = currentIndex === idx;
+                const isQEssay = q.type === 'essay';
                 return (
                   <button
                     key={String(q.id)}
@@ -220,7 +285,7 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
                         ? "bg-[#EEF2FF] text-[#5052EE] border-[#5052EE]/30 hover:bg-[#5052EE]/15"
                         : "bg-[#F8FAFC] text-[#64647A] border-[#EAEAF4] hover:bg-white hover:border-[#5052EE]/40"
                     }`}
-                    title={`Câu số ${idx + 1}: ${isAnswered ? "Đã chọn đáp án" : "Chưa làm"}`}
+                    title={`Câu số ${idx + 1} (${isQEssay ? "Tự luận" : "Trắc nghiệm"}): ${isAnswered ? "Đã trả lời" : "Chưa làm"}`}
                   >
                     <span>{idx + 1}</span>
                     {isAnswered && !isCurrent && (
@@ -232,10 +297,23 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
             </div>
           </div>
 
+          {/* ─── Question Header & Type Badge ─── */}
           <div className="mb-7">
-            <span className="text-[#5052EE] text-[11px] font-semibold tracking-wider uppercase bg-[#EEF2FF] px-3 py-1 rounded-full border border-[#5052EE]/20">
-              Câu hỏi số {currentIndex + 1} / {quiz.questions.length}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[#5052EE] text-[11px] font-semibold tracking-wider uppercase bg-[#EEF2FF] px-3 py-1 rounded-full border border-[#5052EE]/20">
+                Câu hỏi số {currentIndex + 1} / {quiz.questions.length}
+              </span>
+
+              {isEssay ? (
+                <span className="text-[#D97706] text-[11px] font-semibold uppercase bg-[#FEF3C7] px-3 py-1 rounded-full border border-[#D97706]/30 flex items-center gap-1">
+                  <span>✏️ Tự luận AI Grading ({question?.points || 5} điểm)</span>
+                </span>
+              ) : (
+                <span className="text-[#0D9488] text-[11px] font-semibold uppercase bg-[#EAF8F5] px-3 py-1 rounded-full border border-[#0D9488]/30 flex items-center gap-1">
+                  <span>🔘 Trắc nghiệm ({question?.points || 1} điểm)</span>
+                </span>
+              )}
+            </div>
 
             <div className="flex items-end justify-between mt-3.5">
               <h1 className="text-lg sm:text-xl font-semibold text-[#1A1A2E] leading-relaxed max-w-[85%]" title={question?.content}>
@@ -249,49 +327,94 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
             </div>
           </div>
 
-          {/* ─── Answers List with High-Contrast Selected UI Effect ─── */}
-          <div className="flex flex-col gap-3.5">
-            {question?.answers.map((answer, i) => {
-              // Guaranteed string matching prevents ANY mismatch between number/string IDs!
-              const isSelected = selectedAnswerId != null && String(selectedAnswerId) === String(answer.id);
-              const letter = String.fromCharCode(65 + i); // A, B, C, D
-              return (
-                <div 
-                  key={String(answer.id)}
-                  onClick={() => handleSelectAnswer(question.id, answer.id)}
-                  className={`group flex items-start sm:items-center p-4 sm:p-4.5 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                    isSelected 
-                      ? "border-[#5052EE] bg-[#EEF2FF] shadow-[0_4px_18px_rgba(80,82,238,0.14)] -translate-y-0.5 z-10" 
-                      : "border-[#EAEAF4] bg-white hover:border-[#5052EE]/40 hover:bg-[#F8FAFC] hover:shadow-2xs"
-                  }`}
-                >
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 transition-all ${
-                    isSelected 
-                      ? "bg-gradient-to-br from-[#4648D4] to-[#5052EE] text-white shadow-[0_2px_8px_rgba(80,82,238,0.35)] scale-105" 
-                      : "bg-[#F0F2F8] text-[#64647A] group-hover:bg-[#E2E8F0]"
-                  }`}>
-                    {letter}
+          {/* ─── Render UI depending on Question Type ─── */}
+          {isEssay ? (
+            /* ─── ESSAY TEXTAREA UI ─── */
+            <div className="bg-white rounded-2xl border-2 border-[#5052EE]/30 p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-[#EAEAF4] pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#EEF2FF] text-[#5052EE] flex items-center justify-center font-bold text-sm">
+                    ✏️
                   </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-[#1A1A2E]">Câu trả lời tự luận của bạn</h3>
+                    <p className="text-[11px] text-[#7878A0]">Hãy trình bày câu trả lời chi tiết. Gia sư AI sẽ chấm điểm dựa trên đáp án tham khảo &amp; rubric.</p>
+                  </div>
+                </div>
+                <span className="text-[11px] bg-[#EAF8F5] text-[#0D9488] px-2.5 py-1 rounded-full font-medium border border-[#0D9488]/20 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
+                  Tự động lưu nháp
+                </span>
+              </div>
 
-                  <span className={`ml-3.5 text-sm sm:text-base flex-1 leading-relaxed transition-colors ${
-                    isSelected ? "font-bold text-[#1A1A2E]" : "font-normal text-[#374151] group-hover:text-[#1A1A2E]"
-                  }`}>
-                    {answer.content}
-                  </span>
+              {question?.rubric && (
+                <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4] text-xs text-[#64647A] space-y-1">
+                  <span className="font-semibold text-[#5052EE] uppercase tracking-wider text-[10px] block">📌 Tiêu chí chấm điểm (Rubric):</span>
+                  <p className="whitespace-pre-line text-xs text-[#374151] leading-relaxed">{question.rubric}</p>
+                </div>
+              )}
 
-                  {/* Distinct active checked indicator badge */}
-                  {isSelected && (
-                    <div className="shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#5052EE] text-white text-xs font-semibold ml-3 shadow-xs animate-fadeIn">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-                      </svg>
-                      <span>Đã chọn</span>
-                    </div>
+              <div className="relative">
+                <textarea
+                  rows={8}
+                  value={String(currentAnswerVal || "")}
+                  onChange={(e) => handleEssayChange(question.id, e.target.value)}
+                  placeholder="Nhập câu trả lời chi tiết tại đây... (Nêu rõ lập luận, dẫn chứng hoặc các bước xử lý cụ thể)"
+                  className="w-full p-4 rounded-xl border-2 border-[#EAEAF4] focus:border-[#5052EE] focus:ring-4 focus:ring-[#5052EE]/10 text-sm sm:text-base text-[#1A1A2E] placeholder-[#9CA3AF] transition-all resize-y min-h-[220px] outline-none font-sans leading-relaxed"
+                />
+                <div className="flex justify-between items-center mt-2 text-xs text-[#7878A0]">
+                  <span>Ký tự: {String(currentAnswerVal || "").length} | Số từ: {String(currentAnswerVal || "").trim().split(/\s+/).filter(Boolean).length}</span>
+                  {String(currentAnswerVal || "").trim().length > 0 ? (
+                    <span className="text-[#10B981] font-semibold flex items-center gap-1">✓ Đã tự động lưu nháp câu trả lời</span>
+                  ) : (
+                    <span className="text-[#F59E0B]">⚠️ Chưa nhập câu trả lời</span>
                   )}
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            </div>
+          ) : (
+            /* ─── MULTIPLE CHOICE OPTIONS LIST ─── */
+            <div className="flex flex-col gap-3.5">
+              {question?.answers.map((answer, i) => {
+                const isSelected = currentAnswerVal != null && String(currentAnswerVal) === String(answer.id);
+                const letter = String.fromCharCode(65 + i); // A, B, C, D
+                return (
+                  <div 
+                    key={String(answer.id)}
+                    onClick={() => handleSelectAnswer(question.id, answer.id)}
+                    className={`group flex items-start sm:items-center p-4 sm:p-4.5 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                      isSelected 
+                        ? "border-[#5052EE] bg-[#EEF2FF] shadow-[0_4px_18px_rgba(80,82,238,0.14)] -translate-y-0.5 z-10" 
+                        : "border-[#EAEAF4] bg-white hover:border-[#5052EE]/40 hover:bg-[#F8FAFC] hover:shadow-2xs"
+                    }`}
+                  >
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 transition-all ${
+                      isSelected 
+                        ? "bg-gradient-to-br from-[#4648D4] to-[#5052EE] text-white shadow-[0_2px_8px_rgba(80,82,238,0.35)] scale-105" 
+                        : "bg-[#F0F2F8] text-[#64647A] group-hover:bg-[#E2E8F0]"
+                    }`}>
+                      {letter}
+                    </div>
+
+                    <span className={`ml-3.5 text-sm sm:text-base flex-1 leading-relaxed transition-colors ${
+                      isSelected ? "font-bold text-[#1A1A2E]" : "font-normal text-[#374151] group-hover:text-[#1A1A2E]"
+                    }`}>
+                      {answer.content}
+                    </span>
+
+                    {isSelected && (
+                      <div className="shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#5052EE] text-white text-xs font-semibold ml-3 shadow-xs animate-fadeIn">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                        </svg>
+                        <span>Đã chọn</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
           
           {/* AI Tutor Hint */}
           <div className="mt-8 bg-gradient-to-r from-[#EEF2FF]/80 via-[#F3F4FC] to-[#EAF8F5]/80 border border-[#5052EE]/20 rounded-2xl p-5 shadow-2xs flex gap-4 items-start">
@@ -306,7 +429,7 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
                 <span className="text-[10px] bg-white px-2 py-0.5 rounded-full text-[#0D9488] font-medium border border-[#0D9488]/20">AI Hint</span>
               </div>
               <p className="text-xs sm:text-sm text-[#374151] font-normal leading-relaxed">
-                Hãy chú ý các lựa chọn đáp án của bạn đều được hệ thống tự động ghi nhớ và bảo lưu qua các nút chuyển câu hỏi bên dưới cho tới khi chính thức nộp bài!
+                Tất cả bài làm trắc nghiệm &amp; tự luận đều được lưu nháp tự động. Sau khi bấm nộp bài, Gia sư AI Nova sẽ đánh giá chi tiết và hiển thị điểm số trên thang 10 chuẩn mực!
               </p>
             </div>
           </div>
@@ -342,7 +465,7 @@ export function QuizQuestionScreen({ lessonId, courseTitle = "Chuyên đề Kỹ
               disabled={isSubmitting}
               className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:opacity-95 text-white font-semibold text-xs sm:text-sm shadow-[0_4px_15px_rgba(80,82,238,0.35)] hover:-translate-y-0.5 transition-all focus:outline-none disabled:opacity-70 disabled:pointer-events-none cursor-pointer"
             >
-              {currentIndex === quiz.questions.length - 1 ? (isSubmitting ? "Đang chấm điểm..." : "🚀 Nộp bài thi") : "Câu tiếp theo"}
+              {currentIndex === quiz.questions.length - 1 ? (isSubmitting ? "🤖 AI đang chấm điểm..." : "🚀 Nộp bài thi") : "Câu tiếp theo"}
               {currentIndex < quiz.questions.length - 1 && (
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12"></line>

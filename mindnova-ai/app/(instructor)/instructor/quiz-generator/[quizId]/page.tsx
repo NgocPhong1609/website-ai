@@ -409,7 +409,7 @@ export default function QuizDetailPage() {
               </button>
               <button
                 type="button"
-                onClick={handleDelete}
+                onClick={() => handleDelete()}
                 disabled={isDeleting}
                 className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
               >

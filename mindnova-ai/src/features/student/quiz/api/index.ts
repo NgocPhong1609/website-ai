@@ -9,7 +9,10 @@ export interface StudentAnswer {
 
 export interface StudentQuestion {
   id: string | number;
+  type?: 'multiple_choice' | 'essay';
   content: string;
+  points?: number;
+  rubric?: string;
   order: number;
   answers: StudentAnswer[];
 }

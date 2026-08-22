@@ -91,10 +91,36 @@ export interface ActionCardItem {
   icon_type: string;
 }
 
+export interface AiAnalysisInfo {
+  matched_points?: string[];
+  missing_points?: string[];
+  provider?: string;
+  error?: string;
+}
+
+export interface QuestionResultDetail {
+  question_id: number | string;
+  order: number;
+  content: string;
+  type: 'multiple_choice' | 'essay';
+  user_answer?: string;
+  user_answer_text?: string;
+  correct_answer?: string;
+  sample_answer?: string;
+  rubric?: string;
+  is_correct: boolean;
+  score: number;
+  max_score: number;
+  feedback?: string;
+  ai_analysis?: AiAnalysisInfo;
+  grading_status?: string;
+}
+
 export interface QuizGradingResult {
   attempt_id: number | string;
   module_id?: string;
   score: number;
+  score_10?: number;
   total_score_max?: number;
   accuracy: string;
   passed: boolean;
@@ -105,6 +131,7 @@ export interface QuizGradingResult {
   quiz_title?: string;
   ai_insight?: string;
   ai_coach_suggestion?: string;
+  question_results?: QuestionResultDetail[];
   topic_performance?: TopicPerformanceItem[];
   action_cards?: ActionCardItem[];
 }
