@@ -33,6 +33,7 @@ class CourseResource extends JsonResource
             'durationHours' => $this->duration_hours,
             // ── Versioning info ──
             'current_version' => $this->current_version,
+            'lock_version' => $this->lock_version,
             'published_version_id' => $this->published_version_id,
             'is_published' => $this->isPublished(),
             'has_pending_submission' => $this->hasPendingSubmission(),

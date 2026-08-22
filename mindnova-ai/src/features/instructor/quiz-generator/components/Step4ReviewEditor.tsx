@@ -1,0 +1,190 @@
+"use client";
+
+import React, { useState } from "react";
+import { GeneratedQuestion } from "../types/quizGenerator.types";
+import { QuestionCardMultipleChoice } from "./QuestionCardMultipleChoice";
+import { QuestionCardEssay } from "./QuestionCardEssay";
+
+interface Step4ReviewEditorProps {
+  questions: GeneratedQuestion[];
+  onUpdateQuestion: (id: string, updated: Partial<GeneratedQuestion>) => void;
+  onApproveQuestion: (id: string) => void;
+  onDeleteQuestion: (id: string) => void;
+  onRegenerateQuestion: (id: string, type: "multiple_choice" | "essay", difficulty: string) => void;
+  onRegenerateAll: () => void;
+  onSave: (status: "draft" | "published") => void;
+  onBack: () => void;
+  isSaving: boolean;
+}
+
+export function Step4ReviewEditor({
+  questions,
+  onUpdateQuestion,
+  onApproveQuestion,
+  onDeleteQuestion,
+  onRegenerateQuestion,
+  onRegenerateAll,
+  onSave,
+  onBack,
+  isSaving,
+}: Step4ReviewEditorProps) {
+  const [filterType, setFilterType] = useState<"all" | "multiple_choice" | "essay">("all");
+
+  const mcQuestions = questions.filter((q) => q.type === "multiple_choice");
+  const essayQuestions = questions.filter((q) => q.type === "essay");
+
+  const filteredQuestions = questions.filter((q) => {
+    if (filterType === "all") return true;
+    return q.type === filterType;
+  });
+
+  const approvedCount = questions.filter((q) => q.reviewStatus === "approved" || q.reviewStatus === "edited").length;
+  const totalPoints = questions.reduce((sum, q) => sum + (q.points || 0), 0);
+
+  return (
+    <div className="p-8 bg-white rounded-3xl border border-[#EAEAF4] shadow-sm flex flex-col gap-6 animate-fadeIn">
+      {/* Header Bar */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-5">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="px-3 py-1 bg-indigo-50 text-[#4F46E5] text-xs font-black rounded-lg border border-indigo-100 uppercase tracking-wider">
+              Bước 4 / 5
+            </span>
+            <h2 className="text-xl font-black text-[#1A1A2E]">Review &amp; Hiệu Chỉnh Đề Kiểm Tra</h2>
+          </div>
+          <p className="text-xs text-gray-500 font-medium mt-1">
+            Bạn giữ toàn quyền biên tập: Chỉnh sửa inline, phê duyệt (Approve), xóa hoặc yêu cầu AI sinh lại từng câu.
+          </p>
+        </div>
+
+        {/* Realtime Summary Badge */}
+        <div className="flex items-center gap-3">
+          <div className="px-3 py-2 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center gap-2 text-xs font-bold text-[#4F46E5]">
+            <span>📊 Đã duyệt:</span>
+            <span className="font-extrabold text-sm">{approvedCount}/{questions.length}</span>
+          </div>
+          <div className="px-3 py-2 rounded-2xl bg-purple-50 border border-purple-100 flex items-center gap-2 text-xs font-bold text-purple-700">
+            <span>🎯 Tổng điểm:</span>
+            <span className="font-extrabold text-sm">{totalPoints} điểm</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Control Bar: Filters & Actions */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-[#FAF8FF] border border-indigo-50">
+        {/* Filter Tabs */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setFilterType("all")}
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+              filterType === "all"
+                ? "bg-[#4F46E5] text-white shadow-md"
+                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+            }`}
+          >
+            Tất cả ({questions.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterType("multiple_choice")}
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+              filterType === "multiple_choice"
+                ? "bg-[#4F46E5] text-white shadow-md"
+                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+            }`}
+          >
+            Trắc nghiệm ({mcQuestions.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterType("essay")}
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+              filterType === "essay"
+                ? "bg-purple-600 text-white shadow-md"
+                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+            }`}
+          >
+            Tự luận ({essayQuestions.length})
+          </button>
+        </div>
+
+        {/* Global Action: Regenerate All */}
+        <button
+          type="button"
+          onClick={onRegenerateAll}
+          className="text-xs font-bold text-[#4F46E5] hover:underline flex items-center gap-1 cursor-pointer"
+        >
+          <span>🔄 Sinh lại toàn bộ đề</span>
+        </button>
+      </div>
+
+      {/* Questions List */}
+      <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto pr-1">
+        {filteredQuestions.length === 0 ? (
+          <div className="p-12 text-center rounded-2xl bg-gray-50 border border-gray-200 text-gray-500 font-medium">
+            Không tìm thấy câu hỏi phù hợp với bộ lọc hiện tại.
+          </div>
+        ) : (
+          filteredQuestions.map((q, idx) => {
+            if (q.type === "essay") {
+              return (
+                <QuestionCardEssay
+                  key={q.id}
+                  question={q}
+                  index={idx}
+                  onUpdate={onUpdateQuestion}
+                  onApprove={onApproveQuestion}
+                  onDelete={onDeleteQuestion}
+                  onRegenerate={(id) => onRegenerateQuestion(id, "essay", q.difficulty)}
+                />
+              );
+            }
+            return (
+              <QuestionCardMultipleChoice
+                key={q.id}
+                question={q}
+                index={idx}
+                onUpdate={onUpdateQuestion}
+                onApprove={onApproveQuestion}
+                onDelete={onDeleteQuestion}
+                onRegenerate={(id) => onRegenerateQuestion(id, "multiple_choice", q.difficulty)}
+              />
+            );
+          })
+        )}
+      </div>
+
+      {/* Footer Navigation & Save Buttons */}
+      <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-2">
+        <button
+          type="button"
+          onClick={onBack}
+          className="px-6 py-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold text-xs transition-all cursor-pointer"
+        >
+          🠔 Sửa cấu hình
+        </button>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => onSave("draft")}
+            disabled={isSaving}
+            className="px-6 py-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-extrabold text-xs transition-all cursor-pointer"
+          >
+            {isSaving ? "Đang lưu..." : "💾 Lưu Nháp"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onSave("published")}
+            disabled={isSaving || questions.length === 0}
+            className="px-8 py-3 bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#4338CA] hover:to-[#6D28D9] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 cursor-pointer flex items-center gap-2"
+          >
+            <span>✓ Xuất Bản &amp; Gắn Vào Khóa Học ➜</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

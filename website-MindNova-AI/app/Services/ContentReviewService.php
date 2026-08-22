@@ -18,6 +18,7 @@ class ContentReviewService
 {
     public function __construct(
         private readonly ContentAuditService $auditService,
+        private readonly \App\Services\Instructor\CourseHealthService $courseHealthService,
     ) {}
 
     // ================================================================
@@ -171,6 +172,16 @@ class ContentReviewService
     public function submitForReview(Course $course, User $user): ReviewSubmission
     {
         return DB::transaction(function () use ($course, $user) {
+            $health = $this->courseHealthService->evaluate($course);
+            if (!$health['can_submit']) {
+                $messages = collect($health['issues'])
+                    ->where('severity', 'error')
+                    ->pluck('message')
+                    ->take(3)
+                    ->implode(' ');
+                throw new \DomainException("Khóa học chưa đạt điều kiện gửi kiểm duyệt. {$messages}");
+            }
+
             // Validate: cannot submit if already pending review
             $existingPending = ReviewSubmission::where('course_id', $course->id)
                 ->whereIn('status', ['pending', 'under_review'])

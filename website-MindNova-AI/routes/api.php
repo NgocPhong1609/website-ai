@@ -51,6 +51,8 @@ use App\Http\Controllers\Api\Instructor\RevenueController;
 use App\Http\Controllers\Api\Instructor\CourseOutlineController;
 use App\Http\Controllers\Api\Instructor\ContentReviewController as InstructorContentReviewController;
 use App\Http\Controllers\Api\Instructor\TeacherProfileController;
+use App\Http\Controllers\Api\Instructor\DraftRevisionController;
+use App\Http\Controllers\Api\Instructor\QuizGeneratorController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -191,6 +193,11 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::post('courses/{course}/thumbnail', [CourseController::class, 'uploadThumbnail']);
     Route::patch('courses/{course}/status', [CourseController::class, 'updateStatus']);
     Route::patch('courses/{course}/price', [CourseController::class, 'updatePrice']);
+    Route::get('courses/{course}/health', [CourseController::class, 'health']);
+    Route::put('courses/{course}/draft', [DraftRevisionController::class, 'saveCourseDraft']);
+    Route::get('courses/{course}/draft-revisions', [DraftRevisionController::class, 'index']);
+    Route::get('courses/{course}/draft-revisions/{revision}/diff', [DraftRevisionController::class, 'diff']);
+    Route::post('courses/{course}/draft-revisions/{revision}/restore', [DraftRevisionController::class, 'restore']);
 
     // Modules
     Route::get('courses/{course}/modules', [CourseModuleController::class, 'index']);
@@ -251,8 +258,17 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     // Reviews
     Route::get('reviews', [\App\Http\Controllers\Api\Instructor\ReviewController::class, 'index']);
 
-    // AI Quiz & Course Outline
-    Route::post('ai-quiz/generate', [CourseOutlineController::class, 'generateQuiz']);
+    // AI Quiz Generator (Instructor Standalone & Attachment)
+    Route::get('ai-quiz', [QuizGeneratorController::class, 'index']);
+    Route::post('ai-quiz/generate', [QuizGeneratorController::class, 'generate']);
+    Route::post('ai-quiz/regenerate-question', [QuizGeneratorController::class, 'regenerateQuestion']);
+    Route::post('ai-quiz/store', [QuizGeneratorController::class, 'store']);
+    Route::get('ai-quiz/{quiz}', [QuizGeneratorController::class, 'show']);
+    Route::put('ai-quiz/{quiz}', [QuizGeneratorController::class, 'update']);
+    Route::delete('ai-quiz/{quiz}', [QuizGeneratorController::class, 'destroy']);
+    Route::post('ai-quiz/{quiz}/attach', [QuizGeneratorController::class, 'attach']);
+
+    // AI Course Outline
     Route::post('courses/ai-outline/generate', [CourseOutlineController::class, 'generate']);
     Route::post('courses/{course}/ai-outline/save', [CourseOutlineController::class, 'save']);
 

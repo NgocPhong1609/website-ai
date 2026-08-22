@@ -20,6 +20,8 @@ class ContentAuditLog extends Model
         'version_number',
         'metadata',
         'created_at',
+        'course_id',
+        'correlation_id',
     ];
 
     protected $casts = [
@@ -33,6 +35,11 @@ class ContentAuditLog extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class);
     }
 
     // ─── Scopes ────────────────────────────────────────────────

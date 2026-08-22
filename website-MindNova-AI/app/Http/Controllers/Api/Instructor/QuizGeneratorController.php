@@ -3,79 +3,144 @@
 namespace App\Http\Controllers\Api\Instructor;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Contracts\AiProviderInterface;
-use App\DTOs\AiMessageDto;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\Instructor\AttachQuizRequest;
+use App\Http\Requests\Instructor\GenerateAiQuizRequest;
+use App\Http\Requests\Instructor\StoreAiQuizRequest;
+use App\Models\Quiz;
+use App\Services\Instructor\AiQuizGeneratorService;
+use App\Services\Instructor\QuizService;
+use App\Traits\ApiResponse;
 use Exception;
-use App\Models\Lesson;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class QuizGeneratorController extends Controller
 {
-    public function __construct(private readonly AiProviderInterface $aiService)
-    {
+    use ApiResponse;
+
+    public function __construct(
+        private readonly AiQuizGeneratorService $aiQuizGeneratorService,
+        private readonly QuizService $quizService
+    ) {
     }
 
-    public function generate(Request $request)
+    /**
+     * POST /api/instructor/ai-quiz/generate
+     * Generate quiz questions from content or topic using AI.
+     */
+    public function generate(GenerateAiQuizRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'content' => 'required|string',
-            'count' => 'required|integer|min:1|max:20',
-            'difficulty' => 'required|string',
-            'types' => 'required|array',
-            'types.*' => 'string'
+        try {
+            $quizData = $this->aiQuizGeneratorService->generateQuiz($request->user(), $request->validated());
+
+            return $this->successResponse($quizData, 'Quiz generated successfully.');
+        } catch (Exception $e) {
+            return $this->errorResponse('Failed to generate quiz: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * POST /api/instructor/ai-quiz/regenerate-question
+     * Regenerate a single question using AI.
+     */
+    public function regenerateQuestion(Request $request)
+    {
+        $validated = $request->validate([
+            'type' => 'required|string|in:multiple_choice,essay',
+            'difficulty' => 'nullable|string|in:easy,medium,hard',
+            'context' => 'nullable|string',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-        }
+        try {
+            $question = $this->aiQuizGeneratorService->regenerateSingleQuestion($request->user(), $validated);
 
-        $content = $request->input('content');
-        $count = $request->input('count');
-        $difficulty = $request->input('difficulty');
-        $types = implode(', ', $request->input('types'));
-
-        $systemPrompt = "You are an expert technical assessor. Generate exactly {$count} quiz questions based on the provided text.
-        Difficulty: {$difficulty}.
-        Allowed question types: {$types}. (e.g., multiple_choice, true_false, coding_challenge).
-        Return ONLY a JSON object with this exact structure (no markdown, no comments):
-        {
-            \"questions\": [
-                {
-                    \"id\": \"q-ai-generated-id\",
-                    \"type\": \"multiple_choice\",
-                    \"question\": \"The question text\",
-                    \"correctAnswer\": \"The exact correct answer\",
-                    \"distractors\": [\"Incorrect 1\", \"Incorrect 2\", \"Incorrect 3\"],
-                    \"explanation\": \"Why it is correct\",
-                    \"codeSnippet\": \"(Optional) Any code block associated with the question\"
-                }
-            ]
+            return $this->successResponse($question, 'Single question regenerated successfully.');
+        } catch (Exception $e) {
+            return $this->errorResponse('Failed to regenerate single question: ' . $e->getMessage(), 500);
         }
-        Do NOT wrap in ```json block.";
+    }
+
+    /**
+     * GET /api/instructor/ai-quiz
+     * List all quizzes created by instructor.
+     */
+    public function index(Request $request)
+    {
+        $quizzes = $this->quizService->getInstructorQuizzes($request->user());
+
+        return $this->successResponse($quizzes, 'Instructor quizzes retrieved.');
+    }
+
+    /**
+     * POST /api/instructor/ai-quiz/store
+     * Store a new standalone quiz.
+     */
+    public function store(StoreAiQuizRequest $request)
+    {
+        try {
+            $quiz = $this->quizService->createStandaloneQuiz($request->user(), $request->validated());
+
+            return $this->createdResponse($quiz, 'Quiz saved successfully.');
+        } catch (Exception $e) {
+            return $this->errorResponse('Failed to save quiz: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * GET /api/instructor/ai-quiz/{quiz}
+     * Show quiz details.
+     */
+    public function show(Quiz $quiz)
+    {
+        Gate::authorize('view', $quiz);
+
+        return $this->successResponse($quiz->load('questions.answers', 'attachments.course'), 'Quiz details retrieved.');
+    }
+
+    /**
+     * PUT /api/instructor/ai-quiz/{quiz}
+     * Update standalone quiz.
+     */
+    public function update(StoreAiQuizRequest $request, Quiz $quiz)
+    {
+        Gate::authorize('update', $quiz);
 
         try {
-            $responseJson = $this->aiService->sendMessage([
-                new AiMessageDto("system", $systemPrompt),
-                new AiMessageDto("user", "Content to base questions on: \n" . $content)
-            ], ['response_mime_type' => 'application/json']);
+            $updated = $this->quizService->updateStandaloneQuiz($quiz, $request->validated());
 
-            $cleanJson = preg_replace('/```json|```/', '', $responseJson);
-            $quiz = json_decode(trim($cleanJson), true);
-
-            if (!$quiz || !isset($quiz['questions'])) {
-                throw new Exception("Invalid JSON structure returned by AI");
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $quiz['questions']
-            ]);
+            return $this->successResponse($updated, 'Quiz updated successfully.');
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to generate quiz: ' . $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Failed to update quiz: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * DELETE /api/instructor/ai-quiz/{quiz}
+     * Delete quiz.
+     */
+    public function destroy(Quiz $quiz)
+    {
+        Gate::authorize('delete', $quiz);
+
+        $quiz->delete();
+
+        return $this->noContentResponse();
+    }
+
+    /**
+     * POST /api/instructor/ai-quiz/{quiz}/attach
+     * Attach quiz to a course, module, or lesson.
+     */
+    public function attach(AttachQuizRequest $request, Quiz $quiz)
+    {
+        Gate::authorize('attach', $quiz);
+
+        try {
+            $attachment = $this->quizService->attachQuizToCourse($quiz, $request->validated());
+
+            return $this->createdResponse($attachment, 'Quiz attached to course successfully.');
+        } catch (Exception $e) {
+            return $this->errorResponse('Failed to attach quiz to course: ' . $e->getMessage(), 500);
         }
     }
 }

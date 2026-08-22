@@ -27,6 +27,7 @@ class Course extends Model
     'is_flash_sale',
     'published_version_id',
     'current_version',
+    'lock_version',
 ];
 
     protected $casts = [
@@ -37,6 +38,7 @@ class Course extends Model
     'is_flash_sale' => 'boolean',
     'admin_hidden_at' => 'datetime',
     'current_version' => 'integer',
+    'lock_version' => 'integer',
 ];
 
     protected $appends = [
@@ -129,6 +131,12 @@ class Course extends Model
         return $this->hasMany(ContentVersion::class, 'versionable_id')
                     ->where('versionable_type', self::class)
                     ->orderByDesc('version_number');
+    }
+
+    /** Draft snapshots are independent from immutable content-review versions. */
+    public function draftRevisions(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(DraftRevision::class, 'revisionable')->latest('revision_number');
     }
 
     /**
