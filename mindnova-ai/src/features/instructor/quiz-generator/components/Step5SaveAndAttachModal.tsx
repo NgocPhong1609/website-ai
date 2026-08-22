@@ -79,10 +79,13 @@ export function Step5SaveAndAttachModal({ quiz, onClose }: Step5SaveAndAttachMod
     }
   });
 
+  const [errorInfo, setErrorInfo] = useState<{ message: string; errorCode: string } | null>(null);
+
   const handleAttach = async () => {
     if (!selectedCourseId) return;
 
     setIsAttaching(true);
+    setErrorInfo(null);
     try {
       await quizGeneratorApi.attachQuiz(quiz.id, {
         course_id: selectedCourseId,
@@ -92,7 +95,10 @@ export function Step5SaveAndAttachModal({ quiz, onClose }: Step5SaveAndAttachMod
       });
       setAttachedSuccess(true);
     } catch (err: any) {
-      alert("Không thể gắn bài kiểm tra vào khóa học: " + (err.message || "Lỗi server"));
+      const resp = err.response?.data;
+      const msg = resp?.message || err.message || "Không thể gắn bài kiểm tra vào khóa học.";
+      const code = resp?.error_code || resp?.errorCode || "ATTACH_QUIZ_FAILED";
+      setErrorInfo({ message: msg, errorCode: code });
     } finally {
       setIsAttaching(false);
     }
@@ -117,7 +123,27 @@ export function Step5SaveAndAttachModal({ quiz, onClose }: Step5SaveAndAttachMod
           </div>
         </div>
 
-        {/* Attachment Options */}
+        {errorInfo && (
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 flex items-start justify-between gap-3 animate-fadeIn">
+            <div className="flex items-start gap-3">
+              <span className="text-xl">⚠️</span>
+              <div>
+                <h4 className="text-xs font-bold text-rose-800">Không thể gắn bài kiểm tra vào khóa học</h4>
+                <p className="text-xs font-medium text-rose-700 mt-0.5">{errorInfo.message}</p>
+                <span className="inline-block mt-1 px-2 py-0.5 bg-rose-100 text-rose-800 font-mono font-bold text-[10px] rounded-md">
+                  Mã lỗi: {errorInfo.errorCode}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setErrorInfo(null)}
+              className="text-xs font-bold text-rose-600 hover:text-rose-800 cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        )}
         {attachedSuccess ? (
           <div className="p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex flex-col items-center justify-center text-center gap-3">
             <span className="text-4xl">✅</span>
@@ -168,7 +194,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose }: Step5SaveAndAttachMod
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
-                  { key: "capability_assessment", label: "📝 Kiểm tra tổng quát (3 tín)", icon: "📝" },
+                  { key: "capability_assessment", label: "📝 Kiểm tra tổng quát", icon: "📝" },
                   { key: "end_of_course", label: "🏁 Cuối khóa học", icon: "🏁" },
                   { key: "in_module", label: "📂 Trong một Module", icon: "📂" },
                   { key: "after_lesson", label: "📖 Sau bài học cụ thể", icon: "📖" },

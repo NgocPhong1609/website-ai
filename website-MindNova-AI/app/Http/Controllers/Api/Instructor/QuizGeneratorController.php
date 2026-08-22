@@ -196,13 +196,41 @@ class QuizGeneratorController extends Controller
     public function attach(AttachQuizRequest $request, Quiz $quiz)
     {
         Gate::authorize('attach', $quiz);
+        $user = $request->user();
+        $payload = $request->validated();
+
+        \Illuminate\Support\Facades\Log::info("[QUIZ_ATTACH STEP 1] Request received", [
+            'quiz_id' => $quiz->id,
+            'quiz_title' => $quiz->title,
+            'instructor_id' => $user ? $user->id : null,
+            'payload' => $payload,
+        ]);
 
         try {
-            $attachment = $this->quizService->attachQuizToCourse($quiz, $request->validated());
+            $attachment = $this->quizService->attachQuizToCourse($quiz, $payload);
+
+            \Illuminate\Support\Facades\Log::info("[QUIZ_ATTACH STEP 2] Attachment created successfully", [
+                'attachment_id' => $attachment->id,
+                'quiz_id' => $quiz->id,
+                'course_id' => $attachment->course_id,
+                'position' => $attachment->position,
+            ]);
 
             return $this->createdResponse($attachment, 'Quiz attached to course successfully.');
-        } catch (Exception $e) {
-            return $this->errorResponse('Failed to attach quiz to course: ' . $e->getMessage(), 500);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("[QUIZ_ATTACH ERROR]", [
+                'quiz_id' => $quiz->id,
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể gắn bài kiểm tra vào khóa học: ' . $e->getMessage(),
+                'error_code' => 'ATTACH_QUIZ_FAILED',
+                'errorCode' => 'ATTACH_QUIZ_FAILED',
+            ], 500);
         }
     }
 }

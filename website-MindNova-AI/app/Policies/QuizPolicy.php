@@ -14,26 +14,26 @@ class QuizPolicy
 
     public function view(User $user, Quiz $quiz): bool
     {
-        return $user->id === $quiz->instructor_id || $user->isAdmin();
+        return (int) $user->id === (int) $quiz->instructor_id || $user->isAdmin();
     }
 
     public function create(User $user): bool
     {
-        return $user->hasRole('teacher');
+        return $user->hasRole('teacher') || $user->isAdmin();
     }
 
     public function update(User $user, Quiz $quiz): bool
     {
-        return $user->id === $quiz->instructor_id || $user->isAdmin();
+        return (int) $user->id === (int) $quiz->instructor_id || $user->isAdmin();
     }
 
     public function delete(User $user, Quiz $quiz): bool
     {
-        return $user->id === $quiz->instructor_id || $user->isAdmin();
+        return (int) $user->id === (int) $quiz->instructor_id || $user->isAdmin();
     }
 
     public function attach(User $user, Quiz $quiz): bool
     {
-        return $user->id === $quiz->instructor_id || $user->isAdmin();
+        return (int) $user->id === (int) $quiz->instructor_id || $user->isAdmin();
     }
 }

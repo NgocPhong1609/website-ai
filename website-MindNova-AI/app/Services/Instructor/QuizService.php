@@ -184,7 +184,7 @@ class QuizService
     {
         return Quiz::where('instructor_id', $instructor->id)
             ->withCount('questions')
-            ->with('attachments.course')
+            ->with(['attachments.course', 'lesson.module.course', 'lesson.course'])
             ->orderBy('created_at', 'desc')
             ->get();
     }
