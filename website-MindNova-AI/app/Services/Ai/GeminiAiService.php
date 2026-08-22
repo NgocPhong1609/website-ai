@@ -17,7 +17,7 @@ class GeminiAiService extends AbstractAiService
     public function sendMessage(array $messages, array $options = []): string
     {
         $apiKey = config("services.gemini.api_key");
-        $model = config("services.gemini.model", "gemini-1.5-flash");
+        $model = config("services.gemini.model", "gemini-3.6-flash");
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
         // Chuyen doi messages tu AiMessageDto sang format cua Gemini

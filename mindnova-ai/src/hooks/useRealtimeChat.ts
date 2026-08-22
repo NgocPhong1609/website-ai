@@ -8,7 +8,7 @@ let echoInstance: any = null;
 export const getEchoInstance = (token: string) => {
     if (!echoInstance) {
         (window as any).Pusher = Pusher;
-        Pusher.logToConsole = true; // Enable debugging
+        Pusher.logToConsole = process.env.NEXT_PUBLIC_ENABLE_PUSHER_LOGS === 'true';
         echoInstance = new Echo({
             broadcaster: 'reverb',
             key: process.env.NEXT_PUBLIC_REVERB_APP_KEY || 'app-key',

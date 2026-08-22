@@ -38,6 +38,21 @@ export function Step2ConfigForm({ config, onChangeConfig, onBack, onGenerate }: 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Column: Metadata */}
         <div className="flex flex-col gap-4">
+          {config.source_type === "course" && config.course_title && (
+            <div className="p-3.5 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-base">📚</span>
+                <div>
+                  <span className="text-[10px] font-black text-indigo-500 uppercase tracking-wider block">Khóa học được chọn</span>
+                  <span className="text-xs font-black text-[#1A1A2E]">{config.course_title}</span>
+                </div>
+              </div>
+              <span className="px-2.5 py-1 bg-white text-indigo-600 text-[11px] font-extrabold rounded-lg border border-indigo-100 shadow-2xs">
+                🔒 Tự động từ Bước 1
+              </span>
+            </div>
+          )}
+
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-1">Tên bài kiểm tra</label>
             <input

@@ -20,17 +20,57 @@ class AiQuizGeneratorService
      */
     public function generateQuiz(User $instructor, array $data): array
     {
-        $sourceType = $data['source_type'];
+        $sourceType = $data['source_type'] ?? 'topic';
         $content = $data['content'] ?? '';
         $topic = $data['topic'] ?? '';
+        $courseId = $data['course_id'] ?? null;
         $difficulty = $data['difficulty'] ?? 'mixed';
         $total = (int) $data['total_questions'];
         $mcCount = (int) $data['multiple_choice_count'];
         $essayCount = (int) $data['essay_count'];
 
-        $sourceDescription = $sourceType === 'content'
-            ? "Nội dung tài liệu/bài học sau:\n\n{$content}"
-            : "Chủ đề kiến thức: '{$topic}'";
+        $courseTitle = null;
+        $moduleCount = 0;
+        $lessonCount = 0;
+
+        if (($sourceType === 'course' || !empty($courseId)) && $courseId) {
+            $course = \App\Models\Course::with(['modules.lessons'])->where('id', $courseId)->first();
+
+            if (!$course) {
+                throw new Exception("Không tìm thấy khóa học với ID {$courseId}.");
+            }
+
+            if ((int) $course->teacher_id !== (int) $instructor->id) {
+                throw new Exception("Bạn không có quyền quản lý khóa học '{$course->title}'.");
+            }
+
+            $courseTitle = $course->title;
+            $moduleCount = $course->modules->count();
+            $aggregatedContent = "";
+
+            foreach ($course->modules as $modIndex => $module) {
+                foreach ($module->lessons as $lesIndex => $lesson) {
+                    $lessonCount++;
+                    $lessonText = trim(strip_tags($lesson->content ?? ''));
+                    $aggregatedContent .= "--- Bài " . ($lesIndex + 1) . ": {$lesson->title} (Module: {$module->title}) ---\n";
+                    if (!empty($lessonText)) {
+                        $aggregatedContent .= $lessonText . "\n\n";
+                    } else {
+                        $aggregatedContent .= "Kiến thức bài học lý thuyết về {$lesson->title}.\n\n";
+                    }
+                }
+            }
+
+            if (empty($aggregatedContent)) {
+                $aggregatedContent = "Khóa học '{$courseTitle}' với {$moduleCount} Module và {$lessonCount} Bài học.";
+            }
+
+            $sourceDescription = "Nội dung kiến thức bài học của Khóa học: '{$courseTitle}' (Gồm {$moduleCount} Module, {$lessonCount} Bài học):\n\n{$aggregatedContent}";
+        } elseif ($sourceType === 'content') {
+            $sourceDescription = "Nội dung tài liệu/bài học sau:\n\n{$content}";
+        } else {
+            $sourceDescription = "Chủ đề kiến thức: '{$topic}'";
+        }
 
         $systemPrompt = "Bạn là một chuyên gia khảo thí và thiết kế đề kiểm tra hàng đầu.
 Nhiệm vụ của bạn là tạo một đề kiểm tra gồm TỔNG CỘNG ĐÚNG {$total} CÂU HỎI dựa trên {$sourceDescription}.
@@ -95,25 +135,49 @@ CẤU TRÚC JSON MẪU:
                 'feature' => 'ai_quiz_generator'
             ]);
 
-            $responseJson = $aiResult['content'];
-            $cleanJson = preg_replace('/^```json\s*|\s*```$/i', '', trim($responseJson));
-            $parsed = json_decode($cleanJson, true);
+            $parsed = $this->cleanAndParseJson($aiResult['content']);
 
-            if (!$parsed || !isset($parsed['questions']) || !is_array($parsed['questions'])) {
-                throw new Exception("Dữ liệu JSON trả về từ AI không đúng cấu trúc.");
+            if (!isset($parsed['questions']) || !is_array($parsed['questions'])) {
+                throw new Exception("Dữ liệu JSON trả về từ AI không chứa mảng câu hỏi 'questions'.");
             }
 
             // Standardize output
             $questions = [];
             foreach ($parsed['questions'] as $index => $q) {
-                $qType = $q['type'] ?? 'multiple_choice';
+                $rawType = strtolower($q['type'] ?? '');
+                $qType = ($rawType === 'essay' || $rawType === 'tu_luan') ? 'essay' : 'multiple_choice';
+
+                $options = [];
+                if ($qType === 'multiple_choice') {
+                    $rawOptions = $q['options'] ?? [];
+                    if (is_array($rawOptions)) {
+                        foreach ($rawOptions as $opt) {
+                            $options[] = is_string($opt) ? trim($opt) : (string) json_encode($opt);
+                        }
+                    }
+                    while (count($options) < 4) {
+                        $options[] = 'Lựa chọn ' . chr(65 + count($options));
+                    }
+                    if (count($options) > 4) {
+                        $options = array_slice($options, 0, 4);
+                    }
+                }
+
+                $correctIndex = 0;
+                if ($qType === 'multiple_choice') {
+                    $idx = $q['correct_answer_index'] ?? 0;
+                    if (is_numeric($idx) && (int)$idx >= 0 && (int)$idx < count($options)) {
+                        $correctIndex = (int) $idx;
+                    }
+                }
+
                 $questions[] = [
                     'id' => 'gen_' . ($index + 1) . '_' . uniqid(),
                     'type' => $qType,
-                    'difficulty' => $q['difficulty'] ?? 'medium',
-                    'question' => $q['question'] ?? 'Câu hỏi ' . ($index + 1),
-                    'options' => $qType === 'multiple_choice' ? ($q['options'] ?? []) : [],
-                    'correct_answer_index' => $qType === 'multiple_choice' ? (int) ($q['correct_answer_index'] ?? 0) : null,
+                    'difficulty' => in_array($q['difficulty'] ?? '', ['easy', 'medium', 'hard']) ? $q['difficulty'] : ($difficulty !== 'mixed' ? $difficulty : 'medium'),
+                    'question' => !empty($q['question']) ? $q['question'] : ('Câu hỏi ' . ($index + 1)),
+                    'options' => $options,
+                    'correct_answer_index' => $qType === 'multiple_choice' ? $correctIndex : null,
                     'explanation' => $q['explanation'] ?? '',
                     'sample_answer' => $qType === 'essay' ? ($q['sample_answer'] ?? '') : '',
                     'rubric' => $qType === 'essay' ? ($q['rubric'] ?? '') : '',
@@ -133,10 +197,12 @@ CẤU TRÚC JSON MẪU:
             ]);
 
             return [
-                'title' => $parsed['title'] ?? ($sourceType === 'topic' ? "Kiểm tra: {$topic}" : "Bài kiểm tra từ tài liệu"),
+                'title' => $parsed['title'] ?? ($courseTitle ? "Đề kiểm tra: {$courseTitle}" : ($sourceType === 'topic' ? "Kiểm tra: {$topic}" : "Bài kiểm tra từ tài liệu")),
                 'description' => $parsed['description'] ?? "Bài kiểm tra sinh tự động bởi AI",
                 'source_type' => $sourceType,
-                'source_content' => $sourceType === 'content' ? $content : $topic,
+                'source_content' => $sourceType === 'course' ? $courseTitle : ($sourceType === 'content' ? $content : $topic),
+                'course_id' => $courseId ? (int) $courseId : null,
+                'course_title' => $courseTitle,
                 'difficulty' => $difficulty,
                 'total_questions' => count($questions),
                 'mc_questions_count' => count(array_filter($questions, fn($q) => $q['type'] === 'multiple_choice')),
@@ -195,11 +261,26 @@ Trả về CHỈ JSON theo định dạng:
             'feature' => 'ai_quiz_single_question'
         ]);
 
-        $cleanJson = preg_replace('/^```json\s*|\s*```$/i', '', trim($aiResult['content']));
-        $parsed = json_decode($cleanJson, true);
+        $parsed = $this->cleanAndParseJson($aiResult['content']);
 
-        if (!$parsed || !isset($parsed['question'])) {
+        if (!isset($parsed['question'])) {
             throw new Exception("AI không trả về câu hỏi hợp lệ.");
+        }
+
+        $options = [];
+        if ($type === 'multiple_choice') {
+            $rawOptions = $parsed['options'] ?? [];
+            if (is_array($rawOptions)) {
+                foreach ($rawOptions as $opt) {
+                    $options[] = is_string($opt) ? trim($opt) : (string) json_encode($opt);
+                }
+            }
+            while (count($options) < 4) {
+                $options[] = 'Lựa chọn ' . chr(65 + count($options));
+            }
+            if (count($options) > 4) {
+                $options = array_slice($options, 0, 4);
+            }
         }
 
         return [
@@ -207,7 +288,7 @@ Trả về CHỈ JSON theo định dạng:
             'type' => $type,
             'difficulty' => $difficulty,
             'question' => $parsed['question'],
-            'options' => $type === 'multiple_choice' ? ($parsed['options'] ?? []) : [],
+            'options' => $type === 'multiple_choice' ? $options : [],
             'correct_answer_index' => $type === 'multiple_choice' ? (int) ($parsed['correct_answer_index'] ?? 0) : null,
             'explanation' => $parsed['explanation'] ?? '',
             'sample_answer' => $type === 'essay' ? ($parsed['sample_answer'] ?? '') : '',
@@ -215,5 +296,46 @@ Trả về CHỈ JSON theo định dạng:
             'points' => (float) ($parsed['points'] ?? ($type === 'essay' ? 5.0 : 1.0)),
             'reviewStatus' => 'pending'
         ];
+    }
+
+    /**
+     * Safely extract and parse JSON from AI string output.
+     */
+    private function cleanAndParseJson(string $rawResponse): array
+    {
+        // 1. Strip UTF-8 BOM if present
+        $clean = preg_replace('/^\xEF\xBB\xBF/', '', trim($rawResponse));
+
+        // 2. Extract content from markdown code fences ```json ... ```
+        if (preg_match('/```(?:json)?\s*(.*?)\s*```/s', $clean, $matches)) {
+            $clean = $matches[1];
+        }
+
+        // 3. Extract substring between first `{` and last `}`
+        $firstBrace = strpos($clean, '{');
+        $lastBrace = strrpos($clean, '}');
+        if ($firstBrace !== false && $lastBrace !== false && $lastBrace > $firstBrace) {
+            $clean = substr($clean, $firstBrace, $lastBrace - $firstBrace + 1);
+        }
+
+        // 4. Decode JSON
+        $decoded = json_decode($clean, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return $decoded;
+        }
+
+        // 5. Attempt cleanup on control characters inside JSON strings if initial decode failed
+        $fixedJson = preg_replace_callback('/"([^"\\]*(?:\\.[^"\\]*)*)"/s', function ($m) {
+            return '"' . str_replace(["\r", "\n", "\t"], ["\\r", "\\n", "\\t"], $m[1]) . '"';
+        }, $clean);
+
+        $decodedFixed = json_decode($fixedJson, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decodedFixed)) {
+            return $decodedFixed;
+        }
+
+        Log::error("[AiQuizGeneratorService] JSON decode failed: " . json_last_error_msg() . " | Raw: " . substr($rawResponse, 0, 500));
+        throw new Exception("Không thể parse dữ liệu JSON từ AI (Lỗi: " . json_last_error_msg() . ").");
     }
 }

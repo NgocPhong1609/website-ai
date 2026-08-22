@@ -49,9 +49,17 @@ class QuizService
                 'status' => $data['status'] ?? 'published',
             ]);
 
+            if (!empty($data['course_id'])) {
+                QuizCourseAttachment::create([
+                    'quiz_id' => $quiz->id,
+                    'course_id' => $data['course_id'],
+                    'position' => 'end_of_course',
+                ]);
+            }
+
             $this->saveQuestionsAndAnswers($quiz, $questionsData);
 
-            return $quiz->load('questions.answers');
+            return $quiz->load('questions.answers', 'attachments.course');
         });
     }
 
@@ -91,11 +99,21 @@ class QuizService
                 'status' => $data['status'] ?? $quiz->status,
             ]);
 
+            if (!empty($data['course_id'])) {
+                QuizCourseAttachment::updateOrCreate(
+                    ['quiz_id' => $quiz->id],
+                    [
+                        'course_id' => $data['course_id'],
+                        'position' => 'end_of_course',
+                    ]
+                );
+            }
+
             // Re-create questions
             $quiz->questions()->delete();
             $this->saveQuestionsAndAnswers($quiz, $questionsData);
 
-            return $quiz->load('questions.answers');
+            return $quiz->load('questions.answers', 'attachments.course');
         });
     }
 
@@ -134,13 +152,15 @@ class QuizService
      */
     public function attachQuizToCourse(Quiz $quiz, array $attachData): QuizCourseAttachment
     {
-        return QuizCourseAttachment::create([
-            'quiz_id' => $quiz->id,
-            'course_id' => $attachData['course_id'],
-            'module_id' => $attachData['module_id'] ?? null,
-            'after_lesson_id' => $attachData['after_lesson_id'] ?? null,
-            'position' => $attachData['position'] ?? 'end_of_course',
-        ]);
+        return QuizCourseAttachment::updateOrCreate(
+            ['quiz_id' => $quiz->id],
+            [
+                'course_id' => $attachData['course_id'],
+                'module_id' => $attachData['module_id'] ?? null,
+                'after_lesson_id' => $attachData['after_lesson_id'] ?? null,
+                'position' => $attachData['position'] ?? 'end_of_course',
+            ]
+        );
     }
 
     /**

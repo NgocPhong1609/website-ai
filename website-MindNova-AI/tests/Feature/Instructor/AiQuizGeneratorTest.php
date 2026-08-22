@@ -185,3 +185,95 @@ test('instructor cannot attach quiz owned by another teacher', function () {
             'position' => 'end_of_course'
         ])->assertStatus(403);
 });
+
+test('instructor cannot generate quiz using a course owned by another teacher', function () {
+    $otherCourse = Course::create([
+        'teacher_id' => $this->otherTeacher->id,
+        'title' => 'Khóa học của người khác',
+        'slug' => 'khoa-hoc-nguoi-khac',
+        'description' => 'Mô tả khóa học của giáo viên khác',
+        'price' => 200
+    ]);
+
+    $this->actingAs($this->teacher)
+        ->postJson('/api/instructor/ai-quiz/generate', [
+            'source_type' => 'course',
+            'course_id' => $otherCourse->id,
+            'difficulty' => 'easy',
+            'total_questions' => 2,
+            'multiple_choice_count' => 2,
+            'essay_count' => 0,
+        ])->assertStatus(422)
+        ->assertJsonValidationErrors(['course_id']);
+});
+
+test('instructor can generate quiz from owned course with lessons', function () {
+    $course = Course::create([
+        'teacher_id' => $this->teacher->id,
+        'title' => 'Toán hệ nhị phân',
+        'slug' => 'toan-he-nhi-phan',
+        'description' => 'Mô tả khóa học hệ nhị phân',
+        'price' => 150
+    ]);
+
+    $module = $course->modules()->create([
+        'title' => 'Module 1: Nhập môn',
+        'order' => 1,
+    ]);
+
+    $module->lessons()->create([
+        'course_id' => $course->id,
+        'title' => 'Bài 1: Khái niệm hệ nhị phân',
+        'content' => 'Hệ nhị phân chỉ bao gồm hai ký tự 0 và 1.',
+        'order' => 1,
+    ]);
+
+    $mockAiRouter = Mockery::mock(AiRouterService::class);
+    $mockAiRouter->shouldReceive('sendMessageWithFallback')
+        ->once()
+        ->andReturn([
+            'content' => json_encode([
+                'title' => 'Đề kiểm tra: Toán hệ nhị phân',
+                'description' => 'Mô tả đề kiểm tra',
+                'questions' => [
+                    [
+                        'id' => 'q1',
+                        'type' => 'multiple_choice',
+                        'difficulty' => 'easy',
+                        'question' => 'Hệ nhị phân dùng bao nhiêu ký hiệu?',
+                        'options' => ['2', '8', '10', '16'],
+                        'correct_answer_index' => 0,
+                        'explanation' => 'Dùng 2 ký hiệu 0 và 1',
+                        'points' => 1
+                    ],
+                    [
+                        'id' => 'q2',
+                        'type' => 'essay',
+                        'difficulty' => 'medium',
+                        'question' => 'Giải thích khái niệm hệ nhị phân?',
+                        'sample_answer' => 'Hệ thống đếm cơ số 2',
+                        'rubric' => 'Thang điểm chi tiết',
+                        'points' => 5
+                    ]
+                ]
+            ]),
+            'meta' => ['provider' => 'mock', 'fallbackUsed' => false]
+        ]);
+
+    $this->app->instance(AiRouterService::class, $mockAiRouter);
+
+    $response = $this->actingAs($this->teacher)
+        ->postJson('/api/instructor/ai-quiz/generate', [
+            'source_type' => 'course',
+            'course_id' => $course->id,
+            'difficulty' => 'mixed',
+            'total_questions' => 2,
+            'multiple_choice_count' => 1,
+            'essay_count' => 1,
+        ]);
+
+    $response->assertStatus(200)
+        ->assertJsonPath('success', true)
+        ->assertJsonPath('data.course_id', $course->id)
+        ->assertJsonPath('data.course_title', 'Toán hệ nhị phân');
+});

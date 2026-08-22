@@ -18,6 +18,7 @@ export function QuizGeneratorWizard() {
     isGenerating,
     isSaving,
     error,
+    clearError,
     savedQuiz,
     handleGenerate,
     updateQuestion,
@@ -89,7 +90,7 @@ export function QuizGeneratorWizard() {
       {error && (
         <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold flex items-center justify-between animate-fadeIn">
           <span>⚠️ {error}</span>
-          <button type="button" onClick={() => {}} className="text-red-500 hover:text-red-800 font-extrabold">
+          <button type="button" onClick={clearError} className="text-red-500 hover:text-red-800 font-extrabold cursor-pointer">
             ✕
           </button>
         </div>

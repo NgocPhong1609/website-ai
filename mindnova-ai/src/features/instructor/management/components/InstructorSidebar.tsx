@@ -13,6 +13,7 @@ import {
   SettingsNavIcon,
   HelpNavIcon,
   DiscussionsNavIcon,
+  QuizNavIcon,
 } from "./icons";
 
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
@@ -216,6 +217,12 @@ export function InstructorSidebar() {
 
   const INSTRUCTOR_NAV: NavItem[] = [
     { label: "Quản lý Khóa học", href: "/instructor/courses", Icon: CourseManagementNavIcon },
+    { 
+      label: "AI Quiz Generator", 
+      href: "/instructor/quiz-generator", 
+      activePatterns: ["/instructor/quiz-generator"], 
+      Icon: QuizNavIcon 
+    },
     { 
       label: "Thảo luận & Hỏi đáp", 
       href: "/instructor/discussions", 

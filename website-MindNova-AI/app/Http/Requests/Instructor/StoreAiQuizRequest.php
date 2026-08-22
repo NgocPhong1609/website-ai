@@ -16,8 +16,9 @@ class StoreAiQuizRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'source_type' => 'nullable|string|in:content,topic',
+            'source_type' => 'nullable|string|in:content,topic,course',
             'source_content' => 'nullable|string',
+            'course_id' => 'nullable|integer|exists:courses,id',
             'difficulty' => 'nullable|string|in:easy,medium,hard,mixed',
             'time_limit_minutes' => 'nullable|integer|min:0',
             'passing_score' => 'nullable|integer|min:0|max:100',
@@ -34,5 +35,20 @@ class StoreAiQuizRequest extends FormRequest
             'questions.*.answers.*.content' => 'required|string',
             'questions.*.answers.*.is_correct' => 'required|boolean',
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if ($this->filled('course_id')) {
+                $course = \App\Models\Course::find($this->input('course_id'));
+                if (!$course || (int) $course->teacher_id !== (int) $this->user()->id) {
+                    $validator->errors()->add(
+                        'course_id',
+                        'Bạn không có quyền quản lý khóa học này.'
+                    );
+                }
+            }
+        });
     }
 }

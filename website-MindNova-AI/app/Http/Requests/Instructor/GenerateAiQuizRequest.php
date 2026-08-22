@@ -14,7 +14,8 @@ class GenerateAiQuizRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'source_type' => 'required|in:content,topic',
+            'source_type' => 'required|in:content,topic,course',
+            'course_id' => 'required_if:source_type,course|nullable|integer|exists:courses,id',
             'content' => 'required_if:source_type,content|nullable|string|min:10',
             'topic' => 'required_if:source_type,topic|nullable|string|min:3',
             'difficulty' => 'required|string|in:easy,medium,hard,mixed',
@@ -38,6 +39,16 @@ class GenerateAiQuizRequest extends FormRequest
                     'total_questions',
                     "Tổng số câu hỏi ({$total}) phải bằng tổng số câu trắc nghiệm ({$mc}) + tự luận ({$essay})."
                 );
+            }
+
+            if ($this->filled('course_id')) {
+                $course = \App\Models\Course::find($this->input('course_id'));
+                if (!$course || (int) $course->teacher_id !== (int) $this->user()->id) {
+                    $validator->errors()->add(
+                        'course_id',
+                        'Bạn không có quyền quản lý khóa học này.'
+                    );
+                }
             }
         });
     }

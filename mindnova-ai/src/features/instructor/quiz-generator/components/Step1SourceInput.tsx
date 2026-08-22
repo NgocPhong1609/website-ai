@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { QuizConfig } from "../types/quizGenerator.types";
+import { quizGeneratorApi } from "../api/quizGeneratorApi";
 
 interface Step1SourceInputProps {
   config: QuizConfig;
@@ -10,8 +11,104 @@ interface Step1SourceInputProps {
 }
 
 export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1SourceInputProps) {
+  const [courses, setCourses] = useState<any[]>([]);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+  const [selectedCourseDetails, setSelectedCourseDetails] = useState<any>(null);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+
+  // Fetch instructor's owned courses
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoadingCourses(true);
+    quizGeneratorApi
+      .getInstructorCourses()
+      .then((res) => {
+        if (isMounted && res?.data && Array.isArray(res.data)) {
+          setCourses(res.data);
+          // If source_type is default or empty, auto-select course mode if instructor has courses
+          if (res.data.length > 0) {
+            if (!config.course_id) {
+              const firstCourse = res.data[0];
+              onChangeConfig({
+                source_type: "course",
+                course_id: firstCourse.id,
+                course_title: firstCourse.title,
+                title: `Đề kiểm tra: ${firstCourse.title}`,
+              });
+            } else if (config.source_type !== "course") {
+              // Ensure course mode is optionable
+            }
+          } else {
+            // No courses owned, fallback to topic or content
+            if (config.source_type === "course") {
+              onChangeConfig({ source_type: "topic" });
+            }
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn("Failed to load courses:", err);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingCourses(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Fetch selected course modules & lessons whenever course_id changes
+  useEffect(() => {
+    if (config.course_id && config.source_type === "course") {
+      setIsLoadingDetails(true);
+      quizGeneratorApi
+        .getCourseDetails(config.course_id)
+        .then((res) => {
+          if (res?.data) {
+            setSelectedCourseDetails(res.data);
+          }
+        })
+        .catch(() => {
+          setSelectedCourseDetails(null);
+        })
+        .finally(() => {
+          setIsLoadingDetails(false);
+        });
+    } else {
+      setSelectedCourseDetails(null);
+    }
+  }, [config.course_id, config.source_type]);
+
+  const handleSelectCourse = (courseId: number) => {
+    const course = courses.find((c) => c.id === courseId);
+    if (course) {
+      onChangeConfig({
+        source_type: "course",
+        course_id: course.id,
+        course_title: course.title,
+        title: `Đề kiểm tra: ${course.title}`,
+      });
+    }
+  };
+
   const isContentValid =
-    config.source_type === "content" ? config.source_content.trim().length >= 10 : config.topic.trim().length >= 3;
+    config.source_type === "course"
+      ? Boolean(config.course_id && config.course_id > 0)
+      : config.source_type === "content"
+      ? config.source_content.trim().length >= 10
+      : config.topic.trim().length >= 3;
+
+  // Extract lesson list for preview
+  const modulesList = selectedCourseDetails?.modules || [];
+  const lessonsList: any[] = [];
+  modulesList.forEach((m: any) => {
+    if (Array.isArray(m.lessons)) {
+      m.lessons.forEach((l: any) => {
+        lessonsList.push({ ...l, module_title: m.title });
+      });
+    }
+  });
 
   return (
     <div className="p-8 bg-white rounded-3xl border border-[#EAEAF4] shadow-sm flex flex-col gap-6 animate-fadeIn">
@@ -24,46 +121,86 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
           <h2 className="text-xl font-black text-[#1A1A2E]">Nguồn Dữ Liệu Tạo Đề Bài Kiểm Tra</h2>
         </div>
         <p className="text-xs text-gray-500 font-medium mt-1">
-          Chọn một trong hai phương thức bên dưới để AI tự động phân tích ngữ cảnh và trích xuất câu hỏi chuẩn xác.
+          Chọn nguồn dữ liệu bài học hoặc chủ đề để AI tự động phân tích ngữ cảnh và trích xuất câu hỏi chuẩn xác.
         </p>
       </div>
 
-      {/* Tabs Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Tab 1: Content-Based */}
+      {/* 3 Source Types Selection */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Option 1: Course-Based */}
         <button
           type="button"
-          onClick={() => onChangeConfig({ source_type: "content" })}
-          className={`p-5 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer flex flex-col gap-2 ${
-            config.source_type === "content"
-              ? "border-[#4F46E5] bg-indigo-50/30 shadow-[0_4px_20px_rgba(79,70,229,0.08)]"
+          onClick={() => {
+            const firstCourse = courses[0];
+            onChangeConfig({
+              source_type: "course",
+              course_id: firstCourse ? firstCourse.id : undefined,
+              course_title: firstCourse ? firstCourse.title : undefined,
+              title: firstCourse ? `Đề kiểm tra: ${firstCourse.title}` : config.title,
+            });
+          }}
+          className={`p-5 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer flex flex-col gap-2 relative ${
+            config.source_type === "course"
+              ? "border-[#4F46E5] bg-indigo-50/40 shadow-[0_4px_20px_rgba(79,70,229,0.08)]"
               : "border-gray-200 hover:border-gray-300 bg-white"
           }`}
         >
           <div className="flex items-center justify-between">
             <div className="w-10 h-10 rounded-xl bg-indigo-100 text-[#4F46E5] flex items-center justify-center text-xl font-bold">
+              📚
+            </div>
+            <input
+              type="radio"
+              checked={config.source_type === "course"}
+              onChange={() => {}}
+              className="w-4 h-4 text-[#4F46E5]"
+            />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <h3 className="text-sm font-extrabold text-[#1A1A2E]">1. Chọn Từ Khóa Học</h3>
+            <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-black rounded-md">
+              Tự động
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 font-medium leading-relaxed">
+            AI đọc toàn bộ bài học thuộc khóa học của bạn để tạo câu hỏi bám sát chương trình.
+          </p>
+        </button>
+
+        {/* Option 2: Content-Based */}
+        <button
+          type="button"
+          onClick={() => onChangeConfig({ source_type: "content" })}
+          className={`p-5 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer flex flex-col gap-2 ${
+            config.source_type === "content"
+              ? "border-[#4F46E5] bg-indigo-50/40 shadow-[0_4px_20px_rgba(79,70,229,0.08)]"
+              : "border-gray-200 hover:border-gray-300 bg-white"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl font-bold">
               📜
             </div>
             <input
               type="radio"
               checked={config.source_type === "content"}
-              onChange={() => onChangeConfig({ source_type: "content" })}
+              onChange={() => {}}
               className="w-4 h-4 text-[#4F46E5]"
             />
           </div>
-          <h3 className="text-sm font-extrabold text-[#1A1A2E]">1. Dán Nội Dung / Bài Học</h3>
+          <h3 className="text-sm font-extrabold text-[#1A1A2E]">2. Dán Nội Dung Thủ Công</h3>
           <p className="text-xs text-gray-500 font-medium leading-relaxed">
-            Dán bài giảng, tài liệu PDF, đoạn văn hoặc ghi chú chuyên môn. AI sẽ đọc hiểu để tạo câu hỏi bám sát.
+            Dán bài giảng, tài liệu PDF hoặc văn bản bất kỳ để AI tạo câu hỏi từ đoạn văn bản đó.
           </p>
         </button>
 
-        {/* Tab 2: Topic-Based */}
+        {/* Option 3: Topic-Based */}
         <button
           type="button"
           onClick={() => onChangeConfig({ source_type: "topic" })}
           className={`p-5 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer flex flex-col gap-2 ${
             config.source_type === "topic"
-              ? "border-[#4F46E5] bg-indigo-50/30 shadow-[0_4px_20px_rgba(79,70,229,0.08)]"
+              ? "border-[#4F46E5] bg-indigo-50/40 shadow-[0_4px_20px_rgba(79,70,229,0.08)]"
               : "border-gray-200 hover:border-gray-300 bg-white"
           }`}
         >
@@ -74,19 +211,110 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
             <input
               type="radio"
               checked={config.source_type === "topic"}
-              onChange={() => onChangeConfig({ source_type: "topic" })}
+              onChange={() => {}}
               className="w-4 h-4 text-[#4F46E5]"
             />
           </div>
-          <h3 className="text-sm font-extrabold text-[#1A1A2E]">2. Tạo Theo Chủ Đề Tự Nhiên</h3>
+          <h3 className="text-sm font-extrabold text-[#1A1A2E]">3. Tạo Theo Chủ Đề Tự Nhiên</h3>
           <p className="text-xs text-gray-500 font-medium leading-relaxed">
-            Nhập tên chủ đề hoặc prompt ngắn (VD: "Toán nhị phân", "React Context API"). AI tự mở rộng kiến thức.
+            Nhập tên chủ đề (VD: "Toán hệ nhị phân", "React Hooks"). AI sẽ tự sinh câu hỏi kiến thức.
           </p>
         </button>
       </div>
 
-      {/* Input Field Based on Selection */}
-      {config.source_type === "content" ? (
+      {/* Interactive Input Form Area */}
+      {config.source_type === "course" ? (
+        <div className="flex flex-col gap-4 p-6 rounded-2xl bg-[#FAF8FF] border border-indigo-100">
+          <div>
+            <label className="block text-xs font-extrabold text-[#1A1A2E] mb-2 uppercase tracking-wider">
+              Chọn khóa học của bạn do bạn quản lý:
+            </label>
+            {isLoadingCourses ? (
+              <div className="p-4 bg-white rounded-xl border border-gray-200 text-xs font-bold text-gray-500 animate-pulse">
+                ⏳ Đang tải danh sách khóa học...
+              </div>
+            ) : courses.length === 0 ? (
+              <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold flex flex-col gap-1">
+                <span>⚠️ Bạn chưa có khóa học nào trong tài khoản.</span>
+                <span className="text-[11px] font-medium text-amber-700">
+                  Hãy chọn phương thức "Dán nội dung thủ công" hoặc "Tạo theo chủ đề" ở trên để tiếp tục.
+                </span>
+              </div>
+            ) : (
+              <select
+                value={config.course_id || ""}
+                onChange={(e) => handleSelectCourse(Number(e.target.value))}
+                className="w-full p-3.5 rounded-xl border-2 border-indigo-200 bg-white text-xs font-bold text-gray-900 focus:outline-none focus:border-[#4F46E5] shadow-xs"
+              >
+                {courses.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    📚 {c.title} (ID: #{c.id})
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          {/* Selected Course Breakdown & Verification Card */}
+          {config.course_id && (
+            <div className="p-5 rounded-2xl bg-white border border-indigo-100 shadow-sm flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-8 h-8 rounded-xl bg-indigo-50 text-[#4F46E5] flex items-center justify-center font-bold text-sm">
+                    📖
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-black text-[#1A1A2E]">
+                      {config.course_title || "Khóa học đã chọn"}
+                    </h4>
+                    <p className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                      <span>✓</span>
+                      <span>AI sẽ sử dụng nội dung thực tế của các bài học trong khóa học này để tạo đề.</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs font-bold">
+                  <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-[#4F46E5] border border-indigo-100">
+                    📂 {modulesList.length} Modules
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-purple-50 text-purple-700 border border-purple-100">
+                    📚 {lessonsList.length} Lessons
+                  </span>
+                </div>
+              </div>
+
+              {/* Lesson Verification Badge Chips */}
+              {isLoadingDetails ? (
+                <div className="text-[11px] font-bold text-gray-400 animate-pulse">
+                  ⏳ Đang nạp danh sách các bài học thuộc khóa học...
+                </div>
+              ) : lessonsList.length > 0 ? (
+                <div className="flex flex-col gap-1.5 pt-2 border-t border-gray-100">
+                  <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                    Các bài học được AI trích xuất (Tối đa {lessonsList.length} bài):
+                  </span>
+                  <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-1">
+                    {lessonsList.map((les, idx) => (
+                      <span
+                        key={les.id || idx}
+                        className="px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-200 text-gray-700 text-[11px] font-bold truncate max-w-xs"
+                        title={les.title}
+                      >
+                        ✓ Bài {idx + 1}: {les.title}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-[11px] font-bold text-gray-400">
+                  Khóa học hiện chưa có bài học nào. AI sẽ sử dụng thông tin tổng quan của khóa học để thiết kế câu hỏi.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ) : config.source_type === "content" ? (
         <div className="flex flex-col gap-2">
           <label className="text-xs font-bold text-gray-700 flex items-center justify-between">
             <span>Nội dung tài liệu / Bài giảng (Tối thiểu 10 ký tự)</span>
@@ -117,7 +345,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
                 key={item}
                 type="button"
                 onClick={() => onChangeConfig({ topic: item })}
-                className="px-2.5 py-1 bg-gray-100 hover:bg-indigo-50 hover:text-[#4F46E5] text-gray-600 text-[11px] font-extrabold rounded-lg transition-all"
+                className="px-2.5 py-1 bg-gray-100 hover:bg-indigo-50 hover:text-[#4F46E5] text-gray-600 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer"
               >
                 + {item}
               </button>

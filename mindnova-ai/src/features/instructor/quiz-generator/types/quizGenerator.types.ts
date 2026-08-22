@@ -1,4 +1,4 @@
-export type SourceType = "content" | "topic";
+export type SourceType = "content" | "topic" | "course";
 export type DifficultyType = "easy" | "medium" | "hard" | "mixed";
 export type QuestionType = "multiple_choice" | "essay";
 export type ReviewStatus = "pending" | "approved" | "edited" | "discarded";
@@ -23,6 +23,8 @@ export interface QuizConfig {
   source_type: SourceType;
   source_content: string;
   topic: string;
+  course_id?: number | null;
+  course_title?: string | null;
   difficulty: DifficultyType;
   total_questions: number;
   multiple_choice_count: number;
@@ -43,6 +45,8 @@ export interface QuizSummary {
   title: string;
   description: string | null;
   source_type: SourceType;
+  course_id?: number | null;
+  course_title?: string | null;
   difficulty: DifficultyType;
   total_questions: number;
   mc_questions_count: number;

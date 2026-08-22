@@ -6,6 +6,7 @@ export const quizGeneratorApi = {
   generateQuiz: async (config: QuizConfig) => {
     const payload = {
       source_type: config.source_type,
+      course_id: config.source_type === "course" ? config.course_id : undefined,
       content: config.source_type === "content" ? config.source_content : undefined,
       topic: config.source_type === "topic" ? config.topic : undefined,
       difficulty: config.difficulty,
@@ -16,7 +17,9 @@ export const quizGeneratorApi = {
       passing_score: config.passing_score,
     };
 
-    const res = await axiosClient.post("/api/instructor/ai-quiz/generate", payload);
+    const res = await axiosClient.post("/api/instructor/ai-quiz/generate", payload, {
+      timeout: 120000,
+    });
     return res.data;
   },
 
@@ -26,6 +29,8 @@ export const quizGeneratorApi = {
       type,
       difficulty,
       context,
+    }, {
+      timeout: 60000,
     });
     return res.data;
   },
@@ -36,6 +41,7 @@ export const quizGeneratorApi = {
     description: string;
     source_type: string;
     source_content: string;
+    course_id?: number | null;
     difficulty: string;
     time_limit_minutes: number;
     passing_score: number;
@@ -84,8 +90,23 @@ export const quizGeneratorApi = {
   },
 
   // Get instructor courses for attachment dropdown
-  getInstructorCourses: async () => {
-    const res = await axiosClient.get("/api/instructor/courses");
+  getInstructorCourses: async (): Promise<{ success: boolean; data: any[] }> => {
+    const res = await axiosClient.get("/api/instructor/courses?per_page=100");
+    const raw = res.data;
+    let list: any[] = [];
+    if (Array.isArray(raw?.data)) {
+      list = raw.data;
+    } else if (Array.isArray(raw?.data?.data)) {
+      list = raw.data.data;
+    } else if (Array.isArray(raw)) {
+      list = raw;
+    }
+    return { success: true, data: list };
+  },
+
+  // Get full course details with modules and lessons
+  getCourseDetails: async (courseId: number) => {
+    const res = await axiosClient.get(`/api/instructor/courses/${courseId}`);
     return res.data;
   },
 };

@@ -109,7 +109,8 @@ export function useAiQuizWizard() {
         title: config.title,
         description: config.description,
         source_type: config.source_type,
-        source_content: config.source_type === "content" ? config.source_content : config.topic,
+        source_content: config.source_type === "course" ? (config.course_title || "") : (config.source_type === "content" ? config.source_content : config.topic),
+        course_id: config.course_id,
         difficulty: config.difficulty,
         time_limit_minutes: config.time_limit_minutes,
         passing_score: config.passing_score,
@@ -133,6 +134,8 @@ export function useAiQuizWizard() {
 
   const approvedCount = questions.filter((q) => q.reviewStatus === "approved" || q.reviewStatus === "edited").length;
 
+  const clearError = useCallback(() => setError(null), []);
+
   return {
     step,
     setStep,
@@ -142,6 +145,8 @@ export function useAiQuizWizard() {
     isGenerating,
     isSaving,
     error,
+    setError,
+    clearError,
     savedQuiz,
     handleGenerate,
     updateQuestion,

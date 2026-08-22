@@ -30,12 +30,16 @@ class QuizGeneratorController extends Controller
      */
     public function generate(GenerateAiQuizRequest $request)
     {
+        set_time_limit(180);
         try {
             $quizData = $this->aiQuizGeneratorService->generateQuiz($request->user(), $request->validated());
 
             return $this->successResponse($quizData, 'Quiz generated successfully.');
         } catch (Exception $e) {
-            return $this->errorResponse('Failed to generate quiz: ' . $e->getMessage(), 500);
+            \Illuminate\Support\Facades\Log::error("[QuizGeneratorController] generate error: " . $e->getMessage(), [
+                'exception' => $e
+            ]);
+            return $this->errorResponse('Không thể tạo bài kiểm tra bằng AI: ' . $e->getMessage(), 500);
         }
     }
 
