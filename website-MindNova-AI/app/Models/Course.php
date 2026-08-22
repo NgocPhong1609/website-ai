@@ -103,6 +103,11 @@ class Course extends Model
         return $this->hasMany(CourseModule::class)->orderBy('order');
     }
 
+    public function lessons(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Lesson::class, 'course_id')->orderBy('order');
+    }
+
     public function enrollments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Enrollment::class);
@@ -159,7 +164,14 @@ class Course extends Model
 
     public function getTotalLessonsAttribute(): int
     {
-        return \App\Models\Lesson::whereIn('module_id', $this->modules()->select('id'))->count();
+        $moduleLessonsCount = \App\Models\Lesson::whereIn('module_id', $this->modules()->select('id'))->count();
+        if ($moduleLessonsCount > 0) {
+            return $moduleLessonsCount;
+        }
+        if (\Illuminate\Support\Facades\Schema::hasColumn('lessons', 'course_id')) {
+            return \App\Models\Lesson::where('course_id', $this->id)->count();
+        }
+        return 0;
     }
 
     public function getDurationHoursAttribute(): float
@@ -169,6 +181,9 @@ class Course extends Model
         }
 
         $totalSeconds = \App\Models\Lesson::whereIn('module_id', $this->modules()->select('id'))->sum('duration_seconds');
+        if (($totalSeconds ?? 0) == 0 && \Illuminate\Support\Facades\Schema::hasColumn('lessons', 'course_id')) {
+            $totalSeconds = \App\Models\Lesson::where('course_id', $this->id)->sum('duration_seconds');
+        }
         return round((float) ($totalSeconds ?? 0) / 3600, 1);
     }
 

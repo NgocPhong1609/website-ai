@@ -277,3 +277,128 @@ test('instructor can generate quiz from owned course with lessons', function () 
         ->assertJsonPath('data.course_id', $course->id)
         ->assertJsonPath('data.course_title', 'Toán hệ nhị phân');
 });
+
+test('course detail endpoint returns eager loaded modules and lessons', function () {
+    $course = Course::create([
+        'teacher_id' => $this->teacher->id,
+        'title' => 'Tán gái cho người mới',
+        'slug' => 'tan-gai-cho-nguoi-moi',
+        'description' => 'Khóa học kỹ năng giao tiếp',
+        'price' => 200
+    ]);
+
+    $module = $course->modules()->create([
+        'title' => 'Module 1: Tâm lý học',
+        'order' => 1,
+    ]);
+
+    $module->lessons()->create([
+        'course_id' => $course->id,
+        'title' => 'Bài 1: Tạo ấn tượng đầu tiên',
+        'content' => 'Nội dung bài 1...',
+        'order' => 1,
+    ]);
+
+    $response = $this->actingAs($this->teacher)
+        ->getJson("/api/instructor/courses/{$course->id}");
+
+    $response->assertStatus(200)
+        ->assertJsonPath('success', true)
+        ->assertJsonPath('data.id', $course->id)
+        ->assertJsonPath('data.modules.0.title', 'Module 1: Tâm lý học')
+        ->assertJsonPath('data.modules.0.lessons.0.title', 'Bài 1: Tạo ấn tượng đầu tiên');
+});
+
+test('instructor can view own quiz detail', function () {
+    $quiz = Quiz::create([
+        'instructor_id' => $this->teacher->id,
+        'title' => 'Đề thi của tôi',
+        'description' => 'Mô tả đề thi',
+        'total_questions' => 1,
+        'status' => 'published'
+    ]);
+
+    $response = $this->actingAs($this->teacher)
+        ->getJson("/api/instructor/ai-quiz/{$quiz->id}");
+
+    $response->assertStatus(200)
+        ->assertJsonPath('success', true)
+        ->assertJsonPath('data.title', 'Đề thi của tôi');
+});
+
+test('instructor cannot view another instructor quiz detail', function () {
+    $quiz = Quiz::create([
+        'instructor_id' => $this->otherTeacher->id,
+        'title' => 'Đề thi giáo viên khác',
+        'total_questions' => 1,
+        'status' => 'published'
+    ]);
+
+    $response = $this->actingAs($this->teacher)
+        ->getJson("/api/instructor/ai-quiz/{$quiz->id}");
+
+    $response->assertStatus(403);
+});
+
+test('instructor can delete own unattached quiz', function () {
+    $quiz = Quiz::create([
+        'instructor_id' => $this->teacher->id,
+        'title' => 'Đề thi cần xóa',
+        'total_questions' => 1,
+        'status' => 'published'
+    ]);
+
+    $response = $this->actingAs($this->teacher)
+        ->deleteJson("/api/instructor/ai-quiz/{$quiz->id}");
+
+    $response->assertStatus(200)
+        ->assertJsonPath('success', true);
+
+    $this->assertDatabaseMissing('quizzes', ['id' => $quiz->id]);
+});
+
+test('instructor cannot delete attached quiz and receives 422 error', function () {
+    $quiz = Quiz::create([
+        'instructor_id' => $this->teacher->id,
+        'title' => 'Đề thi đang gắn khóa học',
+        'total_questions' => 1,
+        'status' => 'published'
+    ]);
+
+    $course = Course::create([
+        'teacher_id' => $this->teacher->id,
+        'title' => 'Khóa học mẫu',
+        'slug' => 'khoa-hoc-mau',
+        'description' => 'Mô tả',
+        'price' => 100
+    ]);
+
+    \App\Models\QuizCourseAttachment::create([
+        'quiz_id' => $quiz->id,
+        'course_id' => $course->id,
+        'position' => 'end_of_course'
+    ]);
+
+    $response = $this->actingAs($this->teacher)
+        ->deleteJson("/api/instructor/ai-quiz/{$quiz->id}");
+
+    $response->assertStatus(422)
+        ->assertJsonPath('success', false)
+        ->assertJsonPath('message', 'Không thể xóa đề kiểm tra này vì đề đang được gắn vào khóa học.');
+
+    $this->assertDatabaseHas('quizzes', ['id' => $quiz->id]);
+});
+
+test('instructor cannot delete another instructor quiz', function () {
+    $quiz = Quiz::create([
+        'instructor_id' => $this->otherTeacher->id,
+        'title' => 'Đề thi của giáo viên B',
+        'total_questions' => 1,
+        'status' => 'published'
+    ]);
+
+    $response = $this->actingAs($this->teacher)
+        ->deleteJson("/api/instructor/ai-quiz/{$quiz->id}");
+
+    $response->assertStatus(403);
+});

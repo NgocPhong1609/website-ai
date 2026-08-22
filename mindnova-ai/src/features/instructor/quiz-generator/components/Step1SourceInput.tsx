@@ -65,9 +65,8 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
       quizGeneratorApi
         .getCourseDetails(config.course_id)
         .then((res) => {
-          if (res?.data) {
-            setSelectedCourseDetails(res.data);
-          }
+          const detail = res?.data || res;
+          setSelectedCourseDetails(detail);
         })
         .catch(() => {
           setSelectedCourseDetails(null);
@@ -99,16 +98,28 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
       ? config.source_content.trim().length >= 10
       : config.topic.trim().length >= 3;
 
-  // Extract lesson list for preview
-  const modulesList = selectedCourseDetails?.modules || [];
+  // Extract module & lesson list for preview
+  const rawModules = selectedCourseDetails?.modules;
+  const rawLessons = selectedCourseDetails?.lessons || selectedCourseDetails?.direct_lessons;
+  const modulesList = Array.isArray(rawModules) ? rawModules : [];
   const lessonsList: any[] = [];
-  modulesList.forEach((m: any) => {
-    if (Array.isArray(m.lessons)) {
-      m.lessons.forEach((l: any) => {
-        lessonsList.push({ ...l, module_title: m.title });
-      });
-    }
-  });
+
+  if (modulesList.length > 0) {
+    modulesList.forEach((m: any) => {
+      if (Array.isArray(m.lessons)) {
+        m.lessons.forEach((l: any) => {
+          lessonsList.push({ ...l, module_title: m.title });
+        });
+      }
+    });
+  }
+
+  // Fallback if course has no modules but direct lessons exist
+  if (lessonsList.length === 0 && Array.isArray(rawLessons)) {
+    rawLessons.forEach((l: any) => {
+      lessonsList.push(l);
+    });
+  }
 
   return (
     <div className="p-8 bg-white rounded-3xl border border-[#EAEAF4] shadow-sm flex flex-col gap-6 animate-fadeIn">

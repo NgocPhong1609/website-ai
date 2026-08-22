@@ -37,14 +37,30 @@ class CourseResource extends JsonResource
                         'id' => $module->id,
                         'title' => $module->title,
                         'order' => $module->order,
-                        'lessons' => $module->lessons->map(function ($lesson) {
+                        'lessons' => $module->relationLoaded('lessons') ? $module->lessons->map(function ($lesson) {
                             return [
                                 'id' => $lesson->id,
                                 'title' => $lesson->title,
                                 'type' => $lesson->type,
+                                'content' => $lesson->content,
+                                'video_url' => $lesson->video_url,
+                                'duration_seconds' => $lesson->duration_seconds ?? 0,
                                 'order' => $lesson->order,
                             ];
-                        }),
+                        }) : [],
+                    ];
+                });
+            }),
+            'lessons' => $this->whenLoaded('lessons', function () {
+                return $this->lessons->map(function ($lesson) {
+                    return [
+                        'id' => $lesson->id,
+                        'title' => $lesson->title,
+                        'type' => $lesson->type,
+                        'content' => $lesson->content,
+                        'video_url' => $lesson->video_url,
+                        'duration_seconds' => $lesson->duration_seconds ?? 0,
+                        'order' => $lesson->order,
                     ];
                 });
             }),

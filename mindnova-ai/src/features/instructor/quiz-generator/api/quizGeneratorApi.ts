@@ -80,6 +80,12 @@ export const quizGeneratorApi = {
   // Get quiz details
   getQuizById: async (quizId: number) => {
     const res = await axiosClient.get(`/api/instructor/ai-quiz/${quizId}`);
+    return res.data?.data || res.data;
+  },
+
+  // Delete quiz
+  deleteQuiz: async (quizId: number) => {
+    const res = await axiosClient.delete(`/api/instructor/ai-quiz/${quizId}`);
     return res.data;
   },
 
@@ -107,6 +113,6 @@ export const quizGeneratorApi = {
   // Get full course details with modules and lessons
   getCourseDetails: async (courseId: number) => {
     const res = await axiosClient.get(`/api/instructor/courses/${courseId}`);
-    return res.data;
+    return res.data?.data || res.data;
   },
 };

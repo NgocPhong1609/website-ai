@@ -126,9 +126,20 @@ class QuizGeneratorController extends Controller
     {
         Gate::authorize('delete', $quiz);
 
-        $quiz->delete();
+        if ($quiz->attachments()->exists() || $quiz->lesson_id !== null) {
+            return $this->errorResponse('Không thể xóa đề kiểm tra này vì đề đang được gắn vào khóa học.', 422);
+        }
 
-        return $this->noContentResponse();
+        \Illuminate\Support\Facades\DB::transaction(function () use ($quiz) {
+            foreach ($quiz->questions as $question) {
+                $question->answers()->delete();
+                $question->delete();
+            }
+            $quiz->attachments()->delete();
+            $quiz->delete();
+        });
+
+        return $this->successResponse(null, 'Đã xóa bài kiểm tra thành công.');
     }
 
     /**

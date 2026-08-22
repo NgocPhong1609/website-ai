@@ -34,7 +34,11 @@ class AiQuizGeneratorService
         $lessonCount = 0;
 
         if (($sourceType === 'course' || !empty($courseId)) && $courseId) {
-            $course = \App\Models\Course::with(['modules.lessons'])->where('id', $courseId)->first();
+            $courseQuery = \App\Models\Course::with(['modules.lessons']);
+            if (\Illuminate\Support\Facades\Schema::hasColumn('lessons', 'course_id')) {
+                $courseQuery->with('lessons');
+            }
+            $course = $courseQuery->where('id', $courseId)->first();
 
             if (!$course) {
                 throw new Exception("Không tìm thấy khóa học với ID {$courseId}.");
@@ -45,24 +49,54 @@ class AiQuizGeneratorService
             }
 
             $courseTitle = $course->title;
-            $moduleCount = $course->modules->count();
+            $moduleCount = $course->modules ? $course->modules->count() : 0;
             $aggregatedContent = "";
 
-            foreach ($course->modules as $modIndex => $module) {
-                foreach ($module->lessons as $lesIndex => $lesson) {
+            if ($moduleCount > 0) {
+                foreach ($course->modules as $modIndex => $module) {
+                    foreach ($module->lessons as $lesIndex => $lesson) {
+                        $lessonCount++;
+                        $lessonText = trim(strip_tags($lesson->content ?? ''));
+                        $aggregatedContent .= "--- Bài " . ($lessonCount) . ": {$lesson->title} (Module: {$module->title}) ---\n";
+                        if (!empty($lessonText)) {
+                            $aggregatedContent .= $lessonText . "\n\n";
+                        } else {
+                            $aggregatedContent .= "Kiến thức bài học lý thuyết về {$lesson->title}.\n\n";
+                        }
+                    }
+                }
+            }
+
+            // Fallback to direct lessons if modular lessons count is 0
+            if ($lessonCount === 0 && $course->relationLoaded('lessons') && $course->lessons->isNotEmpty()) {
+                foreach ($course->lessons as $lesIndex => $lesson) {
                     $lessonCount++;
                     $lessonText = trim(strip_tags($lesson->content ?? ''));
-                    $aggregatedContent .= "--- Bài " . ($lesIndex + 1) . ": {$lesson->title} (Module: {$module->title}) ---\n";
+                    $aggregatedContent .= "--- Bài " . ($lessonCount) . ": {$lesson->title} ---\n";
                     if (!empty($lessonText)) {
                         $aggregatedContent .= $lessonText . "\n\n";
                     } else {
                         $aggregatedContent .= "Kiến thức bài học lý thuyết về {$lesson->title}.\n\n";
                     }
                 }
+            } elseif ($lessonCount === 0 && \Illuminate\Support\Facades\Schema::hasColumn('lessons', 'course_id')) {
+                $directLessons = \App\Models\Lesson::where('course_id', $course->id)->orderBy('order')->get();
+                if ($directLessons->isNotEmpty()) {
+                    foreach ($directLessons as $lesIndex => $lesson) {
+                        $lessonCount++;
+                        $lessonText = trim(strip_tags($lesson->content ?? ''));
+                        $aggregatedContent .= "--- Bài " . ($lessonCount) . ": {$lesson->title} ---\n";
+                        if (!empty($lessonText)) {
+                            $aggregatedContent .= $lessonText . "\n\n";
+                        } else {
+                            $aggregatedContent .= "Kiến thức bài học lý thuyết về {$lesson->title}.\n\n";
+                        }
+                    }
+                }
             }
 
-            if (empty($aggregatedContent)) {
-                $aggregatedContent = "Khóa học '{$courseTitle}' với {$moduleCount} Module và {$lessonCount} Bài học.";
+            if (empty(trim($aggregatedContent))) {
+                $aggregatedContent = "Khóa học '{$courseTitle}' với {$moduleCount} Module và {$lessonCount} Bài học. Mô tả: {$course->description}";
             }
 
             $sourceDescription = "Nội dung kiến thức bài học của Khóa học: '{$courseTitle}' (Gồm {$moduleCount} Module, {$lessonCount} Bài học):\n\n{$aggregatedContent}";

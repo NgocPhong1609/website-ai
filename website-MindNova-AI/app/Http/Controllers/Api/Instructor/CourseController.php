@@ -63,6 +63,11 @@ class CourseController extends Controller
     {
         Gate::authorize('view', $course);
 
+        $course->load(['modules.lessons']);
+        if (\Illuminate\Support\Facades\Schema::hasColumn('lessons', 'course_id')) {
+            $course->load('lessons');
+        }
+
         return $this->successResponse(new CourseResource($course));
     }
 
