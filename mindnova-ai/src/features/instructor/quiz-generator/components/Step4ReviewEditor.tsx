@@ -39,7 +39,11 @@ export function Step4ReviewEditor({
   });
 
   const approvedCount = questions.filter((q) => q.reviewStatus === "approved" || q.reviewStatus === "edited").length;
-  const totalPoints = questions.reduce((sum, q) => sum + (q.points || 0), 0);
+  const rawTotal = questions.reduce((sum, q) => sum + (q.points || 0), 0);
+  const totalPoints = Number(rawTotal.toFixed(2));
+  const isValidTotal = Math.abs(totalPoints - 10) < 0.001;
+  const isLess = totalPoints < 10;
+  const isMore = totalPoints > 10;
 
   return (
     <div className="p-8 bg-white rounded-3xl border border-[#EAEAF4] shadow-sm flex flex-col gap-6 animate-fadeIn">
@@ -63,11 +67,46 @@ export function Step4ReviewEditor({
             <span>📊 Đã duyệt:</span>
             <span className="font-extrabold text-sm">{approvedCount}/{questions.length}</span>
           </div>
-          <div className="px-3 py-2 rounded-2xl bg-purple-50 border border-purple-100 flex items-center gap-2 text-xs font-bold text-purple-700">
-            <span>🎯 Tổng điểm:</span>
-            <span className="font-extrabold text-sm">{totalPoints} điểm</span>
+          <div
+            className={`px-3 py-2 rounded-2xl border flex items-center gap-2 text-xs font-bold ${
+              isValidTotal
+                ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                : "bg-amber-50 border-amber-200 text-amber-800"
+            }`}
+          >
+            <span>🎯 Tổng điểm hiện tại:</span>
+            <span className="font-black text-sm">{totalPoints} / 10</span>
           </div>
         </div>
+      </div>
+
+      {/* Score Validation Banner */}
+      <div>
+        {isValidTotal ? (
+          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between shadow-2xs">
+            <div className="flex items-center gap-2">
+              <span className="text-base">✓</span>
+              <span>Tổng điểm hợp lệ: <strong>10 / 10</strong>. Bài kiểm tra đã sẵn sàng để xuất bản.</span>
+            </div>
+            <span className="px-2.5 py-1 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-lg">Standard 10.0</span>
+          </div>
+        ) : isLess ? (
+          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex items-center justify-between shadow-2xs">
+            <div className="flex items-center gap-2">
+              <span className="text-base">⚠️</span>
+              <span>Tổng điểm chưa đủ 10 (Hiện tại: <strong>{totalPoints} / 10</strong>). Vui lòng điều chỉnh điểm các câu hỏi.</span>
+            </div>
+            <span className="px-2.5 py-1 bg-amber-600 text-white text-[10px] font-black uppercase rounded-lg">Thiếu {Number((10 - totalPoints).toFixed(2))}đ</span>
+          </div>
+        ) : (
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs font-bold flex items-center justify-between shadow-2xs">
+            <div className="flex items-center gap-2">
+              <span className="text-base">⚠️</span>
+              <span>Tổng điểm vượt quá 10 (Hiện tại: <strong>{totalPoints} / 10</strong>). Vui lòng giảm điểm các câu hỏi.</span>
+            </div>
+            <span className="px-2.5 py-1 bg-rose-600 text-white text-[10px] font-black uppercase rounded-lg">Vượt {Number((totalPoints - 10).toFixed(2))}đ</span>
+          </div>
+        )}
       </div>
 
       {/* Control Bar: Filters & Actions */}
@@ -156,7 +195,7 @@ export function Step4ReviewEditor({
       </div>
 
       {/* Footer Navigation & Save Buttons */}
-      <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-gray-100 pt-4 mt-2">
         <button
           type="button"
           onClick={onBack}
@@ -166,11 +205,17 @@ export function Step4ReviewEditor({
         </button>
 
         <div className="flex items-center gap-3">
+          {!isValidTotal && (
+            <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-2 rounded-xl border border-amber-200">
+              ⚠️ Tổng điểm phải bằng 10 để lưu.
+            </span>
+          )}
+
           <button
             type="button"
             onClick={() => onSave("draft")}
-            disabled={isSaving}
-            className="px-6 py-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-extrabold text-xs transition-all cursor-pointer"
+            disabled={isSaving || !isValidTotal}
+            className="px-6 py-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-extrabold text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isSaving ? "Đang lưu..." : "💾 Lưu Nháp"}
           </button>
@@ -178,8 +223,8 @@ export function Step4ReviewEditor({
           <button
             type="button"
             onClick={() => onSave("published")}
-            disabled={isSaving || questions.length === 0}
-            className="px-8 py-3 bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#4338CA] hover:to-[#6D28D9] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 cursor-pointer flex items-center gap-2"
+            disabled={isSaving || questions.length === 0 || !isValidTotal}
+            className="px-8 py-3 bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:from-[#4338CA] hover:to-[#6D28D9] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center gap-2"
           >
             <span>✓ Xuất Bản &amp; Gắn Vào Khóa Học ➜</span>
           </button>

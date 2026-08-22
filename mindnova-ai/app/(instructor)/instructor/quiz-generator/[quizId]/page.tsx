@@ -15,6 +15,13 @@ export default function QuizDetailPage() {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // Edit Points Mode State
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editedQuestions, setEditedQuestions] = useState<any[]>([]);
+  const [isSavingPoints, setIsSavingPoints] = useState(false);
+  const [savePointsError, setSavePointsError] = useState<string | null>(null);
+  const [savePointsSuccess, setSavePointsSuccess] = useState<string | null>(null);
+
   // Deletion modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -33,6 +40,7 @@ export default function QuizDetailPage() {
       .then((data) => {
         if (data) {
           setQuiz(data);
+          setEditedQuestions(JSON.parse(JSON.stringify(data.questions || [])));
         } else {
           setErrorMsg("Không tìm thấy đề kiểm tra.");
         }
@@ -50,6 +58,99 @@ export default function QuizDetailPage() {
       })
       .finally(() => setLoading(false));
   }, [quizId]);
+
+  const questionsToDisplay = isEditMode ? editedQuestions : (quiz?.questions || []);
+
+  const mcqQuestions = (questionsToDisplay || []).filter(
+    (q: any) => q.type === "multiple_choice" || q.type === "trac_nghiem"
+  );
+  const essayQuestions = (questionsToDisplay || []).filter(
+    (q: any) => q.type === "essay" || q.type === "tu_luan"
+  );
+
+  const rawTotal = (questionsToDisplay || []).reduce(
+    (sum: number, q: any) => sum + (parseFloat(q.points) || 0),
+    0
+  );
+  const totalScore = Number(rawTotal.toFixed(2));
+  const isValidTotal = Math.abs(totalScore - 10) < 0.001;
+  const isLess = totalScore < 10;
+  const isMore = totalScore > 10;
+
+  const handleStartEdit = () => {
+    setEditedQuestions(JSON.parse(JSON.stringify(quiz.questions || [])));
+    setIsEditMode(true);
+    setSavePointsError(null);
+    setSavePointsSuccess(null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditedQuestions(JSON.parse(JSON.stringify(quiz.questions || [])));
+    setIsEditMode(false);
+    setSavePointsError(null);
+  };
+
+  const handleUpdateQuestionPoint = (qIndex: number, newPoint: number) => {
+    setEditedQuestions((prev) => {
+      const copy = [...prev];
+      copy[qIndex] = {
+        ...copy[qIndex],
+        points: isNaN(newPoint) || newPoint < 0 ? 0 : newPoint,
+      };
+      return copy;
+    });
+  };
+
+  const handleUpdateQuestionRubric = (qIndex: number, newRubric: string) => {
+    setEditedQuestions((prev) => {
+      const copy = [...prev];
+      copy[qIndex] = {
+        ...copy[qIndex],
+        rubric: newRubric,
+      };
+      return copy;
+    });
+  };
+
+  const handleSavePoints = async () => {
+    if (!isValidTotal) return;
+
+    setIsSavingPoints(true);
+    setSavePointsError(null);
+    setSavePointsSuccess(null);
+
+    try {
+      const res = await quizGeneratorApi.updateQuiz(quizId, {
+        title: quiz.title,
+        description: quiz.description,
+        source_type: quiz.source_type,
+        source_content: quiz.source_content,
+        course_id: quiz.attachments?.[0]?.course_id || quiz.course_id || null,
+        difficulty: quiz.difficulty,
+        time_limit_minutes: quiz.time_limit_minutes,
+        passing_score: quiz.passing_score,
+        status: quiz.status,
+        questions: editedQuestions,
+      });
+
+      const updatedQuiz = res?.data || res;
+      setQuiz(updatedQuiz);
+      setEditedQuestions(JSON.parse(JSON.stringify(updatedQuiz.questions || [])));
+      setIsEditMode(false);
+      setSavePointsSuccess("✓ Đã cập nhật điểm và thang điểm bài kiểm tra thành công!");
+      setTimeout(() => setSavePointsSuccess(null), 4000);
+    } catch (err: any) {
+      console.error("Save points error:", err);
+      const apiMsg = err.response?.data?.message || err.message;
+      if (apiMsg && typeof apiMsg === "string") {
+        setSavePointsError(apiMsg);
+      } else {
+        setSavePointsError("Không thể lưu điểm. Vui lòng kiểm tra lại tổng điểm (phải bằng 10).");
+      }
+    } finally {
+      setIsSavingPoints(false);
+    }
+  };
 
   const handleDelete = async (force: boolean = false) => {
     setIsDeleting(true);
@@ -100,13 +201,6 @@ export default function QuizDetailPage() {
     );
   }
 
-  const mcqQuestions = (quiz.questions || []).filter(
-    (q: any) => q.type === "multiple_choice" || q.type === "trac_nghiem"
-  );
-  const essayQuestions = (quiz.questions || []).filter(
-    (q: any) => q.type === "essay" || q.type === "tu_luan"
-  );
-
   const attachedCourseName =
     quiz.attachments?.[0]?.course?.title || quiz.course_title || null;
 
@@ -123,6 +217,43 @@ export default function QuizDetailPage() {
         </Link>
 
         <div className="flex items-center gap-3">
+          {!isEditMode ? (
+            <button
+              type="button"
+              onClick={handleStartEdit}
+              className="px-4 py-2 rounded-xl bg-indigo-50 border border-indigo-200 text-[#4F46E5] text-xs font-extrabold hover:bg-[#4F46E5] hover:text-white transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>✏️</span>
+              <span>Sửa điểm</span>
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                disabled={isSavingPoints}
+                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-extrabold transition-all cursor-pointer"
+              >
+                ✕ Hủy
+              </button>
+              <button
+                type="button"
+                onClick={handleSavePoints}
+                disabled={!isValidTotal || isSavingPoints}
+                className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {isSavingPoints ? (
+                  <span>⏳ Đang lưu...</span>
+                ) : (
+                  <>
+                    <span>💾</span>
+                    <span>Lưu điểm</span>
+                  </>
+                )}
+              </button>
+            </>
+          )}
+
           <button
             type="button"
             onClick={() => setShowDeleteModal(true)}
@@ -133,6 +264,20 @@ export default function QuizDetailPage() {
           </button>
         </div>
       </div>
+
+      {savePointsSuccess && (
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-extrabold flex items-center gap-2 animate-fadeIn shadow-2xs">
+          <span>✓</span>
+          <span>{savePointsSuccess}</span>
+        </div>
+      )}
+
+      {savePointsError && (
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-extrabold flex items-center gap-2 animate-fadeIn shadow-2xs">
+          <span>⚠️</span>
+          <span>{savePointsError}</span>
+        </div>
+      )}
 
       {/* Main Quiz Overview Header Card */}
       <div className="p-8 rounded-3xl bg-gradient-to-r from-[#1E233E] via-[#2B2D62] to-[#121626] text-white flex flex-col gap-5 shadow-xl border border-white/10 relative overflow-hidden">
@@ -205,17 +350,76 @@ export default function QuizDetailPage() {
           </div>
 
           <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex flex-col">
-            <span className="text-[10px] text-indigo-300 font-bold uppercase">Khóa học liên kết</span>
-            <span className="text-xs font-extrabold text-emerald-300 truncate mt-1">
-              {attachedCourseName ? `📚 ${attachedCourseName}` : "Độc lập (Chưa gắn)"}
+            <span className="text-[10px] text-indigo-300 font-bold uppercase">Tổng điểm chuẩn</span>
+            <span className={`text-xs font-extrabold mt-1 ${isValidTotal ? "text-emerald-300" : "text-amber-300"}`}>
+              {totalScore} / 10 điểm
             </span>
           </div>
         </div>
       </div>
 
+      {/* Score Validation Banner */}
+      <div>
+        {isValidTotal ? (
+          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between shadow-2xs">
+            <div className="flex items-center gap-2">
+              <span className="text-base">✓</span>
+              <span>Tổng điểm hợp lệ: <strong>10 / 10</strong>. Bài kiểm tra đạt chuẩn quy định 10 điểm.</span>
+            </div>
+            <span className="px-2.5 py-1 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-lg">Standard 10.0</span>
+          </div>
+        ) : isLess ? (
+          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex items-center justify-between shadow-2xs">
+            <div className="flex items-center gap-2">
+              <span className="text-base">⚠️</span>
+              <span>Tổng điểm chưa đủ 10 (Hiện tại: <strong>{totalScore} / 10</strong>). Vui lòng điều chỉnh điểm các câu hỏi.</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-1 bg-amber-600 text-white text-[10px] font-black uppercase rounded-lg">Thiếu {Number((10 - totalScore).toFixed(2))}đ</span>
+              {!isEditMode && (
+                <button
+                  type="button"
+                  onClick={handleStartEdit}
+                  className="px-3 py-1 bg-amber-800 hover:bg-amber-900 text-white text-xs font-black rounded-lg transition-all cursor-pointer"
+                >
+                  ✏️ Sửa điểm ngay
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs font-bold flex items-center justify-between shadow-2xs">
+            <div className="flex items-center gap-2">
+              <span className="text-base">⚠️</span>
+              <span>Tổng điểm vượt quá 10 (Hiện tại: <strong>{totalScore} / 10</strong>). Vui lòng giảm điểm các câu hỏi.</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-1 bg-rose-600 text-white text-[10px] font-black uppercase rounded-lg">Vượt {Number((totalScore - 10).toFixed(2))}đ</span>
+              {!isEditMode && (
+                <button
+                  type="button"
+                  onClick={handleStartEdit}
+                  className="px-3 py-1 bg-rose-800 hover:bg-rose-900 text-white text-xs font-black rounded-lg transition-all cursor-pointer"
+                >
+                  ✏️ Sửa điểm ngay
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Questions Section Header */}
       <div className="flex items-center justify-between pt-2">
-        <h2 className="text-lg font-black text-[#1A1A2E]">Danh Sách Câu Hỏi ({quiz.questions?.length || 0})</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-black text-[#1A1A2E]">Danh Sách Câu Hỏi ({questionsToDisplay.length})</h2>
+          {isEditMode && (
+            <span className="px-3 py-1 rounded-xl bg-amber-100 text-amber-800 text-xs font-extrabold border border-amber-300 flex items-center gap-1.5 animate-pulse">
+              <span>✏️ Đang ở chế độ chỉnh sửa điểm</span>
+            </span>
+          )}
+        </div>
+
         <div className="flex items-center gap-2">
           <span className="px-3 py-1 rounded-lg bg-indigo-50 text-[#4F46E5] text-xs font-extrabold border border-indigo-100">
             Trắc nghiệm: {mcqQuestions.length}
@@ -228,13 +432,16 @@ export default function QuizDetailPage() {
 
       {/* Questions List */}
       <div className="flex flex-col gap-6">
-        {(quiz.questions || []).map((q: any, idx: number) => {
+        {questionsToDisplay.map((q: any, idx: number) => {
           const isMcq = q.type === "multiple_choice" || q.type === "trac_nghiem";
+          const currentPoint = parseFloat(q.points) || 0;
 
           return (
             <div
               key={q.id || idx}
-              className="p-6 md:p-8 rounded-3xl bg-white border border-[#EAEAF4] shadow-xs flex flex-col gap-4 relative"
+              className={`p-6 md:p-8 rounded-3xl bg-white border-2 transition-all duration-200 shadow-xs flex flex-col gap-4 relative ${
+                isEditMode ? "border-indigo-300 bg-indigo-50/10" : "border-[#EAEAF4]"
+              }`}
             >
               {/* Question Header */}
               <div className="flex items-start justify-between gap-4">
@@ -256,9 +463,25 @@ export default function QuizDetailPage() {
                   </span>
                 </div>
 
-                <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-100">
-                  🎯 {q.points || (isMcq ? 1 : 5)} điểm
-                </span>
+                {/* Point Display / Input field */}
+                {isEditMode ? (
+                  <div className="flex items-center gap-2 p-2 rounded-2xl bg-indigo-50 border border-indigo-200">
+                    <label className="text-xs font-extrabold text-[#4F46E5]">Điểm tối đa:</label>
+                    <input
+                      type="number"
+                      step="0.25"
+                      min="0"
+                      value={currentPoint}
+                      onChange={(e) => handleUpdateQuestionPoint(idx, parseFloat(e.target.value))}
+                      className="w-24 p-2 rounded-xl bg-white border border-indigo-300 text-xs font-black text-[#1A1A2E] focus:outline-none focus:border-indigo-600 text-center"
+                    />
+                    <span className="text-xs font-bold text-gray-500">đ</span>
+                  </div>
+                ) : (
+                  <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-3.5 py-1.5 rounded-xl border border-emerald-100 shadow-2xs">
+                    🎯 {currentPoint} điểm
+                  </span>
+                )}
               </div>
 
               {/* Question Text */}
@@ -269,7 +492,6 @@ export default function QuizDetailPage() {
               {/* Multiple Choice Options */}
               {isMcq && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-                  {/* Extract options from array or answers relationship */}
                   {(() => {
                     let opts: Array<{ text: string; isCorrect: boolean }> = [];
                     if (Array.isArray(q.answers) && q.answers.length > 0) {
@@ -343,22 +565,75 @@ export default function QuizDetailPage() {
                     </div>
                   )}
 
-                  {q.rubric && (
-                    <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200 text-xs flex flex-col gap-1">
-                      <span className="font-extrabold text-amber-800 uppercase tracking-wider text-[10px]">
-                        📊 Thang điểm / Rubric chấm điểm:
-                      </span>
+                  <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200 text-xs flex flex-col gap-1">
+                    <span className="font-extrabold text-amber-800 uppercase tracking-wider text-[10px]">
+                      📊 Thang điểm / Rubric chấm điểm:
+                    </span>
+                    {isEditMode ? (
+                      <textarea
+                        value={q.rubric || ""}
+                        onChange={(e) => handleUpdateQuestionRubric(idx, e.target.value)}
+                        rows={3}
+                        className="w-full p-3 rounded-xl border border-amber-300 bg-white text-xs font-medium text-amber-950 focus:outline-none focus:border-amber-500 mt-1"
+                        placeholder="- Ý 1: 40% = 1.0đ..."
+                      />
+                    ) : (
                       <p className="font-medium text-amber-950 leading-relaxed whitespace-pre-line">
-                        {q.rubric}
+                        {q.rubric || "Chưa có thang điểm chi tiết."}
                       </p>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               )}
             </div>
           );
         })}
       </div>
+
+      {/* Edit Mode Sticky Action Footer */}
+      {isEditMode && (
+        <div className="p-4 rounded-2xl bg-white border border-indigo-200 shadow-xl flex items-center justify-between sticky bottom-4 z-40 animate-fadeIn">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-extrabold text-[#1A1A2E]">Cập nhật tổng điểm:</span>
+            <span className={`text-sm font-black px-3 py-1 rounded-xl border ${
+              isValidTotal ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-amber-50 border-amber-200 text-amber-800"
+            }`}>
+              {totalScore} / 10 điểm
+            </span>
+            {!isValidTotal && (
+              <span className="text-xs font-bold text-amber-800">
+                ⚠️ Tổng điểm phải bằng 10 để lưu.
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleCancelEdit}
+              disabled={isSavingPoints}
+              className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold text-xs transition-all cursor-pointer"
+            >
+              ✕ Hủy
+            </button>
+            <button
+              type="button"
+              onClick={handleSavePoints}
+              disabled={!isValidTotal || isSavingPoints}
+              className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {isSavingPoints ? (
+                <span>⏳ Đang lưu điểm...</span>
+              ) : (
+                <>
+                  <span>💾</span>
+                  <span>Lưu điểm</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (

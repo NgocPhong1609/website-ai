@@ -125,7 +125,7 @@ class StudentQuizController extends Controller
                 'id' => (string) $question->id,
                 'type' => $question->type ?: 'multiple_choice',
                 'content' => $question->content,
-                'points' => (float) ($question->points > 0 ? $question->points : ($question->type === 'essay' ? 5.0 : 1.0)),
+                'points' => (float) ($question->points > 0 ? $question->points : (($question->type ?: 'multiple_choice') === 'essay' ? 2.5 : 0.5)),
                 'rubric' => $question->rubric ?: null,
                 'order' => $order++,
                 'answers' => $ansList,

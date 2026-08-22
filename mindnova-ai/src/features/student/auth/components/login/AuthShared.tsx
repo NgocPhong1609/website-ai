@@ -56,23 +56,24 @@ export function resolveUserRole(user: AuthUser): NormalizedRole {
 
 export function getRedirectPathFromRole(role: NormalizedRole): string {
   if (role === "admin") return "/admin";
-  if (role === "instructor") return "/instructor/courses";
-  return "/";
+  if (role === "instructor") return "/instructor";
+  return "/explore";
 }
 
-export const getUserRoleStr = (roles: UserRole[]) => {
-  const isAdmin = roles.some((r: UserRole) => r.id === 1 || r.name?.toLowerCase() === 'admin');
-  const isInstructor = roles.some((r: UserRole) => r.id === 2 || r.name?.toLowerCase() === 'instructor' || r.name?.toLowerCase() === 'teacher');
-  if (isAdmin) return "admin";
-  if (isInstructor) return "instructor";
+export const getUserRoleStr = (input: any): NormalizedRole => {
+  if (!input) return "student";
+  if (Array.isArray(input)) {
+    return resolveUserRole({ roles: input });
+  }
+  if (typeof input === "object") {
+    return resolveUserRole(input);
+  }
   return "student";
 };
 
-export const getRedirectPath = (roles: UserRole[]) => {
-  const roleStr = getUserRoleStr(roles);
-  if (roleStr === "admin") return "/admin";
-  if (roleStr === "instructor") return "/instructor/courses"; 
-  return "/"; 
+export const getRedirectPath = (input: any): string => {
+  const roleStr = getUserRoleStr(input);
+  return getRedirectPathFromRole(roleStr);
 };
 
 // ─── Icons ────────────────────────────────────────────────────────────────────

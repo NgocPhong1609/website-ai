@@ -69,34 +69,14 @@ Route::middleware('throttle:30,1')->group(function () {
 
 // -- API VNPay IPN (Webhooks) --
 Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
-
-// API Student Dashboard, Study Plan & Quizzes (Áp dụng cho mọi phiên học viên)
-Route::get('/student/dashboard', [StudentDashboardController::class, 'overview']);
-Route::get('/student/study-plan', [StudentStudyPlanController::class, 'overview']);
-Route::get('/student/practice/overview', [StudentPracticeController::class, 'overview']);
-Route::get('/student/progress/overview', [StudentProgressController::class, 'overview']);
-Route::get('/student/history/overview', [StudentHistoryController::class, 'overview']);
-Route::get('/student/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
-Route::get('/student/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
-Route::get('/student/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'index']);
-Route::post('/student/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
-Route::post('/student/onboarding', [OnboardingController::class, 'store']);
-// 🌟 BƯỚC 1: ĐẶT API AI PHÂN TÍCH BÀI HỌC VÀ GỢI Ý KHÓA HỌC Ở ĐÂY
-Route::post('/student/analyze-lesson', [\App\Http\Controllers\Api\Student\AnalyzeLessonController::class, 'analyze']);
-
-// 🧠 API AI ĐÁNH GIÁ NĂNG LỰC (Self-Assessment)
-Route::post('/student/courses/{courseId}/self-assessment/generate', [\App\Http\Controllers\Api\Student\SelfAssessmentController::class, 'generate']);
-Route::post('/student/self-assessment/submit', [\App\Http\Controllers\Api\Student\SelfAssessmentController::class, 'submit']);
-
-// Payment IPN (Webhook) - Cần public để Momo/VNPAY gọi
-Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
 Route::get('/student/payment/vnpay-ipn', [OrderController::class, 'vnpayIpn']);
 Route::post('/student/payment/momo-ipn', [OrderController::class, 'momoIpn']);
 
-// API Student Public
+// API Student Public Catalog (Khách chưa đăng nhập cũng có thể xem danh sách & chi tiết khóa học)
 Route::prefix('student')->group(function () {
     Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
     Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
+    Route::get('/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'index']);
 });
 
 // ==========================================
@@ -138,14 +118,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders', [OrderController::class, 'store']);
 
     // ==========================================
-    // 3. NHÓM API HỌC SINH (Student)
+    // 3. NHÓM API HỌC SINH (Student Only — Strict Authorization)
     // ==========================================
-    Route::prefix('student')->group(function () {
+    Route::middleware('role:student')->prefix('student')->group(function () {
 
         // 🌟 TÍNH NĂNG ONBOARDING & AI PHÂN TÍCH BÀI HỌC
         Route::post('/onboarding', [OnboardingController::class, 'store']);
         Route::get('/available-topics', [OnboardingController::class, 'getAvailableTopics']);
         Route::post('/analyze-lesson', [OnboardingController::class, 'analyzeLesson']);
+        Route::post('/courses/{courseId}/self-assessment/generate', [\App\Http\Controllers\Api\Student\SelfAssessmentController::class, 'generate']);
+        Route::post('/self-assessment/submit', [\App\Http\Controllers\Api\Student\SelfAssessmentController::class, 'submit']);
 
         // Dashboard, Study Plan & Quizzes
         Route::get('/dashboard', [StudentDashboardController::class, 'overview']);

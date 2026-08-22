@@ -156,13 +156,17 @@ export function QuestionCardMultipleChoice({
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Điểm số</label>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Điểm tối đa (max_score)</label>
               <input
                 type="number"
-                step="0.5"
+                step="0.25"
+                min="0"
                 value={draftPoints}
-                onChange={(e) => setDraftPoints(parseFloat(e.target.value) || 1)}
-                className="w-full p-2.5 rounded-xl border border-gray-200 text-xs font-bold"
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value);
+                  setDraftPoints(isNaN(val) || val < 0 ? 0 : val);
+                }}
+                className="w-full p-2.5 rounded-xl border border-gray-200 text-xs font-bold focus:border-[#4F46E5] focus:outline-none"
               />
             </div>
           </div>

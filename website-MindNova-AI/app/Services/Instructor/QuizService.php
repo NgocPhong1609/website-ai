@@ -21,16 +21,15 @@ class QuizService
             $questionsData = $data['questions'] ?? [];
             $mcCount = 0;
             $essayCount = 0;
-            $totalPoints = 0;
+            $totalPoints = 0.0;
 
             foreach ($questionsData as $q) {
                 if (($q['type'] ?? 'multiple_choice') === 'essay') {
                     $essayCount++;
-                    $totalPoints += (float) ($q['points'] ?? 5.0);
                 } else {
                     $mcCount++;
-                    $totalPoints += (float) ($q['points'] ?? 1.0);
                 }
+                $totalPoints += (float) ($q['points'] ?? 0.0);
             }
 
             $quiz = Quiz::create([
@@ -45,7 +44,7 @@ class QuizService
                 'essay_questions_count' => $essayCount,
                 'time_limit_minutes' => $data['time_limit_minutes'] ?? 15,
                 'passing_score' => $data['passing_score'] ?? 70,
-                'total_points' => $totalPoints,
+                'total_points' => round($totalPoints, 2),
                 'status' => $data['status'] ?? 'published',
             ]);
 
@@ -72,16 +71,15 @@ class QuizService
             $questionsData = $data['questions'] ?? [];
             $mcCount = 0;
             $essayCount = 0;
-            $totalPoints = 0;
+            $totalPoints = 0.0;
 
             foreach ($questionsData as $q) {
                 if (($q['type'] ?? 'multiple_choice') === 'essay') {
                     $essayCount++;
-                    $totalPoints += (float) ($q['points'] ?? 5.0);
                 } else {
                     $mcCount++;
-                    $totalPoints += (float) ($q['points'] ?? 1.0);
                 }
+                $totalPoints += (float) ($q['points'] ?? 0.0);
             }
 
             $quiz->update([
@@ -95,7 +93,7 @@ class QuizService
                 'essay_questions_count' => $essayCount,
                 'time_limit_minutes' => $data['time_limit_minutes'] ?? $quiz->time_limit_minutes,
                 'passing_score' => $data['passing_score'] ?? $quiz->passing_score,
-                'total_points' => $totalPoints,
+                'total_points' => round($totalPoints, 2),
                 'status' => $data['status'] ?? $quiz->status,
             ]);
 
@@ -132,7 +130,7 @@ class QuizService
                 'explanation' => $qData['explanation'] ?? null,
                 'sample_answer' => $type === 'essay' ? ($qData['sample_answer'] ?? null) : null,
                 'rubric' => $type === 'essay' ? ($qData['rubric'] ?? null) : null,
-                'points' => (float) ($qData['points'] ?? ($type === 'essay' ? 5.0 : 1.0)),
+                'points' => (float) ($qData['points'] ?? 0.0),
                 'order' => $qIndex + 1,
             ]);
 

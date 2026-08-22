@@ -35,6 +35,50 @@ export const quizGeneratorApi = {
     return res.data;
   },
 
+  // Update existing quiz and points
+  updateQuiz: async (
+    quizId: number,
+    quizData: {
+      title: string;
+      description?: string;
+      source_type?: string;
+      source_content?: string;
+      course_id?: number | null;
+      difficulty?: string;
+      time_limit_minutes?: number;
+      passing_score?: number;
+      status?: "draft" | "published";
+      questions: any[];
+    }
+  ) => {
+    const payload = {
+      ...quizData,
+      questions: quizData.questions.map((q: any) => ({
+        type: q.type === "trac_nghiem" ? "multiple_choice" : (q.type === "tu_luan" ? "essay" : q.type),
+        difficulty: q.difficulty || "medium",
+        content: q.content || q.question || "",
+        explanation: q.explanation || "",
+        sample_answer: q.type === "essay" || q.type === "tu_luan" ? (q.sample_answer || "") : undefined,
+        rubric: q.type === "essay" || q.type === "tu_luan" ? (q.rubric || "") : undefined,
+        points: parseFloat(q.points) || 0,
+        answers: (q.type === "multiple_choice" || q.type === "trac_nghiem") && Array.isArray(q.answers)
+          ? q.answers.map((a: any) => ({
+              content: a.content || a.text || "",
+              is_correct: Boolean(a.is_correct),
+            }))
+          : (q.type === "multiple_choice" || q.type === "trac_nghiem") && Array.isArray(q.options)
+          ? q.options.map((opt: string, idx: number) => ({
+              content: opt,
+              is_correct: idx === q.correct_answer_index,
+            }))
+          : undefined,
+      })),
+    };
+
+    const res = await axiosClient.put(`/api/instructor/ai-quiz/${quizId}`, payload);
+    return res.data;
+  },
+
   // Save standalone quiz
   saveQuiz: async (quizData: {
     title: string;

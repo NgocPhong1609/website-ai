@@ -30,7 +30,7 @@ class QuizGradingService
         foreach ($quiz->questions as $index => $question) {
             $qId = (string) $question->id;
             $qType = $question->type ?: 'multiple_choice';
-            $maxScore = (float) ($question->points > 0 ? $question->points : ($qType === 'essay' ? 5.0 : 1.0));
+            $maxScore = (float) ($question->points > 0 ? $question->points : ($qType === 'essay' ? 2.5 : 0.5));
             $totalMaxPoints += $maxScore;
 
             $rawUserAns = $submittedAnswers[$qId] ?? null;

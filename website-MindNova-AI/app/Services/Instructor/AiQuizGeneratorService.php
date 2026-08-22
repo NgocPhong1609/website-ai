@@ -136,16 +136,22 @@ CẤU TRÚC ĐỀ THI BẮT BUỘC:
 - Số câu trắc nghiệm (multiple_choice): ĐÚNG {$mcCount} CÂU.
 - Số câu tự luận (essay): ĐÚNG {$essayCount} CÂU.
 
+QUY TẮC PHÂN BỔ ĐIỂM BẮT BUỘC:
+- TỔNG ĐIỂM CỦA TẤT CẢ CÂU HỎI PHẢI ĐÚNG BẰNG 10.0 ĐIỂM.
+- Mỗi câu trắc nghiệm (multiple_choice) có điểm 'points' phù hợp (ví dụ: 0.5, 0.4, 0.25...).
+- Mỗi câu tự luận (essay) có điểm 'points' phù hợp (ví dụ: 2.5, 4.0, 1.5...).
+- Tổng điểm của toàn bộ bài thi PHẢI BẰNG 10.0 ĐIỂM.
+
 YÊU CẦU ĐỐI VỚI CÂU TRẮC NGHIỆM (multiple_choice):
 1. Mỗi câu có đúng 4 đáp án trong mảng 'options'.
 2. Chỉ định rõ 'correct_answer_index' (số nguyên từ 0 đến 3 chỉ định đáp án đúng trong mảng 'options').
 3. Cung cấp 'explanation' giải thích chi tiết tại sao đáp án đó đúng.
-4. Mặc định 'points': 1.
 
 YÊU CẦU ĐỐI VỚI CÂU TỰ LUẬN (essay):
 1. Cung cấp 'sample_answer' (đáp án tham khảo chi tiết).
-2. Cung cấp 'rubric' (gợi ý chấm điểm chi tiết chia theo ý chính/thang điểm).
-3. Mặc định 'points': 5 (hoặc điều chỉnh phù hợp với độ phức tạp).
+2. Cung cấp 'rubric' (Thang điểm chấm mô tả từng ý chính kèm % điểm chiếm trong tổng điểm câu, ví dụ:
+   '- Ý 1 (Nêu đúng khái niệm): 40% = 1.0 điểm\n- Ý 2 (Phân tích nguyên nhân): 30% = 0.75 điểm\n- Ý 3 (Ví dụ minh họa): 30% = 0.75 điểm\nTổng: 100% = 2.5 điểm'
+).
 
 QUY TẮC ĐỊNH DẠNG ĐẦU RA:
 - Trả về DUY NHẤT một chuỗi JSON chuẩn (Response MIME type: application/json).
@@ -164,7 +170,7 @@ CẤU TRÚC JSON MẪU:
       \"options\": [\"Đáp án A\", \"Đáp án B\", \"Đáp án C\", \"Đáp án D\"],
       \"correct_answer_index\": 0,
       \"explanation\": \"Giải thích vì sao đáp án A đúng...\",
-      \"points\": 1
+      \"points\": 0.5
     },
     {
       \"id\": \"q-2\",
@@ -172,8 +178,8 @@ CẤU TRÚC JSON MẪU:
       \"difficulty\": \"medium\",
       \"question\": \"Nội dung câu hỏi tự luận...?\",
       \"sample_answer\": \"Nội dung câu trả lời tham khảo mẫu...\",
-      \"rubric\": \"1. Ý 1 (2đ). 2. Ý 2 (3đ)...\",
-      \"points\": 5
+      \"rubric\": \"- Ý 1 (Nêu đúng khái niệm): 40% = 1.0 điểm\\n- Ý 2 (Phân tích nguyên nhân): 30% = 0.75 điểm\\n- Ý 3 (Ví dụ): 30% = 0.75 điểm\\nTổng: 100% = 2.5 điểm\",
+      \"points\": 2.5
     }
   ]
 }";
@@ -254,10 +260,13 @@ CẤU TRÚC JSON MẪU:
                     'explanation' => $q['explanation'] ?? '',
                     'sample_answer' => $qType === 'essay' ? ($q['sample_answer'] ?? '') : '',
                     'rubric' => $qType === 'essay' ? ($q['rubric'] ?? '') : '',
-                    'points' => (float) ($q['points'] ?? ($qType === 'essay' ? 5.0 : 1.0)),
+                    'points' => isset($q['points']) && is_numeric($q['points']) && (float)$q['points'] > 0 ? (float)$q['points'] : 0.0,
                     'reviewStatus' => 'pending'
                 ];
             }
+
+            // AUTO-NORMALIZE QUESTION POINTS TO EXACTLY 10.0 TOTAL POINTS
+            $this->normalizeQuestionPoints($questions);
 
             // Log AI generation
             AiGenerationLog::create([
@@ -429,5 +438,72 @@ Trả về CHỈ JSON theo định dạng:
             "AI_INVALID_RESPONSE",
             422
         );
+    }
+
+    /**
+     * Auto-normalize generated question points so that total sum equals exactly 10.0 points.
+     */
+    private function normalizeQuestionPoints(array &$questions): void
+    {
+        $totalCount = count($questions);
+        if ($totalCount === 0) return;
+
+        $mcCount = 0;
+        $essayCount = 0;
+
+        foreach ($questions as $q) {
+            if (($q['type'] ?? '') === 'essay') {
+                $essayCount++;
+            } else {
+                $mcCount++;
+            }
+        }
+
+        // Check if points are already summing to 10.0
+        $currentSum = 0.0;
+        foreach ($questions as $q) {
+            $currentSum += (float) ($q['points'] ?? 0);
+        }
+
+        // If sum is already 10.0 (with 0.01 tolerance) and all points > 0, keep them
+        if (abs($currentSum - 10.0) < 0.01 && min(array_column($questions, 'points')) > 0) {
+            return;
+        }
+
+        // Distribute 10.0 total points
+        if ($essayCount === 0) {
+            $baseMc = round(10.0 / $mcCount, 2);
+            foreach ($questions as &$q) {
+                $q['points'] = $baseMc;
+            }
+        } elseif ($mcCount === 0) {
+            $baseEssay = round(10.0 / $essayCount, 2);
+            foreach ($questions as &$q) {
+                $q['points'] = $baseEssay;
+            }
+        } else {
+            // Mixed MCQ & Essay: Give Essay 2.5x weight of MCQ
+            $weightTotal = ($mcCount * 1.0) + ($essayCount * 2.5);
+            $baseUnit = 10.0 / $weightTotal;
+            $baseMc = round($baseUnit * 1.0, 2);
+            $baseEssay = round($baseUnit * 2.5, 2);
+
+            foreach ($questions as &$q) {
+                if (($q['type'] ?? '') === 'essay') {
+                    $q['points'] = $baseEssay;
+                } else {
+                    $q['points'] = $baseMc;
+                }
+            }
+        }
+        unset($q);
+
+        // Adjust rounding residual on the last question to ensure exact sum === 10.0
+        $newSum = array_sum(array_column($questions, 'points'));
+        $diff = round(10.0 - $newSum, 2);
+        if (abs($diff) > 0.0001 && count($questions) > 0) {
+            $lastIdx = count($questions) - 1;
+            $questions[$lastIdx]['points'] = round($questions[$lastIdx]['points'] + $diff, 2);
+        }
     }
 }

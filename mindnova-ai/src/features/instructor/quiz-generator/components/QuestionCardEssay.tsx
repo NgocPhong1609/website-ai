@@ -126,23 +126,33 @@ export function QuestionCardEssay({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">Tiêu chí / Rubric chấm điểm</label>
+            <label className="block text-xs font-bold text-gray-700 mb-1">
+              Thang điểm / Rubric chấm điểm (% &amp; Điểm thành phần)
+            </label>
+            <p className="text-[10px] text-gray-500 font-medium mb-1">
+              Gợi ý mô tả %: - Ý 1 (Khái niệm): 40% = 1.0đ | - Ý 2 (Nguyên nhân): 30% = 0.75đ | - Ý 3 (Ví dụ): 30% = 0.75đ
+            </p>
             <textarea
               value={draftRubric}
               onChange={(e) => setDraftRubric(e.target.value)}
               rows={3}
-              className="w-full p-3 rounded-xl border border-gray-200 text-xs font-medium text-gray-800 focus:outline-none"
+              className="w-full p-3 rounded-xl border border-gray-200 text-xs font-medium text-gray-800 focus:outline-none focus:border-purple-500"
+              placeholder="- Ý 1: 40% = 1.0đ..."
             />
           </div>
 
-          <div className="w-1/3">
-            <label className="block text-xs font-bold text-gray-700 mb-1">Số điểm câu này</label>
+          <div className="w-1/2 md:w-1/3">
+            <label className="block text-xs font-bold text-purple-800 mb-1">Điểm tối đa CẢ CÂU (max_score)</label>
             <input
               type="number"
-              step="0.5"
+              step="0.25"
+              min="0"
               value={draftPoints}
-              onChange={(e) => setDraftPoints(parseFloat(e.target.value) || 5)}
-              className="w-full p-2.5 rounded-xl border border-gray-200 text-xs font-bold"
+              onChange={(e) => {
+                const val = parseFloat(e.target.value);
+                setDraftPoints(isNaN(val) || val < 0 ? 0 : val);
+              }}
+              className="w-full p-2.5 rounded-xl border border-purple-200 text-xs font-bold text-purple-900 focus:outline-none focus:border-purple-600"
             />
           </div>
         </div>

@@ -49,6 +49,20 @@ class StoreAiQuizRequest extends FormRequest
                     );
                 }
             }
+
+            $questions = $this->input('questions', []);
+            if (is_array($questions) && count($questions) > 0) {
+                $totalPoints = 0.0;
+                foreach ($questions as $q) {
+                    $totalPoints += (float) ($q['points'] ?? 0);
+                }
+                if (abs($totalPoints - 10.0) > 0.001) {
+                    $validator->errors()->add(
+                        'questions',
+                        'Tổng điểm của đề kiểm tra phải bằng 10.'
+                    );
+                }
+            }
         });
     }
 }
