@@ -25,32 +25,37 @@ export function QuizResultContent() {
     setLoading(false);
   }, []);
 
-  const displayData: QuizGradingResult = result || {
-    attempt_id: 1042,
-    module_id: "67",
-    score: 85,
-    score_10: 8.5,
-    total_score_max: 10,
-    accuracy: "85%",
-    passed: true,
-    correct_count: 17,
-    total_questions: 20,
-    time_taken_formatted: "4 phút 25 giây",
-    quiz_title: "Đề kiểm tra tổng hợp: Nghệ thuật thu hút và chinh phục",
-    ai_insight: "Xuất sắc! Bạn nắm giữ tư duy kiến trúc và quy luật ứng xử rất vững chắc. Các câu hỏi trắc nghiệm và phần luận lập kế hoạch hẹn hò tự luận được giải thích mạch lạc.",
-    ai_coach_suggestion: "Năng lực đạt điểm tối ưu trên thang 10. Tự tin chinh phục Module tiếp theo!",
-    topic_performance: [
-      { id: "1", topic_title: "Trắc nghiệm Kiến thức Nền tảng", sub_title: "Khái niệm & Nguyên lý thu hút 80/20", score_percentage: 90, status_label: "Tốt (9.0/10)", status_color: "indigo" },
-      { id: "2", topic_title: "Tự luận Vận dụng Thực tế", sub_title: "Phân tích tư duy & Kế hoạch hẹn hò chi tiết", score_percentage: 80, status_label: "Tốt (8.0/10)", status_color: "indigo" },
-      { id: "3", topic_title: "Tương tác & Phản ứng Tình huống", sub_title: "Xử lý tin nhắn & Kino Escalation 3 mức độ", score_percentage: 85, status_label: "Khá (8.5/10)", status_color: "teal" },
-    ],
-    action_cards: [
-      { id: "a1", title: "Xem lại câu hỏi & Bài làm tự luận", description: "Soát lại từng chi tiết đáp án trắc nghiệm và bài làm tự luận kèm nhận xét AI và Rubric.", action_text: "Bắt đầu soát bài", icon_type: "review" },
-      { id: "a2", title: "Luyện tập bổ trợ AI", description: "Vào lại chế độ kiểm nghiệm với bộ đề tự động xáo trộn ngẫu nhiên câu hỏi.", action_text: "Luyện tập thêm", icon_type: "practice" },
-      { id: "a3", title: "Chuyển sang Module khác", description: "Tiến thẳng về danh mục các khóa học thực chiến để bứt phá.", action_text: "Tiếp tục hành trình", icon_type: "continue" },
-    ],
-  };
+  if (loading) {
+    return (
+      <div className="p-8 max-w-4xl mx-auto text-center space-y-4">
+        <div className="w-12 h-12 border-4 border-[#5052EE] border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-sm font-semibold text-gray-600">Đang tải kết quả chấm điểm AI...</p>
+      </div>
+    );
+  }
 
+  if (!result) {
+    return (
+      <div className="p-8 max-w-2xl mx-auto my-12 text-center bg-white rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-2xl mx-auto font-bold border border-amber-200">
+          ⚠️
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold text-gray-900">Không tìm thấy dữ liệu bài thi</h2>
+          <p className="text-sm text-gray-600">
+            Bạn vừa truy cập trang kết quả trực tiếp hoặc chưa có lượt làm bài nào được ghi nhận.
+          </p>
+        </div>
+        <Link href="/practice">
+          <button type="button" className="px-6 py-3 bg-[#5052EE] text-white font-bold text-xs rounded-xl shadow-md hover:bg-[#383AB8] transition-all cursor-pointer">
+             Quay lại Trung tâm Luyện tập &amp; Kiểm tra
+          </button>
+        </Link>
+      </div>
+    );
+  }
+
+  const displayData: QuizGradingResult = result;
   const targetModuleId = displayData.module_id || "67";
   const displayScore10 = displayData.score_10 != null 
     ? Number(displayData.score_10).toFixed(1) 

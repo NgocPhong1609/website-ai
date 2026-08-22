@@ -366,9 +366,12 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
 });
 
 // ==========================================
-// 6. DEV / TEST ENDPOINTS
+// 6. DEV / TEST ENDPOINTS (Protected)
 // ==========================================
 if (app()->environment('local', 'testing')) {
-    Route::post('/dev/orders/{orderId}/complete', [App\Http\Controllers\Api\Student\OrderController::class, 'devCompleteOrder']);
-    Route::post('/dev/orders/{orderId}/refund', [App\Http\Controllers\Api\Student\OrderController::class, 'devRefundOrder']);
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('/dev/orders/{orderId}/complete', [App\Http\Controllers\Api\Student\OrderController::class, 'devCompleteOrder']);
+        Route::post('/dev/orders/{orderId}/refund', [App\Http\Controllers\Api\Student\OrderController::class, 'devRefundOrder']);
+    });
 }
+
