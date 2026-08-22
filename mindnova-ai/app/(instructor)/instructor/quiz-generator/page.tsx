@@ -60,6 +60,20 @@ export default function InstructorQuizListPage() {
     }
   };
 
+  const getAttachedCourseTitle = (q: QuizSummary): string | null => {
+    if (Array.isArray(q.attachments) && q.attachments.length > 0) {
+      const title = q.attachments[0]?.course?.title;
+      if (title) return title;
+    }
+    if ((q as any).lesson?.module?.course?.title) {
+      return (q as any).lesson.module.course.title;
+    }
+    if ((q as any).lesson?.course?.title) {
+      return (q as any).lesson.course.title;
+    }
+    return null;
+  };
+
   return (
     <div className="max-w-6xl mx-auto flex flex-col gap-8 p-6 md:p-8">
       {/* Toast Banner Notification */}
@@ -133,67 +147,86 @@ export default function InstructorQuizListPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {quizzes.map((q) => (
-              <div
-                key={q.id}
-                className="p-6 rounded-2xl bg-white border border-[#EAEAF4] hover:border-indigo-300 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4"
-              >
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-black uppercase px-2.5 py-1 rounded-lg bg-indigo-50 text-[#4F46E5] border border-indigo-100">
-                      {q.source_type === "course"
-                        ? "📚 Từ khóa học"
-                        : q.source_type === "content"
-                        ? "📜 Từ tài liệu"
-                        : "💡 Từ chủ đề"}
-                    </span>
-                    <span
-                      className={`text-[11px] font-extrabold px-2.5 py-1 rounded-lg border ${
-                        q.status === "published"
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                          : "bg-amber-50 text-amber-700 border-amber-200"
-                      }`}
-                    >
-                      {q.status === "published" ? "✓ Đã xuất bản" : "✎ Bản nháp"}
-                    </span>
+            {quizzes.map((q) => {
+              const attachedTitle = getAttachedCourseTitle(q);
+              return (
+                <div
+                  key={q.id}
+                  className="p-6 rounded-2xl bg-white border border-[#EAEAF4] hover:border-indigo-300 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4"
+                >
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="text-[11px] font-black uppercase px-2.5 py-1 rounded-lg bg-indigo-50 text-[#4F46E5] border border-indigo-100">
+                        {q.source_type === "course"
+                          ? "📚 Từ khóa học"
+                          : q.source_type === "content"
+                          ? "📜 Từ tài liệu"
+                          : "💡 Từ chủ đề"}
+                      </span>
+
+                      {attachedTitle ? (
+                        <span
+                          className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5 line-clamp-1 max-w-[220px]"
+                          title={`Gắn vào khóa học: ${attachedTitle}`}
+                        >
+                          <span>🔗</span>
+                          <span className="truncate">Khóa: <strong className="font-extrabold">{attachedTitle}</strong></span>
+                        </span>
+                      ) : (
+                        <span className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-gray-100 text-gray-500 border border-gray-200 flex items-center gap-1">
+                          <span>⚪</span>
+                          <span>Chưa gắn</span>
+                        </span>
+                      )}
+
+                      <span
+                        className={`text-[11px] font-extrabold px-2.5 py-1 rounded-lg border ${
+                          q.status === "published"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            : "bg-amber-50 text-amber-700 border-amber-200"
+                        }`}
+                      >
+                        {q.status === "published" ? "✓ Đã xuất bản" : "✎ Bản nháp"}
+                      </span>
+                    </div>
+
+                    <h3 className="text-base font-extrabold text-[#1A1A2E] line-clamp-1">{q.title}</h3>
+                    <p className="text-xs text-gray-500 font-medium line-clamp-2">{q.description || "Không có mô tả"}</p>
                   </div>
 
-                  <h3 className="text-base font-extrabold text-[#1A1A2E] line-clamp-1">{q.title}</h3>
-                  <p className="text-xs text-gray-500 font-medium line-clamp-2">{q.description || "Không có mô tả"}</p>
+                  <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs font-semibold text-gray-500">
+                    <div className="flex items-center gap-3 text-[11px]">
+                      <span>❓ {q.questions_count || q.total_questions} câu</span>
+                      <span>⏱️ {q.time_limit_minutes}p</span>
+                      <span>🎯 {q.total_points} đ</span>
+                    </div>
+
+                    {/* Action Buttons: Xem đề & Xóa */}
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/instructor/quiz-generator/${q.id}`}
+                        className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-[#4F46E5] text-[11px] font-extrabold rounded-xl transition-all flex items-center gap-1 border border-indigo-100"
+                      >
+                        <span>👁</span>
+                        <span>Xem đề</span>
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQuizToDelete(q);
+                          setDeleteError(null);
+                        }}
+                        className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-[11px] font-extrabold rounded-xl transition-all flex items-center gap-1 border border-rose-100 cursor-pointer"
+                      >
+                        <span>🗑</span>
+                        <span>Xóa</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-
-                <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs font-semibold text-gray-500">
-                  <div className="flex items-center gap-3 text-[11px]">
-                    <span>❓ {q.questions_count || q.total_questions} câu</span>
-                    <span>⏱️ {q.time_limit_minutes}p</span>
-                    <span>🎯 {q.total_points} đ</span>
-                  </div>
-
-                  {/* Action Buttons: Xem đề & Xóa */}
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href={`/instructor/quiz-generator/${q.id}`}
-                      className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-[#4F46E5] text-[11px] font-extrabold rounded-xl transition-all flex items-center gap-1 border border-indigo-100"
-                    >
-                      <span>👁</span>
-                      <span>Xem đề</span>
-                    </Link>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setQuizToDelete(q);
-                        setDeleteError(null);
-                      }}
-                      className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-[11px] font-extrabold rounded-xl transition-all flex items-center gap-1 border border-rose-100 cursor-pointer"
-                    >
-                      <span>🗑</span>
-                      <span>Xóa</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

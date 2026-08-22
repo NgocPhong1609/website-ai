@@ -137,7 +137,7 @@ export default function QuizDetailPage() {
       {/* Main Quiz Overview Header Card */}
       <div className="p-8 rounded-3xl bg-gradient-to-r from-[#1E233E] via-[#2B2D62] to-[#121626] text-white flex flex-col gap-5 shadow-xl border border-white/10 relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="px-3 py-1 bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 text-[10px] font-black rounded-lg uppercase tracking-wider">
               {quiz.source_type === "course"
                 ? "📚 Khóa học"
@@ -145,10 +145,23 @@ export default function QuizDetailPage() {
                 ? "📜 Tài liệu"
                 : "💡 Chủ đề"}
             </span>
+
+            {attachedCourseName ? (
+              <span className="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black rounded-lg flex items-center gap-1.5">
+                <span>🔗</span>
+                <span>Khóa: <strong className="font-extrabold">{attachedCourseName}</strong></span>
+              </span>
+            ) : (
+              <span className="px-3 py-1 bg-white/10 text-gray-300 border border-white/20 text-[10px] font-bold rounded-lg flex items-center gap-1.5">
+                <span>⚪</span>
+                <span>Chưa gắn vào khóa học</span>
+              </span>
+            )}
+
             <span
               className={`px-3 py-1 text-[10px] font-black rounded-lg border uppercase tracking-wider ${
                 quiz.status === "published"
-                  ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/30"
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-xs"
                   : "bg-amber-500/20 text-amber-300 border-amber-400/30"
               }`}
             >
