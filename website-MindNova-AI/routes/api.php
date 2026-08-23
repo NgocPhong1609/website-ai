@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\Student\PracticeController as StudentPracticeContro
 use App\Http\Controllers\Api\Student\ProgressController as StudentProgressController;
 use App\Http\Controllers\Api\Student\HistoryController as StudentHistoryController;
 use App\Http\Controllers\Api\Student\NotificationController as StudentNotificationController;
+use App\Http\Controllers\Api\Student\StreakController;
 
 // Nhóm Dùng chung
 use App\Http\Controllers\Api\RealtimeController;
@@ -67,6 +68,9 @@ Route::middleware('throttle:30,1')->group(function () {
 // -- API VNPay IPN (Webhooks) --
 Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
 
+// -- API Payment Callback (Public để nhận redirect từ cổng thanh toán) --
+Route::get('/student/payments/callback/{provider}', [\App\Http\Controllers\Api\Student\PaymentController::class, 'callback']);
+
 // API Student Dashboard, Study Plan & Quizzes (Áp dụng cho mọi phiên học viên)
 Route::get('/student/dashboard', [StudentDashboardController::class, 'overview']);
 Route::get('/student/study-plan', [StudentStudyPlanController::class, 'overview']);
@@ -100,6 +104,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // -- Đăng xuất --
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // API Điểm danh
+    Route::post('/student/check-in', [StreakController::class, 'checkIn']);
 
     // -- AI hỗ trợ học tập (Học sinh, Giáo viên, Admin đều dùng chung) --
     Route::post('/ai-chat', [AiTutorController::class, 'chat']);

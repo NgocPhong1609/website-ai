@@ -46,21 +46,21 @@ class PaymentController extends Controller
 
     public function callback(Request $request, string $provider): JsonResponse
     {
-        $paymentService = app(PaymentService::class); // Lấy service thanh toán từ container
-        $payment = $paymentService->processCallback($provider, $request->all()); // Xử lý callback từ cổng
+        $paymentService = app(\App\Services\PaymentService::class);
+        $payment = $paymentService->processCallback($provider, $request->all());
 
         if (! $payment) {
-            return response()->json(['message' => 'Unable to verify payment callback or payment not found.'], 422); // Nếu không xác thực được hoặc không tìm thấy payment
+            return response()->json(['message' => 'Unable to verify payment callback or payment not found.'], 422);
         }
 
         if ($payment->user) {
-            $payment->user->notify(new NewPaymentNotification($payment)); // Gửi thông báo khi payment đã xác nhận
+            $payment->user->notify(new \App\Notifications\NewPaymentNotification($payment));
         }
 
         return response()->json([
             'message' => 'Payment callback processed.',
             'data' => $payment,
-        ]); // Trả về payment đã cập nhật
+        ]);
     }
 
     public function show(Payment $payment): JsonResponse

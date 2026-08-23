@@ -70,4 +70,10 @@ return [
         'secret_key' => env('MOMO_SECRET_KEY'),
         'endpoint' => env('MOMO_ENDPOINT', 'https://test-payment.momo.vn/v2/gateway/api/create'),
     ],
+
+    'vnpay' => [
+        'tmn_code' => env('VNPAY_TMN_CODE', env('VNP_TMN_CODE', '')),
+        'hash_secret' => env('VNPAY_HASH_SECRET', env('VNP_HASH_SECRET', '')),
+        'endpoint' => env('VNP_URL', 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'),
+    ],
 ];

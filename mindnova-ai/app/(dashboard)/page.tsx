@@ -95,6 +95,8 @@ export default async function DashboardPage() {
             studyStreak={dashboardData.study_streak} 
             focusAreas={dashboardData.focus_areas}
             weeklyActivity={dashboardData.weekly_activity}
+            checkedInDates={(dashboardData as any).checked_in_dates || []}
+            streakFreezeCount={(dashboardData.study_streak as any)?.freeze_count || 1}
           />
 
           {/* ─── AI Co-Pilot Suggestion Box ─── */}

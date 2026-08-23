@@ -157,8 +157,8 @@ export function ContinueLearning({ courses = [] }: ContinueLearningProps) {
       </div>
 
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {items.map((course) => (
-          <CourseCard key={course.id} course={course} />
+        {courses.map((course, index) => (
+          <CourseCard key={`${course.id}-${index}`} course={course} />
         ))}
       </div>
     </section>
