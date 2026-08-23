@@ -47,34 +47,46 @@ class PracticeService
         }
 
         // QUERY REAL DATABASE: Load all available quizzes along with their parent Lesson and Course
-        // Filter strictly by the courses the user is enrolled in.
-        $dbQuizzes = Quiz::with(['lesson', 'lesson.module', 'lesson.module.course', 'questions'])
-            ->whereHas('lesson.module.course.enrollments', function ($q) use ($userId) {
-                if ($userId) {
-                    $q->where('user_id', $userId);
-                }
-            })
-            ->get();
+        $dbQuizzesQuery = Quiz::with(['lesson', 'lesson.module', 'lesson.module.course', 'attachments.course', 'questions']);
         
-        // If user is not logged in or has no enrollments, $dbQuizzes will be empty (or we can just show empty state)
-        if (!$userId) {
-            $dbQuizzes = collect();
+        if ($userId) {
+            $dbQuizzesQuery->where(function($q) use ($userId) {
+                $q->whereHas('lesson.module.course.enrollments', fn($e) => $e->where('user_id', $userId))
+                  ->orWhereHas('attachments.course.enrollments', fn($e) => $e->where('user_id', $userId));
+            });
+        }
+
+        $dbQuizzes = $dbQuizzesQuery->get();
+
+        // Fallback: If student has no enrolled quizzes yet, return available published quizzes
+        if ($dbQuizzes->isEmpty()) {
+            $dbQuizzes = Quiz::with(['lesson', 'lesson.module', 'lesson.module.course', 'attachments.course', 'questions'])
+                ->where('status', 'published')
+                ->take(6)
+                ->get();
         }
         $modulesList = [];
         $index = 1;
 
         foreach ($dbQuizzes as $quiz) {
             $lesson = $quiz->lesson;
-            $course = ($lesson && $lesson->module && $lesson->module->course) ? $lesson->module->course : null;
+            $course = ($lesson && $lesson->module && $lesson->module->course) 
+                ? $lesson->module->course 
+                : ($quiz->attachments->first()?->course ?: null);
             $courseTitle = $course ? $course->title : 'Chuyên đề Công nghệ AI & Fullstack';
             $questionCount = $quiz->questions->count();
             $timeLimit = $quiz->time_limit_minutes > 0 ? $quiz->time_limit_minutes : 15;
             $passingScore = $quiz->passing_score > 0 ? $quiz->passing_score : 70;
             
+            $isCap = $quiz->type === 'capability_assessment' || 
+                     $quiz->attachments->contains('position', 'capability_assessment');
+
             // Determine specialized AI insights & prerequisites based on lesson title keywords
             $title = $quiz->title;
-            if (stripos($title, 'Mạng Thần Kinh') !== false || stripos($title, 'Deep Learning') !== false) {
-                $badge = "Đánh giá Năng lực Thực chiến • Module {$index} (AI Foundations)";
+            if ($isCap) {
+                $badge = "📝 Kiểm tra tổng quát • " . ($course ? $course->title : "Khóa học");
+            } elseif (stripos($title, 'Mạng Thần Kinh') !== false || stripos($title, 'Deep Learning') !== false) {
+                $badge = "Bài kiểm tra kiến thức • Module {$index} (AI Foundations)";
                 $readiness = [
                     'status_label' => "Độ sẵn sàng Module {$index} ↗",
                     'percentage_text' => 'Sẵn sàng 100%',

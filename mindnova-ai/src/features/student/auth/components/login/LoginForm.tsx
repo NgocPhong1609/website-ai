@@ -42,12 +42,12 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
     if (token && userInfoRaw) {
       try {
         const user = JSON.parse(userInfoRaw);
-        const roleStr = getUserRoleStr(user.roles || []);
+        const roleStr = getUserRoleStr(user);
         
         document.cookie = `accessToken=${encodeURIComponent(token)}; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
         document.cookie = `userRole=${roleStr}; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
 
-        window.location.assign(getRedirectPath(user.roles || []));
+        window.location.assign(getRedirectPath(user));
       } catch {
         window.localStorage.clear();
         document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
@@ -100,12 +100,12 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
         window.localStorage.setItem("userInfo", JSON.stringify(user));
 
         const maxAge = values.rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 8;
-        const roleStr = getUserRoleStr(user.roles || []);
+        const roleStr = getUserRoleStr(user);
         document.cookie = `accessToken=${encodeURIComponent(token)}; path=/; max-age=${maxAge}; samesite=lax`;
         document.cookie = `userRole=${roleStr}; path=/; max-age=${maxAge}; samesite=lax`;
 
         setStatusMessage("Đăng nhập thành công...");
-        window.location.assign(getRedirectPath(user.roles || []));
+        window.location.assign(getRedirectPath(user));
       }
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : "Đăng nhập thất bại.");

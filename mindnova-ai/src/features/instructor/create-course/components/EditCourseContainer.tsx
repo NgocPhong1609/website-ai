@@ -10,6 +10,7 @@ import { useUpdateCourse, useUploadCourseThumbnail, useDeleteCourse, useUpdateCo
 import { Step1BasicInfo } from "./Step1BasicInfo";
 import { Step3SettingsPrice } from "./Step3SettingsPrice";
 import { CourseEditTabs, EditCourseTab } from "./CourseEditTabs";
+import { CourseHealthCard } from "./CourseHealthCard";
 import type { CourseBasicInfo, DifficultyLevel } from "../types";
 import {
   SaveIcon,
@@ -240,6 +241,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
 
       {/* ── THÂN TRANG & HIỂN THỊ THEO TAB ──────────────────────────────────── */}
       <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-6 flex flex-col">
+        <CourseHealthCard courseId={courseId} />
         
         {/* Nội dung render tương ứng với tab được chọn */}
         <div className="mt-2">

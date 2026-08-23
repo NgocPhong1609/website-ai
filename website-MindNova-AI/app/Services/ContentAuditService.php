@@ -28,6 +28,8 @@ class ContentAuditService
         ?string $newStatus = null,
         ?int $versionNumber = null,
         ?array $metadata = null,
+        ?int $courseId = null,
+        ?string $correlationId = null,
     ): ContentAuditLog {
         return ContentAuditLog::create([
             'user_id' => $user->id,
@@ -39,6 +41,8 @@ class ContentAuditService
             'new_status' => $newStatus,
             'version_number' => $versionNumber,
             'metadata' => $metadata,
+            'course_id' => $courseId,
+            'correlation_id' => $correlationId,
             'created_at' => now(),
         ]);
     }

@@ -4,10 +4,12 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useGetPracticeOverview } from "../../api";
 import type { PracticeOverviewData, AssessmentModuleItem } from "../../types";
+import { SelfAssessmentModal } from "../self-assessment/SelfAssessmentModal";
 
 export function QuizStartContent() {
   const { data, isLoading, isError } = useGetPracticeOverview();
   const [selectedModId, setSelectedModId] = useState<string>("");
+  const [isSelfAssessmentOpen, setIsSelfAssessmentOpen] = useState<boolean>(false);
 
   if (isLoading) {
     return (
@@ -232,11 +234,11 @@ export function QuizStartContent() {
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-[#6B6BFF]/30 text-xs font-semibold text-[#4648D4] shadow-sm">
               <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
               <span className="w-2 h-2 rounded-full bg-[#10B981] absolute" />
-              Ngân hàng đề thi động • Khảo sát Năng lực
+              Ngân hàng đề thi động • Kiểm tra tổng quát
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1A1A2E] leading-tight">
-              Trung tâm Đánh giá Năng lực: {" "}
+              Trung tâm Kiểm tra &amp; Đánh giá: {" "}
               <span className="bg-gradient-to-r from-[#4648D4] via-[#6063EE] to-[#4CD7F6] bg-clip-text text-transparent font-bold drop-shadow-2xs">
                 AI &amp; Fullstack
               </span>
@@ -361,7 +363,7 @@ export function QuizStartContent() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
               <div className="space-y-2 max-w-xl">
                 <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#EAF8F5] text-[#0D9488] border border-[#0D9488]/20 inline-block">
-                  {assess.badge_title.split("(")[0].trim() || "Khảo sát Năng lực"}
+                  {assess.badge_title.split("(")[0].trim() || "Kiểm tra tổng quát"}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-semibold text-[#1A1A2E] tracking-tight leading-tight">
                   {assess.title}
@@ -371,12 +373,22 @@ export function QuizStartContent() {
                 </p>
               </div>
               
-              <Link href={`/practice/quiz/question?lessonId=${currentMod.id}`} className="w-full sm:w-auto text-decoration-none shrink-0">
-                <button type="button" className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:opacity-95 text-white font-semibold rounded-xl text-xs sm:text-sm shadow-[0_6px_20px_rgba(80,82,238,0.35)] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2.5 cursor-pointer">
-                  <span>🚀 Bắt Đầu Làm Bài Ngay</span>
-                  <span className="text-base">➔</span>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsSelfAssessmentOpen(true)}
+                  className="px-5 py-3.5 bg-white border border-[#0D9488]/40 hover:bg-[#EAF8F5] text-[#0D9488] font-bold rounded-xl text-xs sm:text-sm shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>🧠 Đánh giá năng lực AI (Tự luyện)</span>
                 </button>
-              </Link>
+
+                <Link href={`/practice/quiz/question?lessonId=${currentMod.id}`} className="w-full sm:w-auto text-decoration-none shrink-0">
+                  <button type="button" className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:opacity-95 text-white font-semibold rounded-xl text-xs sm:text-sm shadow-[0_6px_20px_rgba(80,82,238,0.35)] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2.5 cursor-pointer">
+                    <span>🚀 Kiểm Tra Tổng Quát</span>
+                    <span className="text-base">➔</span>
+                  </button>
+                </Link>
+              </div>
             </div>
 
             <div className="h-[1px] w-full bg-[#F0F2F8]" />
@@ -492,6 +504,13 @@ export function QuizStartContent() {
         </div>
 
       </div>
+
+      <SelfAssessmentModal
+        courseId={currentMod.id}
+        courseTitle={currentMod.course_title || currentMod.title}
+        isOpen={isSelfAssessmentOpen}
+        onClose={() => setIsSelfAssessmentOpen(false)}
+      />
 
     </div>
   );

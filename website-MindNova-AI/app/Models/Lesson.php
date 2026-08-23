@@ -20,12 +20,14 @@ class Lesson extends Model
         'status',
         'published_version_id',
         'current_version',
+        'lock_version',
     ];
 
     protected $casts = [
         'current_version' => 'integer',
         'duration_seconds' => 'integer',
         'order' => 'integer',
+        'lock_version' => 'integer',
     ];
 
     // ─── Existing Relationships ────────────────────────────────
@@ -63,6 +65,12 @@ class Lesson extends Model
         return $this->hasMany(ContentVersion::class, 'versionable_id')
                     ->where('versionable_type', self::class)
                     ->orderByDesc('version_number');
+    }
+
+    /** Draft snapshots are independent from immutable content-review versions. */
+    public function draftRevisions(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(DraftRevision::class, 'revisionable')->latest('revision_number');
     }
 
     /**

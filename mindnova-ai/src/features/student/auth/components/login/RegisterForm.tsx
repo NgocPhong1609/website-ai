@@ -114,12 +114,12 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
         window.localStorage.setItem("userInfo", JSON.stringify(user));
 
         const maxAge = 60 * 60 * 8; // default 8 hours for register
-        const roleStr = getUserRoleStr(user.roles || []);
+        const roleStr = getUserRoleStr(user);
         document.cookie = `accessToken=${encodeURIComponent(token)}; path=/; max-age=${maxAge}; samesite=lax`;
         document.cookie = `userRole=${roleStr}; path=/; max-age=${maxAge}; samesite=lax`;
 
         setStatusMessage("Đăng ký thành công...");
-        window.location.assign(getRedirectPath(user.roles || []));
+        window.location.assign(getRedirectPath(user));
       }
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : "Đăng ký thất bại.");

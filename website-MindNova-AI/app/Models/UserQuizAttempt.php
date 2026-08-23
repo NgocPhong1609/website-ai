@@ -13,13 +13,16 @@ class UserQuizAttempt extends Model
         'user_id',
         'quiz_id',
         'score',
+        'score_10',
         'accuracy',
         'time_taken_seconds',
         'status',
+        'grading_status',
     ];
 
     protected $casts = [
         'score' => 'integer',
+        'score_10' => 'float',
         'accuracy' => 'integer',
         'time_taken_seconds' => 'integer',
         'created_at' => 'datetime',
@@ -33,5 +36,10 @@ class UserQuizAttempt extends Model
     public function quiz(): BelongsTo
     {
         return $this->belongsTo(Quiz::class);
+    }
+
+    public function answers(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(UserQuizAttemptAnswer::class, 'user_quiz_attempt_id');
     }
 }

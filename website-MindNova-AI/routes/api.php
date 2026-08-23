@@ -52,6 +52,8 @@ use App\Http\Controllers\Api\Instructor\RevenueController;
 use App\Http\Controllers\Api\Instructor\CourseOutlineController;
 use App\Http\Controllers\Api\Instructor\ContentReviewController as InstructorContentReviewController;
 use App\Http\Controllers\Api\Instructor\TeacherProfileController;
+use App\Http\Controllers\Api\Instructor\DraftRevisionController;
+use App\Http\Controllers\Api\Instructor\QuizGeneratorController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -71,30 +73,14 @@ Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
 
 // -- API Payment Callback (Public để nhận redirect từ cổng thanh toán) --
 Route::get('/student/payments/callback/{provider}', [\App\Http\Controllers\Api\Student\PaymentController::class, 'callback']);
-
-// API Student Dashboard, Study Plan & Quizzes (Áp dụng cho mọi phiên học viên)
-Route::get('/student/dashboard', [StudentDashboardController::class, 'overview']);
-Route::get('/student/study-plan', [StudentStudyPlanController::class, 'overview']);
-Route::get('/student/practice/overview', [StudentPracticeController::class, 'overview']);
-Route::get('/student/progress/overview', [StudentProgressController::class, 'overview']);
-Route::get('/student/history/overview', [StudentHistoryController::class, 'overview']);
-Route::get('/student/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
-Route::get('/student/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
-Route::get('/student/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'index']);
-Route::post('/student/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
-Route::post('/student/onboarding', [OnboardingController::class, 'store']);
-// 🌟 BƯỚC 1: ĐẶT API AI PHÂN TÍCH BÀI HỌC VÀ GỢI Ý KHÓA HỌC Ở ĐÂY
-Route::post('/student/analyze-lesson', [\App\Http\Controllers\Api\Student\AnalyzeLessonController::class, 'analyze']);
-
-// Payment IPN (Webhook) - Cần public để Momo/VNPAY gọi
-Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
 Route::get('/student/payment/vnpay-ipn', [OrderController::class, 'vnpayIpn']);
 Route::post('/student/payment/momo-ipn', [OrderController::class, 'momoIpn']);
 
-// API Student Public
+// API Student Public Catalog (Khách chưa đăng nhập cũng có thể xem danh sách & chi tiết khóa học)
 Route::prefix('student')->group(function () {
     Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
     Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
+    Route::get('/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'index']);
 });
 
 // ==========================================
@@ -139,14 +125,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders', [OrderController::class, 'store']);
 
     // ==========================================
-    // 3. NHÓM API HỌC SINH (Student)
+    // 3. NHÓM API HỌC SINH (Student Only — Strict Authorization)
     // ==========================================
-    Route::prefix('student')->group(function () {
+    Route::middleware('role:student')->prefix('student')->group(function () {
 
         // 🌟 TÍNH NĂNG ONBOARDING & AI PHÂN TÍCH BÀI HỌC
         Route::post('/onboarding', [OnboardingController::class, 'store']);
         Route::get('/available-topics', [OnboardingController::class, 'getAvailableTopics']);
         Route::post('/analyze-lesson', [OnboardingController::class, 'analyzeLesson']);
+        Route::post('/courses/{courseId}/self-assessment/generate', [\App\Http\Controllers\Api\Student\SelfAssessmentController::class, 'generate']);
+        Route::post('/self-assessment/submit', [\App\Http\Controllers\Api\Student\SelfAssessmentController::class, 'submit']);
 
         // Dashboard, Study Plan & Quizzes
         Route::get('/dashboard', [StudentDashboardController::class, 'overview']);
@@ -198,6 +186,11 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::post('courses/{course}/thumbnail', [CourseController::class, 'uploadThumbnail']);
     Route::patch('courses/{course}/status', [CourseController::class, 'updateStatus']);
     Route::patch('courses/{course}/price', [CourseController::class, 'updatePrice']);
+    Route::get('courses/{course}/health', [CourseController::class, 'health']);
+    Route::put('courses/{course}/draft', [DraftRevisionController::class, 'saveCourseDraft']);
+    Route::get('courses/{course}/draft-revisions', [DraftRevisionController::class, 'index']);
+    Route::get('courses/{course}/draft-revisions/{revision}/diff', [DraftRevisionController::class, 'diff']);
+    Route::post('courses/{course}/draft-revisions/{revision}/restore', [DraftRevisionController::class, 'restore']);
 
     // Modules
     Route::get('courses/{course}/modules', [CourseModuleController::class, 'index']);
@@ -258,8 +251,17 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     // Reviews
     Route::get('reviews', [\App\Http\Controllers\Api\Instructor\ReviewController::class, 'index']);
 
-    // AI Quiz & Course Outline
-    Route::post('ai-quiz/generate', [CourseOutlineController::class, 'generateQuiz']);
+    // AI Quiz Generator (Instructor Standalone & Attachment)
+    Route::get('ai-quiz', [QuizGeneratorController::class, 'index']);
+    Route::post('ai-quiz/generate', [QuizGeneratorController::class, 'generate']);
+    Route::post('ai-quiz/regenerate-question', [QuizGeneratorController::class, 'regenerateQuestion']);
+    Route::post('ai-quiz/store', [QuizGeneratorController::class, 'store']);
+    Route::get('ai-quiz/{quiz}', [QuizGeneratorController::class, 'show']);
+    Route::put('ai-quiz/{quiz}', [QuizGeneratorController::class, 'update']);
+    Route::delete('ai-quiz/{quiz}', [QuizGeneratorController::class, 'destroy']);
+    Route::post('ai-quiz/{quiz}/attach', [QuizGeneratorController::class, 'attach']);
+
+    // AI Course Outline
     Route::post('courses/ai-outline/generate', [CourseOutlineController::class, 'generate']);
     Route::post('courses/{course}/ai-outline/save', [CourseOutlineController::class, 'save']);
 
@@ -353,9 +355,12 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
 });
 
 // ==========================================
-// 6. DEV / TEST ENDPOINTS
+// 6. DEV / TEST ENDPOINTS (Protected)
 // ==========================================
 if (app()->environment('local', 'testing')) {
-    Route::post('/dev/orders/{orderId}/complete', [App\Http\Controllers\Api\Student\OrderController::class, 'devCompleteOrder']);
-    Route::post('/dev/orders/{orderId}/refund', [App\Http\Controllers\Api\Student\OrderController::class, 'devRefundOrder']);
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('/dev/orders/{orderId}/complete', [App\Http\Controllers\Api\Student\OrderController::class, 'devCompleteOrder']);
+        Route::post('/dev/orders/{orderId}/refund', [App\Http\Controllers\Api\Student\OrderController::class, 'devRefundOrder']);
+    });
 }
+

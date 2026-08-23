@@ -2,94 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import type { QuizGradingResult } from "../../types";
-
-interface QuizReviewItem {
-  number: number;
-  question: string;
-  correctAnswer: string;
-  aiExplanation: string;
-  category: string;
-}
-
-const REVIEW_QUESTIONS_DATA: QuizReviewItem[] = [
-  {
-    number: 1,
-    category: "Cấu trúc Route Handlers",
-    question: "Trong Next.js 15 App Router, quy ước đặt tên tệp nào sau đây được bắt buộc sử dụng để định nghĩa một Route Handler chịu trách nhiệm xử lý các HTTP request (GET, POST)?",
-    correctAnswer: "A. route.ts hoặc route.js đặt bên trong một thư mục thuộc app/",
-    aiExplanation: "Trong Next.js 15 App Router, tệp route.ts được thiết kế riêng cho các API endpoint dạng RESTful hoặc Webhooks. Bạn không thể đặt trùng route.ts và page.ts trong cùng một cấp thư mục."
-  },
-  {
-    number: 2,
-    category: "Cơ chế Caching",
-    question: "Sự khác biệt căn bản về cơ chế bộ nhớ đệm (caching) giữa hàm export async function GET() và POST() trong Route Handlers là gì?",
-    correctAnswer: "A. GET có thể được cache tùy thuộc vào dynamic config, trong khi POST luôn luôn thực thi theo thời gian thực (opt-out of cache)",
-    aiExplanation: "Các yêu cầu POST mang tính chất biến đổi dữ liệu (mutation) nên mặc định Next.js sẽ không bao giờ lưu đệm (no-cache) nhằm đảm bảo dữ liệu mới nhất được ghi nhận."
-  },
-  {
-    number: 3,
-    category: "Tham số Động (Params)",
-    question: "Từ Next.js 15 trở đi, tham số động (dynamic routing parameters) trong các Route Handlers như { params } có sự thay đổi mang tính cốt lõi nào khi truy xuất?",
-    correctAnswer: "A. params là một Promise bất đồng bộ và bắt buộc phải dùng await trước khi trích xuất giá trị id",
-    aiExplanation: "Next.js 15 đã chuyển dịch params từ đối tượng đồng bộ sang Promise bất đồng bộ nhằm tối ưu hóa tiến trình serverless và khả năng chuẩn bị dữ liệu song song."
-  },
-  {
-    number: 4,
-    category: "✨ AI Golden Tip • Stream Fallback",
-    question: "Trong chiến lược Fallback giữa Google Gemini và OpenAI, khi dòng truyền streaming từ một nhà cung cấp gặp trở ngại kỹ thuật, cách quản lý đối tượng ReadableStream nào dưới đây đảm bảo không phá vỡ kết nối hiện tại của Client?",
-    correctAnswer: "A. Sử dụng TransformStream để bọc luồng dữ liệu; khi phát hiện lỗi nghẽn mạch, ngay lập tức đóng Reader hiện tại và chuyển (pipe) sang luồng ReadableStream của AI Provider dự phòng",
-    aiExplanation: "Bằng cách sử dụng TransformStream làm trung gian, client chỉ nhìn thấy một dòng chuỗi vô vần xuyên suốt. Kỹ thuật này ngăn chặn lỗi HTTP 500 và giúp trải nghiệm học viên mượt mà tuyệt hảo!"
-  },
-  {
-    number: 5,
-    category: "Cơ chế Streaming LLM",
-    question: "Để khởi tạo một luồng phát tín hiệu thời gian thực (Real-time AI Stream) trong Next.js Route Handlers, đối tượng trả về chuẩn hóa cần tuân thủ cấu trúc nào?",
-    correctAnswer: 'A. new Response(readableStream, { headers: { "Content-Type": "text/event-stream" } })',
-    aiExplanation: "Định dạng Server-Sent Events (SSE) yêu cầu kiểu nội dung text/event-stream kèm theo luồng dữ liệu nhị phân ReadableStream để trình duyệt liên tục lắng nghe token chớp nhoáng."
-  },
-  {
-    number: 6,
-    category: "Môi trường Runtime",
-    question: "Trong cấu hình tệp Route Handlers cho các dịch vụ AI Stream tốc độ cực cao, khai báo export const runtime = 'edge' mang đến sức mạnh thực thi nào?",
-    correctAnswer: "A. Thực thi trên mạng lưới Edge của Cloudflare/Vercel với độ trễ khởi động (cold start) gần như bằng 0 và sử dụng bộ API chuẩn Web V8",
-    aiExplanation: "Edge Runtime gạt bỏ những mô-đun Node.js cồng kềnh, đưa luồng tính toán đến trung tâm dữ liệu gần học viên nhất, giảm tốc độ khởi tạo xuống dưới vài milli-giây."
-  },
-  {
-    number: 7,
-    category: "✨ AI Golden Tip • Timeout Fallback",
-    question: "Để kiểm soát hiệu quả vấn đề treo kết nối khi LLM Provider không phản hồi (Header Timeout Fallback), kỹ thuật lập trình bất đồng bộ nào nên được gắn vào cấu hình Fetch API?",
-    correctAnswer: "A. Tạo đối tượng AbortController kết hợp setTimeout để tự động kích hoạt abort signal sau số giây quy định, mở đường gọi fallback lập tức",
-    aiExplanation: "Nếu máy chủ AI Provider bị nghẽn lệnh không gửi header về trong hạn định, tín hiệu signal từ AbortController sẽ chủ động dập gắt luồng gọi cũ, giúp hệ thống không bị treo vô thời hạn."
-  },
-  {
-    number: 8,
-    category: "Vercel AI SDK",
-    question: "Khi sử dụng thư viện chuyên dụng Vercel AI SDK (hoặc @ai-sdk/react) kết hợp cùng Next.js 15, hàm phương thức nào có nhiệm vụ đóng gói đầu ra của LLM thành một chuỗi dữ liệu Stream hợp lệ để trả về cho Custom Hook useChat()?",
-    correctAnswer: "A. result.toDataStreamResponse() hoặc streamText(...)",
-    aiExplanation: "Các phương thức như streamText hoặc toDataStreamResponse tự động định dạng luồng token thành giao thức tương thích trực tiếp với React Custom Hook useChat() ở phía client."
-  },
-  {
-    number: 9,
-    category: "Bảo mật & Rate Limiting",
-    question: "Để bảo vệ các điểm truy cập AI Route Handlers trong Next.js khỏi tình trạng spam requests và khai thác token tài khoản trái phép, lớp chắn bảo mật nào nên được đặt ở tiền tuyến?",
-    correctAnswer: "A. Next.js Middleware kết hợp kiểm soát Rate Limiting và Bearer Token Authentication",
-    aiExplanation: "Middleware thực thi ngay tại viền mạng trước khi request chạm vào Route Handler, cho phép từ chối ngay lập tức các IP có tần suất truy cập đáng ngờ."
-  },
-  {
-    number: 10,
-    category: "Tối ưu Tài nguyên Server",
-    question: "Khi người dùng vô tình bấm thả hoặc đóng thẻ tab trình duyệt trong khi dòng AI Streaming vẫn đang cuồn cuộn chảy trả về, phương pháp tối ưu resource nào trong Route Handlers giúp ngắt tiến trình LLM backend tức thời?",
-    correctAnswer: "A. Lắng nghe sự kiện request.signal (AbortSignal) từ HTTP request gốc, nếu client ngắt kết nối thì tự động hủy tiến trình phát streaming",
-    aiExplanation: "Việc ngắt luồng ngay khi Client rớt mạng giúp hệ thống tiết kiệm triệt để lượng Token tiêu hao và giảm chi phí hạ tầng Server cho đơn vị cung cấp dịch vụ LLM."
-  }
-];
+import type { QuizGradingResult, QuestionResultDetail } from "../../types";
 
 export function QuizResultContent() {
   const [result, setResult] = useState<QuizGradingResult | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
-  const [selectedTopicFilter, setSelectedTopicFilter] = useState<string>("all");
+  const [selectedFilter, setSelectedFilter] = useState<"all" | "mc" | "essay">("all");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -106,47 +25,67 @@ export function QuizResultContent() {
     setLoading(false);
   }, []);
 
-  const displayData: QuizGradingResult = result || {
-    attempt_id: 1042,
-    module_id: "mod3",
-    score: 80,
-    total_score_max: 100,
-    accuracy: "80%",
-    passed: true,
-    correct_count: 8,
-    total_questions: 10,
-    time_taken_formatted: "4 phút 25 giây",
-    quiz_title: "Kiểm tra Thực chiến: Tích hợp API & AI Stream 🚀",
-    ai_insight: "Xuất sắc! Bạn nắm giữ tư duy kiến trúc Route Handlers và App Router cực kỳ vững chắc. Quản lý luồng ReadableStream và kỹ thuật chuyển qua lại giữa Gemini/OpenAI tại câu 4 và 7 được áp dụng chính xác.",
-    ai_coach_suggestion: "Năng lực đạt điểm tối ưu. Tự tin chinh phục Module tiếp theo về Security & Middleware!",
-    topic_performance: [
-      { id: "1", topic_title: "Cấu trúc Route Handlers & App Router", sub_title: "Khái niệm cơ bản & Quy ước tệp route.ts", score_percentage: 100, status_label: "Tốt (100%)", status_color: "indigo" },
-      { id: "2", topic_title: "Cơ chế Streaming LLM & ReadableStream", sub_title: "Xử lý luồng dữ liệu thời gian thực từ AI Provider", score_percentage: 85, status_label: "Tốt (85%)", status_color: "indigo" },
-      { id: "3", topic_title: "Xử lý Lỗi & Timeout Fallback (Q4, Q7)", sub_title: "Quản lý AbortController & tự động chuyển mạch Provider", score_percentage: 75, status_label: "Khá (75%)", status_color: "teal" },
-    ],
-    action_cards: [
-      { id: "a1", title: "Xem lại câu hỏi trắc nghiệm", description: "Soát lại từng chi tiết đáp án và lời giải trình tường tận của Gia sư AI MindNova cho 10 câu thi.", action_text: "Bắt đầu soát bài", icon_type: "review" },
-      { id: "a2", title: "Luyện tập bổ trợ AI", description: "Vào lại chế độ kiểm nghiệm với bộ đề tự động xáo trộn ngẫu nhiên 100% câu hỏi và đáp án.", action_text: "Luyện tập thêm", icon_type: "practice" },
-      { id: "a3", title: "Chuyển sang Module khác", description: "Tiến thẳng về danh mục 4 Chủ đề Thực chiến (Mạng thần kinh, React 19, Security) để bứt phá.", action_text: "Tiếp tục hành trình", icon_type: "continue" },
-    ],
-  };
+  if (loading) {
+    return (
+      <div className="p-8 max-w-4xl mx-auto text-center space-y-4">
+        <div className="w-12 h-12 border-4 border-[#5052EE] border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-sm font-semibold text-gray-600">Đang tải kết quả chấm điểm AI...</p>
+      </div>
+    );
+  }
 
-  const targetModuleId = displayData.module_id || "mod3";
+  if (!result) {
+    return (
+      <div className="p-8 max-w-2xl mx-auto my-12 text-center bg-white rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-2xl mx-auto font-bold border border-amber-200">
+          ⚠️
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold text-gray-900">Không tìm thấy dữ liệu bài thi</h2>
+          <p className="text-sm text-gray-600">
+            Bạn vừa truy cập trang kết quả trực tiếp hoặc chưa có lượt làm bài nào được ghi nhận.
+          </p>
+        </div>
+        <Link href="/practice">
+          <button type="button" className="px-6 py-3 bg-[#5052EE] text-white font-bold text-xs rounded-xl shadow-md hover:bg-[#383AB8] transition-all cursor-pointer">
+             Quay lại Trung tâm Luyện tập &amp; Kiểm tra
+          </button>
+        </Link>
+      </div>
+    );
+  }
+
+  const displayData: QuizGradingResult = result;
+  const targetModuleId = displayData.module_id || "67";
+  const displayScore10 = displayData.score_10 != null 
+    ? Number(displayData.score_10).toFixed(1) 
+    : (Math.round((displayData.score / 100) * 100) / 10).toFixed(1);
+
+  const questionResultsList: QuestionResultDetail[] = displayData.question_results || [];
+  const mcCount = questionResultsList.filter(q => q.type === 'multiple_choice').length;
+  const essayCount = questionResultsList.filter(q => q.type === 'essay').length;
+
+  const filteredQuestions = questionResultsList.filter(q => {
+    if (selectedFilter === "mc") return q.type === "multiple_choice";
+    if (selectedFilter === "essay") return q.type === "essay";
+    return true;
+  });
 
   if (loading) {
     return (
       <div className="flex-1 min-h-screen bg-[#F8F9FC] flex items-center justify-center p-6">
-        <div className="text-center text-[#64647A] text-sm font-medium animate-pulse">Đang tổng hợp báo cáo đánh giá năng lực từ AI...</div>
+        <div className="text-center text-[#64647A] text-sm font-medium animate-pulse">Đang tổng hợp báo cáo đánh giá năng lực từ Gia sư AI Nova...</div>
       </div>
     );
   }
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#F8F9FC] min-h-screen relative">
+      
       {/* ─── Interactive Review Modal / Slide-over ─── */}
       {isReviewModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 sm:p-6 animate-fadeIn">
-          <div className="bg-white w-full max-w-4xl rounded-2xl border border-[#EAEAF4] shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-scaleUp">
+          <div className="bg-white w-full max-w-4xl rounded-3xl border border-[#EAEAF4] shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-scaleUp">
             
             {/* Modal Header */}
             <div className="p-6 bg-gradient-to-r from-[#EEF2FF] via-[#F3F4FC] to-[#EAF8F5] border-b border-[#EAEAF4] flex items-center justify-between shrink-0">
@@ -154,7 +93,7 @@ export function QuizResultContent() {
                 <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-white text-xs font-semibold text-[#5052EE] border border-[#5052EE]/20">
                   <span>💡 Soát Lỗi Chi Tiết từ Gia Sư AI Nova</span>
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-[#1A1A2E]">Bảng Đối Chiếu Đáp Án &amp; Lời Giải Thích Kỹ Thuật</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-[#1A1A2E]">Bảng Đối Chiếu Đáp Án, Bài Làm Tự Luận &amp; Nhận Xét Rubric</h3>
               </div>
               <button 
                 type="button"
@@ -168,54 +107,155 @@ export function QuizResultContent() {
 
             {/* Modal Content Scrollable Area */}
             <div className="p-6 overflow-y-auto space-y-6 flex-1 bg-[#F8FAFC]">
+              
+              {/* Category Filter Tabs */}
               <div className="flex flex-wrap gap-2 pb-2 border-b border-[#EAEAF4]">
                 <button 
-                  onClick={() => setSelectedTopicFilter("all")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${selectedTopicFilter === "all" ? "bg-[#5052EE] text-white" : "bg-white text-[#64647A] border border-[#EAEAF4]"}`}
+                  onClick={() => setSelectedFilter("all")}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${selectedFilter === "all" ? "bg-[#5052EE] text-white" : "bg-white text-[#64647A] border border-[#EAEAF4]"}`}
                 >
-                  Tất cả (10 Câu)
+                  Tất cả ({questionResultsList.length > 0 ? questionResultsList.length : 20} Câu)
                 </button>
                 <button 
-                  onClick={() => setSelectedTopicFilter("ai-tip")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${selectedTopicFilter === "ai-tip" ? "bg-[#0D9488] text-white" : "bg-white text-[#0D9488] border border-[#0D9488]/30"}`}
+                  onClick={() => setSelectedFilter("mc")}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${selectedFilter === "mc" ? "bg-[#0D9488] text-white" : "bg-white text-[#0D9488] border border-[#0D9488]/30"}`}
                 >
-                  ✨ Câu hỏi AI Golden Tips (Q4, Q7)
+                  🔘 Trắc nghiệm ({mcCount > 0 ? mcCount : 15} Câu)
+                </button>
+                <button 
+                  onClick={() => setSelectedFilter("essay")}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${selectedFilter === "essay" ? "bg-[#D97706] text-white" : "bg-white text-[#D97706] border border-[#D97706]/30"}`}
+                >
+                  ✏️ Tự luận AI Chấm ({essayCount > 0 ? essayCount : 5} Câu)
                 </button>
               </div>
 
+              {/* Render Question Breakdown List */}
               <div className="space-y-5">
-                {REVIEW_QUESTIONS_DATA
-                  .filter(item => selectedTopicFilter === "all" ? true : (item.number === 4 || item.number === 7))
-                  .map((item) => (
-                    <div key={item.number} className="bg-white rounded-xl p-5 border border-[#EAEAF4] shadow-2xs space-y-4 hover:border-[#5052EE]/30 transition-colors">
-                      <div className="flex items-center justify-between gap-3">
+                {filteredQuestions.length > 0 ? (
+                  filteredQuestions.map((item) => (
+                    <div key={item.question_id} className="bg-white rounded-2xl p-5 border border-[#EAEAF4] shadow-2xs space-y-4 hover:border-[#5052EE]/30 transition-colors">
+                      
+                      {/* Top Header Badge */}
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
                         <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#EEF2FF] text-[#5052EE] border border-[#5052EE]/15">
-                          Câu #{item.number} • {item.category}
+                          Câu #{item.order} • {item.type === 'essay' ? '✏️ Tự luận AI' : '🔘 Trắc nghiệm'}
                         </span>
-                        <span className="text-xs font-medium text-[#059669] bg-[#D1FAE5] px-2.5 py-0.5 rounded-md flex items-center gap-1">
-                          ✓ Lời giải chuẩn xác
-                        </span>
+                        
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${
+                            item.score >= (item.max_score * 0.8) 
+                              ? "bg-[#EAF8F5] text-[#0D9488] border-[#0D9488]/20" 
+                              : item.score > 0 
+                              ? "bg-[#FEF3C7] text-[#D97706] border-[#D97706]/30"
+                              : "bg-[#FFF2F2] text-[#E11D48] border-[#E11D48]/20"
+                          }`}>
+                            Điểm: {item.score} / {item.max_score} điểm
+                          </span>
+                        </div>
                       </div>
 
+                      {/* Question Content */}
                       <h4 className="text-sm sm:text-base font-semibold text-[#1A1A2E] leading-relaxed">
-                        {item.question}
+                        {item.content}
                       </h4>
 
-                      <div className="p-3.5 rounded-lg bg-[#EAF8F5]/60 border border-[#0D9488]/20 text-xs sm:text-sm font-semibold text-[#0D9488] flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-[#10B981] text-white flex items-center justify-center text-xs shrink-0">✓</span>
-                        <span>{item.correctAnswer}</span>
-                      </div>
+                      {/* Content Depending on Type */}
+                      {item.type === 'essay' ? (
+                        <div className="space-y-3 pt-1">
+                          {/* Student Typed Answer */}
+                          <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4] space-y-1">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-[#5052EE]">📝 Bài làm tự luận của bạn:</span>
+                            <p className="text-xs sm:text-sm text-[#1A1A2E] whitespace-pre-line leading-relaxed font-normal">
+                              {item.user_answer_text && item.user_answer_text.trim() !== "" 
+                                ? item.user_answer_text 
+                                : <span className="text-[#E11D48] italic">(Học viên chưa nhập câu trả lời)</span>
+                              }
+                            </p>
+                          </div>
 
-                      <div className="bg-[#F8FAFC] p-4 rounded-xl border border-[#EAEAF4] space-y-1.5">
-                        <p className="text-[11px] font-semibold tracking-wide text-[#5052EE] uppercase flex items-center gap-1.5">
-                          <span>🤖 Gia sư AI MindNova giải mã</span>
-                        </p>
-                        <p className="text-xs sm:text-sm text-[#374151] font-normal leading-relaxed">
-                          {item.aiExplanation}
-                        </p>
-                      </div>
+                          {/* Reference Answer */}
+                          {item.sample_answer && (
+                            <div className="p-4 rounded-xl bg-[#EAF8F5]/60 border border-[#0D9488]/20 space-y-1">
+                              <span className="text-[11px] font-bold uppercase tracking-wider text-[#0D9488]">💡 Đáp án tham khảo mẫu:</span>
+                              <p className="text-xs sm:text-sm text-[#065F46] whitespace-pre-line leading-relaxed font-normal">
+                                {item.sample_answer}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* AI Feedback & Rubric Point Matching */}
+                          <div className="p-4 rounded-xl bg-gradient-to-r from-[#EEF2FF]/80 via-[#F3F4FC] to-[#EAF8F5]/80 border border-[#5052EE]/20 space-y-2">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-[#5052EE] flex items-center gap-1.5">
+                              <span>🤖 Nhận xét đánh giá từ Gia sư AI MindNova:</span>
+                            </span>
+                            <p className="text-xs sm:text-sm text-[#374151] leading-relaxed">
+                              {item.feedback || "Đã ghi nhận bài làm."}
+                            </p>
+
+                            {/* Matched Rubric Points */}
+                            {item.ai_analysis?.matched_points && item.ai_analysis.matched_points.length > 0 && (
+                              <div className="pt-2 border-t border-[#EAEAF4] space-y-1">
+                                <span className="text-[10px] font-bold text-[#0D9488] uppercase">✓ Ý đạt điểm (Matched Points):</span>
+                                <ul className="list-disc list-inside space-y-0.5 text-xs text-[#065F46]">
+                                  {item.ai_analysis.matched_points.map((pt, pIdx) => (
+                                    <li key={pIdx}>{pt}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            {/* Missing Rubric Points */}
+                            {item.ai_analysis?.missing_points && item.ai_analysis.missing_points.length > 0 && (
+                              <div className="pt-1 space-y-1">
+                                <span className="text-[10px] font-bold text-[#D97706] uppercase">⚠️ Ý cần bổ sung (Missing Points):</span>
+                                <ul className="list-disc list-inside space-y-0.5 text-xs text-[#92400E]">
+                                  {item.ai_analysis.missing_points.map((pt, pIdx) => (
+                                    <li key={pIdx}>{pt}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        /* Multiple Choice Details */
+                        <div className="space-y-3 pt-1">
+                          <div className={`p-3.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center gap-2 ${
+                            item.is_correct 
+                              ? "bg-[#EAF8F5] border-[#0D9488]/20 text-[#0D9488]" 
+                              : "bg-[#FFF2F2] border-[#E11D48]/20 text-[#E11D48]"
+                          }`}>
+                            <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 text-white font-bold" style={{ backgroundColor: item.is_correct ? '#10B981' : '#E11D48' }}>
+                              {item.is_correct ? '✓' : '✕'}
+                            </span>
+                            <span>Đáp án bạn chọn: {item.user_answer_text || 'Chưa chọn'}</span>
+                          </div>
+
+                          {!item.is_correct && item.correct_answer && (
+                            <div className="p-3.5 rounded-xl bg-[#EAF8F5] border border-[#0D9488]/20 text-xs sm:text-sm font-semibold text-[#0D9488]">
+                              <span>Đáp án chuẩn xác từ CSDL: {item.correct_answer}</span>
+                            </div>
+                          )}
+
+                          <div className="bg-[#F8FAFC] p-4 rounded-xl border border-[#EAEAF4] space-y-1.5">
+                            <p className="text-[11px] font-semibold tracking-wide text-[#5052EE] uppercase flex items-center gap-1.5">
+                              <span>🤖 Gia sư AI MindNova giải thích</span>
+                            </p>
+                            <p className="text-xs sm:text-sm text-[#374151] font-normal leading-relaxed">
+                              {item.feedback || "Các yêu cầu trắc nghiệm được đánh giá theo dữ liệu chuẩn xác."}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
                     </div>
-                  ))}
+                  ))
+                ) : (
+                  <div className="text-center py-12 text-[#7878A0] text-sm">
+                    Không có câu hỏi nào thuộc phân loại đã chọn.
+                  </div>
+                )}
               </div>
             </div>
 
@@ -250,7 +290,7 @@ export function QuizResultContent() {
         {/* ─── Top Section: Score & AI Insight ────────────────────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
           
-          {/* Score Card (7 cols) */}
+          {/* Score Card (7 cols) - NORMALIZED 10-POINT SCALE DISPLAY */}
           <div className="md:col-span-7 bg-gradient-to-br from-white via-[#FAFBFF] to-[#F3F4FC] rounded-2xl border border-[#EAEAF4] shadow-2xs relative overflow-hidden p-8 flex flex-col items-center justify-center text-center transition-all duration-300 hover:shadow-sm">
             <div className="absolute top-0 right-0 w-44 h-44 rounded-full bg-[#6B6BFF]/10 blur-2xl pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-44 h-44 rounded-full bg-[#4CD7F6]/10 blur-2xl pointer-events-none" />
@@ -262,16 +302,16 @@ export function QuizResultContent() {
             </div>
 
             <div className="relative z-10 mt-2 space-y-1">
-              <p className="text-xs font-semibold tracking-wider text-[#7878A0] uppercase">Điểm Thành Tích Chung</p>
+              <p className="text-xs font-semibold tracking-wider text-[#7878A0] uppercase">Điểm Thành Tích Chung (Thang Điểm 10)</p>
               <div className="flex items-baseline justify-center gap-1.5 my-2">
                 <span className="text-6xl sm:text-7xl font-bold bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] bg-clip-text text-transparent tracking-tight">
-                  {displayData.score}
+                  {displayScore10}
                 </span>
-                <span className="text-2xl font-semibold text-[#7878A0]">/100</span>
+                <span className="text-2xl font-semibold text-[#7878A0]">/10.0</span>
               </div>
             </div>
 
-            <p className="text-xs text-[#64647A] mt-1">Bài thi: <span className="font-medium text-[#1A1A2E]">{displayData.quiz_title || "Kiểm tra thực chiến: Tích hợp API & AI Stream"}</span></p>
+            <p className="text-xs text-[#64647A] mt-1">Bài thi: <span className="font-medium text-[#1A1A2E]">{displayData.quiz_title || "Kiểm tra thực chiến"}</span></p>
 
             <div className="relative z-10 grid grid-cols-2 gap-8 w-full max-w-xs mt-7 pt-5 border-t border-[#EAEAF4]/80">
               <div>
@@ -303,14 +343,14 @@ export function QuizResultContent() {
               </div>
 
               <p className="text-xs sm:text-sm text-[#374151] leading-relaxed font-normal bg-[#F8FAFC] p-4 rounded-xl border border-[#EAEAF4]/60">
-                &ldquo;{displayData.ai_insight || "Bạn đã nắm vững nền tảng Route Handlers cơ bản trong Next.js 15, khả năng xử lý Stream rất ấn tượng!"}&rdquo;
+                &ldquo;{displayData.ai_insight || "Bạn đã nắm vững nền tảng kiến thức và trình bày bài làm rất ấn tượng!"}&rdquo;
               </p>
             </div>
             
             <div className="pt-4 border-t border-[#F0F2F8] mt-4 space-y-1.5">
               <p className="text-[11px] font-semibold tracking-wide text-[#7878A0] uppercase">🎯 Chiến thuật tiếp theo</p>
               <p className="text-xs sm:text-sm font-semibold text-[#5052EE] bg-[#EEF2FF]/50 p-3 rounded-xl border border-[#5052EE]/15">
-                {displayData.ai_coach_suggestion || "Hãy tập trung kiểm chứng sâu hơn về xử lý lỗi Header Timeout nhé."}
+                {displayData.ai_coach_suggestion || "Hãy mở Bảng soát bài chi tiết để đối chiếu nhận xét Rubric tự luận nhé."}
               </p>
             </div>
           </div>
@@ -321,7 +361,7 @@ export function QuizResultContent() {
           <div className="flex items-center justify-between border-b border-[#F0F2F8] pb-4 mb-6">
             <div>
               <h3 className="text-base sm:text-lg font-semibold text-[#1A1A2E]">Phân tích độ thành thạo theo chủ đề (Topic Mastery)</h3>
-              <p className="text-xs text-[#7878A0] mt-0.5">Trí tuệ nhân tạo phân rã mức độ thông hiểu kỹ thuật từ 10 câu hỏi của bạn</p>
+              <p className="text-xs text-[#7878A0] mt-0.5">Trí tuệ nhân tạo phân rã mức độ thông hiểu kỹ thuật từ bài thi của bạn</p>
             </div>
             <span className="text-xs text-[#5052EE] bg-[#EEF2FF]/60 px-3 py-1 rounded-full font-medium hidden sm:inline-block border border-[#5052EE]/15">
               3 Chủ đề cốt lõi
@@ -365,10 +405,10 @@ export function QuizResultContent() {
                 🔍
               </div>
               <h4 className="font-semibold text-base text-[#1A1A2E] mt-5 mb-2 group-hover:text-[#5052EE] transition-colors">
-                Xem lại câu hỏi trắc nghiệm
+                Xem lại câu hỏi &amp; Bài làm tự luận
               </h4>
               <p className="text-xs sm:text-sm text-[#64647A] leading-relaxed font-normal">
-                Soát lại từng chi tiết đáp án và lời giải trình tường tận của Gia sư AI MindNova cho 10 câu thi.
+                Soát lại từng chi tiết đáp án trắc nghiệm và bài làm tự luận kèm nhận xét AI và Rubric.
               </p>
             </div>
 
@@ -378,7 +418,7 @@ export function QuizResultContent() {
             </div>
           </div>
 
-          {/* Card 2: AI Practice Supplemental Link (Retake with randomized shuffled options) */}
+          {/* Card 2: AI Practice Supplemental Link */}
           <Link href={`/practice/quiz/question?lessonId=${targetModuleId}`} className="text-decoration-none block">
             <div className="h-full bg-white rounded-2xl p-6 border border-[#EAEAF4] shadow-2xs transition-all duration-300 hover:shadow-md hover:border-[#0D9488]/50 hover:-translate-y-0.5 flex flex-col justify-between group cursor-pointer">
               <div>
@@ -386,10 +426,10 @@ export function QuizResultContent() {
                   🤖
                 </div>
                 <h4 className="font-semibold text-base text-[#1A1A2E] mt-5 mb-2 group-hover:text-[#0D9488] transition-colors">
-                  Luyện tập lại với đề xáo trộn mới
+                  Luyện tập lại bộ đề thi này
                 </h4>
                 <p className="text-xs sm:text-sm text-[#64647A] leading-relaxed font-normal">
-                  Vào lại chế độ kiểm nghiệm với bộ đề tự động xáo trộn ngẫu nhiên 100% thứ tự câu và đáp án A/B/C/D.
+                  Vào lại chế độ thi kiểm nghiệm để thực hành kỹ năng làm bài tự luận và trắc nghiệm.
                 </p>
               </div>
 
@@ -411,7 +451,7 @@ export function QuizResultContent() {
                   Chuyển sang Module chủ đề khác
                 </h4>
                 <p className="text-xs sm:text-sm text-[#64647A] leading-relaxed font-normal">
-                  Tiến thẳng về danh mục 4 Chủ đề Thực chiến (Mạng thần kinh, React 19, Security) để bứt phá.
+                  Quay về Trung tâm đánh giá để lựa chọn các chuyên đề khóa học khác.
                 </p>
               </div>
 
@@ -436,7 +476,7 @@ export function QuizResultContent() {
           <Link href={`/practice/quiz/question?lessonId=${targetModuleId}`} className="text-decoration-none">
             <button type="button" className="px-7 py-3 bg-white border border-[#EAEAF4] hover:bg-[#F8FAFC] text-[#374151] rounded-xl font-medium text-xs sm:text-sm shadow-2xs hover:border-[#5052EE]/30 transition-all cursor-pointer flex items-center gap-2">
               <span>🔄</span>
-              <span>Làm lại bài với đề mới (Randomize)</span>
+              <span>Làm lại bài với đề mới</span>
             </button>
           </Link>
         </div>

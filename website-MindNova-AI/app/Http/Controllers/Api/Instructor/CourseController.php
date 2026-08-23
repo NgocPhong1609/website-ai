@@ -12,6 +12,7 @@ use App\Http\Resources\CourseCollection;
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
 use App\Services\Instructor\CourseService;
+use App\Services\Instructor\CourseHealthService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -20,7 +21,10 @@ class CourseController extends Controller
 {
     use ApiResponse;
 
-    public function __construct(private readonly CourseService $courseService)
+    public function __construct(
+        private readonly CourseService $courseService,
+        private readonly CourseHealthService $courseHealthService,
+    )
     {
     }
 
@@ -58,6 +62,11 @@ class CourseController extends Controller
     public function show(Course $course)
     {
         Gate::authorize('view', $course);
+
+        $course->load(['modules.lessons']);
+        if (\Illuminate\Support\Facades\Schema::hasColumn('lessons', 'course_id')) {
+            $course->load('lessons');
+        }
 
         return $this->successResponse(new CourseResource($course));
     }
@@ -129,5 +138,12 @@ class CourseController extends Controller
         }
 
         return $this->successResponse(new CourseResource($course), 'Price updated.');
+    }
+
+    public function health(Course $course)
+    {
+        Gate::authorize('view', $course);
+
+        return $this->successResponse($this->courseHealthService->evaluate($course));
     }
 }

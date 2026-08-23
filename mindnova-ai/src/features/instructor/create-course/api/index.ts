@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { axiosClient } from "../../../../shared/lib/axios";
 import type { CourseBasicInfo } from "../types";
 
@@ -8,6 +8,31 @@ export interface CreateCoursePayload {
   level?: string;
   category_id: number;
   thumbnail?: File;
+}
+
+export interface CourseHealthIssue {
+  severity: "error" | "warning";
+  field: string;
+  message: string;
+}
+
+export interface CourseHealthReport {
+  status: "blocked" | "ready_with_warnings" | "ready";
+  score: number;
+  can_submit: boolean;
+  issues: CourseHealthIssue[];
+}
+
+export function useCourseHealth(courseId: string, enabled = true) {
+  return useQuery({
+    queryKey: ["instructor", "course", courseId, "health"],
+    queryFn: async () => {
+      const { data } = await axiosClient.get(`/api/instructor/courses/${courseId}/health`);
+      return data.data as CourseHealthReport;
+    },
+    enabled: enabled && Boolean(courseId),
+    staleTime: 15_000,
+  });
 }
 
 export function useCreateCourse() {
@@ -35,6 +60,8 @@ export function useCreateCourse() {
 }
 
 export function useUploadCourseThumbnail() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async ({ courseId, file }: { courseId: string; file: File }) => {
       const formData = new FormData();
@@ -45,6 +72,9 @@ export function useUploadCourseThumbnail() {
         formData
       );
       return data.data;
+    },
+    onSuccess: (_, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId, "health"] });
     },
   });
 }
@@ -79,6 +109,7 @@ export function useUpdateCoursePrice() {
     onSuccess: (_, { courseId }) => {
       queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
       queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId] });
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId, "health"] });
     },
   });
 }
@@ -173,8 +204,9 @@ export function useUpdateCourse() {
       const { data } = await axiosClient.post(`/api/instructor/courses/${courseId}`, formData);
       return data.data;
     },
-    onSuccess: () => {
+    onSuccess: (_, { courseId }) => {
       queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId, "health"] });
     },
   });
 }

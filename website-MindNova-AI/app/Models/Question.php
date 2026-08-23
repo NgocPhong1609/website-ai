@@ -11,7 +11,13 @@ class Question extends Model
     protected $fillable = [
         'quiz_id',
         'topic_id',
+        'type',
+        'difficulty',
         'content',
+        'explanation',
+        'sample_answer',
+        'rubric',
+        'points',
         'question_category',
         'ai_insight',
         'order',
@@ -19,6 +25,7 @@ class Question extends Model
 
     protected $casts = [
         'order' => 'integer',
+        'points' => 'float',
     ];
 
     public function quiz(): BelongsTo

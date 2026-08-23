@@ -1,6 +1,7 @@
 import { InstructorSidebar } from "@/src/features/instructor/management/components/InstructorSidebar";
 import { InstructorTopbar } from "@/src/features/instructor/management/components/InstructorTopbar";
 import { FloatingAiChat } from "@/src/features/student/layout";
+import { InstructorRoleGuard } from "@/src/shared/components/InstructorRoleGuard";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,13 +14,15 @@ export default function InstructorLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F4F4F8]">
-      <InstructorSidebar />
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <InstructorTopbar />
-        <main className="flex-1 overflow-y-auto">{children}</main>
+    <InstructorRoleGuard>
+      <div className="flex h-screen overflow-hidden bg-[#F4F4F8]">
+        <InstructorSidebar />
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <InstructorTopbar />
+          <main className="flex-1 overflow-y-auto">{children}</main>
+        </div>
+        <FloatingAiChat />
       </div>
-      <FloatingAiChat />
-    </div>
+    </InstructorRoleGuard>
   );
 }

@@ -159,8 +159,8 @@ class ProgressService
                         'priority_tag' => '+40% Ghi nhớ',
                         'color_scheme' => 'indigo',
                         'content' => 'Hoàn tất bài Quiz Đánh giá Module 2 trong tuần này để kích hoạt huy hiệu Quantum Pioneer và duy trì phong độ!',
-                        'action_label' => '📝 Làm Khảo sát năng lực ➔',
-                        'action_url' => "/practice/quiz/question?lessonId=mod1"
+                        'action_label' => '📝 Kiểm tra tổng quát ➔',
+                        'action_url' => "/practice/quiz/question?lessonId=" . ($courseId ?: 1)
                     ],
                 ],
                 'performance_stats' => [

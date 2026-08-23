@@ -27,6 +27,7 @@ class Course extends Model
     'is_flash_sale',
     'published_version_id',
     'current_version',
+    'lock_version',
 ];
 
     protected $casts = [
@@ -37,6 +38,7 @@ class Course extends Model
     'is_flash_sale' => 'boolean',
     'admin_hidden_at' => 'datetime',
     'current_version' => 'integer',
+    'lock_version' => 'integer',
 ];
 
     protected $appends = [
@@ -101,6 +103,11 @@ class Course extends Model
         return $this->hasMany(CourseModule::class)->orderBy('order');
     }
 
+    public function lessons(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Lesson::class, 'course_id')->orderBy('order');
+    }
+
     public function enrollments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Enrollment::class);
@@ -131,6 +138,12 @@ class Course extends Model
                     ->orderByDesc('version_number');
     }
 
+    /** Draft snapshots are independent from immutable content-review versions. */
+    public function draftRevisions(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(DraftRevision::class, 'revisionable')->latest('revision_number');
+    }
+
     /**
      * All review submissions for this course.
      */
@@ -151,7 +164,14 @@ class Course extends Model
 
     public function getTotalLessonsAttribute(): int
     {
-        return \App\Models\Lesson::whereIn('module_id', $this->modules()->select('id'))->count();
+        $moduleLessonsCount = \App\Models\Lesson::whereIn('module_id', $this->modules()->select('id'))->count();
+        if ($moduleLessonsCount > 0) {
+            return $moduleLessonsCount;
+        }
+        if (\Illuminate\Support\Facades\Schema::hasColumn('lessons', 'course_id')) {
+            return \App\Models\Lesson::where('course_id', $this->id)->count();
+        }
+        return 0;
     }
 
     public function getDurationHoursAttribute(): float
@@ -161,6 +181,9 @@ class Course extends Model
         }
 
         $totalSeconds = \App\Models\Lesson::whereIn('module_id', $this->modules()->select('id'))->sum('duration_seconds');
+        if (($totalSeconds ?? 0) == 0 && \Illuminate\Support\Facades\Schema::hasColumn('lessons', 'course_id')) {
+            $totalSeconds = \App\Models\Lesson::where('course_id', $this->id)->sum('duration_seconds');
+        }
         return round((float) ($totalSeconds ?? 0) / 3600, 1);
     }
 

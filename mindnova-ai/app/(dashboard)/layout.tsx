@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Sidebar, FloatingAiChat } from "@/src/features/student/layout";
 import { DashboardTopbar } from "@/src/features/student/dashboard";
+import { StudentRoleGuard } from "@/src/shared/components/StudentRoleGuard";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -12,7 +13,7 @@ export default function DashboardLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <>
+    <StudentRoleGuard>
       <div className="fixed inset-0 w-full h-full overflow-hidden flex bg-[#F7F7FB]">
         {/* Left sidebar — sticky */}
         <Sidebar />
@@ -24,8 +25,8 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      {/* Global Student Floating AI Co-Pilot Icon & Modal - Absolute top level in DOM to prevent z-index or overflow clipping */}
+      {/* Global Student Floating AI Co-Pilot Icon & Modal */}
       <FloatingAiChat />
-    </>
+    </StudentRoleGuard>
   );
 }

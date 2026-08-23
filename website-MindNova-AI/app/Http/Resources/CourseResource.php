@@ -31,8 +31,42 @@ class CourseResource extends JsonResource
             'category_id' => $this->category_id,
             'totalLessons' => $this->total_lessons,
             'durationHours' => $this->duration_hours,
+            'modules' => $this->whenLoaded('modules', function () {
+                return $this->modules->map(function ($module) {
+                    return [
+                        'id' => $module->id,
+                        'title' => $module->title,
+                        'order' => $module->order,
+                        'lessons' => $module->relationLoaded('lessons') ? $module->lessons->map(function ($lesson) {
+                            return [
+                                'id' => $lesson->id,
+                                'title' => $lesson->title,
+                                'type' => $lesson->type,
+                                'content' => $lesson->content,
+                                'video_url' => $lesson->video_url,
+                                'duration_seconds' => $lesson->duration_seconds ?? 0,
+                                'order' => $lesson->order,
+                            ];
+                        }) : [],
+                    ];
+                });
+            }),
+            'lessons' => $this->whenLoaded('lessons', function () {
+                return $this->lessons->map(function ($lesson) {
+                    return [
+                        'id' => $lesson->id,
+                        'title' => $lesson->title,
+                        'type' => $lesson->type,
+                        'content' => $lesson->content,
+                        'video_url' => $lesson->video_url,
+                        'duration_seconds' => $lesson->duration_seconds ?? 0,
+                        'order' => $lesson->order,
+                    ];
+                });
+            }),
             // ── Versioning info ──
             'current_version' => $this->current_version,
+            'lock_version' => $this->lock_version,
             'published_version_id' => $this->published_version_id,
             'is_published' => $this->isPublished(),
             'has_pending_submission' => $this->hasPendingSubmission(),
