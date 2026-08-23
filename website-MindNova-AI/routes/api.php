@@ -24,6 +24,13 @@ use App\Http\Controllers\Api\Student\ProgressController as StudentProgressContro
 use App\Http\Controllers\Api\Student\HistoryController as StudentHistoryController;
 use App\Http\Controllers\Api\Student\NotificationController as StudentNotificationController;
 use App\Http\Controllers\Api\Student\StreakController;
+use App\Http\Controllers\Api\Student\AiQuizGeneratorController;
+use App\Http\Controllers\Api\Student\AnalyzeLessonController;
+use App\Http\Controllers\Api\Student\SelfAssessmentController;
+use App\Http\Controllers\Api\Student\PaymentController as StudentPaymentController;
+use App\Http\Controllers\Api\Student\ReviewController as StudentReviewController;
+use App\Http\Controllers\Api\Student\LessonController as StudentLessonController;
+use App\Http\Controllers\Api\Student\DiscussionController as StudentDiscussionController;
 
 // Nhóm Dùng chung
 use App\Http\Controllers\Api\RealtimeController;
@@ -54,6 +61,9 @@ use App\Http\Controllers\Api\Instructor\ContentReviewController as InstructorCon
 use App\Http\Controllers\Api\Instructor\TeacherProfileController;
 use App\Http\Controllers\Api\Instructor\DraftRevisionController;
 use App\Http\Controllers\Api\Instructor\QuizGeneratorController;
+use App\Http\Controllers\Api\Instructor\StudentAnalyticsController;
+use App\Http\Controllers\Api\Instructor\OrderController as InstructorOrderController;
+use App\Http\Controllers\Api\Instructor\ReviewController as InstructorReviewController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -68,19 +78,37 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 });
 
-// -- API VNPay IPN (Webhooks) --
+// -- API Payment Callbacks & Webhooks --
 Route::get('/vnpay/ipn', [OrderController::class, 'vnpayIpn']);
-
-// -- API Payment Callback (Public để nhận redirect từ cổng thanh toán) --
-Route::get('/student/payments/callback/{provider}', [\App\Http\Controllers\Api\Student\PaymentController::class, 'callback']);
+Route::get('/student/payments/callback/{provider}', [StudentPaymentController::class, 'callback']);
 Route::get('/student/payment/vnpay-ipn', [OrderController::class, 'vnpayIpn']);
 Route::post('/student/payment/momo-ipn', [OrderController::class, 'momoIpn']);
 
-// API Student Public Catalog (Khách chưa đăng nhập cũng có thể xem danh sách & chi tiết khóa học)
+// -- Nhóm AI Quiz Generator & Review (Động) --
+Route::prefix('student/practice')->group(function () {
+    Route::post('/generate-ai-quiz', [AiQuizGeneratorController::class, 'generate']);
+    Route::get('/ai-quizzes/history', [AiQuizGeneratorController::class, 'history']);
+    Route::get('/ai-quizzes/{id}', [AiQuizGeneratorController::class, 'show']);
+    Route::post('/ai-quizzes/{id}/submit', [AiQuizGeneratorController::class, 'submit']);
+    Route::delete('/ai-quizzes/{id}', [AiQuizGeneratorController::class, 'destroy']);
+});
+
+// -- API Student Dashboard, Study Plan & Khóa học (Dành cho Học viên) --
 Route::prefix('student')->group(function () {
+    Route::get('/dashboard', [StudentDashboardController::class, 'overview']);
+    Route::get('/study-plan', [StudentStudyPlanController::class, 'overview']);
+    Route::get('/practice/overview', [StudentPracticeController::class, 'overview']);
+    Route::get('/progress/overview', [StudentProgressController::class, 'overview']);
+    Route::get('/history/overview', [StudentHistoryController::class, 'overview']);
     Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
     Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
-    Route::get('/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'index']);
+    Route::get('/courses/{course}/reviews', [StudentReviewController::class, 'index']);
+    Route::post('/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:10,1');
+    Route::post('/onboarding', [OnboardingController::class, 'store']);
+    Route::get('/available-topics', [OnboardingController::class, 'getAvailableTopics']);
+    Route::post('/analyze-lesson', [AnalyzeLessonController::class, 'analyze']);
+    Route::post('/courses/{courseId}/self-assessment/generate', [SelfAssessmentController::class, 'generate']);
+    Route::post('/self-assessment/submit', [SelfAssessmentController::class, 'submit']);
 });
 
 // ==========================================
@@ -95,7 +123,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // API Điểm danh
     Route::post('/student/check-in', [StreakController::class, 'checkIn']);
 
-    // -- AI hỗ trợ học tập (Học sinh, Giáo viên, Admin đều dùng chung) --
+    // -- AI hỗ trợ học tập (Dùng chung) --
     Route::post('/ai-chat', [AiTutorController::class, 'chat']);
 
     // -- Gửi tin nhắn Realtime (Dùng chung) --
@@ -125,54 +153,38 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders', [OrderController::class, 'store']);
 
     // ==========================================
-    // 3. NHÓM API HỌC SINH (Student Only — Strict Authorization)
+    // 3. NHÓM API HỌC SINH (Student Authenticated Actions)
     // ==========================================
-    Route::middleware('role:student')->prefix('student')->group(function () {
-
-        // 🌟 TÍNH NĂNG ONBOARDING & AI PHÂN TÍCH BÀI HỌC
-        Route::post('/onboarding', [OnboardingController::class, 'store']);
-        Route::get('/available-topics', [OnboardingController::class, 'getAvailableTopics']);
-        Route::post('/analyze-lesson', [OnboardingController::class, 'analyzeLesson']);
-        Route::post('/courses/{courseId}/self-assessment/generate', [\App\Http\Controllers\Api\Student\SelfAssessmentController::class, 'generate']);
-        Route::post('/self-assessment/submit', [\App\Http\Controllers\Api\Student\SelfAssessmentController::class, 'submit']);
-
-        // Dashboard, Study Plan & Quizzes
-        Route::get('/dashboard', [StudentDashboardController::class, 'overview']);
-        Route::get('/study-plan', [StudentStudyPlanController::class, 'overview']);
-        Route::get('/practice/overview', [StudentPracticeController::class, 'overview']);
-        Route::get('/progress/overview', [StudentProgressController::class, 'overview']);
-        Route::get('/history/overview', [StudentHistoryController::class, 'overview']);
-        Route::post('/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:5,1');
-
+    Route::prefix('student')->group(function () {
         // Enrolled Courses
-        Route::get('/courses/enrolled', [\App\Http\Controllers\Api\Student\CourseController::class, 'enrolledCourses']);
+        Route::get('/courses/enrolled', [StudentCourseController::class, 'enrolledCourses']);
 
         // Check Order Status by Transaction ID
         Route::get('/orders/transaction/{transactionId}', [OrderController::class, 'showByTransaction']);
 
-        // TÍNH NĂNG AI TUTOR & Các tiện ích nâng cao khác
+        // TÍNH NĂNG AI TUTOR & Đánh giá khóa học
         Route::post('/ai-tutor/chat', [AiTutorController::class, 'streamChat']);
-        Route::post('/courses/{course}/reviews', [\App\Http\Controllers\Api\Student\ReviewController::class, 'store']);
-        Route::put('/courses/{course}/reviews/{review}', [\App\Http\Controllers\Api\Student\ReviewController::class, 'update']);
-        Route::delete('/courses/{course}/reviews/{review}', [\App\Http\Controllers\Api\Student\ReviewController::class, 'destroy']);
+        Route::post('/courses/{course}/reviews', [StudentReviewController::class, 'store']);
+        Route::put('/courses/{course}/reviews/{review}', [StudentReviewController::class, 'update']);
+        Route::delete('/courses/{course}/reviews/{review}', [StudentReviewController::class, 'destroy']);
 
-        // Quiz
+        // Quiz bài học
         Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
         Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
 
-        // Lesson — Video URL, Completion, Quiz Answer Check
-        Route::get('lessons/{lesson}/video-url', [\App\Http\Controllers\Api\Student\LessonController::class, 'videoUrl']);
-        Route::post('lessons/{lesson}/complete', [\App\Http\Controllers\Api\Student\LessonController::class, 'complete']);
-        Route::post('lessons/{lesson}/quiz/check-answer', [\App\Http\Controllers\Api\Student\LessonController::class, 'checkAnswer']);
+        // Lesson — Video URL, Hoàn thành, Kiểm tra đáp án Quiz
+        Route::get('lessons/{lesson}/video-url', [StudentLessonController::class, 'videoUrl']);
+        Route::post('lessons/{lesson}/complete', [StudentLessonController::class, 'complete']);
+        Route::post('lessons/{lesson}/quiz/check-answer', [StudentLessonController::class, 'checkAnswer']);
 
         // Notifications
         Route::get('/notifications', [StudentNotificationController::class, 'index']);
         Route::patch('/notifications/{notification}/read', [StudentNotificationController::class, 'markRead']);
         Route::delete('/notifications/read', [StudentNotificationController::class, 'deleteRead']);
 
-        // Discussions
-        Route::get('lessons/{lesson}/discussions', [\App\Http\Controllers\Api\Student\DiscussionController::class, 'index']);
-        Route::post('lessons/{lesson}/discussions', [\App\Http\Controllers\Api\Student\DiscussionController::class, 'store']);
+        // Discussions (Thảo luận bài học)
+        Route::get('lessons/{lesson}/discussions', [StudentDiscussionController::class, 'index']);
+        Route::post('lessons/{lesson}/discussions', [StudentDiscussionController::class, 'store']);
     });
 });
 
@@ -229,8 +241,8 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::get('students/{student}/progress', [InstructorStudentController::class, 'progress']);
 
     // Student Analytics Dashboard
-    Route::get('student-analytics/dashboard-metrics', [\App\Http\Controllers\Api\Instructor\StudentAnalyticsController::class, 'dashboardMetrics']);
-    Route::get('student-analytics/engagement-chart', [\App\Http\Controllers\Api\Instructor\StudentAnalyticsController::class, 'engagementChart']);
+    Route::get('student-analytics/dashboard-metrics', [StudentAnalyticsController::class, 'dashboardMetrics']);
+    Route::get('student-analytics/engagement-chart', [StudentAnalyticsController::class, 'engagementChart']);
 
     // Discussions
     Route::get('discussions', [InstructorDiscussionController::class, 'index']);
@@ -246,10 +258,10 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::get('revenue/sales-report', [RevenueController::class, 'getSalesReport']);
 
     // Orders
-    Route::get('orders', [\App\Http\Controllers\Api\Instructor\OrderController::class, 'index']);
+    Route::get('orders', [InstructorOrderController::class, 'index']);
 
     // Reviews
-    Route::get('reviews', [\App\Http\Controllers\Api\Instructor\ReviewController::class, 'index']);
+    Route::get('reviews', [InstructorReviewController::class, 'index']);
 
     // AI Quiz Generator (Instructor Standalone & Attachment)
     Route::get('ai-quiz', [QuizGeneratorController::class, 'index']);
@@ -351,7 +363,6 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/reviews/{submission}/comments', [AdminReviewController::class, 'addComment']);
     Route::patch('/reviews/deletion-requests/{deletionRequest}/approve', [AdminReviewController::class, 'approveDeletion']);
     Route::patch('/reviews/deletion-requests/{deletionRequest}/reject', [AdminReviewController::class, 'rejectDeletion']);
-
 });
 
 // ==========================================
@@ -359,8 +370,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
 // ==========================================
 if (app()->environment('local', 'testing')) {
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::post('/dev/orders/{orderId}/complete', [App\Http\Controllers\Api\Student\OrderController::class, 'devCompleteOrder']);
-        Route::post('/dev/orders/{orderId}/refund', [App\Http\Controllers\Api\Student\OrderController::class, 'devRefundOrder']);
+        Route::post('/dev/orders/{orderId}/complete', [OrderController::class, 'devCompleteOrder']);
+        Route::post('/dev/orders/{orderId}/refund', [OrderController::class, 'devRefundOrder']);
     });
 }
-
