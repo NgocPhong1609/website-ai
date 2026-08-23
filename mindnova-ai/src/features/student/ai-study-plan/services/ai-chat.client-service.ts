@@ -1,48 +1,52 @@
+import { axiosClient } from "@/src/shared/lib/axios";
 import type { AiChatApiResponse, AiChatMessage } from "../types";
 
 /**
- * Sends a user message to the interactive AI Tutor backend service via client-side fetch.
- * Completely safe for usage inside React "use client" components (zero Node.js or Next headers dependencies).
+ * Sends a user message to the interactive AI Tutor backend service via axiosClient.
+ * Safe for client-side components with automatic authentication and relative API path resolution.
  */
 export async function sendAiChatMessage(
   message: string,
   history: AiChatMessage[] = [],
   lessonId?: number
 ): Promise<AiChatMessage> {
-  const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api").replace(/\/+$/, "");
-  const targetUrl = `${baseUrl.endsWith("/api") ? baseUrl : baseUrl + "/api"}/student/study-plan/chat`;
-
-  const response = await fetch(targetUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+  try {
+    const res = await axiosClient.post("/api/student/study-plan/chat", {
       message,
       lesson_id: lessonId ?? null,
       history: history.slice(-4).map((m) => ({ sender: m.sender, text: m.text })),
-    }),
-  });
+    });
 
-  if (!response.ok) {
-    if (response.status === 429) {
-      throw new Error("⏳ **Gia sư Nova hiện đang bận xíu hoặc bạn đã gửi câu hỏi quá nhanh (> 5 câu/phút). Bạn vui lòng chờ khoảng 1 phút rồi thử đặt câu hỏi lại nhé!** 😊");
+    const result: AiChatApiResponse = res.data;
+    if (result && result.success && result.data) {
+      return result.data;
     }
-    try {
-      const errJson = await response.json();
-      if (errJson && errJson.message) {
-        throw new Error(errJson.message);
+
+    throw new Error(
+      result?.message || "⏳ **Gia sư Nova đang bận xíu, bạn vui lòng chờ khoảng 1 phút rồi gửi lại tin nhắn cho mình nhé!** 😊"
+    );
+  } catch (error: any) {
+    if (error.response) {
+      const status = error.response.status;
+      if (status === 429) {
+        throw new Error("⏳ **Gia sư Nova hiện đang bận xíu hoặc bạn đã gửi câu hỏi quá nhanh (> 5 câu/phút). Bạn vui lòng chờ khoảng 1 phút rồi thử đặt câu hỏi lại nhé!** 😊");
       }
-    } catch {
-      // Ignore JSON parse errors on non-OK responses
+      if (status === 401) {
+        throw new Error("🔑 **Phiên đăng nhập đã hết hạn. Bạn vui lòng đăng nhập lại để trò chuyện với Gia sư Nova nhé!**");
+      }
+      if (status === 403) {
+        throw new Error("⛔ **Bạn chưa có quyền truy cập tính năng Gia sư AI này.**");
+      }
+      if (error.response.data && error.response.data.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error(`⏳ **Gia sư Nova hiện đang bận xíu (lỗi máy chủ ${status}), bạn vui lòng chờ khoảng 1 phút rồi thử lại nhé!** 😊`);
     }
-    throw new Error(`⏳ **Gia sư Nova hiện đang bận xíu (lỗi máy chủ ${response.status}), bạn vui lòng chờ khoảng 1 phút rồi thử lại nhé!** 😊`);
-  }
 
-  const result: AiChatApiResponse = await response.json();
-  if (result.success && result.data) {
-    return result.data;
-  }
+    if (error.request) {
+      throw new Error("📡 **Không thể kết nối đến máy chủ AI. Vui lòng kiểm tra kết nối mạng của bạn và thử lại.**");
+    }
 
-  throw new Error(result.message || "⏳ **Gia sư Nova đang bận xíu, bạn vui lòng chờ khoảng 1 phút rồi gửi lại tin nhắn cho mình nhé!** 😊");
+    throw error;
+  }
 }

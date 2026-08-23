@@ -20,7 +20,7 @@ class OrderController extends Controller
             $q->where('teacher_id', $user->id);
         })
         ->with([
-            'user:id,name,email,avatar',
+            'user:id,name,email,avatar_url',
             'orderItems' => function ($q) use ($user) {
                 $q->whereHas('course', function ($q2) use ($user) {
                     $q2->where('teacher_id', $user->id);

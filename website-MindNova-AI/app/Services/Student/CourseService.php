@@ -13,10 +13,10 @@ class CourseService
      * 
      * SECURITY: Only counts published lessons toward progress.
      */
-    public function calculateStudentProgress(Course $course, int $userId): array
+    public function calculateStudentProgress(Course $course, ?int $userId = null): array
     {
         $completedLessonIds = [];
-        if (class_exists(\App\Models\LessonCompletion::class)) {
+        if ($userId && class_exists(\App\Models\LessonCompletion::class)) {
             $completedLessonIds = \App\Models\LessonCompletion::where('user_id', $userId)
                 ->pluck('lesson_id')
                 ->toArray();
@@ -140,7 +140,7 @@ class CourseService
                     
                     if ($dbCourse->teacher) {
                         $instructorName = $dbCourse->teacher->name;
-                        $instructorAvatar = $dbCourse->teacher->avatar ?? '/avatar-placeholder.png';
+                        $instructorAvatar = $dbCourse->teacher->avatar_url ?? $dbCourse->teacher->avatar ?? '/avatar-placeholder.png';
                         // Fallback role/bio for user if it doesn't exist
                         $instructorBio = "Chuyên gia giàu kinh nghiệm trong lĩnh vực {$categoryName}.";
                     }
@@ -303,7 +303,9 @@ class CourseService
                 'name' => $instructorName,
                 'role' => $instructorRole,
                 'avatar_url' => $instructorAvatar,
-                'bio' => $instructorBio
+                'bio' => $instructorBio,
+                'is_verified' => (bool) ($dbCourse->teacher->is_verified ?? false),
+                'verified_status' => $dbCourse->teacher->teacher_verification_status ?? 'none',
             ],
             'modules' => $modules,
             'resources' => $resources,

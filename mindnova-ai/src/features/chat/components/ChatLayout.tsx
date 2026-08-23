@@ -28,9 +28,9 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
         setConversations(prev => {
             const newConversations = prev.map(c => c.id === conversationId ? { ...c, last_message: lastMessage } : c);
             // Sort by latest message
-            return newConversations.sort((a, b) => {
-                const dateA = a.last_message ? new Date(a.last_message.created_at).getTime() : new Date(a.created_at).getTime();
-                const dateB = b.last_message ? new Date(b.last_message.created_at).getTime() : new Date(b.created_at).getTime();
+            return newConversations.sort((a: any, b: any) => {
+                const dateA = a.last_message ? new Date(a.last_message.created_at).getTime() : (a.created_at ? new Date(a.created_at).getTime() : 0);
+                const dateB = b.last_message ? new Date(b.last_message.created_at).getTime() : (b.created_at ? new Date(b.created_at).getTime() : 0);
                 return dateB - dateA;
             });
         });
@@ -98,9 +98,9 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
                     });
                     
                     // Sort by latest message
-                    return newConversations.sort((a, b) => {
-                        const dateA = a.last_message ? new Date(a.last_message.created_at).getTime() : new Date(a.created_at).getTime();
-                        const dateB = b.last_message ? new Date(b.last_message.created_at).getTime() : new Date(b.created_at).getTime();
+                    return newConversations.sort((a: any, b: any) => {
+                        const dateA = a.last_message ? new Date(a.last_message.created_at).getTime() : (a.created_at ? new Date(a.created_at).getTime() : 0);
+                        const dateB = b.last_message ? new Date(b.last_message.created_at).getTime() : (b.created_at ? new Date(b.created_at).getTime() : 0);
                         return dateB - dateA;
                     });
                 });
