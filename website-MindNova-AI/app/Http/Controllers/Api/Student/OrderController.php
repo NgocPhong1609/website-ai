@@ -420,6 +420,7 @@ class OrderController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('devCompleteOrder failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }

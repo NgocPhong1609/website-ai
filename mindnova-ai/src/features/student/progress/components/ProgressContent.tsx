@@ -232,39 +232,147 @@ export function ProgressContent() {
               </div>
             </div>
 
-            {/* Dynamic Roadmap Timeline View */}
-            <div className="relative pl-2 py-2">
-              {/* Vertical Connector Line */}
-              <div className="absolute left-[19px] top-6 bottom-6 w-0.5 bg-gradient-to-b from-[#10B981] via-[#5052EE] to-[#D1D5DB]" />
+            {/* Dynamic Roadmap View based on viewMode */}
+            {viewMode === "linear" ? (
+              <div className="relative pl-2 py-2">
+                {/* Vertical Connector Line */}
+                <div className="absolute left-[19px] top-6 bottom-6 w-0.5 bg-gradient-to-b from-[#10B981] via-[#5052EE] to-[#D1D5DB]" />
 
-              <div className="flex flex-col gap-7">
+                <div className="flex flex-col gap-7">
+                  {roadmap_modules && roadmap_modules.map((mod, i) => {
+                    const isCompleted = mod.status === "completed";
+                    const isActive = mod.status === "active";
+                    const isLocked = mod.status === "locked" || (!isCompleted && !isActive);
+
+                    if (isCompleted) {
+                      return (
+                        <div key={mod.id || i} className="relative flex items-start gap-5 group">
+                          <div className="relative z-10 w-8 h-8 rounded-full bg-[#D1FAE5] border-2 border-white text-[#059669] flex items-center justify-center shrink-0 shadow-sm mt-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                          </div>
+                          
+                          <div className="flex-1 bg-[#F8F9FC] border border-[#EAEAF4] rounded-xl p-4 sm:p-5 hover:border-[#059669]/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[11px] font-semibold text-[#059669] bg-[#D1FAE5] px-2 py-0.5 rounded-md">{mod.module_number}</span>
+                                <span className="text-xs font-normal text-[#64647A]">{mod.lesson_count_text}</span>
+                              </div>
+                              <h3 className="text-sm sm:text-base font-semibold text-[#1A1A2E]">{mod.title}</h3>
+                              <p className="text-xs font-normal text-[#64647A] leading-relaxed">{mod.subtitle}</p>
+                            </div>
+
+                            <Link href={mod.action_link || "/courses"} className="shrink-0 text-decoration-none">
+                              <button type="button" className="px-4 py-2 rounded-lg bg-white border border-[#EAEAF4] hover:bg-[#EEF2FF] hover:border-[#5052EE]/30 text-[#5052EE] font-semibold text-xs transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                                <span>{mod.action_text || "🔄 Ôn tập lại"}</span>
+                              </button>
+                            </Link>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    if (isActive) {
+                      return (
+                        <div key={mod.id || i} className="relative flex items-start gap-5">
+                          <div className="relative z-10 w-8 h-8 rounded-full bg-[#EEF2FF] border-2 border-white flex items-center justify-center shrink-0 shadow-[0_0_0_4px_rgba(80,82,238,0.2)] mt-6 animate-pulse">
+                            <div className="w-3.5 h-3.5 rounded-full bg-[#5052EE]" />
+                          </div>
+
+                          <div className="flex-1 bg-gradient-to-r from-white via-[#F6F6FB] to-[#EEF2FF]/50 border-2 border-[#5052EE]/35 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all space-y-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                              <div className="space-y-1.5">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-[11px] font-semibold text-[#5052EE] bg-[#EEF2FF] px-2.5 py-0.5 rounded-md border border-[#5052EE]/20">{mod.module_number}</span>
+                                  <span className="text-xs font-medium text-[#D97706] bg-[#FFF8EB] px-2.5 py-0.5 rounded-md border border-[#D97706]/20">⚡ Tiếp tục ngay</span>
+                                </div>
+                                <h3 className="text-base sm:text-lg font-bold text-[#1A1A2E]">{mod.title}</h3>
+                                <p className="text-xs font-normal text-[#64647A] leading-relaxed">
+                                  {mod.subtitle}
+                                </p>
+                              </div>
+
+                              <Link href={mod.action_link || "/courses"} className="shrink-0 text-decoration-none">
+                                <button type="button" className="px-5 py-2.5 bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:brightness-110 text-white rounded-xl font-semibold text-xs shadow-[0_4px_15px_rgba(80,82,238,0.3)] hover:shadow-[0_6px_20px_rgba(80,82,238,0.4)] hover:-translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer">
+                                  <span>{mod.action_text || "▶ Tiếp tục học ➔"}</span>
+                                </button>
+                              </Link>
+                            </div>
+
+                            {/* Progress Bar inside Active Card */}
+                            <div className="space-y-1 pt-3 border-t border-[#EAEAF4]/80">
+                              <div className="flex items-center justify-between text-xs font-medium">
+                                <span className="text-[#64647A]">Tiến trình Module</span>
+                                <span className="text-[#5052EE] font-semibold">{mod.progress_text || `${mod.progress_percentage || 35}% Hoàn thành (3 / 8 Bài)`}</span>
+                              </div>
+                              <div className="w-full h-2 bg-[#F0F0F8] rounded-full overflow-hidden p-0.5 border border-[#EAEAF4]">
+                                <div 
+                                  className="h-full bg-gradient-to-r from-[#4648D4] to-[#0D9488] rounded-full shadow-xs transition-all duration-1000" 
+                                  style={{ width: `${mod.progress_percentage || 35}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // Locked fallback
+                    return (
+                      <div key={mod.id || i} className="relative flex items-start gap-5 opacity-75 hover:opacity-100 transition-opacity">
+                        <div className="relative z-10 w-8 h-8 rounded-full bg-[#F3F4F6] border-2 border-white text-[#9CA3AF] flex items-center justify-center shrink-0 shadow-sm mt-1">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                          </svg>
+                        </div>
+
+                        <div className="flex-1 bg-white border border-[#EAEAF4] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[11px] font-semibold text-[#64647A] bg-[#EAEAF4] px-2 py-0.5 rounded-md">{mod.module_number}</span>
+                              <span className="text-xs font-normal text-[#9CA3AF]">{mod.lesson_count_text}</span>
+                            </div>
+                            <h3 className="text-sm sm:text-base font-semibold text-[#4B5563]">{mod.title}</h3>
+                            <p className="text-xs font-normal text-[#9CA3AF] leading-relaxed">{mod.subtitle}</p>
+                          </div>
+
+                          <span className="shrink-0 px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#64647A] font-medium text-xs border border-[#EAEAF4] flex items-center gap-1.5">
+                            <span>{mod.action_text || "🔒 Cần hoàn tất Module trước"}</span>
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 py-2">
                 {roadmap_modules && roadmap_modules.map((mod, i) => {
                   const isCompleted = mod.status === "completed";
                   const isActive = mod.status === "active";
-                  const isLocked = mod.status === "locked" || (!isCompleted && !isActive);
 
                   if (isCompleted) {
                     return (
-                      <div key={mod.id || i} className="relative flex items-start gap-5 group">
-                        <div className="relative z-10 w-8 h-8 rounded-full bg-[#D1FAE5] border-2 border-white text-[#059669] flex items-center justify-center shrink-0 shadow-sm mt-1">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                          </svg>
-                        </div>
-                        
-                        <div className="flex-1 bg-[#F8F9FC] border border-[#EAEAF4] rounded-xl p-4 sm:p-5 hover:border-[#059669]/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-[11px] font-semibold text-[#059669] bg-[#D1FAE5] px-2 py-0.5 rounded-md">{mod.module_number}</span>
-                              <span className="text-xs font-normal text-[#64647A]">{mod.lesson_count_text}</span>
-                            </div>
-                            <h3 className="text-sm sm:text-base font-semibold text-[#1A1A2E]">{mod.title}</h3>
-                            <p className="text-xs font-normal text-[#64647A] leading-relaxed">{mod.subtitle}</p>
+                      <div key={mod.id || i} className="bg-[#F8F9FC] border border-[#EAEAF4] rounded-2xl p-5 hover:border-[#059669]/30 transition-all flex flex-col justify-between gap-4 group shadow-sm">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-semibold text-[#059669] bg-[#D1FAE5] px-2 py-0.5 rounded-md">{mod.module_number}</span>
+                            <span className="text-[10px] font-normal text-[#64647A]">{mod.lesson_count_text}</span>
                           </div>
-
-                          <Link href={mod.action_link || "/courses"} className="shrink-0 text-decoration-none">
-                            <button type="button" className="px-4 py-2 rounded-lg bg-white border border-[#EAEAF4] hover:bg-[#EEF2FF] hover:border-[#5052EE]/30 text-[#5052EE] font-semibold text-xs transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
-                              <span>{mod.action_text || "🔄 Ôn tập lại"}</span>
+                          <h3 className="text-sm font-semibold text-[#1A1A2E] line-clamp-2">{mod.title}</h3>
+                          <p className="text-xs font-normal text-[#64647A] line-clamp-2 leading-relaxed">{mod.subtitle}</p>
+                        </div>
+                        <div className="pt-3 border-t border-[#EAEAF4]/60 flex items-center justify-between">
+                          <div className="w-7 h-7 rounded-full bg-[#D1FAE5] text-[#059669] flex items-center justify-center">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                          </div>
+                          <Link href={mod.action_link || "/courses"} className="text-decoration-none">
+                            <button type="button" className="px-3 py-1.5 rounded-lg bg-white border border-[#EAEAF4] hover:bg-[#EEF2FF] hover:border-[#5052EE]/30 text-[#5052EE] font-semibold text-xs transition-all shadow-2xs cursor-pointer">
+                              {mod.action_text || "🔄 Ôn tập"}
                             </button>
                           </Link>
                         </div>
@@ -274,44 +382,35 @@ export function ProgressContent() {
 
                   if (isActive) {
                     return (
-                      <div key={mod.id || i} className="relative flex items-start gap-5">
-                        <div className="relative z-10 w-8 h-8 rounded-full bg-[#EEF2FF] border-2 border-white flex items-center justify-center shrink-0 shadow-[0_0_0_4px_rgba(80,82,238,0.2)] mt-6 animate-pulse">
-                          <div className="w-3.5 h-3.5 rounded-full bg-[#5052EE]" />
-                        </div>
-
-                        <div className="flex-1 bg-gradient-to-r from-white via-[#F6F6FB] to-[#EEF2FF]/50 border-2 border-[#5052EE]/35 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all space-y-4">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div className="space-y-1.5">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-[11px] font-semibold text-[#5052EE] bg-[#EEF2FF] px-2.5 py-0.5 rounded-md border border-[#5052EE]/20">{mod.module_number}</span>
-                                <span className="text-xs font-medium text-[#D97706] bg-[#FFF8EB] px-2.5 py-0.5 rounded-md border border-[#D97706]/20">⚡ Tiếp tục ngay</span>
-                              </div>
-                              <h3 className="text-base sm:text-lg font-bold text-[#1A1A2E]">{mod.title}</h3>
-                              <p className="text-xs font-normal text-[#64647A] leading-relaxed">
-                                {mod.subtitle}
-                              </p>
-                            </div>
-
-                            <Link href={mod.action_link || "/courses"} className="shrink-0 text-decoration-none">
-                              <button type="button" className="px-5 py-2.5 bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:brightness-110 text-white rounded-xl font-semibold text-xs shadow-[0_4px_15px_rgba(80,82,238,0.3)] hover:shadow-[0_6px_20px_rgba(80,82,238,0.4)] hover:-translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer">
-                                <span>{mod.action_text || "▶ Tiếp tục học ➔"}</span>
-                              </button>
-                            </Link>
+                      <div key={mod.id || i} className="bg-gradient-to-r from-white via-[#F6F6FB] to-[#EEF2FF]/50 border-2 border-[#5052EE]/35 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-4 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-[#5052EE]/5 rounded-bl-[100%] pointer-events-none" />
+                        <div className="space-y-2 relative z-10">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-semibold text-[#5052EE] bg-[#EEF2FF] px-2.5 py-0.5 rounded-md border border-[#5052EE]/20">{mod.module_number}</span>
+                            <span className="text-[10px] font-medium text-[#D97706] bg-[#FFF8EB] px-2 py-0.5 rounded-md border border-[#D97706]/20">⚡ Đang học</span>
                           </div>
-
-                          {/* Progress Bar inside Active Card */}
-                          <div className="space-y-1 pt-3 border-t border-[#EAEAF4]/80">
-                            <div className="flex items-center justify-between text-xs font-medium">
-                              <span className="text-[#64647A]">Tiến trình Module</span>
-                              <span className="text-[#5052EE] font-semibold">{mod.progress_text || `${mod.progress_percentage || 35}% Hoàn thành (3 / 8 Bài)`}</span>
+                          <h3 className="text-sm font-bold text-[#1A1A2E] line-clamp-2">{mod.title}</h3>
+                          <p className="text-xs font-normal text-[#64647A] line-clamp-2 leading-relaxed">{mod.subtitle}</p>
+                        </div>
+                        
+                        <div className="space-y-3 relative z-10">
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-[10px] font-medium">
+                              <span className="text-[#64647A]">Tiến trình</span>
+                              <span className="text-[#5052EE] font-semibold">{mod.progress_text || `${mod.progress_percentage || 35}%`}</span>
                             </div>
-                            <div className="w-full h-2 bg-[#F0F0F8] rounded-full overflow-hidden p-0.5 border border-[#EAEAF4]">
+                            <div className="w-full h-1.5 bg-[#F0F0F8] rounded-full overflow-hidden border border-[#EAEAF4]/50">
                               <div 
-                                className="h-full bg-gradient-to-r from-[#4648D4] to-[#0D9488] rounded-full shadow-xs transition-all duration-1000" 
+                                className="h-full bg-gradient-to-r from-[#4648D4] to-[#0D9488] rounded-full" 
                                 style={{ width: `${mod.progress_percentage || 35}%` }}
                               />
                             </div>
                           </div>
+                          <Link href={mod.action_link || "/courses"} className="block text-decoration-none">
+                            <button type="button" className="w-full py-2 bg-gradient-to-r from-[#4648D4] to-[#0D9488] hover:brightness-110 text-white rounded-xl font-semibold text-xs shadow-sm transition-all cursor-pointer text-center">
+                              {mod.action_text || "▶ Tiếp tục học"}
+                            </button>
+                          </Link>
                         </div>
                       </div>
                     );
@@ -319,34 +418,25 @@ export function ProgressContent() {
 
                   // Locked fallback
                   return (
-                    <div key={mod.id || i} className="relative flex items-start gap-5 opacity-75 hover:opacity-100 transition-opacity">
-                      <div className="relative z-10 w-8 h-8 rounded-full bg-[#F3F4F6] border-2 border-white text-[#9CA3AF] flex items-center justify-center shrink-0 shadow-sm mt-1">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
-                      </div>
-
-                      <div className="flex-1 bg-white border border-[#EAEAF4] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-semibold text-[#64647A] bg-[#EAEAF4] px-2 py-0.5 rounded-md">{mod.module_number}</span>
-                            <span className="text-xs font-normal text-[#9CA3AF]">{mod.lesson_count_text}</span>
-                          </div>
-                          <h3 className="text-sm sm:text-base font-semibold text-[#4B5563]">{mod.title}</h3>
-                          <p className="text-xs font-normal text-[#9CA3AF] leading-relaxed">{mod.subtitle}</p>
+                    <div key={mod.id || i} className="bg-white border border-[#EAEAF4] rounded-2xl p-5 opacity-75 hover:opacity-100 transition-opacity flex flex-col justify-between gap-4 shadow-sm">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-semibold text-[#64647A] bg-[#EAEAF4] px-2 py-0.5 rounded-md">{mod.module_number}</span>
+                          <span className="text-[10px] font-normal text-[#9CA3AF]">{mod.lesson_count_text}</span>
                         </div>
-
-                        <span className="shrink-0 px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#64647A] font-medium text-xs border border-[#EAEAF4] flex items-center gap-1.5">
-                          <span>{mod.action_text || "🔒 Cần hoàn tất Module trước"}</span>
+                        <h3 className="text-sm font-semibold text-[#4B5563] line-clamp-2">{mod.title}</h3>
+                        <p className="text-xs font-normal text-[#9CA3AF] line-clamp-2 leading-relaxed">{mod.subtitle}</p>
+                      </div>
+                      <div className="pt-3 border-t border-[#EAEAF4]/60">
+                        <span className="block w-full text-center px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#64647A] font-medium text-[11px] border border-[#EAEAF4]">
+                          {mod.action_text || "🔒 Cần hoàn tất Module trước"}
                         </span>
                       </div>
                     </div>
                   );
                 })}
-
               </div>
-            </div>
+            )}
 
           </div>
 

@@ -48,17 +48,22 @@ export default async function PaymentCallbackPage({ searchParams }: Props) {
         }, {} as Record<string, string>)
       ).toString();
 
-      const callbackRes = await fetch(`${apiUrl}/student/payments/callback/vnpay?${queryString}&current_user_id=201`, { 
+      const isVnPay = !!params.vnp_SecureHash;
+      const endpoint = isVnPay 
+        ? `${apiUrl}/student/payments/callback/vnpay?${queryString}&current_user_id=201`
+        : `${apiUrl}/student/orders/transaction/${transactionId}`;
+
+      const callbackRes = await fetch(endpoint, { 
         method: "GET",
-        headers: { "Accept": "application/json" },
+        headers,
         cache: "no-store" 
       });
 
       if (callbackRes.ok) {
         const result = await callbackRes.json();
         if (result.data) {
-          const payment = result.data;
-          isSuccess = payment.status === "completed";
+          const paymentOrOrder = result.data;
+          isSuccess = paymentOrOrder.status === "completed";
 
           if (isSuccess && payment.metadata) {
             const metaCourseIds = payment.metadata.course_ids;

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { readStoredUser } from "@/src/shared/lib/userStorage";
@@ -261,9 +262,9 @@ export function DashboardTopbar() {
               </button>
             </div>
           ) : isMounted && !isLoggedIn ? (
-            <div className="flex items-center gap-3">
-              <a href="/login" className="px-4 py-2 text-sm font-semibold text-[#64647A] hover:text-[#1A1A2E] hover:bg-[#F4F4FA] rounded-xl transition-all text-decoration-none">Đăng nhập</a>
-              <a href="/login?mode=register" className="px-4 py-2 text-sm font-semibold text-white bg-[#4648D4] hover:bg-[#5052EE] rounded-xl transition-all shadow-sm text-decoration-none">Đăng ký</a>
+            <div className="flex items-center gap-3 relative z-[9999] pointer-events-auto">
+              <Link href="/login" onClick={() => { document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;"; document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;"; }} className="px-4 py-2 text-sm font-semibold text-[#64647A] hover:text-[#1A1A2E] hover:bg-[#F4F4FA] rounded-xl transition-all relative z-[9999]">Đăng nhập</Link>
+              <Link href="/login?mode=register" onClick={() => { document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;"; document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;"; }} className="px-4 py-2 text-sm font-semibold text-white bg-[#4648D4] hover:bg-[#5052EE] rounded-xl transition-all shadow-sm relative z-[9999]">Đăng ký</Link>
             </div>
           ) : null}
 

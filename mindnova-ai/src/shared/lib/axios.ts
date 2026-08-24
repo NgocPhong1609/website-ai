@@ -53,8 +53,17 @@ axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Có thể dispatch event đăng xuất hoặc redirect về /login ở đây
       console.warn("Unauthorized, token may be expired.");
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem("accessToken");
+        // Clear cookies so Next.js middleware doesn't get confused
+        document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        // Only redirect if we are not already on the login page
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
+      }
     }
     return Promise.reject(error);
   }
