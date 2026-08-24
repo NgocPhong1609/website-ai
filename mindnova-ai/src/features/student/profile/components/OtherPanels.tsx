@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { MonitorIcon } from "./icons";
 
@@ -128,12 +128,107 @@ export function SettingsPanel() {
   const [notifications, setNotifications] = useState(true);
   const [weeklyReport, setWeeklyReport] = useState(true);
   const [aiSuggestions, setAiSuggestions] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Load settings from backend on mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const response = await axiosClient.get("/api/profile");
+        if (response.data?.data) {
+          const userData = response.data.data;
+          setNotifications(userData.notification_email !== false);
+          setWeeklyReport(userData.weekly_report !== false);
+          setAiSuggestions(userData.ai_suggestions !== false);
+        }
+      } catch (error) {
+        console.error("Failed to load settings:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  // Save setting to backend
+  const saveSetting = async (key: string, value: boolean) => {
+    setIsSaving(true);
+    try {
+      await axiosClient.post("/api/profile/settings", {
+        [key]: value,
+      });
+    } catch (error) {
+      console.error("Failed to save setting:", error);
+      alert("Không thể lưu cài đặt. Vui lòng thử lại.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Handle notification toggle
+  const handleNotificationToggle = () => {
+    const newValue = !notifications;
+    setNotifications(newValue);
+    saveSetting("notification_email", newValue);
+  };
+
+  // Handle weekly report toggle
+  const handleWeeklyReportToggle = () => {
+    const newValue = !weeklyReport;
+    setWeeklyReport(newValue);
+    saveSetting("weekly_report", newValue);
+  };
+
+  // Handle AI suggestions toggle
+  const handleAiSuggestionsToggle = () => {
+    const newValue = !aiSuggestions;
+    setAiSuggestions(newValue);
+    saveSetting("ai_suggestions", newValue);
+  };
 
   const toggles = [
-    { id: "notif",  label: "Thông báo qua Email",       description: "Nhận thông báo cập nhật khoá học mới và lời nhắc học tập mỗi ngày.", value: notifications, set: setNotifications },
-    { id: "weekly", label: "Báo cáo Tiến độ Hàng tuần",  description: "Tự động nhận bản tóm tắt thống kê chuyên cần và hiệu suất vào mỗi cuối tuần.", value: weeklyReport,   set: setWeeklyReport   },
-    { id: "ai-sug", label: "Gợi ý AI Cá nhân hoá",      description: "Cho phép Trợ lý Nova AI phân tích chuyên sâu và chủ động điều chỉnh syllabus.", value: aiSuggestions,  set: setAiSuggestions  },
+    { 
+      id: "notif", 
+      label: "Thông báo qua Email", 
+      description: "Nhận thông báo cập nhật khoá học mới và lời nhắc học tập mỗi ngày.", 
+      value: notifications, 
+      handler: handleNotificationToggle 
+    },
+    { 
+      id: "weekly", 
+      label: "Báo cáo Tiến độ Hàng tuần", 
+      description: "Tự động nhận bản tóm tắt thống kê chuyên cần và hiệu suất vào mỗi cuối tuần.", 
+      value: weeklyReport, 
+      handler: handleWeeklyReportToggle 
+    },
+    { 
+      id: "ai-sug", 
+      label: "Gợi ý AI Cá nhân hoá", 
+      description: "Cho phép Trợ lý Nova AI phân tích chuyên sâu và chủ động điều chỉnh syllabus.", 
+      value: aiSuggestions, 
+      handler: handleAiSuggestionsToggle 
+    },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="border-b border-[#EAEAF4] pb-4">
+          <h2 className="text-base sm:text-lg font-semibold text-[#1A1A2E] tracking-normal">Cài đặt Thông báo &amp; Hệ thống</h2>
+          <p className="text-xs sm:text-sm font-normal text-[#7878A0] mt-1 leading-relaxed">
+            Tùy biến trải nghiệm rèn luyện trực tuyến và các kênh tương tác của hệ thống.
+          </p>
+        </div>
+        <div className="animate-pulse">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-20 bg-[#F0F0F8] rounded-2xl mb-3.5" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -145,11 +240,11 @@ export function SettingsPanel() {
       </div>
 
       <div className="flex flex-col gap-3.5">
-        {toggles.map(({ id, label, description, value, set }) => (
+        {toggles.map(({ id, label, description, value, handler }) => (
           <div
             key={id}
-            onClick={() => set(!value)}
-            className="group flex items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl border border-[#E2E4F0] bg-[#F8FAFC]/70 hover:bg-white transition-all duration-200 shadow-2xs hover:shadow-sm cursor-pointer"
+            onClick={handler}
+            className={`group flex items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl border border-[#E2E4F0] bg-[#F8FAFC]/70 hover:bg-white transition-all duration-200 shadow-2xs hover:shadow-sm ${isSaving ? "opacity-75 cursor-not-allowed" : "cursor-pointer"}`}
           >
             <div className="space-y-1">
               <p className="text-sm font-semibold text-[#1A1A2E] group-hover:text-[#5052EE] transition-colors">{label}</p>
@@ -161,9 +256,10 @@ export function SettingsPanel() {
               aria-checked={value}
               onClick={(e) => {
                 e.stopPropagation();
-                set(!value);
+                handler();
               }}
-              className={`relative w-12 h-6.5 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#5052EE]/30 shrink-0 cursor-pointer ${
+              disabled={isSaving}
+              className={`relative w-12 h-6.5 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#5052EE]/30 shrink-0 ${isSaving ? "cursor-not-allowed" : "cursor-pointer"} ${
                 value ? "bg-gradient-to-r from-[#5052EE] via-[#6063EE] to-[#0D9488]" : "bg-[#CBD5E1]"
               }`}
             >

@@ -126,11 +126,11 @@ export function AdminNotificationsPage() {
   };
 
   return (
-    <div className="space-y-6 p-6 lg:p-8 [font-family:var(--font-admin-body)]">
-      <section className="mn-stagger rounded-[30px] border border-cyan-200/20 bg-[linear-gradient(125deg,#14213d_0%,#113a63_45%,#0f766e_100%)] p-6 text-white shadow-[0_30px_70px_-30px_rgba(13,23,56,0.95)]">
-        <p className="text-xs uppercase tracking-[0.35em] text-cyan-100/70">PB-036 · Email Notification</p>
-        <h1 className="mt-2 text-3xl font-semibold [font-family:var(--font-admin-head)]">Gửi email thông báo từ trang quản trị</h1>
-        <p className="mt-2 max-w-3xl text-sm text-slate-200/90">
+    <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+      <section className="mn-stagger rounded-2xl border border-cyan-200/20 bg-[linear-gradient(125deg,#14213d_0%,#113a63_45%,#0f766e_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
+        <p className="text-[10px] uppercase tracking-[0.35em] text-cyan-100/70">PB-036 · Email Notification</p>
+        <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Gửi email thông báo từ trang quản trị</h1>
+        <p className="mt-1 max-w-3xl text-xs text-slate-200/90">
           Soạn nội dung thông báo và đưa vào queue để hệ thống gửi nền. Endpoint sử dụng: POST /api/admin/notifications/test-email.
         </p>
       </section>

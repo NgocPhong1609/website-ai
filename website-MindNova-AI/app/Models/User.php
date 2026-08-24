@@ -13,8 +13,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'google_id', 'avatar_url', 'status', 'last_login_at', 'is_locked'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -32,10 +30,14 @@ class User extends Authenticatable
         'last_login_at',
         'is_locked',
         'role',
+        'notification_email',
+        'weekly_report',
+        'ai_suggestions',
     ];
 
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     protected $appends = [
@@ -49,6 +51,9 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_locked' => 'boolean',
             'teacher_verified_at' => 'datetime',
+            'notification_email' => 'boolean',
+            'weekly_report' => 'boolean',
+            'ai_suggestions' => 'boolean',
         ];
     }
 

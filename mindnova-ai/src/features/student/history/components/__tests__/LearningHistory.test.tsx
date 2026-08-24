@@ -25,7 +25,14 @@ const mockData = {
         { id: 'i2', type: 'lesson', title: 'Test Lesson' }
       ]
     }
-  ]
+  ],
+  pagination: {
+    current_page: 1,
+    per_page: 10,
+    total_items: 2,
+    total_pages: 1,
+    has_more: false,
+  },
 };
 
 describe('LearningHistory', () => {

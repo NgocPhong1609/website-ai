@@ -44,38 +44,24 @@ export function DashboardTopbar() {
   const [showNotif, setShowNotif] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<any | null>(null);
   const [user, setUser] = useState<any>(null);
-
-<<<<<<< HEAD
-  const syncUserFromStorage = () => {
-    const storedUser = readStoredUser();
-    setUser(storedUser ?? null);
-  };
-=======
-  // Initialize token & userId from localStorage
   const [token, setToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
 
-  // Kiểm tra trạng thái đăng nhập khi component được tải lên trình duyệt
-  useEffect(() => {
-    setIsMounted(true);
-    const storedToken = window.localStorage.getItem("accessToken");
-    setToken(storedToken);
-    
+  const chatUnreadCount = useChatGlobalUnread(token, userId);
+
+  const syncUserFromStorage = () => {
+    const storedUser = readStoredUser();
+    setUser(storedUser ?? null);
+
     const userInfoRaw = window.localStorage.getItem("userInfo");
     if (userInfoRaw) {
       try {
         setUserId(JSON.parse(userInfoRaw).id);
-      } catch(e) {}
+      } catch (e) {
+        console.error("Failed to parse userInfo", e);
+      }
     }
-
-    if (storedToken) {
-      setIsLoggedIn(true);
-      fetchNotifications();
-    }
-  }, []);//không phải bị lỗi đâu đừng có xóa
->>>>>>> e340ed07a201fdd23988545e9dc40b471e7686da
-
-  const chatUnreadCount = useChatGlobalUnread(token, userId);
+  };
 
   const fetchNotifications = async () => {
     try {
@@ -91,8 +77,11 @@ export function DashboardTopbar() {
   useEffect(() => {
     setIsMounted(true);
     syncUserFromStorage();
-    const token = window.localStorage.getItem("accessToken");
-    if (token) {
+
+    const storedToken = window.localStorage.getItem("accessToken");
+    setToken(storedToken);
+
+    if (storedToken) {
       setIsLoggedIn(true);
       fetchNotifications();
     }

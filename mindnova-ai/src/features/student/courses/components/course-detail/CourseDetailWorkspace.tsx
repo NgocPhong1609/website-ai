@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Loader } from "@/src/shared/components/ui/Loader";
-import { useAuth } from "@/src/shared/hooks/useAuth";
 import { useGetCourseDetail, useGetCourseReviews, useCreateCourseReview, useUpdateCourseReview, useDeleteCourseReview } from "../../api";
 import { CourseHeader } from "./CourseHeader";
 import { CurriculumAccordion } from "./CurriculumAccordion";
@@ -13,15 +12,12 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
   const createReviewMutation = useCreateCourseReview();
   const updateReviewMutation = useUpdateCourseReview();
   const deleteReviewMutation = useDeleteCourseReview();
-  const { user } = useAuth();
-  const currentUserId = Number(user?.id ?? 0);
-
   const [rating, setRating] = React.useState(5);
   const [comment, setComment] = React.useState("");
   const [submitError, setSubmitError] = React.useState("");
   const [editingReviewId, setEditingReviewId] = React.useState<string | number | null>(null);
-  const [editingRating, setEditingRating] = React.useState(5);
-  const [editingComment, setEditingComment] = React.useState("");
+  const [editRating, setEditRating] = React.useState(5);
+  const [editComment, setEditComment] = React.useState("");
 
   const reviews = reviewsData?.reviews ?? [];
   const averageRating = reviewsData?.average_rating ?? 0;
@@ -50,58 +46,40 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
     }
   };
 
-  const onStartEdit = (review: { id: string | number; rating: number; comment: string }) => {
+  const handleEdit = (review: typeof reviews[0]) => {
     setEditingReviewId(review.id);
-    setEditingRating(review.rating);
-    setEditingComment(review.comment);
-    setSubmitError("");
+    setEditRating(review.rating);
+    setEditComment(review.comment);
   };
 
-  const onSubmitEdit = async (e: React.FormEvent) => {
+  const handleEditSubmit = async (e: React.FormEvent, reviewId: string | number) => {
     e.preventDefault();
-    if (!editingReviewId) return;
-
-    if (!editingComment.trim()) {
-      setSubmitError("Vui lòng nhập nội dung nhận xét trước khi sửa.");
-      return;
-    }
+    if (!editComment.trim()) return;
 
     try {
       await updateReviewMutation.mutateAsync({
         courseId,
-        reviewId: editingReviewId,
-        rating: editingRating,
-        comment: editingComment.trim(),
+        reviewId,
+        rating: editRating,
+        comment: editComment.trim(),
       });
-
       setEditingReviewId(null);
-      setEditingComment("");
-      setEditingRating(5);
-      setSubmitError("");
     } catch (error: any) {
-      const message = error?.response?.data?.message || "Không thể cập nhật nhận xét.";
-      setSubmitError(message);
+      alert(error?.response?.data?.message || "Không thể cập nhật nhận xét.");
     }
   };
 
-  const onDeleteReview = async (reviewId: string | number) => {
-    if (!window.confirm("Bạn có chắc muốn xoá nhận xét này?")) {
-      return;
-    }
+  const handleDelete = async (reviewId: string | number) => {
+    if (!window.confirm("Bạn có chắc muốn xóa nhận xét này?")) return;
 
     try {
-      await deleteReviewMutation.mutateAsync({ courseId, reviewId });
-      setEditingReviewId((prev) => (prev === reviewId ? null : prev));
+      await deleteReviewMutation.mutateAsync({
+        courseId,
+        reviewId,
+      });
     } catch (error: any) {
-      const message = error?.response?.data?.message || "Không thể xoá nhận xét.";
-      setSubmitError(message);
+      alert(error?.response?.data?.message || "Không thể xóa nhận xét.");
     }
-  };
-
-  const isOwnReview = (review: { user_id?: number | string; user?: { id?: number | string } }) => {
-    const reviewUserId = review.user_id ?? review.user?.id;
-    if (!reviewUserId) return false;
-    return Number(reviewUserId) === currentUserId;
   };
 
   return (
@@ -163,100 +141,85 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
             Chưa có nhận xét nào cho khóa học này.
           </div>
         ) : (
-          reviews.map((review) => {
-            const ownReview = isOwnReview(review);
-            const isEditing = editingReviewId === review.id;
-
-            return (
-              <div key={review.id} className="rounded-2xl border border-[#E7E8F2] bg-[#F8FAFC] p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#5052EE] to-[#7C3AED] text-sm font-bold text-white">
-                      {(review.user?.name ?? "H").charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-[#1A1A2E]">{review.user?.name ?? "Học viên"}</p>
-                      <p className="text-xs text-[#64647A]">{new Date(review.created_at ?? Date.now()).toLocaleDateString("vi-VN")}</p>
-                    </div>
+          reviews.map((review) => (
+            <div key={review.id} className="rounded-2xl border border-[#E7E8F2] bg-[#F8FAFC] p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#5052EE] to-[#7C3AED] text-sm font-bold text-white">
+                    {(review.user?.name ?? "H").charAt(0).toUpperCase()}
                   </div>
+                  <div>
+                    <p className="font-semibold text-[#1A1A2E]">{review.user?.name ?? "Học viên"}</p>
+                    <p className="text-xs text-[#64647A]">{new Date(review.created_at ?? Date.now()).toLocaleDateString("vi-VN")}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
                   <div className="rounded-full bg-[#FFF7ED] px-2 py-1 text-xs font-semibold text-[#C2410C]">
                     {"★".repeat(review.rating)}{review.rating ? "" : ""}
                   </div>
                 </div>
-
-                {isEditing ? (
-                  <form onSubmit={onSubmitEdit} className="mt-4 space-y-3">
-                    <div className="flex items-center gap-2">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          onClick={() => setEditingRating(star)}
-                          className={`text-2xl transition ${star <= editingRating ? "text-yellow-400" : "text-slate-300"}`}
-                          aria-label={`Chọn ${star} sao cho chỉnh sửa`}
-                        >
-                          ★
-                        </button>
-                      ))}
-                    </div>
-
-                    <textarea
-                      value={editingComment}
-                      onChange={(e) => setEditingComment(e.target.value)}
-                      rows={4}
-                      className="w-full resize-none rounded-xl border border-[#D8DCEB] bg-white px-4 py-3 text-sm text-[#1A1A2E] outline-none transition focus:border-[#5052EE]"
-                    />
-
-                    <div className="flex justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditingReviewId(null);
-                          setEditingComment("");
-                          setEditingRating(5);
-                          setSubmitError("");
-                        }}
-                        className="rounded-lg border border-[#D8DCEB] bg-white px-3 py-2 text-sm font-medium text-[#475569]"
-                      >
-                        Huỷ
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={updateReviewMutation.isPending || !editingComment.trim()}
-                        className="rounded-lg bg-[#5052EE] px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-[#B9C0FF]"
-                      >
-                        {updateReviewMutation.isPending ? "Đang lưu..." : "Lưu"}
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <>
-                    <p className="mt-3 text-sm leading-6 text-[#2F374B]">{review.comment}</p>
-
-                    {ownReview && (
-                      <div className="mt-3 flex justify-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() => onStartEdit(review)}
-                          className="rounded-lg border border-[#C7D2FE] bg-[#EEF2FF] px-3 py-1.5 text-xs font-semibold text-[#3730A3]"
-                        >
-                          Sửa
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onDeleteReview(review.id)}
-                          disabled={deleteReviewMutation.isPending}
-                          className="rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-1.5 text-xs font-semibold text-[#B91C1C] disabled:cursor-not-allowed"
-                        >
-                          {deleteReviewMutation.isPending ? "Đang xoá..." : "Xoá"}
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
               </div>
-            );
-          })
+
+              {editingReviewId === review.id ? (
+                <form onSubmit={(e) => handleEditSubmit(e, review.id)} className="mt-3 flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setEditRating(star)}
+                        className={`text-xl transition ${star <= editRating ? "text-yellow-400" : "text-slate-300"}`}
+                        aria-label={`Chọn ${star} sao`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    value={editComment}
+                    onChange={(e) => setEditComment(e.target.value)}
+                    rows={3}
+                    className="w-full resize-none rounded-xl border border-[#D8DCEB] bg-white px-4 py-3 text-sm text-[#1A1A2E] outline-none focus:border-[#5052EE]"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditingReviewId(null)}
+                      className="rounded-xl border border-[#E5E7EB] px-4 py-2 text-xs font-semibold text-[#64647A] hover:bg-gray-50"
+                    >
+                      Hủy
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={updateReviewMutation.isPending}
+                      className="rounded-xl bg-[#5052EE] px-4 py-2 text-xs font-semibold text-white hover:bg-[#4648D4] disabled:opacity-60"
+                    >
+                      {updateReviewMutation.isPending ? "Đang lưu..." : "Lưu"}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <p className="mt-3 text-sm leading-6 text-[#2F374B]">{review.comment}</p>
+                  <div className="mt-3 flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => handleEdit(review)}
+                      className="text-xs font-semibold text-[#5052EE] hover:text-[#4648D4] transition-colors"
+                    >
+                      Sửa
+                    </button>
+                    <button
+                      onClick={() => handleDelete(review.id)}
+                      disabled={deleteReviewMutation.isPending}
+                      className="text-xs font-semibold text-red-500 hover:text-red-700 transition-colors disabled:opacity-60"
+                    >
+                      Xóa
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          ))
         )}
       </div>
     </section>

@@ -58,6 +58,12 @@ export interface AdvancedRecommendation {
   aiMatch?: string;
 }
 
+export interface DailyGoal {
+  target: number;
+  completed: number;
+  percentage: number;
+}
+
 export interface DashboardOverview {
   user: UserProfileSummary | null;
   courses: DashboardCourse[];
@@ -66,6 +72,8 @@ export interface DashboardOverview {
   overall_progress: OverallProgress;
   study_streak: StudyStreak;
   advanced_recommendations?: AdvancedRecommendation[];
+  daily_goal?: DailyGoal;
+  weekly_activity?: Record<string, boolean>;
 }
 
 export interface DashboardApiResponse {

@@ -159,4 +159,42 @@ class CourseOutlineController extends Controller
             'message' => 'Đã lưu đề cương khóa học thành công.'
         ]);
     }
+
+    public function generateQuiz(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'content' => 'required|string',
+            'count' => 'nullable|integer',
+            'difficulty' => 'nullable|string',
+            'types' => 'nullable|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $content = $request->input('content');
+        $count = $request->input('count', 3);
+        $difficulty = $request->input('difficulty', 'intermediate');
+
+        $systemPrompt = "Bạn là chuyên gia tạo bài kiểm tra trắc nghiệm. Dựa vào nội dung tài liệu sau:\n\n{$content}\n\nHãy tạo {$count} câu hỏi trắc nghiệm ở độ khó '{$difficulty}'.\nMỗi câu hỏi gồm 'content', 'type' ('multiple_choice' hoặc 'true_false'), 'explanation' và danh sách 'answers' (mỗi answer có 'content' và 'is_correct' true/false).\n\nTrả về CHỈ JSON theo định dạng:\n{\"questions\": [ {\"content\": \"...\", \"type\": \"multiple_choice\", \"explanation\": \"...\", \"answers\": [{\"content\": \"...\", \"is_correct\": true}, {\"content\": \"...\", \"is_correct\": false}]} ]}";
+
+        try {
+            $userDto = new AiMessageDto('user', $systemPrompt);
+            $response = $this->aiRouter->sendMessage([$userDto], 'json');
+            $cleanJson = preg_replace('/^```json\s*|\s*```$/i', '', trim($response));
+            $data = json_decode($cleanJson, true);
+            $questions = $data['questions'] ?? [];
+
+            return response()->json([
+                'success' => true,
+                'data' => $questions
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi tạo bài tập AI: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

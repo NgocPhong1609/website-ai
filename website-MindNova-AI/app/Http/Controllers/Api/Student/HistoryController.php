@@ -18,17 +18,19 @@ class HistoryController extends Controller
     }
 
     /**
-     * Display chronological student activity timeline and achievements for Learning History page.
-     */
-    public function overview(Request $request): JsonResponse
-    {
-        $user = $request->user('sanctum') ?? $request->user();
-
-        $historyData = $this->historyService->getHistory($user);
-
-        return $this->successResponse(
-            new HistoryOverviewResource($historyData),
-            'Student learning history retrieved successfully.'
-        );
-    }
+      * Display chronological student activity timeline and achievements for Learning History page.
+      */
+     public function overview(Request $request): JsonResponse
+     {
+         $user = $request->user('sanctum') ?? $request->user();
+         $page = (int) $request->query('page', 1);
+         $perPage = (int) $request->query('per_page', 10);
+ 
+         $historyData = $this->historyService->getHistory($user, $page, $perPage);
+ 
+         return $this->successResponse(
+             new HistoryOverviewResource($historyData),
+             'Student learning history retrieved successfully.'
+         );
+     }
 }

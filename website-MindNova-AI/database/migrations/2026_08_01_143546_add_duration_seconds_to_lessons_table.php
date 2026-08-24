@@ -11,12 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('lessons', function (Blueprint $table) {
-            $table->integer('duration_seconds')->default(0)->after('video_url');
-            if (Schema::hasColumn('lessons', 'duration_minutes')) {
+        if (!Schema::hasColumn('lessons', 'duration_seconds')) {
+            Schema::table('lessons', function (Blueprint $table) {
+                $table->integer('duration_seconds')->default(0)->after('video_url');
+            });
+        }
+        
+        if (Schema::hasColumn('lessons', 'duration_minutes')) {
+            Schema::table('lessons', function (Blueprint $table) {
                 $table->dropColumn('duration_minutes');
-            }
-        });
+            });
+        }
     }
 
     /**

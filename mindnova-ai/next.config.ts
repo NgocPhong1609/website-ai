@@ -29,15 +29,14 @@ const nextConfig: NextConfig = {
   },
   // Proxy /api requests → Laravel backend (tránh CORS hoàn toàn)
   async rewrites() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
     return [
       {
         source: "/api/:path*",
-        destination: `${BACKEND_URL}/api/:path*`,
+        destination: `${apiUrl}/api/:path*`,
       },
     ];
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   typescript: {
     ignoreBuildErrors: true,

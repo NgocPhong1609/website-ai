@@ -1,9 +1,12 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import type { ProfileTab } from "../types";
 import { PersonalInfoIcon, SecurityIcon, SettingsIcon } from "./icons";
 import { PROFILE_TABS } from "../constants";
+import { useUploadAvatar } from "../api";
+import { writeStoredUser } from "@/src/shared/lib/userStorage";
 
 const TAB_ICON_MAP = {
   "personal-info": PersonalInfoIcon,
@@ -19,7 +22,13 @@ interface ProfileSidebarProps {
   avatarUrl?: string | null;
 }
 
-function ProfileAvatar({ name, avatarUrl }: { name: string; avatarUrl?: string | null }) {
+interface ProfileAvatarProps {
+  name: string;
+  avatarUrl?: string | null;
+  onClick?: () => void;
+}
+
+function ProfileAvatar({ name, avatarUrl, onClick }: ProfileAvatarProps) {
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -28,7 +37,7 @@ function ProfileAvatar({ name, avatarUrl }: { name: string; avatarUrl?: string |
     .join("");
 
   return (
-    <div className="relative mx-auto w-24 h-24 group cursor-pointer">
+    <div className="relative mx-auto w-24 h-24 group cursor-pointer" onClick={onClick}>
       {/* Soft elegant avatar sphere */}
       <div className="w-full h-full rounded-2xl bg-gradient-to-tr from-[#5052EE] via-[#6063EE] to-[#0D9488] p-[2px] shadow-2xs transition-all duration-300 group-hover:shadow-sm group-hover:-translate-y-0.5">
         <div className="w-full h-full rounded-2xl bg-[#F8FAFC] flex items-center justify-center relative overflow-hidden">
@@ -126,11 +135,50 @@ export function ProfileSidebar({
   major,
   avatarUrl,
 }: ProfileSidebarProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadAvatarMutation = useUploadAvatar();
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+    setLocalPreview(previewUrl);
+
+    try {
+      await uploadAvatarMutation.mutateAsync(file);
+      setLocalPreview(null);
+    } catch (error: any) {
+      console.error("Avatar upload failed:", error);
+      alert(error?.response?.data?.message || "Không thể cập nhật ảnh đại diện. Vui lòng thử lại.");
+      setLocalPreview(null);
+    } finally {
+      URL.revokeObjectURL(previewUrl);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const displayAvatarUrl = localPreview || avatarUrl;
+
   return (
     <div className="flex flex-col gap-6">
       {/* Avatar + Name */}
       <div className="flex flex-col items-center gap-3 pt-1">
-        <ProfileAvatar name={fullName} avatarUrl={avatarUrl} />
+        <ProfileAvatar name={fullName} avatarUrl={displayAvatarUrl} onClick={handleAvatarClick} />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/jpg,image/gif,image/svg+xml"
+          className="hidden"
+          onChange={handleFileChange}
+        />
         <div className="text-center space-y-1.5 mt-1">
           <p className="text-base font-semibold text-[#1A1A2E] leading-tight tracking-normal">{fullName}</p>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAF8F5] border border-[#0D9488]/20 text-[#0D9488]">

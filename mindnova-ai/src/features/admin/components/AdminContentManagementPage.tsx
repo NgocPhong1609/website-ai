@@ -213,11 +213,11 @@ export function AdminContentManagementPage() {
   };
 
   return (
-    <div className="space-y-6 p-6 lg:p-8 [font-family:var(--font-admin-body)]">
-      <section className="rounded-[28px] border border-cyan-200/20 bg-[linear-gradient(120deg,#0f172a_0%,#155e75_50%,#0f766e_100%)] p-6 text-white shadow-[0_30px_70px_-35px_rgba(7,18,45,0.8)]">
-        <p className="text-xs uppercase tracking-[0.34em] text-cyan-100/70">Content Management</p>
-        <h1 className="mt-2 text-3xl font-semibold [font-family:var(--font-admin-head)]">Quản lý khóa học</h1>
-        <p className="mt-2 text-sm text-slate-100/90">Duyệt/gỡ bài giảng, quản lý kho tài liệu mẫu, và phân loại ngân hàng câu hỏi cho AI tạo đề.</p>
+    <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+      <section className="rounded-2xl border border-cyan-200/20 bg-[linear-gradient(120deg,#0f172a_0%,#155e75_50%,#0f766e_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.8)]">
+        <p className="text-[10px] uppercase tracking-[0.34em] text-cyan-100/70">Content Management</p>
+        <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý khóa học</h1>
+        <p className="mt-1 text-xs text-slate-100/90">Duyệt/gỡ bài giảng, quản lý kho tài liệu mẫu, và phân loại ngân hàng câu hỏi cho AI tạo đề.</p>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">

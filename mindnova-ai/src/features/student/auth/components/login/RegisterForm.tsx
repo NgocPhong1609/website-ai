@@ -103,8 +103,10 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
           setErrors(apiErrors);
           throw new Error("Vui lòng kiểm tra lại thông tin.");
         }
-        throw new Error(payload?.message ?? "Đăng ký thất bại.");
+        const detailError = payload?.error || payload?.message || "Đăng ký thất bại.";
+  throw new Error(detailError);
       }
+      
 
       const token = payload?.access_token;
       const user = payload?.user;

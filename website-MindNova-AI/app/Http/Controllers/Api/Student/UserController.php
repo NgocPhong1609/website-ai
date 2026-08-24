@@ -188,4 +188,45 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Xoá bằng cấp thành công'], 200);
     }
+
+    // 8. Lưu cài đặt thông báo
+    public function saveSettings(Request $request)
+    {
+        $user = $request->user();
+
+        $validator = Validator::make($request->all(), [
+            'notification_email' => 'sometimes|boolean',
+            'weekly_report' => 'sometimes|boolean',
+            'ai_suggestions' => 'sometimes|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $settingsData = [];
+
+        if ($request->has('notification_email')) {
+            $settingsData['notification_email'] = (bool)$request->notification_email;
+        }
+
+        if ($request->has('weekly_report')) {
+            $settingsData['weekly_report'] = (bool)$request->weekly_report;
+        }
+
+        if ($request->has('ai_suggestions')) {
+            $settingsData['ai_suggestions'] = (bool)$request->ai_suggestions;
+        }
+
+        $user->update($settingsData);
+
+        return response()->json([
+            'message' => 'Cập nhật cài đặt thành công',
+            'data' => [
+                'notification_email' => $user->notification_email,
+                'weekly_report' => $user->weekly_report,
+                'ai_suggestions' => $user->ai_suggestions,
+            ]
+        ], 200);
+    }
 }

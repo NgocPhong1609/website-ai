@@ -58,7 +58,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({ conversations, activeC
                         >
                             <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
                                 {conv.course?.thumbnail ? (
-                                    <img src={conv.course.thumbnail} alt={conv.title} className="w-full h-full object-cover" />
+                                    <img src={conv.course.thumbnail} alt={conv.title || undefined} className="w-full h-full object-cover" />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-400 font-bold">
                                         {conv.title?.charAt(0) || 'G'}

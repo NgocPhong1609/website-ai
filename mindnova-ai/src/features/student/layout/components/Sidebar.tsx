@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { SidebarBrand } from "./SidebarBrand";
@@ -50,6 +50,13 @@ function MenuIcon() {
 
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    setIsLoggedIn(!!window.localStorage.getItem("accessToken"));
+  }, []);
   
   // Hàm xử lý Logout chuyên nghiệp
   const handleLogout = () => {
@@ -119,7 +126,7 @@ export default function Sidebar() {
           {!isCollapsed && <span>Upgrade to Pro</span>}
         </button>
 
-        {/* Help + Logout */}
+        {/* Help + Auth */}
         <div className="flex flex-col gap-0.5 w-full">
           <Link
             href="/help"
@@ -133,18 +140,32 @@ export default function Sidebar() {
             {!isCollapsed && <span>Help</span>}
           </Link>
           
-          <button
-            type="button"
-            onClick={handleLogout}
-            title={isCollapsed ? "Logout" : undefined}
-            className={twMerge(
-              "flex items-center rounded-lg text-[#64647A] hover:bg-red-50 hover:text-red-500 transition-all duration-150 shrink-0 cursor-pointer",
-              isCollapsed ? "justify-center w-10 h-10 mx-auto" : "gap-2.5 px-3 py-2 text-sm w-full text-left"
-            )}
-          >
-            <LogoutIcon />
-            {!isCollapsed && <span>Logout</span>}
-          </button>
+          {isMounted && isLoggedIn ? (
+            <button
+              type="button"
+              onClick={handleLogout}
+              title={isCollapsed ? "Logout" : undefined}
+              className={twMerge(
+                "flex items-center rounded-lg text-[#64647A] hover:bg-red-50 hover:text-red-500 transition-all duration-150 shrink-0 cursor-pointer",
+                isCollapsed ? "justify-center w-10 h-10 mx-auto" : "gap-2.5 px-3 py-2 text-sm w-full text-left"
+              )}
+            >
+              <LogoutIcon />
+              {!isCollapsed && <span>Logout</span>}
+            </button>
+          ) : isMounted && !isLoggedIn ? (
+            <Link
+              href="/login"
+              title={isCollapsed ? "Login" : undefined}
+              className={twMerge(
+                "flex items-center rounded-lg text-[#64647A] hover:bg-[#EEF2FF] hover:text-[#5052EE] transition-all duration-150 shrink-0 text-decoration-none",
+                isCollapsed ? "justify-center w-10 h-10 mx-auto" : "gap-2.5 px-3 py-2 text-sm w-full text-left"
+              )}
+            >
+              <LogoutIcon /> {/* Same icon rotated or just use the same for Login layout consistency, maybe a different icon but LogoutIcon is okay for now or we can use another icon. I'll just use LogoutIcon for Login since we don't have a LoginIcon predefined. Let's define a LoginIcon or just use LogoutIcon but flip it... actually let's just use LogoutIcon for now to save time, or I can add a simple svg for login. */}
+              {!isCollapsed && <span>Login</span>}
+            </Link>
+          ) : null}
         </div>
       </div>
     </aside>

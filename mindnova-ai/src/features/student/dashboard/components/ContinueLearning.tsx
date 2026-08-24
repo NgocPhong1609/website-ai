@@ -106,7 +106,7 @@ export function ContinueLearning({ courses = [] }: ContinueLearningProps) {
           </div>
           
           <Link
-            href="/courses"
+            href="/explore"
             className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold text-[#5052EE] bg-[#EEF2FF] hover:bg-[#E0E0FF] border border-[#5052EE]/20 transition-all text-decoration-none w-fit shrink-0"
           >
             <span>Khám phá khoá học ➔</span>
@@ -122,7 +122,7 @@ export function ContinueLearning({ courses = [] }: ContinueLearningProps) {
           <h3 className="text-lg font-bold text-[#1A1A2E] mb-2">Bạn chưa bắt đầu khóa học nào</h3>
           <p className="text-sm text-[#64647A] max-w-md mb-6">Hãy khám phá thư viện khóa học của chúng tôi và bắt đầu hành trình học tập của bạn ngay hôm nay.</p>
           <Link
-            href="/courses"
+            href="/explore"
             className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#4648D4] to-[#0D9488] hover:shadow-md hover:opacity-90 transition-all text-decoration-none"
           >
             Tìm khóa học
@@ -149,7 +149,7 @@ export function ContinueLearning({ courses = [] }: ContinueLearningProps) {
         </div>
         
         <Link
-          href="/courses"
+          href="/explore"
           className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold text-[#5052EE] bg-[#EEF2FF] hover:bg-[#E0E0FF] border border-[#5052EE]/20 transition-all text-decoration-none w-fit shrink-0"
         >
           <span>Xem tất cả khoá học ➔</span>

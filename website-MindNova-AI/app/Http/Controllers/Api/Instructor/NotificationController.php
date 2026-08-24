@@ -40,20 +40,20 @@ class NotificationController extends Controller
         }
 
         $notifications = [];
+        $now = now();
         foreach ($studentIds as $studentId) {
             $notifications[] = [
-                'id' => Str::uuid()->toString(),
+                'user_id' => $studentId,
                 'type' => 'instructor_announcement',
-                'notifiable_type' => \App\Models\User::class,
-                'notifiable_id' => $studentId,
-                'data' => json_encode([
-                    'title' => $request->title,
-                    'message' => $request->message,
+                'title' => $request->title,
+                'body' => $request->message,
+                'is_read' => false,
+                'metadata' => json_encode([
                     'course_id' => $course->id,
                     'instructor_name' => $request->user()->name,
                 ]),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => $now,
+                'updated_at' => $now,
             ];
         }
 

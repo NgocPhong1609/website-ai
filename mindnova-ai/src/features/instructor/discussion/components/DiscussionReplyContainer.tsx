@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -252,6 +253,7 @@ export function DiscussionReplyContainer() {
                           <div className="flex items-center gap-2 font-black text-emerald-800 text-xs">
                             <span className="w-5 h-5 rounded-md bg-emerald-600 text-white flex items-center justify-center font-bold">✓</span>
                             <span>Phản hồi của giảng viên:</span>
+                            <VerifiedTeacherBadge isVerified={true} size="xs" />
                           </div>
                           <p className="text-sm leading-relaxed pl-7">{thread.replyText}</p>
                         </div>
