@@ -32,8 +32,8 @@ export type OnboardingStep =
 
 export interface OnboardingFormData {
   goal: string;
-  level: string;
-  topics: string[];
+  currentLevel: string;
+  timeAvailable: string;
 }
 
 export type GeneratingStepStatus = "completed" | "in-progress" | "pending";

@@ -15,8 +15,8 @@ export function useOnboarding() {
   const setStep = useOnboardingStore((s) => s.setStep);
   const setProgress = useOnboardingStore((s) => s.setProgress);
   const selectGoal = useOnboardingStore((s) => s.selectGoal);
-  const selectLevel = useOnboardingStore((s) => s.selectLevel);
-  const selectTopics = useOnboardingStore((s) => s.selectTopics);
+  const selectCurrentLevel = useOnboardingStore((s) => s.selectCurrentLevel);
+  const selectTimeAvailable = useOnboardingStore((s) => s.selectTimeAvailable);
   const completeSignUp = useOnboardingStore((s) => s.completeSignUp);
   const resetOnboarding = useOnboardingStore((s) => s.resetOnboarding);
 
@@ -36,8 +36,8 @@ export function useOnboarding() {
     setStep,
     setProgress,
     selectGoal,
-    selectLevel,
-    selectTopics,
+    selectCurrentLevel,
+    selectTimeAvailable,
     completeSignUp,
     resetOnboarding,
   };

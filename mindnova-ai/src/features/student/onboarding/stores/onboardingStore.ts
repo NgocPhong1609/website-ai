@@ -16,8 +16,8 @@ interface IOnboardingState {
   setAuth: (isAuth: boolean) => void;
   setProgress: (progress: number) => void;
   selectGoal: (goal: string) => void;
-  selectLevel: (level: string) => void;
-  selectTopics: (topics: string[]) => void;
+  selectCurrentLevel: (level: string) => void;
+  selectTimeAvailable: (time: string) => void;
   completeSignUp: () => void;
   resetOnboarding: () => void;
   setGeneratedPlan: (plan: unknown) => void; // Thêm action lưu kết quả AI
@@ -25,8 +25,8 @@ interface IOnboardingState {
 
 const INITIAL_FORM_DATA: OnboardingFormData = {
   goal: "",
-  level: "",
-  topics: [],
+  currentLevel: "",
+  timeAvailable: "",
 };
 
 export const useOnboardingStore = create<IOnboardingState>((set, get) => ({
@@ -46,16 +46,16 @@ export const useOnboardingStore = create<IOnboardingState>((set, get) => ({
       currentStep: "level",
     })),
 
-  selectLevel: (level) =>
+  selectCurrentLevel: (level) =>
     set((state) => ({
-      formData: { ...state.formData, level },
+      formData: { ...state.formData, currentLevel: level },
       currentStep: "topics",
     })),
 
-  selectTopics: (topics) => {
+  selectTimeAvailable: (time) => {
     const { isAuthenticated } = get();
     set((state) => ({
-      formData: { ...state.formData, topics },
+      formData: { ...state.formData, timeAvailable: time },
       currentStep: isAuthenticated ? "generating" : "signup",
     }));
   },

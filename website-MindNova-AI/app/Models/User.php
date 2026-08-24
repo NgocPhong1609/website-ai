@@ -32,6 +32,8 @@ class User extends Authenticatable
         'last_login_at',
         'is_locked',
         'role',
+        'onboarding_data',
+        'is_onboarded',
     ];
 
     protected $hidden = [

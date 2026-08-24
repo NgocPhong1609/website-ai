@@ -13,19 +13,15 @@ import { LearningPathCard } from "./LearningPathCard";
 import { PlanSummaryCard } from "./PlanSummaryCard";
 import type { IPlanPhase } from "@/src/features/student/onboarding/types";
 
-interface IAILesson {
-  name?: string;
-  title?: string;
-  lesson_name?: string;
-  text?: string;
-  duration?: string;
+interface IAIRoadmapCourse {
+  id: number;
+  title: string;
 }
 
-interface IAIPhase {
-  phase?: number;
-  title?: string;
-  duration?: string;
-  lessons?: IAILesson[];
+export interface IAIRoadmapPhase {
+  phase_name: string;
+  description: string;
+  courses: IAIRoadmapCourse[];
 }
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -62,62 +58,26 @@ function ShieldCheckIcon() {
 
 function usePlan() {
   const router = useRouter();
-  const { goal, level, topics } = useOnboardingStore((s) => s.formData);
-  
-  const onboardingStore = useOnboardingStore() as unknown as { generatedPlan?: { profile?: { est_time?: string }; learning_path?: IAIPhase[] } };
+  const { goal, currentLevel, timeAvailable } = useOnboardingStore((s) => s.formData);
+  const onboardingStore = useOnboardingStore() as unknown as { generatedPlan?: { phases?: IAIRoadmapPhase[] } };
   const generatedPlan = onboardingStore.generatedPlan;
-  const aiPhases = generatedPlan?.learning_path;
-
-  const unlockedPhases = useMemo(() => {
-    const cfg = LEVEL_PHASE_CONFIG[level];
-    return cfg?.unlockedPhases ?? 1;
-  }, [level]);
+  const phases = generatedPlan?.phases || [];
 
   const estimatedTime = useMemo(() => {
-    if (generatedPlan?.profile?.est_time) {
-      return generatedPlan.profile.est_time;
-    }
-    const count = topics.length;
-    const complexity =
-      COMPLEXITY_CONFIG.find((c) => count <= c.maxTopics) ??
-      COMPLEXITY_CONFIG[COMPLEXITY_CONFIG.length - 1];
-    const TIME_MAP: Record<number, string> = {
-      0: "—", 1: "2–4 weeks", 2: "1–2 months", 3: "2–3 months", 4: "3–5 months", 5: "5–8 months",
-    };
-    return TIME_MAP[complexity.level] ?? "—";
-  }, [generatedPlan, topics]);
+    return timeAvailable || "—";
+  }, [timeAvailable]);
 
-  const phases = useMemo((): IPlanPhase[] => {
-    if (aiPhases && Array.isArray(aiPhases)) {
-      return aiPhases.map((p: IAIPhase, idx: number) => ({
-        id: p.phase || idx + 1,
-        title: p.title || `Phase ${idx + 1}`,
-        duration: p.duration || "2-4 weeks",
-        items: (p.lessons || []).map((l: IAILesson, lIdx: number) => {
-          const lessonName = l.name || l.title || l.lesson_name || l.text || `Lesson ${lIdx + 1}`;
-          return {
-            id: lIdx + 1,
-            label: lessonName,
-            title: lessonName,
-            duration: l.duration || "1 week",
-            status: idx < unlockedPhases ? (idx === 0 && lIdx === 0 ? "ready" : "upcoming") : "locked",
-          };
-        }),
-      }));
-    }
 
-    return [];
-  }, [aiPhases, unlockedPhases]);
 
   const handleStart = useCallback(() => {
-    router.push("/");
-  }, [router]);
+    window.location.href = "/study-plan";
+  }, []);
 
   const handleBack = useCallback(() => {
     router.push("/onboarding/topics");
   }, [router]);
 
-  return { goal, level, topics, unlockedPhases, estimatedTime, phases, handleStart, handleBack };
+  return { goal, currentLevel, timeAvailable, estimatedTime, phases, handleStart, handleBack };
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -163,13 +123,13 @@ function CelebrationBanner({ goal }: { goal: string }) {
 
 export default function PlanContainer() {
   const {
-    goal, level, topics,
-    unlockedPhases, estimatedTime,
+    goal, currentLevel, timeAvailable,
+    estimatedTime,
     phases, handleStart, handleBack,
   } = usePlan();
 
   return (
-    <div className="w-full flex flex-col items-center gap-8 px-6 py-12">
+    <div className="w-full flex flex-col items-center gap-8 px-6 pt-12 pb-40">
       <StepBadge />
 
       <div className="flex flex-col items-center gap-3 text-center max-w-2xl">
@@ -187,11 +147,11 @@ export default function PlanContainer() {
       <CelebrationBanner goal={goal} />
 
       <div className="flex items-start gap-5 w-full max-w-4xl">
-        <LearningPathCard phases={phases} unlockedPhases={unlockedPhases} />
+        <LearningPathCard phases={phases} />
         <PlanSummaryCard
           goal={goal}
-          level={level}
-          topics={topics}
+          level={currentLevel}
+          topics={[timeAvailable]}
           estimatedTime={estimatedTime}
         />
       </div>

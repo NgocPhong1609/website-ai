@@ -56,11 +56,42 @@ class DashboardService
             $courses = collect();
         }
 
+        // Add the AI Onboarding Generated Plan to courses
+        if ($user && $user->is_onboarded && $user->onboarding_data) {
+            $onboarding = is_string($user->onboarding_data) ? json_decode($user->onboarding_data, true) : $user->onboarding_data;
+            if ($onboarding && isset($onboarding['goal'])) {
+                $aiPlanTitle = "Lộ trình AI: " . $onboarding['goal'];
+                
+                $learningPath = $onboarding['ai_plan']['learning_path'] ?? [];
+                $nextLesson = $learningPath[0]['lessons'][0]['name'] ?? 'Bắt đầu lộ trình đặc biệt của bạn';
+
+                $courses->prepend([
+                    'id' => 'ai-custom-' . $user->id,
+                    'title' => $aiPlanTitle,
+                    'next_lesson' => $nextLesson,
+                    'progress' => 0,
+                    'thumbnail_gradient' => 'from-[#6B6BFF] via-[#818cf8] to-[#4cd7f6]',
+                    'thumbnail_url' => 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=600&auto=format&fit=crop',
+                ]);
+            }
+        }
+
         // 2. AI Recommended Focus Areas (Mock based on progress)
         $focusAreas = [];
 
         // 3. AI Suggestion Box
         $aiSuggestion = null;
+        if ($user && $user->is_onboarded && $user->onboarding_data) {
+            $onboarding = is_string($user->onboarding_data) ? json_decode($user->onboarding_data, true) : $user->onboarding_data;
+            if ($onboarding && isset($onboarding['goal'])) {
+                $topicsText = is_array($onboarding['topics'] ?? null) ? implode(', ', $onboarding['topics']) : 'các chủ đề đã chọn';
+                $aiSuggestion = [
+                    'message' => 'Dựa trên mục tiêu "' . $onboarding['goal'] . '", bạn nên tập trung vào ' . $topicsText . ' để đạt hiệu quả cao nhất trong tuần này.',
+                    'action_text' => 'Tiếp tục lộ trình AI',
+                    'action_url' => '/study-plan'
+                ];
+            }
+        }
 
         // 5. Overall Stats & Streak
         $overallProgressPct = 0;

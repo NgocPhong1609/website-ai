@@ -48,8 +48,64 @@ class StudyPlanService
         $lessonResources = [];
         $courseTitle = 'Chưa có khóa học';
 
-        // Get latest active enrollment
-        if ($userId && class_exists(\App\Models\Enrollment::class)) {
+        // 1. Try to load AI Onboarding Plan FIRST
+        $hasAiPlan = false;
+        if ($user && $user->is_onboarded && $user->onboarding_data) {
+            $onboarding = is_string($user->onboarding_data) ? json_decode($user->onboarding_data, true) : $user->onboarding_data;
+            if (isset($onboarding['ai_plan']) && isset($onboarding['ai_plan']['learning_path']) && !empty($onboarding['ai_plan']['learning_path'])) {
+                $hasAiPlan = true;
+                $learningPath = $onboarding['ai_plan']['learning_path'];
+                
+                $courseTitle = 'Lộ trình AI: ' . ($onboarding['goal'] ?? 'Cá nhân hóa');
+                $totalModules = count($learningPath);
+                
+                $currentModuleIndex = 1;
+                $currentModuleTitle = $learningPath[0]['title'] ?? 'Bắt đầu học';
+                $completedTopics = 0;
+                $totalTopics = 0;
+                
+                foreach ($learningPath as $phase) {
+                    $lessons = $phase['lessons'] ?? [];
+                    $totalTopics += count($lessons);
+                    
+                    if ($phase['phase'] == $currentModuleIndex) {
+                        $currentModuleTitle = $phase['title'] ?? $currentModuleTitle;
+                        foreach ($lessons as $idx => $les) {
+                            if (count($coreConcepts) < 5) {
+                                $coreConcepts[] = [
+                                    'id' => 'concept-ai-' . $phase['phase'] . '-' . $idx,
+                                    'title' => mb_substr($les['name'] ?? 'Chủ đề', 0, 40, 'UTF-8'),
+                                    'status' => $idx === 0 ? 'In Progress' : 'Queued',
+                                    'status_color' => $idx === 0 ? 'amber' : 'neutral',
+                                    'description' => ($les['duration'] ?? 'Chưa rõ') . ' học',
+                                ];
+                            }
+                        }
+                    }
+                }
+                
+                $lessonResources = [
+                    ['id' => 'res-ai-1', 'type' => 'pdf', 'title' => 'Tổng quan lộ trình ' . ($onboarding['goal'] ?? ''), 'meta' => 'Tài liệu AI', 'url' => '#'],
+                    ['id' => 'res-ai-2', 'type' => 'video', 'title' => 'Hướng dẫn tiếp cận ' . ($onboarding['topics'][0] ?? 'chủ đề'), 'meta' => 'Bài giảng AI', 'url' => '#']
+                ];
+
+                $activeSyllabus = [
+                    'id' => 'ai-custom-' . $userId,
+                    'title' => $courseTitle,
+                    'current_module_index' => $currentModuleIndex,
+                    'total_modules' => $totalModules,
+                    'module_title' => $currentModuleTitle,
+                    'description' => 'Lộ trình học tập được AI thiết kế riêng dựa trên mục tiêu của bạn.',
+                    'progress_percentage' => 0,
+                    'completed_topics' => 0,
+                    'total_topics' => $totalTopics,
+                    'status_badge' => 'Bắt đầu',
+                ];
+            }
+        }
+
+        // 2. Get latest active enrollment ONLY if no AI Plan exists
+        if (!$hasAiPlan && $userId && class_exists(\App\Models\Enrollment::class)) {
             $enrollment = \App\Models\Enrollment::with('course.modules.lessons')->where('user_id', $userId)->latest('enrolled_at')->first();
             
             if ($enrollment && $enrollment->course) {

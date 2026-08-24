@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import type { IPlanPhase, IPlanItem, PlanItemStatus } from "@/src/features/student/onboarding/types";
+import type { IAIRoadmapPhase } from "./PlanContainer";
 import { LessonDetailModal } from "./LessonDetailModal";
 import { useOnboardingStore } from "@/src/features/student/onboarding/stores/onboardingStore";
 
@@ -54,46 +54,31 @@ function PhaseIcon({ status }: { status: PlanItemStatus }) {
 // ─── Phase header badge ────────────────────────────────────────────────────────
 
 interface PhaseHeaderProps {
-  phase: IPlanPhase;
+  phase: IAIRoadmapPhase;
   phaseIndex: number;
-  isUnlocked: boolean;
 }
 
-function PhaseHeader({ phase, phaseIndex, isUnlocked }: PhaseHeaderProps) {
+function PhaseHeader({ phase, phaseIndex }: PhaseHeaderProps) {
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center gap-2.5">
         <div
           className={twMerge(
             "w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0",
-            isUnlocked
-              ? "bg-gradient-to-br from-[#6B6BFF] to-[#4648D4] text-white shadow-[0_2px_8px_rgba(107,107,255,0.35)]"
-              : "bg-[#E8E8F0] text-[#ADADC0]",
+            "bg-gradient-to-br from-[#6B6BFF] to-[#4648D4] text-white shadow-[0_2px_8px_rgba(107,107,255,0.35)]"
           )}
         >
           {phaseIndex + 1}
         </div>
         <div>
-          <span
-            className={twMerge(
-              "text-xs font-bold tracking-wide",
-              isUnlocked ? "text-[#131B2E]" : "text-[#ADADC0]",
-            )}
-          >
-            {phase.title}
+          <span className="text-xs font-bold tracking-wide text-[#131B2E]">
+            {phase.phase_name}
           </span>
         </div>
       </div>
 
-      <span
-        className={twMerge(
-          "text-[10px] font-semibold px-2.5 py-1 rounded-full border",
-          isUnlocked
-            ? "bg-[#6B6BFF]/8 text-[#4648D4] border-[#6B6BFF]/15"
-            : "bg-[#F5F5F8] text-[#C7C4D7] border-[#EDEDF2]",
-        )}
-      >
-        {phase.duration}
+      <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full border bg-[#6B6BFF]/8 text-[#4648D4] border-[#6B6BFF]/15">
+        {phase.courses.length} courses
       </span>
     </div>
   );
@@ -102,13 +87,12 @@ function PhaseHeader({ phase, phaseIndex, isUnlocked }: PhaseHeaderProps) {
 // ─── Individual item row ──────────────────────────────────────────────────────
 
 interface PlanItemRowProps {
-  item: IPlanItem;
+  course: { id: number; title: string };
   isLast: boolean;
   onLessonClick: (title: string) => void;
 }
 
-function PlanItemRow({ item, isLast, onLessonClick }: PlanItemRowProps) {
-  const cfg = STATUS_CONFIG[item.status];
+function PlanItemRow({ course, isLast, onLessonClick }: PlanItemRowProps) {
 
   return (
     <div className="flex items-center gap-3 relative">
@@ -119,37 +103,20 @@ function PlanItemRow({ item, isLast, onLessonClick }: PlanItemRowProps) {
         />
       )}
 
-      <div
-        className={twMerge(
-          "relative z-10 w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0 text-white",
-          cfg.dotClass,
-          item.status === "locked" && "text-[#ADADC0]",
-        )}
-      >
-        <PhaseIcon status={item.status} />
+      <div className="relative z-10 w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0 text-white bg-[#4648D4]">
+        <CheckIcon />
       </div>
 
       <div className="flex-1 flex items-center justify-between py-2">
-        {/* Bấm vào tên bài học để gọi AI Analyst */}
+        {/* Bấm vào tên khóa học */}
         <span
-          onClick={() => item.status !== "locked" && onLessonClick(item.label)}
-          className={twMerge(
-            "text-xs leading-snug transition-colors",
-            item.status === "locked" 
-              ? "text-[#ADADC0] cursor-not-allowed" 
-              : "text-[#464554] font-medium hover:text-[#6B6BFF] cursor-pointer underline-offset-4 hover:underline",
-          )}
-          title={item.status !== "locked" ? "Click để xem AI phân tích & khóa học liên quan" : "Bài học đang bị khóa"}
+          onClick={() => onLessonClick(course.title)}
+          className="text-xs leading-snug transition-colors text-[#464554] font-medium hover:text-[#6B6BFF] cursor-pointer underline-offset-4 hover:underline"
         >
-          {item.label}
+          {course.title}
         </span>
-        <span
-          className={twMerge(
-            "text-[10px] shrink-0 ml-2",
-            cfg.labelClass,
-          )}
-        >
-          {item.status !== "locked" ? item.duration : cfg.label}
+        <span className="text-[10px] shrink-0 ml-2 text-[#4648D4] font-semibold">
+          Course
         </span>
       </div>
     </div>
@@ -159,30 +126,22 @@ function PlanItemRow({ item, isLast, onLessonClick }: PlanItemRowProps) {
 // ─── Phase block ──────────────────────────────────────────────────────────────
 
 interface PhaseBlockProps {
-  phase: IPlanPhase;
+  phase: IAIRoadmapPhase;
   phaseIndex: number;
-  isUnlocked: boolean;
   onLessonClick: (title: string) => void;
 }
 
-function PhaseBlock({ phase, phaseIndex, isUnlocked, onLessonClick }: PhaseBlockProps) {
+function PhaseBlock({ phase, phaseIndex, onLessonClick }: PhaseBlockProps) {
   return (
-    <div
-      className={twMerge(
-        "rounded-2xl border p-4 transition-all duration-300",
-        isUnlocked
-          ? "bg-white border-[#E8E8F0] shadow-[0_2px_12px_rgba(107,107,255,0.06)]"
-          : "bg-[#FAFAFA] border-[#F0F0F7]",
-      )}
-    >
-      <PhaseHeader phase={phase} phaseIndex={phaseIndex} isUnlocked={isUnlocked} />
-
+    <div className="rounded-2xl border p-4 transition-all duration-300 bg-white border-[#E8E8F0] shadow-[0_2px_12px_rgba(107,107,255,0.06)]">
+      <PhaseHeader phase={phase} phaseIndex={phaseIndex} />
+      <p className="text-xs text-[#84849A] mb-3 leading-relaxed">{phase.description}</p>
       <div className="pl-1 space-y-0.5">
-        {phase.items.map((item, idx) => (
+        {phase.courses.map((course, idx) => (
           <PlanItemRow 
-            key={item.id} 
-            item={item} 
-            isLast={idx === phase.items.length - 1} 
+            key={course.id} 
+            course={course} 
+            isLast={idx === phase.courses.length - 1} 
             onLessonClick={onLessonClick}
           />
         ))}
@@ -194,18 +153,17 @@ function PhaseBlock({ phase, phaseIndex, isUnlocked, onLessonClick }: PhaseBlock
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export interface LearningPathCardProps {
-  phases: IPlanPhase[];
-  unlockedPhases: number;
+  phases: IAIRoadmapPhase[];
 }
 
-export function LearningPathCard({ phases, unlockedPhases }: LearningPathCardProps) {
+export function LearningPathCard({ phases }: LearningPathCardProps) {
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null);
   const formData = useOnboardingStore((s) => s.formData) as { goal?: string };
 
   return (
     <>
-      <div className="flex-1 bg-white/70 backdrop-blur-sm border border-[#E8E8F0] rounded-3xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06),0_8px_32px_rgba(107,107,255,0.06)]">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#F0F0F7] bg-gradient-to-r from-white to-[#F8F8FF]">
+      <div className="flex-1 bg-white/70 backdrop-blur-sm border border-[#E8E8F0] rounded-3xl shadow-[0_2px_8px_rgba(0,0,0,0.06),0_8px_32px_rgba(107,107,255,0.06)]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#F0F0F7] bg-gradient-to-r from-white to-[#F8F8FF] rounded-t-3xl">
           <div className="flex items-center gap-2.5">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6B6BFF] opacity-60" />
@@ -220,17 +178,16 @@ export function LearningPathCard({ phases, unlockedPhases }: LearningPathCardPro
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
               <path d="M2 5L4 7L8 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            {unlockedPhases} / {phases.length} phases unlocked
+            {phases.length} phases
           </div>
         </div>
 
         <div className="p-5 flex flex-col gap-3">
           {phases.map((phase, idx) => (
             <PhaseBlock
-              key={phase.id}
+              key={idx}
               phase={phase}
               phaseIndex={idx}
-              isUnlocked={idx < unlockedPhases}
               onLessonClick={(title) => setSelectedLesson(title)}
             />
           ))}

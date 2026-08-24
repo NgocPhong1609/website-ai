@@ -16,9 +16,16 @@ function PlayCircleIcon() {
 function CourseCard({ course }: { course: DashboardCourse }) {
   const nextLessonTitle = course.next_lesson ?? course.nextLesson ?? "Tiếp tục bài học";
   const thumbnail = course.thumbnail_url ?? course.thumbnailUrl;
+  const isAiPlan = String(course.id).startsWith("ai-custom-");
+  const detailLink = isAiPlan ? "/study-plan" : "/courses/detail";
+  const lessonLink = isAiPlan ? "/study-plan" : "/courses/lesson";
 
   return (
-    <div className="group/card bg-white border border-[#EAEAF4] rounded-2xl flex flex-col justify-between h-full shadow-sm hover:shadow-md hover:border-[#5052EE]/40 transition-all duration-300 overflow-hidden">
+    <div className={`group/card bg-white border rounded-2xl flex flex-col justify-between h-full transition-all duration-300 overflow-hidden relative ${
+      isAiPlan 
+        ? "border-[#4CD7F6]/50 shadow-[0_0_15px_rgba(76,215,246,0.15)] hover:shadow-[0_0_25px_rgba(76,215,246,0.25)] hover:border-[#6B6BFF]/70"
+        : "border-[#EAEAF4] shadow-sm hover:shadow-md hover:border-[#5052EE]/40"
+    }`}>
       {/* Compact Thumbnail Container matching /courses clean style */}
       <div className="relative h-44 w-full bg-[#1A1A2E] overflow-hidden shrink-0">
         {thumbnail ? (
@@ -30,7 +37,7 @@ function CourseCard({ course }: { course: DashboardCourse }) {
             className="object-cover group-hover/card:scale-105 transition-transform duration-500 brightness-[0.96] group-hover/card:brightness-100"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-tr from-[#1E1B4B] via-[#4648D4] to-[#6B6BFF]" />
+          <div className={`w-full h-full bg-gradient-to-tr ${isAiPlan ? "from-[#1A1A2E] via-[#4648D4] to-[#4CD7F6]" : "from-[#1E1B4B] via-[#4648D4] to-[#6B6BFF]"}`} />
         )}
         
         {/* Gentle veil */}
@@ -41,6 +48,14 @@ function CourseCard({ course }: { course: DashboardCourse }) {
           <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
           <span>{course.progress}% hoàn thành</span>
         </div>
+
+        {/* Special AI Badge */}
+        {isAiPlan && (
+          <div className="absolute top-3.5 left-3.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-[#4648D4] to-[#0D9488] text-white text-[10px] font-bold shadow-sm border border-white/20 flex items-center gap-1.5 z-10 uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+            ✨ AI Roadmap
+          </div>
+        )}
       </div>
 
       {/* Interactive Progress Bar under thumbnail */}
@@ -54,7 +69,7 @@ function CourseCard({ course }: { course: DashboardCourse }) {
       {/* Clean White Content Body (Proportional padding and typography) */}
       <div className="p-5 flex-1 flex flex-col justify-between gap-4 bg-white">
         <div>
-          <Link href="/courses/detail" className="block text-decoration-none focus:outline-none min-w-0 group/title">
+          <Link href={detailLink} className="block text-decoration-none focus:outline-none min-w-0 group/title">
             <h3 className="text-base sm:text-lg font-bold text-[#1A1A2E] leading-snug line-clamp-1 group-hover/card:text-[#5052EE] group-hover/title:text-[#5052EE] transition-colors">
               {course.title}
             </h3>
@@ -71,10 +86,10 @@ function CourseCard({ course }: { course: DashboardCourse }) {
         </div>
 
         <Link
-          href="/courses/lesson"
+          href={lessonLink}
           className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-[#5052EE] bg-[#EEF2FF] hover:bg-gradient-to-r hover:from-[#4648D4] hover:to-[#0D9488] hover:text-white border border-[#5052EE]/20 hover:border-transparent transition-all duration-200 shadow-2xs flex items-center justify-center gap-2 group/btn mt-auto text-decoration-none"
         >
-          <span>Vào học tiếp</span>
+          <span>{isAiPlan ? "Xem lộ trình AI" : "Vào học tiếp"}</span>
           <span className="group-hover/btn:translate-x-1 transition-transform">➔</span>
         </Link>
       </div>

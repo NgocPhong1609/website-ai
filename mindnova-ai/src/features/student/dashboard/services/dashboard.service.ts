@@ -29,9 +29,9 @@ function normalizeRecommendation(rec: AdvancedRecommendation): AdvancedRecommend
  */
 export async function getDashboardOverview(): Promise<DashboardOverview> {
   try {
-    // Fetch directly from Server Component with revalidate: 60 seconds
+    // Fetch directly from Server Component with no-store to prevent global caching
     const response = await apiClient<DashboardApiResponse>("/student/dashboard", {
-      next: { revalidate: 60 },
+      cache: "no-store",
     } as RequestInit);
 
     if (response?.success && response?.data) {
@@ -44,6 +44,7 @@ export async function getDashboardOverview(): Promise<DashboardOverview> {
   } catch (error) {
     // Graceful fallback if backend API server is unreachable during local development
     console.warn("[DashboardService] Unable to reach backend /student/dashboard API, using local fallback:", error);
+    require('fs').appendFileSync('error.log', String(error) + '\n');
   }
 
   return {

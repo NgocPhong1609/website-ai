@@ -10,11 +10,11 @@ import SkillCard from "./SkillCard";
 export default function SkillContainer() {
   const router = useRouter();
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const { selectLevel } = useOnboarding();
+  const { selectCurrentLevel } = useOnboarding();
 
   const handleSelect = (id: number, level: string) => {
     setSelectedId(id);
-    selectLevel(level);
+    selectCurrentLevel(level);
   };
 
   return (

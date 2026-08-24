@@ -45,21 +45,21 @@ export function AiSuggestionCard({ suggestion = AI_SUGGESTION }: AiSuggestionCar
 
           {/* Message Content */}
           <p className="text-sm sm:text-base font-bold text-[#1A1A2E] tracking-tight leading-snug group-hover:text-[#4648D4] transition-colors duration-200">
-            &quot;Chúng tôi nhận thấy bạn vừa dành 20 phút xử lý vướng mắc về Hydration errors. Hãy thử ôn tập chuyên sâu học phần <span className="text-[#5052EE]">Server vs Client Leaf Node Components</span> nhé!&quot;
+            {suggestion?.message || "Chúng tôi nhận thấy bạn vừa dành 20 phút xử lý vướng mắc về Hydration errors. Hãy thử ôn tập chuyên sâu học phần Server vs Client Leaf Node Components nhé!"}
           </p>
 
           <div className="flex items-center gap-2 text-xs text-[#64647A] font-normal italic bg-white/80 backdrop-blur-md px-3 py-2 rounded-xl border border-white/70">
             <span className="text-[#5052EE] font-semibold">💡 Lý do đề xuất:</span>
-            <span>Điểm kiểm tra kỹ năng State &amp; Client Components lần trước là 58%.</span>
+            <span>{suggestion?.reason || "Điểm kiểm tra kỹ năng State & Client Components lần trước là 58%."}</span>
           </div>
 
           {/* Compact Interactive Actions */}
           <div className="flex flex-wrap items-center gap-3 pt-1">
             <Link
-              href="/courses/lesson"
+              href={suggestion?.action_url || "/courses/lesson"}
               className="inline-flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] shadow-[0_4px_12px_rgba(80,82,238,0.35)] hover:shadow-[0_6px_18px_rgba(80,82,238,0.5)] hover:-translate-y-0.5 transition-all duration-200 text-decoration-none group/btn"
             >
-              <span>Vào bài ôn tập ngay</span>
+              <span>{suggestion?.action_text || "Vào bài ôn tập ngay"}</span>
               <span className="group-hover/btn:translate-x-1 transition-transform">➔</span>
             </Link>
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\Course;
 
 class OnboardingController extends Controller
 {
@@ -13,15 +14,15 @@ class OnboardingController extends Controller
     {
         $data = $request->validate([
             'goal' => 'required|string',
-            'level' => 'required|string',
-            'topics' => 'required|array',
+            'currentLevel' => 'required|string',
+            'timeAvailable' => 'required|string',
         ]);
 
         $goal = $data['goal'];
-        $level = $data['level'];
-        $topics = implode(', ', $data['topics']);
+        $level = $data['currentLevel'];
+        $timeAvailable = $data['timeAvailable'];
 
-        $user = $request->user();
+        $user = $request->user('sanctum') ?? $request->user();
         if ($user) {
             $user->update([
                 'onboarding_data' => json_encode($data),
@@ -29,52 +30,19 @@ class OnboardingController extends Controller
             ]);
         }
 
-        $prompt = "You are an elite AI education architect. A student's goal is '{$goal}', their current level is '{$level}', and their chosen focus topics are: [{$topics}].
-        Create a deeply customized, realistic learning path tailored specifically to this exact goal.
-        Provide 3 progressive phases (Phase 1: Foundation, Phase 2: Core Practical Skills, Phase 3: Advanced Mastery). Inside each phase, provide 3 to 4 specific, high-value lessons.
-
-        CRITICAL: Return ONLY a valid raw JSON object. No markdown, no backticks, no conversational text. Exact structure required:
+        $prompt = "Bạn là một chuyên gia xây dựng lộ trình học tập ưu tú. Mục tiêu của học viên là '{$goal}', trình độ hiện tại là '{$level}', và thời gian rảnh mỗi ngày là '{$timeAvailable}'.
+        Hãy tạo một lộ trình học tập thực tế và cá nhân hóa sâu sắc theo đúng mục tiêu này.
+        Hãy chia lộ trình thành các giai đoạn (phases) hợp lý. Trong mỗi giai đoạn, cung cấp các từ khóa (search_keywords) để tìm kiếm các khóa học liên quan trong hệ thống.
+        
+        CRITICAL: Return ONLY a valid raw JSON object. Exact structure required:
         {
-          \"status\": \"success\",
-          \"data\": {
-            \"profile\": {
-              \"goal\": \"{$goal}\",
-              \"level\": \"{$level}\",
-              \"topics_count\": " . count($data['topics']) . ",
-              \"est_time\": \"2-4 months\"
-            },
-            \"learning_path\": [
-              {
-                \"phase\": 1,
-                \"title\": \"Foundation & Basics\",
-                \"duration\": \"2 weeks\",
-                \"status\": \"unlocked\",
-                \"lessons\": [
-                  { \"name\": \"Lesson title here\", \"duration\": \"3 days\" },
-                  { \"name\": \"Lesson title here\", \"duration\": \"4 days\" }
-                ]
-              },
-              {
-                \"phase\": 2,
-                \"title\": \"Core Implementation\",
-                \"duration\": \"1 month\",
-                \"status\": \"locked\",
-                \"lessons\": [
-                  { \"name\": \"Lesson title here\", \"duration\": \"1 week\" },
-                  { \"name\": \"Lesson title here\", \"duration\": \"1 week\" }
-                ]
-              },
-              {
-                \"phase\": 3,
-                \"title\": \"Advanced Mastery\",
-                \"duration\": \"1 month\",
-                \"status\": \"locked\",
-                \"lessons\": [
-                  { \"name\": \"Lesson title here\", \"duration\": \"2 weeks\" }
-                ]
-              }
-            ]
-          }
+          \"phases\": [
+            {
+              \"phase_name\": \"Tên giai đoạn\",
+              \"description\": \"Mô tả\",
+              \"search_keywords\": [\"keyword1\", \"keyword2\"]
+            }
+          ]
         }";
 
         try {
@@ -87,69 +55,87 @@ class OnboardingController extends Controller
                         ['role' => 'user', 'content' => $prompt]
                     ],
                     'temperature' => 0.7,
+                    'response_format' => ['type' => 'json_object']
                 ]);
 
             if ($response->successful()) {
                 $aiContent = $response->json('choices.0.message.content');
-                $cleanJson = trim(str_replace(['```json', '```'], '', $aiContent));
+                $resultData = json_decode($aiContent, true);
 
-                $firstOpen = strpos($cleanJson, '{');
-                $lastClose = strrpos($cleanJson, '}');
-                if ($firstOpen !== false && $lastClose !== false) {
-                    $cleanJson = substr($cleanJson, $firstOpen, $lastClose - $firstOpen + 1);
-                }
+                if (json_last_error() === JSON_ERROR_NONE && isset($resultData['phases'])) {
+                    // Map courses from database using search_keywords
+                    foreach ($resultData['phases'] as &$phase) {
+                        $keywords = $phase['search_keywords'] ?? [];
+                        $query = Course::query()->where('status', 'published')->visibleInAdmin();
+                        
+                        if (!empty($keywords)) {
+                            $query->where(function ($q) use ($keywords) {
+                                foreach ($keywords as $keyword) {
+                                    $q->orWhere('title', 'LIKE', '%' . $keyword . '%')
+                                      ->orWhere('description', 'LIKE', '%' . $keyword . '%');
+                                }
+                            });
+                        }
+                        
+                        // Limit to 3 courses per phase
+                        $courses = $query->limit(3)->get(['id', 'title', 'thumbnail', 'slug']);
+                        $phase['courses'] = $courses;
+                    }
 
-                $resultData = json_decode($cleanJson, true);
-                if ($resultData && isset($resultData['data']['learning_path'])) {
+                    if ($user) {
+                        $onboardingData = $data;
+                        $onboardingData['ai_plan'] = $resultData;
+                        $user->update([
+                            'onboarding_data' => json_encode($onboardingData)
+                        ]);
+                    }
                     return response()->json($resultData, 200);
+                } else {
+                    Log::error("Groq JSON Error: " . json_last_error_msg() . " | Output: " . $aiContent);
                 }
+            } else {
+                Log::error("Groq API Failed: " . $response->status() . " " . $response->body());
             }
         } catch (\Exception $e) {
             Log::error("Groq AI Error: " . $e->getMessage());
         }
 
-        // Fallback động theo Goal (Đã sửa lại dấu => chuẩn PHP)
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'profile' => [
-                    'goal' => $goal,
-                    'level' => $level,
-                    'topics_count' => count($data['topics']),
-                    'est_time' => '3-6 months'
-                ],
-                'learning_path' => [
-                    [
-                        'phase' => 1,
-                        'title' => 'Foundation - ' . $goal,
-                        'duration' => '2 weeks',
-                        'status' => 'unlocked',
-                        'lessons' => [
-                            [ 'name' => 'Overview and Core Principles', 'duration' => '3 days' ],
-                            [ 'name' => 'Setting up your environment', 'duration' => '4 days' ]
-                        ]
-                    ],
-                    [
-                        'phase' => 2,
-                        'title' => 'Practical Skills',
-                        'duration' => '1 month',
-                        'status' => 'locked',
-                        'lessons' => [
-                            [ 'name' => 'Working with Selected Topics', 'duration' => '1 week' ],
-                            [ 'name' => 'Hands-on Exercise', 'duration' => '1 week' ]
-                        ]
-                    ],
-                    [
-                        'phase' => 3,
-                        'title' => 'Advanced Mastery',
-                        'duration' => '1 month',
-                        'status' => 'locked',
-                        'lessons' => [
-                            [ 'name' => 'Real-world Project Execution', 'duration' => '2 weeks' ]
-                        ]
-                    ]
+        // Create dynamic fallback based on goal if Groq fails (e.g. IP block)
+        $words = explode(' ', $goal);
+        $query = Course::query()->where('status', 'published')->visibleInAdmin();
+        $query->where(function ($q) use ($words) {
+            foreach ($words as $word) {
+                if (mb_strlen($word) > 2) {
+                    $q->orWhere('title', 'LIKE', '%' . $word . '%')
+                      ->orWhere('description', 'LIKE', '%' . $word . '%');
+                }
+            }
+        });
+        $fallbackCourses = $query->limit(3)->get(['id', 'title', 'thumbnail', 'slug']);
+        
+        if ($fallbackCourses->isEmpty()) {
+            $fallbackCourses = Course::query()->where('status', 'published')->visibleInAdmin()->inRandomOrder()->limit(3)->get(['id', 'title', 'thumbnail', 'slug']);
+        }
+
+        $fallbackData = [
+            'phases' => [
+                [
+                    'phase_name' => 'Nền tảng - ' . $goal,
+                    'description' => 'Xây dựng kiến thức cơ bản cho ' . $goal,
+                    'search_keywords' => ['basic', $goal],
+                    'courses' => $fallbackCourses
                 ]
             ]
-        ], 200);
+        ];
+
+        if ($user) {
+            $onboardingData = $data;
+            $onboardingData['ai_plan'] = $fallbackData;
+            $user->update([
+                'onboarding_data' => json_encode($onboardingData)
+            ]);
+        }
+
+        return response()->json($fallbackData, 200);
     }
 }

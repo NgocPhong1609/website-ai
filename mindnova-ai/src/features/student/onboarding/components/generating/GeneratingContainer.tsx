@@ -13,8 +13,8 @@ import { LeftFloatingIcons, RightFloatingIcons } from "./FloatingIcons";
 interface IOnboardingStoreExtended {
   formData: {
     goal: string;
-    level: string;
-    topics: string[];
+    currentLevel: string;
+    timeAvailable: string;
   };
   setGeneratedPlan?: (plan: unknown) => void;
 }
@@ -30,16 +30,17 @@ export default function GeneratingContainer() {
       try {
         const token = localStorage.getItem("accessToken") || "";
 
-        const fetchPromise = fetch("http://localhost:8000/api/student/onboarding", {
+        const fetchPromise = fetch(process.env.NEXT_PUBLIC_API_URL + "/student/onboarding", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Accept": "application/json",
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             goal: formData.goal,
-            level: formData.level,
-            topics: formData.topics,
+            currentLevel: formData.currentLevel,
+            timeAvailable: formData.timeAvailable,
           }),
         });
 
@@ -49,10 +50,10 @@ export default function GeneratingContainer() {
         const apiResponse = response as Response;
         const result = await apiResponse.json();
 
-        if (apiResponse.ok && result.status === "success") {
+        if (apiResponse.ok && result) {
           // Lưu kết quả AI vào store để trang Plan hiển thị
           if (setGeneratedPlan) {
-            setGeneratedPlan(result.data);
+            setGeneratedPlan(result); // result contain 'phases' directly
           }
 
           router.push("/onboarding/plan");
@@ -77,11 +78,10 @@ export default function GeneratingContainer() {
       <div className="relative z-10 flex flex-col items-center gap-8 w-full max-w-lg">
         <div className="flex flex-col items-center gap-3 text-center">
           <h1 className="text-[32px] font-bold text-[#131B2E] leading-tight">
-            MindNova AI is creating your study plan…
+            AI đang thiết kế lộ trình...
           </h1>
           <p className="text-sm text-[#84849A] max-w-sm leading-relaxed">
-            Our neural network is tailoring content specifically for your goals
-            and expertise.
+            Hệ thống đang cá nhân hóa nội dung học tập theo mục tiêu và thời gian rảnh của bạn.
           </p>
         </div>
 
