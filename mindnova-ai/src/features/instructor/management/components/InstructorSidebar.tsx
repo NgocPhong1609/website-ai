@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { twMerge } from "tailwind-merge";
+import { axiosClient } from "@/src/shared/lib/axios";
 import {
   CourseManagementNavIcon,
   StudentManagementNavIcon,
@@ -12,7 +13,10 @@ import {
   SettingsNavIcon,
   HelpNavIcon,
   DiscussionsNavIcon,
+  QuizNavIcon,
 } from "./icons";
+
+import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -51,25 +55,104 @@ function CreateCourseCTA() {
 }
 
 function SidebarUserProfile({ isCollapsed }: { isCollapsed: boolean }) {
-  if (isCollapsed) {
-    return (
-      <div className="flex flex-col gap-3 py-2 items-center">
-        <div className="w-9 h-9 rounded-full bg-[#4648D4]/15 text-[#4648D4] flex items-center justify-center text-sm font-black shadow-2xs shrink-0 border border-[#4648D4]/20">
-          N
-        </div>
-      </div>
-    );
-  }
+  const [user, setUser] = React.useState<any>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  const loadUser = React.useCallback(() => {
+    try {
+      const userInfoRaw = window.localStorage.getItem("userInfo");
+      if (userInfoRaw) {
+        setUser(JSON.parse(userInfoRaw));
+      }
+    } catch (e) {
+      console.error("Error parsing user info", e);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    loadUser();
+    window.addEventListener("user:updated", loadUser);
+    window.addEventListener("storage", loadUser);
+    return () => {
+      window.removeEventListener("user:updated", loadUser);
+      window.removeEventListener("storage", loadUser);
+    };
+  }, [loadUser]);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await axiosClient.post("/api/logout");
+    } catch (error) {
+      console.error("Logout API failed", error);
+    } finally {
+      window.localStorage.removeItem("accessToken");
+      window.localStorage.removeItem("userInfo");
+      document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      window.location.replace("/login");
+    }
+  };
+
+  const getInitial = (name: string) => {
+    if (!name) return "U";
+    return name.charAt(0).toUpperCase();
+  };
+
+  const name = user?.name || "Teacher";
+  const avatarUrl = user?.avatar_url || user?.avatar || user?.profile_image || null;
+  const initial = getInitial(name);
 
   return (
-    <div className="flex items-center gap-3 py-2 px-2">
-      <div className="w-9 h-9 rounded-full bg-[#4648D4]/15 text-[#4648D4] flex items-center justify-center text-sm font-black shadow-2xs shrink-0 border border-[#4648D4]/20">
-        N
-      </div>
-      <div className="flex flex-col min-w-0 leading-tight">
-        <span className="text-sm font-black text-gray-900 truncate">Nguyễn Minh Anh</span>
-        <span className="text-[11px] text-gray-500 font-bold truncate">Senior AI Instructor</span>
-      </div>
+    <div className={twMerge("relative flex py-2", isCollapsed ? "flex-col gap-3 items-center" : "items-center gap-3 px-2")} ref={dropdownRef}>
+      <button 
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        className="w-9 h-9 rounded-full bg-[#4648D4]/15 text-[#4648D4] flex items-center justify-center text-sm font-black shadow-2xs shrink-0 border border-[#4648D4]/20 overflow-hidden hover:ring-2 hover:ring-[#4648D4]/50 transition-all focus:outline-none"
+      >
+        {avatarUrl ? (
+          <img src={avatarUrl} alt={name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerText = initial; }} />
+        ) : (
+          initial
+        )}
+      </button>
+
+      {isDropdownOpen && (
+        <div className={twMerge(
+          "absolute z-50 bg-white border border-gray-200 rounded-xl shadow-lg py-1 min-w-[160px] overflow-hidden",
+          isCollapsed ? "left-full ml-2 bottom-0" : "bottom-full mb-2 left-2"
+        )}>
+          <Link
+            href="/instructor/profile"
+            onClick={() => setIsDropdownOpen(false)}
+            className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#4648D4] transition-colors"
+          >
+            Thông tin tài khoản
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="w-full text-left px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      )}
+
+      {!isCollapsed && (
+        <Link href="/instructor/profile" className="flex items-center gap-1 min-w-0 leading-tight group cursor-pointer">
+          <span className="text-sm font-black text-gray-900 truncate group-hover:text-[#4648D4] transition-colors">{name}</span>
+          {user?.is_verified && <VerifiedTeacherBadge isVerified={true} size="xs" />}
+        </Link>
+      )}
     </div>
   );
 }
@@ -134,7 +217,18 @@ export function InstructorSidebar() {
 
   const INSTRUCTOR_NAV: NavItem[] = [
     { label: "Quản lý Khóa học", href: "/instructor/courses", Icon: CourseManagementNavIcon },
-    { label: "Thảo luận & Hỏi đáp", href: "/instructor/discussions", Icon: DiscussionsNavIcon },
+    { 
+      label: "AI Quiz Generator", 
+      href: "/instructor/quiz-generator", 
+      activePatterns: ["/instructor/quiz-generator"], 
+      Icon: QuizNavIcon 
+    },
+    { 
+      label: "Thảo luận & Hỏi đáp", 
+      href: "/instructor/discussions", 
+      activePatterns: ["/instructor/discussions", "/instructor/messages", "/instructor/chat", "/chat"],
+      Icon: DiscussionsNavIcon 
+    },
     { label: "Quản lý Học viên", href: "/instructor/students", activePatterns: ["/instructor/analytics"], Icon: StudentManagementNavIcon },
     { label: "Quản lý Doanh thu", href: "/instructor/revenue", Icon: RevenueNavIcon },
   ];

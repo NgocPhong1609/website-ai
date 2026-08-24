@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 import type { AdvancedRecommendation } from "../types";
 
 interface AdvancedRecommendationsSectionProps {
@@ -100,7 +101,8 @@ export function AdvancedRecommendationsSection({ recommendations = [] }: Advance
                     {/* Instructor & Rating Metadata */}
                     <div className="flex items-center justify-between gap-2 text-xs text-[#64647A] mt-3 pb-3 border-b border-[#F0F0F8]">
                       <span className="truncate font-medium text-[#4B5563] flex items-center gap-1.5">
-                        👨‍🏫 {rec.instructor.split("•")[0]}
+                        <span>👨‍🏫 {rec.instructor.split("•")[0]}</span>
+                        <VerifiedTeacherBadge isVerified={true} size="xs" />
                       </span>
                       <span className="font-semibold text-[#10B981] shrink-0 flex items-center gap-1">
                         ★ {rec.rating.toFixed(1)} <span className="text-[#8888A8] font-normal">({studentsCount})</span>

@@ -78,11 +78,11 @@ export function AdminAiSystemPage() {
   }
 
   return (
-    <div className="space-y-6 p-6 lg:p-8 [font-family:var(--font-admin-body)]">
-      <section className="rounded-[28px] border border-cyan-200/20 bg-[linear-gradient(120deg,#1e293b_0%,#0f766e_55%,#0369a1_100%)] p-6 text-white shadow-[0_30px_70px_-35px_rgba(7,18,45,0.85)]">
-        <p className="text-xs uppercase tracking-[0.34em] text-cyan-100/70">AI & System Configuration</p>
-        <h1 className="mt-2 text-3xl font-semibold [font-family:var(--font-admin-head)]">Quản lý cấu hình AI và hạn mức sử dụng</h1>
-        <p className="mt-2 text-sm text-slate-100/90">Quản lý API key provider, quota Student/Guest, và System Prompt cho AI trợ giảng/chấm bài.</p>
+    <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+      <section className="rounded-2xl border border-cyan-200/20 bg-[linear-gradient(120deg,#1e293b_0%,#0f766e_55%,#0369a1_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.85)]">
+        <p className="text-[10px] uppercase tracking-[0.34em] text-cyan-100/70">AI & System Configuration</p>
+        <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý cấu hình AI và hạn mức sử dụng</h1>
+        <p className="mt-1 text-xs text-slate-100/90">Quản lý API key provider, quota Student/Guest, và System Prompt cho AI trợ giảng/chấm bài.</p>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">

@@ -30,7 +30,7 @@ export default function GeneratingContainer() {
       try {
         const token = localStorage.getItem("accessToken") || "";
 
-        const fetchPromise = fetch(process.env.NEXT_PUBLIC_API_URL + "/student/onboarding", {
+        const fetchPromise = fetch("/api/student/onboarding", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

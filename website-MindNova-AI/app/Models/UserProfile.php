@@ -15,7 +15,8 @@ class UserProfile extends Model
         'skill_level',
         'bio',
         'phone',
-        'address'
+        'address',
+        'cv_path'
     ];
 
     // Quan hệ ngược lại: Mỗi Profile thuộc về 1 User

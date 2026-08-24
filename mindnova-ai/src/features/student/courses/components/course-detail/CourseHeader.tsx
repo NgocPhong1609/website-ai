@@ -1,23 +1,47 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import type { CourseDetailHeaderInfo } from "../../types";
 
+const SAVED_COURSES_KEY = "mindnova_saved_courses_v1";
+
 export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
   const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    if (!info?.id) return;
+
+    try {
+      const raw = window.localStorage.getItem(SAVED_COURSES_KEY);
+      const savedIds = raw ? (JSON.parse(raw) as Array<string | number>) : [];
+      setIsSaved(savedIds.some((id) => String(id) === String(info.id)));
+    } catch {
+      setIsSaved(false);
+    }
+  }, [info?.id]);
 
   const title = info?.title || "AI & Neural Networks • Fullstack Next.js 15";
   const level = info?.level || "Intermediate";
   const description = info?.description || "Chuyên đề đào tạo toàn diện: từ kiến trúc mạng Nơ-ron lượng tử, thuật toán tối ưu hóa cho đến mô hình Transformers tạo sinh trong các hệ thống phần mềm thực tế.";
   const nextLesson = info?.next_lesson_title || "RMSprop Optimization & Adam Optimizer";
   const nextLessonId = info?.next_lesson_id || "l1-2";
-  const durationText = info?.duration_text || "32 Giờ tổng cộng";
-  const ratingText = info?.rating_text || "4.9 ⭐ (315 Đánh giá)";
-  const studentsText = info?.students_text || "1,248 Học viên tích cực";
+  const durationText = info?.duration_text || "0 Phút tổng cộng";
+  const ratingText = info?.rating_text || "0.0 ⭐ (0 Đánh giá)";
+  const studentsText = info?.students_text || "0 Học viên tích cực";
   const categoryTag = info?.category_tag || "Chuyên đề Core AI • Kỳ II";
 
   const handleSaveToggle = () => {
+    if (!info?.id) return;
+
+    const courseId = String(info.id);
+    const raw = window.localStorage.getItem(SAVED_COURSES_KEY);
+    const savedIds: Array<string | number> = raw ? JSON.parse(raw) : [];
+    const nextSavedIds = isSaved
+      ? savedIds.filter((id) => String(id) !== courseId)
+      : [...savedIds.filter((id) => String(id) !== courseId), courseId];
+
+    window.localStorage.setItem(SAVED_COURSES_KEY, JSON.stringify(nextSavedIds));
     setIsSaved(!isSaved);
     alert(!isSaved ? "🔖 Đã lưu khóa học vào danh sách quan tâm của bạn!" : "Đã bỏ lưu khóa học.");
   };
@@ -87,19 +111,33 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap items-center gap-4 pt-2">
-            <Link 
-              href={`/courses/lesson?courseId=${info?.id || 1}&lessonId=${nextLessonId}`}
-              className="text-decoration-none"
-            >
-              <button
-                type="button"
-                className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:brightness-110 transition-all shadow-[0_4px_15px_rgba(80,82,238,0.35)] hover:shadow-[0_6px_22px_rgba(80,82,238,0.45)] hover:-translate-y-0.5 cursor-pointer"
+            {info?.is_enrolled ? (
+              <Link 
+                href={`/courses/lesson?courseId=${info?.id || 1}&lessonId=${nextLessonId}`}
+                className="text-decoration-none"
               >
-                <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
-                <span className="w-2 h-2 rounded-full bg-[#10B981] absolute" />
-                <span>▶ Tiếp tục bài học: <strong className="underline decoration-white/50">{nextLesson}</strong></span>
-              </button>
-            </Link>
+                <button
+                  type="button"
+                  className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:brightness-110 transition-all shadow-[0_4px_15px_rgba(80,82,238,0.35)] hover:shadow-[0_6px_22px_rgba(80,82,238,0.45)] hover:-translate-y-0.5 cursor-pointer"
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-[#10B981] absolute" />
+                  <span>▶ Tiếp tục bài học: <strong className="underline decoration-white/50">{nextLesson}</strong></span>
+                </button>
+              </Link>
+            ) : (
+              <Link 
+                href={`/checkout?courseId=${info?.id || 1}`}
+                className="text-decoration-none"
+              >
+                <button
+                  type="button"
+                  className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:brightness-110 transition-all shadow-[0_4px_15px_rgba(80,82,238,0.35)] hover:shadow-[0_6px_22px_rgba(80,82,238,0.45)] hover:-translate-y-0.5 cursor-pointer"
+                >
+                  <span>🛒 Đăng ký khóa học ngay: <strong className="underline decoration-white/50">{Number(info?.price ? info?.price : 0).toLocaleString('vi-VN')} VND</strong></span>
+                </button>
+              </Link>
+            )}
 
             <button
               type="button"

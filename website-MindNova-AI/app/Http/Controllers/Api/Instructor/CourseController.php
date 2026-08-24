@@ -12,6 +12,7 @@ use App\Http\Resources\CourseCollection;
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
 use App\Services\Instructor\CourseService;
+use App\Services\Instructor\CourseHealthService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -20,7 +21,10 @@ class CourseController extends Controller
 {
     use ApiResponse;
 
-    public function __construct(private readonly CourseService $courseService)
+    public function __construct(
+        private readonly CourseService $courseService,
+        private readonly CourseHealthService $courseHealthService,
+    )
     {
     }
 
@@ -59,6 +63,11 @@ class CourseController extends Controller
     {
         Gate::authorize('view', $course);
 
+        $course->load(['modules.lessons']);
+        if (\Illuminate\Support\Facades\Schema::hasColumn('lessons', 'course_id')) {
+            $course->load('lessons');
+        }
+
         return $this->successResponse(new CourseResource($course));
     }
 
@@ -94,7 +103,7 @@ class CourseController extends Controller
         Gate::authorize('update', $course);
 
         try {
-            $course = $this->courseService->updateStatus($course, $request->status);
+            $course = $this->courseService->updateStatus($course, $request->status, $request->user());
             return $this->successResponse(new CourseResource($course), 'Course status updated.');
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 422);
@@ -105,8 +114,36 @@ class CourseController extends Controller
     {
         Gate::authorize('update', $course);
 
-        $course->update(['price' => $request->price]);
+        \Illuminate\Support\Facades\Log::info('updatePrice payload', $request->all());
+
+        $price = (float) $request->price;
+
+        // Free courses: clear all flash sale data for consistency
+        if ($price == 0) {
+            $course->update([
+                'price' => 0,
+                'is_flash_sale' => false,
+                'sale_price' => null,
+                'sale_start_date' => null,
+                'sale_end_date' => null,
+            ]);
+        } else {
+            $course->update([
+                'price' => $price,
+                'is_flash_sale' => $request->boolean('is_flash_sale'),
+                'sale_price' => $request->sale_price,
+                'sale_start_date' => $request->sale_start_date,
+                'sale_end_date' => $request->sale_end_date,
+            ]);
+        }
 
         return $this->successResponse(new CourseResource($course), 'Price updated.');
+    }
+
+    public function health(Course $course)
+    {
+        Gate::authorize('view', $course);
+
+        return $this->successResponse($this->courseHealthService->evaluate($course));
     }
 }

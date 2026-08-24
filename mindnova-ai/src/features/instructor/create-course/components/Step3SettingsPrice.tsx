@@ -9,10 +9,23 @@ export interface Step3SettingsPriceProps {
   courseTitle?: string;
   thumbnailPreview?: string | null;
   initialPrice?: number | null;
+  initialFlashSale?: boolean;
+  initialSalePrice?: number | null;
+  initialSaleStartDate?: string | null;
+  initialSaleEndDate?: string | null;
   onSaveConfig?: () => void;
 }
 
-export function Step3SettingsPrice({ courseTitle = "Khóa học AI mới", thumbnailPreview, initialPrice, onSaveConfig }: Step3SettingsPriceProps) {
+export function Step3SettingsPrice({ 
+  courseTitle = "Khóa học AI mới", 
+  thumbnailPreview, 
+  initialPrice, 
+  initialFlashSale,
+  initialSalePrice,
+  initialSaleStartDate,
+  initialSaleEndDate,
+  onSaveConfig 
+}: Step3SettingsPriceProps) {
   const setSettings = useCreateCourseStore((s) => s.setSettings);
   
   const {
@@ -27,11 +40,21 @@ export function Step3SettingsPrice({ courseTitle = "Khóa học AI mới", thumb
     setTier,
     toggleDiscount,
     updateDiscount,
-  } = useInstructorPricing(initialPrice ?? 500000);
+  } = useInstructorPricing(
+    initialPrice ?? 500000,
+    initialFlashSale ?? false,
+    initialSalePrice ?? undefined,
+    initialSaleStartDate ?? undefined,
+    initialSaleEndDate ?? undefined
+  );
 
   useEffect(() => {
     setSettings("basePrice", String(isFree ? 0 : basePrice));
-  }, [basePrice, isFree, setSettings]);
+    setSettings("isFlashSale", isFree ? false : discount.isEnabled);
+    setSettings("salePrice", isFree ? "" : String(discount.discountPrice));
+    setSettings("saleStartDate", isFree ? "" : discount.startDate);
+    setSettings("saleEndDate", isFree ? "" : discount.endDate);
+  }, [basePrice, isFree, discount, setSettings]);
 
   return (
     <div className="w-full flex flex-col gap-6 animate-fadeIn">

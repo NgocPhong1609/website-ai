@@ -11,6 +11,13 @@ class StoreLessonRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'status' => 'draft',
+        ]);
+    }
+
     public function rules(): array
     {
         return [
@@ -19,13 +26,21 @@ class StoreLessonRequest extends FormRequest
             'content' => 'nullable|string',
             'video_url' => 'nullable|string',
             'order' => 'integer|min:0',
-            'status' => 'required|in:draft,published',
+            // RULE 4: Lessons ALWAYS start as draft — no published option
+            'status' => 'sometimes|in:draft',
             'temp_media_ids' => 'nullable|array',
             'temp_media_ids.*' => 'integer|exists:lesson_media,id',
             'quizData' => 'nullable|array',
             'quizData.time_limit_minutes' => 'nullable|integer',
             'quizData.passing_score' => 'nullable|numeric',
             'quizData.questions' => 'nullable|array',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'status.in' => 'Bài học chỉ có thể được tạo ở trạng thái bản nháp.',
         ];
     }
 }

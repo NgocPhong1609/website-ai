@@ -4,17 +4,10 @@ import React, { useState, useCallback } from "react";
 import { twMerge } from "tailwind-merge";
 import { Loader } from "@/src/shared/components/ui/Loader";
 import { SparklesIcon, CheckCircleIcon, PlayCircleIcon } from "./icons";
-
-export interface OutlineChapter {
-  title: string;
-  lessons: string[];
-}
-
-export interface GeneratedOutline {
-  chapters: OutlineChapter[];
-}
+import { useGenerateOutline, OutlineChapter, OutlineLesson, GeneratedOutline } from "../hooks/useGenerateOutline";
 
 export interface AIOutlineModalProps {
+
   isOpen: boolean;
   onClose: () => void;
   onApply?: (outline: GeneratedOutline) => void;
@@ -37,44 +30,17 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
   const [outline, setOutline] = useState<GeneratedOutline>({ chapters: [] });
   const [editingChapterIdx, setEditingChapterIdx] = useState<number | null>(null);
 
-  const handleGenerate = useCallback(() => {
-    if (!topic.trim()) return;
-    setGenState("loading");
+  const { generate, isGenerating, error } = useGenerateOutline();
+
+  const handleGenerate = useCallback(async () => {
+    if (!topic.trim() || isGenerating) return;
     setStep("preview");
 
-    setTimeout(() => {
-      const is8020 = methodology.includes("80/20");
-      setOutline({
-        chapters: [
-          {
-            title: `Module 1: ${topic} Foundations & Architecture`,
-            lessons: [
-              "Why this technology matters: Core Paradigms (20% Theory)",
-              "Hands-On Lab: Initializing Type-Safe Project Environment (80% Practice)",
-              "Live Build: Setting up OAuth Authentication Providers",
-            ],
-          },
-          {
-            title: "Module 2: Advanced Edge Caching & Database Connectivity",
-            lessons: [
-              "RSC vs Client Component Execution Boundaries",
-              "Hands-On Workshop: Optimistic UI & React Server Actions",
-              "Production Challenge: Connecting PostgreSQL with Drizzle ORM",
-            ],
-          },
-          {
-            title: "Module 3: Enterprise Deployment & Observability",
-            lessons: [
-              "Automated CI/CD Pipelines with GitHub & Vercel",
-              "Real-World Case Study: Diagnosing Memory Leaks in Server Actions",
-              "Final Capstone Project Architecture Submission",
-            ],
-          },
-        ],
-      });
-      setGenState("done");
-    }, 1800);
-  }, [topic, methodology]);
+    const result = await generate({ topic, targetAudience, skillLevel, methodology });
+    if (result) {
+      setOutline(result);
+    }
+  }, [topic, targetAudience, skillLevel, methodology, generate, isGenerating]);
 
   const handleApply = () => {
     if (onApply && outline.chapters.length > 0) {
@@ -85,7 +51,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
 
   const updateLessonTitle = (cIdx: number, lIdx: number, newTitle: string) => {
     const updated = { ...outline };
-    updated.chapters[cIdx].lessons[lIdx] = newTitle;
+    updated.chapters[cIdx].lessons[lIdx] = { ...updated.chapters[cIdx].lessons[lIdx], title: newTitle };
     setOutline(updated);
   };
 
@@ -102,8 +68,8 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
               🪄
             </span>
             <div>
-              <h3 className="text-base font-black text-white">AI Teaching Co-Creator Wizard (Section 2.1)</h3>
-              <p className="text-xs text-indigo-200">Architect structured course curriculums based on domain best practices.</p>
+              <h3 className="text-base font-black text-white">Trợ lý AI tạo Đề cương (Mục 2.1)</h3>
+              <p className="text-xs text-indigo-200">Xây dựng cấu trúc chương trình học chuẩn mực dựa trên thực tiễn tốt nhất.</p>
             </div>
           </div>
           <button
@@ -121,7 +87,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
             <div className="flex flex-col gap-5 animate-fadeIn">
               <div>
                 <label className="block text-xs font-black text-[#1A1A2E] uppercase tracking-wide mb-1.5">
-                  Course Topic &amp; Core Domain
+                  Chủ đề Khóa học &amp; Lĩnh vực
                 </label>
                 <input
                   type="text"
@@ -134,7 +100,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-black text-[#1A1A2E] uppercase tracking-wide mb-1.5">
-                    Target Audience
+                    Đối tượng Mục tiêu
                   </label>
                   <input
                     type="text"
@@ -145,16 +111,16 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
                 </div>
                 <div>
                   <label className="block text-xs font-black text-[#1A1A2E] uppercase tracking-wide mb-1.5">
-                    Target Skill Level
+                    Trình độ Mục tiêu
                   </label>
                   <select
                     value={skillLevel}
                     onChange={(e) => setSkillLevel(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-2xl border border-gray-300 text-xs font-bold text-[#1A1A2E] bg-white focus:outline-none focus:border-[#6B6BFF]"
                   >
-                    <option value="Beginner">Beginner (Foundations)</option>
-                    <option value="Intermediate to Advanced">Intermediate to Advanced</option>
-                    <option value="Executive Mastery">Executive Mastery</option>
+                    <option value="Beginner">Người mới bắt đầu (Cơ bản)</option>
+                    <option value="Intermediate to Advanced">Trung bình đến Cao cấp</option>
+                    <option value="Executive Mastery">Chuyên gia</option>
                   </select>
                 </div>
               </div>
@@ -162,7 +128,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
               {/* Teaching Methodology Selection */}
               <div>
                 <label className="block text-xs font-black text-[#1A1A2E] uppercase tracking-wide mb-2">
-                  Pedagogical Methodology (Architecture Strategy)
+                  Phương pháp Giảng dạy (Chiến lược Cấu trúc)
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
@@ -175,9 +141,9 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
                         : "border-gray-200 text-gray-600 hover:border-gray-300"
                     )}
                   >
-                    <p className="text-xs font-extrabold">🚀 80/20 Practical vs Theory (Recommended)</p>
+                    <p className="text-xs font-extrabold">🚀 80/20 Thực hành vs Lý thuyết (Khuyên dùng)</p>
                     <p className="text-[11px] font-semibold text-gray-500 mt-1">
-                      Heavily project-based syllabus; 80% hands-on building &amp; capstone application, 20% fundamental core concepts.
+                      Chương trình chú trọng dự án; 80% thời gian thực hành &amp; làm bài tập, 20% lý thuyết nền tảng.
                     </p>
                   </button>
 
@@ -191,9 +157,9 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
                         : "border-gray-200 text-gray-600 hover:border-gray-300"
                     )}
                   >
-                    <p className="text-xs font-extrabold">🎓 Comprehensive Academic Mastery</p>
+                    <p className="text-xs font-extrabold">🎓 Nắm vững Học thuật Toàn diện</p>
                     <p className="text-[11px] font-semibold text-gray-500 mt-1">
-                      Deep theoretical immersion with research case studies, algorithmic proofing, and formal architectural defense.
+                      Đi sâu vào lý thuyết, nghiên cứu các tình huống thực tế và phân tích kiến thức chuyên sâu.
                     </p>
                   </button>
                 </div>
@@ -202,31 +168,38 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
           ) : (
             /* Step 2: Skeleton Tree Preview & Edit */
             <div className="flex flex-col gap-6 animate-fadeIn">
-              {genState === "loading" ? (
+              {isGenerating ? (
                 <div className="py-20 flex flex-col items-center justify-center gap-4 text-center">
                   <Loader size="md" />
-                  <h4 className="text-sm font-extrabold text-[#1A1A2E]">Architecting course outline via best practices...</h4>
+                  <h4 className="text-sm font-extrabold text-[#1A1A2E]">Đang tạo đề cương khóa học bằng AI...</h4>
                   <p className="text-xs text-gray-500 max-w-sm">
-                    Structuring chapters with a strict 80/20 ratio of practical application to theoretical paradigms.
+                    Đang cấu trúc các chương dựa trên phương pháp bạn đã chọn.
                   </p>
+                </div>
+              ) : error ? (
+                <div className="py-20 flex flex-col items-center justify-center gap-4 text-center text-red-500">
+                  <h4 className="text-sm font-extrabold">{error}</h4>
+                  <button disabled={isGenerating} onClick={handleGenerate} className="px-4 py-2 bg-red-100 text-red-600 rounded-xl font-bold hover:bg-red-200 disabled:opacity-50">
+                    Thử lại
+                  </button>
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-extrabold text-emerald-600 px-3 py-1 bg-emerald-50 rounded-xl border border-emerald-200">
-                      ✓ AI Curriculum Tree Generated
+                      ✓ Đã tạo Đề cương bằng AI
                     </span>
                     <button
                       type="button"
                       onClick={() => setStep("params")}
                       className="text-xs font-bold text-indigo-600 hover:underline"
                     >
-                      ← Modify Parameters
+                      ← Thay đổi thông số
                     </button>
                   </div>
 
                   <p className="text-xs text-gray-500 font-semibold">
-                    Review and manually tweak the generated chapters and lesson titles before populating your live builder.
+                    Xem lại và chỉnh sửa tiêu đề các chương, bài học đã tạo trước khi áp dụng vào chương trình chính.
                   </p>
 
                   <div className="flex flex-col gap-4 max-h-[360px] overflow-y-auto pr-2">
@@ -236,19 +209,47 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
                           <h5 className="text-sm font-black text-[#1A1A2E]">
                             {cIdx + 1}. {ch.title}
                           </h5>
-                          <span className="text-[10px] font-bold text-gray-400 uppercase">{ch.lessons.length} Lessons</span>
+                          <span className="text-[10px] font-bold text-gray-400 uppercase">{ch.lessons.length} Bài học</span>
                         </div>
 
                         <ul className="flex flex-col gap-2">
-                          {ch.lessons.map((lessonTitle, lIdx) => (
-                            <li key={lIdx} className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-gray-200 shadow-2xs">
-                              <span className="text-xs text-indigo-500 font-extrabold">🔹</span>
-                              <input
-                                type="text"
-                                value={lessonTitle}
-                                onChange={(e) => updateLessonTitle(cIdx, lIdx, e.target.value)}
-                                className="flex-1 text-xs font-bold text-gray-800 bg-transparent focus:outline-none focus:text-[#6B6BFF]"
-                              />
+                          {ch.lessons.map((lesson, lIdx) => (
+                            <li key={lIdx} className={twMerge(
+                              "flex flex-col gap-1.5 p-2.5 rounded-xl border shadow-2xs",
+                              lesson.type === "quiz"
+                                ? "bg-amber-50 border-amber-200"
+                                : "bg-white border-gray-200"
+                            )}>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-extrabold">
+                                  {lesson.type === "quiz" ? "📝" : "📄"}
+                                </span>
+                                <input
+                                  type="text"
+                                  value={lesson.title}
+                                  onChange={(e) => updateLessonTitle(cIdx, lIdx, e.target.value)}
+                                  className="flex-1 text-xs font-bold text-gray-800 bg-transparent focus:outline-none focus:text-[#6B6BFF]"
+                                />
+                                <span className={twMerge(
+                                  "text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0",
+                                  lesson.type === "quiz"
+                                    ? "bg-amber-100 text-amber-700"
+                                    : "bg-indigo-100 text-indigo-600"
+                                )}>
+                                  {lesson.type === "quiz" ? "Trắc nghiệm" : "Tài liệu"}
+                                </span>
+                              </div>
+                              {/* Preview nội dung */}
+                              {lesson.type === "document" && lesson.content && (
+                                <p className="text-[11px] text-gray-400 font-medium ml-6 line-clamp-2">
+                                  ✅ Đã có nội dung ({lesson.content.replace(/<[^>]*>/g, '').slice(0, 80)}...)
+                                </p>
+                              )}
+                              {lesson.type === "quiz" && lesson.questions && lesson.questions.length > 0 && (
+                                <p className="text-[11px] text-amber-600 font-medium ml-6">
+                                  ✅ {lesson.questions.length} câu hỏi trắc nghiệm đã sẵn sàng
+                                </p>
+                              )}
                             </li>
                           ))}
                         </ul>
@@ -268,7 +269,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
             onClick={onClose}
             className="px-5 py-2 rounded-xl text-xs font-extrabold text-gray-500 hover:bg-gray-200 transition-colors"
           >
-            Cancel
+            Hủy bỏ
           </button>
 
           {step === "params" ? (
@@ -277,25 +278,25 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
               onClick={handleGenerate}
               className="px-6 py-2.5 bg-gradient-to-r from-[#6B6BFF] to-[#4648D4] text-white text-xs font-extrabold rounded-xl shadow-md hover:opacity-95 transition-all flex items-center gap-2"
             >
-              <span>✨ Generate Curriculum Tree</span>
+              <span>✨ Tạo Đề cương</span>
             </button>
           ) : (
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={handleGenerate}
-                disabled={genState === "loading"}
+                disabled={isGenerating}
                 className="px-4 py-2 bg-white border border-[#D5D5FF] text-[#4648D4] text-xs font-extrabold rounded-xl hover:bg-[#FAF8FF] transition-all disabled:opacity-50"
               >
-                🔄 Regenerate
+                🔄 Tạo lại
               </button>
               <button
                 type="button"
                 onClick={handleApply}
-                disabled={genState === "loading"}
+                disabled={isGenerating || outline.chapters.length === 0}
                 className="px-6 py-2.5 bg-[#1A1A2E] text-white text-xs font-black rounded-xl shadow-md hover:bg-[#4648D4] transition-all disabled:opacity-50"
               >
-                ✓ Apply To Curriculum Builder
+                ✓ Áp dụng vào Khóa học
               </button>
             </div>
           )}

@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { axiosClient } from "../../../../shared/lib/axios";
 import type { CourseBasicInfo } from "../types";
 
@@ -8,6 +8,31 @@ export interface CreateCoursePayload {
   level?: string;
   category_id: number;
   thumbnail?: File;
+}
+
+export interface CourseHealthIssue {
+  severity: "error" | "warning";
+  field: string;
+  message: string;
+}
+
+export interface CourseHealthReport {
+  status: "blocked" | "ready_with_warnings" | "ready";
+  score: number;
+  can_submit: boolean;
+  issues: CourseHealthIssue[];
+}
+
+export function useCourseHealth(courseId: string, enabled = true) {
+  return useQuery({
+    queryKey: ["instructor", "course", courseId, "health"],
+    queryFn: async () => {
+      const { data } = await axiosClient.get(`/api/instructor/courses/${courseId}/health`);
+      return data.data as CourseHealthReport;
+    },
+    enabled: enabled && Boolean(courseId),
+    staleTime: 15_000,
+  });
 }
 
 export function useCreateCourse() {
@@ -35,6 +60,8 @@ export function useCreateCourse() {
 }
 
 export function useUploadCourseThumbnail() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async ({ courseId, file }: { courseId: string; file: File }) => {
       const formData = new FormData();
@@ -46,21 +73,43 @@ export function useUploadCourseThumbnail() {
       );
       return data.data;
     },
+    onSuccess: (_, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId, "health"] });
+    },
   });
 }
 
 export function useUpdateCoursePrice() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ courseId, price }: { courseId: string; price: number }) => {
+    mutationFn: async ({ 
+      courseId, 
+      price,
+      is_flash_sale,
+      sale_price,
+      sale_start_date,
+      sale_end_date 
+    }: { 
+      courseId: string; 
+      price: number;
+      is_flash_sale?: boolean;
+      sale_price?: number;
+      sale_start_date?: string;
+      sale_end_date?: string;
+    }) => {
       const { data } = await axiosClient.patch(`/api/instructor/courses/${courseId}/price`, {
         price,
+        is_flash_sale,
+        sale_price,
+        sale_start_date,
+        sale_end_date
       });
       return data.data;
     },
     onSuccess: (_, { courseId }) => {
       queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
       queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId] });
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId, "health"] });
     },
   });
 }
@@ -72,6 +121,20 @@ export function useUpdateCourseStatus() {
       const { data } = await axiosClient.patch(`/api/instructor/courses/${courseId}/status`, {
         status,
       });
+      return data.data;
+    },
+    onSuccess: (_, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId] });
+    },
+  });
+}
+
+export function useSubmitForReview() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ courseId }: { courseId: string }) => {
+      const { data } = await axiosClient.post(`/api/instructor/courses/${courseId}/submit-review`);
       return data.data;
     },
     onSuccess: (_, { courseId }) => {
@@ -141,8 +204,9 @@ export function useUpdateCourse() {
       const { data } = await axiosClient.post(`/api/instructor/courses/${courseId}`, formData);
       return data.data;
     },
-    onSuccess: () => {
+    onSuccess: (_, { courseId }) => {
       queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId, "health"] });
     },
   });
 }

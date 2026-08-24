@@ -2,20 +2,29 @@
 
 namespace App\Models;
 
-use App\Models\User;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'action', 'subject_type', 'subject_id', 'ip_address', 'user_agent', 'metadata'])]
 class ActivityLog extends Model
 {
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'action',
+        'subject_type',
+        'subject_id',
+        'ip_address',
+        'user_agent',
+        'metadata'
+    ];
+
+    // Ép kiểu cột metadata thành mảng array tự động
     protected $casts = [
         'metadata' => 'array',
     ];
 
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }

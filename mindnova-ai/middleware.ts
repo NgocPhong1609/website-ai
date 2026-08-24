@@ -2,32 +2,87 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Trong file src/middleware.ts
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('accessToken')?.value;
-  const role = request.cookies.get('userRole')?.value;
+  const role = request.cookies.get('userRole')?.value?.toLowerCase();
   const { pathname } = request.nextUrl;
 
-  // CẬP NHẬT Ở ĐÂY: Bảo vệ trang chủ "/" thay vì "/dashboard"
-  const protectedRoutes = ['/instructor', '/admin']; 
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+  const isAuthRoute = pathname === '/login' || pathname === '/register';
+  const isInstructorRoute = pathname.startsWith('/instructor');
+  const isAdminRoute = pathname.startsWith('/admin');
+  const isPublicRoute = isAuthRoute || pathname === '/welcome' || pathname === '/forgot-password';
 
-  // Chặn truy cập nếu chưa đăng nhập
-  if (isProtectedRoute && !token) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // Student routes (everything else that is not auth, instructor, admin, welcome, forgot-password)
+  const isStudentRoute = !isAuthRoute && !isInstructorRoute && !isAdminRoute && !isPublicRoute;
+
+  // Normalized roles
+  const isTeacherRole = role === 'instructor' || role === 'teacher';
+  const isAdminRole = role === 'admin';
+  const isStudentRole = role === 'student' || (!isTeacherRole && !isAdminRole);
+
+  // 1. Unauthenticated users:
+  if (!token) {
+    // Protected student routes requiring authentication
+    const protectedStudentPaths = [
+      '/courses/lesson',
+      '/courses/assignment',
+      '/courses/certificates',
+      '/practice',
+      '/study-plan',
+      '/progress',
+      '/history',
+      '/profile',
+      '/billing',
+      '/checkout',
+      '/payment',
+      '/messages',
+      '/onboarding',
+      '/updated'
+    ];
+
+    if (isInstructorRoute || isAdminRoute || protectedStudentPaths.some(p => pathname.startsWith(p))) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    return NextResponse.next();
   }
 
-  // Nếu đã login mà vào trang login, đẩy về trang tương ứng
-  const authRoutes = ['/login', '/register'];
-  if (authRoutes.includes(pathname) && token) {
-    if (role === 'admin') return NextResponse.redirect(new URL('/admin', request.url));
-    if (role === 'instructor') return NextResponse.redirect(new URL('/instructor/courses', request.url));
-    return NextResponse.redirect(new URL('/', request.url)); // SỬA Ở ĐÂY: Trỏ về "/"
+  // 2. Authenticated users visiting Auth routes (/login, /register):
+  if (isAuthRoute) {
+    if (isAdminRole) return NextResponse.redirect(new URL('/admin', request.url));
+    if (isTeacherRole) return NextResponse.redirect(new URL('/instructor', request.url));
+    return NextResponse.redirect(new URL('/explore', request.url));
+  }
+
+  // 3. Teacher / Instructor role restrictions:
+  if (isTeacherRole) {
+    // Teacher MUST remain in /instructor portal ONLY.
+    // If Teacher accesses ANY student route or admin route -> REDIRECT to /instructor
+    if (isStudentRoute || isAdminRoute) {
+      return NextResponse.redirect(new URL('/instructor', request.url));
+    }
+  }
+
+  // 4. Student role restrictions:
+  if (isStudentRole) {
+    // Student CANNOT access /instructor/* or /admin/*
+    if (isInstructorRoute || isAdminRoute) {
+      return NextResponse.redirect(new URL('/explore', request.url));
+    }
+  }
+
+  // 5. Admin role restrictions:
+  if (isAdminRole) {
+    if (isAdminRoute) {
+      return NextResponse.next();
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/instructor/:path*', '/admin/:path*', '/login', '/register'], // Bỏ /dashboard ở đây
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+  ],
 };

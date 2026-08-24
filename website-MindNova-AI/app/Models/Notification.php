@@ -20,4 +20,19 @@ class Notification extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    protected static function booted()
+    {
+        static::created(function ($notification) {
+            $count = static::where('user_id', $notification->user_id)->count();
+            if ($count > 50) {
+                $excess = $count - 50;
+                $oldestIds = static::where('user_id', $notification->user_id)
+                    ->orderBy('id', 'asc')
+                    ->limit($excess)
+                    ->pluck('id');
+                static::whereIn('id', $oldestIds)->delete();
+            }
+        });
+    }
 }

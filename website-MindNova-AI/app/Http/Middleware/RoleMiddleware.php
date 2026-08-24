@@ -30,8 +30,24 @@ class RoleMiddleware
             ], 401);
         }
 
+        // Expand required roles to include aliases (e.g., teacher <-> instructor)
+        $expandedRoles = [];
+        foreach ($roles as $r) {
+            $expandedRoles[] = $r;
+            if ($r === 'teacher') $expandedRoles[] = 'instructor';
+            if ($r === 'instructor') $expandedRoles[] = 'teacher';
+        }
+
         // Check if user has any of the required roles via pivot table
-        $hasRole = $user->roles()->whereIn('name', $roles)->exists();
+        $hasRole = $user->roles()->whereIn('name', $expandedRoles)->exists();
+
+        // Fallback: check users.role column
+        if (!$hasRole) {
+            $legacyRole = (string) ($user->getRawOriginal('role') ?? $user->role ?? '');
+            if ($legacyRole !== '' && in_array($legacyRole, $expandedRoles, true)) {
+                $hasRole = true;
+            }
+        }
 
         if (!$hasRole) {
             return response()->json([

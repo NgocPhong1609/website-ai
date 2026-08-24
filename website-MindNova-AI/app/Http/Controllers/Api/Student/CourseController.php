@@ -21,10 +21,17 @@ class CourseController extends Controller
 
     /**
      * Retrieve list of published available courses.
+     *
+     * SECURITY: Only returns courses with status = 'published'
+     * and a valid published_version_id.
      */
     public function getAvailableCourses(Request $request): JsonResponse
     {
-        $query = Course::where('status', 'published');
+        // ── RULE 6 & 15: Only published courses with approved version ──
+        $query = Course::with(['teacher', 'category'])
+            ->where('status', 'published')
+            ->whereNotNull('published_version_id');
+
         $courses = $query->get();
 
         $user = $request->user('sanctum') ?? $request->user();
@@ -43,9 +50,21 @@ class CourseController extends Controller
 
     /**
      * Display detailed curriculum, AI tutor analytics, and student progress for a course.
+     *
+     * SECURITY: Only returns published lessons from approved versions.
+     * Draft/pending/rejected lessons are completely invisible.
      */
     public function detail(Request $request, $id = 1): JsonResponse
     {
+        // Verify the course is published
+        $course = Course::where('status', 'published')
+            ->whereNotNull('published_version_id')
+            ->find($id);
+
+        if (!$course) {
+            return $this->notFoundResponse('Không tìm thấy khóa học.');
+        }
+
         $user = $request->user('sanctum') ?? $request->user();
 
         $courseData = $this->courseService->getCourseDetail($id, $user);
@@ -53,6 +72,21 @@ class CourseController extends Controller
         return $this->successResponse(
             new CourseDetailResource($courseData),
             'Course detail retrieved successfully.'
+        );
+    }
+
+    /**
+     * Retrieve all enrolled courses for the student with progress metrics.
+     */
+    public function enrolledCourses(Request $request): JsonResponse
+    {
+        $user = $request->user('sanctum') ?? $request->user();
+
+        $enrolledCourses = $this->courseService->getEnrolledCourses($user);
+
+        return $this->successResponse(
+            $enrolledCourses,
+            'Enrolled courses retrieved successfully.'
         );
     }
 }

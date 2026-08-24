@@ -29,6 +29,7 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|max:255|unique:users,email,' . $user->id,
             'learning_goal' => 'sometimes|string|max:255',
             'skill_level' => 'sometimes|in:beginner,intermediate,advanced',
             'bio' => 'sometimes|string',
@@ -40,13 +41,20 @@ class UserController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Cập nhật bảng users (nếu có gửi lên name)
+        $userData = [];
+
         if ($request->has('name')) {
-            $user->update(['name' => $request->name]);
+            $userData['name'] = $request->name;
         }
 
-        // Cập nhật bảng user_profiles
-        // Sử dụng updateOrCreate để phòng trường hợp user chưa có record trong bảng profiles
+        if ($request->has('email')) {
+            $userData['email'] = $request->email;
+        }
+
+        if (!empty($userData)) {
+            $user->update($userData);
+        }
+
         $user->profile()->updateOrCreate(
             ['user_id' => $user->id],
             $request->only(['learning_goal', 'skill_level', 'bio', 'phone', 'address'])
@@ -54,16 +62,47 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'Cập nhật hồ sơ thành công',
-            'data' => $user->load('profile')
+            'data' => $user->fresh()->load('profile')
         ], 200);
     }
 
     // 3. Đổi mật khẩu
+    public function requestChangePasswordOtp(Request $request)
+    {
+        $user = $request->user();
+        $otp = str_pad(random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
+
+        $lastOtp = \App\Models\PasswordOtp::where('email', $user->email)
+            ->where('type', 'change_password')
+            ->orderBy('id', 'desc')
+            ->first();
+        
+        if ($lastOtp && $lastOtp->created_at->diffInSeconds(now()) < 60) {
+            return response()->json(['message' => 'Vui lòng đợi 60 giây để yêu cầu mã mới.'], 429);
+        }
+
+        \App\Models\PasswordOtp::updateOrCreate(
+            ['email' => $user->email, 'type' => 'change_password'],
+            [
+                'otp_hash' => Hash::make($otp),
+                'expires_at' => now()->addMinutes(5),
+                'verified_at' => null,
+                'attempts' => 0
+            ]
+        );
+
+        \Illuminate\Support\Facades\Mail::raw("MindNova AI\n\nMã xác nhận đổi mật khẩu của bạn là:\n\n$otp\n\nMã có hiệu lực trong 5 phút.\nNếu bạn không thực hiện yêu cầu này, hãy bảo vệ tài khoản ngay lập tức.", function ($message) use ($user) {
+            $message->to($user->email)->subject('MindNova AI - Mã OTP Đổi Mật Khẩu');
+        });
+
+        return response()->json(['message' => 'Đã gửi mã OTP.'], 200);
+    }
+
     public function changePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'current_password' => 'required',
-            'new_password' => 'required|min:6|confirmed', // Yêu cầu biến new_password_confirmation
+            'otp' => 'required|digits:6',
+            'new_password' => 'required|min:6|confirmed',
         ]);
 
         if ($validator->fails()) {
@@ -72,15 +111,32 @@ class UserController extends Controller
 
         $user = $request->user();
 
-        // Kiểm tra mật khẩu cũ có khớp không
-        if (!Hash::check($request->current_password, $user->password)) {
-            return response()->json(['message' => 'Mật khẩu hiện tại không chính xác'], 400);
+        $otpRecord = \App\Models\PasswordOtp::where('email', $user->email)
+            ->where('type', 'change_password')
+            ->first();
+
+        if (!$otpRecord) return response()->json(['message' => 'Mã OTP không hợp lệ hoặc chưa được yêu cầu.'], 400);
+
+        if ($otpRecord->attempts >= 5) {
+            $otpRecord->delete();
+            return response()->json(['message' => 'Quá số lần thử. Vui lòng yêu cầu mã mới.'], 400);
+        }
+
+        if (now()->greaterThan($otpRecord->expires_at)) {
+            return response()->json(['message' => 'Mã xác nhận đã hết hạn. Vui lòng yêu cầu mã mới.'], 400);
+        }
+
+        if (!Hash::check($request->otp, $otpRecord->otp_hash)) {
+            $otpRecord->increment('attempts');
+            return response()->json(['message' => 'Mã xác nhận không chính xác.'], 400);
         }
 
         // Cập nhật mật khẩu mới
         $user->update([
             'password' => Hash::make($request->new_password)
         ]);
+
+        $otpRecord->delete();
 
         return response()->json(['message' => 'Đổi mật khẩu thành công'], 200);
     }
@@ -118,5 +174,66 @@ class UserController extends Controller
         }
 
         return response()->json(['message' => 'Không tìm thấy file ảnh'], 400);
+    }
+
+    // 5. Upload CV (dành cho giáo viên gửi hồ sơ xét duyệt)
+    public function uploadCv(Request $request)
+    {
+        $request->validate([
+            'cv' => 'required|mimes:pdf,doc,docx|max:5120',
+        ]);
+
+        $user = $request->user();
+        $profile = $user->profile;
+
+        if ($profile && $profile->cv_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($profile->cv_path);
+        }
+
+        $path = $request->file('cv')->store('teacher-cv', 'public');
+
+        $user->profile()->updateOrCreate(['user_id' => $user->id], ['cv_path' => $path]);
+
+        return response()->json([
+            'message' => 'Tải lên CV thành công',
+            'cv_url' => asset('storage/' . $path),
+        ], 200);
+    }
+
+    // 6. Upload ảnh bằng cấp / chứng chỉ (có thể tải lên nhiều ảnh)
+    public function uploadCredential(Request $request)
+    {
+        $request->validate([
+            'credential' => 'required|image|mimes:jpeg,png,jpg,webp|max:4096',
+            'title' => 'sometimes|string|max:255',
+        ]);
+
+        $user = $request->user();
+        $path = $request->file('credential')->store('teacher-credentials', 'public');
+
+        $credential = $user->credentials()->create([
+            'title' => $request->input('title'),
+            'file_path' => $path,
+        ]);
+
+        return response()->json([
+            'message' => 'Tải lên bằng cấp thành công',
+            'data' => [
+                'id' => $credential->id,
+                'title' => $credential->title,
+                'file_url' => asset('storage/' . $credential->file_path),
+            ],
+        ], 201);
+    }
+
+    // 7. Xoá ảnh bằng cấp / chứng chỉ
+    public function deleteCredential(Request $request, int $credentialId)
+    {
+        $credential = $request->user()->credentials()->where('id', $credentialId)->firstOrFail();
+
+        \Illuminate\Support\Facades\Storage::disk('public')->delete($credential->file_path);
+        $credential->delete();
+
+        return response()->json(['message' => 'Xoá bằng cấp thành công'], 200);
     }
 }

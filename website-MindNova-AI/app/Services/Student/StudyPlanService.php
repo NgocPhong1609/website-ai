@@ -255,10 +255,15 @@ class StudyPlanService
             $aiResponseText = $this->callGemini($geminiKey, $systemPrompt, $message, $history);
         }
 
-        // Bước 3 & 4: Nếu Gemini bị lỗi (quá tải 429, sập API, hết lượt request -> trả về null) -> Tự động gọi sang OpenAI (gpt-4o-mini) để chữa cháy.
-        if (empty($aiResponseText) && !empty($openAiKey)) {
-            Log::info('[AI Fallback] Gemini unavailable or exceeded quota; automatically switching to OpenAI (gpt-4o-mini) transparently.');
-            $aiResponseText = $this->callOpenAi($openAiKey, $systemPrompt, $message, $history);
+        // Bước 3 & 4: Nếu Gemini bị lỗi (quá tải 429, sập API, hết lượt request -> trả về null) -> Tự động gọi sang OpenAI/Groq để chữa cháy.
+        if (empty($aiResponseText)) {
+            $provider = env('BACKUP_AI_PROVIDER', 'openai');
+            $fallbackKey = $provider === 'groq' ? $this->getEnvKey('GROQ_API_KEY') : $openAiKey;
+            
+            if (!empty($fallbackKey)) {
+                Log::info("[AI Fallback] Gemini unavailable or exceeded quota; automatically switching to {$provider} transparently.");
+                $aiResponseText = $this->callOpenAi($fallbackKey, $systemPrompt, $message, $history);
+            }
         }
 
         // 3. Fallback intelligence or user-friendly status notice if both APIs fail or keys are unassigned
@@ -316,7 +321,10 @@ class StudyPlanService
     private function callOpenAi(string $apiKey, string $systemPrompt, string $userMessage, array $history): ?string
     {
         try {
-            $model = $this->getEnvKey('OPENAI_MODEL') ?: config('services.openai.model', 'gpt-4o-mini');
+            $model = $this->getEnvKey('BACKUP_AI_MODEL') ?: ($this->getEnvKey('OPENAI_MODEL') ?: config('services.openai.model', 'gpt-4o-mini'));
+            $provider = env('BACKUP_AI_PROVIDER', 'openai');
+            $baseUrl = $provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://api.openai.com/v1/chat/completions';
+
             $messages = [
                 ['role' => 'system', 'content' => $systemPrompt],
             ];
@@ -331,7 +339,7 @@ class StudyPlanService
 
             $response = Http::withToken($apiKey)
                 ->timeout(30)
-                ->post('https://api.openai.com/v1/chat/completions', [
+                ->post($baseUrl, [
                     'model' => $model,
                     'messages' => $messages,
                     'temperature' => 0.7,
@@ -404,9 +412,9 @@ class StudyPlanService
      */
     private function generateIntelligentFallback(string $message, array $history = []): string
     {
-        $hasKey = !empty($this->getEnvKey('GEMINI_API_KEY')) || !empty($this->getEnvKey('OPENAI_API_KEY'));
+        $hasKey = !empty($this->getEnvKey('GEMINI_API_KEY')) || !empty($this->getEnvKey('OPENAI_API_KEY')) || !empty($this->getEnvKey('GROQ_API_KEY'));
 
-        // If at least one API key was configured in .env but BOTH Gemini and OpenAI failed (or both reached rate limits), display friendly UI guidance
+        // If at least one API key was configured in .env but BOTH Gemini and Fallback failed (or both reached rate limits), display friendly UI guidance
         if ($hasKey) {
             return "⏳ **Gia sư Nova hiện đang bận xíu (Hệ thống vừa chạm giới hạn tần suất yêu cầu hoặc đang bảo trì tải cao). Bạn vui lòng chờ khoảng 1 phút rồi quay lại trò chuyện với mình nhé!** 😊";
         }
@@ -436,7 +444,7 @@ class StudyPlanService
 
         // Dynamic conversational echo for custom input when offline
         $shortMessage = htmlspecialchars(mb_strimwidth($message, 0, 150, '...', 'UTF-8'));
-        $noticeBox = "> [!NOTE]\n> **Chế độ AI Cục bộ (Offline Mode Notification):**\n> Hiện tại hệ thống Backend kiểm tra thấy biến `OPENAI_API_KEY` và `GEMINI_API_KEY` trong file `.env` **đang bị để trống (chưa điền key)**.\n> 👉 Để trợ lý **Nova** trả lời tự do bằng Trí tuệ Nhân tạo thông minh (LLM), trò chuyện theo chính xác từng ý hỏi của bạn một cách không giới hạn, bạn hãy điền API Key thật của OpenAI hoặc Gemini vào file `.env` của Backend nhé!";
+        $noticeBox = "> [!NOTE]\n> **Chế độ AI Cục bộ (Offline Mode Notification):**\n> Hiện tại hệ thống Backend kiểm tra thấy biến API Key trong file `.env` **đang bị để trống (chưa điền key)**.\n> 👉 Để trợ lý **Nova** trả lời tự do bằng Trí tuệ Nhân tạo thông minh (LLM), trò chuyện theo chính xác từng ý hỏi của bạn một cách không giới hạn, bạn hãy điền API Key thật vào file `.env` của Backend nhé!";
 
         return "### 💡 Phân tích yêu cầu từ bạn\n\nMình đã tiếp nhận thông điệp của bạn: **\"{$shortMessage}\"**\n\nTrong lộ trình của **Module 4: Quantum Computing Fundamentals**, đây là một góc nhìn rất đáng quan tâm. Để tháo gỡ vấn đề này hiệu quả nhất, bạn có thể áp dụng chiến thuật sau:\n\n1. **Phủ định và xác định bản chất:** Đặt ra các câu hỏi cốt lõi để loại bỏ những ràng buộc không liên quan, tập trung thẳng vào logic nền tảng.\n2. **Đối chiếu với kiến thức chủ chốt:** Liên hệ với tài liệu trong phần *Study Inspector* bên phải, đặc biệt là các công thức toán học và biểu đồ mặt cầu.\n3. **Mô hình hóa thực nghiệm:** Nếu bạn đang triển khai giải thuật hoặc phân tích, hãy thử chia nhỏ thành từng bước hàm (function steps) để kiểm chứng giá trị đầu ra.\n\n{$noticeBox}\n\n✨ *Bạn muốn cùng mình đào sâu chi tiết hơn vào khía cạnh nào ở trên?*";
     }

@@ -138,7 +138,7 @@ export function LessonEditModal({ lesson, onSave, onClose }: LessonEditModalProp
       setVideoUrl(result.url);
     } catch (err: any) {
       if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED' || err?.message === 'canceled') {
-        console.log("Upload cancelled by user");
+        // User cancelled upload
       } else {
         console.error(err);
         alert("Đã xảy ra lỗi khi tải video.");

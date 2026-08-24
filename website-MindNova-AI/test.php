@@ -1,12 +1,11 @@
 <?php
-
-require __DIR__.'/vendor/autoload.php';
-$app = require_once __DIR__.'/bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-$kernel->bootstrap();
-
-$user = \App\Models\User::find(1);
-$service = new \App\Services\Student\StudyPlanService();
-$overview = $service->getOverview($user);
-
-echo json_encode($overview, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+require 'vendor/autoload.php';
+$app = require_once 'bootstrap/app.php';
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+$user = \App\Models\User::find(83);
+$req = Illuminate\Http\Request::create('/api/instructor/discussions', 'GET');
+// By passing the user, Laravel might still redirect if we don't bind it to the auth guard
+$app['auth']->guard('sanctum')->setUser($user);
+$req->setUserResolver(function() use ($user) { return $user; });
+$response = $kernel->handle($req);
+echo $response->getContent();

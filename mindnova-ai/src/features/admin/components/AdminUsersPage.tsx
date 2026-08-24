@@ -30,12 +30,12 @@ export async function AdminUsersPage() {
   };
 
   return (
-    <div className="space-y-6 p-6 lg:p-8 [font-family:var(--font-admin-body)]">
-      <section className="mn-stagger rounded-[30px] border border-cyan-200/20 bg-[linear-gradient(125deg,#0b1636_0%,#0d224a_50%,#115e83_100%)] p-6 text-white shadow-[0_30px_70px_-30px_rgba(13,23,56,0.95)]">
+    <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+      <section className="mn-stagger rounded-2xl border border-cyan-200/20 bg-[linear-gradient(125deg,#0b1636_0%,#0d224a_50%,#115e83_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
         <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-cyan-100/65">Kiểm duyệt người dùng</p>
-          <h1 className="mt-2 text-3xl font-semibold [font-family:var(--font-admin-head)]">Quản lý kiểm duyệt người dùng</h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-200/90">
+          <p className="text-[10px] uppercase tracking-[0.35em] text-cyan-100/65">Kiểm duyệt người dùng</p>
+          <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý kiểm duyệt người dùng</h1>
+          <p className="mt-1 max-w-2xl text-xs text-slate-200/90">
             Theo dõi trạng thái tài khoản học viên, giảng viên và xử lý kiểm duyệt quyền truy cập.
           </p>
         </div>

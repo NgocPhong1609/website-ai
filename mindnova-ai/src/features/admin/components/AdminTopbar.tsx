@@ -199,18 +199,19 @@ export function AdminTopbar() {
   };
 
   return (
-    <header className="flex h-20 shrink-0 items-center gap-4 border-b border-cyan-100/70 bg-white/75 px-5 backdrop-blur-2xl">
-      <div className="flex flex-1 items-center gap-3">
-        <div className="flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50/70 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+    <header className="flex h-14 shrink-0 items-center gap-4 border-b border-slate-200 bg-white/80 px-5 backdrop-blur-xl">
+      <div className="flex flex-1 items-center gap-4">
+        <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold text-emerald-700">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          Đồng bộ trực tiếp
+          Online sync
         </div>
 
-        <div className="relative max-w-lg flex-1">
+        <div className="relative max-w-xl flex-1">
+          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">⌕</span>
           <input
             type="search"
-            placeholder="Tìm người dùng, doanh thu, khóa học..."
-            className="w-full rounded-2xl border border-cyan-100 bg-white/90 px-4 py-3 text-sm text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none transition focus:border-cyan-300 focus:bg-white focus:ring-4 focus:ring-cyan-100"
+            placeholder="Tìm nhanh người dùng, khóa học, doanh thu..."
+            className="w-full rounded-2xl border border-slate-200 bg-slate-50/90 py-2.5 pl-10 pr-4 text-sm text-slate-700 outline-none transition focus:border-cyan-300 focus:bg-white focus:ring-4 focus:ring-cyan-100"
           />
         </div>
       </div>
@@ -264,10 +265,20 @@ export function AdminTopbar() {
         >
           {isRefreshing ? "Đang làm mới..." : "Làm mới dữ liệu"}
         </button>
+
+        <button
+          type="button"
+          aria-label="Notifications"
+          className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-lg text-slate-600 transition hover:border-cyan-200 hover:text-cyan-700"
+        >
+          🔔
+          <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
+        </button>
+
         <button
           type="button"
           onClick={handleLogout}
-          className="rounded-2xl border border-rose-200 bg-rose-50/80 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
+          className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
         >
           Đăng xuất
         </button>

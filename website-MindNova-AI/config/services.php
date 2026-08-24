@@ -47,15 +47,33 @@ return [
         'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
     ],
 
+    // AI tạo nội dung (course generation, v.v.)
     'gemini' => [
         'api_key' => env('GEMINI_API_KEY'),
-        'model' => env('GEMINI_MODEL', 'gemini-1.5-flash'),
+        'model' => env('GEMINI_MODEL', 'gemini-3.6-flash'),
     ],
-    
+
+    // AI trả lời câu hỏi / hỗ trợ học sinh (chat)
+    'groq' => [
+        'key' => env('GROQ_API_KEY'),
+        'model' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+    ],
+
+    'backup_ai' => [
+        'api_key' => env('BACKUP_AI_API_KEY'),
+        'model' => env('BACKUP_AI_MODEL', 'gpt-4o-mini'),
+    ],
+
     'momo' => [
         'partner_code' => env('MOMO_PARTNER_CODE'),
         'access_key' => env('MOMO_ACCESS_KEY'),
         'secret_key' => env('MOMO_SECRET_KEY'),
         'endpoint' => env('MOMO_ENDPOINT', 'https://test-payment.momo.vn/v2/gateway/api/create'),
+    ],
+
+    'vnpay' => [
+        'tmn_code' => env('VNPAY_TMN_CODE', env('VNP_TMN_CODE', '')),
+        'hash_secret' => env('VNPAY_HASH_SECRET', env('VNP_HASH_SECRET', '')),
+        'endpoint' => env('VNP_URL', 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'),
     ],
 ];

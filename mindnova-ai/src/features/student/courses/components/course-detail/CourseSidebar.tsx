@@ -201,26 +201,37 @@ function ResourcesCard({ resources = [] }: { resources?: CourseDetailResourceIte
   );
 }
 
-function InstructorCard({ instructor }: { instructor?: CourseDetailInstructor }) {
+import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
+import { Avatar } from "@/src/shared/components/ui/Avatar";
+
+function InstructorCard({ instructor }: { instructor?: CourseDetailInstructor & { is_verified?: boolean; avatar_url?: string } }) {
   const name = instructor?.name || "TS. Nguyễn Ngọc Phong";
   const role = instructor?.role || "Chuyên gia Kiến trúc Trí tuệ Nhân tạo";
   const bio = instructor?.bio || "Hơn 12 năm kinh nghiệm thiết kế mô hình AI và dẫn dắt các dự án điện toán đám mây thế hệ mới tại các học viện công nghệ hàng đầu.";
+  const isVerified = instructor?.is_verified ?? true;
+  const avatarSrc = instructor?.avatar_url || (instructor as any)?.avatar || null;
 
   return (
     <div className="bg-white rounded-2xl border border-[#EAEAF4] p-5 shadow-2xs flex flex-col items-center text-center relative overflow-hidden group hover:border-[#6B6BFF]/30 transition-all">
       <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-r from-[#EEF2FF] via-[#E0F2FE] to-[#EEF2FF] border-b border-[#EAEAF4]" />
 
-      <div className="relative z-10 w-20 h-20 rounded-full bg-gradient-to-tr from-[#5052EE] to-[#4CD7F6] p-1 shadow-md mb-3 mt-3">
-        <div className="w-full h-full rounded-full bg-white flex items-center justify-center font-bold text-xl text-[#5052EE]">
-          NP
-        </div>
+      <div className="relative z-10 mb-3 mt-3">
+        <Avatar
+          src={avatarSrc}
+          fallback={name}
+          size="xl"
+          className="w-20 h-20 text-xl font-bold shadow-md border-2 border-white ring-2 ring-[#5052EE]"
+        />
       </div>
 
       <span className="text-[11px] font-medium text-[#5052EE] bg-[#EEF2FF] px-2.5 py-0.5 rounded-full border border-[#5052EE]/20 mb-1">
         Giảng viên Chủ trì • Chuyên gia AI
       </span>
 
-      <h3 className="text-base font-bold text-[#1A1A2E]">{name}</h3>
+      <div className="flex items-center gap-1">
+        <h3 className="text-base font-bold text-[#1A1A2E]">{name}</h3>
+        <VerifiedTeacherBadge isVerified={isVerified} size="sm" />
+      </div>
       <p className="text-xs text-[#0D9488] font-semibold mb-2">{role}</p>
       <p className="text-xs text-[#64647A] leading-relaxed max-w-xs font-normal mb-4">
         {bio}
@@ -245,7 +256,7 @@ function EnrollCard({ price, courseId }: { price?: number, courseId?: string | n
       <div className="flex items-center justify-between gap-2 mb-3">
         <div>
           <span className="text-xs font-semibold text-[#10B981] uppercase tracking-wider block">Phí Đăng Ký</span>
-          <h3 className="text-2xl font-bold text-[#1A1A2E] mt-0.5">{price ? `${price.toLocaleString()} VND` : 'Miễn phí'}</h3>
+          <h3 className="text-2xl font-bold text-[#1A1A2E] mt-0.5">{Number(price) === 0 ? 'Miễn phí' : `${Number(price).toLocaleString()} VND`}</h3>
         </div>
       </div>
       <p className="text-xs text-[#64647A] mb-4 leading-relaxed">

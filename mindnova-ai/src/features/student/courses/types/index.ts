@@ -71,6 +71,7 @@ export interface CourseDetailHeaderInfo {
   category_tag: string;
   is_enrolled?: boolean;
   price?: number;
+  thumbnail?: string;
 }
 
 export interface CourseDetailProgressCard {
@@ -100,9 +101,13 @@ export interface CourseDetailLessonItem {
   id: string | number;
   order?: number;
   title: string;
+  type?: 'video' | 'article' | 'quiz_module' | string;
   duration: string;
+  duration_seconds?: number;
   status: 'completed' | 'current' | 'locked' | string;
   video_url?: string;
+  has_uploaded_video?: boolean;
+  content?: string; // HTML content for article type
 }
 
 export interface CourseDetailModuleItem {

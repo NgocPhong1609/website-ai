@@ -23,6 +23,19 @@ class Enrollment extends Model
         'progress_percentage' => 'integer',
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($enrollment) {
+            $conversation = \App\Models\ChatConversation::where('course_id', $enrollment->course_id)->first();
+            if ($conversation) {
+                \App\Models\ChatConversationMember::firstOrCreate([
+                    'chat_conversation_id' => $conversation->id,
+                    'user_id' => $enrollment->user_id
+                ]);
+            }
+        });
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

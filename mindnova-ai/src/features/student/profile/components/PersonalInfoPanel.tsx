@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useUpdateProfile } from "../api";
 
 interface PersonalInfoPanelProps {
   fullName: string;
@@ -55,13 +56,25 @@ export function PersonalInfoPanel({
   const [email, setEmail] = useState(initialEmail);
   const [bio, setBio] = useState(initialBio);
   const [saved, setSaved] = useState(false);
+  const updateProfileMutation = useUpdateProfile();
 
   const isDirty =
     fullName !== initialName || email !== initialEmail || bio !== initialBio;
 
-  function handleSave() {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  async function handleSave() {
+    try {
+      await updateProfileMutation.mutateAsync({
+        fullName,
+        email,
+        bio,
+      });
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (error: any) {
+      console.error("Failed to save profile", error);
+      alert(error?.response?.data?.message || "Không thể lưu thông tin hồ sơ. Vui lòng thử lại.");
+    }
   }
 
   function handleDiscard() {
@@ -140,7 +153,8 @@ export function PersonalInfoPanel({
           <button
             type="button"
             onClick={handleSave}
-            className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#5052EE] via-[#6063EE] to-[#0D9488] shadow-sm hover:opacity-95 active:scale-98 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+            disabled={updateProfileMutation.isPending || !isDirty}
+            className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#5052EE] via-[#6063EE] to-[#0D9488] shadow-sm hover:opacity-95 active:scale-98 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               {saved ? (
@@ -153,7 +167,7 @@ export function PersonalInfoPanel({
                 </>
               )}
             </svg>
-            <span>{saved ? "Đã cập nhật thành công!" : "Lưu thay đổi"}</span>
+            <span>{updateProfileMutation.isPending ? "Đang lưu..." : saved ? "Đã cập nhật thành công!" : "Lưu thay đổi"}</span>
           </button>
         </div>
       </div>

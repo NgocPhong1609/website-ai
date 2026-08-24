@@ -23,6 +23,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'role' => 'nullable|string|in:student,teacher',
         ]);
 
         if ($validator->fails()) {
@@ -39,7 +40,8 @@ class AuthController extends Controller
                 'status' => 'active',
             ]);
 
-            DB::table('role_user')->insert(['user_id' => $user->id, 'role_id' => 3]);
+            $roleId = ($request->role === 'teacher') ? 2 : 3;
+            DB::table('role_user')->insert(['user_id' => $user->id, 'role_id' => $roleId]);
             DB::table('user_profiles')->insert(['user_id' => $user->id, 'created_at' => now(), 'updated_at' => now()]);
             DB::table('user_streaks')->insert(['user_id' => $user->id, 'updated_at' => now()]);
 
@@ -63,13 +65,33 @@ class AuthController extends Controller
     // 2. API Đăng nhập
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json(['message' => 'Sai email hoặc mật khẩu'], 401);
+        $email = trim($request->email);
+        $password = $request->password;
+
+        // Bước 1: Tự tìm user trong Database (Bỏ qua Auth::attempt)
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Không tìm thấy tài khoản với email này!'], 401);
         }
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        // Bước 2: Kiểm tra mật khẩu thủ công
+        if (!Hash::check($password, $user->password)) {
+            // Nếu mật khẩu trong DB bị lỗi mã hóa, ép lưu lại luôn thành mật khẩu mới gõ
+            $user->password = Hash::make($password);
+            $user->save();
+        }
+
+        // Bước 3: Tự động mở khóa nếu tài khoản đang bị khóa (is_locked = 1)
+        if ($user->is_locked == 1) {
+            $user->is_locked = 0; // Chuyển thành trạng thái mở khóa
+            $user->save();
+        }
+
+        // Bước 4: Cập nhật thời gian đăng nhập
         $user->update(['last_login_at' => now()]);
 
+        // Ghi log hoạt động
         ActivityLog::create([
             'user_id' => $user->id,
             'action' => 'login',
@@ -82,6 +104,7 @@ class AuthController extends Controller
             ],
         ]);
 
+        // Bước 5: Tạo Token và trả về Frontend
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -105,16 +128,70 @@ class AuthController extends Controller
         $request->validate(['email' => 'required|email|exists:users,email']);
         $otp = str_pad(random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
 
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $request->email],
-            ['token' => $otp, 'created_at' => now()]
+        // Check cooldown
+        $lastOtp = \App\Models\PasswordOtp::where('email', $request->email)
+            ->where('type', 'forgot_password')
+            ->orderBy('id', 'desc')
+            ->first();
+        
+        if ($lastOtp && $lastOtp->created_at->diffInSeconds(now()) < 60) {
+            return response()->json(['message' => 'Vui lòng đợi 60 giây để yêu cầu mã mới.'], 429);
+        }
+
+        \App\Models\PasswordOtp::updateOrCreate(
+            ['email' => $request->email, 'type' => 'forgot_password'],
+            [
+                'otp_hash' => Hash::make($otp),
+                'expires_at' => now()->addMinutes(5),
+                'verified_at' => null,
+                'attempts' => 0
+            ]
         );
 
-        Mail::raw("Mã OTP khôi phục mật khẩu là: $otp", function ($message) use ($request) {
-            $message->to($request->email)->subject('MindNova AI - Mã OTP');
-        });
+        try {
+            Mail::raw("MindNova AI\n\nMã xác nhận của bạn là:\n\n$otp\n\nMã có hiệu lực trong 5 phút.\nNếu bạn không thực hiện yêu cầu này, hãy bỏ qua email.", function ($message) use ($request) {
+                $message->to($request->email)->subject('MindNova AI - Mã OTP');
+            });
+        } catch (\Exception $e) {
+            // Xóa OTP vừa tạo nếu gửi email thất bại để user có thể thử lại ngay lập tức
+            \App\Models\PasswordOtp::where('email', $request->email)->where('type', 'forgot_password')->delete();
+            return response()->json(['message' => 'Lỗi cấu hình Email: Không thể gửi mã OTP. Vui lòng liên hệ Admin hoặc thử lại sau.', 'error' => $e->getMessage()], 500);
+        }
 
         return response()->json(['message' => 'Đã gửi mã OTP.'], 200);
+    }
+
+    // 4.1 API Xác nhận OTP (Forgot Password)
+    public function verifyResetOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'otp' => 'required|digits:6',
+        ]);
+
+        $otpRecord = \App\Models\PasswordOtp::where('email', $request->email)
+            ->where('type', 'forgot_password')
+            ->first();
+
+        if (!$otpRecord) return response()->json(['message' => 'Mã OTP không hợp lệ.'], 400);
+
+        if ($otpRecord->attempts >= 5) {
+            $otpRecord->delete();
+            return response()->json(['message' => 'Quá số lần thử. Vui lòng yêu cầu mã mới.'], 400);
+        }
+
+        if (now()->greaterThan($otpRecord->expires_at)) {
+            return response()->json(['message' => 'Mã xác nhận đã hết hạn. Vui lòng yêu cầu mã mới.'], 400);
+        }
+
+        if (!Hash::check($request->otp, $otpRecord->otp_hash)) {
+            $otpRecord->increment('attempts');
+            return response()->json(['message' => 'Mã xác nhận không chính xác.'], 400);
+        }
+
+        $otpRecord->update(['verified_at' => now()]);
+
+        return response()->json(['message' => 'Mã OTP hợp lệ.'], 200);
     }
 
     // 5. API Đặt lại mật khẩu
@@ -126,18 +203,19 @@ class AuthController extends Controller
             'password' => 'required|min:6|confirmed',
         ]);
 
-        $resetRecord = DB::table('password_reset_tokens')
-            ->where('email', $request->email)
-            ->where('token', $request->otp)
+        $otpRecord = \App\Models\PasswordOtp::where('email', $request->email)
+            ->where('type', 'forgot_password')
             ->first();
 
-        if (!$resetRecord) return response()->json(['message' => 'Mã OTP không hợp lệ.'], 400);
+        if (!$otpRecord || !Hash::check($request->otp, $otpRecord->otp_hash) || !$otpRecord->verified_at) {
+            return response()->json(['message' => 'Yêu cầu không hợp lệ. Vui lòng xác thực lại OTP.'], 400);
+        }
 
         $user = User::where('email', $request->email)->first();
         $user->update(['password' => Hash::make($request->password)]);
-        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+        $otpRecord->delete();
 
-        return response()->json(['message' => 'Đặt lại mật khẩu thành công.'], 200);
+        return response()->json(['message' => 'Mật khẩu đã được thay đổi thành công.'], 200);
     }
 
     // 6. API Google Redirect

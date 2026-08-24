@@ -221,7 +221,7 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
                 itemStyle={{ fontWeight: 'bold' }}
                 labelStyle={{ color: '#6b7280', marginBottom: '4px', fontSize: '12px' }}
-                formatter={(value: any, name: string) => [`${value.toLocaleString('vi-VN')}đ`, name === 'revenue' ? 'Doanh thu bán mới' : 'Hoàn tiền']}
+                formatter={(value: any, name: any) => [`${value.toLocaleString('vi-VN')} đ`, name === 'revenue' ? 'Doanh thu' : 'Hoàn tiền']}
               />
               <Area 
                 type="monotone" 
@@ -246,8 +246,10 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
-            Chưa có dữ liệu
+          <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+            <span className="text-4xl mb-3 opacity-50 grayscale">📉</span>
+            <span className="text-sm font-bold text-gray-600">Chưa có dữ liệu báo cáo</span>
+            <span className="text-xs font-medium text-gray-400 mt-1">Sẽ hiển thị khi có phát sinh doanh thu/hoàn tiền</span>
           </div>
         )}
       </div>

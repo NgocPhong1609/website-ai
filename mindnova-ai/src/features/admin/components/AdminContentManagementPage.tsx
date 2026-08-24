@@ -61,7 +61,7 @@ export function AdminContentManagementPage() {
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [courseDetail, setCourseDetail] = useState<CourseDetail | null>(null);
   const [detailCourseId, setDetailCourseId] = useState<number | null>(null);
-  const [courseVisibility, setCourseVisibility] = useState<"visible" | "hidden">("visible");
+  const [activeTab, setActiveTab] = useState<"pending" | "all">("pending");
   const [resourceForm, setResourceForm] = useState({ title: "", type: "ebook", url: "", description: "" });
 
   const loadData = async () => {
@@ -69,7 +69,7 @@ export function AdminContentManagementPage() {
 
     try {
       const [coursesRes, resourcesRes, questionsRes] = await Promise.all([
-        adminApi<{ data: CourseRow[] }>(`/admin/content/courses?visibility=${courseVisibility}`),
+        adminApi<{ data: CourseRow[] }>("/admin/content/courses?visibility=all"),
         adminApi<{ data: ResourceRow[] }>("/admin/content/resources"),
         adminApi<{ data: QuestionRow[] }>("/admin/content/question-bank"),
       ]);
@@ -84,7 +84,7 @@ export function AdminContentManagementPage() {
 
   useEffect(() => {
     void loadData();
-  }, [courseVisibility]);
+  }, []);
 
   useEffect(() => {
     const handleRefresh = () => {
@@ -95,9 +95,9 @@ export function AdminContentManagementPage() {
     return () => window.removeEventListener("admin:refresh-data", handleRefresh);
   }, []);
 
-  const pendingCourses = useMemo(() => courses.filter((course) => course.status === "draft").length, [courses]);
+  const pendingCourses = useMemo(() => courses.filter((course) => course.status === "pending_review").length, [courses]);
 
-  const hiddenCourses = useMemo(() => courses.filter((course) => Boolean(course.admin_hidden_at)).length, [courses]);
+  const allCoursesCount = courses.length;
 
   const fetchCourseDetail = async (courseId: number) => {
     const payload = await adminApi<{ data: CourseDetail }>(`/admin/content/courses/${courseId}`);
@@ -213,16 +213,16 @@ export function AdminContentManagementPage() {
   };
 
   return (
-    <div className="space-y-6 p-6 lg:p-8 [font-family:var(--font-admin-body)]">
-      <section className="rounded-[28px] border border-cyan-200/20 bg-[linear-gradient(120deg,#0f172a_0%,#155e75_50%,#0f766e_100%)] p-6 text-white shadow-[0_30px_70px_-35px_rgba(7,18,45,0.8)]">
-        <p className="text-xs uppercase tracking-[0.34em] text-cyan-100/70">Content Management</p>
-        <h1 className="mt-2 text-3xl font-semibold [font-family:var(--font-admin-head)]">Kiểm duyệt nội dung học tập</h1>
-        <p className="mt-2 text-sm text-slate-100/90">Duyệt/gỡ bài giảng, quản lý kho tài liệu mẫu, và phân loại ngân hàng câu hỏi cho AI tạo đề.</p>
+    <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+      <section className="rounded-2xl border border-cyan-200/20 bg-[linear-gradient(120deg,#0f172a_0%,#155e75_50%,#0f766e_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.8)]">
+        <p className="text-[10px] uppercase tracking-[0.34em] text-cyan-100/70">Content Management</p>
+        <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý khóa học</h1>
+        <p className="mt-1 text-xs text-slate-100/90">Duyệt/gỡ bài giảng, quản lý kho tài liệu mẫu, và phân loại ngân hàng câu hỏi cho AI tạo đề.</p>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <SmallCard label="Tổng khóa học" value={courses.length} />
-        <SmallCard label={courseVisibility === "hidden" ? "Đã ẩn khỏi admin" : "Chờ duyệt"} value={courseVisibility === "hidden" ? hiddenCourses : pendingCourses} />
+        <SmallCard label="Tổng khóa học" value={allCoursesCount} />
+        <SmallCard label="Chờ duyệt" value={pendingCourses} />
         <SmallCard label="Kho tài liệu mẫu" value={resources.length} />
       </section>
 
@@ -232,17 +232,17 @@ export function AdminContentManagementPage() {
           <div className="inline-flex rounded-xl bg-slate-100 p-1 text-sm">
             <button
               type="button"
-              onClick={() => setCourseVisibility("visible")}
-              className={`rounded-lg px-3 py-2 font-medium transition ${courseVisibility === "visible" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"}`}
+              onClick={() => setActiveTab("pending")}
+              className={`rounded-lg px-3 py-2 font-medium transition ${activeTab === "pending" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"}`}
             >
-              Đang hiển thị
+              Khóa học chờ duyệt
             </button>
             <button
               type="button"
-              onClick={() => setCourseVisibility("hidden")}
-              className={`rounded-lg px-3 py-2 font-medium transition ${courseVisibility === "hidden" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"}`}
+              onClick={() => setActiveTab("all")}
+              className={`rounded-lg px-3 py-2 font-medium transition ${activeTab === "all" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"}`}
             >
-              Đã ẩn khỏi admin
+              Tất cả khóa học
             </button>
           </div>
         </div>
@@ -257,14 +257,22 @@ export function AdminContentManagementPage() {
               </tr>
             </thead>
             <tbody>
-              {courses.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-3 py-6 text-center text-sm text-slate-500">
-                    {courseVisibility === "hidden" ? "Chưa có khóa học nào bị ẩn khỏi admin." : "Chưa có khóa học trong danh sách kiểm duyệt."}
-                  </td>
-                </tr>
-              ) : (
-                courses.map((course) => (
+              {(() => {
+                const displayedCourses = activeTab === "pending"
+                  ? courses.filter((c) => c.status === "pending_review")
+                  : courses;
+
+                if (displayedCourses.length === 0) {
+                  return (
+                    <tr>
+                      <td colSpan={4} className="px-3 py-6 text-center text-sm text-slate-500">
+                        {activeTab === "pending" ? "Không có khóa học nào đang chờ duyệt." : "Chưa có khóa học nào trong hệ thống."}
+                      </td>
+                    </tr>
+                  );
+                }
+
+                return displayedCourses.map((course) => (
                   <tr key={course.id} className="border-t border-slate-200">
                     <td className="px-3 py-2">{course.title}</td>
                     <td className="px-3 py-2">{course.teacher?.name || "-"}</td>
@@ -284,7 +292,7 @@ export function AdminContentManagementPage() {
                           {pendingAction === `detail-${course.id}` ? "Đang tải..." : "Xem chi tiết"}
                         </button>
 
-                        {courseVisibility === "hidden" ? (
+                        {course.admin_hidden_at ? (
                           <button
                             type="button"
                             onClick={() => void restoreCourse(course.id)}
@@ -295,14 +303,16 @@ export function AdminContentManagementPage() {
                           </button>
                         ) : (
                           <>
-                            <button
-                              type="button"
-                              onClick={() => void moderateCourse(course.id, "published")}
-                              disabled={pendingAction !== null}
-                              className="rounded-lg bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
-                            >
-                              {pendingAction === `published-${course.id}` ? "Đang duyệt..." : "Duyệt"}
-                            </button>
+                            {activeTab === "pending" && (
+                               <button
+                                 type="button"
+                                 onClick={() => void moderateCourse(course.id, "published")}
+                                 disabled={pendingAction !== null}
+                                 className="rounded-lg bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+                               >
+                                 {pendingAction === `published-${course.id}` ? "Đang duyệt..." : "Duyệt"}
+                               </button>
+                            )}
                             <button
                               type="button"
                               onClick={() => void moderateCourse(course.id, "archived")}
@@ -326,8 +336,8 @@ export function AdminContentManagementPage() {
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
+                ));
+              })()}
             </tbody>
           </table>
         </div>
@@ -523,15 +533,17 @@ function SmallCard({ label, value }: { label: string; value: number }) {
 }
 
 function statusLabel(status: string): string {
-  if (status === "published") return "Đã duyệt";
+  if (status === "published") return "Đã công khai";
   if (status === "archived") return "Đã gỡ bỏ";
-  if (status === "draft") return "Chờ duyệt";
+  if (status === "pending_review") return "Chờ duyệt";
+  if (status === "draft") return "Bản nháp";
   return status;
 }
 
 function statusClassName(status: string): string {
   if (status === "published") return "bg-emerald-100 text-emerald-800";
   if (status === "archived") return "bg-amber-100 text-amber-800";
+  if (status === "pending_review") return "bg-sky-100 text-sky-800";
   if (status === "draft") return "bg-slate-100 text-slate-700";
   return "bg-slate-100 text-slate-700";
 }
