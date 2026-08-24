@@ -64,4 +64,37 @@ class DiscussionController extends Controller
 
         return $this->createdResponse($discussion, 'Discussion created successfully.');
     }
+
+    public function update(Request $request, Lesson $lesson, Discussion $discussion)
+    {
+        $student = $request->user();
+
+        if ($discussion->student_id !== $student->id) {
+            return $this->forbiddenResponse('Bạn không có quyền sửa bình luận này.');
+        }
+
+        $request->validate([
+            'content' => 'required|string|max:2000',
+        ]);
+
+        $discussion->update([
+            'content' => $request->content,
+            'title' => mb_substr($request->content, 0, 50) . (mb_strlen($request->content) > 50 ? '...' : ''),
+        ]);
+
+        return $this->successResponse($discussion->load(['student', 'replies.user']), 'Cập nhật bình luận thành công.');
+    }
+
+    public function destroy(Request $request, Lesson $lesson, Discussion $discussion)
+    {
+        $student = $request->user();
+
+        if ($discussion->student_id !== $student->id) {
+            return $this->forbiddenResponse('Bạn không có quyền xóa bình luận này.');
+        }
+
+        $discussion->delete();
+
+        return $this->successResponse(null, 'Xóa bình luận thành công.');
+    }
 }

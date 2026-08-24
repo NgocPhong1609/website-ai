@@ -13,10 +13,10 @@ class CourseService
      * 
      * SECURITY: Only counts published lessons toward progress.
      */
-    public function calculateStudentProgress(Course $course, ?int $userId = null): array
+    public function calculateStudentProgress(Course $course, int $userId): array
     {
         $completedLessonIds = [];
-        if ($userId && class_exists(\App\Models\LessonCompletion::class)) {
+        if (class_exists(\App\Models\LessonCompletion::class)) {
             $completedLessonIds = \App\Models\LessonCompletion::where('user_id', $userId)
                 ->pluck('lesson_id')
                 ->toArray();
@@ -102,32 +102,21 @@ class CourseService
             $completedLessonIds = \App\Models\LessonCompletion::where('user_id', $userId)->pluck('lesson_id')->toArray();
         }
 
-        $isEnrolled = false;
-        if ($userId && class_exists(\App\Models\Enrollment::class) && isset($dbCourse)) {
-            $isEnrolled = \App\Models\Enrollment::where('user_id', $userId)->where('course_id', $dbCourse->id)->exists();
-        }
-
         // Query real database course
         try {
             if (class_exists(Course::class)) {
                 // ── SECURITY: Only fetch published courses ──
-                if (!isset($dbCourse)) {
+                $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])
+                    ->where('status', 'published')
+                    ->whereNotNull('published_version_id')
+                    ->find($courseId);
+                
+                if (!$dbCourse) {
+                    // Fallback to first published course
                     $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])
                         ->where('status', 'published')
                         ->whereNotNull('published_version_id')
-                        ->find($courseId);
-                    
-                    if (!$dbCourse) {
-                        // Fallback to first published course
-                        $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])
-                            ->where('status', 'published')
-                            ->whereNotNull('published_version_id')
-                            ->first();
-                    }
-
-                    if ($dbCourse && $userId && class_exists(\App\Models\Enrollment::class)) {
-                        $isEnrolled = \App\Models\Enrollment::where('user_id', $userId)->where('course_id', $dbCourse->id)->exists();
-                    }
+                        ->first();
                 }
 
                 if ($dbCourse) {
@@ -140,7 +129,7 @@ class CourseService
                     
                     if ($dbCourse->teacher) {
                         $instructorName = $dbCourse->teacher->name;
-                        $instructorAvatar = $dbCourse->teacher->avatar_url ?? $dbCourse->teacher->avatar ?? '/avatar-placeholder.png';
+                        $instructorAvatar = $dbCourse->teacher->avatar ?? '/avatar-placeholder.png';
                         // Fallback role/bio for user if it doesn't exist
                         $instructorBio = "Chuyên gia giàu kinh nghiệm trong lĩnh vực {$categoryName}.";
                     }
@@ -188,13 +177,12 @@ class CourseService
                                         'duration' => $durationText,
                                         'duration_seconds' => $durationSec,
                                         'status' => $status,
-                                        // ── RULE 2: Protect content if not enrolled ──
-                                        'video_url' => $isEnrolled ? $les->video_url : null,
-                                        'has_uploaded_video' => $isEnrolled ? $les->media()->where('media_type', 'video')->where('status', 'ready')->exists() : false,
-                                        'content' => ($isEnrolled && $lessonType === 'article') ? $les->content : null,
+                                        'video_url' => $les->video_url,
+                                        'has_uploaded_video' => $les->media()->where('media_type', 'video')->where('status', 'ready')->exists(),
+                                        'content' => $lessonType === 'article' ? $les->content : null,
                                     ];
                                     
-                                    if ($isEnrolled && $les->video_url && count($resources) < 3) {
+                                    if ($les->video_url && count($resources) < 3) {
                                         $resources[] = [
                                             'id' => 'res-vid-' . $les->id,
                                             'title' => 'Tài liệu video: ' . mb_substr($les->title, 0, 30),
@@ -303,9 +291,7 @@ class CourseService
                 'name' => $instructorName,
                 'role' => $instructorRole,
                 'avatar_url' => $instructorAvatar,
-                'bio' => $instructorBio,
-                'is_verified' => (bool) ($dbCourse->teacher->is_verified ?? false),
-                'verified_status' => $dbCourse->teacher->teacher_verification_status ?? 'none',
+                'bio' => $instructorBio
             ],
             'modules' => $modules,
             'resources' => $resources,

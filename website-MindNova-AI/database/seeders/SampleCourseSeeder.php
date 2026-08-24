@@ -77,7 +77,7 @@ class SampleCourseSeeder extends Seeder
                 'type' => 'video',
                 'content' => 'Nội dung bài học AI mẫu cho UI.',
                 'video_url' => 'https://www.youtube.com/watch?v=example',
-                'duration_minutes' => 15,
+                'duration_seconds' => 15 * 60,
                 'order' => 1,
                 'status' => 'published',
                 'published_version_id' => $versionId,

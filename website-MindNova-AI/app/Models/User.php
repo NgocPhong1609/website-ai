@@ -13,8 +13,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'google_id', 'avatar_url', 'status', 'last_login_at', 'is_locked'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -29,16 +27,19 @@ class User extends Authenticatable
         'teacher_verification_status',
         'teacher_verified_at',
         'teacher_verification_note',
-        'is_verified',
         'last_login_at',
         'is_locked',
         'role',
         'onboarding_data',
         'is_onboarded',
+        'notification_email',
+        'weekly_report',
+        'ai_suggestions',
     ];
 
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     protected $appends = [
@@ -51,8 +52,12 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_locked' => 'boolean',
-            'is_verified' => 'boolean',
             'teacher_verified_at' => 'datetime',
+            'is_onboarded' => 'boolean',
+            'onboarding_data' => 'array',
+            'notification_email' => 'boolean',
+            'weekly_report' => 'boolean',
+            'ai_suggestions' => 'boolean',
         ];
     }
 
@@ -75,21 +80,6 @@ class User extends Authenticatable
     public function credentials(): HasMany
     {
         return $this->hasMany(TeacherCredential::class);
-    }
-
-    public function teacherCertificates(): HasMany
-    {
-        return $this->hasMany(TeacherCertificate::class, 'teacher_id');
-    }
-
-    public function teacherVerifications(): HasMany
-    {
-        return $this->hasMany(TeacherVerification::class, 'teacher_id');
-    }
-
-    public function teacherVerificationLogs(): HasMany
-    {
-        return $this->hasMany(TeacherVerificationLog::class, 'teacher_id');
     }
 
     public function subscriptions(): HasMany

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { MonitorIcon } from "./icons";
 
@@ -29,50 +29,33 @@ function ActiveSessionsBox() {
 }
 
 export function SecurityPanel() {
-  const [step, setStep] = useState<"REQUEST" | "VERIFY" | "SUCCESS">("REQUEST");
-  const [otp, setOtp] = useState("");
+  const [currentPw, setCurrentPw] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
-  
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [updated, setUpdated] = useState(false);
 
-  const canSave = otp.length >= 6 && newPw.length >= 6 && newPw === confirmPw;
-
-  async function handleRequestOtp() {
-    setIsLoading(true);
-    setErrorMsg(null);
-    try {
-      const res = await axiosClient.post("/api/profile/change-password/request-otp");
-      setStep("VERIFY");
-    } catch (err: any) {
-      setErrorMsg(err.response?.data?.message || err.message || "Không thể gửi OTP.");
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const canSave = currentPw.length > 0 && newPw.length >= 6 && newPw === confirmPw;
 
   async function handleUpdate() {
     if (!canSave) return;
-    setIsLoading(true);
-    setErrorMsg(null);
+
     try {
-      const res = await axiosClient.post("/api/profile/change-password", {
-        otp,
+      await axiosClient.post("/api/profile/change-password", {
+        current_password: currentPw,
         new_password: newPw,
         new_password_confirmation: confirmPw,
       });
-      setStep("SUCCESS");
+
+      setUpdated(true);
       setTimeout(() => {
-        setStep("REQUEST");
-        setOtp("");
+        setUpdated(false);
+        setCurrentPw("");
         setNewPw("");
         setConfirmPw("");
-      }, 3000);
-    } catch (err: any) {
-      setErrorMsg(err.response?.data?.message || err.message || "Đổi mật khẩu thất bại.");
-    } finally {
-      setIsLoading(false);
+      }, 2500);
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.response?.data?.errors?.new_password?.[0] || "Không thể đổi mật khẩu. Vui lòng thử lại.";
+      alert(message);
     }
   }
 
@@ -91,95 +74,51 @@ export function SecurityPanel() {
       </div>
 
       <div className="flex flex-col gap-5 max-w-lg">
-        {errorMsg && (
-          <div className="p-3 rounded-xl text-xs font-medium bg-red-50 text-red-600 border border-red-200">
-            {errorMsg}
+        {[
+          { id: "current-pw", label: "Mật khẩu hiện tại", value: currentPw, set: setCurrentPw, placeholder: "Nhập mật khẩu đang sử dụng..." },
+          { id: "new-pw",     label: "Mật khẩu mới",     value: newPw,     set: setNewPw,     placeholder: "Tối thiểu 6 ký tự mật khẩu mạnh..." },
+          { id: "confirm-pw", label: "Xác nhận mật khẩu mới", value: confirmPw, set: setConfirmPw, placeholder: "Nhập lại mật khẩu mới vừa đặt..." },
+        ].map(({ id, label, value, set, placeholder }) => (
+          <div key={id}>
+            <label htmlFor={id} className="block text-xs sm:text-sm font-medium text-[#4A4A68] mb-1.5">
+              {label}
+            </label>
+            <input
+              id={id}
+              type="password"
+              value={value}
+              onChange={(e) => set(e.target.value)}
+              placeholder={placeholder}
+              className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm font-normal text-[#1A1A2E] bg-[#F8FAFC] focus:bg-white border border-[#E4E6F0] focus:border-[#5052EE] shadow-2xs focus:outline-none focus:ring-2 focus:ring-[#5052EE]/15 placeholder-[#989AAB] transition-all duration-200"
+            />
           </div>
+        ))}
+
+        {newPw.length > 0 && newPw !== confirmPw && (
+          <p className="text-xs font-medium text-[#EF4444] bg-[#FEE2E2] px-3 py-2 rounded-xl border border-[#EF4444]/20 flex items-center gap-1.5">
+            <span>⚠️</span>
+            <span>Mật khẩu xác nhận chưa trùng khớp với mật khẩu mới.</span>
+          </p>
         )}
 
-        {step === "REQUEST" && (
-          <div className="flex flex-col gap-4">
-            <p className="text-sm text-[#4A4A68]">Để đảm bảo an toàn, chúng tôi sẽ gửi mã OTP đến email của bạn trước khi đổi mật khẩu.</p>
-            <button
-              type="button"
-              onClick={handleRequestOtp}
-              disabled={isLoading}
-              className="w-fit px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#5052EE] via-[#6063EE] to-[#0D9488] shadow-sm hover:opacity-95 disabled:opacity-50"
-            >
-              {isLoading ? "Đang gửi..." : "Gửi mã OTP qua Email"}
-            </button>
-          </div>
-        )}
-
-        {step === "VERIFY" && (
-          <div className="flex flex-col gap-4">
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-[#4A4A68] mb-1.5">Mã OTP (gửi qua email)</label>
-              <input
-                type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="123456"
-                className="w-full px-4 py-2.5 rounded-xl text-sm bg-[#F8FAFC] focus:bg-white border border-[#E4E6F0] focus:border-[#5052EE] shadow-2xs focus:outline-none transition-all"
-              />
-            </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-[#4A4A68] mb-1.5">Mật khẩu mới</label>
-              <input
-                type="password"
-                value={newPw}
-                onChange={(e) => setNewPw(e.target.value)}
-                placeholder="Tối thiểu 6 ký tự..."
-                className="w-full px-4 py-2.5 rounded-xl text-sm bg-[#F8FAFC] focus:bg-white border border-[#E4E6F0] focus:border-[#5052EE] shadow-2xs focus:outline-none transition-all"
-              />
-            </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-[#4A4A68] mb-1.5">Xác nhận mật khẩu mới</label>
-              <input
-                type="password"
-                value={confirmPw}
-                onChange={(e) => setConfirmPw(e.target.value)}
-                placeholder="Nhập lại mật khẩu..."
-                className="w-full px-4 py-2.5 rounded-xl text-sm bg-[#F8FAFC] focus:bg-white border border-[#E4E6F0] focus:border-[#5052EE] shadow-2xs focus:outline-none transition-all"
-              />
-            </div>
-
-            {newPw.length > 0 && newPw !== confirmPw && (
-              <p className="text-xs font-medium text-[#EF4444] bg-[#FEE2E2] px-3 py-2 rounded-xl border border-[#EF4444]/20">
-                ⚠️ Mật khẩu xác nhận chưa trùng khớp.
-              </p>
-            )}
-
-            <div className="flex justify-end pt-2 border-t border-[#F0F2FA] gap-3">
-              <button
-                type="button"
-                onClick={() => setStep("REQUEST")}
-                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-[#4A4A68] hover:bg-[#F8FAFC]"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                onClick={handleUpdate}
-                disabled={!canSave || isLoading}
-                className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#5052EE] via-[#6063EE] to-[#0D9488] shadow-sm hover:opacity-95 disabled:opacity-50"
-              >
-                {isLoading ? "Đang xử lý..." : "Đổi mật khẩu"}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step === "SUCCESS" && (
-          <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50 flex items-center gap-3">
-            <span className="text-xl">✅</span>
-            <span className="text-sm font-semibold text-emerald-700">Mật khẩu đã được thay đổi thành công!</span>
-          </div>
-        )}
+        <div className="flex justify-end pt-2 border-t border-[#F0F2FA]">
+          <button
+            type="button"
+            onClick={handleUpdate}
+            disabled={!canSave && !updated}
+            className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#5052EE] via-[#6063EE] to-[#0D9488] shadow-sm hover:opacity-95 active:scale-98 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span>{updated ? "Đã cập nhật mật khẩu an toàn!" : "Cập nhật Mật khẩu"}</span>
+          </button>
+        </div>
       </div>
 
       <hr className="border-t border-[#EAEAF4] mt-1" />
 
+      {/* Active Sessions Embedded into Security Panel */}
       <ActiveSessionsBox />
     </div>
   );
@@ -189,12 +128,107 @@ export function SettingsPanel() {
   const [notifications, setNotifications] = useState(true);
   const [weeklyReport, setWeeklyReport] = useState(true);
   const [aiSuggestions, setAiSuggestions] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Load settings from backend on mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const response = await axiosClient.get("/api/profile");
+        if (response.data?.data) {
+          const userData = response.data.data;
+          setNotifications(userData.notification_email !== false);
+          setWeeklyReport(userData.weekly_report !== false);
+          setAiSuggestions(userData.ai_suggestions !== false);
+        }
+      } catch (error) {
+        console.error("Failed to load settings:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  // Save setting to backend
+  const saveSetting = async (key: string, value: boolean) => {
+    setIsSaving(true);
+    try {
+      await axiosClient.post("/api/profile/settings", {
+        [key]: value,
+      });
+    } catch (error) {
+      console.error("Failed to save setting:", error);
+      alert("Không thể lưu cài đặt. Vui lòng thử lại.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Handle notification toggle
+  const handleNotificationToggle = () => {
+    const newValue = !notifications;
+    setNotifications(newValue);
+    saveSetting("notification_email", newValue);
+  };
+
+  // Handle weekly report toggle
+  const handleWeeklyReportToggle = () => {
+    const newValue = !weeklyReport;
+    setWeeklyReport(newValue);
+    saveSetting("weekly_report", newValue);
+  };
+
+  // Handle AI suggestions toggle
+  const handleAiSuggestionsToggle = () => {
+    const newValue = !aiSuggestions;
+    setAiSuggestions(newValue);
+    saveSetting("ai_suggestions", newValue);
+  };
 
   const toggles = [
-    { id: "notif",  label: "Thông báo qua Email",       description: "Nhận thông báo cập nhật khoá học mới và lời nhắc học tập mỗi ngày.", value: notifications, set: setNotifications },
-    { id: "weekly", label: "Báo cáo Tiến độ Hàng tuần",  description: "Tự động nhận bản tóm tắt thống kê chuyên cần và hiệu suất vào mỗi cuối tuần.", value: weeklyReport,   set: setWeeklyReport   },
-    { id: "ai-sug", label: "Gợi ý AI Cá nhân hoá",      description: "Cho phép Trợ lý Nova AI phân tích chuyên sâu và chủ động điều chỉnh syllabus.", value: aiSuggestions,  set: setAiSuggestions  },
+    { 
+      id: "notif", 
+      label: "Thông báo qua Email", 
+      description: "Nhận thông báo cập nhật khoá học mới và lời nhắc học tập mỗi ngày.", 
+      value: notifications, 
+      handler: handleNotificationToggle 
+    },
+    { 
+      id: "weekly", 
+      label: "Báo cáo Tiến độ Hàng tuần", 
+      description: "Tự động nhận bản tóm tắt thống kê chuyên cần và hiệu suất vào mỗi cuối tuần.", 
+      value: weeklyReport, 
+      handler: handleWeeklyReportToggle 
+    },
+    { 
+      id: "ai-sug", 
+      label: "Gợi ý AI Cá nhân hoá", 
+      description: "Cho phép Trợ lý Nova AI phân tích chuyên sâu và chủ động điều chỉnh syllabus.", 
+      value: aiSuggestions, 
+      handler: handleAiSuggestionsToggle 
+    },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="border-b border-[#EAEAF4] pb-4">
+          <h2 className="text-base sm:text-lg font-semibold text-[#1A1A2E] tracking-normal">Cài đặt Thông báo &amp; Hệ thống</h2>
+          <p className="text-xs sm:text-sm font-normal text-[#7878A0] mt-1 leading-relaxed">
+            Tùy biến trải nghiệm rèn luyện trực tuyến và các kênh tương tác của hệ thống.
+          </p>
+        </div>
+        <div className="animate-pulse">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-20 bg-[#F0F0F8] rounded-2xl mb-3.5" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -206,11 +240,11 @@ export function SettingsPanel() {
       </div>
 
       <div className="flex flex-col gap-3.5">
-        {toggles.map(({ id, label, description, value, set }) => (
+        {toggles.map(({ id, label, description, value, handler }) => (
           <div
             key={id}
-            onClick={() => set(!value)}
-            className="group flex items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl border border-[#E2E4F0] bg-[#F8FAFC]/70 hover:bg-white transition-all duration-200 shadow-2xs hover:shadow-sm cursor-pointer"
+            onClick={handler}
+            className={`group flex items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl border border-[#E2E4F0] bg-[#F8FAFC]/70 hover:bg-white transition-all duration-200 shadow-2xs hover:shadow-sm ${isSaving ? "opacity-75 cursor-not-allowed" : "cursor-pointer"}`}
           >
             <div className="space-y-1">
               <p className="text-sm font-semibold text-[#1A1A2E] group-hover:text-[#5052EE] transition-colors">{label}</p>
@@ -222,9 +256,10 @@ export function SettingsPanel() {
               aria-checked={value}
               onClick={(e) => {
                 e.stopPropagation();
-                set(!value);
+                handler();
               }}
-              className={`relative w-12 h-6.5 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#5052EE]/30 shrink-0 cursor-pointer ${
+              disabled={isSaving}
+              className={`relative w-12 h-6.5 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#5052EE]/30 shrink-0 ${isSaving ? "cursor-not-allowed" : "cursor-pointer"} ${
                 value ? "bg-gradient-to-r from-[#5052EE] via-[#6063EE] to-[#0D9488]" : "bg-[#CBD5E1]"
               }`}
             >

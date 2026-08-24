@@ -53,14 +53,17 @@ axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.warn("Unauthorized, token may be expired.");
+      console.warn("Unauthorized, token may have expired.");
       if (typeof window !== "undefined") {
         window.localStorage.removeItem("accessToken");
+        window.localStorage.removeItem("userInfo");
+
         // Clear cookies so Next.js middleware doesn't get confused
-        document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-        document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-        // Only redirect if we are not already on the login page
-        if (window.location.pathname !== "/login") {
+        document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; samesite=lax";
+        document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; samesite=lax";
+
+        // Only redirect if we are not already on the login page (including query params)
+        if (!window.location.pathname.startsWith("/login")) {
           window.location.href = "/login";
         }
       }

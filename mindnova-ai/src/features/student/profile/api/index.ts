@@ -35,7 +35,7 @@ export function useGetProfile() {
         completionPercent: user.profile ? 100 : 50,
       };
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 }
 
@@ -71,6 +71,42 @@ export function useUpdateProfile() {
       return data.data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["student", "profile"] });
+      queryClient.invalidateQueries({ queryKey: ["student", "dashboard"] });
+    },
+  });
+}
+
+// Upload avatar
+export function useUploadAvatar() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const { data } = await axiosClient.post("/api/profile/avatar", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return data;
+    },
+    onSuccess: (data) => {
+      const avatarUrl = data?.data?.avatar_url || data?.avatar_url;
+      if (avatarUrl) {
+        writeStoredUser({ avatar_url: avatarUrl, avatar: avatarUrl });
+
+        queryClient.setQueryData(["student", "profile"], (oldData: UserProfile | undefined) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            avatarUrl,
+          };
+        });
+      }
       queryClient.invalidateQueries({ queryKey: ["student", "profile"] });
       queryClient.invalidateQueries({ queryKey: ["student", "dashboard"] });
     },

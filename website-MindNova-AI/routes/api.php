@@ -84,7 +84,7 @@ Route::get('/student/payments/callback/{provider}', [StudentPaymentController::c
 Route::get('/student/payment/vnpay-ipn', [OrderController::class, 'vnpayIpn']);
 Route::post('/student/payment/momo-ipn', [OrderController::class, 'momoIpn']);
 
-// -- Nhóm AI Quiz Generator & Review (Động) --
+// -- Nhóm AI Quiz Generator & Review --
 Route::prefix('student/practice')->group(function () {
     Route::post('/generate-ai-quiz', [AiQuizGeneratorController::class, 'generate']);
     Route::get('/ai-quizzes/history', [AiQuizGeneratorController::class, 'history']);
@@ -93,7 +93,7 @@ Route::prefix('student/practice')->group(function () {
     Route::delete('/ai-quizzes/{id}', [AiQuizGeneratorController::class, 'destroy']);
 });
 
-// -- API Student Dashboard, Study Plan & Khóa học (Dành cho Học viên) --
+// -- API Student Public Routes --
 Route::prefix('student')->group(function () {
     Route::get('/dashboard', [StudentDashboardController::class, 'overview']);
     Route::get('/study-plan', [StudentStudyPlanController::class, 'overview']);
@@ -185,6 +185,8 @@ Route::middleware('auth:sanctum')->group(function () {
         // Discussions (Thảo luận bài học)
         Route::get('lessons/{lesson}/discussions', [StudentDiscussionController::class, 'index']);
         Route::post('lessons/{lesson}/discussions', [StudentDiscussionController::class, 'store']);
+        Route::put('lessons/{lesson}/discussions/{discussion}', [StudentDiscussionController::class, 'update']);
+        Route::delete('lessons/{lesson}/discussions/{discussion}', [StudentDiscussionController::class, 'destroy']);
     });
 });
 
@@ -277,14 +279,14 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::post('courses/ai-outline/generate', [CourseOutlineController::class, 'generate']);
     Route::post('courses/{course}/ai-outline/save', [CourseOutlineController::class, 'save']);
 
-    // ── Content Review Workflow ──
+    // Content Review Workflow
     Route::post('courses/{course}/submit-review', [InstructorContentReviewController::class, 'submitForReview']);
     Route::get('courses/{course}/versions', [InstructorContentReviewController::class, 'versions']);
     Route::get('courses/{course}/submissions', [InstructorContentReviewController::class, 'submissions']);
     Route::get('submissions/{submission}', [InstructorContentReviewController::class, 'showSubmission']);
     Route::post('lessons/{lesson}/request-deletion', [InstructorContentReviewController::class, 'requestLessonDeletion']);
 
-    // ── Teacher Profile & Verification ──
+    // Teacher Profile & Verification
     Route::get('profile', [TeacherProfileController::class, 'getProfile']);
     Route::put('profile', [TeacherProfileController::class, 'updateProfile']);
     Route::post('avatar', [TeacherProfileController::class, 'uploadAvatar']);

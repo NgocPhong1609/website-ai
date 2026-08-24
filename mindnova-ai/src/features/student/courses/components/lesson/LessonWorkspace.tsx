@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGetCourseDetail, useInvalidateCourseDetail, completeLesson, fetchQuiz, checkQuizAnswer, submitQuiz, useGetDiscussions, useCreateDiscussion } from "../../api";
+import { useGetCourseDetail, useInvalidateCourseDetail, completeLesson, fetchQuiz, checkQuizAnswer, submitQuiz, useGetDiscussions, useCreateDiscussion, useUpdateDiscussion, useDeleteDiscussion } from "../../api";
 import type { CourseDetailLessonItem, CourseDetailData } from "../../types";
 import { CustomVideoPlayer } from "./CustomVideoPlayer";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
@@ -652,7 +652,11 @@ function LessonWorkspaceContent() {
   const [activeTab, setActiveTab] = useState<"content" | "ai_tips" | "discussion">("content");
   const { data: apiDiscussions, isLoading: isDiscussionsLoading } = useGetDiscussions(activeLessonId);
   const { mutate: submitDiscussion, isPending: isSubmittingDiscussion } = useCreateDiscussion();
+  const { mutate: updateDiscussion, isPending: isUpdatingDiscussion } = useUpdateDiscussion();
+  const { mutate: deleteDiscussion, isPending: isDeletingDiscussion } = useDeleteDiscussion();
   const [newCommentText, setNewCommentText] = useState("");
+  const [editingDiscussionId, setEditingDiscussionId] = useState<string | number | null>(null);
+  const [editDiscussionText, setEditDiscussionText] = useState("");
 
   const toggleModule = (modId: string) => {
     setExpandedModules((prev) => ({ ...prev, [modId]: !prev[modId] }));
@@ -723,6 +727,34 @@ function LessonWorkspaceContent() {
         }
       }
     );
+  };
+
+  const handleEditDiscussion = (discussionId: string | number, content: string) => {
+    setEditingDiscussionId(discussionId);
+    setEditDiscussionText(content);
+  };
+
+  const handleEditDiscussionSubmit = (e: React.FormEvent, discussionId: string | number) => {
+    e.preventDefault();
+    if (!editDiscussionText.trim()) return;
+
+    updateDiscussion(
+      { lessonId: activeLessonId, discussionId, content: editDiscussionText.trim() },
+      {
+        onSuccess: () => {
+          setEditingDiscussionId(null);
+        }
+      }
+    );
+  };
+
+  const handleDeleteDiscussion = (discussionId: string | number) => {
+    if (!window.confirm("Bạn có chắc muốn xóa bình luận này?")) return;
+
+    deleteDiscussion({
+      lessonId: activeLessonId,
+      discussionId,
+    });
   };
 
   // Navigation
@@ -941,18 +973,60 @@ function LessonWorkspaceContent() {
                       apiDiscussions?.map((item) => (
                         <div key={item.id} className="flex flex-col gap-3">
                           {/* Student Question */}
-                          <div className="p-4 sm:p-5 rounded-xl border transition-all flex items-start gap-3.5 bg-white border-[#E5E7EB]">
-                            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-indigo-100 text-indigo-700 font-bold shrink-0 border border-indigo-200">
-                              {item.student.name.slice(0, 2).toUpperCase()}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between gap-2 mb-1">
-                                <span className="font-bold text-sm text-[#111827]">{item.student.name}</span>
-                                <span className="text-xs text-[#6B7280]">{new Date(item.created_at).toLocaleString('vi-VN')}</span>
+                          {editingDiscussionId === item.id ? (
+                            <form onSubmit={(e) => handleEditDiscussionSubmit(e, item.id)} className="p-4 sm:p-5 rounded-xl border border-[#E5E7EB] bg-white flex flex-col gap-3">
+                              <textarea
+                                value={editDiscussionText}
+                                onChange={(e) => setEditDiscussionText(e.target.value)}
+                                rows={3}
+                                className="w-full resize-none rounded-xl border border-[#D8DCEB] bg-white px-4 py-3 text-sm text-[#111827] outline-none focus:border-[#4F46E5]"
+                              />
+                              <div className="flex justify-end gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingDiscussionId(null)}
+                                  className="rounded-xl border border-[#E5E7EB] px-4 py-2 text-xs font-semibold text-[#64647A] hover:bg-gray-50"
+                                >
+                                  Hủy
+                                </button>
+                                <button
+                                  type="submit"
+                                  disabled={isUpdatingDiscussion}
+                                  className="rounded-xl bg-[#4F46E5] px-4 py-2 text-xs font-semibold text-white hover:bg-[#4338CA] disabled:opacity-60"
+                                >
+                                  {isUpdatingDiscussion ? "Đang lưu..." : "Lưu"}
+                                </button>
                               </div>
-                              <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">{item.content}</p>
+                            </form>
+                          ) : (
+                            <div className="p-4 sm:p-5 rounded-xl border transition-all flex items-start gap-3.5 bg-white border-[#E5E7EB]">
+                              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-indigo-100 text-indigo-700 font-bold shrink-0 border border-indigo-200">
+                                {item.student.name.slice(0, 2).toUpperCase()}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2 mb-1">
+                                  <span className="font-bold text-sm text-[#111827]">{item.student.name}</span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-[#6B7280]">{new Date(item.created_at).toLocaleString('vi-VN')}</span>
+                                    <button
+                                      onClick={() => handleEditDiscussion(item.id, item.content)}
+                                      className="text-xs font-semibold text-[#4F46E5] hover:text-[#4338CA] transition-colors"
+                                    >
+                                      Sửa
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteDiscussion(item.id)}
+                                      disabled={isDeletingDiscussion}
+                                      className="text-xs font-semibold text-red-500 hover:text-red-700 transition-colors disabled:opacity-60"
+                                    >
+                                      Xóa
+                                    </button>
+                                  </div>
+                                </div>
+                                <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed">{item.content}</p>
+                              </div>
                             </div>
-                          </div>
+                          )}
                           
                           {/* Teacher Replies */}
                           {item.replies.map((reply) => (

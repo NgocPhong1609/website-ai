@@ -22,13 +22,23 @@ function ActivePanel({ tab, profile }: { tab: ProfileTab; profile: UserProfile }
 
 export default function ProfileContainer() {
   const [activeTab, setActiveTab] = useState<ProfileTab>("personal-info");
-  const { data: profile, isLoading } = useGetProfile();
+  const { data: profile, isLoading, isError, error } = useGetProfile();
 
   if (isLoading) {
     return <div className="p-8 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-[#4648D4] border-t-transparent rounded-full" /></div>;
   }
 
-  if (!profile) return null;
+  if (isError || !profile) {
+    return (
+      <div className="p-8 flex flex-col items-center justify-center gap-4">
+        <p className="text-sm text-[#64647A]">
+          {error instanceof Error && error.message.includes("401")
+            ? "Phiên đăng nhập đã hết hạn. Đang chuyển hướng..."
+            : "Không thể tải thông tin hồ sơ. Vui lòng thử lại sau."}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-8">

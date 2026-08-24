@@ -61,4 +61,11 @@ export interface HistoryOverviewData {
   metrics_row: HistoryMetricsRow;
   timeline_groups: HistoryTimelineGroup[];
   total_activities_count: number;
+  pagination: {
+    current_page: number;
+    per_page: number;
+    total_items: number;
+    total_pages: number;
+    has_more: boolean;
+  };
 }

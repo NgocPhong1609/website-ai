@@ -32,7 +32,6 @@ class ReviewController extends Controller
             ->map(function ($review) {
                 return [
                     'id' => $review->id,
-                    'user_id' => $review->user_id,
                     'user' => [
                         'id' => $review->user?->id,
                         'name' => $review->user?->name ?? 'Học viên',
@@ -101,7 +100,6 @@ class ReviewController extends Controller
             'message' => 'Đánh giá thành công!',
             'data' => [
                 'id' => $review->id,
-                'user_id' => $user->id,
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
@@ -119,20 +117,16 @@ class ReviewController extends Controller
         $user = $request->user();
 
         if (!$user) {
-            return response()->json(['message' => 'Bạn cần đăng nhập để sửa đánh giá.'], 401);
+            return response()->json(['message' => 'Bạn cần đăng nhập.'], 401);
         }
 
-        if ($review->course_id !== $course->id) {
-            return response()->json(['message' => 'Đánh giá không thuộc khóa học này.'], 404);
-        }
-
-        if ((int) $review->user_id !== (int) $user->id) {
-            return response()->json(['message' => 'Bạn chỉ có thể sửa đánh giá của chính mình.'], 403);
+        if ($review->user_id !== $user->id) {
+            return response()->json(['message' => 'Bạn không có quyền sửa nhận xét này.'], 403);
         }
 
         $validator = Validator::make($request->all(), [
             'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string|max:1000',
+            'comment' => 'nullable|string|max:1000'
         ]);
 
         if ($validator->fails()) {
@@ -145,10 +139,9 @@ class ReviewController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Cập nhật đánh giá thành công!',
+            'message' => 'Cập nhật nhận xét thành công!',
             'data' => [
                 'id' => $review->id,
-                'user_id' => $user->id,
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
@@ -157,7 +150,7 @@ class ReviewController extends Controller
                 'rating' => (int) $review->rating,
                 'comment' => $review->comment,
                 'created_at' => $review->created_at?->toISOString(),
-            ],
+            ]
         ]);
     }
 
@@ -166,21 +159,17 @@ class ReviewController extends Controller
         $user = $request->user();
 
         if (!$user) {
-            return response()->json(['message' => 'Bạn cần đăng nhập để xoá đánh giá.'], 401);
+            return response()->json(['message' => 'Bạn cần đăng nhập.'], 401);
         }
 
-        if ($review->course_id !== $course->id) {
-            return response()->json(['message' => 'Đánh giá không thuộc khóa học này.'], 404);
-        }
-
-        if ((int) $review->user_id !== (int) $user->id) {
-            return response()->json(['message' => 'Bạn chỉ có thể xoá đánh giá của chính mình.'], 403);
+        if ($review->user_id !== $user->id) {
+            return response()->json(['message' => 'Bạn không có quyền xóa nhận xét này.'], 403);
         }
 
         $review->delete();
 
         return response()->json([
-            'message' => 'Xoá đánh giá thành công.',
+            'message' => 'Xóa nhận xét thành công!',
         ]);
     }
 }

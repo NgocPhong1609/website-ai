@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 
 export interface AvatarProps {
@@ -28,6 +28,10 @@ export const Avatar: React.FC<AvatarProps> = ({
   imgClassName,
 }) => {
   const [error, setError] = useState(false);
+
+  React.useEffect(() => {
+    setError(false);
+  }, [src]);
 
   const baseClasses =
     "relative inline-flex items-center justify-center overflow-hidden rounded-full bg-indigo-50 border border-indigo-100 flex-shrink-0";

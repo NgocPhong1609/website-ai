@@ -3,11 +3,10 @@ import { axiosClient } from "../../../../shared/lib/axios";
 import type { CourseDetailData, MyCourse } from "../types";
 
 export function useGetCourseDetail(courseId: string | number = 1) {
-  const normalizedId = String(courseId);
   return useQuery({
-    queryKey: ["student", "courses", "detail", normalizedId],
+    queryKey: ["student", "courses", "detail", courseId],
     queryFn: async (): Promise<CourseDetailData> => {
-      const { data } = await axiosClient.get(`/api/student/courses/detail/${normalizedId}`);
+      const { data } = await axiosClient.get(`/api/student/courses/detail/${courseId}`);
       return data.data;
     },
     staleTime: 5 * 60 * 1000,
@@ -109,7 +108,7 @@ export async function submitQuiz(
 export function useInvalidateCourseDetail() {
   const queryClient = useQueryClient();
   return (courseId: string | number) => {
-    queryClient.invalidateQueries({ queryKey: ["student", "courses", "detail", String(courseId)] });
+    queryClient.invalidateQueries({ queryKey: ["student", "courses", "detail", courseId] });
     queryClient.invalidateQueries({ queryKey: ["student", "courses", "enrolled"] });
   };
 }
@@ -164,11 +163,36 @@ export function useCreateDiscussion() {
   });
 }
 
+export function useUpdateDiscussion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ lessonId, discussionId, content }: { lessonId: string | number, discussionId: string | number, content: string }) => {
+      const { data } = await axiosClient.put(`/api/student/lessons/${lessonId}/discussions/${discussionId}`, { content });
+      return data.data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["student", "lessons", variables.lessonId, "discussions"] });
+    },
+  });
+}
+
+export function useDeleteDiscussion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ lessonId, discussionId }: { lessonId: string | number, discussionId: string | number }) => {
+      const { data } = await axiosClient.delete(`/api/student/lessons/${lessonId}/discussions/${discussionId}`);
+      return data.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["student", "lessons", variables.lessonId, "discussions"] });
+    },
+  });
+}
+
 // ─── Course Review APIs ────────────────────────────────────────────────────────
 
 export interface CourseReviewItem {
   id: number | string;
-  user_id?: number | string;
   rating: number;
   comment: string;
   created_at?: string;
@@ -223,32 +247,26 @@ export function useCreateCourseReview() {
 
 export function useUpdateCourseReview() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async ({ courseId, reviewId, rating, comment }: { courseId: string | number; reviewId: string | number; rating: number; comment: string }) => {
       const { data } = await axiosClient.put(`/api/student/courses/${courseId}/reviews/${reviewId}`, { rating, comment });
       return data.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["student", "courses", variables.courseId, "reviews"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["student", "courses", variables.courseId, "reviews"] });
     },
   });
 }
 
 export function useDeleteCourseReview() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async ({ courseId, reviewId }: { courseId: string | number; reviewId: string | number }) => {
       const { data } = await axiosClient.delete(`/api/student/courses/${courseId}/reviews/${reviewId}`);
-      return data;
+      return data.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["student", "courses", variables.courseId, "reviews"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["student", "courses", variables.courseId, "reviews"] });
     },
   });
 }

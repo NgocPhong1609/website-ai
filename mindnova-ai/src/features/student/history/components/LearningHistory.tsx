@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import {
   CalendarIcon,
-  ChevronDownIcon,
   ChevronRightIcon,
   DownloadIcon,
   BookIcon,
@@ -24,11 +23,24 @@ import type { HistoryTimelineItem } from "../types";
 export function LearningHistory() {
   const [filterType, setFilterType] = useState<"all" | "quiz" | "milestone" | "lesson">("all");
   const [isExporting, setIsExporting] = useState(false);
-  const { data, isLoading, isError, refetch } = useGetHistoryOverview();
+  const [page, setPage] = useState(1);
+  const perPage = 10;
+  const { data, isLoading, isError, refetch } = useGetHistoryOverview(page, perPage);
 
   const handleExport = () => {
     setIsExporting(true);
     setTimeout(() => setIsExporting(false), 2000);
+  };
+
+  const pagination = data?.pagination;
+  const totalPages = pagination?.total_pages ?? 1;
+  const hasMore = pagination?.has_more ?? false;
+
+  const goToPage = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   if (isLoading) {
@@ -488,20 +500,59 @@ export function LearningHistory() {
           );
         })}
 
-        {/* Footer Load More Button */}
-        <div className="pt-2 flex flex-col items-center justify-center pb-6 gap-2">
-          <button
-            type="button"
-            onClick={() => alert("⚡ Hệ thống đã đồng bộ đầy đủ dữ liệu học tập và nhật ký hoạt động mới nhất.")}
-            className="flex items-center gap-2 px-6 py-2.5 bg-white border border-[#EAEAF4] rounded-xl text-xs font-medium text-[#5052EE] hover:bg-[#EEF2FF]/60 hover:border-[#5052EE]/30 transition-all shadow-2xs cursor-pointer"
-          >
-            <span>Hiển thị thêm lịch sử hoạt động</span>
-            <ChevronDownIcon className="w-4 h-4 text-[#5052EE]" />
-          </button>
-          <p className="text-[11px] font-normal text-[#9090B0]">
-            Đã hiển thị các sự kiện chính trên tổng số {overview_card?.total_activities || total_activities_count || 142} hoạt động rèn luyện
-          </p>
-        </div>
+        {/* Footer Pagination */}
+        {totalPages > 1 && (
+          <div className="pt-2 flex flex-col items-center justify-center pb-6 gap-3">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => goToPage(page - 1)}
+                disabled={page <= 1}
+                className="px-4 py-2 rounded-xl bg-white border border-[#EAEAF4] text-xs font-medium text-[#5052EE] hover:bg-[#EEF2FF]/60 hover:border-[#5052EE]/30 transition-all shadow-2xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                ← Trước
+              </button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    type="button"
+                    onClick={() => goToPage(pageNum)}
+                    className={`w-9 h-9 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                      pageNum === page
+                        ? "bg-[#5052EE] text-white shadow-2xs"
+                        : "bg-white border border-[#EAEAF4] text-[#5052EE] hover:bg-[#EEF2FF]/60 hover:border-[#5052EE]/30"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => goToPage(page + 1)}
+                disabled={page >= totalPages}
+                className="px-4 py-2 rounded-xl bg-white border border-[#EAEAF4] text-xs font-medium text-[#5052EE] hover:bg-[#EEF2FF]/60 hover:border-[#5052EE]/30 transition-all shadow-2xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Sau →
+              </button>
+            </div>
+
+            <p className="text-[11px] font-normal text-[#9090B0]">
+              Trang {page} / {totalPages} • Tổng {pagination?.total_items ?? total_activities_count} hoạt động
+            </p>
+          </div>
+        )}
+
+        {totalPages <= 1 && (
+          <div className="pt-2 flex flex-col items-center justify-center pb-6 gap-2">
+            <p className="text-[11px] font-normal text-[#9090B0]">
+              Đã hiển thị tất cả {total_activities_count} hoạt động rèn luyện
+            </p>
+          </div>
+        )}
 
       </div>
     </div>

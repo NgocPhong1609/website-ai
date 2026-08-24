@@ -67,42 +67,11 @@ class UserController extends Controller
     }
 
     // 3. Đổi mật khẩu
-    public function requestChangePasswordOtp(Request $request)
-    {
-        $user = $request->user();
-        $otp = str_pad(random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
-
-        $lastOtp = \App\Models\PasswordOtp::where('email', $user->email)
-            ->where('type', 'change_password')
-            ->orderBy('id', 'desc')
-            ->first();
-        
-        if ($lastOtp && $lastOtp->created_at->diffInSeconds(now()) < 60) {
-            return response()->json(['message' => 'Vui lòng đợi 60 giây để yêu cầu mã mới.'], 429);
-        }
-
-        \App\Models\PasswordOtp::updateOrCreate(
-            ['email' => $user->email, 'type' => 'change_password'],
-            [
-                'otp_hash' => Hash::make($otp),
-                'expires_at' => now()->addMinutes(5),
-                'verified_at' => null,
-                'attempts' => 0
-            ]
-        );
-
-        \Illuminate\Support\Facades\Mail::raw("MindNova AI\n\nMã xác nhận đổi mật khẩu của bạn là:\n\n$otp\n\nMã có hiệu lực trong 5 phút.\nNếu bạn không thực hiện yêu cầu này, hãy bảo vệ tài khoản ngay lập tức.", function ($message) use ($user) {
-            $message->to($user->email)->subject('MindNova AI - Mã OTP Đổi Mật Khẩu');
-        });
-
-        return response()->json(['message' => 'Đã gửi mã OTP.'], 200);
-    }
-
     public function changePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'otp' => 'required|digits:6',
-            'new_password' => 'required|min:6|confirmed',
+            'current_password' => 'required',
+            'new_password' => 'required|min:6|confirmed', // Yêu cầu biến new_password_confirmation
         ]);
 
         if ($validator->fails()) {
@@ -111,32 +80,15 @@ class UserController extends Controller
 
         $user = $request->user();
 
-        $otpRecord = \App\Models\PasswordOtp::where('email', $user->email)
-            ->where('type', 'change_password')
-            ->first();
-
-        if (!$otpRecord) return response()->json(['message' => 'Mã OTP không hợp lệ hoặc chưa được yêu cầu.'], 400);
-
-        if ($otpRecord->attempts >= 5) {
-            $otpRecord->delete();
-            return response()->json(['message' => 'Quá số lần thử. Vui lòng yêu cầu mã mới.'], 400);
-        }
-
-        if (now()->greaterThan($otpRecord->expires_at)) {
-            return response()->json(['message' => 'Mã xác nhận đã hết hạn. Vui lòng yêu cầu mã mới.'], 400);
-        }
-
-        if (!Hash::check($request->otp, $otpRecord->otp_hash)) {
-            $otpRecord->increment('attempts');
-            return response()->json(['message' => 'Mã xác nhận không chính xác.'], 400);
+        // Kiểm tra mật khẩu cũ có khớp không
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['message' => 'Mật khẩu hiện tại không chính xác'], 400);
         }
 
         // Cập nhật mật khẩu mới
         $user->update([
             'password' => Hash::make($request->new_password)
         ]);
-
-        $otpRecord->delete();
 
         return response()->json(['message' => 'Đổi mật khẩu thành công'], 200);
     }
@@ -235,5 +187,46 @@ class UserController extends Controller
         $credential->delete();
 
         return response()->json(['message' => 'Xoá bằng cấp thành công'], 200);
+    }
+
+    // 8. Lưu cài đặt thông báo
+    public function saveSettings(Request $request)
+    {
+        $user = $request->user();
+
+        $validator = Validator::make($request->all(), [
+            'notification_email' => 'sometimes|boolean',
+            'weekly_report' => 'sometimes|boolean',
+            'ai_suggestions' => 'sometimes|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $settingsData = [];
+
+        if ($request->has('notification_email')) {
+            $settingsData['notification_email'] = (bool)$request->notification_email;
+        }
+
+        if ($request->has('weekly_report')) {
+            $settingsData['weekly_report'] = (bool)$request->weekly_report;
+        }
+
+        if ($request->has('ai_suggestions')) {
+            $settingsData['ai_suggestions'] = (bool)$request->ai_suggestions;
+        }
+
+        $user->update($settingsData);
+
+        return response()->json([
+            'message' => 'Cập nhật cài đặt thành công',
+            'data' => [
+                'notification_email' => $user->notification_email,
+                'weekly_report' => $user->weekly_report,
+                'ai_suggestions' => $user->ai_suggestions,
+            ]
+        ], 200);
     }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUpdateProfile } from "../api";
 
 interface PersonalInfoPanelProps {
@@ -58,6 +58,12 @@ export function PersonalInfoPanel({
   const [saved, setSaved] = useState(false);
   const updateProfileMutation = useUpdateProfile();
 
+  useEffect(() => {
+    setFullName(initialName);
+    setEmail(initialEmail);
+    setBio(initialBio);
+  }, [initialName, initialEmail, initialBio]);
+
   const isDirty =
     fullName !== initialName || email !== initialEmail || bio !== initialBio;
 
@@ -73,7 +79,9 @@ export function PersonalInfoPanel({
       setTimeout(() => setSaved(false), 2500);
     } catch (error: any) {
       console.error("Failed to save profile", error);
-      alert(error?.response?.data?.message || "Không thể lưu thông tin hồ sơ. Vui lòng thử lại.");
+      const err = error?.response?.data;
+      const message = err?.message || (err?.errors ? Object.values(err.errors).flat().join(', ') : null) || "Không thể lưu thông tin hồ sơ. Vui lòng thử lại.";
+      alert(message);
     }
   }
 
