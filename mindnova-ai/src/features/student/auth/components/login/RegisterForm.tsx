@@ -265,20 +265,6 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
           </button>
         </form>
 
-        <div className="flex items-center gap-3 my-4">
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#E4E4EF] to-transparent" />
-          <span className="text-[11px] text-[#B0B0C8] font-medium uppercase tracking-widest">OR</span>
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#E4E4EF] to-transparent" />
-        </div>
-
-        <button
-          type="button"
-          className="w-full flex items-center justify-center gap-3 py-3 rounded-xl text-[13px] font-semibold text-[#1A1A2E] bg-white border border-[#E4E4EF] hover:border-[#6B6BFF]/40 hover:bg-[#F8F8FF] hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(107,107,255,0.1)] active:translate-y-0 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-[#6B6BFF]/15"
-        >
-          <GoogleIcon />
-          Continue with Google
-        </button>
-
         <p className="mt-5 text-center text-[13px] text-[#7878A0]">
           Already have an account?{" "}
           <button
