@@ -468,21 +468,7 @@ export function FloatingAiChat() {
           <span className="text-white/70 text-xs tracking-tighter -ml-1 pr-0.5 font-normal">⋮⋮</span>
 
           <div className="relative flex items-center justify-center w-5 h-5 bg-white/20 rounded-full">
-            <svg
-              className="w-3.5 h-3.5 transform group-hover:rotate-12 transition-transform duration-300"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1-1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-              <path d="M5 3v4" />
-              <path d="M19 17v4" />
-              <path d="M3 5h4" />
-              <path d="M17 19h4" />
-            </svg>
+            <></>
             <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-80" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10B981] border border-white" />
@@ -559,10 +545,7 @@ export function FloatingAiChat() {
                 title="Thu nhỏ cửa sổ"
                 className="w-7 h-7 rounded-lg hover:bg-[#E0E5FF] text-[#64647A] hover:text-[#5052EE] flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
               >
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M18 6 6 18" />
-                  <path d="m6 6 12 12" />
-                </svg>
+                <></>
               </button>
             </div>
           </header>
@@ -681,10 +664,7 @@ export function FloatingAiChat() {
                   title="Dừng câu trả lời của AI"
                   className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#DC2626] via-[#E11D48] to-[#EA580C] hover:opacity-95 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-[0_4px_12px_rgba(225,29,72,0.35)] animate-pulse active:scale-95 cursor-pointer"
                 >
-                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                    <rect x="5" y="4" width="5" height="16" rx="1.5" />
-                    <rect x="14" y="4" width="5" height="16" rx="1.5" />
-                  </svg>
+                  <></>
                 </button>
               ) : (
                 <button
@@ -693,10 +673,7 @@ export function FloatingAiChat() {
                   disabled={!input.trim()}
                   className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:opacity-95 disabled:opacity-50 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-sm active:scale-95 cursor-pointer"
                 >
-                  <svg className="w-4 h-4 ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m22 2-7 20-4-9-9-4Z" />
-                    <path d="M22 2 11 13" />
-                  </svg>
+                  <></>
                 </button>
               )}
             </form>

@@ -350,10 +350,7 @@ export function QuizQuestionScreen({
             title="Thoát và nộp bài ngay"
             className="p-2 hover:bg-[#FEE2E2] hover:text-[#EF4444] rounded-full transition-colors text-[#64647A] cursor-pointer"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
+            <></>
           </button>
           <div className="h-7 w-[1px] bg-[#EAEAF4]"></div>
           <div className="flex flex-col">
@@ -370,10 +367,7 @@ export function QuizQuestionScreen({
           </div>
 
           <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full shadow-2xs border transition-all ${timeRemaining < 60 ? "bg-[#FFF2F2] text-[#E11D48] border-[#E11D48]/30 animate-pulse" : "bg-[#EEF2FF] text-[#5052EE] border-[#5052EE]/20"}`}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
+            <></>
             <span className="text-xs sm:text-sm font-semibold tracking-wide">{formatTime(timeRemaining)}</span>
           </div>
         </div>

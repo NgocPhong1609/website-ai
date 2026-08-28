@@ -1,16 +1,16 @@
 export type NavIconKey =
-  | "dashboard"
-  | "explore"
-  | "courses"
-  | "study-plan"
-  | "practice"
-  | "progress"
-  | "history"
-  | "profile"
-  | "billing";
+ | "dashboard"
+ | "explore"
+ | "courses"
+ | "study-plan"
+ | "practice"
+ | "progress"
+ | "history"
+ | "profile"
+ | "billing";
 
 export interface SidebarMenuItem {
-  label: string;
-  iconKey: NavIconKey;
-  href: string;
+ label: string;
+ iconKey: NavIconKey;
+ href: string;
 }

@@ -9,16 +9,16 @@ import { HourlyChart } from "./components/HourlyChart";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AdsHourlySectionProps {
-  /**
-   * Called when user completes a drag-select on the chart.
-   * In production: show a modal, navigate to bid schedule, etc.
-   */
-  onRangeSelected?: (range: DragRange) => void;
-  /**
-   * Hourly performance data.
-   * Falls back to MOCK_HOURLY_DATA when not provided.
-   */
-  data?: typeof MOCK_HOURLY_DATA;
+ /**
+ * Called when user completes a drag-select on the chart.
+ * In production: show a modal, navigate to bid schedule, etc.
+ */
+ onRangeSelected?: (range: DragRange) => void;
+ /**
+ * Hourly performance data.
+ * Falls back to MOCK_HOURLY_DATA when not provided.
+ */
+ data?: typeof MOCK_HOURLY_DATA;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -35,28 +35,28 @@ interface AdsHourlySectionProps {
  * ```
  */
 export function AdsHourlySection({
-  onRangeSelected,
-  data = MOCK_HOURLY_DATA,
+ onRangeSelected,
+ data = MOCK_HOURLY_DATA,
 }: AdsHourlySectionProps) {
-  const { cards, selectedForChart, swapMetric, toggleChartMetric } =
-    useMetricCards();
+ const { cards, selectedForChart, swapMetric, toggleChartMetric } =
+ useMetricCards();
 
-  return (
-    <section aria-label="Hourly performance overview" className="flex flex-col gap-4">
-      {/* 1.1 – Metric Cards */}
-      <MetricCards
-        cards={cards}
-        data={data}
-        swapMetric={swapMetric}
-        toggleChartMetric={toggleChartMetric}
-      />
+ return (
+ <section aria-label="Hourly performance overview" className="flex flex-col gap-4">
+ {/* 1.1 – Metric Cards */}
+ <MetricCards
+ cards={cards}
+ data={data}
+ swapMetric={swapMetric}
+ toggleChartMetric={toggleChartMetric}
+ />
 
-      {/* 1.2 – Hourly Chart */}
-      <HourlyChart
-        selectedMetrics={selectedForChart}
-        data={data}
-        onRangeSelected={onRangeSelected}
-      />
-    </section>
-  );
+ {/* 1.2 – Hourly Chart */}
+ <HourlyChart
+ selectedMetrics={selectedForChart}
+ data={data}
+ onRangeSelected={onRangeSelected}
+ />
+ </section>
+ );
 }

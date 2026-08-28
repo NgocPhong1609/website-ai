@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { QuizQuestionScreen } from "@/src/features/student/quiz";
 
 export const metadata: Metadata = {
-  title: "Quiz Question | MindNova AI",
-  description: "Answer quiz questions.",
+ title: "Quiz Question | MindNova AI",
+ description: "Answer quiz questions.",
 };
 
 export default async function QuizQuestionPage({ searchParams }: { searchParams: Promise<{ lessonId?: string }> }) {
-  const { lessonId } = await searchParams;
-  return <QuizQuestionScreen lessonId={lessonId || "1"} />;
+ const { lessonId } = await searchParams;
+ return <QuizQuestionScreen lessonId={lessonId || "1"} />;
 }

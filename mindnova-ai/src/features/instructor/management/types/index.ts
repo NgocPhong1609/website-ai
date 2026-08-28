@@ -5,22 +5,22 @@ export type CourseStatus = "published" | "draft";
 export type CourseAction = "upload" | "lessons" | "curriculum" | "pricing";
 
 export interface Course {
-  id: string;
-  title: string;
-  /** Thumbnail image URL or null for the "create new" placeholder */
-  thumbnail: string | null;
-  status: CourseStatus;
-  durationHours: number;
-  totalLessons: number;
-  price: number;
-  salePrice?: number;
-  currentPrice?: number;
-  isFlashSale?: boolean;
-  saleStartDate?: string;
-  saleEndDate?: string;
+ id: string;
+ title: string;
+ /** Thumbnail image URL or null for the "create new" placeholder */
+ thumbnail: string | null;
+ status: CourseStatus;
+ durationHours: number;
+ totalLessons: number;
+ price: number;
+ salePrice?: number;
+ currentPrice?: number;
+ isFlashSale?: boolean;
+ saleStartDate?: string;
+ saleEndDate?: string;
 }
 
 export interface CourseStat {
-  label: string;
-  count: number;
+ label: string;
+ count: number;
 }

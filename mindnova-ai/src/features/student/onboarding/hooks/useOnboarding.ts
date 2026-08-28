@@ -7,38 +7,38 @@ import type { OnboardingStep } from "@/src/features/student/onboarding/types";
  * making it easy to swap the underlying state management without touching components.
  */
 export function useOnboarding() {
-  const currentStep = useOnboardingStore((s) => s.currentStep);
-  const progressData = useOnboardingStore((s) => s.progressData);
-  const formData = useOnboardingStore((s) => s.formData);
-  const isAuthenticated = useOnboardingStore((s) => s.isAuthenticated);
+ const currentStep = useOnboardingStore((s) => s.currentStep);
+ const progressData = useOnboardingStore((s) => s.progressData);
+ const formData = useOnboardingStore((s) => s.formData);
+ const isAuthenticated = useOnboardingStore((s) => s.isAuthenticated);
 
-  const setStep = useOnboardingStore((s) => s.setStep);
-  const setProgress = useOnboardingStore((s) => s.setProgress);
-  const selectGoal = useOnboardingStore((s) => s.selectGoal);
-  const selectCurrentLevel = useOnboardingStore((s) => s.selectCurrentLevel);
-  const selectTimeAvailable = useOnboardingStore((s) => s.selectTimeAvailable);
-  const completeSignUp = useOnboardingStore((s) => s.completeSignUp);
-  const resetOnboarding = useOnboardingStore((s) => s.resetOnboarding);
+ const setStep = useOnboardingStore((s) => s.setStep);
+ const setProgress = useOnboardingStore((s) => s.setProgress);
+ const selectGoal = useOnboardingStore((s) => s.selectGoal);
+ const selectCurrentLevel = useOnboardingStore((s) => s.selectCurrentLevel);
+ const selectTimeAvailable = useOnboardingStore((s) => s.selectTimeAvailable);
+ const completeSignUp = useOnboardingStore((s) => s.completeSignUp);
+ const resetOnboarding = useOnboardingStore((s) => s.resetOnboarding);
 
-  const isStepActive = (step: OnboardingStep): boolean => currentStep === step;
+ const isStepActive = (step: OnboardingStep): boolean => currentStep === step;
 
-  return {
-    // State
-    currentStep,
-    progressData,
-    formData,
-    isAuthenticated,
+ return {
+ // State
+ currentStep,
+ progressData,
+ formData,
+ isAuthenticated,
 
-    // Derived
-    isStepActive,
+ // Derived
+ isStepActive,
 
-    // Actions
-    setStep,
-    setProgress,
-    selectGoal,
-    selectCurrentLevel,
-    selectTimeAvailable,
-    completeSignUp,
-    resetOnboarding,
-  };
+ // Actions
+ setStep,
+ setProgress,
+ selectGoal,
+ selectCurrentLevel,
+ selectTimeAvailable,
+ completeSignUp,
+ resetOnboarding,
+ };
 }

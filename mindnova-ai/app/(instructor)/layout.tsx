@@ -5,24 +5,24 @@ import { InstructorRoleGuard } from "@/src/shared/components/InstructorRoleGuard
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Quản lý Khóa học — MindNova AI Instructor",
-  description:
-    "Bảng điều khiển giảng viên MindNova AI — quản lý khóa học, học viên và doanh thu.",
+ title: "Quản lý Khóa học — MindNova AI Instructor",
+ description:
+ "Bảng điều khiển giảng viên MindNova AI — quản lý khóa học, học viên và doanh thu.",
 };
 
 export default function InstructorLayout({
-  children,
+ children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <InstructorRoleGuard>
-      <div className="flex h-screen overflow-hidden bg-[#F4F4F8]">
-        <InstructorSidebar />
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <InstructorTopbar />
-          <main className="flex-1 overflow-y-auto">{children}</main>
-        </div>
-        <FloatingAiChat />
-      </div>
-    </InstructorRoleGuard>
-  );
+ return (
+ <InstructorRoleGuard>
+ <div className="flex h-screen overflow-hidden bg-[#F4F4F8]">
+ <InstructorSidebar />
+ <div className="flex flex-col flex-1 overflow-hidden">
+ <InstructorTopbar />
+ <main className="flex-1 overflow-y-auto">{children}</main>
+ </div>
+ <FloatingAiChat />
+ </div>
+ </InstructorRoleGuard>
+ );
 }

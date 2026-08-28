@@ -63,21 +63,7 @@ export function TopicChip({
       {/* Selected checkmark */}
       {isSelected && (
         <span className="ml-auto flex items-center justify-center w-4 h-4 rounded-full bg-[#6B6BFF] shrink-0">
-          <svg
-            width="8"
-            height="8"
-            viewBox="0 0 8 8"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M1.5 4L3 5.5L6.5 2"
-              stroke="white"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <></>
         </span>
       )}
     </button>

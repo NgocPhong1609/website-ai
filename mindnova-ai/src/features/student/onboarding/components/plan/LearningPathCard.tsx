@@ -22,26 +22,19 @@ const STATUS_CONFIG: Record<
 
 function CheckIcon() {
   return (
-    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-      <path d="M2 5L4 7L8 3" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <></>
   );
 }
 
 function ArrowIcon() {
   return (
-    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-      <path d="M3.5 2L7 5L3.5 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <></>
   );
 }
 
 function LockIcon() {
   return (
-    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
+    <></>
   );
 }
 
@@ -175,9 +168,7 @@ export function LearningPathCard({ phases }: LearningPathCardProps) {
           </div>
 
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#6B6BFF] text-white shadow-[0_2px_10px_rgba(107,107,255,0.35)]">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-              <path d="M2 5L4 7L8 3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <></>
             {phases.length} phases
           </div>
         </div>

@@ -5,21 +5,7 @@ import type { GeneratingStepStatus } from "@/src/features/student/onboarding/typ
 
 function CompletedIcon() {
   return (
-    <div className="w-7 h-7 rounded-full bg-[#4648D4] flex items-center justify-center shrink-0">
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="white"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <polyline points="20 6 9 17 4 12" />
-      </svg>
-    </div>
+    <></>
   );
 }
 

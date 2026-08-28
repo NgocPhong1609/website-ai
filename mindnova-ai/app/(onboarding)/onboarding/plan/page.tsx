@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { PlanContainer } from "@/src/features/student/onboarding/components/plan";
 
 export const metadata: Metadata = {
-  title: "Your Learning Plan — MindNova AI",
-  description: "Your personalized AI-crafted learning path, built around your goals and skill level.",
+ title: "Your Learning Plan — MindNova AI",
+ description: "Your personalized AI-crafted learning path, built around your goals and skill level.",
 };
 
 export default function PlanPage() {
-  return <PlanContainer />;
+ return <PlanContainer />;
 }

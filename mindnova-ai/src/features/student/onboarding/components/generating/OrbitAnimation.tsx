@@ -1,25 +1,7 @@
 // Sparkle icon (4-pointed stars, similar to Gemini/AI sparkle)
 function SparkleIcon() {
   return (
-    <svg
-      width="44"
-      height="44"
-      viewBox="0 0 44 44"
-      fill="none"
-      aria-hidden="true"
-    >
-      {/* Large 4-pointed star */}
-      <path
-        d="M22 4 L24.5 19.5 L40 22 L24.5 24.5 L22 40 L19.5 24.5 L4 22 L19.5 19.5 Z"
-        fill="#4648D4"
-      />
-      {/* Small satellite star */}
-      <path
-        d="M34 10 L35.2 14.8 L40 16 L35.2 17.2 L34 22 L32.8 17.2 L28 16 L32.8 14.8 Z"
-        fill="#4648D4"
-        opacity="0.7"
-      />
-    </svg>
+    <></>
   );
 }
 
