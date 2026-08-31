@@ -5,6 +5,7 @@ import { twMerge } from "tailwind-merge";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeftIcon, ChevronRightIcon } from "./icons";
 import { getStudents, exportStudentsCSV, getNotificationOptions } from "../api";
+import { StudentDetailSidebar, type StudentDetailData } from "./StudentDetailSidebar";
 import { DownloadIcon } from "./icons"; // Import if needed for export button inside table header
 
 export type ProgressStatus = "Hoàn tất" | "Đang học" | "Chưa bắt đầu" | "Nguy cơ trễ";
@@ -133,6 +134,7 @@ export function StudentTable({
  page: number, setPage: (v: number) => void
 }) {
  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+ const [selectedStudent, setSelectedStudent] = useState<StudentDetailData | null>(null);
 
  useEffect(() => {
  const timer = setTimeout(() => {
@@ -230,7 +232,7 @@ export function StudentTable({
  </tr>
  ) : (
  data.data.map((st: any) => (
- <tr key={st.enrollment_id} className="hover:bg-[#FEFCF9]/80 transition-colors">
+ <tr key={st.enrollment_id} onClick={() => setSelectedStudent(st)} className="hover:bg-[#FEFCF9]/80 transition-colors cursor-pointer">
  <td className="px-6 py-4">
  <div className="flex items-center gap-3">
  <Avatar name={st.name} avatarUrl={st.avatar_url} />
@@ -312,6 +314,7 @@ export function StudentTable({
  </div>
  )}
  </div>
+ <StudentDetailSidebar student={selectedStudent} onClose={() => setSelectedStudent(null)} />
  </div>
  );
 }

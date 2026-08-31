@@ -8,9 +8,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 interface Step5SaveAndAttachModalProps {
   quiz: QuizSummary;
   onClose: () => void;
+  onSuccessComplete?: (savedQuiz?: any) => void;
 }
 
-export function Step5SaveAndAttachModal({ quiz, onClose }: Step5SaveAndAttachModalProps) {
+export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: Step5SaveAndAttachModalProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const paramModuleId = searchParams ? (searchParams.get("module_id") || searchParams.get("moduleId")) : null;

@@ -94,7 +94,17 @@ export function StudentAnalyticsContainer() {
  </main>
 
  {activeTab === "analytics" && selectedStudent && (
- <StudentDetailSidebar studentId={selectedStudent} onClose={() => setSelectedStudent(null)} />
+ <StudentDetailSidebar 
+   student={{
+     id: selectedStudent,
+     name: `Học viên #${selectedStudent}`,
+     email: "student@example.com",
+     course: { id: "", title: "Khóa học" },
+     progress: 0,
+     status: "Đang học"
+   }} 
+   onClose={() => setSelectedStudent(null)} 
+ />
  )}
  </div>
  </div>

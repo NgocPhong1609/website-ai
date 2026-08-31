@@ -11,8 +11,8 @@ export interface GeneratedQuestion {
  options: string[];
  correct_answer_index: number | null;
  explanation: string;
- sample_answer: string;
- rubric: string;
+ sample_answer?: string;
+ rubric?: string;
  points: number;
  reviewStatus: ReviewStatus;
 }
@@ -38,6 +38,7 @@ export interface QuizAttachmentPayload {
  position: "capability_assessment" | "end_of_course" | "in_module" | "after_lesson";
  module_id?: number | null;
  after_lesson_id?: number | null;
+ order?: number | null;
 }
 
 export interface QuizSummary {

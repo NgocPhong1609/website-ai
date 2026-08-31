@@ -23,6 +23,8 @@ export interface AiSuggestion {
  message: string;
  reason: string;
  estimated: string;
+ action_url?: string;
+ action_text?: string;
 }
 
 export interface OverallProgress {

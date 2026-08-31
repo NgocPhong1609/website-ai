@@ -8,6 +8,7 @@ interface Step1SourceInputProps {
  config: QuizConfig;
  onChangeConfig: (fields: Partial<QuizConfig>) => void;
  onNext: () => void;
+ embeddedMode?: boolean;
 }
 
 export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1SourceInputProps) {

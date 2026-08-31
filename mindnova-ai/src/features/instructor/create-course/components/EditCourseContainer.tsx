@@ -256,6 +256,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
 
  {activeTab === "pricing" && (
  <Step3SettingsPrice 
+ courseId={courseId}
  courseTitle={basicInfo.title} 
  thumbnailPreview={basicInfo.thumbnailPreview} 
  initialPrice={course?.price}

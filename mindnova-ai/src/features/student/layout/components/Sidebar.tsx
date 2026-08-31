@@ -69,7 +69,7 @@ export default function Sidebar() {
       if (userInfoRaw) {
         const u = JSON.parse(userInfoRaw);
         const role = resolveUserRole(u);
-        if (role === "instructor" || role === "teacher") {
+        if (role === "instructor" || (role as string) === "teacher") {
           setIsTeacher(true);
         }
       }

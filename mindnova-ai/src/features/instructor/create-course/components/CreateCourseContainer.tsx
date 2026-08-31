@@ -193,7 +193,7 @@ export function CreateCourseContainer() {
  for (const lesson of mod.lessons) {
  // Content validation is removed as per new UI logic
  const payloadType = lesson.type === 'quiz' ? 'quiz_module' : (lesson.type === 'document' ? 'article' : lesson.type);
- await createLesson({
+ const createdLesson = await createLesson({
  courseId,
  moduleId,
  payload: {
@@ -207,17 +207,32 @@ export function CreateCourseContainer() {
  quizData: lesson.quizData,
  }
  });
+
+ if (((lesson.type as string) === 'quiz' || (lesson.type as string) === 'quiz_module') && lesson.quizData && createdLesson?.id) {
+    try {
+      await createQuiz({
+        lessonId: createdLesson.id,
+        payload: lesson.quizData,
+      });
+    } catch (qErr) {
+      console.error("Quiz creation error:", qErr);
+    }
+  }
  }
  }
 
  const priceNum = Number(String(settings.basePrice).replace(/[^0-9]/g, ""));
+ const isFlashSaleActive = priceNum > 0 && Boolean(settings.isFlashSale);
+ const salePriceNum = settings.salePrice ? Number(String(settings.salePrice).replace(/[^0-9]/g, "")) : undefined;
+ const validSalePrice = (isFlashSaleActive && salePriceNum && salePriceNum < priceNum) ? salePriceNum : undefined;
+
  await updatePrice({ 
  courseId, 
  price: priceNum,
- is_flash_sale: priceNum === 0 ? false : settings.isFlashSale,
- sale_price: priceNum === 0 ? undefined : (settings.salePrice ? Number(String(settings.salePrice).replace(/[^0-9]/g, "")) : undefined),
- sale_start_date: priceNum === 0 ? undefined : settings.saleStartDate,
- sale_end_date: priceNum === 0 ? undefined : settings.saleEndDate
+ is_flash_sale: isFlashSaleActive,
+ sale_price: validSalePrice,
+ sale_start_date: isFlashSaleActive ? settings.saleStartDate : undefined,
+ sale_end_date: isFlashSaleActive ? settings.saleEndDate : undefined
  });
 
  await updateStatus({ courseId, status: "draft" });

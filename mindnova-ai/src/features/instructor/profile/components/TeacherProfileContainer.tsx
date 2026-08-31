@@ -358,13 +358,31 @@ export function TeacherProfileContainer() {
  )}
 
  <div className="flex items-center justify-between pt-1 border-t border-[#E8E2D9]/50 text-[11px] text-gray-400">
- <span>{cert.is_public ? "️ Hiển thị Public" : " Riêng tư"}</span>
+ <span>{cert.is_public ? " Hiển thị Public" : " Riêng tư"}</span>
+ <div className="flex items-center gap-3">
+ <button
+ onClick={() => {
+   const newName = prompt("Nhập tên bằng cấp mới:", cert.certificate_name);
+   if (!newName || !newName.trim()) return;
+   const newOrg = prompt("Tổ chức cấp:", cert.issuing_organization || "") || "";
+   const newUrl = prompt("Link xác minh (nếu có):", cert.verification_url || "") || "";
+   axiosClient.put(`/api/instructor/certificates/${cert.id}`, {
+     certificate_name: newName,
+     issuing_organization: newOrg,
+     verification_url: newUrl,
+   }).then(() => fetchProfile()).catch(() => alert("Cập nhật thất bại."));
+ }}
+ className="text-[#C0392B] hover:underline font-bold"
+ >
+ Sửa
+ </button>
  <button
  onClick={() => handleDeleteCert(cert.id)}
  className="text-rose-600 hover:underline font-bold"
  >
  Xóa
  </button>
+ </div>
  </div>
  </div>
  ))}

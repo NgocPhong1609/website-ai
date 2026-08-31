@@ -158,6 +158,14 @@ const CKEditorComponent = dynamic(
  config={{
  extraPlugins: [MindNovaVideoPlugin, CustomUploadAdapterPlugin],
  placeholder: placeholder || "Nhập nội dung...",
+ heading: {
+    options: [
+      { model: 'paragraph', title: 'Đoạn văn', class: 'ck-heading_paragraph' },
+      { model: 'heading1', view: 'h1', title: 'Tiêu đề 1 (H1)', class: 'ck-heading_heading1' },
+      { model: 'heading2', view: 'h2', title: 'Tiêu đề 2 (H2)', class: 'ck-heading_heading2' },
+      { model: 'heading3', view: 'h3', title: 'Tiêu đề 3 (H3)', class: 'ck-heading_heading3' }
+    ]
+  },
  toolbar: [
  "heading",
  "|",

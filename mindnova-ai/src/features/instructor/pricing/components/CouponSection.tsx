@@ -161,7 +161,7 @@ function CouponRow({ coupon, onDelete, onToggleStatus }: { coupon: Coupon; onDel
 // ------------------------------------------------------------------------------------------------
 // CouponSection
 // ------------------------------------------------------------------------------------------------
-export function CouponSection() {
+export function CouponSection({ courseId }: { courseId?: string } = {}) {
  const { coupons, isLoading, error, createCoupon, deleteCoupon, toggleStatus } = useCoupons();
  const [showDialog, setShowDialog] = useState(false);
 

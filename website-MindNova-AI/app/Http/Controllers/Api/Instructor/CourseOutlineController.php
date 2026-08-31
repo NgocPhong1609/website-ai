@@ -117,7 +117,6 @@ class CourseOutlineController extends Controller
             'chapters' => 'required|array',
             'chapters.*.title' => 'required|string',
             'chapters.*.lessons' => 'required|array',
-            'chapters.*.lessons.*' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -141,16 +140,62 @@ class CourseOutlineController extends Controller
             ]);
 
             $orderLesson = 1;
-            foreach ($chapterData['lessons'] as $lessonTitle) {
-                Lesson::create([
-                    'course_id' => $course->id,
-                    'module_id' => $module->id,
-                    'title' => $lessonTitle,
-                    'order' => $orderLesson++,
-                    'status' => 'draft',
-                    'content' => '',
-                    'description' => ''
-                ]);
+            foreach ($chapterData['lessons'] as $lessonData) {
+                if (is_array($lessonData)) {
+                    $lessonTitle = $lessonData['title'] ?? "Bài học {$orderLesson}";
+                    $lessonType = $lessonData['type'] ?? 'document';
+                    $lessonContent = $lessonData['content'] ?? '';
+
+                    $lesson = Lesson::create([
+                        'course_id' => $course->id,
+                        'module_id' => $module->id,
+                        'title' => $lessonTitle,
+                        'type' => $lessonType === 'quiz' ? 'quiz_module' : ($lessonType === 'document' ? 'article' : $lessonType),
+                        'order' => $orderLesson++,
+                        'status' => 'published',
+                        'content' => $lessonContent,
+                        'description' => ''
+                    ]);
+
+                    if ($lessonType === 'quiz' && !empty($lessonData['questions']) && is_array($lessonData['questions'])) {
+                        $quiz = \App\Models\Quiz::create([
+                            'lesson_id' => $lesson->id,
+                            'title' => $lessonTitle,
+                            'time_limit_minutes' => 15,
+                            'passing_score' => 80,
+                        ]);
+
+                        $qOrder = 1;
+                        foreach ($lessonData['questions'] as $q) {
+                            $question = \App\Models\Question::create([
+                                'quiz_id' => $quiz->id,
+                                'content' => $q['content'] ?? 'Câu hỏi',
+                                'type' => 'multiple_choice',
+                                'order' => $qOrder++,
+                            ]);
+
+                            if (!empty($q['answers']) && is_array($q['answers'])) {
+                                foreach ($q['answers'] as $ans) {
+                                    \App\Models\Answer::create([
+                                        'question_id' => $question->id,
+                                        'content' => $ans['content'] ?? '',
+                                        'is_correct' => !empty($ans['is_correct']),
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Lesson::create([
+                        'course_id' => $course->id,
+                        'module_id' => $module->id,
+                        'title' => (string) $lessonData,
+                        'order' => $orderLesson++,
+                        'status' => 'published',
+                        'content' => '',
+                        'description' => ''
+                    ]);
+                }
             }
         }
 

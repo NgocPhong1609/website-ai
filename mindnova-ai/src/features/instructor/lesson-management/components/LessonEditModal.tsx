@@ -199,13 +199,14 @@ export function LessonEditModal({ lesson, onSave, onClose }: LessonEditModalProp
  });
  await Promise.all(deletePromises);
 
+ const payloadType = (type as string) === 'quiz' ? 'quiz_module' : ((type as string) === 'document' ? 'article' : type);
  const updates: any = {
  title,
- type,
+ type: payloadType,
  status,
  content: finalContent,
  video_url: type === 'video' ? videoUrl : undefined,
- quizData: type === 'quiz_module' ? quizData : undefined,
+ quizData: ((type as string) === 'quiz' || (type as string) === 'quiz_module') ? quizData : undefined,
  temp_media_ids: usedTempMediaIds
  };
  

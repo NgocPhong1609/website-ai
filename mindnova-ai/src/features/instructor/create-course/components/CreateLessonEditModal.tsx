@@ -7,6 +7,13 @@ import type { DraftLesson, DraftLessonType, DraftQuizData } from "../types";
 import { useUploadTempMedia, useDeleteTempMedia } from "../api";
 import { quizGeneratorApi } from "../../quiz-generator/api/quizGeneratorApi";
 
+function getEmbedUrl(url: string): string | null {
+  if (!url) return null;
+  const youtubeMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+  if (youtubeMatch) return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+  return null;
+}
+
 interface CreateLessonEditModalProps {
  lesson: DraftLesson;
  onSave: (id: string, updates: Partial<DraftLesson>) => void;
@@ -181,16 +188,17 @@ export function CreateLessonEditModal({ lesson, onSave, onClose }: CreateLessonE
       await Promise.all(deletePromises);
 
       if (type === 'quiz' && quizData) {
-        const targetQuizId = (lesson as any).quiz_id || quizData.quiz_id || quizData.id;
+        const qAny = quizData as any;
+        const targetQuizId = (lesson as any).quiz_id || qAny.quiz_id || qAny.id;
         if (targetQuizId) {
           try {
             await quizGeneratorApi.updateQuiz(Number(targetQuizId), {
-              title: quizData.title || title,
-              description: quizData.description || "",
-              time_limit_minutes: quizData.time_limit_minutes || 15,
-              passing_score: quizData.passing_score || 70,
-              difficulty: quizData.difficulty || "mixed",
-              questions: quizData.questions || [],
+              title: qAny.title || title,
+              description: qAny.description || "",
+              time_limit_minutes: qAny.time_limit_minutes || 15,
+              passing_score: qAny.passing_score || 70,
+              difficulty: qAny.difficulty || "mixed",
+              questions: qAny.questions || [],
             });
           } catch (err) {
             console.warn("Failed to update quiz on server:", err);

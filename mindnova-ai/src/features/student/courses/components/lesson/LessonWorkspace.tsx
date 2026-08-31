@@ -74,11 +74,14 @@ interface QuizQuestion {
 }
 
 interface QuizData {
- quiz_id: number;
- title: string;
- time_limit_minutes: number;
- passing_score: number;
- questions: QuizQuestion[];
+  id?: string;
+  quiz_id: number;
+  title: string;
+  course_title?: string;
+  questions_count?: number;
+  time_limit_minutes: number;
+  passing_score: number;
+  questions: QuizQuestion[];
 }
 
 // ─── Lesson Type Labels ───────────────────────────────────────────────────────
@@ -456,8 +459,7 @@ function QuizRenderer({
       if (!essayText.trim()) return;
       setSubmitting(true);
       setAnswered(true);
-      setAnswerResult(true);
-      setCorrectCount((c) => c + 1);
+      setAnswerResult(true); // Recorded
       setAllAnswers(prev => ({ ...prev, [currentQ.id]: essayText }));
       setSubmitting(false);
       return;

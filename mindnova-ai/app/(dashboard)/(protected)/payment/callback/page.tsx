@@ -65,8 +65,8 @@ export default async function PaymentCallbackPage({ searchParams }: Props) {
  const paymentOrOrder = result.data;
  isSuccess = paymentOrOrder.status === "completed";
 
- if (isSuccess && payment.metadata) {
- const metaCourseIds = payment.metadata.course_ids;
+ if (isSuccess && paymentOrOrder.metadata) {
+ const metaCourseIds = paymentOrOrder.metadata.course_ids;
  if (metaCourseIds && metaCourseIds.length > 0) {
  courseId = courseId || String(metaCourseIds[0]);
  }
