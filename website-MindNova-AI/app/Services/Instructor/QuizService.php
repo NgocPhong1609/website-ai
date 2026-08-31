@@ -229,31 +229,56 @@ class QuizService
     public function createOrUpdateQuiz(Lesson $lesson, array $data): Quiz
     {
         return DB::transaction(function () use ($lesson, $data) {
+            $questionsData = $data['questions'] ?? [];
+            $mcCount = 0;
+            $essayCount = 0;
+            $totalPoints = 0.0;
+
+            foreach ($questionsData as $q) {
+                if (($q['type'] ?? 'multiple_choice') === 'essay') {
+                    $essayCount++;
+                } else {
+                    $mcCount++;
+                }
+                $totalPoints += (float) ($q['points'] ?? 0.0);
+            }
+
             $quiz = Quiz::updateOrCreate(
                 ['lesson_id' => $lesson->id],
                 [
                     'instructor_id' => $lesson->module->course->teacher_id ?? null,
                     'title' => $data['title'],
-                    'time_limit_minutes' => $data['time_limit_minutes'] ?? 0,
+                    'time_limit_minutes' => $data['time_limit_minutes'] ?? 15,
                     'passing_score' => $data['passing_score'] ?? 70,
+                    'total_questions' => count($questionsData),
+                    'mc_questions_count' => $mcCount,
+                    'essay_questions_count' => $essayCount,
+                    'total_points' => round($totalPoints, 2),
                 ]
             );
 
             $quiz->questions()->delete();
 
-            foreach ($data['questions'] as $qIndex => $questionData) {
+            foreach ($questionsData as $qIndex => $questionData) {
+                $type = $questionData['type'] ?? 'multiple_choice';
                 $question = $quiz->questions()->create([
-                    'content' => $questionData['content'],
+                    'type' => $type,
+                    'content' => $questionData['content'] ?? $questionData['question'] ?? '',
+                    'explanation' => $questionData['explanation'] ?? null,
+                    'sample_answer' => $type === 'essay' ? ($questionData['sample_answer'] ?? null) : null,
+                    'rubric' => $type === 'essay' ? ($questionData['rubric'] ?? null) : null,
+                    'points' => (float) ($questionData['points'] ?? ($type === 'essay' ? 5.0 : 1.0)),
+                    'difficulty' => $questionData['difficulty'] ?? 'medium',
                     'order' => $qIndex + 1,
                     'topic_id' => $questionData['topic_id'] ?? null,
                     'ai_insight' => $questionData['ai_insight'] ?? null,
                 ]);
 
-                if (!empty($questionData['answers'])) {
+                if ($type !== 'essay' && !empty($questionData['answers'])) {
                     foreach ($questionData['answers'] as $answerData) {
                         $question->answers()->create([
                             'content' => $answerData['content'],
-                            'is_correct' => $answerData['is_correct'],
+                            'is_correct' => (bool) $answerData['is_correct'],
                         ]);
                     }
                 }

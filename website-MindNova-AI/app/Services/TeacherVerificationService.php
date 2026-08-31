@@ -204,6 +204,10 @@ class TeacherVerificationService
             throw new InvalidArgumentException('Bạn không có quyền sửa chứng chỉ này.');
         }
 
+        if ($certificate->verification_status === 'approved') {
+            throw new InvalidArgumentException('Bằng cấp đã được Admin xác minh không thể chỉnh sửa.');
+        }
+
         return DB::transaction(function () use ($teacher, $certificate, $data, $certImage, $evidenceFiles) {
             $oldStatus = $certificate->verification_status;
             

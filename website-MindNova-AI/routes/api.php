@@ -64,6 +64,7 @@ use App\Http\Controllers\Api\Instructor\QuizGeneratorController;
 use App\Http\Controllers\Api\Instructor\StudentAnalyticsController;
 use App\Http\Controllers\Api\Instructor\OrderController as InstructorOrderController;
 use App\Http\Controllers\Api\Instructor\ReviewController as InstructorReviewController;
+use App\Http\Controllers\Api\Instructor\CouponController as InstructorCouponController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -296,6 +297,13 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::delete('certificates/{id}', [TeacherProfileController::class, 'destroyCertificate']);
     Route::post('verification/request', [TeacherProfileController::class, 'submitVerificationRequest']);
     Route::get('verification/status', [TeacherProfileController::class, 'getVerificationStatus']);
+
+    // Coupons (Instructor)
+    Route::get('coupons', [InstructorCouponController::class, 'index']);
+    Route::post('coupons', [InstructorCouponController::class, 'store']);
+    Route::put('coupons/{id}', [InstructorCouponController::class, 'update']);
+    Route::delete('coupons/{id}', [InstructorCouponController::class, 'destroy']);
+    Route::patch('coupons/{id}/toggle', [InstructorCouponController::class, 'toggle']);
 });
 
 // ==========================================

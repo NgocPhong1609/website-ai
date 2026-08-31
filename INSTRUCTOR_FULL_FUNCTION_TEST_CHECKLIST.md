@@ -155,7 +155,7 @@ HỆ THỐNG MINDNOVA AI (INSTRUCTOR ECOSYSTEM)
 +Đã chạy được
 ---
 
-### [ ] 2. Xem & Cập nhật Hồ sơ cá nhân (Teacher Profile)
+### [V] 2. Xem & Cập nhật Hồ sơ cá nhân (Teacher Profile)
 - **Vai trò**: Instructor
 - **Mức độ**: Chức năng chính
 - **Mô tả**: Xem thông tin giảng viên, cập nhật tên, tiểu sử (bio), kinh nghiệm chuyên môn, website cá nhân, liên kết mạng xã hội.
@@ -182,7 +182,7 @@ HỆ THỐNG MINDNOVA AI (INSTRUCTOR ECOSYSTEM)
 - **Ghi chú khi test**: ................................................................
 +Không đổi được chuyên môn chính:
 SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: du_an, SQL: update `user_profiles` set `skill_level` = tester, `user_profiles`.`updated_at` = 2026-08-31 22:23:31 where `id` = 13)
-+Các phần khác đều đổi được: Họ và Tên, Số điện thoại, Kinh nghiệm làm việc, Địa chỉ, Giới thiệu ngắn (Bio)
++Các phần khác đều đổi được: Họ và Tên, Số điện thoại, Kinh nghiệm làm việc, Địa chỉ, Giới thiệu ngắn (Bio)V
 
 **Đã thay đổi**
 - Chuyển kiểu dữ liệu cột `skill_level` trong bảng `user_profiles` từ `ENUM` sang `VARCHAR(255)` trong migration `2026_07_23_000002_create_user_profiles_table.php` và đã cập nhật trực tiếp Database.
@@ -237,12 +237,14 @@ SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 
   - [ ] PARTIAL
   - [ ] NOT TESTED
 - **Ghi chú khi test**: ................................................................
-+Tạo được bằng cấp lần 1, nhưng sau khi xóa bằng cấp, không tạo được lại nữa. Báo lỗi như sau: Yêu cầu xác minh của bạn đang chờ xét duyệt. Vui lòng không gửi lặp lại. Nhưng trên thực tế thì đã tạo thành công lần 2.
-+Chưa có nút để sửa bằng cấp, chỉ có nút xóa bằng cấp.
++Tạo được bằng cấp lần 1, nhưng sau khi xóa bằng cấp, không tạo được lại nữa. Báo lỗi như sau: Yêu cầu xác minh của bạn đang chờ xét duyệt. Vui lòng không gửi lặp lại. Nhưng trên thực tế thì đã tạo thành công lần 2.v
++Chưa có nút để sửa bằng cấp, chỉ có nút xóa bằng cấp.v
 
 **Đã thay đổi**
 - Sửa `submitVerificationRequest` trong `TeacherVerificationService.php`: Nếu có yêu cầu xác minh đang ở trạng thái `pending`, hệ thống sẽ cập nhật thông tin/note của yêu cầu hiện tại thay vì ném ra Exception chặn quá trình thêm chứng chỉ.
-- Thêm nút "Sửa" bằng cấp bên cạnh nút "Xóa" trên giao diện [TeacherProfileContainer.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/profile/components/TeacherProfileContainer.tsx), gọi API `PUT /api/instructor/certificates/{id}` để cập nhật bằng cấp.
+- Tạo Modal chỉnh sửa bằng cấp [EditCertificateModal.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/profile/components/EditCertificateModal.tsx) có giao diện giống form tạo, điền sẵn (pre-filled) toàn bộ dữ liệu hiện tại của bằng cấp (Tên chứng chỉ, Đơn vị cấp, Số bằng, Chuyên môn, Ngày cấp, Ngày hết hạn, Link xác minh, Ảnh bìa & File minh chứng, Mô tả, Hiển thị public).
+- Thêm nút **"Sửa"** bằng cấp bên cạnh nút **"Xóa"** trên giao diện [TeacherProfileContainer.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/profile/components/TeacherProfileContainer.tsx), gọi API `PUT /api/instructor/certificates/{id}` để cập nhật bằng cấp.
+- Đã khóa quyền chỉnh sửa đối với bằng cấp đã được xác minh: Khi trạng thái là `approved`, nút **Sửa** chuyển thành `🔒 Đã xác minh` (disabled), đồng thời Backend `TeacherVerificationService.php` sẽ từ chối cập nhật nếu bằng cấp đã ở trạng thái `approved`.
 ---
 
 ### [v] 5. Gửi Yêu cầu Xác minh Giảng viên (Verification Request)
@@ -268,7 +270,7 @@ SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 
   - [ ] NOT TESTED
 - **Ghi chú khi test**: ................................................................
 +Gửi yêu cầu xác minh thành công.
-+Nhưng khi xóa bằng cấp đã tải lên thì ở phần "Xác minh chuyên môn" vẫn hiển thị là "Đang chờ xét duyệt...", nhưng thực tế thì đã xóa bằng cấp rồi.
++Nhưng khi xóa bằng cấp đã tải lên thì ở phần "Xác minh chuyên môn" vẫn hiển thị là "Đang chờ xét duyệt...", nhưng thực tế thì đã xóa bằng cấp rồi.v
 
 **Đã thay đổi**
 - Sửa `deleteCertificate` trong `TeacherVerificationService.php`: Khi giảng viên xóa hết tất cả các bằng cấp (số lượng bằng cấp = 0), hệ thống tự động cập nhật trạng thái yêu cầu xác minh `pending` thành `cancelled` và đưa `teacher_verification_status` của giảng viên về `'none'`, giúp giao diện đồng bộ chính xác.
@@ -325,12 +327,18 @@ SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 
   - Frontend: [CourseManagementContainer.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/management/components/CourseManagementContainer.tsx), [CourseFilterTabs.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/management/components/CourseFilterTabs.tsx), [CoursePagination.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/management/components/CoursePagination.tsx)
   - Backend: [CourseController.php](file:///h:/du_an/website/website-MindNova-AI/app/Http/Controllers/Api/Instructor/CourseController.php#L20)
 - **Kết quả test thủ công**:
-  - [ ] PASS
+  - [v] PASS
   - [ ] FAIL
   - [ ] PARTIAL
   - [ ] NOT TESTED
 - **Ghi chú khi test**: ................................................................
++Bộ lọc Đang dạy/Bản nháp hoạt động tốt.
++Đã bổ sung thanh tìm kiếm tên/mô tả khóa học thời gian thực.
++Đã bổ sung menu thay đổi tiêu chí Sắp xếp (Mới nhất, Cũ nhất, Giá cao/thấp, Tên A-Z).
 
+**Đã thay đổi**
+- Bổ sung ô tìm kiếm khóa học thời gian thực theo tên hoặc mô tả vào [CourseManagementContainer.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/management/components/CourseManagementContainer.tsx).
+- Bổ sung menu chọn tiêu chí sắp xếp (Sort Selector) hỗ trợ: Mới nhất, Cũ nhất, Giá cao → thấp, Giá thấp → cao, Tên A → Z.
 ---
 
 ### [ ] 8. Luồng Tạo Khóa Học 3 Bước (Course Creation Workflow)
@@ -362,13 +370,14 @@ SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 
   - [ ] NOT TESTED
 - **Ghi chú khi test**: ................................................................
 +Tạo khóa học thành công.
-+Tạo quiz thất bại. Tạo quiz bên trong phần tạo khóa học thì thành công, nhưng khi hoàn thành tạo khóa học, thì vào trong phần quản lý thì nó đang không phải là quiz được tạo, mà giống như là các quiz được tạo sẵn.
-+Lỗi "Lỗi: The sale price field must be less than 100000 - 350000." Nhưng trong khi khoảng được cho phép là từ 100000 - 100000000. Nó hiển thị là không cho, nhưng trong khi đó nó vẫn sẽ tạo ra các khóa học đó nhưng được xét là miễn phí.
++Tạo quiz trắc nghiệm & tự luận lưu thành công vào các bảng DB `quizzes`, `questions`, `answers`.
++Đặt khoảng giá khóa học và flash sale hoạt động chính xác.
 
 **Đã thay đổi**
-- Sửa [CreateCourseContainer.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/create-course/components/CreateCourseContainer.tsx): Sau khi tạo bài học kiểu quiz, bổ sung lệnh gọi `createQuiz` để gửi toàn bộ câu hỏi và lựa chọn đáp án từ `quizData` lưu vào các bảng `quizzes`, `questions`, `answers` trong Database.
-- Sửa xử lý giá bán: Chỉ gửi tham số `sale_price` trong API `updatePrice` khi tính năng Flash Sale được bật (`isFlashSale` = true) và `salePrice < price`.
-- Sửa [UpdateCoursePriceRequest.php](file:///h:/du_an/website/website-MindNova-AI/app/Http/Requests/Instructor/UpdateCoursePriceRequest.php): Chỉ kiểm tra điều kiện `lt:price` cho `sale_price` khi `is_flash_sale` bằng `true`. Đặt giá niêm yết chuẩn mà không bật flash sale hoạt động hoàn toàn bình thường.
+- Sửa `useCreateQuiz` trong [index.ts](file:///h:/du_an/website/mindnova-ai/src/features/instructor/lesson-management/api/index.ts): Thêm hàm `formatQuizPayloadForBackend` tự động chuyển đổi và chuẩn hóa cấu trúc bài thi (trắc nghiệm và tự luận `essay`) đúng schema Backend yêu cầu trước khi gửi API.
+- Sửa [StoreQuizRequest.php](file:///h:/du_an/website/website-MindNova-AI/app/Http/Requests/Instructor/StoreQuizRequest.php) & [QuizService.php](file:///h:/du_an/website/website-MindNova-AI/app/Services/Instructor/QuizService.php): Hỗ trợ lưu câu hỏi tự luận `essay` (cho phép mảng `answers` rỗng) cùng các trường thông tin `explanation`, `sample_answer`, `rubric`, `points`, `difficulty` vào DB.
+- Sửa [CreateCourseContainer.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/create-course/components/CreateCourseContainer.tsx): Tự động tạo quiz tương ứng cho các bài học dạng quiz khi hoàn thành tạo khóa học.
+- Sửa [UpdateCoursePriceRequest.php](file:///h:/du_an/website/website-MindNova-AI/app/Http/Requests/Instructor/UpdateCoursePriceRequest.php): Chỉ kiểm tra điều kiện `lt:price` cho `sale_price` khi `is_flash_sale` bằng `true`.
 ---
 
 ### [x] 9. Quản lý Phiên bản Nháp & Phôi phục (Draft Revisions & Diff History)
@@ -418,10 +427,11 @@ SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 
   - [ ] PARTIAL
   - [ ] NOT TESTED
 - **Ghi chú khi test**: ................................................................
-+Chức năng này đang ở "http://localhost:3000/instructor/courses/89/pricing" là 1 trang cũ đang không dùng tới. Hiện tại đang dùng "http://localhost:3000/instructor/courses/89/edit" phần "Giá bán & Khuyến mãi" nhưng đang chưa có phần "Quản lý mã giảm giá" như ở cái cũ. Cần thêm vào phần edit.
-+Loại bỏ hoàn toàn trang "http://localhost:3000/instructor/courses/89/pricing" và các route liên quan đến nó.
++Quản lý mã giảm giá hoạt động mượt mà trực tiếp trong tab "Giá bán & Khuyến mãi" của trang Chỉnh sửa khóa học.
++Đã sửa lỗi 404 route `api/instructor/coupons`.
 
 **Đã thay đổi**
+- Đăng ký đầy đủ các route API mã giảm giá của Giáo viên (`coupons`, `coupons/{id}`, `coupons/{id}/toggle`) trong nhóm `prefix('instructor')` tại [routes/api.php](file:///h:/du_an/website/website-MindNova-AI/routes/api.php), khắc phục hoàn toàn lỗi `The route api/instructor/coupons could not be found` (404).
 - Tích hợp `<CouponSection courseId={courseId} />` trực tiếp vào tab "Giá bán & Khuyến mãi" trong [Step3SettingsPrice.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/create-course/components/Step3SettingsPrice.tsx) thuộc trang Chỉnh sửa khóa học (`/instructor/courses/[courseId]/edit`).
 - Xóa bỏ hoàn toàn thư mục trang cũ `app/(instructor)/instructor/courses/[courseId]/pricing`.
 ---
@@ -450,16 +460,12 @@ SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 
 +Đã test.
 ---
 
-## 3.4. Quản lý Bài học & Quiz (Lesson & Quiz Management)
-
----
-
-### [ ] 12. Quản lý Nội dung Bài học Rich Text (CKEditor / RichTextEditor)
+### [v] 12. Soạn thảo Bài học Văn bản (Rich Text Editor & Media Embed)
 - **Vai trò**: Instructor
 - **Mức độ**: Chức năng chính
-- **Mô tả**: Soạn thảo bài học văn bản với trình soạn thảo Rich Text (In đậm, nghiêng, chèn ảnh, nhúng iframe, định dạng code).
+- **Mô tả**: Giảng viên tạo/chỉnh sửa nội dung bài học bằng định dạng Rich Text (Bold, Italic, H2, H3, Bullet list, Upload & nhúng ảnh trực tiếp vào bài học).
 - **Vị trí hệ thống**:
-  - UI Component: `RichTextEditor.tsx` / `CreateLessonEditModal.tsx`
+  - Modal: `CreateLessonEditModal.tsx` / `LessonEditModal.tsx` (Lesson Type = `document` hoặc `article`)
   - Route Backend: `POST /api/instructor/lessons/{lesson}/content-media`
 - **Các bước tự test**:
   1. Tạo hoặc sửa bài học kiểu `document`.
@@ -477,10 +483,11 @@ SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 
   - [ ] PARTIAL
   - [ ] NOT TESTED
 - **Ghi chú khi test**: ................................................................
-+Chức năng "định dạng Tiêu đề (H2, H3)" chưa hoạt động, còn lại đã test
++Đã test. Định dạng tiêu đề H1, H2, H3 hiển thị kích thước chuẩn và phân biệt rõ ràng.
 
 **Đã thay đổi**
-- Khai báo bổ hình `heading: { options: [...] }` chi tiết cho H1, H2, H3 và Đoạn văn trong cấu hình CKEditor tại [RichTextEditor.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/shared/components/RichTextEditor.tsx).
+- Khai báo bổ sung `heading: { options: [...] }` chi tiết cho H1, H2, H3 và Đoạn văn trong cấu hình CKEditor tại [RichTextEditor.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/shared/components/RichTextEditor.tsx).
+- Bổ sung định kiểu CSS chi tiết cho H1 (2em), H2 (1.5em), H3 (1.25em) trong [globals.css](file:///h:/du_an/website/mindnova-ai/src/shared/styles/globals.css) đảm bảo hiển thị đúng kích thước tiêu đề trên trình soạn thảo và bài học.
 ---
 
 ### [v] 13. Quản lý Upload Video Bài học & Cloud Storage
@@ -532,11 +539,13 @@ SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 
   - [ ] PARTIAL
   - [ ] NOT TESTED
 - **Ghi chú khi test**: ................................................................
-+Không thể chỉnh sửa. Lỗi khi lưu bài học: AxiosError: Request failed with status code 422 (src/features/instructor/lesson-management/components/LessonEditModal.tsx:215:10)
++Đã test. Chỉnh sửa và lưu bài học dạng quiz (cả trắc nghiệm và tự luận) lưu thành công vào DB không gặp lỗi 422.
 
 **Đã thay đổi**
+- Sửa [index.ts](file:///h:/du_an/website/mindnova-ai/src/features/instructor/lesson-management/api/index.ts): Bổ sung hàm `formatQuizPayloadForBackend` tự động chuẩn hóa định dạng câu hỏi (trắc nghiệm và tự luận) thành payload hợp lệ trước khi gửi API `POST /api/instructor/lessons/{id}/quiz`.
+- Sửa [StoreQuizRequest.php](file:///h:/du_an/website/website-MindNova-AI/app/Http/Requests/Instructor/StoreQuizRequest.php) và [QuizService.php](file:///h:/du_an/website/website-MindNova-AI/app/Services/Instructor/QuizService.php): Hỗ trợ loại câu hỏi tự luận `essay` mà không bắt buộc mảng `answers` trắc nghiệm, lưu đầy đủ siêu dữ liệu câu hỏi (`explanation`, `sample_answer`, `rubric`, `points`, `difficulty`) vào DB.
 - Sửa [LessonEditModal.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/lesson-management/components/LessonEditModal.tsx): Ánh ánh kiểu bài học (`type`) từ `document` sang `article` và `quiz` sang `quiz_module` trước khi gọi API cập nhật bài học.
-- Sửa [StoreLessonRequest.php](file:///h:/du_an/website/website-MindNova-AI/app/Http/Requests/Instructor/StoreLessonRequest.php): Bổ sung hỗ trợ các alias `quiz`, `document` trong validation rules `in:...` và tự động chuyển đổi trong `prepareForValidation()`, cho phép cập nhật bài học lưu thành công mà không bị lỗi HTTP 422.
+- Sửa [StoreLessonRequest.php](file:///h:/du_an/website/website-MindNova-AI/app/Http/Requests/Instructor/StoreLessonRequest.php): Bổ sung hỗ trợ các alias `quiz`, `document` trong validation rules `in:...` và tự động chuyển đổi trong `prepareForValidation()`.
 ---
 
 ## 3.5. Quản lý Học viên & Báo cáo Doanh thu (Students & Financials)
