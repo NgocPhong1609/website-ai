@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { RichTextEditor } from "../../shared/components/RichTextEditor";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { axiosClient } from "@/src/shared/lib/axios";
+import { RichTextEditor } from "@/src/features/instructor/shared/components/RichTextEditor";
 import { QuizEditor } from "../../create-course/components/QuizEditor";
 import { twMerge } from "tailwind-merge";
 import { useUploadTempMedia, useDeleteTempMedia } from "../api";
@@ -45,6 +46,20 @@ export function LessonEditModal({ lesson, onSave, onClose }: LessonEditModalProp
  const [isSaving, setIsSaving] = useState(false);
  const [activeImageUploads, setActiveImageUploads] = useState(0);
  const abortControllerRef = useRef<AbortController | null>(null);
+
+ useEffect(() => {
+    if (lesson.quizData) {
+      setQuizData(lesson.quizData);
+    } else if (lesson.id && ((lesson.type as string) === 'quiz_module' || (lesson.type as string) === 'quiz')) {
+      axiosClient.get(`/api/instructor/lessons/${lesson.id}/quiz`)
+        .then((res: any) => {
+          if (res.data?.data) {
+            setQuizData(res.data.data);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [lesson]);
 
  const hasUnsavedChanges = 
  title !== lesson.title ||

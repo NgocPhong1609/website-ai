@@ -11,26 +11,49 @@ class LessonResource extends JsonResource
     public function toArray(Request $request): array
     {
         $quizData = null;
-        if ($this->type === 'quiz_module' && $this->quiz) {
+        if (($this->type === 'quiz_module' || $this->type === 'quiz') && $this->quiz) {
             $quizData = [
                 'id' => $this->quiz->id,
+                'quiz_id' => $this->quiz->id,
                 'title' => $this->quiz->title,
-                'time_limit_minutes' => $this->quiz->time_limit_minutes,
-                'passing_score' => $this->quiz->passing_score,
-                'questions' => $this->quiz->questions->map(function ($q) {
+                'description' => $this->quiz->description,
+                'time_limit_minutes' => $this->quiz->time_limit_minutes ?? 15,
+                'passing_score' => $this->quiz->passing_score ?? 70,
+                'difficulty' => $this->quiz->difficulty ?? 'mixed',
+                'questions' => $this->quiz->questions ? $this->quiz->questions->map(function ($q) {
+                    $answers = $q->answers ? $q->answers->map(function ($a) {
+                        return [
+                            'id' => $a->id,
+                            'content' => $a->content,
+                            'is_correct' => (bool) $a->is_correct,
+                        ];
+                    })->values()->toArray() : [];
+
+                    $options = $q->answers ? $q->answers->pluck('content')->toArray() : [];
+                    $correctIdx = 0;
+                    if ($q->answers) {
+                        $found = $q->answers->search(fn($a) => (bool)$a->is_correct);
+                        if ($found !== false) {
+                            $correctIdx = $found;
+                        }
+                    }
+
                     return [
                         'id' => $q->id,
+                        'type' => $q->type ?? 'multiple_choice',
+                        'question' => $q->content,
                         'content' => $q->content,
+                        'explanation' => $q->explanation,
+                        'sample_answer' => $q->sample_answer,
+                        'rubric' => $q->rubric,
+                        'points' => (float) ($q->points ?? 1.0),
+                        'difficulty' => $q->difficulty ?? 'medium',
                         'order' => $q->order,
-                        'answers' => $q->answers->map(function ($a) {
-                            return [
-                                'id' => $a->id,
-                                'content' => $a->content,
-                                'is_correct' => (bool) $a->is_correct,
-                            ];
-                        })->toArray(),
+                        'options' => $options,
+                        'correct_answer_index' => $correctIdx,
+                        'answers' => $answers,
                     ];
-                })->toArray(),
+                })->values()->toArray() : [],
             ];
         }
 

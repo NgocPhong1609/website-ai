@@ -26,11 +26,11 @@ class CourseStructureService
             if ($publishedOnly) {
                 $q->where('status', 'published')->whereNotNull('published_version_id');
             }
-            $q->orderBy('order');
+            $q->orderBy('order')->with('quiz.questions.answers');
         }])->get();
 
         // 2. Fetch all quiz attachments for this course
-        $attachmentsQuery = QuizCourseAttachment::with(['quiz.questions'])
+        $attachmentsQuery = QuizCourseAttachment::with(['quiz.questions.answers'])
             ->where('course_id', $course->id);
 
         if ($publishedOnly) {
@@ -56,6 +56,55 @@ class CourseStructureService
                 $durationMinutes = $durationSec > 0 ? round($durationSec / 60) : 0;
                 $durationText = $durationMinutes > 0 ? $durationMinutes . ' phút' : '1 phút';
 
+                $lessonQuizData = null;
+                if ($les->quiz) {
+                    $qModel = $les->quiz;
+                    $lessonQuizData = [
+                        'id' => $qModel->id,
+                        'quiz_id' => $qModel->id,
+                        'title' => $qModel->title,
+                        'description' => $qModel->description,
+                        'time_limit_minutes' => $qModel->time_limit_minutes ?? 15,
+                        'passing_score' => $qModel->passing_score ?? 70,
+                        'difficulty' => $qModel->difficulty ?? 'mixed',
+                        'total_questions' => $qModel->total_questions ?? ($qModel->questions ? $qModel->questions->count() : 0),
+                        'questions' => $qModel->questions ? $qModel->questions->map(function ($q) {
+                            $answers = $q->answers ? $q->answers->map(function ($a) {
+                                return [
+                                    'id' => $a->id,
+                                    'content' => $a->content,
+                                    'is_correct' => (bool) $a->is_correct,
+                                ];
+                            })->values()->toArray() : [];
+
+                            $options = $q->answers ? $q->answers->pluck('content')->toArray() : [];
+                            $correctIdx = 0;
+                            if ($q->answers) {
+                                $found = $q->answers->search(fn($a) => (bool)$a->is_correct);
+                                if ($found !== false) {
+                                    $correctIdx = $found;
+                                }
+                            }
+
+                            return [
+                                'id' => $q->id,
+                                'type' => $q->type ?? 'multiple_choice',
+                                'question' => $q->content,
+                                'content' => $q->content,
+                                'explanation' => $q->explanation,
+                                'sample_answer' => $q->sample_answer,
+                                'rubric' => $q->rubric,
+                                'points' => (float) ($q->points ?? 1.0),
+                                'difficulty' => $q->difficulty ?? 'medium',
+                                'order' => $q->order,
+                                'options' => $options,
+                                'correct_answer_index' => $correctIdx,
+                                'answers' => $answers,
+                            ];
+                        })->values()->toArray() : [],
+                    ];
+                }
+
                 $moduleItems[] = [
                     'id' => $les->id,
                     'item_type' => 'lesson',
@@ -67,7 +116,7 @@ class CourseStructureService
                     'status' => $les->status,
                     'video_url' => $les->video_url,
                     'content' => $les->type === 'article' ? $les->content : null,
-                    'quizData' => null,
+                    'quizData' => $lessonQuizData,
                 ];
 
                 // Check if any quiz is attached AFTER this lesson

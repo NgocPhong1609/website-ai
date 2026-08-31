@@ -21,6 +21,7 @@ export function QuizEditor({ value, onChange, quizId }: QuizEditorProps) {
   const [passingScore, setPassingScore] = useState<number>(value?.passing_score || 70);
   const [difficulty, setDifficulty] = useState<DifficultyType>(value?.difficulty || "mixed");
   const [filterType, setFilterType] = useState<"all" | "multiple_choice" | "essay">("all");
+  const effectiveQuizId = quizId || value?.id || value?.quiz_id;
 
   const [questions, setQuestions] = useState<GeneratedQuestion[]>(() => {
     if (value?.questions && Array.isArray(value.questions) && value.questions.length > 0) {
@@ -51,7 +52,19 @@ export function QuizEditor({ value, onChange, quizId }: QuizEditorProps) {
     ];
   });
 
-  const effectiveQuizId = quizId || value?.id || value?.quiz_id;
+  // Sync value prop changes to internal state
+  useEffect(() => {
+    if (value) {
+      if (value.title) setTitle(value.title);
+      if (value.description !== undefined) setDescription(value.description || "");
+      if (value.time_limit_minutes !== undefined) setTimeLimit(value.time_limit_minutes);
+      if (value.passing_score !== undefined) setPassingScore(value.passing_score);
+      if (value.difficulty) setDifficulty(value.difficulty);
+      if (Array.isArray(value.questions) && value.questions.length > 0) {
+        setQuestions(value.questions.map((q: any, idx: number) => normalizeQuestion(q, idx)));
+      }
+    }
+  }, [value]);
 
   // Fetch full details if quiz_id exists and local questions are empty
   useEffect(() => {
@@ -61,12 +74,12 @@ export function QuizEditor({ value, onChange, quizId }: QuizEditorProps) {
         .getQuizById(Number(effectiveQuizId))
         .then((data) => {
           if (data) {
-            setTitle(data.title || "Bài kiểm tra");
+            if (data.title) setTitle(data.title);
             if (data.description) setDescription(data.description);
             if (data.time_limit_minutes) setTimeLimit(data.time_limit_minutes);
             if (data.passing_score) setPassingScore(data.passing_score);
             if (data.difficulty) setDifficulty(data.difficulty);
-            if (Array.isArray(data.questions)) {
+            if (Array.isArray(data.questions) && data.questions.length > 0) {
               setQuestions(data.questions.map((q: any, idx: number) => normalizeQuestion(q, idx)));
             }
           }
