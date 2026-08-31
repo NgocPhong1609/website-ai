@@ -1,17 +1,19 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { resolveUserRole } from "@/src/features/student/auth/components/login/AuthShared";
 
 /**
  * Client-side guard for Student Layout.
  * Prevents Teachers/Instructors and Admins from rendering Student pages.
- * If user is a Teacher or Admin, instantly redirects to /instructor or /admin.
+ * If user is a Teacher or Admin, instantly redirects to /instructor or /admin, EXCEPT when previewing a course (preview=true).
  */
 export function StudentRoleGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const isPreviewMode = searchParams ? searchParams.get("preview") === "true" : false;
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -23,11 +25,11 @@ export function StudentRoleGuard({ children }: { children: React.ReactNode }) {
         const user = JSON.parse(userInfoRaw);
         const role = resolveUserRole(user);
 
-        if (role === "instructor") {
+        if (role === "instructor" && !isPreviewMode) {
           setIsAuthorized(false);
           router.replace("/instructor");
           return;
-        } else if (role === "admin") {
+        } else if (role === "admin" && !isPreviewMode) {
           setIsAuthorized(false);
           router.replace("/admin");
           return;
@@ -38,7 +40,7 @@ export function StudentRoleGuard({ children }: { children: React.ReactNode }) {
     }
 
     setIsAuthorized(true);
-  }, [pathname, router]);
+  }, [pathname, router, isPreviewMode]);
 
   if (isAuthorized === false) {
     return (

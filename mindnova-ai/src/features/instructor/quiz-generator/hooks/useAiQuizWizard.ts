@@ -1,11 +1,28 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { QuizConfig, GeneratedQuestion, QuizSummary } from "../types/quizGenerator.types";
 import { quizGeneratorApi } from "../api/quizGeneratorApi";
 
-export function useAiQuizWizard() {
- const [step, setStep] = useState<number>(1);
+export function useAiQuizWizard(options?: {
+  initialCourseId?: number;
+  initialModuleId?: number;
+  initialAfterLessonId?: number;
+  embeddedMode?: boolean;
+  onSuccessComplete?: (savedQuiz?: any) => void;
+}) {
+ const searchParams = useSearchParams();
+ const rawCourseId = searchParams ? (searchParams.get("course_id") || searchParams.get("courseId")) : null;
+ const rawModuleId = searchParams ? (searchParams.get("module_id") || searchParams.get("moduleId")) : null;
+ const rawAfterLessonId = searchParams ? (searchParams.get("after_lesson_id") || searchParams.get("afterLessonId")) : null;
+ const positionParam = searchParams ? searchParams.get("position") : null;
+
+ const courseIdParam = rawCourseId ? Number(rawCourseId) : options?.initialCourseId;
+ const moduleIdParam = rawModuleId ? Number(rawModuleId) : options?.initialModuleId;
+ const afterLessonIdParam = rawAfterLessonId ? Number(rawAfterLessonId) : options?.initialAfterLessonId;
+
+ const [step, setStep] = useState<number>(options?.embeddedMode ? 2 : 1);
  const [isGenerating, setIsGenerating] = useState<boolean>(false);
  const [isSaving, setIsSaving] = useState<boolean>(false);
  const [error, setError] = useState<string | null>(null);
@@ -14,9 +31,10 @@ export function useAiQuizWizard() {
  const [config, setConfig] = useState<QuizConfig>({
  title: "Kiểm tra kiến thức",
  description: "Đề kiểm tra trắc nghiệm & tự luận được tạo bởi AI",
- source_type: "topic",
+ source_type: courseIdParam ? "course" : "topic",
+ course_id: courseIdParam || undefined,
  source_content: "",
- topic: "Toán hệ nhị phân",
+ topic: "Kiến thức bài học",
  difficulty: "mixed",
  total_questions: 20,
  multiple_choice_count: 15,
@@ -24,6 +42,16 @@ export function useAiQuizWizard() {
  time_limit_minutes: 20,
  passing_score: 70,
  });
+
+ useEffect(() => {
+   if (courseIdParam) {
+     setConfig((prev) => ({
+       ...prev,
+       source_type: "course",
+       course_id: Number(courseIdParam),
+     }));
+   }
+ }, [courseIdParam]);
 
  const [questions, setQuestions] = useState<GeneratedQuestion[]>([]);
 
@@ -134,11 +162,33 @@ export function useAiQuizWizard() {
  questions: activeQuestions,
  });
 
- if (response.success && response.data) {
- setSavedQuiz(response.data);
- setStep(5); // Move to Step 5 (Attachment & Success)
- return response.data;
- } else {
+      if (response.success && response.data) {
+        const quizData = response.data;
+        setSavedQuiz(quizData);
+
+        // If in embedded course mode, auto attach if course_id exists and bypass Step 5 modal unconditionally
+        if (options?.embeddedMode || options?.onSuccessComplete) {
+          if (config.course_id && options?.initialModuleId) {
+            try {
+              await quizGeneratorApi.attachQuiz(quizData.id, {
+                course_id: config.course_id,
+                module_id: options.initialModuleId,
+                position: "in_module",
+                order: 99,
+              });
+            } catch (attachErr) {
+              console.warn("Auto attach failed:", attachErr);
+            }
+          }
+          if (options?.onSuccessComplete) {
+            options.onSuccessComplete(quizData);
+            return quizData;
+          }
+        }
+
+        setStep(5); // Move to Step 5 only if standalone mode
+        return quizData;
+      } else {
  throw new Error(response.message || "Lưu bài kiểm tra thất bại");
  }
  } catch (err: any) {

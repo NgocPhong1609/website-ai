@@ -110,7 +110,11 @@ class QuizGeneratorController extends Controller
      */
     public function index(Request $request)
     {
-        $quizzes = $this->quizService->getInstructorQuizzes($request->user());
+        $courseId = $request->query('course_id') ?? $request->query('courseId');
+        $quizzes = $this->quizService->getInstructorQuizzes(
+            $request->user(),
+            $courseId ? (int) $courseId : null
+        );
 
         return $this->successResponse($quizzes, 'Instructor quizzes retrieved.');
     }

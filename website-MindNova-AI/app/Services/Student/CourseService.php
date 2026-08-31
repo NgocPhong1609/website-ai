@@ -134,6 +134,35 @@ class CourseService
                         $instructorBio = "Chuyên gia giàu kinh nghiệm trong lĩnh vực {$categoryName}.";
                     }
 
+                    // Fetch quiz attachments
+                    $quizAttachments = collect();
+                    if (class_exists(\App\Models\QuizCourseAttachment::class)) {
+                        $quizAttachments = \App\Models\QuizCourseAttachment::with('quiz')
+                            ->where('course_id', $courseId)
+                            ->whereHas('quiz', function($q) {
+                                $q->where('status', 'published');
+                            })
+                            ->get();
+                    }
+
+                    // Helper to format quiz as a lesson
+                    $formatQuiz = function($attachment, $order) {
+                        $quiz = $attachment->quiz;
+                        return [
+                            'id' => 'quiz-' . $quiz->id,
+                            'real_quiz_id' => $quiz->id,
+                            'order' => $order,
+                            'title' => '📝 ' . ($quiz->title ?? 'Bài kiểm tra'),
+                            'type' => 'quiz',
+                            'duration' => ($quiz->time_limit_minutes ?? 15) . ' phút',
+                            'duration_seconds' => ($quiz->time_limit_minutes ?? 15) * 60,
+                            'status' => 'locked', // Can be enhanced to check if student passed
+                            'video_url' => null,
+                            'has_uploaded_video' => false,
+                            'content' => $quiz->description,
+                        ];
+                    };
+
                     $progressData = $this->calculateStudentProgress($dbCourse, $userId);
                     $totalLessons = $progressData['total_lessons'];
                     $completedLessons = $progressData['completed_lessons'];
@@ -144,8 +173,8 @@ class CourseService
                         $modOrder = 1;
                         foreach ($dbCourse->modules->sortBy('order') as $mod) {
                             $mLessons = [];
+                            $lOrder = 1;
                             if ($mod->lessons && $mod->lessons->isNotEmpty()) {
-                                $lOrder = 1;
                                 foreach ($mod->lessons->sortBy('order') as $les) {
                                     // ── RULE 6, 14, 15: ONLY show PUBLISHED lessons ──
                                     if ($les->status !== 'published' || $les->published_version_id === null) {
@@ -192,10 +221,24 @@ class CourseService
                                         ];
                                     }
                                     $lOrder++;
+
+                                    // Check if there are any 'after_lesson' quizzes for this lesson
+                                    $afterLessonQuizzes = $quizAttachments->where('position', 'after_lesson')->where('after_lesson_id', $les->id);
+                                    foreach ($afterLessonQuizzes as $attachment) {
+                                        $mLessons[] = $formatQuiz($attachment, $lOrder);
+                                        $lOrder++;
+                                    }
                                 }
                             }
 
-                            // Only include modules that have published lessons
+                            // Check if there are any 'in_module' quizzes for this module
+                            $inModuleQuizzes = $quizAttachments->where('position', 'in_module')->where('module_id', $mod->id);
+                            foreach ($inModuleQuizzes as $attachment) {
+                                $mLessons[] = $formatQuiz($attachment, $lOrder);
+                                $lOrder++;
+                            }
+
+                            // Only include modules that have published lessons or attached quizzes
                             if (!empty($mLessons)) {
                                 $modules[] = [
                                     'id' => $mod->id,
@@ -207,6 +250,25 @@ class CourseService
                             }
                             $modOrder++;
                         }
+                    }
+                    
+                    // Handle 'end_of_course' quizzes (append as a new final module)
+                    $endOfCourseQuizzes = $quizAttachments->whereIn('position', ['end_of_course', 'capability_assessment']);
+                    if ($endOfCourseQuizzes->isNotEmpty()) {
+                        $finalLessons = [];
+                        $lOrder = 1;
+                        foreach ($endOfCourseQuizzes as $attachment) {
+                            $finalLessons[] = $formatQuiz($attachment, $lOrder);
+                            $lOrder++;
+                        }
+                        
+                        $modules[] = [
+                            'id' => 'module-final-quizzes',
+                            'order' => $modOrder,
+                            'title' => 'Bài kiểm tra cuối khóa',
+                            'duration' => 'Nhiều bài kiểm tra',
+                            'lessons' => $finalLessons,
+                        ];
                     }
                 }
             }

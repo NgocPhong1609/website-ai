@@ -13,6 +13,7 @@ class QuizCourseAttachment extends Model
         'module_id',
         'after_lesson_id',
         'position',
+        'order',
     ];
 
     public function quiz(): BelongsTo

@@ -38,6 +38,7 @@ class QuizService
                 'description' => $data['description'] ?? null,
                 'source_type' => $data['source_type'] ?? 'topic',
                 'source_content' => $data['source_content'] ?? null,
+                'type' => $data['type'] ?? 'normal',
                 'difficulty' => $data['difficulty'] ?? 'mixed',
                 'total_questions' => count($questionsData),
                 'mc_questions_count' => $mcCount,
@@ -152,16 +153,19 @@ class QuizService
     {
         $position = $attachData['position'] ?? 'end_of_course';
 
-        if ($position === 'capability_assessment') {
-            $quiz->update([
-                'type' => 'capability_assessment',
-                'credits' => 3,
-            ]);
-        } else {
-            $quiz->update([
-                'type' => $quiz->type === 'capability_assessment' ? 'normal' : $quiz->type,
-                'credits' => $quiz->type === 'capability_assessment' ? 1 : ($quiz->credits ?? 1),
-            ]);
+        $targetType = ($position === 'capability_assessment')
+            ? 'capability_assessment'
+            : (($quiz->type === 'capability_assessment' || !$quiz->type) ? 'normal' : $quiz->type);
+
+        $quiz->update([
+            'type' => $targetType,
+            'credits' => $targetType === 'capability_assessment' ? 3 : ($quiz->credits ?? 1),
+        ]);
+
+        $order = $attachData['order'] ?? null;
+        if ($order === null || $order === 0) {
+            $maxOrder = QuizCourseAttachment::where('course_id', $attachData['course_id'])->max('order') ?? 0;
+            $order = $maxOrder + 1;
         }
 
         return QuizCourseAttachment::updateOrCreate(
@@ -171,18 +175,50 @@ class QuizService
                 'module_id' => $attachData['module_id'] ?? null,
                 'after_lesson_id' => $attachData['after_lesson_id'] ?? null,
                 'position' => $position,
+                'order' => (int) $order,
             ]
         );
     }
 
-    /**
-     * Get all standalone quizzes for an instructor.
-     */
-    public function getInstructorQuizzes(User $instructor)
+    public function detachQuizFromCourse(Quiz $quiz, ?int $courseId = null): bool
     {
-        return Quiz::where('instructor_id', $instructor->id)
-            ->withCount('questions')
-            ->with(['attachments.course', 'lesson.module.course', 'lesson.course'])
+        $query = QuizCourseAttachment::where('quiz_id', $quiz->id);
+        if ($courseId) {
+            $query->where('course_id', $courseId);
+        }
+        return (bool) $query->delete();
+    }
+
+    /**
+     * Get all standalone or course-bound quizzes for an instructor.
+     */
+    public function getInstructorQuizzes(User $instructor, ?int $courseId = null)
+    {
+        $query = Quiz::where('instructor_id', $instructor->id);
+
+        if ($courseId) {
+            // Verify that course belongs to instructor
+            $ownsCourse = \App\Models\Course::where('id', $courseId)
+                ->where('teacher_id', $instructor->id)
+                ->exists();
+
+            if (!$ownsCourse) {
+                return collect();
+            }
+
+            $query->where(function ($q) use ($courseId) {
+                $q->whereHas('attachments', function ($att) use ($courseId) {
+                    $att->where('course_id', $courseId);
+                })->orWhereHas('lesson.module', function ($mod) use ($courseId) {
+                    $mod->where('course_id', $courseId);
+                })->orWhereHas('lesson', function ($les) use ($courseId) {
+                    $les->where('course_id', $courseId);
+                });
+            });
+        }
+
+        return $query->withCount('questions')
+            ->with(['attachments.course', 'lesson.module.course'])
             ->orderBy('created_at', 'desc')
             ->get();
     }

@@ -224,9 +224,9 @@ export function Step4ReviewEditor({
  type="button"
  onClick={() => onSave("published")}
  disabled={isSaving || questions.length === 0 || !isValidTotal}
- className="px-8 py-3 bg-[#C0392B] hover:from-[#4338CA] hover:to-[#6D28D9] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center gap-2"
+ className="px-8 py-3 bg-[#C0392B] hover:bg-[#a02c20] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center gap-2"
  >
- <span> Xuất Bản &amp; Gắn Vào Khóa Học </span>
+ <span>✨ Hoàn Tất &amp; Thêm Vào Giáo Trình</span>
  </button>
  </div>
  </div>

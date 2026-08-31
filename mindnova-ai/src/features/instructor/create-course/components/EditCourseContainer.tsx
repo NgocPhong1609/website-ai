@@ -11,6 +11,7 @@ import { Step1BasicInfo } from "./Step1BasicInfo";
 import { Step3SettingsPrice } from "./Step3SettingsPrice";
 import { CourseEditTabs, EditCourseTab } from "./CourseEditTabs";
 import { CourseHealthCard } from "./CourseHealthCard";
+import { Step2CourseStructure } from "./Step2CourseStructure";
 import type { CourseBasicInfo, DifficultyLevel } from "../types";
 import {
  SaveIcon,
@@ -179,7 +180,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  {/* Right Header - Buttons */}
  <div className="flex items-center gap-2.5">
  <Link
- href={`/courses/${courseId}`}
+ href={`/courses/lesson?course_id=${courseId}&preview=true`}
  target="_blank"
  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-gray-700 bg-white border border-[#E8E2D9] hover:bg-[#FEFCF9] transition-all shadow-2xs"
  >
@@ -247,6 +248,10 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <div className="mt-2">
  {activeTab === "overview" && (
  <Step1BasicInfo data={basicInfo} onChange={handleBasicInfoChange} />
+ )}
+
+ {activeTab === "structure" && (
+ <Step2CourseStructure courseId={courseId} />
  )}
 
  {activeTab === "pricing" && (

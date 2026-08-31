@@ -4,7 +4,7 @@ import React from "react";
 import { twMerge } from "tailwind-merge";
 import { FileEditIcon, BookOpenIcon, TagIcon, SettingsIcon } from "./icons";
 
-export type EditCourseTab = "overview" | "pricing" | "advanced";
+export type EditCourseTab = "overview" | "structure" | "pricing" | "advanced";
 
 interface CourseEditTabsProps {
  activeTab: EditCourseTab;
@@ -17,6 +17,11 @@ export function CourseEditTabs({ activeTab, onChangeTab }: CourseEditTabsProps) 
  id: "overview",
  label: "Thông tin tổng quan & SEO",
  icon: <FileEditIcon size={16} />,
+ },
+ {
+ id: "structure",
+ label: "Cấu trúc bài giảng & Quiz",
+ icon: <BookOpenIcon size={16} />,
  },
  {
  id: "pricing",

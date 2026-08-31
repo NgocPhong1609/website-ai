@@ -12,20 +12,26 @@ use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 
+use App\Services\Instructor\CourseStructureService;
+
 class CourseModuleController extends Controller
 {
     use ApiResponse;
 
-    public function __construct(private readonly CourseModuleService $moduleService)
-    {
+    public function __construct(
+        private readonly CourseModuleService $moduleService,
+        private readonly CourseStructureService $structureService
+    ) {
     }
 
     public function index(Course $course)
     {
         Gate::authorize('view', $course);
 
+        $structure = $this->structureService->getCourseStructure($course, false);
+
         return $this->successResponse(
-            CourseModuleResource::collection($course->modules()->with('lessons')->orderBy('order')->get()), 
+            $structure, 
             'Modules retrieved successfully.'
         );
     }

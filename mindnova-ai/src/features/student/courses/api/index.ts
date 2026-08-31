@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosClient } from "../../../../shared/lib/axios";
 import type { CourseDetailData, MyCourse } from "../types";
 
-export function useGetCourseDetail(courseId: string | number = 1) {
+export function useGetCourseDetail(courseId: string | number = 0) {
  return useQuery({
  queryKey: ["student", "courses", "detail", courseId],
  queryFn: async (): Promise<CourseDetailData> => {
@@ -10,6 +10,7 @@ export function useGetCourseDetail(courseId: string | number = 1) {
  return data.data;
  },
  staleTime: 5 * 60 * 1000,
+ enabled: !!courseId && Number(courseId) > 0,
  });
 }
 

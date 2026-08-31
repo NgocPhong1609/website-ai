@@ -123,20 +123,20 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
 
  return (
  <div className="p-8 bg-white rounded-3xl border border-[#E8E2D9] shadow-sm flex flex-col gap-6 animate-fadeIn">
- {/* Header */}
- <div>
- <div className="flex items-center gap-2">
- <span className="px-3 py-1 bg-indigo-50 text-[#C0392B] text-xs font-black rounded-lg border -[#FAF7F2] uppercase tracking-wider">
- Bước 1 / 5
- </span>
- <h2 className="text-xl font-black text-[#2C3039]">Nguồn Dữ Liệu Tạo Đề Bài Kiểm Tra</h2>
- </div>
- <p className="text-xs text-[#8A8478] font-medium mt-1">
- Chọn nguồn dữ liệu bài học hoặc chủ đề để AI tự động phân tích ngữ cảnh và trích xuất câu hỏi chuẩn xác.
- </p>
- </div>
+   {/* Header */}
+   <div>
+     <div className="flex items-center gap-2">
+       <span className="px-3 py-1 bg-indigo-50 text-[#C0392B] text-xs font-black rounded-lg border border-indigo-100 uppercase tracking-wider">
+         Bước 1 / 5
+       </span>
+       <h2 className="text-xl font-black text-[#2C3039]">Nguồn Dữ Liệu Tạo Đề Bài Kiểm Tra</h2>
+     </div>
+     <p className="text-xs text-[#8A8478] font-medium mt-1">
+       Chọn nguồn dữ liệu bài học hoặc chủ đề để AI tự động phân tích ngữ cảnh và trích xuất câu hỏi chuẩn xác.
+     </p>
+   </div>
 
- {/* 3 Source Types Selection */}
+   {/* 3 Source Types Selection */}
  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
  {/* Option 1: Course-Based */}
  <button
@@ -227,38 +227,54 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
  </button>
  </div>
 
- {/* Interactive Input Form Area */}
- {config.source_type === "course" ? (
- <div className="flex flex-col gap-4 p-6 rounded-2xl bg-[#FAF8FF] border -[#FAF7F2]">
- <div>
- <label className="block text-xs font-extrabold text-[#2C3039] mb-2 uppercase tracking-wider">
- Chọn khóa học của bạn do bạn quản lý:
- </label>
- {isLoadingCourses ? (
- <div className="p-4 bg-white rounded-xl border border-[#E8E2D9] text-xs font-bold text-[#8A8478] animate-pulse">
- Đang tải danh sách khóa học...
- </div>
- ) : courses.length === 0 ? (
- <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold flex flex-col gap-1">
- <span>️ Bạn chưa có khóa học nào trong tài khoản.</span>
- <span className="text-[11px] font-medium text-amber-700">
- Hãy chọn phương thức "Dán nội dung thủ công" hoặc "Tạo theo chủ đề" ở trên để tiếp tục.
- </span>
- </div>
- ) : (
- <select
- value={config.course_id || ""}
- onChange={(e) => handleSelectCourse(Number(e.target.value))}
- className="w-full p-3.5 rounded-xl border-2 -[#FAF7F2] bg-white text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] shadow-xs"
- >
- {courses.map((c) => (
- <option key={c.id} value={c.id}>
- {c.title} (ID: #{c.id})
- </option>
- ))}
- </select>
- )}
- </div>
+  {/* Interactive Input Form Area */}
+  {config.source_type === "course" ? (
+    <div className="flex flex-col gap-4 p-6 rounded-2xl bg-[#FAF8FF] border border-gray-100">
+      {config.course_id ? (
+        <div className="p-3.5 rounded-xl bg-white border border-indigo-100 flex items-center justify-between text-xs font-bold text-indigo-950 shadow-2xs">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🎓</span>
+            <div>
+              <span className="text-[10px] font-black text-indigo-600 uppercase tracking-wider block">Khóa học đang soạn</span>
+              <span className="text-xs font-black text-indigo-950">{config.course_title || `Khóa học #${config.course_id}`}</span>
+            </div>
+          </div>
+          <span className="px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-extrabold text-[11px]">
+            Đã chọn
+          </span>
+        </div>
+      ) : (
+        <div>
+          <label className="block text-xs font-extrabold text-[#2C3039] mb-2 uppercase tracking-wider">
+            Chọn khóa học của bạn do bạn quản lý:
+          </label>
+          {isLoadingCourses ? (
+            <div className="p-4 bg-white rounded-xl border border-[#E8E2D9] text-xs font-bold text-[#8A8478] animate-pulse">
+              Đang tải danh sách khóa học...
+            </div>
+          ) : courses.length === 0 ? (
+            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold flex flex-col gap-1">
+              <span>⚠️ Bạn chưa có khóa học nào trong tài khoản.</span>
+              <span className="text-[11px] font-medium text-amber-700">
+                Hãy chọn phương thức "Dán nội dung thủ công" hoặc "Tạo theo chủ đề" ở trên để tiếp tục.
+              </span>
+            </div>
+          ) : (
+            <select
+              value={config.course_id || ""}
+              onChange={(e) => handleSelectCourse(Number(e.target.value))}
+              className="w-full p-3.5 rounded-xl border-2 border-gray-200 bg-white text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] shadow-xs"
+            >
+              <option value="" disabled>-- Chọn khóa học --</option>
+              {courses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title} (ID: #{c.id})
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+      )}
 
  {/* Selected Course Breakdown & Verification Card */}
  {config.course_id && (

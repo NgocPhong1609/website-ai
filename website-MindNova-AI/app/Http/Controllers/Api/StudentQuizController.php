@@ -26,7 +26,20 @@ class StudentQuizController extends Controller
      */
     private function resolveQuizFromParam($param): ?Quiz
     {
-        $numericId = is_numeric($param) ? (int) $param : (str_starts_with(strtolower((string)$param), 'mod') ? (int) filter_var($param, FILTER_SANITIZE_NUMBER_INT) : null);
+        $paramStr = strtolower(trim((string) $param));
+
+        // 0. If parameter starts with 'quiz-', extract quiz ID and find Quiz directly
+        if (str_starts_with($paramStr, 'quiz-')) {
+            $quizId = (int) preg_replace('/[^0-9]/', '', $paramStr);
+            if ($quizId > 0) {
+                $quiz = Quiz::with(['lesson', 'lesson.module', 'lesson.module.course', 'questions.answers'])->find($quizId);
+                if ($quiz) {
+                    return $quiz;
+                }
+            }
+        }
+
+        $numericId = is_numeric($param) ? (int) $param : (str_starts_with($paramStr, 'mod') ? (int) filter_var($paramStr, FILTER_SANITIZE_NUMBER_INT) : null);
 
         // 1. If numeric, first try finding a Lesson that owns a Quiz
         if (is_numeric($param)) {

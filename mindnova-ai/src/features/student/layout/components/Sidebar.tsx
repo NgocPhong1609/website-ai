@@ -48,15 +48,37 @@ function MenuIcon() {
 
 // ─── Main Sidebar ─────────────────────────────────────────────────────────────
 
-export default function Sidebar() {
- const [isCollapsed, setIsCollapsed] = useState(false);
- const [isMounted, setIsMounted] = useState(false);
- const [isLoggedIn, setIsLoggedIn] = useState(false);
+import { useSearchParams } from "next/navigation";
+import { InstructorSidebar } from "@/src/features/instructor/management/components/InstructorSidebar";
+import { resolveUserRole } from "@/src/features/student/auth/components/login/AuthShared";
 
- useEffect(() => {
- setIsMounted(true);
- setIsLoggedIn(!!window.localStorage.getItem("accessToken"));
- }, []);
+export default function Sidebar() {
+  const searchParams = useSearchParams();
+  const isPreview = searchParams ? searchParams.get("preview") === "true" : false;
+
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isTeacher, setIsTeacher] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    setIsLoggedIn(!!window.localStorage.getItem("accessToken"));
+    try {
+      const userInfoRaw = window.localStorage.getItem("userInfo");
+      if (userInfoRaw) {
+        const u = JSON.parse(userInfoRaw);
+        const role = resolveUserRole(u);
+        if (role === "instructor" || role === "teacher") {
+          setIsTeacher(true);
+        }
+      }
+    } catch (e) {}
+  }, []);
+
+  if (isPreview || isTeacher) {
+    return <InstructorSidebar />;
+  }
  
  // Hàm xử lý Logout chuyên nghiệp
  const handleLogout = () => {

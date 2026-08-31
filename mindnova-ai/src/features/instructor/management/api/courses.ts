@@ -75,3 +75,14 @@ export function useInstructorCourse(courseId: string) {
  enabled: !!courseId,
  });
 }
+
+export function useCourseModules(courseId: string) {
+  return useQuery({
+    queryKey: ["instructor", "courses", courseId, "modules"],
+    queryFn: async () => {
+      const { data } = await axiosClient.get(`/api/instructor/courses/${courseId}/modules`);
+      return data.data;
+    },
+    enabled: !!courseId,
+  });
+}

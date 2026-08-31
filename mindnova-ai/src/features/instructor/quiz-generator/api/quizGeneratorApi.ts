@@ -116,8 +116,9 @@ export const quizGeneratorApi = {
  },
 
  // Get list of instructor quizzes
- getQuizzes: async (): Promise<{ success: boolean; data: QuizSummary[] }> => {
- const res = await axiosClient.get("/api/instructor/ai-quiz");
+ getQuizzes: async (courseId?: number): Promise<{ success: boolean; data: QuizSummary[] }> => {
+ const url = courseId ? `/api/instructor/ai-quiz?course_id=${courseId}` : "/api/instructor/ai-quiz";
+ const res = await axiosClient.get(url);
  return res.data;
  },
 
