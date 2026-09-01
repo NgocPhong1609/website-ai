@@ -54,11 +54,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/explore', request.url));
   }
 
+  // Check if user is previewing a course as instructor
+  const isPreviewMode = request.nextUrl.searchParams.get('preview') === 'true';
+
   // 3. Teacher / Instructor role restrictions:
   if (isTeacherRole) {
-    // Teacher MUST remain in /instructor portal ONLY.
-    // If Teacher accesses ANY student route or admin route -> REDIRECT to /instructor
-    if (isStudentRoute || isAdminRoute) {
+    // Teacher MUST remain in /instructor portal ONLY, EXCEPT when previewing a course (preview=true)
+    if ((isStudentRoute || isAdminRoute) && !isPreviewMode) {
       return NextResponse.redirect(new URL('/instructor', request.url));
     }
   }
@@ -73,7 +75,7 @@ export function middleware(request: NextRequest) {
 
   // 5. Admin role restrictions:
   if (isAdminRole) {
-    if (isAdminRoute) {
+    if (isAdminRoute || isPreviewMode) {
       return NextResponse.next();
     }
   }

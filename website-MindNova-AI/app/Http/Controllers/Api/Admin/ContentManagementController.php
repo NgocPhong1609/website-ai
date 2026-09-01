@@ -64,6 +64,57 @@ class ContentManagementController extends Controller
             ->where('orders.status', 'completed')
             ->sum('order_items.price');
 
+        $structureService = app(\App\Services\Instructor\CourseStructureService::class);
+        $structuredModules = $structureService->getCourseStructure($course);
+
+        $courseLevelAttachments = \App\Models\QuizCourseAttachment::with(['quiz.questions.answers'])
+            ->where('course_id', $course->id)
+            ->whereIn('position', ['capability_assessment', 'end_of_course'])
+            ->get();
+
+        $formatQuiz = function ($attachment) {
+            if (!$attachment || !$attachment->quiz) return null;
+            $quiz = $attachment->quiz;
+            return [
+                'attachment_id' => $attachment->id,
+                'quiz_id' => $quiz->id,
+                'title' => $quiz->title,
+                'description' => $quiz->description,
+                'position' => $attachment->position,
+                'is_active' => (bool) $attachment->is_active,
+                'time_limit_minutes' => $quiz->time_limit_minutes ?? 15,
+                'passing_score' => $quiz->passing_score ?? 70,
+                'total_questions' => $quiz->questions ? $quiz->questions->count() : ($quiz->total_questions ?? 0),
+                'questions' => $quiz->questions ? $quiz->questions->map(function ($q) {
+                    return [
+                        'id' => $q->id,
+                        'type' => $q->type ?? 'multiple_choice',
+                        'question' => $q->content,
+                        'content' => $q->content,
+                        'explanation' => $q->explanation,
+                        'sample_answer' => $q->sample_answer,
+                        'rubric' => $q->rubric,
+                        'points' => (float) ($q->points ?? 1.0),
+                        'difficulty' => $q->difficulty ?? 'medium',
+                        'options' => $q->answers ? $q->answers->pluck('content')->toArray() : [],
+                        'answers' => $q->answers ? $q->answers->map(fn($a) => [
+                            'id' => $a->id,
+                            'content' => $a->content,
+                            'is_correct' => (bool) $a->is_correct,
+                        ])->values()->toArray() : [],
+                    ];
+                })->values()->toArray() : [],
+            ];
+        };
+
+        $capabilityQuizAtt = $courseLevelAttachments->firstWhere('position', 'capability_assessment');
+        $endOfCourseQuizAtt = $courseLevelAttachments->firstWhere('position', 'end_of_course');
+
+        $courseLevelQuizzes = [
+            'capability_assessment' => $formatQuiz($capabilityQuizAtt),
+            'end_of_course' => $formatQuiz($endOfCourseQuizAtt),
+        ];
+
         return response()->json([
             'data' => [
                 'id' => $course->id,
@@ -77,6 +128,8 @@ class ContentManagementController extends Controller
                 'enrollments' => $course->enrollments()->count(),
                 'revenue' => $revenue,
                 'admin_hidden_at' => $course->admin_hidden_at,
+                'structured_modules' => $structuredModules,
+                'course_level_quizzes' => $courseLevelQuizzes,
                 'modules' => $course->modules->map(fn ($module) => [
                     'id' => $module->id,
                     'title' => $module->title,

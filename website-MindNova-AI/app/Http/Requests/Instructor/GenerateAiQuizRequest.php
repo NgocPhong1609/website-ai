@@ -14,16 +14,24 @@ class GenerateAiQuizRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'source_type' => 'required|in:content,topic,course',
-            'course_id' => 'required_if:source_type,course|nullable|integer|exists:courses,id',
-            'content' => 'required_if:source_type,content|nullable|string|min:10',
-            'topic' => 'required_if:source_type,topic|nullable|string|min:3',
+            'source_type' => 'nullable|in:content,topic,course,manual',
+            'course_id' => 'nullable|integer|exists:courses,id',
+            'content' => 'nullable|string',
+            'topic' => 'nullable|string',
             'difficulty' => 'required|string|in:easy,medium,hard,mixed',
             'total_questions' => 'required|integer|min:1|max:50',
             'multiple_choice_count' => 'required|integer|min:0',
             'essay_count' => 'required|integer|min:0',
             'time_limit_minutes' => 'nullable|integer|min:0',
             'passing_score' => 'nullable|integer|min:0|max:100',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'course_id.required' => 'Vui lòng chọn khóa học trước khi tạo Quiz.',
+            'course_id.exists' => 'Khóa học được chọn không tồn tại trong hệ thống.',
         ];
     }
 

@@ -51,11 +51,15 @@ class GeminiAiService extends AbstractAiService
             $payload["systemInstruction"] = $systemInstruction;
         }
 
+        $generationConfig = [
+            'maxOutputTokens' => (int) ($options['max_tokens'] ?? 8192)
+        ];
+
         if (!empty($options['response_mime_type'])) {
-            $payload['generationConfig'] = [
-                'responseMimeType' => $options['response_mime_type']
-            ];
+            $generationConfig['responseMimeType'] = $options['response_mime_type'];
         }
+
+        $payload['generationConfig'] = $generationConfig;
 
         $maxRetries = $options['max_retries'] ?? 4;
         $lastException = null;

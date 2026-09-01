@@ -13,21 +13,32 @@ class StoreLessonRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        $this->merge([
-            'status' => 'draft',
-        ]);
+        $mergeData = [];
+
+        if (!$this->has('status')) {
+            $mergeData['status'] = 'draft';
+        }
+
+        if ($this->type === 'quiz') {
+            $mergeData['type'] = 'quiz_module';
+        } elseif ($this->type === 'document') {
+            $mergeData['type'] = 'article';
+        }
+
+        if (!empty($mergeData)) {
+            $this->merge($mergeData);
+        }
     }
 
     public function rules(): array
     {
         return [
             'title' => 'required|string|max:255',
-            'type' => 'required|in:video,article,quiz_module',
+            'type' => 'required|in:video,article,quiz_module,quiz,document',
             'content' => 'nullable|string',
             'video_url' => 'nullable|string',
             'order' => 'integer|min:0',
-            // RULE 4: Lessons ALWAYS start as draft — no published option
-            'status' => 'sometimes|in:draft',
+            'status' => 'sometimes|in:draft,published',
             'temp_media_ids' => 'nullable|array',
             'temp_media_ids.*' => 'integer|exists:lesson_media,id',
             'quizData' => 'nullable|array',

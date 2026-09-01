@@ -11,12 +11,31 @@ class StoreAiQuizRequest extends FormRequest
         return $this->user() && $this->user()->hasRole('teacher');
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('questions') && is_array($this->questions)) {
+            $questions = array_map(function ($q) {
+                if (is_array($q)) {
+                    if (empty($q['content']) && !empty($q['question'])) {
+                        $q['content'] = $q['question'];
+                    }
+                    if (isset($q['type']) && $q['type'] === 'tu_luan') {
+                        $q['type'] = 'essay';
+                    }
+                }
+                return $q;
+            }, $this->questions);
+
+            $this->merge(['questions' => $questions]);
+        }
+    }
+
     public function rules(): array
     {
         return [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'source_type' => 'nullable|string|in:content,topic,course',
+            'source_type' => 'nullable|string|in:content,topic,course,manual',
             'source_content' => 'nullable|string',
             'course_id' => 'nullable|integer|exists:courses,id',
             'difficulty' => 'nullable|string|in:easy,medium,hard,mixed',
@@ -34,6 +53,14 @@ class StoreAiQuizRequest extends FormRequest
             'questions.*.answers' => 'required_if:questions.*.type,multiple_choice|array',
             'questions.*.answers.*.content' => 'required|string',
             'questions.*.answers.*.is_correct' => 'required|boolean',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'course_id.required' => 'Vui lòng chọn khóa học trước khi tạo Quiz.',
+            'course_id.exists' => 'Khóa học được chọn không tồn tại trong hệ thống.',
         ];
     }
 

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 import { VerificationRequestModal } from "./VerificationRequestModal";
+import { EditCertificateModal } from "./EditCertificateModal";
 import { writeStoredUser } from "@/src/shared/lib/userStorage";
 
 export function TeacherProfileContainer() {
@@ -14,6 +15,7 @@ export function TeacherProfileContainer() {
  const [msg, setMsg] = useState({ type: "", text: "" });
 
  const [isModalOpen, setIsModalOpen] = useState(false);
+ const [editingCert, setEditingCert] = useState<any | null>(null);
 
  const [form, setForm] = useState({
  name: "",
@@ -358,13 +360,32 @@ export function TeacherProfileContainer() {
  )}
 
  <div className="flex items-center justify-between pt-1 border-t border-[#E8E2D9]/50 text-[11px] text-gray-400">
- <span>{cert.is_public ? "️ Hiển thị Public" : " Riêng tư"}</span>
- <button
- onClick={() => handleDeleteCert(cert.id)}
- className="text-rose-600 hover:underline font-bold"
- >
- Xóa
- </button>
+ <span>{cert.is_public ? " Hiển thị Public" : " Riêng tư"}</span>
+  <div className="flex items-center gap-3">
+  {cert.verification_status === "approved" ? (
+    <span
+      title="Bằng cấp đã được Admin xác minh không thể sửa"
+      className="text-gray-400 font-bold text-[11px] cursor-not-allowed select-none flex items-center gap-1"
+    >
+      🔒 Đã xác minh
+    </span>
+  ) : (
+    <button
+      type="button"
+      onClick={() => setEditingCert(cert)}
+      className="text-[#C0392B] hover:underline font-bold cursor-pointer"
+    >
+      Sửa
+    </button>
+  )}
+  <button
+    type="button"
+    onClick={() => handleDeleteCert(cert.id)}
+    className="text-rose-600 hover:underline font-bold cursor-pointer"
+  >
+    Xóa
+  </button>
+  </div>
  </div>
  </div>
  ))}
@@ -520,6 +541,14 @@ export function TeacherProfileContainer() {
  <VerificationRequestModal
  isOpen={isModalOpen}
  onClose={() => setIsModalOpen(false)}
+ onSuccess={fetchProfile}
+ />
+
+ {/* Edit Certificate Modal */}
+ <EditCertificateModal
+ isOpen={!!editingCert}
+ certificate={editingCert}
+ onClose={() => setEditingCert(null)}
  onSuccess={fetchProfile}
  />
  </div>

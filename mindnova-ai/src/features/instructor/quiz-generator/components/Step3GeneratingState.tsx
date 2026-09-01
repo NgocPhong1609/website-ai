@@ -7,11 +7,11 @@ export function Step3GeneratingState() {
  const [currentProgressStep, setCurrentProgressStep] = useState(0);
 
  const steps = [
- "1. Phân tích ngữ cảnh nội dung & chủ đề...",
- "2. Trích xuất kiến thức trọng tâm & khái niệm cốt lõi...",
+ "1. Đang quét & đọc toàn bộ nội dung chi tiết các bài học...",
+ "2. Trích xuất kiến thức trọng tâm & xây dựng ma trận đề thi...",
  "3. Sinh bộ câu hỏi trắc nghiệm kèm giải thích...",
  "4. Phân tích câu hỏi tự luận & lập đáp án tham khảo...",
- "5. Chuẩn hóa Rubric chấm điểm & hoàn thiện JSON...",
+ "5. Chuẩn hóa Rubric chấm điểm & hoàn thiện bài thi...",
  ];
 
  useEffect(() => {

@@ -10,6 +10,7 @@ import { SparklesIcon, PlusIcon } from "./icons";
 import { generateAiNotification, sendNotification, getNotificationOptions } from "../api";
 import { MultiSelect } from "@/src/shared/components/ui/MultiSelect";
 import { SingleSelect } from "@/src/shared/components/ui/SingleSelect";
+import { X as LucideX, RefreshCw, Copy, Bold, Italic, Underline, List, Link as LucideLink, ChevronDown } from "lucide-react";
 
 // ─── Local icons ──────────────────────────────────────────────────────────────
 
@@ -23,29 +24,23 @@ const S = {
 };
 
 function XIcon() {
- return (
- <></>
- );
+ return <LucideX size={16} />;
 }
 
 function RefreshIcon() {
- return (
- <></>
- );
+ return <RefreshCw size={14} />;
 }
 
 function CopyIcon() {
- return (
- <></>
- );
+ return <Copy size={14} />;
 }
 
-function BoldIcon() { return <></>; }
-function ItalicIcon() { return <></>; }
-function UnderlineIcon() { return <></>; }
-function ListIcon() { return <></>; }
-function LinkIcon() { return <></>; }
-function ChevronDownIcon() { return <></>; }
+function BoldIcon() { return <Bold size={14} />; }
+function ItalicIcon() { return <Italic size={14} />; }
+function UnderlineIcon() { return <Underline size={14} />; }
+function ListIcon() { return <List size={14} />; }
+function LinkIcon() { return <LucideLink size={14} />; }
+function ChevronDownIcon() { return <ChevronDown size={14} />; }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

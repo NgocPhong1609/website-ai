@@ -143,7 +143,7 @@ test('instructor can store standalone quiz with mcq and essay questions', functi
                 'content' => 'Câu 2: Phân biệt bù 1 và bù 2?',
                 'sample_answer' => 'Đáp án tham khảo mẫu',
                 'rubric' => 'Thang điểm chi tiết',
-                'points' => 5,
+                'points' => 9,
             ]
         ]
     ];
@@ -159,7 +159,7 @@ test('instructor can store standalone quiz with mcq and essay questions', functi
         'title' => 'Đề kiểm tra hệ nhị phân chính thức',
         'mc_questions_count' => 1,
         'essay_questions_count' => 1,
-        'total_points' => 6.0
+        'total_points' => 10.0
     ]);
 });
 

@@ -1,58 +1,39 @@
-// ─── Shared SVG props ─────────────────────────────────────────────────────────
+import React from "react";
+import {
+  User,
+  Shield,
+  Settings,
+  Check,
+  Sparkles,
+  Monitor,
+  Trash2,
+  LucideProps,
+} from "lucide-react";
 
-const SVG_PROPS = {
- width: 16,
- height: 16,
- viewBox: "0 0 24 24",
- fill: "none",
- stroke: "currentColor",
- strokeWidth: 1.8,
- strokeLinecap: "round" as const,
- strokeLinejoin: "round" as const,
- "aria-hidden": true as const,
-};
-
-// ─── Tab Icons ────────────────────────────────────────────────────────────────
-
-export function PersonalInfoIcon() {
- return (
- <></>
- );
+export function PersonalInfoIcon(props: LucideProps) {
+  return <User size={16} {...props} />;
 }
 
-export function SecurityIcon() {
- return (
- <></>
- );
+export function SecurityIcon(props: LucideProps) {
+  return <Shield size={16} {...props} />;
 }
 
-export function SettingsIcon() {
- return (
- <></>
- );
+export function SettingsIcon(props: LucideProps) {
+  return <Settings size={16} {...props} />;
 }
 
-export function CheckIcon() {
- return (
- <></>
- );
+export function CheckIcon(props: LucideProps) {
+  return <Check size={16} {...props} />;
 }
 
-export function SparkleIcon({ size = 14 }: { size?: number }) {
- return (
- <></>
- );
+export function SparkleIcon({ size = 14, ...props }: { size?: number } & LucideProps) {
+  return <Sparkles size={size} {...props} />;
 }
 
-export function MonitorIcon() {
- return (
- <></>
- );
+export function MonitorIcon(props: LucideProps) {
+  return <Monitor size={16} {...props} />;
 }
 
-export function TrashIcon() {
- return (
- <></>
- );
+export function TrashIcon(props: LucideProps) {
+  return <Trash2 size={16} {...props} />;
 }
-

@@ -22,7 +22,8 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'course_ids'     => 'required|array|min:1',
             'course_ids.*'   => 'required|integer|exists:courses,id',
-            'payment_method' => 'required|string|in:vnpay,momo,banking,free'
+            'payment_method' => 'required|string|in:vnpay,momo,banking,free',
+            'coupon_code'    => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -39,7 +40,41 @@ class OrderController extends Controller
         DB::beginTransaction();
         try {
             $courses = Course::with('teacher')->whereIn('id', $request->course_ids)->get();
-            $totalAmount = $courses->sum('price');
+            $originalTotal = (float) $courses->sum('price');
+            $discountAmount = 0;
+
+            if ($request->filled('coupon_code')) {
+                $code = strtoupper(trim($request->coupon_code));
+                $coupon = \App\Models\Coupon::where('code', $code)->first();
+
+                if ($coupon && $coupon->status === 'active') {
+                    $isExpired = $coupon->expires_at && now()->greaterThan($coupon->expires_at);
+                    $limitReached = $coupon->max_uses !== null && (int)$coupon->used_count >= (int)$coupon->max_uses;
+                    $courseMismatch = $coupon->course_id && !in_array((int)$coupon->course_id, array_map('intval', $request->course_ids));
+                    
+                    $instructorMismatch = false;
+                    if ($coupon->instructor_id) {
+                        foreach ($courses as $c) {
+                            $cTeacherId = (int) ($c->teacher_id ?? 0);
+                            if ((int) $coupon->instructor_id !== $cTeacherId) {
+                                $instructorMismatch = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!$isExpired && !$limitReached && !$courseMismatch && !$instructorMismatch) {
+                        if ($coupon->type === 'percent') {
+                            $discountAmount = round($originalTotal * ((float)$coupon->value / 100));
+                        } else {
+                            $discountAmount = min($originalTotal, (float)$coupon->value);
+                        }
+                        $coupon->increment('used_count');
+                    }
+                }
+            }
+
+            $totalAmount = max(0, $originalTotal - $discountAmount);
             $transactionId = 'ORD-' . strtoupper(Str::random(6));
 
             $order = Order::create([

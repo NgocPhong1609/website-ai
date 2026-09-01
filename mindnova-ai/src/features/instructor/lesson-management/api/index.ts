@@ -112,30 +112,125 @@ export function useUpdateLesson() {
 }
 
 export function useDeleteLesson() {
- const queryClient = useQueryClient();
- return useMutation({
- mutationFn: async ({ courseId, lessonId }: { courseId: string; lessonId: string | number }) => {
- await axiosClient.delete(`/api/instructor/lessons/${lessonId}`);
- },
- onSuccess: (_, { courseId }) => {
- queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId, "modules"] });
- },
- });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ courseId, lessonId }: { courseId: string; lessonId: string | number }) => {
+      await axiosClient.delete(`/api/instructor/lessons/${lessonId}`);
+    },
+    onSuccess: (_, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId, "modules"] });
+    },
+  });
+}
+
+export function useReorderModuleItems() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ courseId, moduleId, items }: { courseId: string; moduleId: string | number; items: Array<{ id: string | number; order: number }> }) => {
+      const { data } = await axiosClient.put(`/api/instructor/modules/${moduleId}/reorder-items`, { items });
+      return data;
+    },
+    onSuccess: (_, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "courses", courseId, "modules"] });
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId, "modules"] });
+    },
+  });
+}
+
+// ─── Quiz Helper ─────────────────────────────────────────────────────────────
+
+export function formatQuizPayloadForBackend(payload: any) {
+  if (!payload) return payload;
+
+  const title = payload.title || "Bài kiểm tra";
+  const timeLimit = payload.time_limit_minutes !== undefined ? Number(payload.time_limit_minutes) : 15;
+  const passingScore = payload.passing_score !== undefined ? Number(payload.passing_score) : 70;
+  const rawQuestions = Array.isArray(payload.questions) ? payload.questions : [];
+
+  const formattedQuestions = rawQuestions.map((q: any) => {
+    const isMcq = q.type === "multiple_choice" || q.type === "trac_nghiem" || (!q.type && (Array.isArray(q.options) || Array.isArray(q.answers)));
+    const type = isMcq ? "multiple_choice" : "essay";
+    const content = q.content || q.question || "Nội dung câu hỏi";
+    const points = typeof q.points === "number" ? q.points : (parseFloat(q.points) || (type === "essay" ? 5.0 : 1.0));
+    const explanation = q.explanation || "";
+
+    if (type === "essay") {
+      return {
+        type: "essay",
+        content,
+        explanation,
+        sample_answer: q.sample_answer || "",
+        rubric: q.rubric || "",
+        points,
+        answers: [],
+      };
+    }
+
+    let answers: Array<{ content: string; is_correct: boolean }> = [];
+    if (Array.isArray(q.answers) && q.answers.length > 0) {
+      answers = q.answers.map((a: any) => ({
+        content: String(a.content || a.answer || ""),
+        is_correct: Boolean(a.is_correct),
+      }));
+    } else if (Array.isArray(q.options) && q.options.length > 0) {
+      const correctIdx = typeof q.correct_answer_index === "number" ? q.correct_answer_index : 0;
+      answers = q.options.map((opt: any, i: number) => ({
+        content: String(opt),
+        is_correct: i === correctIdx,
+      }));
+    }
+
+    if (answers.length < 2) {
+      answers = [
+        { content: answers[0]?.content || "Đáp án 1", is_correct: true },
+        { content: "Đáp án 2", is_correct: false },
+      ];
+    }
+    const correctCount = answers.filter((a) => a.is_correct).length;
+    if (correctCount === 0) {
+      answers[0].is_correct = true;
+    } else if (correctCount > 1) {
+      let firstFound = false;
+      answers = answers.map((a) => {
+        if (a.is_correct && !firstFound) {
+          firstFound = true;
+          return a;
+        }
+        return { ...a, is_correct: false };
+      });
+    }
+
+    return {
+      type: "multiple_choice",
+      content,
+      explanation,
+      points,
+      answers,
+    };
+  });
+
+  return {
+    title,
+    time_limit_minutes: timeLimit,
+    passing_score: passingScore,
+    questions: formattedQuestions,
+  };
 }
 
 // ─── Quiz Hooks ─────────────────────────────────────────────────────────────
 
 export function useCreateQuiz() {
- const queryClient = useQueryClient();
- return useMutation({
- mutationFn: async ({ lessonId, payload }: { lessonId: string | number; payload: any }) => {
- const { data } = await axiosClient.post(`/api/instructor/lessons/${lessonId}/quiz`, payload);
- return data.data;
- },
- onSuccess: (_, { lessonId }) => {
- queryClient.invalidateQueries({ queryKey: ["instructor", "lesson", lessonId, "quiz"] });
- },
- });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ lessonId, payload }: { lessonId: string | number; payload: any }) => {
+      const formattedPayload = formatQuizPayloadForBackend(payload);
+      const { data } = await axiosClient.post(`/api/instructor/lessons/${lessonId}/quiz`, formattedPayload);
+      return data.data;
+    },
+    onSuccess: (_, { lessonId }) => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "lesson", lessonId, "quiz"] });
+    },
+  });
 }
 
 export function useUploadContentMedia() {

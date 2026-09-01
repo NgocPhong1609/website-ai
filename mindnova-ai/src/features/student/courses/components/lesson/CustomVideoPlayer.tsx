@@ -6,52 +6,79 @@ import { fetchVideoUrl } from "../../api";
 import type { LessonData } from "./LessonWorkspace";
 
 // --- Icons ---
-function PlayIcon() {
- return (
- <></>
- );
+function PlayIcon({ className = "w-6 h-6" }: { className?: string }) {
+  return (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  );
 }
 
-function PauseIcon() {
- return (
- <></>
- );
+function PauseIcon({ className = "w-6 h-6" }: { className?: string }) {
+  return (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+    </svg>
+  );
 }
 
-function Rewind10Icon() {
- return (
- <></>
- );
+function Rewind10Icon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12.5 8.5L7 12l5.5 3.5V8.5z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M18.5 8.5L13 12l5.5 3.5V8.5z" />
+    </svg>
+  );
 }
 
-function Forward10Icon() {
- return (
- <></>
- );
+function Forward10Icon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M11.5 15.5L17 12l-5.5-3.5v7z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5.5 15.5L11 12 5.5 8.5v7z" />
+    </svg>
+  );
 }
 
-function VolumeIcon({ muted }: { muted: boolean }) {
- return (
- <></>
- );
+function VolumeIcon({ muted, className = "w-5 h-5" }: { muted: boolean; className?: string }) {
+  if (muted) {
+    return (
+      <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+      </svg>
+    );
+  }
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+    </svg>
+  );
 }
 
-function FullscreenIcon() {
- return (
- <></>
- );
+function FullscreenIcon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+    </svg>
+  );
 }
 
-function MinimizeIcon() {
- return (
- <></>
- );
+function MinimizeIcon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L4 20m0 0h4m-4 0v-4m11-11l5-5m-5 0h4m-4 0v4M9 9L4 4m0 0h4M4 4v4m11 11l5 5m-5 0h4m-4 0v-4" />
+    </svg>
+  );
 }
 
-function SpinnerIcon() {
- return (
- <></>
- );
+function SpinnerIcon({ className = "w-8 h-8 animate-spin text-white" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+    </svg>
+  );
 }
 
 function formatTime(seconds: number): string {

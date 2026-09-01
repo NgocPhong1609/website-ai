@@ -34,8 +34,21 @@ class StudentController extends Controller
         $perPage = $request->input('per_page', $request->input('limit', 10));
         $enrollments = $query->paginate($perPage);
 
+        // Preload all quiz attempts for all students in this page to eliminate N+1 queries
+        $userIds = $enrollments->pluck('user_id')->unique()->filter();
+        $courseIds = $enrollments->pluck('course_id')->unique()->filter();
+
+        $allAttempts = \App\Models\UserQuizAttempt::whereIn('user_id', $userIds)
+            ->whereHas('quiz', function($q) use ($courseIds) {
+                $q->whereHas('attachments', fn($att) => $att->whereIn('course_id', $courseIds))
+                  ->orWhereHas('lesson.module', fn($m) => $m->whereIn('course_id', $courseIds));
+            })
+            ->with(['quiz.attachments'])
+            ->get()
+            ->groupBy('user_id');
+
         // Map results to include average quiz score and proper status
-        $enrollments->getCollection()->transform(function ($enrollment) {
+        $enrollments->getCollection()->transform(function ($enrollment) use ($allAttempts) {
             $student = $enrollment->user;
             
             // Calculate status based on rule
@@ -50,14 +63,8 @@ class StudentController extends Controller
                 $status = 'Nguy cơ trễ';
             }
 
-            // Calculate quiz scores, credits, and weighted average score for this specific course
-            $attempts = \App\Models\UserQuizAttempt::where('user_id', $student->id)
-                ->whereHas('quiz', function($q) use ($enrollment) {
-                    $q->whereHas('attachments', fn($att) => $att->where('course_id', $enrollment->course_id))
-                      ->orWhereHas('lesson.module', fn($m) => $m->where('course_id', $enrollment->course_id));
-                })
-                ->with(['quiz.attachments'])
-                ->get();
+            // Calculate quiz scores from preloaded attempts
+            $attempts = $allAttempts->get($student->id, collect());
 
             $quizScores = [];
             $totalCredits = 0;

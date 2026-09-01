@@ -110,7 +110,11 @@ class QuizGeneratorController extends Controller
      */
     public function index(Request $request)
     {
-        $quizzes = $this->quizService->getInstructorQuizzes($request->user());
+        $courseId = $request->query('course_id') ?? $request->query('courseId');
+        $quizzes = $this->quizService->getInstructorQuizzes(
+            $request->user(),
+            $courseId ? (int) $courseId : null
+        );
 
         return $this->successResponse($quizzes, 'Instructor quizzes retrieved.');
     }
@@ -209,6 +213,10 @@ class QuizGeneratorController extends Controller
         try {
             $attachment = $this->quizService->attachQuizToCourse($quiz, $payload);
 
+            if (!empty($payload['set_active']) || !empty($payload['is_active'])) {
+                $this->quizService->setActiveQuiz($quiz, (int) $payload['course_id'], $payload['position'] ?? null);
+            }
+
             \Illuminate\Support\Facades\Log::info("[QUIZ_ATTACH STEP 2] Attachment created successfully", [
                 'attachment_id' => $attachment->id,
                 'quiz_id' => $quiz->id,
@@ -232,5 +240,26 @@ class QuizGeneratorController extends Controller
                 'errorCode' => 'ATTACH_QUIZ_FAILED',
             ], 500);
         }
+    }
+
+    public function setActive(Request $request, Quiz $quiz)
+    {
+        Gate::authorize('update', $quiz);
+
+        $request->validate([
+            'course_id' => 'required|integer|exists:courses,id',
+            'position' => 'nullable|string|in:capability_assessment,end_of_course,in_module,after_lesson',
+        ]);
+
+        $courseId = (int) $request->input('course_id');
+        $position = $request->input('position');
+
+        $success = $this->quizService->setActiveQuiz($quiz, $courseId, $position);
+
+        if ($success) {
+            return $this->successResponse(null, 'Đã chọn bài kiểm tra làm bài thi chính thành công.');
+        }
+
+        return $this->errorResponse('Không thể cập nhật bài kiểm tra chính.', 400);
     }
 }

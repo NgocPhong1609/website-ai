@@ -134,6 +134,87 @@ class CourseService
                         $instructorBio = "Chuyên gia giàu kinh nghiệm trong lĩnh vực {$categoryName}.";
                     }
 
+                    // Fetch quiz attachments
+                    $quizAttachments = collect();
+                    if (class_exists(\App\Models\QuizCourseAttachment::class)) {
+                        $quizAttachments = \App\Models\QuizCourseAttachment::with('quiz.questions')
+                            ->where('course_id', $courseId)
+                            ->get();
+                    }
+
+                    // Helper to format quiz as a lesson
+                    $formatQuiz = function($attachment, $order) {
+                        $quiz = $attachment->quiz;
+                        if (!$quiz) return null;
+                        $quizObj = \App\Models\Quiz::with('questions.answers')->find($quiz->id);
+                        $qData = null;
+                        if ($quizObj && $quizObj->questions && $quizObj->questions->count() > 0) {
+                            $qData = [
+                                'id' => (string) $quizObj->id,
+                                'quiz_id' => $quizObj->id,
+                                'title' => $quizObj->title,
+                                'time_limit_minutes' => $quizObj->time_limit_minutes ?? 15,
+                                'passing_score' => $quizObj->passing_score ?? 70,
+                                'questions_count' => count($quizObj->questions),
+                                'questions' => $quizObj->questions->map(function($q) {
+                                    $answersArr = $q->answers && $q->answers->count() > 0 ? $q->answers->map(function($a) {
+                                        return [
+                                            'id' => (string) $a->id,
+                                            'content' => $a->content,
+                                            'text' => $a->content,
+                                            'option' => $a->content,
+                                            'is_correct' => (bool) $a->is_correct,
+                                        ];
+                                    })->values()->toArray() : [];
+
+                                    $optionsArr = !empty($answersArr)
+                                        ? array_column($answersArr, 'content')
+                                        : (is_string($q->options) ? json_decode($q->options, true) : ($q->options ?? []));
+
+                                    $correctAnswer = null;
+                                    foreach ($answersArr as $a) {
+                                        if (!empty($a['is_correct'])) {
+                                            $correctAnswer = $a['content'];
+                                            break;
+                                        }
+                                    }
+
+                                    $text = $q->content ?? $q->question ?? $q->question_text ?? '';
+                                    return [
+                                        'id' => $q->id,
+                                        'question' => $text,
+                                        'question_text' => $text,
+                                        'content' => $text,
+                                        'title' => $text,
+                                        'answers' => $answersArr,
+                                        'options' => $optionsArr,
+                                        'choices' => $optionsArr,
+                                        'correct_answer' => $correctAnswer,
+                                        'answer' => $correctAnswer,
+                                        'explanation' => $q->explanation,
+                                        'type' => $q->type ?? 'multiple_choice',
+                                    ];
+                                })->values()->toArray(),
+                            ];
+                        }
+                        return [
+                            'id' => 'quiz-' . $quiz->id,
+                            'real_quiz_id' => $quiz->id,
+                            'quiz_id' => $quiz->id,
+                            'order' => $order,
+                            'title' => '📝 ' . ($quiz->title ?? 'Bài kiểm tra'),
+                            'type' => 'quiz',
+                            'duration' => ($quiz->time_limit_minutes ?? 15) . ' phút',
+                            'duration_seconds' => ($quiz->time_limit_minutes ?? 15) * 60,
+                            'status' => 'locked',
+                            'video_url' => null,
+                            'has_uploaded_video' => false,
+                            'content' => $quiz->description,
+                            'quizData' => $qData,
+                            'quiz' => $qData,
+                        ];
+                    };
+
                     $progressData = $this->calculateStudentProgress($dbCourse, $userId);
                     $totalLessons = $progressData['total_lessons'];
                     $completedLessons = $progressData['completed_lessons'];
@@ -144,8 +225,8 @@ class CourseService
                         $modOrder = 1;
                         foreach ($dbCourse->modules->sortBy('order') as $mod) {
                             $mLessons = [];
+                            $lOrder = 1;
                             if ($mod->lessons && $mod->lessons->isNotEmpty()) {
-                                $lOrder = 1;
                                 foreach ($mod->lessons->sortBy('order') as $les) {
                                     // ── RULE 6, 14, 15: ONLY show PUBLISHED lessons ──
                                     if ($les->status !== 'published' || $les->published_version_id === null) {
@@ -169,6 +250,63 @@ class CourseService
                                     $durationText = $durationMinutes > 0 ? $durationMinutes . ' phút' : '1 phút';
                                     $lessonType = $les->type ?? 'video';
 
+                                    // Look up quiz for this lesson
+                                    $quizObj = $les->quiz ?? \App\Models\Quiz::where('lesson_id', $les->id)->with('questions.answers')->first();
+                                    if ($quizObj && !$quizObj->relationLoaded('questions')) {
+                                        $quizObj->load('questions.answers');
+                                    }
+                                    $quizId = $quizObj ? $quizObj->id : null;
+                                    $quizDataPayload = null;
+                                    if ($quizObj && $quizObj->questions && $quizObj->questions->count() > 0) {
+                                        $quizDataPayload = [
+                                            'id' => (string) $quizObj->id,
+                                            'quiz_id' => $quizObj->id,
+                                            'title' => $quizObj->title ?: $les->title,
+                                            'time_limit_minutes' => $quizObj->time_limit_minutes ?? 15,
+                                            'passing_score' => $quizObj->passing_score ?? 70,
+                                            'questions_count' => count($quizObj->questions),
+                                            'questions' => $quizObj->questions->map(function($q) {
+                                                $answersArr = $q->answers && $q->answers->count() > 0 ? $q->answers->map(function($a) {
+                                                    return [
+                                                        'id' => (string) $a->id,
+                                                        'content' => $a->content,
+                                                        'text' => $a->content,
+                                                        'option' => $a->content,
+                                                        'is_correct' => (bool) $a->is_correct,
+                                                    ];
+                                                })->values()->toArray() : [];
+
+                                                $optionsArr = !empty($answersArr)
+                                                    ? array_column($answersArr, 'content')
+                                                    : (is_string($q->options) ? json_decode($q->options, true) : ($q->options ?? []));
+
+                                                $correctAnswer = null;
+                                                foreach ($answersArr as $a) {
+                                                    if (!empty($a['is_correct'])) {
+                                                        $correctAnswer = $a['content'];
+                                                        break;
+                                                    }
+                                                }
+
+                                                $text = $q->content ?? $q->question ?? $q->question_text ?? '';
+                                                return [
+                                                    'id' => $q->id,
+                                                    'question' => $text,
+                                                    'question_text' => $text,
+                                                    'content' => $text,
+                                                    'title' => $text,
+                                                    'answers' => $answersArr,
+                                                    'options' => $optionsArr,
+                                                    'choices' => $optionsArr,
+                                                    'correct_answer' => $correctAnswer,
+                                                    'answer' => $correctAnswer,
+                                                    'explanation' => $q->explanation,
+                                                    'type' => $q->type ?? 'multiple_choice',
+                                                ];
+                                            })->values()->toArray(),
+                                        ];
+                                    }
+
                                     $mLessons[] = [
                                         'id' => $les->id,
                                         'order' => $les->order ?: $lOrder,
@@ -180,6 +318,10 @@ class CourseService
                                         'video_url' => $les->video_url,
                                         'has_uploaded_video' => $les->media()->where('media_type', 'video')->where('status', 'ready')->exists(),
                                         'content' => $lessonType === 'article' ? $les->content : null,
+                                        'quiz_id' => $quizId,
+                                        'quizData' => $quizDataPayload,
+                                        'quiz' => $quizDataPayload,
+                                        'questions' => $quizDataPayload ? ($quizDataPayload['questions'] ?? []) : [],
                                     ];
                                     
                                     if ($les->video_url && count($resources) < 3) {
@@ -192,10 +334,30 @@ class CourseService
                                         ];
                                     }
                                     $lOrder++;
+
+                                    // Check if there are any 'after_lesson' quizzes for this lesson
+                                    $afterLessonQuizzes = $quizAttachments->where('position', 'after_lesson')->where('after_lesson_id', $les->id);
+                                    foreach ($afterLessonQuizzes as $attachment) {
+                                        if ($quizId && (int) $attachment->quiz_id === (int) $quizId) {
+                                            continue; // Prevent duplicate quiz item in sidebar if lesson is already linked to this quiz
+                                        }
+                                        $formattedQuiz = $formatQuiz($attachment, $lOrder);
+                                        if ($formattedQuiz) {
+                                            $mLessons[] = $formattedQuiz;
+                                            $lOrder++;
+                                        }
+                                    }
                                 }
                             }
 
-                            // Only include modules that have published lessons
+                            // Check if there are any 'in_module' quizzes for this module
+                            $inModuleQuizzes = $quizAttachments->where('position', 'in_module')->where('module_id', $mod->id);
+                            foreach ($inModuleQuizzes as $attachment) {
+                                $mLessons[] = $formatQuiz($attachment, $lOrder);
+                                $lOrder++;
+                            }
+
+                            // Only include modules that have published lessons or attached quizzes
                             if (!empty($mLessons)) {
                                 $modules[] = [
                                     'id' => $mod->id,
@@ -207,6 +369,25 @@ class CourseService
                             }
                             $modOrder++;
                         }
+                    }
+                    
+                    // Handle 'end_of_course' quizzes (append as a new final module)
+                    $endOfCourseQuizzes = $quizAttachments->whereIn('position', ['end_of_course', 'capability_assessment']);
+                    if ($endOfCourseQuizzes->isNotEmpty()) {
+                        $finalLessons = [];
+                        $lOrder = 1;
+                        foreach ($endOfCourseQuizzes as $attachment) {
+                            $finalLessons[] = $formatQuiz($attachment, $lOrder);
+                            $lOrder++;
+                        }
+                        
+                        $modules[] = [
+                            'id' => 'module-final-quizzes',
+                            'order' => $modOrder,
+                            'title' => 'Bài kiểm tra cuối khóa',
+                            'duration' => 'Nhiều bài kiểm tra',
+                            'lessons' => $finalLessons,
+                        ];
                     }
                 }
             }

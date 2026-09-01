@@ -52,16 +52,10 @@ class AiRouterService
                 ]
             ];
             
-        } catch (AiTransientException $e) {
+        } catch (\Throwable $e) {
             $primaryError = $e->getMessage();
-            // Lỗi tạm thời của Primary, tiến hành fallback
-            Log::warning("[AI Router] Gemini retry failed: {$e->getMessage()}");
-            Log::warning("[AI Router] Switching to Backup AI");
-        } catch (Exception $e) {
-            // Lỗi không phải tạm thời (VD: 400, 401, 403), không fallback
-            $duration = round((microtime(true) - $startTime) * 1000);
-            Log::error("[AI Router] Primary failed with permanent error: {$e->getMessage()}. Duration: {$duration}ms");
-            throw $e;
+            Log::warning("[AI Router] Primary provider failed ({$this->primaryProvider->getProviderName()}): {$e->getMessage()}");
+            Log::warning("[AI Router] Switching to Backup AI provider ({$this->backupProvider->getProviderName()})");
         }
 
         // Fallback execution

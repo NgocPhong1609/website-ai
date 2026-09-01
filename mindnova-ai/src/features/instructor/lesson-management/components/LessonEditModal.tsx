@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { RichTextEditor } from "../../shared/components/RichTextEditor";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { axiosClient } from "@/src/shared/lib/axios";
+import { RichTextEditor } from "@/src/features/instructor/shared/components/RichTextEditor";
 import { QuizEditor } from "../../create-course/components/QuizEditor";
 import { twMerge } from "tailwind-merge";
 import { useUploadTempMedia, useDeleteTempMedia } from "../api";
@@ -20,9 +21,10 @@ interface LessonEditModalProps {
  };
  onSave: (id: string, updates: any) => Promise<void> | void;
  onClose: () => void;
+ courseId?: string | number;
 }
 
-export function LessonEditModal({ lesson, onSave, onClose }: LessonEditModalProps) {
+export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEditModalProps) {
  const [title, setTitle] = useState(lesson.title);
  const [type, setType] = useState(lesson.type);
  const [status, setStatus] = useState(lesson.status);
@@ -45,6 +47,20 @@ export function LessonEditModal({ lesson, onSave, onClose }: LessonEditModalProp
  const [isSaving, setIsSaving] = useState(false);
  const [activeImageUploads, setActiveImageUploads] = useState(0);
  const abortControllerRef = useRef<AbortController | null>(null);
+
+ useEffect(() => {
+    if (lesson.quizData) {
+      setQuizData(lesson.quizData);
+    } else if (lesson.id && ((lesson.type as string) === 'quiz_module' || (lesson.type as string) === 'quiz')) {
+      axiosClient.get(`/api/instructor/lessons/${lesson.id}/quiz`)
+        .then((res: any) => {
+          if (res.data?.data) {
+            setQuizData(res.data.data);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [lesson]);
 
  const hasUnsavedChanges = 
  title !== lesson.title ||
@@ -199,13 +215,14 @@ export function LessonEditModal({ lesson, onSave, onClose }: LessonEditModalProp
  });
  await Promise.all(deletePromises);
 
+ const payloadType = (type as string) === 'quiz' ? 'quiz_module' : ((type as string) === 'document' ? 'article' : type);
  const updates: any = {
  title,
- type,
+ type: payloadType,
  status,
  content: finalContent,
  video_url: type === 'video' ? videoUrl : undefined,
- quizData: type === 'quiz_module' ? quizData : undefined,
+ quizData: ((type as string) === 'quiz' || (type as string) === 'quiz_module') ? quizData : undefined,
  temp_media_ids: usedTempMediaIds
  };
  
@@ -294,6 +311,8 @@ export function LessonEditModal({ lesson, onSave, onClose }: LessonEditModalProp
  <QuizEditor 
  value={quizData}
  onChange={setQuizData}
+ quizId={(lesson as any).quizData?.id || (lesson as any).quizData?.quiz_id}
+ courseId={courseId ? Number(courseId) : undefined}
  />
  ) : type === 'video' ? (
  <div className="flex flex-col gap-3 mb-6 p-4 border border-[#E8E2D9] rounded-xl bg-[#F8F8FC]">

@@ -17,6 +17,7 @@ class Coupon extends Model
         'value',
         'max_uses',
         'used_count',
+        'starts_at',
         'expires_at',
         'status',
         'instructor_id',
@@ -24,6 +25,7 @@ class Coupon extends Model
     ];
 
     protected $casts = [
+        'starts_at' => 'datetime',
         'expires_at' => 'datetime',
         'value' => 'decimal:2'
     ];

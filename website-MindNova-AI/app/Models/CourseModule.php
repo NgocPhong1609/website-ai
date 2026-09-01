@@ -25,6 +25,11 @@ class CourseModule extends Model
         return $this->hasMany(Lesson::class, 'module_id')->orderBy('order');
     }
 
+    public function quizAttachments(): HasMany
+    {
+        return $this->hasMany(QuizCourseAttachment::class, 'module_id')->orderBy('order');
+    }
+
     // ─── Scopes ────────────────────────────────────────────────
 
     public function scopePublished($query)

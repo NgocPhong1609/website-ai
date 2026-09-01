@@ -275,43 +275,39 @@ function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLes
 
 // ─── AI Assist Card ───────────────────────────────────────────────────────────
 
-function AIAssistCard({ onQuizGenerate, onSuggestChapter }: {
- onQuizGenerate: () => void;
+function AIAssistCard({ courseId, onSuggestChapter }: {
+ courseId?: string;
  onSuggestChapter: () => void;
 }) {
  return (
- <div className="rounded-2xl border -[#FAF7F2] from-indigo-50 to-blue-50 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
- {/* Icon + text */}
+ <div className="rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50/80 via-purple-50/50 to-blue-50/80 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
  <div className="flex flex-col gap-1.5 flex-1 min-w-0">
  <div className="flex items-center gap-2 text-[#C0392B]">
  <span className="animate-pulse"><SparklesIcon size={13} /></span>
- <span className="text-[10px] font-bold tracking-widest uppercase">
+ <span className="text-[10px] font-black tracking-widest uppercase">
  MindNova AI Assist
  </span>
  </div>
- <p className="text-[14px] font-bold text-[#2C3039]">
- Sử dụng AI để tối ưu lộ trình học tập
+ <p className="text-[14px] font-black text-[#2C3039]">
+ Studio Tạo &amp; Tự Động Sinh Đề Kiểm Tra Bằng AI
  </p>
- <p className="text-[12px] text-[#8A8478] leading-relaxed max-w-[420px]">
- Hệ thống AI của chúng tôi có thể giúp bạn tự động sinh câu hỏi Quiz,
- tóm tắt bài giảng hoặc đề xuất thêm các chương học dựa trên xu hướng
- thị trường.
+ <p className="text-[12px] text-[#8A8478] font-medium leading-relaxed max-w-[420px]">
+ Trí tuệ nhân tạo MindNova phân tích toàn bộ bài học thuộc khóa học này để tự động tạo bộ câu hỏi trắc nghiệm &amp; tự luận bám sát giáo trình.
  </p>
  </div>
 
- {/* Actions */}
  <div className="flex items-center gap-2 shrink-0">
- <button
- type="button"
- onClick={onQuizGenerate}
- className="px-4 py-2.5 rounded-xl border -[#FAF7F2] text-[13px] font-semibold text-[#C0392B] bg-white hover:bg-indigo-50 hover:-[#C0392B] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#C0392B]/30"
+ <Link
+ href={`/instructor/quiz-generator?course_id=${courseId || ""}`}
+ className="px-4 py-2.5 rounded-xl text-[13px] font-extrabold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-md transition-all cursor-pointer flex items-center gap-1.5"
  >
- Sinh câu hỏi Quiz
- </button>
+ <SparklesIcon size={13} />
+ <span>🤖 Tạo Quiz bằng AI</span>
+ </Link>
  <button
  type="button"
  onClick={onSuggestChapter}
- className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-2xs hover:shadow-sm transition-all duration-200 focus:outline-none"
+ className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-[#2C3039] bg-white border border-[#E8E2D9] hover:bg-gray-50 transition-all duration-200 focus:outline-none"
  >
  <PlusIcon size={13} />
  Gợi ý Chương mới
@@ -680,7 +676,7 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
  </div>
  <div className="flex items-center gap-2.5 shrink-0">
  <Link
- href={`/courses/${courseId}`}
+ href={`/courses/lesson?course_id=${courseId}&preview=true`}
  target="_blank"
  className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#E8E2D9] text-xs font-bold text-gray-700 bg-white hover:bg-[#FEFCF9] transition-all cursor-pointer shadow-2xs"
  >
@@ -732,7 +728,7 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
  </div>
 
  <AIAssistCard
- onQuizGenerate={() => setActiveQuizLesson("Toàn bộ khóa học (General Rubric)")}
+ courseId={courseId}
  onSuggestChapter={openAddChapterModal}
  />
 
@@ -759,6 +755,7 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
  {editingLesson && (
  <LessonEditModal
  lesson={editingLesson.lesson}
+ courseId={courseId}
  onSave={async (id, updates) => {
  try {
  await updateLesson(editingLesson.chapterId, id, updates);

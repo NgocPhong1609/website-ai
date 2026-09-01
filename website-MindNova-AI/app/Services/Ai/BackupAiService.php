@@ -47,6 +47,7 @@ class BackupAiService extends AbstractAiService
             'model' => $model,
             'messages' => $openAiMessages,
             'temperature' => 0.7,
+            'max_tokens' => (int) ($options['max_tokens'] ?? 8192),
         ];
         
         if (!empty($options['response_mime_type']) && $options['response_mime_type'] === 'application/json') {
@@ -97,8 +98,8 @@ class BackupAiService extends AbstractAiService
                     }
                 }
 
-                Log::error("Backup AI Error: " . $response->body());
-                throw new Exception("Lỗi khi gọi Backup AI API: " . $response->status());
+                Log::error("Backup AI Error (" . $response->status() . "): " . $response->body());
+                throw new Exception("Lỗi khi gọi Backup AI API ({$response->status()}): " . $response->body());
 
             } catch (Exception $e) {
                 $lastException = $e;

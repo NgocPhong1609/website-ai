@@ -12,7 +12,7 @@ class CouponController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Coupon::query()->with('course:id,title')->latest();
+        $query = Coupon::query()->with(['course:id,title', 'instructor:id,name,email'])->latest();
 
         if ($request->filled('search')) {
             $keyword = trim((string) $request->string('search'));

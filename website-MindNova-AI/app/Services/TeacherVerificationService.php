@@ -204,6 +204,10 @@ class TeacherVerificationService
             throw new InvalidArgumentException('Bạn không có quyền sửa chứng chỉ này.');
         }
 
+        if ($certificate->verification_status === 'approved') {
+            throw new InvalidArgumentException('Bằng cấp đã được Admin xác minh không thể chỉnh sửa.');
+        }
+
         return DB::transaction(function () use ($teacher, $certificate, $data, $certImage, $evidenceFiles) {
             $oldStatus = $certificate->verification_status;
             
@@ -276,6 +280,16 @@ class TeacherVerificationService
             
             $this->logAction($teacher->id, null, $certificate->id, 'delete_certificate', $certificate->verification_status, null, 'Xóa bằng cấp');
             $certificate->delete();
+
+            $remainingCertsCount = TeacherCertificate::where('teacher_id', $teacher->id)->count();
+            if ($remainingCertsCount === 0) {
+                TeacherVerification::where('teacher_id', $teacher->id)
+                    ->where('status', 'pending')
+                    ->update(['status' => 'cancelled']);
+                
+                $teacher->teacher_verification_status = 'none';
+                $teacher->save();
+            }
         });
     }
 
@@ -294,7 +308,14 @@ class TeacherVerificationService
             ->first();
 
         if ($pendingRequest) {
-            throw new InvalidArgumentException('Yêu cầu xác minh của bạn đang chờ xét duyệt. Vui lòng không gửi lặp lại.');
+            if ($note) {
+                $pendingRequest->admin_note = $note;
+                $pendingRequest->submitted_at = now();
+                $pendingRequest->save();
+            }
+            $teacher->teacher_verification_status = 'pending';
+            $teacher->save();
+            return $pendingRequest;
         }
 
         return DB::transaction(function () use ($teacher, $note) {

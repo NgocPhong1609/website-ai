@@ -356,34 +356,113 @@ class LessonService
 
     private function saveQuizData(Lesson $lesson, array $quizData): void
     {
-        $quiz = $lesson->quiz()->firstOrCreate(
-            ['lesson_id' => $lesson->id],
-            [
-                'title' => $quizData['title'] ?? 'Bài kiểm tra',
-            ]
-        );
+        $questionsData = $quizData['questions'] ?? [];
+        $mcCount = 0;
+        $essayCount = 0;
+        $totalPoints = 0.0;
 
-        $quiz->update([
-            'title' => $quizData['title'] ?? 'Bài kiểm tra',
-            'time_limit_minutes' => $quizData['time_limit_minutes'] ?? 15,
-            'passing_score' => $quizData['passing_score'] ?? 80,
-        ]);
+        foreach ($questionsData as $q) {
+            if (($q['type'] ?? 'multiple_choice') === 'essay') {
+                $essayCount++;
+            } else {
+                $mcCount++;
+            }
+            $totalPoints += (float) ($q['points'] ?? 0.0);
+        }
 
-        if (isset($quizData['questions']) && is_array($quizData['questions'])) {
-            // Delete old questions to simplify sync for now
+        $teacherId = auth()->id() ?? ($lesson->course->teacher_id ?? ($lesson->module->course->teacher_id ?? null));
+
+        $targetQuizId = $quizData['quiz_id'] ?? ($quizData['id'] ?? null);
+        $quiz = null;
+
+        if ($targetQuizId && is_numeric($targetQuizId)) {
+            $foundQuiz = \App\Models\Quiz::find((int) $targetQuizId);
+            if ($foundQuiz) {
+                $foundQuiz->update([
+                    'lesson_id' => $lesson->id,
+                    'instructor_id' => $teacherId ?? $foundQuiz->instructor_id,
+                    'title' => $quizData['title'] ?? $foundQuiz->title,
+                    'description' => $quizData['description'] ?? $foundQuiz->description,
+                    'time_limit_minutes' => $quizData['time_limit_minutes'] ?? $foundQuiz->time_limit_minutes ?? 15,
+                    'passing_score' => $quizData['passing_score'] ?? $foundQuiz->passing_score ?? 70,
+                    'difficulty' => $quizData['difficulty'] ?? $foundQuiz->difficulty ?? 'mixed',
+                    'total_questions' => count($questionsData),
+                    'mc_questions_count' => $mcCount,
+                    'essay_questions_count' => $essayCount,
+                    'total_points' => round($totalPoints, 2),
+                ]);
+                $quiz = $foundQuiz;
+            }
+        }
+
+        if (!$quiz) {
+            $quiz = \App\Models\Quiz::updateOrCreate(
+                ['lesson_id' => $lesson->id],
+                [
+                    'instructor_id' => $teacherId,
+                    'title' => $quizData['title'] ?? 'Bài kiểm tra',
+                    'description' => $quizData['description'] ?? null,
+                    'time_limit_minutes' => $quizData['time_limit_minutes'] ?? 15,
+                    'passing_score' => $quizData['passing_score'] ?? 70,
+                    'difficulty' => $quizData['difficulty'] ?? 'mixed',
+                    'total_questions' => count($questionsData),
+                    'mc_questions_count' => $mcCount,
+                    'essay_questions_count' => $essayCount,
+                    'total_points' => round($totalPoints, 2),
+                ]
+            );
+        }
+
+        $courseId = $lesson->course_id ?? ($lesson->module->course_id ?? null);
+        if ($courseId) {
+            \App\Models\QuizCourseAttachment::updateOrCreate(
+                ['quiz_id' => $quiz->id],
+                [
+                    'course_id' => $courseId,
+                    'module_id' => $lesson->module_id,
+                    'after_lesson_id' => $lesson->id,
+                    'position' => 'after_lesson',
+                ]
+            );
+        }
+
+        if (!empty($questionsData)) {
             $quiz->questions()->delete();
-            
-            foreach ($quizData['questions'] as $index => $qData) {
+
+            foreach ($questionsData as $index => $qData) {
+                $type = $qData['type'] ?? 'multiple_choice';
+                if ($type === 'tu_luan') $type = 'essay';
+                if ($type === 'trac_nghiem') $type = 'multiple_choice';
+                $content = !empty($qData['question']) ? $qData['question'] : (!empty($qData['content']) ? $qData['content'] : 'Câu hỏi');
+
                 $question = $quiz->questions()->create([
-                    'content' => $qData['content'] ?? '',
+                    'type' => $type,
+                    'content' => $content,
+                    'explanation' => $qData['explanation'] ?? null,
+                    'sample_answer' => $type === 'essay' ? ($qData['sample_answer'] ?? null) : null,
+                    'rubric' => $type === 'essay' ? ($qData['rubric'] ?? null) : null,
+                    'points' => (float) ($qData['points'] ?? ($type === 'essay' ? 5.0 : 1.0)),
+                    'difficulty' => $qData['difficulty'] ?? 'medium',
                     'order' => $index + 1,
                 ]);
 
-                if (isset($qData['answers']) && is_array($qData['answers'])) {
-                    foreach ($qData['answers'] as $aData) {
+                if ($type !== 'essay') {
+                    $answersList = $qData['answers'] ?? [];
+
+                    if (empty($answersList) && !empty($qData['options']) && is_array($qData['options'])) {
+                        $correctIdx = is_numeric($qData['correct_answer_index'] ?? null) ? (int)$qData['correct_answer_index'] : 0;
+                        foreach ($qData['options'] as $optIdx => $optContent) {
+                            $answersList[] = [
+                                'content' => (string) $optContent,
+                                'is_correct' => $optIdx == $correctIdx,
+                            ];
+                        }
+                    }
+
+                    foreach ($answersList as $aData) {
                         $question->answers()->create([
-                            'content' => $aData['content'] ?? '',
-                            'is_correct' => $aData['is_correct'] ?? false,
+                            'content' => $aData['content'] ?? $aData['answer'] ?? '',
+                            'is_correct' => !empty($aData['is_correct']),
                         ]);
                     }
                 }

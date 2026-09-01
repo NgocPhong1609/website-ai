@@ -1,22 +1,54 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { QuizConfig, GeneratedQuestion, QuizSummary } from "../types/quizGenerator.types";
 import { quizGeneratorApi } from "../api/quizGeneratorApi";
 
-export function useAiQuizWizard() {
- const [step, setStep] = useState<number>(1);
+export function useAiQuizWizard(options?: {
+  initialCourseId?: number;
+  initialModuleId?: number;
+  initialAfterLessonId?: number;
+  initialPosition?: "capability_assessment" | "end_of_course" | "in_module" | "after_lesson";
+  embeddedMode?: boolean;
+  onSuccessComplete?: (savedQuiz?: any) => void;
+}) {
+ const searchParams = useSearchParams();
+ const rawCourseId = searchParams ? (searchParams.get("course_id") || searchParams.get("courseId")) : null;
+ const rawModuleId = searchParams ? (searchParams.get("module_id") || searchParams.get("moduleId")) : null;
+ const rawAfterLessonId = searchParams ? (searchParams.get("after_lesson_id") || searchParams.get("afterLessonId")) : null;
+ const positionParam = searchParams ? searchParams.get("position") : null;
+
+ const courseIdParam = rawCourseId ? Number(rawCourseId) : options?.initialCourseId;
+ const moduleIdParam = rawModuleId ? Number(rawModuleId) : options?.initialModuleId;
+ const afterLessonIdParam = rawAfterLessonId ? Number(rawAfterLessonId) : options?.initialAfterLessonId;
+ const position = (positionParam || options?.initialPosition) as any;
+
+ const [step, setStep] = useState<number>(options?.embeddedMode ? 2 : 1);
  const [isGenerating, setIsGenerating] = useState<boolean>(false);
  const [isSaving, setIsSaving] = useState<boolean>(false);
  const [error, setError] = useState<string | null>(null);
  const [savedQuiz, setSavedQuiz] = useState<QuizSummary | null>(null);
 
+ const getDefaultTitle = () => {
+   if (position === "capability_assessment") return "Bài kiểm tra Đánh giá năng lực tổng quát";
+   if (position === "end_of_course") return "Bài kiểm tra Cuối khóa học";
+   return "Kiểm tra kiến thức";
+ };
+
+ const getDefaultDescription = () => {
+   if (position === "capability_assessment") return "Đánh giá kiến thức tổng quan toàn bộ nội dung trong khóa học.";
+   if (position === "end_of_course") return "Đánh giá hoàn thành toàn bộ khóa học để cấp chứng chỉ.";
+   return "Đề kiểm tra trắc nghiệm & tự luận được tạo bởi AI";
+ };
+
  const [config, setConfig] = useState<QuizConfig>({
- title: "Kiểm tra kiến thức",
- description: "Đề kiểm tra trắc nghiệm & tự luận được tạo bởi AI",
- source_type: "topic",
+ title: getDefaultTitle(),
+ description: getDefaultDescription(),
+ source_type: courseIdParam ? "course" : "topic",
+ course_id: courseIdParam || undefined,
  source_content: "",
- topic: "Toán hệ nhị phân",
+ topic: "Kiến thức bài học",
  difficulty: "mixed",
  total_questions: 20,
  multiple_choice_count: 15,
@@ -24,6 +56,18 @@ export function useAiQuizWizard() {
  time_limit_minutes: 20,
  passing_score: 70,
  });
+
+ useEffect(() => {
+   if (courseIdParam) {
+     setConfig((prev) => ({
+       ...prev,
+       title: prev.title === "Kiểm tra kiến thức" ? getDefaultTitle() : prev.title,
+       description: prev.description === "Đề kiểm tra trắc nghiệm & tự luận được tạo bởi AI" ? getDefaultDescription() : prev.description,
+       source_type: "course",
+       course_id: Number(courseIdParam),
+     }));
+   }
+ }, [courseIdParam, position]);
 
  const [questions, setQuestions] = useState<GeneratedQuestion[]>([]);
 
@@ -121,24 +165,59 @@ export function useAiQuizWizard() {
  try {
  const activeQuestions = questions.filter((q) => q.reviewStatus !== "discarded");
 
- const response = await quizGeneratorApi.saveQuiz({
- title: config.title,
- description: config.description,
- source_type: config.source_type,
- source_content: config.source_type === "course" ? (config.course_title || "") : (config.source_type === "content" ? config.source_content : config.topic),
- course_id: config.course_id,
- difficulty: config.difficulty,
- time_limit_minutes: config.time_limit_minutes,
- passing_score: config.passing_score,
- status,
- questions: activeQuestions,
- });
+  const targetCourseId = config.course_id || (courseIdParam ? Number(courseIdParam) : undefined);
 
- if (response.success && response.data) {
- setSavedQuiz(response.data);
- setStep(5); // Move to Step 5 (Attachment & Success)
- return response.data;
- } else {
+  const response = await quizGeneratorApi.saveQuiz({
+    title: config.title,
+    description: config.description,
+    source_type: config.source_type,
+    source_content: config.source_type === "course" ? (config.course_title || "") : (config.source_type === "content" ? config.source_content : config.topic),
+    course_id: targetCourseId,
+    difficulty: config.difficulty,
+    time_limit_minutes: config.time_limit_minutes,
+    passing_score: config.passing_score,
+    status,
+    questions: activeQuestions,
+  });
+
+  if (response.success && response.data) {
+    const quizData = response.data;
+    setSavedQuiz(quizData);
+
+    // If in embedded course mode, auto attach if course_id exists and bypass Step 5 modal unconditionally
+    if (options?.embeddedMode || options?.onSuccessComplete) {
+      if (targetCourseId && options?.initialPosition && (options.initialPosition === "capability_assessment" || options.initialPosition === "end_of_course")) {
+        try {
+          await quizGeneratorApi.attachQuiz(quizData.id, {
+            course_id: targetCourseId,
+            position: options.initialPosition,
+            is_active: true,
+            set_active: true,
+          } as any);
+        } catch (attachErr) {
+          console.warn("Auto attach course-level quiz failed:", attachErr);
+        }
+      } else if (targetCourseId && options?.initialModuleId) {
+        try {
+          await quizGeneratorApi.attachQuiz(quizData.id, {
+            course_id: targetCourseId,
+            module_id: options.initialModuleId,
+            position: "in_module",
+            order: 99,
+          });
+        } catch (attachErr) {
+          console.warn("Auto attach failed:", attachErr);
+        }
+      }
+          if (options?.onSuccessComplete) {
+            options.onSuccessComplete(quizData);
+            return quizData;
+          }
+        }
+
+        setStep(5); // Move to Step 5 only if standalone mode
+        return quizData;
+      } else {
  throw new Error(response.message || "Lưu bài kiểm tra thất bại");
  }
  } catch (err: any) {

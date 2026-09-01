@@ -109,6 +109,11 @@ class Course extends Model
         return $this->hasMany(Lesson::class, 'course_id')->orderBy('order');
     }
 
+    public function quizAttachments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(QuizCourseAttachment::class, 'course_id')->orderBy('order');
+    }
+
     public function enrollments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Enrollment::class);

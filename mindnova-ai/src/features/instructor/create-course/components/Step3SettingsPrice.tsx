@@ -4,8 +4,10 @@ import React, { useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { useInstructorPricing } from "@/src/hooks/instructor/useInstructorPricing";
 import { useCreateCourseStore } from "../stores/createCourseStore";
+import { CouponSection } from "@/src/features/instructor/pricing/components/CouponSection";
 
 export interface Step3SettingsPriceProps {
+ courseId?: string;
  courseTitle?: string;
  thumbnailPreview?: string | null;
  initialPrice?: number | null;
@@ -17,6 +19,7 @@ export interface Step3SettingsPriceProps {
 }
 
 export function Step3SettingsPrice({ 
+ courseId,
  courseTitle = "Khóa học AI mới", 
  thumbnailPreview, 
  initialPrice, 
@@ -283,6 +286,12 @@ export function Step3SettingsPrice({
  </div>
  </div>
  </div>
+
+ {courseId && (
+   <div className="mt-4">
+     <CouponSection courseId={courseId} />
+   </div>
+ )}
  </div>
  );
 }

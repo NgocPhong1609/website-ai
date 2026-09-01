@@ -68,8 +68,11 @@ class CourseManagementTest extends TestCase
 
     public function test_teacher_can_list_their_courses()
     {
+        $teacher = User::factory()->create();
+        $teacher->roles()->attach($this->teacherRole->id);
+
         Course::create([
-            'teacher_id' => $this->teacher->id,
+            'teacher_id' => $teacher->id,
             'title' => 'Course 1',
             'slug' => 'course-1',
             'description' => 'Desc 1',
@@ -78,11 +81,11 @@ class CourseManagementTest extends TestCase
             'status' => 'draft',
         ]);
 
-        $response = $this->actingAs($this->teacher)
+        $response = $this->actingAs($teacher)
             ->getJson('/api/instructor/courses');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(1, 'data');
+                 ->assertJsonCount(1, 'data.data');
     }
 
     public function test_teacher_can_update_course_status()
@@ -99,11 +102,11 @@ class CourseManagementTest extends TestCase
 
         $response = $this->actingAs($this->teacher)
             ->patchJson("/api/instructor/courses/{$course->id}/status", [
-                'status' => 'published',
+                'status' => 'pending_review',
             ]);
 
         $response->assertStatus(200)
-                 ->assertJsonPath('data.status', 'published');
+                 ->assertJsonPath('data.status', 'pending_review');
     }
 
     public function test_teacher_can_update_course_price()

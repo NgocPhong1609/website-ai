@@ -22,7 +22,7 @@ class UpdateCoursePriceRequest extends FormRequest
 
         // Only enforce sale_price < price when the course is paid (price > 0).
         // For free courses (price = 0), sale_price is simply ignored/nullable.
-        if ($this->input('price') > 0) {
+        if ($this->input('price') > 0 && $this->boolean('is_flash_sale') && $this->filled('sale_price')) {
             $rules['sale_price'] = 'nullable|numeric|min:0|lt:price';
         } else {
             $rules['sale_price'] = 'nullable';

@@ -166,7 +166,7 @@ class QuizGradingService
     /**
      * Grade a single essay question using AI Router (Gemini primary, Groq fallback).
      */
-    private function gradeSingleEssayWithAi(Question $question, string $studentAnswer, float $maxScore, ?User $user = null): array
+    public function gradeSingleEssayWithAi(Question $question, string $studentAnswer, float $maxScore, ?User $user = null): array
     {
         $sampleAnswer = $question->sample_answer ?: "Đáp án tiêu chuẩn yêu cầu trả lời đúng trọng tâm câu hỏi, đủ ý chính và ví dụ.";
         $rubric = $question->rubric ?: "- Trình bày đúng ý chính (60% điểm)\n- Phân tích chi tiết & ví dụ (40% điểm)";

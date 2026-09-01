@@ -37,6 +37,11 @@ class Lesson extends Model
         return $this->belongsTo(CourseModule::class, 'module_id');
     }
 
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class, 'course_id');
+    }
+
     public function media()
     {
         return $this->hasMany(LessonMedia::class);
@@ -45,6 +50,11 @@ class Lesson extends Model
     public function quiz()
     {
         return $this->hasOne(Quiz::class);
+    }
+
+    public function afterQuizAttachments(): HasMany
+    {
+        return $this->hasMany(QuizCourseAttachment::class, 'after_lesson_id')->orderBy('order');
     }
 
     // ─── Versioning Relationships ──────────────────────────────

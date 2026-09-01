@@ -92,18 +92,26 @@ export function CreateCourseContainer() {
  draftLesson.content = lesson.content;
  }
 
- // Gắn câu hỏi trắc nghiệm cho bài quiz
- if (lessonType === "quiz" && typeof lesson === "object" && Array.isArray(lesson.questions)) {
+ if (typeof lesson === "object" && lesson.quizData) {
+ draftLesson.quizData = lesson.quizData;
+ } else if (lessonType === "quiz" && typeof lesson === "object" && Array.isArray(lesson.questions)) {
  draftLesson.quizData = {
  title: lessonTitle,
  time_limit_minutes: 15,
  passing_score: 80,
  questions: lesson.questions.map((q: any) => ({
  id: uid(),
- content: q.content,
+ type: q.type || "multiple_choice",
+ question: q.content || q.question || "",
+ content: q.content || q.question || "",
+ explanation: q.explanation || "",
+ sample_answer: q.sample_answer || "",
+ rubric: q.rubric || "",
+ points: q.points || (q.type === "essay" ? 5.0 : 1.0),
+ difficulty: q.difficulty || "medium",
  answers: (q.answers || []).map((a: any) => ({
  id: uid(),
- content: a.content,
+ content: a.content || a.answer || "",
  is_correct: a.is_correct === true,
  })),
  })),
@@ -193,7 +201,7 @@ export function CreateCourseContainer() {
  for (const lesson of mod.lessons) {
  // Content validation is removed as per new UI logic
  const payloadType = lesson.type === 'quiz' ? 'quiz_module' : (lesson.type === 'document' ? 'article' : lesson.type);
- await createLesson({
+ const createdLesson = await createLesson({
  courseId,
  moduleId,
  payload: {
@@ -207,17 +215,32 @@ export function CreateCourseContainer() {
  quizData: lesson.quizData,
  }
  });
+
+ if (((lesson.type as string) === 'quiz' || (lesson.type as string) === 'quiz_module') && lesson.quizData && createdLesson?.id) {
+    try {
+      await createQuiz({
+        lessonId: createdLesson.id,
+        payload: lesson.quizData,
+      });
+    } catch (qErr) {
+      console.error("Quiz creation error:", qErr);
+    }
+  }
  }
  }
 
  const priceNum = Number(String(settings.basePrice).replace(/[^0-9]/g, ""));
+ const isFlashSaleActive = priceNum > 0 && Boolean(settings.isFlashSale);
+ const salePriceNum = settings.salePrice ? Number(String(settings.salePrice).replace(/[^0-9]/g, "")) : undefined;
+ const validSalePrice = (isFlashSaleActive && salePriceNum && salePriceNum < priceNum) ? salePriceNum : undefined;
+
  await updatePrice({ 
  courseId, 
  price: priceNum,
- is_flash_sale: priceNum === 0 ? false : settings.isFlashSale,
- sale_price: priceNum === 0 ? undefined : (settings.salePrice ? Number(String(settings.salePrice).replace(/[^0-9]/g, "")) : undefined),
- sale_start_date: priceNum === 0 ? undefined : settings.saleStartDate,
- sale_end_date: priceNum === 0 ? undefined : settings.saleEndDate
+ is_flash_sale: isFlashSaleActive,
+ sale_price: validSalePrice,
+ sale_start_date: isFlashSaleActive ? settings.saleStartDate : undefined,
+ sale_end_date: isFlashSaleActive ? settings.saleEndDate : undefined
  });
 
  await updateStatus({ courseId, status: "draft" });

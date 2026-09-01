@@ -6,7 +6,7 @@ export const quizGeneratorApi = {
  generateQuiz: async (config: QuizConfig) => {
  const payload = {
  source_type: config.source_type,
- course_id: config.source_type === "course" && config.course_id ? Number(config.course_id) : undefined,
+ course_id: config.course_id ? Number(config.course_id) : undefined,
  content: config.source_type === "content" ? config.source_content : undefined,
  topic: config.source_type === "topic" ? config.topic : undefined,
  difficulty: config.difficulty,
@@ -94,21 +94,31 @@ export const quizGeneratorApi = {
  }) => {
  const payload = {
  ...quizData,
- questions: quizData.questions.map((q) => ({
- type: q.type,
- difficulty: q.difficulty,
- content: q.question,
- explanation: q.explanation,
- sample_answer: q.type === "essay" ? q.sample_answer : undefined,
- rubric: q.type === "essay" ? q.rubric : undefined,
- points: q.points,
- answers: q.type === "multiple_choice"
- ? q.options.map((opt, idx) => ({
+ questions: quizData.questions.map((q: any) => {
+ const isEssay = q.type === "essay" || q.type === "tu_luan";
+ return {
+ type: isEssay ? "essay" : "multiple_choice",
+ difficulty: q.difficulty || "medium",
+ content: q.question || q.content || "",
+ explanation: q.explanation || "",
+ sample_answer: isEssay ? (q.sample_answer || "") : undefined,
+ rubric: isEssay ? (q.rubric || "") : undefined,
+ points: parseFloat(q.points) || (isEssay ? 2.5 : 0.5),
+ answers: !isEssay
+ ? (Array.isArray(q.answers)
+ ? q.answers.map((a: any) => ({
+ content: a.content || a.text || "",
+ is_correct: Boolean(a.is_correct),
+ }))
+ : (Array.isArray(q.options)
+ ? q.options.map((opt: string, idx: number) => ({
  content: opt,
  is_correct: idx === q.correct_answer_index,
  }))
+ : []))
  : undefined,
- })),
+ };
+ }),
  };
 
  const res = await axiosClient.post("/api/instructor/ai-quiz/store", payload);
@@ -116,8 +126,9 @@ export const quizGeneratorApi = {
  },
 
  // Get list of instructor quizzes
- getQuizzes: async (): Promise<{ success: boolean; data: QuizSummary[] }> => {
- const res = await axiosClient.get("/api/instructor/ai-quiz");
+ getQuizzes: async (courseId?: number): Promise<{ success: boolean; data: QuizSummary[] }> => {
+ const url = courseId ? `/api/instructor/ai-quiz?course_id=${courseId}` : "/api/instructor/ai-quiz";
+ const res = await axiosClient.get(url);
  return res.data;
  },
 
@@ -140,6 +151,15 @@ export const quizGeneratorApi = {
  const res = await axiosClient.post(`/api/instructor/ai-quiz/${quizId}/attach`, attachment);
  return res.data;
  },
+
+  // Set active quiz for a course position
+  setActiveQuiz: async (quizId: number, courseId: number, position?: string) => {
+    const res = await axiosClient.post(`/api/instructor/ai-quiz/${quizId}/set-active`, {
+      course_id: courseId,
+      position,
+    });
+    return res.data;
+  },
 
  // Get instructor courses for attachment dropdown
  getInstructorCourses: async (): Promise<{ success: boolean; data: any[] }> => {

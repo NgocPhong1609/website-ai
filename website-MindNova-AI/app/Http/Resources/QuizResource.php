@@ -16,18 +16,38 @@ class QuizResource extends JsonResource
             'time_limit_minutes' => $this->time_limit_minutes,
             'passing_score' => $this->passing_score,
             'questions' => $this->whenLoaded('questions', function () {
-                return $this->questions->map(function ($question) {
+                return $this->questions->map(function ($q) {
+                    $answers = $q->answers ? $q->answers->map(function ($a) {
+                        return [
+                            'id' => $a->id,
+                            'content' => $a->content,
+                            'is_correct' => (bool) $a->is_correct,
+                        ];
+                    })->values()->toArray() : [];
+
+                    $options = $q->answers ? $q->answers->pluck('content')->toArray() : [];
+                    $correctIdx = 0;
+                    if ($q->answers) {
+                        $found = $q->answers->search(fn($a) => (bool)$a->is_correct);
+                        if ($found !== false) {
+                            $correctIdx = $found;
+                        }
+                    }
+
                     return [
-                        'id' => $question->id,
-                        'content' => $question->content,
-                        'order' => $question->order,
-                        'answers' => $question->answers->map(function ($answer) {
-                            return [
-                                'id' => $answer->id,
-                                'content' => $answer->content,
-                                'is_correct' => $answer->is_correct,
-                            ];
-                        }),
+                        'id' => $q->id,
+                        'type' => $q->type ?? 'multiple_choice',
+                        'question' => $q->content,
+                        'content' => $q->content,
+                        'explanation' => $q->explanation,
+                        'sample_answer' => $q->sample_answer,
+                        'rubric' => $q->rubric,
+                        'points' => (float) ($q->points ?? 1.0),
+                        'difficulty' => $q->difficulty ?? 'medium',
+                        'order' => $q->order,
+                        'options' => $options,
+                        'correct_answer_index' => $correctIdx,
+                        'answers' => $answers,
                     ];
                 });
             }),

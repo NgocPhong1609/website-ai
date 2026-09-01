@@ -64,6 +64,7 @@ use App\Http\Controllers\Api\Instructor\QuizGeneratorController;
 use App\Http\Controllers\Api\Instructor\StudentAnalyticsController;
 use App\Http\Controllers\Api\Instructor\OrderController as InstructorOrderController;
 use App\Http\Controllers\Api\Instructor\ReviewController as InstructorReviewController;
+use App\Http\Controllers\Api\Instructor\CouponController as InstructorCouponController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -148,9 +149,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/avatar', [UserController::class, 'uploadAvatar']);
     });
 
-    // -- Nhóm API Đơn hàng (Orders) --
+    // -- Nhóm API Đơn hàng (Orders) & Mã giảm giá (Coupons) --
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
+    Route::post('/coupons/apply', [\App\Http\Controllers\Api\Student\CouponController::class, 'apply']);
 
     // ==========================================
     // 3. NHÓM API HỌC SINH (Student Authenticated Actions)
@@ -171,6 +173,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Quiz bài học
         Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
         Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
+        Route::post('quiz/grade-essay', [StudentQuizController::class, 'gradeEssay']);
 
         // Lesson — Video URL, Hoàn thành, Kiểm tra đáp án Quiz
         Route::get('lessons/{lesson}/video-url', [StudentLessonController::class, 'videoUrl']);
@@ -211,6 +214,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::get('modules/{module}', [CourseModuleController::class, 'show']);
     Route::post('courses/{course}/modules', [CourseModuleController::class, 'store']);
     Route::put('modules/{module}', [CourseModuleController::class, 'update']);
+    Route::put('modules/{module}/reorder-items', [CourseModuleController::class, 'reorderItems']);
     Route::delete('modules/{module}', [CourseModuleController::class, 'destroy']);
 
     // Lessons
@@ -274,6 +278,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::put('ai-quiz/{quiz}', [QuizGeneratorController::class, 'update']);
     Route::delete('ai-quiz/{quiz}', [QuizGeneratorController::class, 'destroy']);
     Route::post('ai-quiz/{quiz}/attach', [QuizGeneratorController::class, 'attach']);
+    Route::post('ai-quiz/{quiz}/set-active', [QuizGeneratorController::class, 'setActive']);
 
     // AI Course Outline
     Route::post('courses/ai-outline/generate', [CourseOutlineController::class, 'generate']);
@@ -296,6 +301,13 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::delete('certificates/{id}', [TeacherProfileController::class, 'destroyCertificate']);
     Route::post('verification/request', [TeacherProfileController::class, 'submitVerificationRequest']);
     Route::get('verification/status', [TeacherProfileController::class, 'getVerificationStatus']);
+
+    // Coupons (Instructor)
+    Route::get('coupons', [InstructorCouponController::class, 'index']);
+    Route::post('coupons', [InstructorCouponController::class, 'store']);
+    Route::put('coupons/{id}', [InstructorCouponController::class, 'update']);
+    Route::delete('coupons/{id}', [InstructorCouponController::class, 'destroy']);
+    Route::patch('coupons/{id}/toggle', [InstructorCouponController::class, 'toggle']);
 });
 
 // ==========================================
