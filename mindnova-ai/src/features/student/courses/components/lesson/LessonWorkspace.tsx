@@ -14,22 +14,44 @@ import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBad
 import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/quizGeneratorApi";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
-function CheckIcon() {
- return (
- <></>
- );
+function CheckIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  );
 }
 
-function PlayCircleIcon({ className }: { className?: string }) {
- return (
- <></>
- );
+function PlayCircleIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
+    </svg>
+  );
 }
 
-function ChevronIcon({ className }: { className?: string }) {
- return (
- <></>
- );
+function ChevronIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+    </svg>
+  );
+}
+
+function ArrowLeftIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+    </svg>
+  );
+}
+
+function ChevronRightIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+  );
 }
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
@@ -274,10 +296,34 @@ function QuizRenderer({
     setAnswerResult(null);
     setAnswered(false);
     setCorrectCount(0);
-    setPhase('quiz');
     setAllAnswers({});
-    setQuizResult(null);
-    hasCompletedRef.current = false;
+
+    // Restore saved quiz result if student already completed this quiz
+    if (typeof window !== "undefined") {
+      const savedRes = window.localStorage.getItem(`student_quiz_result_${lesson.id}`);
+      if (savedRes) {
+        try {
+          const parsed = JSON.parse(savedRes);
+          if (parsed && typeof parsed === "object" && typeof parsed.score !== "undefined") {
+            setQuizResult(parsed);
+            setPhase('result');
+            hasCompletedRef.current = true;
+          } else {
+            setQuizResult(null);
+            setPhase('quiz');
+          }
+        } catch (e) {
+          setQuizResult(null);
+          setPhase('quiz');
+        }
+      } else {
+        setQuizResult(null);
+        setPhase('quiz');
+      }
+    } else {
+      setQuizResult(null);
+      setPhase('quiz');
+    }
 
     const loadQuizData = async () => {
       // 0. Check localStorage for instructor edited quiz
@@ -364,27 +410,32 @@ function QuizRenderer({
     loadQuizData();
   }, [lesson, normalizeQuestions]);
 
- const handleFinishQuiz = useCallback(async (currentAnswers: Record<string, string>) => {
- if (!quizData) return;
- setSubmittingFinal(true);
- if (timerRef.current) clearInterval(timerRef.current);
- try {
- const timeTaken = quizData.time_limit_minutes > 0 && timeLeft !== null 
- ? (quizData.time_limit_minutes * 60) - timeLeft 
- : 60;
- const res = await submitQuiz(lesson.id, currentAnswers, timeTaken);
- setQuizResult(res);
- setPhase('result');
- 
- // Báo hiệu hoàn thành để Component cha cập nhật Progress / Sidebar
- if (res.passed) {
- onComplete();
- }
- } catch (err) {
- setError("Lỗi khi nộp bài. Vui lòng tải lại trang.");
- }
- setSubmittingFinal(false);
- }, [quizData, lesson.id, timeLeft, onComplete]);
+  const handleFinishQuiz = useCallback(async (currentAnswers: Record<string, string>) => {
+    if (!quizData) return;
+    setSubmittingFinal(true);
+    if (timerRef.current) clearInterval(timerRef.current);
+    try {
+      const timeTaken = quizData.time_limit_minutes > 0 && timeLeft !== null 
+        ? (quizData.time_limit_minutes * 60) - timeLeft 
+        : 60;
+      const res = await submitQuiz(lesson.id, currentAnswers, timeTaken);
+      setQuizResult(res);
+      setPhase('result');
+
+      // Save result to localStorage for persistence upon page refresh (F5)
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(`student_quiz_result_${lesson.id}`, JSON.stringify(res));
+      }
+
+      // Báo hiệu hoàn thành để Component cha cập nhật Progress / Sidebar
+      if (res.passed) {
+        onComplete();
+      }
+    } catch (err) {
+      setError("Lỗi khi nộp bài. Vui lòng tải lại trang.");
+    }
+    setSubmittingFinal(false);
+  }, [quizData, lesson.id, timeLeft, onComplete]);
 
  // Timer
  useEffect(() => {
@@ -463,14 +514,17 @@ function QuizRenderer({
     // Check locally if answers array has is_correct property
     if (Array.isArray(currentQ.answers) && currentQ.answers.length > 0) {
       const selectedAnsObj = currentQ.answers.find(
-        (ans: any) => String(ans.id) === String(selectedAnswer) || ans.content === selectedAnswer
+        (ans: any) => String(ans.id) === String(selectedAnswer)
+      ) || currentQ.answers.find(
+        (ans: any) => ans.content === selectedAnswer
       );
+
       if (selectedAnsObj && typeof selectedAnsObj.is_correct !== "undefined") {
         isCorrect = Boolean(selectedAnsObj.is_correct);
       } else {
         const correctIdx = typeof currentQ.correct_answer_index === "number" ? currentQ.correct_answer_index : 0;
         const selectedIdx = currentQ.answers.findIndex(
-          (ans: any) => String(ans.id) === String(selectedAnswer) || ans.content === selectedAnswer
+          (ans: any) => String(ans.id) === String(selectedAnswer)
         );
         isCorrect = selectedIdx >= 0 && selectedIdx === correctIdx;
       }
@@ -513,31 +567,24 @@ function QuizRenderer({
     }
   };
 
- const handleRetry = () => {
- setCurrentIndex(0);
- setSelectedAnswer("");
- setAnswerResult(null);
- setAnswered(false);
- setCorrectCount(0);
- setAllAnswers({});
- setQuizResult(null);
- setPhase('quiz');
- hasCompletedRef.current = false;
- if (quizData && quizData.time_limit_minutes > 0) {
- setTimeLeft(quizData.time_limit_minutes * 60);
- }
- // Re-fetch to get re-shuffled questions
- setLoading(true);
- fetchQuiz(lesson.id)
- .then((data) => {
- setQuizData(data);
- setLoading(false);
- })
- .catch(() => {
- setError("Không thể tải lại bài kiểm tra.");
- setLoading(false);
- });
- };
+  const handleRetry = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(`student_quiz_result_${lesson.id}`);
+    }
+    setCurrentIndex(0);
+    setSelectedAnswer("");
+    setEssayText("");
+    setAnswerResult(null);
+    setAnswered(false);
+    setCorrectCount(0);
+    setAllAnswers({});
+    setQuizResult(null);
+    setPhase('quiz');
+    hasCompletedRef.current = false;
+    if (quizData && quizData.time_limit_minutes > 0) {
+      setTimeLeft(quizData.time_limit_minutes * 60);
+    }
+  };
 
  if (loading) {
  return (

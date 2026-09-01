@@ -149,9 +149,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/avatar', [UserController::class, 'uploadAvatar']);
     });
 
-    // -- Nhóm API Đơn hàng (Orders) --
+    // -- Nhóm API Đơn hàng (Orders) & Mã giảm giá (Coupons) --
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
+    Route::post('/coupons/apply', [\App\Http\Controllers\Api\Student\CouponController::class, 'apply']);
 
     // ==========================================
     // 3. NHÓM API HỌC SINH (Student Authenticated Actions)

@@ -25,8 +25,8 @@ function CourseManagementContent() {
 
   const totalCourses = courses?.length || 0;
   const activeCourses = courses?.filter((c) => c.status === "published" || c.status === "approved").length || 0;
-  const pendingCourses = courses?.filter((c) => c.status === "pending" || c.status === "pending_approval" || c.status === "under_review").length || 0;
-  const draftCourses = courses?.filter((c) => c.status === "draft" || (!c.status && c.status !== "published" && c.status !== "pending")).length || 0;
+  const pendingCourses = courses?.filter((c) => c.status === "pending" || c.status === "pending_review" || c.status === "pending_approval" || c.status === "under_review").length || 0;
+  const draftCourses = courses?.filter((c) => c.status === "draft" || (!c.status && c.status !== "published" && c.status !== "pending" && c.status !== "pending_review")).length || 0;
 
   const counts = {
     all: totalCourses,
@@ -40,7 +40,7 @@ function CourseManagementContent() {
 
     let list = courses.filter((c) => {
       const isPublished = c.status === "published" || c.status === "approved";
-      const isPending = c.status === "pending" || c.status === "pending_approval" || c.status === "under_review";
+      const isPending = c.status === "pending" || c.status === "pending_review" || c.status === "pending_approval" || c.status === "under_review";
       const isDraft = c.status === "draft" || (!c.status && !isPublished && !isPending);
 
       if (filter === "active" && !isPublished) return false;

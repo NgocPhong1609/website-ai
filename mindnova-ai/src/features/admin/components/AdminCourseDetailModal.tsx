@@ -2,6 +2,13 @@
 
 import { useState } from "react";
 
+function getEmbedUrl(url?: string | null): string | null {
+  if (!url) return null;
+  const youtubeMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+  if (youtubeMatch) return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+  return null;
+}
+
 export type CourseLevelQuizDetail = {
   attachment_id: number | string;
   quiz_id: number | string;
@@ -308,37 +315,114 @@ export function AdminCourseDetailModal({
                             </div>
 
                             {/* Expanded Lesson Detail Preview */}
-                            {selectedLesson?.id === les.id && (
-                              <div className="mt-3 p-4 bg-slate-900 text-slate-100 rounded-xl text-xs space-y-3 animate-fadeIn">
-                                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                                  <span className="font-bold text-sky-400">📄 Chi tiết bài học #{les.title}</span>
-                                  <span className="text-[10px] text-slate-400 uppercase">{les.type || "Nội dung"}</span>
-                                </div>
+                            {selectedLesson?.id === les.id && (() => {
+                              const lesType = (les.type || les.item_type || "").toLowerCase();
+                              const isVideo = lesType === "video" || Boolean(les.video_url);
+                              const isDoc = lesType === "article" || lesType === "document" || lesType === "doc" || (Boolean(les.content) && !isVideo);
+                              const isQuiz = lesType === "quiz" || lesType === "quiz_module" || Boolean(les.quizData || les.quiz);
+                              const quizData = les.quizData || les.quiz;
 
-                                {les.video_url && (
-                                  <div>
-                                    <span className="font-semibold text-slate-400 block mb-1">Link Video / Bài giảng:</span>
-                                    <a
-                                      href={les.video_url}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                      className="text-sky-300 underline break-all hover:text-sky-200"
-                                    >
-                                      {les.video_url}
-                                    </a>
-                                  </div>
-                                )}
-
-                                {les.content && (
-                                  <div>
-                                    <span className="font-semibold text-slate-400 block mb-1">Nội dung bài đọc (Article):</span>
-                                    <div className="p-3 bg-slate-800 rounded-lg whitespace-pre-line text-slate-200 text-xs leading-relaxed max-h-48 overflow-y-auto">
-                                      {les.content}
+                              return (
+                                <div className="mt-3 p-5 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-4 animate-fadeIn shadow-2xs">
+                                  <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-extrabold text-slate-900 text-sm">
+                                        {isQuiz ? "📝 Chi tiết bài kiểm tra:" : isVideo ? "🎬 Chi tiết video:" : "📄 Chi tiết tài liệu đọc:"} {les.title}
+                                      </span>
                                     </div>
+                                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-200 text-slate-800">
+                                      {les.type || les.item_type || "Nội dung"}
+                                    </span>
                                   </div>
-                                )}
-                              </div>
-                            )}
+
+                                  {/* VIDEO LESSON RENDER */}
+                                  {isVideo && les.video_url && (
+                                    <div className="space-y-2">
+                                      <span className="font-bold text-slate-700 block">🎥 Trình phát Video bài giảng:</span>
+                                      <div className="w-full bg-black rounded-2xl overflow-hidden border border-slate-300 flex items-center justify-center relative shadow-sm max-h-[380px]">
+                                        {getEmbedUrl(les.video_url) ? (
+                                          <iframe
+                                            src={getEmbedUrl(les.video_url)!}
+                                            className="w-full h-[350px]"
+                                            frameBorder="0"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowFullScreen
+                                          />
+                                        ) : (
+                                          <video 
+                                            src={les.video_url} 
+                                            controls 
+                                            className="w-full max-h-[350px] object-contain"
+                                          />
+                                        )}
+                                      </div>
+                                      <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                                        <span>Link trực tiếp: <a href={les.video_url} target="_blank" rel="noreferrer" className="text-sky-600 underline font-semibold hover:text-sky-800">{les.video_url}</a></span>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* ARTICLE / DOCUMENT LESSON RENDER */}
+                                  {isDoc && (
+                                    <div className="space-y-2">
+                                      <span className="font-bold text-slate-700 block">📖 Nội dung bài đọc chi tiết (Article):</span>
+                                      {les.content ? (
+                                        <div 
+                                          className="p-5 bg-white rounded-2xl border border-slate-200 text-slate-800 text-sm leading-relaxed max-h-[450px] overflow-y-auto shadow-2xs prose max-w-none prose-img:rounded-xl prose-img:max-h-[350px] prose-img:mx-auto"
+                                          dangerouslySetInnerHTML={{ __html: les.content }}
+                                        />
+                                      ) : (
+                                        <div className="p-4 bg-white rounded-xl border border-slate-200 text-slate-400 italic">
+                                          Bài đọc này chưa có nội dung văn bản.
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+
+                                  {/* QUIZ LESSON RENDER */}
+                                  {isQuiz && (
+                                    <div className="space-y-4">
+                                      {quizData ? (
+                                        <div className="space-y-4">
+                                          <div className="p-4 rounded-2xl bg-white border border-indigo-100 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
+                                            <div>
+                                              <h4 className="text-sm font-black text-slate-900">{quizData.title || les.title}</h4>
+                                              {quizData.description && (
+                                                <p className="text-xs text-slate-500 mt-0.5">{quizData.description}</p>
+                                              )}
+                                            </div>
+                                            <div className="flex items-center gap-3 text-xs font-bold text-slate-700 bg-indigo-50/60 px-3 py-1.5 rounded-xl border border-indigo-100">
+                                              <span>⏱ Thời gian: <strong className="text-indigo-600">{quizData.time_limit_minutes || 15} phút</strong></span>
+                                              <span>•</span>
+                                              <span>🎯 Điểm đạt: <strong className="text-indigo-600">{quizData.passing_score || 70}%</strong></span>
+                                              <span>•</span>
+                                              <span>❓ Số câu hỏi: <strong className="text-indigo-600">{quizData.questions?.length || quizData.total_questions || 0} câu</strong></span>
+                                            </div>
+                                          </div>
+
+                                          <div className="space-y-3">
+                                            <h5 className="text-xs font-black text-slate-800 uppercase tracking-wider">📋 Danh sách câu hỏi trong bài kiểm tra:</h5>
+                                            {(!quizData.questions || quizData.questions.length === 0) ? (
+                                              <div className="p-4 bg-white rounded-xl border border-slate-200 text-slate-400 italic text-center">
+                                                Bài kiểm tra này chưa được tạo câu hỏi.
+                                              </div>
+                                            ) : (
+                                              quizData.questions.map((q: any, qIdx: number) => (
+                                                <RenderQuestionDetail key={q.id || qIdx} question={q} index={qIdx} />
+                                              ))
+                                            )}
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <div className="p-4 bg-white rounded-xl border border-slate-200 text-slate-500 italic text-center">
+                                          Bài kiểm tra chưa được cập nhật dữ liệu bộ câu hỏi.
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })()}
                           </div>
                         ))}
                       </div>
@@ -668,9 +752,10 @@ function formatDuration(seconds?: number | null): string {
 }
 
 function formatCurrency(value: number): string {
+  if (!value || value === 0) return "Miễn phí";
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
+    currency: "VND",
+    maximumFractionDigits: 0,
   }).format(value);
 }

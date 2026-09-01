@@ -16,20 +16,27 @@ class CouponController extends Controller
         
         $query = Coupon::where('instructor_id', $teacherId);
 
+        if ($request->filled('course_id')) {
+            $courseId = (int) $request->course_id;
+            $query->where(function ($q) use ($courseId) {
+                $q->where('course_id', $courseId)->orWhereNull('course_id');
+            });
+        }
+
         if ($request->has('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
         }
 
-        $coupons = $query->orderBy('created_at', 'desc')->paginate(10);
+        $coupons = $query->orderBy('created_at', 'desc')->get();
 
         return response()->json([
             'success' => true,
-            'data' => $coupons->items(),
-            'total' => $coupons->total(),
+            'data' => $coupons,
+            'total' => count($coupons),
             'stats' => [
                 'total_codes' => Coupon::where('instructor_id', $teacherId)->count(),
                 'used_count' => Coupon::where('instructor_id', $teacherId)->sum('used_count'),
-                'discount_amount' => 0 // Can calculate based on usage history later
+                'discount_amount' => 0
             ]
         ]);
     }
@@ -41,6 +48,7 @@ class CouponController extends Controller
             'type' => 'required|in:percent,fixed',
             'value' => 'required|numeric|min:0',
             'max_uses' => 'nullable|integer|min:1',
+            'starts_at' => 'nullable|date',
             'expires_at' => 'nullable|date',
             'status' => 'required|in:active,disabled',
             'course_id' => 'nullable|exists:courses,id'
@@ -48,6 +56,19 @@ class CouponController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        if ($request->filled('course_id')) {
+            $course = \App\Models\Course::where('id', $request->course_id)
+                ->where('teacher_id', auth()->id())
+                ->first();
+
+            if (!$course) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bạn chỉ có thể tạo mã giảm giá cho khóa học thuộc sở hữu của bạn.'
+                ], 403);
+            }
         }
 
         $coupon = Coupon::create(array_merge(

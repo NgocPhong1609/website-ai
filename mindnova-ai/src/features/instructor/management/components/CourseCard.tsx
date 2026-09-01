@@ -14,7 +14,7 @@ import {
 
 function StatusBadge({ status }: { status: Course["status"] | string }) {
   const isPublished = status === "published" || status === "approved";
-  const isPending = status === "pending" || status === "pending_approval" || status === "under_review";
+  const isPending = status === "pending" || status === "pending_review" || status === "pending_approval" || status === "under_review";
   const isRejected = status === "rejected";
 
   let label = "Bản nháp";
@@ -88,7 +88,7 @@ function CourseActionButtons({ courseId }: { courseId: string }) {
         <span className="text-[#C0392B]">
           <BookOpenIcon />
         </span>
-        <span>📖 Chi tiết</span>
+        <span>Chi tiết</span>
       </Link>
     </div>
   );

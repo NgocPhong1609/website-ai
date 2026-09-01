@@ -30,7 +30,7 @@ function CourseCard({ course }: { course: DashboardCourse }) {
  )}
  
  {/* Gentle veil */}
- <div className="absolute inset-0 bg-[#2C3039] via-transparent to-transparent opacity-80" />
+ <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
  
  {/* Progress badge */}
  <div className="absolute top-3.5 right-3.5 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-sm text-xs font-semibold text-[#2C3039] border border-white/50 flex items-center gap-1.5 z-10">

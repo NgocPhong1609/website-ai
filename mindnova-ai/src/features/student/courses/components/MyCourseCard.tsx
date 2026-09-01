@@ -38,8 +38,7 @@ export function MyCourseCard({ course }: { course: MyCourse }) {
  ) : (
  <div className="w-full h-full bg-[#4A4F5C]" />
  )}
-
- <div className="absolute inset-0 bg-[#2C3039] via-transparent to-transparent pointer-events-none" />
+ <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
 
  {/* Top Badges */}
  <div className="absolute top-3.5 left-3.5 flex items-center gap-2 z-10">
