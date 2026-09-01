@@ -149,37 +149,39 @@ export function useAiQuizWizard(options?: {
  try {
  const activeQuestions = questions.filter((q) => q.reviewStatus !== "discarded");
 
- const response = await quizGeneratorApi.saveQuiz({
- title: config.title,
- description: config.description,
- source_type: config.source_type,
- source_content: config.source_type === "course" ? (config.course_title || "") : (config.source_type === "content" ? config.source_content : config.topic),
- course_id: config.course_id,
- difficulty: config.difficulty,
- time_limit_minutes: config.time_limit_minutes,
- passing_score: config.passing_score,
- status,
- questions: activeQuestions,
- });
+  const targetCourseId = config.course_id || (courseIdParam ? Number(courseIdParam) : undefined);
 
-      if (response.success && response.data) {
-        const quizData = response.data;
-        setSavedQuiz(quizData);
+  const response = await quizGeneratorApi.saveQuiz({
+    title: config.title,
+    description: config.description,
+    source_type: config.source_type,
+    source_content: config.source_type === "course" ? (config.course_title || "") : (config.source_type === "content" ? config.source_content : config.topic),
+    course_id: targetCourseId,
+    difficulty: config.difficulty,
+    time_limit_minutes: config.time_limit_minutes,
+    passing_score: config.passing_score,
+    status,
+    questions: activeQuestions,
+  });
 
-        // If in embedded course mode, auto attach if course_id exists and bypass Step 5 modal unconditionally
-        if (options?.embeddedMode || options?.onSuccessComplete) {
-          if (config.course_id && options?.initialModuleId) {
-            try {
-              await quizGeneratorApi.attachQuiz(quizData.id, {
-                course_id: config.course_id,
-                module_id: options.initialModuleId,
-                position: "in_module",
-                order: 99,
-              });
-            } catch (attachErr) {
-              console.warn("Auto attach failed:", attachErr);
-            }
-          }
+  if (response.success && response.data) {
+    const quizData = response.data;
+    setSavedQuiz(quizData);
+
+    // If in embedded course mode, auto attach if course_id exists and bypass Step 5 modal unconditionally
+    if (options?.embeddedMode || options?.onSuccessComplete) {
+      if (targetCourseId && options?.initialModuleId) {
+        try {
+          await quizGeneratorApi.attachQuiz(quizData.id, {
+            course_id: targetCourseId,
+            module_id: options.initialModuleId,
+            position: "in_module",
+            order: 99,
+          });
+        } catch (attachErr) {
+          console.warn("Auto attach failed:", attachErr);
+        }
+      }
           if (options?.onSuccessComplete) {
             options.onSuccessComplete(quizData);
             return quizData;

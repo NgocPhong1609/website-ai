@@ -123,6 +123,8 @@ class QuizService
     {
         foreach ($questionsData as $qIndex => $qData) {
             $type = $qData['type'] ?? 'multiple_choice';
+            if ($type === 'tu_luan') $type = 'essay';
+            if ($type === 'trac_nghiem') $type = 'multiple_choice';
 
             $question = $quiz->questions()->create([
                 'type' => $type,
@@ -131,15 +133,27 @@ class QuizService
                 'explanation' => $qData['explanation'] ?? null,
                 'sample_answer' => $type === 'essay' ? ($qData['sample_answer'] ?? null) : null,
                 'rubric' => $type === 'essay' ? ($qData['rubric'] ?? null) : null,
-                'points' => (float) ($qData['points'] ?? 0.0),
+                'points' => (float) ($qData['points'] ?? ($type === 'essay' ? 2.5 : 0.5)),
                 'order' => $qIndex + 1,
             ]);
 
-            if ($type === 'multiple_choice' && !empty($qData['answers'])) {
-                foreach ($qData['answers'] as $aData) {
+            if ($type === 'multiple_choice') {
+                $answersList = $qData['answers'] ?? [];
+
+                if (empty($answersList) && !empty($qData['options']) && is_array($qData['options'])) {
+                    $correctIdx = is_numeric($qData['correct_answer_index'] ?? null) ? (int)$qData['correct_answer_index'] : 0;
+                    foreach ($qData['options'] as $idx => $optContent) {
+                        $answersList[] = [
+                            'content' => (string) $optContent,
+                            'is_correct' => $idx == $correctIdx,
+                        ];
+                    }
+                }
+
+                foreach ($answersList as $aData) {
                     $question->answers()->create([
-                        'content' => $aData['content'],
-                        'is_correct' => (bool) $aData['is_correct'],
+                        'content' => $aData['content'] ?? $aData['answer'] ?? '',
+                        'is_correct' => !empty($aData['is_correct']),
                     ]);
                 }
             }

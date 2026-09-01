@@ -431,6 +431,8 @@ class LessonService
 
             foreach ($questionsData as $index => $qData) {
                 $type = $qData['type'] ?? 'multiple_choice';
+                if ($type === 'tu_luan') $type = 'essay';
+                if ($type === 'trac_nghiem') $type = 'multiple_choice';
                 $content = !empty($qData['question']) ? $qData['question'] : (!empty($qData['content']) ? $qData['content'] : 'Câu hỏi');
 
                 $question = $quiz->questions()->create([

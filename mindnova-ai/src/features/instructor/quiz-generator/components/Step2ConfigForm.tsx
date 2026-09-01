@@ -83,7 +83,7 @@ export function Step2ConfigForm({
               <input
                 type="text"
                 value={config.topic || ""}
-                onChange={(e) => onChangeConfig({ topic: e.target.value, source_type: "topic" })}
+                onChange={(e) => onChangeConfig({ topic: e.target.value })}
                 className="w-full p-3.5 rounded-xl border border-[#E8E2D9] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
                 placeholder="VD: Kiến thức bài học, HTML/CSS căn bản, React Hooks..."
               />

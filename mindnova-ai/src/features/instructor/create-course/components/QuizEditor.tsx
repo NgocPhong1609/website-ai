@@ -83,30 +83,41 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
   }, []);
 
   function normalizeQuestion(q: any, idx: number): GeneratedQuestion {
-    const isMcq = q.type === "multiple_choice" || q.type === "trac_nghiem" || Array.isArray(q.answers) || Array.isArray(q.options);
+    const isEssay = q.type === "essay" || q.type === "tu_luan";
+    const isMcq = !isEssay && (
+      q.type === "multiple_choice" || 
+      q.type === "trac_nghiem" || 
+      (Array.isArray(q.answers) && q.answers.length > 0) || 
+      (Array.isArray(q.options) && q.options.length > 0)
+    );
     
     let optionsList: string[] = ["Đáp án 1", "Đáp án 2", "Đáp án 3", "Đáp án 4"];
     let correctIdx = 0;
 
-    if (Array.isArray(q.options) && q.options.length > 0) {
-      optionsList = q.options;
-      correctIdx = typeof q.correct_answer_index === "number" ? q.correct_answer_index : 0;
-    } else if (Array.isArray(q.answers) && q.answers.length > 0) {
-      optionsList = q.answers.map((a: any) => a.content || a.answer || "");
-      const foundIdx = q.answers.findIndex((a: any) => Boolean(a.is_correct));
-      correctIdx = foundIdx >= 0 ? foundIdx : 0;
+    if (isMcq) {
+      if (Array.isArray(q.options) && q.options.length > 0) {
+        optionsList = q.options;
+        correctIdx = typeof q.correct_answer_index === "number" ? q.correct_answer_index : 0;
+      } else if (Array.isArray(q.answers) && q.answers.length > 0) {
+        optionsList = q.answers.map((a: any) => a.content || a.answer || "");
+        const foundIdx = q.answers.findIndex((a: any) => Boolean(a.is_correct));
+        correctIdx = foundIdx >= 0 ? foundIdx : 0;
+      }
+    } else {
+      optionsList = [];
+      correctIdx = 0;
     }
 
     return {
       id: q.id ? String(q.id) : `q_${Date.now()}_${idx}`,
-      type: isMcq ? "multiple_choice" : "essay",
+      type: isEssay ? "essay" : "multiple_choice",
       question: q.question || q.content || `Câu hỏi #${idx + 1}`,
-      options: optionsList,
-      correct_answer_index: correctIdx,
+      options: isEssay ? [] : optionsList,
+      correct_answer_index: isEssay ? null : correctIdx,
       explanation: q.explanation || "",
       sample_answer: q.sample_answer || "",
       rubric: q.rubric || "",
-      points: parseFloat(q.points) || (isMcq ? 0.5 : 1.0),
+      points: parseFloat(q.points) || (isEssay ? 2.5 : 0.5),
       difficulty: q.difficulty || "medium",
       reviewStatus: "approved",
     };

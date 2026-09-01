@@ -18,7 +18,7 @@ class StoreAiQuizRequest extends FormRequest
             'description' => 'nullable|string',
             'source_type' => 'nullable|string|in:content,topic,course',
             'source_content' => 'nullable|string',
-            'course_id' => 'required|integer|exists:courses,id',
+            'course_id' => 'nullable|integer|exists:courses,id',
             'difficulty' => 'nullable|string|in:easy,medium,hard,mixed',
             'time_limit_minutes' => 'nullable|integer|min:0',
             'passing_score' => 'nullable|integer|min:0|max:100',

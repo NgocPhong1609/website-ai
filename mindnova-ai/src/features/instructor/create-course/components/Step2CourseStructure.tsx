@@ -22,6 +22,7 @@ import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/q
 import { CourseAiQuizModal } from "./CourseAiQuizModal";
 import { CourseManualQuizModal } from "./CourseManualQuizModal";
 import { SelectCourseLevelQuizModal } from "./SelectCourseLevelQuizModal";
+import { useCreateCourseStore } from "../stores/createCourseStore";
 
 function GripIcon({ size = 16 }: { size?: number }) {
   return (
@@ -79,14 +80,6 @@ function TrashIcon({ size = 14 }: { size?: number }) {
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="3 6 5 6 21 6"/>
       <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-    </svg>
-  );
-}
-
-function SparklesIcon({ size = 14 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
     </svg>
   );
 }
@@ -497,6 +490,57 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
     }
   };
 
+  const handleAddQuizLesson = (chapterId: string, currentCount: number, isAi: boolean = false) => {
+    if (courseId) {
+      if (isAi) {
+        setAiQuizModal({ isOpen: true, moduleId: String(chapterId) });
+      } else {
+        setManualQuizModal({ isOpen: true, moduleId: String(chapterId) });
+      }
+    } else {
+      const quizTitle = isAi ? `Bài kiểm tra AI #${currentCount + 1}` : `Bài kiểm tra trắc nghiệm #${currentCount + 1}`;
+      const defaultQuestions = isAi ? [
+        {
+          id: `q_${Date.now()}_1`,
+          type: "multiple_choice",
+          question: "Câu hỏi trắc nghiệm mẫu 1?",
+          content: "Câu hỏi trắc nghiệm mẫu 1?",
+          explanation: "Giải thích đáp án đúng",
+          points: 1,
+          difficulty: "medium",
+          answers: [
+            { id: `a_${Date.now()}_1`, content: "Đáp án A (Đúng)", is_correct: true },
+            { id: `a_${Date.now()}_2`, content: "Đáp án B", is_correct: false },
+            { id: `a_${Date.now()}_3`, content: "Đáp án C", is_correct: false },
+            { id: `a_${Date.now()}_4`, content: "Đáp án D", is_correct: false },
+          ]
+        }
+      ] : [];
+
+      const initialQuizData = {
+        title: quizTitle,
+        time_limit_minutes: 15,
+        passing_score: 70,
+        questions: defaultQuestions,
+      };
+
+      addDraftLesson(chapterId, quizTitle, "quiz");
+      
+      setTimeout(() => {
+        const state = useCreateCourseStore.getState();
+        const targetChap = state.modules.find((c: any) => c.id === chapterId);
+        if (targetChap && targetChap.lessons.length > 0) {
+          const newLesson = targetChap.lessons[targetChap.lessons.length - 1];
+          updateDraftLesson(chapterId, newLesson.id, { quizData: initialQuizData });
+          setEditingLesson({
+            chapterId,
+            lesson: { ...newLesson, type: "quiz", quizData: initialQuizData } as any,
+          });
+        }
+      }, 50);
+    }
+  };
+
   const handleAddDocLesson = async (chapterId: string, currentCount: number) => {
     if (courseId) {
       try {
@@ -666,18 +710,18 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
             {/* Sub-section A: 🏆 Kiểm tra tổng quát */}
-            <div className="p-5 rounded-2xl bg-white border border-amber-200/80 shadow-2xs flex flex-col gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-amber-100 pb-3 gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">🏆</span>
-                  <div>
-                    <h4 className="text-xs font-black text-amber-950 uppercase tracking-wider">
-                      A. Kiểm tra tổng quát (General Assessment)
+            <div className="p-5 rounded-2xl bg-white border border-amber-200/80 shadow-2xs flex flex-col justify-between gap-4 h-full">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-amber-100 pb-3 gap-2 min-h-[58px]">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <span className="text-xl shrink-0">🏆</span>
+                  <div className="min-w-0">
+                    <h4 className="text-xs font-black text-amber-950 uppercase tracking-wider truncate">
+                      A. Kiểm tra tổng quát
                     </h4>
-                    <span className="text-[11px] text-amber-700 font-semibold">
-                      Đánh giá kiến thức tổng quan, không gắn vào Module
+                    <span className="text-[11px] text-amber-700 font-semibold block truncate">
+                      Đánh giá kiến thức tổng quan toàn khóa học
                     </span>
                   </div>
                 </div>
@@ -703,9 +747,9 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
               </div>
 
               {/* ONLY DISPLAY THE SELECTED/ACTIVE QUIZ CARD */}
-              <div className="flex flex-col gap-3">
+              <div className="flex-1 flex flex-col justify-center">
                 {!activeGeneralQuiz ? (
-                  <div className="p-6 rounded-2xl bg-amber-50/50 border border-dashed border-amber-200 text-center flex flex-col items-center justify-center gap-2">
+                  <div className="p-6 rounded-2xl bg-amber-50/50 border border-dashed border-amber-200 text-center flex flex-col items-center justify-center gap-2 h-full">
                     <span className="text-3xl">🏆</span>
                     <p className="text-xs font-bold text-amber-900">Chưa có bài kiểm tra tổng quát nào được chọn.</p>
                     <p className="text-[11px] text-amber-700 max-w-xs">
@@ -720,10 +764,10 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                     </button>
                   </div>
                 ) : (
-                  <div className="p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/30 shadow-xs flex flex-col gap-3">
+                  <div className="p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/30 shadow-xs flex flex-col justify-between gap-4 h-full">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg">🏆</span>
+                        <span className="text-lg shrink-0">🏆</span>
                         <div>
                           <h5 className="text-xs font-black text-[#1A1A2E]">{activeGeneralQuiz.title}</h5>
                           <span className="text-[10px] font-bold text-emerald-800">
@@ -738,7 +782,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] font-bold text-gray-500 border-t border-emerald-200/60 pt-2.5">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-gray-500 border-t border-emerald-200/60 pt-2.5 mt-auto">
                       <div className="flex items-center gap-3 text-emerald-900">
                         <span>❓ {activeGeneralQuiz.total_questions || activeGeneralQuiz.questions_count || 0} câu</span>
                         <span>⏱️ {activeGeneralQuiz.time_limit_minutes || 15}p</span>
@@ -777,15 +821,15 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
             </div>
 
             {/* Sub-section B: 🏁 Kiểm tra cuối khóa học */}
-            <div className="p-5 rounded-2xl bg-white border border-indigo-200/80 shadow-2xs flex flex-col gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-indigo-100 pb-3 gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">🏁</span>
-                  <div>
-                    <h4 className="text-xs font-black text-indigo-950 uppercase tracking-wider">
-                      B. Kiểm tra cuối khóa học (Final Examination)
+            <div className="p-5 rounded-2xl bg-white border border-indigo-200/80 shadow-2xs flex flex-col justify-between gap-4 h-full">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-indigo-100 pb-3 gap-2 min-h-[58px]">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <span className="text-xl shrink-0">🏁</span>
+                  <div className="min-w-0">
+                    <h4 className="text-xs font-black text-indigo-950 uppercase tracking-wider truncate">
+                      B. Kiểm tra cuối khóa học
                     </h4>
-                    <span className="text-[11px] text-indigo-700 font-semibold">
+                    <span className="text-[11px] text-indigo-700 font-semibold block truncate">
                       Đánh giá hoàn thành toàn bộ khóa học
                     </span>
                   </div>
@@ -812,9 +856,9 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
               </div>
 
               {/* ONLY DISPLAY THE SELECTED/ACTIVE QUIZ CARD */}
-              <div className="flex flex-col gap-3">
+              <div className="flex-1 flex flex-col justify-center">
                 {!activeFinalQuiz ? (
-                  <div className="p-6 rounded-2xl bg-indigo-50/50 border border-dashed border-indigo-200 text-center flex flex-col items-center justify-center gap-2">
+                  <div className="p-6 rounded-2xl bg-indigo-50/50 border border-dashed border-indigo-200 text-center flex flex-col items-center justify-center gap-2 h-full">
                     <span className="text-3xl">🏁</span>
                     <p className="text-xs font-bold text-indigo-900">Chưa có bài kiểm tra cuối khóa nào được chọn.</p>
                     <p className="text-[11px] text-indigo-700 max-w-xs">
@@ -829,10 +873,10 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                     </button>
                   </div>
                 ) : (
-                  <div className="p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/30 shadow-xs flex flex-col gap-3">
+                  <div className="p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/30 shadow-xs flex flex-col justify-between gap-4 h-full">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg">🏁</span>
+                        <span className="text-lg shrink-0">🏁</span>
                         <div>
                           <h5 className="text-xs font-black text-[#1A1A2E]">{activeFinalQuiz.title}</h5>
                           <span className="text-[10px] font-bold text-emerald-800">
@@ -847,7 +891,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] font-bold text-gray-500 border-t border-emerald-200/60 pt-2.5">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-gray-500 border-t border-emerald-200/60 pt-2.5 mt-auto">
                       <div className="flex items-center gap-3 text-emerald-900">
                         <span>❓ {activeFinalQuiz.total_questions || activeFinalQuiz.questions_count || 0} câu</span>
                         <span>⏱️ {activeFinalQuiz.time_limit_minutes || 15}p</span>
@@ -997,7 +1041,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
 
                       <button
                         type="button"
-                        onClick={() => setAiQuizModal({ isOpen: true, moduleId: String(chap.id) })}
+                        onClick={() => handleAddQuizLesson(chap.id, chap.lessons.length, true)}
                         className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
                       >
                         <span>🤖 + Quiz AI</span>
@@ -1005,7 +1049,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
 
                       <button
                         type="button"
-                        onClick={() => setManualQuizModal({ isOpen: true, moduleId: String(chap.id) })}
+                        onClick={() => handleAddQuizLesson(chap.id, chap.lessons.length, false)}
                         className="px-2.5 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
                       >
                         <span>✍️ + Manual Quiz</span>
@@ -1036,7 +1080,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                       {chap.lessons.length === 0 ? (
                         <NoData
                           title="Chưa có bài giảng hoặc bài thi"
-                          description="Chuyên đề này chưa có nội dung. Chọn + Video hoặc + Quiz AI để thêm nội dung."
+                          description="Chuyên đề này chưa có nội dung. Chọn + Video, + Quiz AI hoặc + Manual Quiz để thêm nội dung."
                           className="py-6"
                         />
                       ) : (

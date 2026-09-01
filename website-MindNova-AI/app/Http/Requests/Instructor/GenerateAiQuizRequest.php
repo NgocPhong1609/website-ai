@@ -15,7 +15,7 @@ class GenerateAiQuizRequest extends FormRequest
     {
         return [
             'source_type' => 'nullable|in:content,topic,course',
-            'course_id' => 'required|integer|exists:courses,id',
+            'course_id' => 'nullable|integer|exists:courses,id',
             'content' => 'nullable|string',
             'topic' => 'nullable|string',
             'difficulty' => 'required|string|in:easy,medium,hard,mixed',
