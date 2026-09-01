@@ -172,6 +172,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Quiz bài học
         Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
         Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
+        Route::post('quiz/grade-essay', [StudentQuizController::class, 'gradeEssay']);
 
         // Lesson — Video URL, Hoàn thành, Kiểm tra đáp án Quiz
         Route::get('lessons/{lesson}/video-url', [StudentLessonController::class, 'videoUrl']);

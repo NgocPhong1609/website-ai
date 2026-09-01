@@ -223,6 +223,7 @@ function QuizRenderer({
   const [submitting, setSubmitting] = useState(false);
   const [submittingFinal, setSubmittingFinal] = useState(false);
   const [allAnswers, setAllAnswers] = useState<Record<string, string>>({});
+  const [essayResult, setEssayResult] = useState<Record<string, any>>({});
   const [quizResult, setQuizResult] = useState<any>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -426,43 +427,91 @@ function QuizRenderer({
     if (isEssayQ) {
       if (!essayText.trim()) return;
       setSubmitting(true);
-      setAnswered(true);
-      setAnswerResult(true); // Recorded
-      setAllAnswers(prev => ({ ...prev, [currentQ.id]: essayText }));
-      setSubmitting(false);
+      setAllAnswers((prev) => ({ ...prev, [currentQ.id]: essayText }));
+
+      try {
+        const res = await axiosClient.post("/api/student/quiz/grade-essay", {
+          question_id: currentQ.id,
+          question_content: currentQ.content,
+          sample_answer: currentQ.sample_answer || "",
+          rubric: currentQ.rubric || "",
+          max_score: currentQ.points || 2.5,
+          student_answer: essayText,
+        });
+        const evalData = res.data?.data || res.data;
+        if (evalData) {
+          setEssayResult((prev) => ({ ...prev, [currentQ.id]: evalData }));
+          if (evalData.score >= (currentQ.points || 2.5) * 0.7) {
+            setCorrectCount((c) => c + 1);
+          }
+        }
+      } catch (err) {
+        console.warn("AI grading single essay fallback:", err);
+      } finally {
+        setAnswered(true);
+        setAnswerResult(true);
+        setSubmitting(false);
+      }
       return;
     }
 
     if (!selectedAnswer) return;
     setSubmitting(true);
-    setAnswered(true);
 
-    try {
-      const result = await checkQuizAnswer(lesson.id, currentQ.id, selectedAnswer);
-      setAnswerResult(result.correct);
-      if (result.correct) {
-        setCorrectCount((c) => c + 1);
+    let isCorrect = false;
+
+    // Check locally if answers array has is_correct property
+    if (Array.isArray(currentQ.answers) && currentQ.answers.length > 0) {
+      const selectedAnsObj = currentQ.answers.find(
+        (ans: any) => String(ans.id) === String(selectedAnswer) || ans.content === selectedAnswer
+      );
+      if (selectedAnsObj && typeof selectedAnsObj.is_correct !== "undefined") {
+        isCorrect = Boolean(selectedAnsObj.is_correct);
+      } else {
+        const correctIdx = typeof currentQ.correct_answer_index === "number" ? currentQ.correct_answer_index : 0;
+        const selectedIdx = currentQ.answers.findIndex(
+          (ans: any) => String(ans.id) === String(selectedAnswer) || ans.content === selectedAnswer
+        );
+        isCorrect = selectedIdx >= 0 && selectedIdx === correctIdx;
       }
-      setAllAnswers(prev => ({ ...prev, [currentQ.id]: selectedAnswer }));
-    } catch {
-      setAnswerResult(false);
-      setAllAnswers(prev => ({ ...prev, [currentQ.id]: selectedAnswer }));
+      setAnswered(true);
+      setAnswerResult(isCorrect);
+      if (isCorrect) setCorrectCount((c) => c + 1);
+      setAllAnswers((prev) => ({ ...prev, [currentQ.id]: selectedAnswer }));
+    } else {
+      try {
+        const result = await checkQuizAnswer(lesson.id, currentQ.id, selectedAnswer);
+        isCorrect = Boolean(result.correct);
+        setAnswered(true);
+        setAnswerResult(isCorrect);
+        if (isCorrect) setCorrectCount((c) => c + 1);
+        setAllAnswers((prev) => ({ ...prev, [currentQ.id]: selectedAnswer }));
+      } catch {
+        const correctIdx = typeof currentQ.correct_answer_index === "number" ? currentQ.correct_answer_index : 0;
+        const answersList = currentQ.options || [];
+        const foundIdx = answersList.indexOf(selectedAnswer);
+        isCorrect = foundIdx >= 0 && foundIdx === correctIdx;
+        setAnswered(true);
+        setAnswerResult(isCorrect);
+        if (isCorrect) setCorrectCount((c) => c + 1);
+        setAllAnswers((prev) => ({ ...prev, [currentQ.id]: selectedAnswer }));
+      }
     }
     setSubmitting(false);
   };
 
- const handleNext = () => {
- if (!quizData) return;
- if (currentIndex < quizData.questions.length - 1) {
- setCurrentIndex((i) => i + 1);
- setSelectedAnswer("");
- setAnswerResult(null);
- setAnswered(false);
- } else {
- // Finished all questions
- handleFinishQuiz(allAnswers);
- }
- };
+  const handleNext = () => {
+    if (!quizData) return;
+    if (currentIndex < quizData.questions.length - 1) {
+      setCurrentIndex((i) => i + 1);
+      setSelectedAnswer("");
+      setEssayText("");
+      setAnswerResult(null);
+      setAnswered(false);
+    } else {
+      handleFinishQuiz(allAnswers);
+    }
+  };
 
  const handleRetry = () => {
  setCurrentIndex(0);
@@ -518,46 +567,55 @@ function QuizRenderer({
  );
  }
 
- if (phase === 'result' && quizResult) {
- const passed = quizResult.passed;
- const scorePercent = quizResult.score;
- const totalQ = quizResult.total_questions;
- const actualCorrect = quizResult.correct_count;
+  if (phase === 'result' && quizResult) {
+    const passed = quizResult.passed;
+    const scorePercent = quizResult.score;
+    const totalQ = quizResult.total_questions;
+    const actualCorrect = quizResult.correct_count;
 
- return (
- <div className="w-full bg-white rounded-2xl border border-[#E8E2D9] shadow-sm p-8 flex flex-col items-center gap-6">
- <div className={twMerge(
- "w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold",
- passed ? "bg-[#FAF7F2] text-[#2C3039]" : "bg-[#FAF7F2] text-[#C0392B]"
- )}>
- {passed ? "" : ""}
- </div>
+    const score10 = typeof quizResult.score_10 === 'number' 
+      ? quizResult.score_10 
+      : (typeof quizResult.total_earned_points === 'number' 
+          ? Number(quizResult.total_earned_points.toFixed(1)) 
+          : Number(((scorePercent / 100) * 10).toFixed(1)));
 
- <h2 className="text-2xl font-bold text-[#2C3039]">
- {passed ? "Chúc mừng! Bạn đã vượt qua!" : "Chưa đạt yêu cầu"}
- </h2>
+    return (
+      <div className="w-full bg-white rounded-2xl border border-[#E8E2D9] shadow-sm p-8 flex flex-col items-center gap-6">
+        <div className={twMerge(
+          "w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold",
+          passed ? "bg-[#FAF7F2] text-[#065F46]" : "bg-[#FAF7F2] text-[#C0392B]"
+        )}>
+          {passed ? "🎉" : "⚠️"}
+        </div>
 
- <div className="text-center">
- <p className="text-lg font-semibold text-[#374151] mb-1">
- Bạn đúng {actualCorrect}/{totalQ} câu
- </p>
- <p className="text-sm text-[#8A8478]">
- Điểm: {scorePercent}% — Yêu cầu tối thiểu: {quizData?.passing_score}%
- </p>
- </div>
+        <h2 className="text-2xl font-bold text-[#2C3039]">
+          {passed ? "Chúc mừng! Bạn đã vượt qua!" : "Chưa đạt yêu cầu"}
+        </h2>
 
- {/* Progress bar */}
- <div className="w-full max-w-xs">
- <div className="w-full h-3 bg-[#F5F0E8] rounded-full overflow-hidden">
- <div
- className={twMerge(
- "h-full rounded-full transition-all duration-700",
- passed ? "bg-[#059669]" : "bg-[#DC2626]"
- )}
- style={{ width: `${scorePercent}%` }}
- />
- </div>
- </div>
+        <div className="text-center space-y-1">
+          <p className="text-2xl font-extrabold text-[#2C3039]">
+            {score10} / 10 điểm
+          </p>
+          <p className="text-xs font-semibold text-[#8A8478]">
+            Tỷ lệ đạt: {scorePercent}% — Yêu cầu tối thiểu: {quizData?.passing_score}%
+          </p>
+          <p className="text-[11px] text-gray-400 mt-0.5">
+            (Đã trả lời đúng {actualCorrect}/{totalQ} câu)
+          </p>
+        </div>
+
+        {/* Progress bar */}
+        <div className="w-full max-w-xs">
+          <div className="w-full h-3 bg-[#F5F0E8] rounded-full overflow-hidden">
+            <div
+              className={twMerge(
+                "h-full rounded-full transition-all duration-700",
+                passed ? "bg-[#059669]" : "bg-[#DC2626]"
+              )}
+              style={{ width: `${scorePercent}%` }}
+            />
+          </div>
+        </div>
 
  {passed ? (
  <div className="flex flex-col items-center gap-3">
@@ -627,27 +685,67 @@ function QuizRenderer({
   />
 
   {answered && (
-  <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-indigo-100 flex flex-col gap-3 text-xs animate-fadeIn mt-2 shadow-2xs">
-  <div className="flex items-center gap-2 text-indigo-900 font-extrabold text-sm">
-  <span>💡 Gợi ý / Đáp án tham khảo mẫu từ Giảng viên:</span>
-  </div>
-  <p className="text-gray-800 font-medium leading-relaxed whitespace-pre-line bg-white p-4 rounded-xl border border-indigo-50 shadow-2xs">
-  {(question as any).sample_answer || "Yêu cầu học viên phân tích đầy đủ các luận điểm chính trong bài học."}
-  </p>
+  <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-indigo-100 flex flex-col gap-4 text-xs animate-fadeIn mt-2 shadow-2xs">
+  {essayResult[question.id] ? (
+  <div className="flex flex-col gap-3 p-4 rounded-xl bg-white border border-indigo-100 shadow-2xs">
+    <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+      <div className="flex items-center gap-2">
+        <span className="text-base">🤖</span>
+        <span className="font-extrabold text-indigo-900 text-sm">Kết quả đánh giá từ Gia sư AI (Gemini):</span>
+      </div>
+      <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-xs">
+        🎯 Điểm: {essayResult[question.id].score} / {essayResult[question.id].max_score || (question as any).points || 2.5} điểm
+      </div>
+    </div>
 
-  {(question as any).rubric && (
-  <div className="flex flex-col gap-1.5 pt-3 border-t border-indigo-100">
-  <span className="font-extrabold text-amber-900 text-xs">📋 Thang điểm & Rubric chấm điểm:</span>
-  <p className="text-amber-950 font-medium leading-relaxed whitespace-pre-line bg-amber-50/60 p-3.5 rounded-xl border border-amber-200/60">
-  {(question as any).rubric}
-  </p>
+    <p className="text-gray-800 font-medium text-xs leading-relaxed bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/60">
+      💬 <strong>Nhận xét AI:</strong> {essayResult[question.id].feedback}
+    </p>
+
+    {Array.isArray(essayResult[question.id].ai_analysis?.matched_points) && essayResult[question.id].ai_analysis.matched_points.length > 0 && (
+      <div className="flex flex-col gap-1">
+        <span className="font-bold text-emerald-800 text-[11px]">✅ Ý trả lời tốt:</span>
+        <ul className="list-disc list-inside text-emerald-900 text-xs space-y-0.5 pl-1">
+          {essayResult[question.id].ai_analysis.matched_points.map((pt: string, pIdx: number) => (
+            <li key={pIdx}>{pt}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {Array.isArray(essayResult[question.id].ai_analysis?.missing_points) && essayResult[question.id].ai_analysis.missing_points.length > 0 && (
+      <div className="flex flex-col gap-1">
+        <span className="font-bold text-amber-800 text-[11px]">⚠️ Cần bổ sung / hoàn thiện:</span>
+        <ul className="list-disc list-inside text-amber-900 text-xs space-y-0.5 pl-1">
+          {essayResult[question.id].ai_analysis.missing_points.map((pt: string, pIdx: number) => (
+            <li key={pIdx}>{pt}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+  ) : (
+  <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs font-bold flex items-center justify-between">
+    <span>✅ Đã nộp bài tự luận - Thang điểm: <strong>{(question as any).points || 2.5} điểm</strong></span>
+    <span className="px-2.5 py-0.5 rounded bg-emerald-600 text-white text-[10px] uppercase font-black">Đã ghi nhận</span>
   </div>
   )}
 
-  <div className="mt-2 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs font-bold flex items-center justify-between">
-  <span>✅ Đã nộp bài tự luận - Điểm tối đa: <strong>{(question as any).points || 1.0} điểm</strong></span>
-  <span className="px-2.5 py-0.5 rounded bg-emerald-600 text-white text-[10px] uppercase font-black">Chấm tự động</span>
+  <div className="flex flex-col gap-1.5">
+    <span className="text-indigo-900 font-extrabold text-xs">💡 Đáp án tham khảo mẫu từ Giảng viên:</span>
+    <p className="text-gray-800 font-medium leading-relaxed whitespace-pre-line bg-white p-4 rounded-xl border border-indigo-50 shadow-2xs">
+      {(question as any).sample_answer || "Yêu cầu học viên phân tích đầy đủ các luận điểm chính trong bài học."}
+    </p>
   </div>
+
+  {(question as any).rubric && (
+  <div className="flex flex-col gap-1.5 pt-2 border-t border-indigo-100">
+  <span className="font-extrabold text-amber-900 text-xs">📋 Thang điểm & Rubric chấm điểm:</span>
+  <p className="text-amber-950 font-medium leading-relaxed whitespace-pre-line bg-amber-50/60 p-3.5 rounded-xl border border-amber-200/60">
+    {(question as any).rubric}
+  </p>
+  </div>
+  )}
   </div>
   )}
   </div>
@@ -706,13 +804,21 @@ function QuizRenderer({
   {/* Action buttons */}
  <div className="flex justify-end gap-3">
  {!answered ? (
- <button
- onClick={handleAnswer}
- disabled={!selectedAnswer || submitting}
- className="px-6 py-2.5 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white font-semibold text-sm transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm"
- >
- {submitting ? "Đang kiểm tra..." : "Trả lời"}
- </button>
+  <button
+  onClick={handleAnswer}
+  disabled={
+    ((question as any).type === "essay" || !question.answers || question.answers.length === 0)
+      ? (!essayText.trim() || submitting)
+      : (!selectedAnswer || submitting)
+  }
+  className="px-6 py-2.5 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white font-semibold text-sm transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm flex items-center gap-2"
+  >
+  {submitting ? (
+    ((question as any).type === "essay" || !question.answers || question.answers.length === 0)
+      ? "🤖 Gia sư AI đang chấm điểm..."
+      : "Đang kiểm tra..."
+  ) : "Trả lời"}
+  </button>
  ) : (
  <button
  onClick={handleNext}

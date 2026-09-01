@@ -304,4 +304,34 @@ class StudentQuizController extends Controller
 
         return $this->successResponse($responseReport, 'Chấm điểm tự luận và trắc nghiệm hoàn tất.');
     }
+
+    /**
+     * POST /api/student/quiz/grade-essay
+     * Grade a single essay answer instantly via AI.
+     */
+    public function gradeEssay(Request $request): JsonResponse
+    {
+        $request->validate([
+            'question_id' => 'nullable',
+            'question_content' => 'required|string',
+            'sample_answer' => 'nullable|string',
+            'rubric' => 'nullable|string',
+            'max_score' => 'nullable|numeric',
+            'student_answer' => 'required|string',
+        ]);
+
+        $question = new \App\Models\Question();
+        $question->id = $request->input('question_id', 1);
+        $question->content = $request->input('question_content');
+        $question->sample_answer = $request->input('sample_answer', '');
+        $question->rubric = $request->input('rubric', '');
+        $question->points = (float) ($request->input('max_score') ?: 2.5);
+
+        $user = $request->user('sanctum') ?? $request->user();
+        $studentAnswer = $request->input('student_answer');
+
+        $result = $this->quizGradingService->gradeSingleEssayWithAi($question, $studentAnswer, $question->points, $user);
+
+        return $this->successResponse($result, 'AI đã chấm bài tự luận thành công.');
+    }
 }

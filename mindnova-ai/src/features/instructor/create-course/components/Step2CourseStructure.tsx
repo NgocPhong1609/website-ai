@@ -588,23 +588,31 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
 
   const handleSaveLesson = async (lessonId: string, updates: any) => {
     if (courseId && editingLesson) {
+      const isQuizItem =
+        editingLesson.lesson.type === "quiz" ||
+        (editingLesson.lesson as any).item_type === "quiz" ||
+        (typeof lessonId === "string" && lessonId.startsWith("quiz-")) ||
+        Boolean((editingLesson.lesson as any).quiz_id);
+
       try {
-        await updateLessonMutation.mutateAsync({
-          courseId,
-          lessonId,
-          payload: updates,
-        });
-        if (updates.quizData) {
-          await createQuizMutation.mutateAsync({
+        if (!isQuizItem) {
+          await updateLessonMutation.mutateAsync({
+            courseId,
             lessonId,
-            payload: updates.quizData,
+            payload: updates,
           });
+          if (updates.quizData) {
+            await createQuizMutation.mutateAsync({
+              lessonId,
+              payload: updates.quizData,
+            });
+          }
         }
         await refetchModules();
         refetchCourseQuizzes();
         setEditingLesson(null);
       } catch (err: any) {
-        alert("Có lỗi xảy ra khi lưu bài học: " + (err?.message || "Vui lòng thử lại"));
+        alert("Có lỗi xảy ra khi lưu: " + (err?.response?.data?.message || err?.message || "Vui lòng thử lại"));
       }
     } else if (editingLesson) {
       updateDraftLesson(editingLesson.chapterId, lessonId, updates);

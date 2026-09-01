@@ -194,8 +194,19 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
 
       if (isQuiz && quizData) {
         const qAny = quizData as any;
-        const targetQuizId = (lesson as any).quiz_id || qAny.quiz_id || qAny.id;
-        if (targetQuizId) {
+        const targetQuizId =
+          (lesson as any).quiz_id ||
+          (lesson as any).quizData?.id ||
+          (lesson as any).quizData?.quiz_id ||
+          qAny.quiz_id ||
+          qAny.id ||
+          (typeof lesson.id === "string" && lesson.id.startsWith("quiz-")
+            ? Number(lesson.id.replace("quiz-", ""))
+            : typeof lesson.id === "number"
+            ? lesson.id
+            : undefined);
+
+        if (targetQuizId && !isNaN(Number(targetQuizId))) {
           try {
             await quizGeneratorApi.updateQuiz(Number(targetQuizId), {
               title: qAny.title || title,
@@ -205,8 +216,12 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
               difficulty: qAny.difficulty || "mixed",
               questions: qAny.questions || [],
             });
-          } catch (err) {
-            console.warn("Failed to update quiz on server:", err);
+          } catch (err: any) {
+            console.error("Lỗi khi cập nhật bài kiểm tra:", err);
+            const msg = err?.response?.data?.message || err?.message || "Không thể cập nhật bài kiểm tra trên máy chủ.";
+            alert("Có lỗi xảy ra khi lưu bài kiểm tra: " + msg);
+            setIsSaving(false);
+            return;
           }
         }
       }
