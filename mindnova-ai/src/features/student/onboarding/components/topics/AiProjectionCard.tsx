@@ -1,4 +1,5 @@
 import { twMerge } from "tailwind-merge";
+import { Gauge } from "lucide-react";
 import { COMPLEXITY_CONFIG } from "@/src/features/student/onboarding/constants";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -40,7 +41,7 @@ function getComplexity(selectedCount: number) {
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function ComplexityIcon() {
- return (<></>);
+ return <Gauge size={16} />;
 }
 
 interface ComplexityMeterProps {
