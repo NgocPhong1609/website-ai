@@ -21,9 +21,10 @@ interface LessonEditModalProps {
  };
  onSave: (id: string, updates: any) => Promise<void> | void;
  onClose: () => void;
+ courseId?: string | number;
 }
 
-export function LessonEditModal({ lesson, onSave, onClose }: LessonEditModalProps) {
+export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEditModalProps) {
  const [title, setTitle] = useState(lesson.title);
  const [type, setType] = useState(lesson.type);
  const [status, setStatus] = useState(lesson.status);
@@ -311,6 +312,7 @@ export function LessonEditModal({ lesson, onSave, onClose }: LessonEditModalProp
  value={quizData}
  onChange={setQuizData}
  quizId={(lesson as any).quizData?.id || (lesson as any).quizData?.quiz_id}
+ courseId={courseId ? Number(courseId) : undefined}
  />
  ) : type === 'video' ? (
  <div className="flex flex-col gap-3 mb-6 p-4 border border-[#E8E2D9] rounded-xl bg-[#F8F8FC]">

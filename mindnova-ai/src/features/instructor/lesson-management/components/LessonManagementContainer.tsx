@@ -755,6 +755,7 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
  {editingLesson && (
  <LessonEditModal
  lesson={editingLesson.lesson}
+ courseId={courseId}
  onSave={async (id, updates) => {
  try {
  await updateLesson(editingLesson.chapterId, id, updates);

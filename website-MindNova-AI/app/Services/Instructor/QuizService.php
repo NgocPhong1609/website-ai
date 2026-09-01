@@ -218,7 +218,7 @@ class QuizService
         }
 
         return $query->withCount('questions')
-            ->with(['attachments.course', 'lesson.module.course'])
+            ->with(['attachments.course', 'lesson.module.course', 'lesson.course'])
             ->orderBy('created_at', 'desc')
             ->get();
     }
@@ -245,19 +245,46 @@ class QuizService
 
             $teacherId = auth()->id() ?? ($lesson->course->teacher_id ?? ($lesson->module->course->teacher_id ?? null));
 
-            $quiz = Quiz::updateOrCreate(
-                ['lesson_id' => $lesson->id],
-                [
-                    'instructor_id' => $teacherId,
-                    'title' => $data['title'],
-                    'time_limit_minutes' => $data['time_limit_minutes'] ?? 15,
-                    'passing_score' => $data['passing_score'] ?? 70,
-                    'total_questions' => count($questionsData),
-                    'mc_questions_count' => $mcCount,
-                    'essay_questions_count' => $essayCount,
-                    'total_points' => round($totalPoints, 2),
-                ]
-            );
+            $targetQuizId = $data['quiz_id'] ?? ($data['id'] ?? null);
+            $quiz = null;
+
+            if ($targetQuizId && is_numeric($targetQuizId)) {
+                $foundQuiz = Quiz::find((int) $targetQuizId);
+                if ($foundQuiz) {
+                    $foundQuiz->update([
+                        'lesson_id' => $lesson->id,
+                        'instructor_id' => $teacherId ?? $foundQuiz->instructor_id,
+                        'title' => $data['title'] ?? $foundQuiz->title,
+                        'description' => $data['description'] ?? $foundQuiz->description,
+                        'time_limit_minutes' => $data['time_limit_minutes'] ?? $foundQuiz->time_limit_minutes ?? 15,
+                        'passing_score' => $data['passing_score'] ?? $foundQuiz->passing_score ?? 70,
+                        'difficulty' => $data['difficulty'] ?? $foundQuiz->difficulty ?? 'mixed',
+                        'total_questions' => count($questionsData),
+                        'mc_questions_count' => $mcCount,
+                        'essay_questions_count' => $essayCount,
+                        'total_points' => round($totalPoints, 2),
+                    ]);
+                    $quiz = $foundQuiz;
+                }
+            }
+
+            if (!$quiz) {
+                $quiz = Quiz::updateOrCreate(
+                    ['lesson_id' => $lesson->id],
+                    [
+                        'instructor_id' => $teacherId,
+                        'title' => $data['title'],
+                        'description' => $data['description'] ?? null,
+                        'time_limit_minutes' => $data['time_limit_minutes'] ?? 15,
+                        'passing_score' => $data['passing_score'] ?? 70,
+                        'difficulty' => $data['difficulty'] ?? 'mixed',
+                        'total_questions' => count($questionsData),
+                        'mc_questions_count' => $mcCount,
+                        'essay_questions_count' => $essayCount,
+                        'total_points' => round($totalPoints, 2),
+                    ]
+                );
+            }
 
             $courseId = $lesson->course_id ?? ($lesson->module->course_id ?? null);
             if ($courseId) {

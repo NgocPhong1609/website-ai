@@ -159,10 +159,19 @@ class CourseOutlineController extends Controller
 
                     if ($lessonType === 'quiz' && !empty($lessonData['questions']) && is_array($lessonData['questions'])) {
                         $quiz = \App\Models\Quiz::create([
+                            'instructor_id' => $request->user()->id,
                             'lesson_id' => $lesson->id,
                             'title' => $lessonTitle,
                             'time_limit_minutes' => 15,
                             'passing_score' => 80,
+                        ]);
+
+                        \App\Models\QuizCourseAttachment::create([
+                            'quiz_id' => $quiz->id,
+                            'course_id' => $course->id,
+                            'module_id' => $module->id,
+                            'after_lesson_id' => $lesson->id,
+                            'position' => 'after_lesson',
                         ]);
 
                         $qOrder = 1;

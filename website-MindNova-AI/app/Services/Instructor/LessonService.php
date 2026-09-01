@@ -372,21 +372,46 @@ class LessonService
 
         $teacherId = auth()->id() ?? ($lesson->course->teacher_id ?? ($lesson->module->course->teacher_id ?? null));
 
-        $quiz = \App\Models\Quiz::updateOrCreate(
-            ['lesson_id' => $lesson->id],
-            [
-                'instructor_id' => $teacherId,
-                'title' => $quizData['title'] ?? 'Bài kiểm tra',
-                'description' => $quizData['description'] ?? null,
-                'time_limit_minutes' => $quizData['time_limit_minutes'] ?? 15,
-                'passing_score' => $quizData['passing_score'] ?? 70,
-                'difficulty' => $quizData['difficulty'] ?? 'mixed',
-                'total_questions' => count($questionsData),
-                'mc_questions_count' => $mcCount,
-                'essay_questions_count' => $essayCount,
-                'total_points' => round($totalPoints, 2),
-            ]
-        );
+        $targetQuizId = $quizData['quiz_id'] ?? ($quizData['id'] ?? null);
+        $quiz = null;
+
+        if ($targetQuizId && is_numeric($targetQuizId)) {
+            $foundQuiz = \App\Models\Quiz::find((int) $targetQuizId);
+            if ($foundQuiz) {
+                $foundQuiz->update([
+                    'lesson_id' => $lesson->id,
+                    'instructor_id' => $teacherId ?? $foundQuiz->instructor_id,
+                    'title' => $quizData['title'] ?? $foundQuiz->title,
+                    'description' => $quizData['description'] ?? $foundQuiz->description,
+                    'time_limit_minutes' => $quizData['time_limit_minutes'] ?? $foundQuiz->time_limit_minutes ?? 15,
+                    'passing_score' => $quizData['passing_score'] ?? $foundQuiz->passing_score ?? 70,
+                    'difficulty' => $quizData['difficulty'] ?? $foundQuiz->difficulty ?? 'mixed',
+                    'total_questions' => count($questionsData),
+                    'mc_questions_count' => $mcCount,
+                    'essay_questions_count' => $essayCount,
+                    'total_points' => round($totalPoints, 2),
+                ]);
+                $quiz = $foundQuiz;
+            }
+        }
+
+        if (!$quiz) {
+            $quiz = \App\Models\Quiz::updateOrCreate(
+                ['lesson_id' => $lesson->id],
+                [
+                    'instructor_id' => $teacherId,
+                    'title' => $quizData['title'] ?? 'Bài kiểm tra',
+                    'description' => $quizData['description'] ?? null,
+                    'time_limit_minutes' => $quizData['time_limit_minutes'] ?? 15,
+                    'passing_score' => $quizData['passing_score'] ?? 70,
+                    'difficulty' => $quizData['difficulty'] ?? 'mixed',
+                    'total_questions' => count($questionsData),
+                    'mc_questions_count' => $mcCount,
+                    'essay_questions_count' => $essayCount,
+                    'total_points' => round($totalPoints, 2),
+                ]
+            );
+        }
 
         $courseId = $lesson->course_id ?? ($lesson->module->course_id ?? null);
         if ($courseId) {

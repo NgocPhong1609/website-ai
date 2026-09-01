@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/quizGeneratorApi";
 import { QuestionCardMultipleChoice } from "@/src/features/instructor/quiz-generator/components/QuestionCardMultipleChoice";
 import { QuestionCardEssay } from "@/src/features/instructor/quiz-generator/components/QuestionCardEssay";
+import { SelectQuizModal } from "@/src/features/instructor/quiz-generator/components/SelectQuizModal";
 import type { GeneratedQuestion, DifficultyType } from "@/src/features/instructor/quiz-generator/types/quizGenerator.types";
 import type { DraftQuizData } from "../types";
 
@@ -11,17 +12,20 @@ interface QuizEditorProps {
   value?: DraftQuizData | any;
   onChange: (value: DraftQuizData | any) => void;
   quizId?: number;
+  courseId?: number;
 }
 
-export function QuizEditor({ value, onChange, quizId }: QuizEditorProps) {
+export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSelectModalOpen, setIsSelectModalOpen] = useState<boolean>(false);
+  const [selectedQuizId, setSelectedQuizId] = useState<number | undefined>(quizId || value?.id || value?.quiz_id);
   const [title, setTitle] = useState<string>(value?.title || "Bài kiểm tra mới");
   const [description, setDescription] = useState<string>(value?.description || "");
   const [timeLimit, setTimeLimit] = useState<number>(value?.time_limit_minutes || 15);
   const [passingScore, setPassingScore] = useState<number>(value?.passing_score || 70);
   const [difficulty, setDifficulty] = useState<DifficultyType>(value?.difficulty || "mixed");
   const [filterType, setFilterType] = useState<"all" | "multiple_choice" | "essay">("all");
-  const effectiveQuizId = quizId || value?.id || value?.quiz_id;
+  const effectiveQuizId = selectedQuizId || quizId || value?.id || value?.quiz_id;
   const hasMountedRef = React.useRef(false);
   const hasLoadedFromApiRef = React.useRef(false);
 
@@ -109,11 +113,20 @@ export function QuizEditor({ value, onChange, quizId }: QuizEditorProps) {
   }
 
   // Notify parent on change — only after mount to avoid overwriting with empty/default data
-  const notifyParent = (newQuestions: GeneratedQuestion[], newTitle = title, newTime = timeLimit, newScore = passingScore, newDiff = difficulty, newDesc = description) => {
+  const notifyParent = (
+    newQuestions: GeneratedQuestion[],
+    newTitle = title,
+    newTime = timeLimit,
+    newScore = passingScore,
+    newDiff = difficulty,
+    newDesc = description,
+    forcedQuizId?: number
+  ) => {
     if (!hasMountedRef.current) return;
+    const targetId = forcedQuizId || selectedQuizId || effectiveQuizId;
     const payload = {
-      id: effectiveQuizId,
-      quiz_id: effectiveQuizId,
+      id: targetId,
+      quiz_id: targetId,
       title: newTitle,
       description: newDesc,
       time_limit_minutes: newTime,
@@ -122,12 +135,37 @@ export function QuizEditor({ value, onChange, quizId }: QuizEditorProps) {
       total_questions: newQuestions.length,
       questions: newQuestions,
     };
-    if (typeof window !== "undefined" && effectiveQuizId) {
+    if (typeof window !== "undefined" && targetId) {
       try {
-        window.localStorage.setItem(`instructor_quiz_${effectiveQuizId}`, JSON.stringify(payload));
+        window.localStorage.setItem(`instructor_quiz_${targetId}`, JSON.stringify(payload));
       } catch (e) {}
     }
     onChange(payload);
+  };
+
+  const handleSelectQuizFromBank = (quizDetails: any) => {
+    if (!quizDetails) return;
+    const newQuizId = quizDetails.id || quizDetails.quiz_id;
+    setSelectedQuizId(newQuizId);
+    if (quizDetails.title) setTitle(quizDetails.title);
+    if (quizDetails.description) setDescription(quizDetails.description || "");
+    if (quizDetails.time_limit_minutes) setTimeLimit(quizDetails.time_limit_minutes);
+    if (quizDetails.passing_score) setPassingScore(quizDetails.passing_score);
+    if (quizDetails.difficulty) setDifficulty(quizDetails.difficulty);
+
+    const rawQs = Array.isArray(quizDetails.questions) ? quizDetails.questions : [];
+    const normQuestions = rawQs.map((q: any, idx: number) => normalizeQuestion(q, idx));
+    setQuestions(normQuestions);
+
+    notifyParent(
+      normQuestions,
+      quizDetails.title || title,
+      quizDetails.time_limit_minutes || timeLimit,
+      quizDetails.passing_score || passingScore,
+      quizDetails.difficulty || difficulty,
+      quizDetails.description || description,
+      newQuizId
+    );
   };
 
   const handleUpdateQuestion = (id: string, updated: Partial<GeneratedQuestion>) => {
@@ -199,6 +237,37 @@ export function QuizEditor({ value, onChange, quizId }: QuizEditorProps) {
 
   return (
     <div className="flex flex-col gap-6 animate-fadeIn">
+      {/* Import from Bank Banner */}
+      <div className="flex items-center justify-between p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100">
+        <div className="flex items-center gap-3">
+          <span className="text-xl">🪄</span>
+          <div>
+            <h4 className="text-xs font-black text-[#1A1A2E]">Chèn đề thi từ Ngân Hàng Quiz</h4>
+            <p className="text-[11px] font-medium text-gray-500">
+              {selectedQuizId
+                ? `Đang liên kết với Bài thi #${selectedQuizId}`
+                : "Bạn có thể chèn một đề thi đã được tạo sẵn từ AI Quiz Generator vào bài học này."}
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsSelectModalOpen(true)}
+          className="px-4 py-2 bg-[#C0392B] hover:bg-[#a02c20] text-white text-xs font-extrabold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+        >
+          <span>📥</span>
+          <span>{selectedQuizId ? "Đổi đề thi khác" : "Chọn từ Ngân hàng Quiz"}</span>
+        </button>
+      </div>
+
+      <SelectQuizModal
+        isOpen={isSelectModalOpen}
+        onClose={() => setIsSelectModalOpen(false)}
+        onSelectQuiz={handleSelectQuizFromBank}
+        courseId={courseId}
+      />
+
       {/* Quiz Meta Settings */}
       <div className="p-6 rounded-3xl bg-[#FAF8FF] border border-indigo-100 flex flex-col gap-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
