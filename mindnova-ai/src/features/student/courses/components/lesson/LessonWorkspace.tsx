@@ -354,41 +354,9 @@ function QuizRenderer({
         } catch (e) {}
       }
 
-      // 3. Fallback for preview mode or newly created instructor quizzes (2 standard questions: 1 MCQ + 1 Essay)
-      const defaultPreviewQuestions = [
-        {
-          id: "q_1",
-          type: "multiple_choice",
-          content: "Câu hỏi trắc nghiệm mẫu",
-          answers: [
-            { id: "a", content: "Đáp án A", is_correct: true },
-            { id: "b", content: "Đáp án B", is_correct: false },
-            { id: "c", content: "Đáp án C", is_correct: false },
-            { id: "d", content: "Đáp án D", is_correct: false },
-          ],
-        },
-        {
-          id: "q_2",
-          type: "essay",
-          content: "Câu hỏi tự luận mẫu",
-          sample_answer: "Đáp án gợi ý chi tiết...",
-          rubric: "Thang điểm: 5.0đ cho câu trả lời đầy đủ ý.",
-          points: 5.0,
-          answers: [],
-        },
-      ];
-
-      setQuizData({
-        id: String(lesson.id),
-        quiz_id: Number((lesson as any).quiz_id || lesson.id),
-        title: lesson.title || "Bài kiểm tra mới",
-        course_title: "",
-        time_limit_minutes: 15,
-        passing_score: 70,
-        questions_count: 2,
-        questions: defaultPreviewQuestions as any,
-      });
-      setTimeLeft(15 * 60);
+      // 3. Fallback: No quiz data available from any source
+      setQuizData(null as any);
+      setError("Bài kiểm tra chưa có câu hỏi. Vui lòng liên hệ giảng viên để cập nhật nội dung.");
       setLoading(false);
     };
 

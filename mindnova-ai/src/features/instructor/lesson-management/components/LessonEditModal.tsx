@@ -310,6 +310,7 @@ export function LessonEditModal({ lesson, onSave, onClose }: LessonEditModalProp
  <QuizEditor 
  value={quizData}
  onChange={setQuizData}
+ quizId={(lesson as any).quizData?.id || (lesson as any).quizData?.quiz_id}
  />
  ) : type === 'video' ? (
  <div className="flex flex-col gap-3 mb-6 p-4 border border-[#E8E2D9] rounded-xl bg-[#F8F8FC]">

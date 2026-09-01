@@ -22,39 +22,20 @@ export function QuizEditor({ value, onChange, quizId }: QuizEditorProps) {
   const [difficulty, setDifficulty] = useState<DifficultyType>(value?.difficulty || "mixed");
   const [filterType, setFilterType] = useState<"all" | "multiple_choice" | "essay">("all");
   const effectiveQuizId = quizId || value?.id || value?.quiz_id;
+  const hasMountedRef = React.useRef(false);
+  const hasLoadedFromApiRef = React.useRef(false);
 
   const [questions, setQuestions] = useState<GeneratedQuestion[]>(() => {
     if (value?.questions && Array.isArray(value.questions) && value.questions.length > 0) {
       return value.questions.map((q: any, idx: number) => normalizeQuestion(q, idx));
     }
-    return [
-      {
-        id: "q_1",
-        type: "multiple_choice",
-        question: "Câu hỏi trắc nghiệm mẫu",
-        options: ["Đáp án A", "Đáp án B", "Đáp án C", "Đáp án D"],
-        correct_answer_index: 0,
-        explanation: "Giải thích chi tiết cho câu hỏi.",
-        points: 5.0,
-        difficulty: "medium",
-        reviewStatus: "approved",
-      },
-      {
-        id: "q_2",
-        type: "essay",
-        question: "Câu hỏi tự luận mẫu",
-        sample_answer: "Đáp án gợi ý chi tiết...",
-        rubric: "Thang điểm: 5.0đ cho câu trả lời đầy đủ ý.",
-        points: 5.0,
-        difficulty: "medium",
-        reviewStatus: "approved",
-      },
-    ];
+    // Start empty — will be populated from API or remain empty for new quizzes
+    return [];
   });
 
-  // Sync value prop changes to internal state
+  // Sync value prop changes to internal state (only when value actually has questions from parent)
   useEffect(() => {
-    if (value) {
+    if (value && !hasLoadedFromApiRef.current) {
       if (value.title) setTitle(value.title);
       if (value.description !== undefined) setDescription(value.description || "");
       if (value.time_limit_minutes !== undefined) setTimeLimit(value.time_limit_minutes);
@@ -66,16 +47,17 @@ export function QuizEditor({ value, onChange, quizId }: QuizEditorProps) {
     }
   }, [value]);
 
-  // Fetch full details if quiz_id exists and local questions are empty
+  // Fetch full details from API if quiz_id exists — always prioritize API data
   useEffect(() => {
-    if (effectiveQuizId && (!value?.questions || value.questions.length === 0)) {
+    if (effectiveQuizId) {
       setIsLoading(true);
       quizGeneratorApi
         .getQuizById(Number(effectiveQuizId))
         .then((data) => {
           if (data) {
+            hasLoadedFromApiRef.current = true;
             if (data.title) setTitle(data.title);
-            if (data.description) setDescription(data.description);
+            if (data.description) setDescription(data.description || "");
             if (data.time_limit_minutes) setTimeLimit(data.time_limit_minutes);
             if (data.passing_score) setPassingScore(data.passing_score);
             if (data.difficulty) setDifficulty(data.difficulty);
@@ -90,6 +72,11 @@ export function QuizEditor({ value, onChange, quizId }: QuizEditorProps) {
         .finally(() => setIsLoading(false));
     }
   }, [effectiveQuizId]);
+
+  // Mark mount complete after initial render
+  useEffect(() => {
+    hasMountedRef.current = true;
+  }, []);
 
   function normalizeQuestion(q: any, idx: number): GeneratedQuestion {
     const isMcq = q.type === "multiple_choice" || q.type === "trac_nghiem" || Array.isArray(q.answers) || Array.isArray(q.options);
@@ -121,8 +108,9 @@ export function QuizEditor({ value, onChange, quizId }: QuizEditorProps) {
     };
   }
 
-  // Notify parent on change
+  // Notify parent on change — only after mount to avoid overwriting with empty/default data
   const notifyParent = (newQuestions: GeneratedQuestion[], newTitle = title, newTime = timeLimit, newScore = passingScore, newDiff = difficulty, newDesc = description) => {
+    if (!hasMountedRef.current) return;
     const payload = {
       id: effectiveQuizId,
       quiz_id: effectiveQuizId,
@@ -387,7 +375,7 @@ export function QuizEditor({ value, onChange, quizId }: QuizEditorProps) {
       <div className="flex flex-col gap-4 max-h-[550px] overflow-y-auto pr-1">
         {filteredQuestions.length === 0 ? (
           <div className="p-10 text-center rounded-2xl bg-white border border-gray-200 text-gray-500 font-medium text-xs">
-            Chưa có câu hỏi nào. Nhấn "+ Trắc nghiệm" hoặc "+ Tự luận" ở trên để thêm.
+            {isLoading ? 'Đang tải câu hỏi...' : 'Chưa có câu hỏi nào. Nhấn "+ Trắc nghiệm" hoặc "+ Tự luận" ở trên để thêm.'}
           </div>
         ) : (
           filteredQuestions.map((q, idx) => {

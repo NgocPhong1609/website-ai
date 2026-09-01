@@ -364,9 +364,9 @@ SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 
   - Frontend: [CreateCourseContainer.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/create-course/components/CreateCourseContainer.tsx), [Step1BasicInfo.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/create-course/components/Step1BasicInfo.tsx), [Step2CourseStructure.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/create-course/components/Step2CourseStructure.tsx), [Step3SettingsPrice.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/create-course/components/Step3SettingsPrice.tsx)
   - Backend: [CourseController.php](file:///h:/du_an/website/website-MindNova-AI/app/Http/Controllers/Api/Instructor/CourseController.php), [CourseService.php](file:///h:/du_an/website/website-MindNova-AI/app/Services/Instructor/CourseService.php)
 - **Kết quả test thủ công**:
-  - [v] PASS
+  - [] PASS
   - [ ] FAIL
-  - [ ] PARTIAL
+  - [v] PARTIAL
   - [ ] NOT TESTED
 - **Ghi chú khi test**: ................................................................
 +Tạo khóa học thành công.
@@ -540,12 +540,16 @@ SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 
   - [ ] NOT TESTED
 - **Ghi chú khi test**: ................................................................
 +Đã test. Chỉnh sửa và lưu bài học dạng quiz (cả trắc nghiệm và tự luận) lưu thành công vào DB không gặp lỗi 422.
++BUG: Khi mở lại quiz đã lưu, luôn hiện câu hỏi mẫu mặc định ("Câu hỏi trắc nghiệm mẫu", "Câu hỏi tự luận mẫu") thay vì câu hỏi do giảng viên tạo. Không chỉnh sửa được quiz đã lưu.
 
 **Đã thay đổi**
 - Sửa [index.ts](file:///h:/du_an/website/mindnova-ai/src/features/instructor/lesson-management/api/index.ts): Bổ sung hàm `formatQuizPayloadForBackend` tự động chuẩn hóa định dạng câu hỏi (trắc nghiệm và tự luận) thành payload hợp lệ trước khi gửi API `POST /api/instructor/lessons/{id}/quiz`.
 - Sửa [StoreQuizRequest.php](file:///h:/du_an/website/website-MindNova-AI/app/Http/Requests/Instructor/StoreQuizRequest.php) và [QuizService.php](file:///h:/du_an/website/website-MindNova-AI/app/Services/Instructor/QuizService.php): Hỗ trợ loại câu hỏi tự luận `essay` mà không bắt buộc mảng `answers` trắc nghiệm, lưu đầy đủ siêu dữ liệu câu hỏi (`explanation`, `sample_answer`, `rubric`, `points`, `difficulty`) vào DB.
 - Sửa [LessonEditModal.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/lesson-management/components/LessonEditModal.tsx): Ánh ánh kiểu bài học (`type`) từ `document` sang `article` và `quiz` sang `quiz_module` trước khi gọi API cập nhật bài học.
 - Sửa [StoreLessonRequest.php](file:///h:/du_an/website/website-MindNova-AI/app/Http/Requests/Instructor/StoreLessonRequest.php): Bổ sung hỗ trợ các alias `quiz`, `document` trong validation rules `in:...` và tự động chuyển đổi trong `prepareForValidation()`.
+- **[FIX 01/09/2026]** Sửa [QuizEditor.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/create-course/components/QuizEditor.tsx): Xóa bỏ 2 câu hỏi mẫu mặc định hardcoded trong `useState` initializer. Khởi tạo mảng rỗng `[]` thay vì câu hỏi mẫu. Thêm `hasMountedRef` để ngăn `notifyParent` ghi đè data rỗng lên parent khi mount. Thêm `hasLoadedFromApiRef` để ưu tiên dữ liệu từ API hơn props. Bỏ điều kiện `(!value?.questions || value.questions.length === 0)` trong useEffect fetch API → luôn fetch khi có `effectiveQuizId`.
+- **[FIX 01/09/2026]** Sửa [LessonEditModal.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/lesson-management/components/LessonEditModal.tsx): Truyền prop `quizId` cho `QuizEditor` để editor biết cần fetch quiz nào từ API backend.
+- **[FIX 01/09/2026]** Sửa [LessonWorkspace.tsx](file:///h:/du_an/website/mindnova-ai/src/features/student/courses/components/lesson/LessonWorkspace.tsx): Xóa bỏ `defaultPreviewQuestions` hardcoded (câu hỏi mẫu giả trên giao diện Student). Khi không tìm thấy quiz từ bất kỳ nguồn nào, hiển thị thông báo lỗi "Bài kiểm tra chưa có câu hỏi" thay vì câu hỏi mẫu.
 ---
 
 ## 3.5. Quản lý Học viên & Báo cáo Doanh thu (Students & Financials)
