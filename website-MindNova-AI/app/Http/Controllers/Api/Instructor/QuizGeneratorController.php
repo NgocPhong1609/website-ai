@@ -213,6 +213,10 @@ class QuizGeneratorController extends Controller
         try {
             $attachment = $this->quizService->attachQuizToCourse($quiz, $payload);
 
+            if (!empty($payload['set_active']) || !empty($payload['is_active'])) {
+                $this->quizService->setActiveQuiz($quiz, (int) $payload['course_id'], $payload['position'] ?? null);
+            }
+
             \Illuminate\Support\Facades\Log::info("[QUIZ_ATTACH STEP 2] Attachment created successfully", [
                 'attachment_id' => $attachment->id,
                 'quiz_id' => $quiz->id,

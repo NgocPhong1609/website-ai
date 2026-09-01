@@ -36,6 +36,18 @@ class CourseHealthServiceTest extends TestCase
         $module = new CourseModule(['id' => 2, 'title' => 'Chương 1']);
         $module->setRelation('lessons', collect([$lesson]));
 
+        $quiz1 = new \App\Models\Quiz(['id' => 101, 'title' => 'Quiz 1']);
+        $quiz1->setRelation('questions', collect([new \App\Models\Question(['id' => 1])]));
+
+        $quiz2 = new \App\Models\Quiz(['id' => 102, 'title' => 'Quiz 2']);
+        $quiz2->setRelation('questions', collect([new \App\Models\Question(['id' => 2])]));
+
+        $att1 = new \App\Models\QuizCourseAttachment(['position' => 'capability_assessment']);
+        $att1->setRelation('quiz', $quiz1);
+
+        $att2 = new \App\Models\QuizCourseAttachment(['position' => 'end_of_course']);
+        $att2->setRelation('quiz', $quiz2);
+
         $course = new Course([
             'id' => 1,
             'title' => 'Khóa học AI cơ bản',
@@ -45,6 +57,7 @@ class CourseHealthServiceTest extends TestCase
             'level' => 'beginner',
         ]);
         $course->setRelation('modules', collect([$module]));
+        $course->setRelation('quizAttachments', collect([$att1, $att2]));
 
         $report = app(CourseHealthService::class)->evaluate($course);
 

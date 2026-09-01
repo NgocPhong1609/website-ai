@@ -10,7 +10,11 @@ class CourseHealthService
     /** @return array{status: string, score: int, can_submit: bool, issues: array<int, array<string, mixed>>} */
     public function evaluate(Course $course): array
     {
-        $course->loadMissing('modules.lessons.media', 'modules.lessons.quiz.questions.answers');
+        $course->loadMissing(
+            'modules.lessons.media', 
+            'modules.lessons.quiz.questions.answers',
+            'quizAttachments.quiz.questions'
+        );
         $issues = [];
 
         $this->require($issues, filled($course->title) && mb_strlen(trim($course->title)) >= 3, 'course.title', 'Khóa học cần có tiêu đề tối thiểu 3 ký tự.');
@@ -39,6 +43,31 @@ class CourseHealthService
         }
 
         $this->require($issues, $lessonCount > 0, 'course.lessons', 'Khóa học cần có ít nhất một bài học.');
+
+        // Course-level Quizzes Check (A. Kiểm tra tổng quát & B. Kiểm tra cuối khóa học)
+        $quizAttachments = $course->quizAttachments ?? collect();
+
+        $hasCapabilityQuiz = $quizAttachments->where('position', 'capability_assessment')
+            ->contains(fn ($att) => $att->quiz !== null && $att->quiz->questions !== null && $att->quiz->questions->isNotEmpty());
+
+        if (!$hasCapabilityQuiz) {
+            $this->warning(
+                $issues,
+                'course.capability_assessment',
+                'Khóa học chưa có Bài kiểm tra tổng quát (🏆 A. KIỂM TRA TỔNG QUÁT - Đánh giá năng lực cấp khóa học).'
+            );
+        }
+
+        $hasEndOfCourseQuiz = $quizAttachments->where('position', 'end_of_course')
+            ->contains(fn ($att) => $att->quiz !== null && $att->quiz->questions !== null && $att->quiz->questions->isNotEmpty());
+
+        if (!$hasEndOfCourseQuiz) {
+            $this->warning(
+                $issues,
+                'course.end_of_course',
+                'Khóa học chưa có Bài kiểm tra cuối khóa học (🏁 B. KIỂM TRA CUỐI KHÓA HỌC - Đánh giá hoàn thành toàn bộ khóa học).'
+            );
+        }
 
         $errorCount = count(array_filter($issues, fn (array $issue): bool => $issue['severity'] === 'error'));
         $warningCount = count(array_filter($issues, fn (array $issue): bool => $issue['severity'] === 'warning'));

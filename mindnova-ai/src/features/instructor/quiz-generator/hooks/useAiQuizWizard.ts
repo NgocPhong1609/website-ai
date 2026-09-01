@@ -9,6 +9,7 @@ export function useAiQuizWizard(options?: {
   initialCourseId?: number;
   initialModuleId?: number;
   initialAfterLessonId?: number;
+  initialPosition?: "capability_assessment" | "end_of_course" | "in_module" | "after_lesson";
   embeddedMode?: boolean;
   onSuccessComplete?: (savedQuiz?: any) => void;
 }) {
@@ -21,6 +22,7 @@ export function useAiQuizWizard(options?: {
  const courseIdParam = rawCourseId ? Number(rawCourseId) : options?.initialCourseId;
  const moduleIdParam = rawModuleId ? Number(rawModuleId) : options?.initialModuleId;
  const afterLessonIdParam = rawAfterLessonId ? Number(rawAfterLessonId) : options?.initialAfterLessonId;
+ const position = (positionParam || options?.initialPosition) as any;
 
  const [step, setStep] = useState<number>(options?.embeddedMode ? 2 : 1);
  const [isGenerating, setIsGenerating] = useState<boolean>(false);
@@ -28,9 +30,21 @@ export function useAiQuizWizard(options?: {
  const [error, setError] = useState<string | null>(null);
  const [savedQuiz, setSavedQuiz] = useState<QuizSummary | null>(null);
 
+ const getDefaultTitle = () => {
+   if (position === "capability_assessment") return "Bài kiểm tra Đánh giá năng lực tổng quát";
+   if (position === "end_of_course") return "Bài kiểm tra Cuối khóa học";
+   return "Kiểm tra kiến thức";
+ };
+
+ const getDefaultDescription = () => {
+   if (position === "capability_assessment") return "Đánh giá kiến thức tổng quan toàn bộ nội dung trong khóa học.";
+   if (position === "end_of_course") return "Đánh giá hoàn thành toàn bộ khóa học để cấp chứng chỉ.";
+   return "Đề kiểm tra trắc nghiệm & tự luận được tạo bởi AI";
+ };
+
  const [config, setConfig] = useState<QuizConfig>({
- title: "Kiểm tra kiến thức",
- description: "Đề kiểm tra trắc nghiệm & tự luận được tạo bởi AI",
+ title: getDefaultTitle(),
+ description: getDefaultDescription(),
  source_type: courseIdParam ? "course" : "topic",
  course_id: courseIdParam || undefined,
  source_content: "",
@@ -47,11 +61,13 @@ export function useAiQuizWizard(options?: {
    if (courseIdParam) {
      setConfig((prev) => ({
        ...prev,
+       title: prev.title === "Kiểm tra kiến thức" ? getDefaultTitle() : prev.title,
+       description: prev.description === "Đề kiểm tra trắc nghiệm & tự luận được tạo bởi AI" ? getDefaultDescription() : prev.description,
        source_type: "course",
        course_id: Number(courseIdParam),
      }));
    }
- }, [courseIdParam]);
+ }, [courseIdParam, position]);
 
  const [questions, setQuestions] = useState<GeneratedQuestion[]>([]);
 
@@ -170,7 +186,18 @@ export function useAiQuizWizard(options?: {
 
     // If in embedded course mode, auto attach if course_id exists and bypass Step 5 modal unconditionally
     if (options?.embeddedMode || options?.onSuccessComplete) {
-      if (targetCourseId && options?.initialModuleId) {
+      if (targetCourseId && options?.initialPosition && (options.initialPosition === "capability_assessment" || options.initialPosition === "end_of_course")) {
+        try {
+          await quizGeneratorApi.attachQuiz(quizData.id, {
+            course_id: targetCourseId,
+            position: options.initialPosition,
+            is_active: true,
+            set_active: true,
+          } as any);
+        } catch (attachErr) {
+          console.warn("Auto attach course-level quiz failed:", attachErr);
+        }
+      } else if (targetCourseId && options?.initialModuleId) {
         try {
           await quizGeneratorApi.attachQuiz(quizData.id, {
             course_id: targetCourseId,

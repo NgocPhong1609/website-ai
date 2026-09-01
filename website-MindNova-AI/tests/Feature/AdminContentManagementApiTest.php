@@ -58,7 +58,7 @@ test('admin can view course detail for moderation with modules lessons and reven
     $order = Order::create([
         'user_id' => $student->id,
         'total_amount' => 99,
-        'payment_method' => 'stripe',
+        'payment_method' => 'vnpay',
         'status' => 'completed',
         'transaction_id' => 'txn-content-1',
     ]);
@@ -109,7 +109,7 @@ test('admin cannot delete a published course that already has order items before
     $order = Order::create([
         'user_id' => $student->id,
         'total_amount' => 149,
-        'payment_method' => 'stripe',
+        'payment_method' => 'vnpay',
         'status' => 'completed',
         'transaction_id' => 'txn-locked-delete-1',
     ]);
@@ -158,7 +158,7 @@ test('admin can hide an archived course with order items from the moderation lis
     $order = Order::create([
         'user_id' => $student->id,
         'total_amount' => 199,
-        'payment_method' => 'stripe',
+        'payment_method' => 'vnpay',
         'status' => 'completed',
         'transaction_id' => 'txn-hidden-course-1',
     ]);

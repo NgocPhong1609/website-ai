@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { adminApi } from "@/src/features/admin/lib/admin-api";
+import { AdminCourseDetailModal, type FullAdminCourseDetail } from "./AdminCourseDetailModal";
 
 type CourseRow = {
  id: number;
@@ -11,32 +12,7 @@ type CourseRow = {
  teacher?: { name?: string | null } | null;
 };
 
-type CourseDetail = {
- id: number;
- title: string;
- description: string;
- status: string;
- level: string;
- price: number;
- category?: string | null;
- enrollments: number;
- revenue: number;
- admin_hidden_at?: string | null;
- teacher?: { name?: string | null; email?: string | null } | null;
- modules: Array<{
- id: number;
- title: string;
- order: number;
- lessons: Array<{
- id: number;
- title: string;
- type?: string | null;
- status?: string | null;
- duration_seconds?: number | null;
- order: number;
- }>;
- }>;
-};
+type CourseDetail = FullAdminCourseDetail;
 
 type ResourceRow = {
  id: number;
@@ -344,133 +320,15 @@ export function AdminContentManagementPage() {
  </section>
 
  {courseDetail && (
- <section className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 shadow-[0_14px_32px_-25px_rgba(10,18,40,0.4)]">
- <div className="flex flex-wrap items-start justify-between gap-3">
- <div>
- <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Chi tiết khóa học</h2>
- <p className="text-sm text-slate-500">Xem nội dung bên trong khóa học trước khi duyệt hoặc gỡ bỏ.</p>
- </div>
- <button
- type="button"
- onClick={() => {
+ <AdminCourseDetailModal
+ course={courseDetail}
+ onClose={() => {
  setCourseDetail(null);
  setDetailCourseId(null);
  }}
- className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700"
- >
- Đóng
- </button>
- </div>
-
- <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
- <div className="space-y-4">
- <div className="rounded-2xl border border-slate-200 p-4">
- <div className="flex flex-wrap items-center justify-between gap-3">
- <div>
- <h3 className="text-base font-semibold text-slate-900">{courseDetail.title}</h3>
- <p className="mt-1 text-sm text-slate-600">{courseDetail.description || "Chưa có mô tả khóa học."}</p>
- </div>
- <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClassName(courseDetail.status)}`}>
- {statusLabel(courseDetail.status)}
- </span>
- </div>
- </div>
-
- <div className="space-y-3">
- {courseDetail.modules.length === 0 ? (
- <div className="rounded-2xl border border-dashed border-slate-300 px-4 py-6 text-sm text-slate-500">
- Khóa học này chưa có module hoặc bài học nào.
- </div>
- ) : (
- courseDetail.modules.map((module, moduleIndex) => (
- <div key={module.id} className="rounded-2xl border border-slate-200 p-4">
- <div className="flex items-center justify-between gap-3">
- <h4 className="font-semibold text-slate-900">{`Phần ${moduleIndex + 1}: ${module.title}`}</h4>
- <span className="text-xs text-slate-500">{module.lessons.length} bài học</span>
- </div>
- <div className="mt-3 space-y-2">
- {module.lessons.length === 0 ? (
- <p className="text-sm text-slate-500">Chưa có bài học trong module này.</p>
- ) : (
- module.lessons.map((lesson, lessonIndex) => (
- <div key={lesson.id} className="rounded-xl bg-slate-50 px-3 py-2 text-sm text-slate-700">
- <div className="flex flex-wrap items-center justify-between gap-2">
- <span className="font-medium">{`Bài ${lessonIndex + 1}: ${lesson.title}`}</span>
- <span className="text-xs text-slate-500">
- {lesson.type || "Nội dung"} · {lesson.status || "draft"} · {formatDuration(lesson.duration_seconds)}
- </span>
- </div>
- </div>
- ))
- )}
- </div>
- </div>
- ))
- )}
- </div>
- </div>
-
- <aside className="space-y-4">
- <div className="rounded-2xl border border-slate-200 p-4">
- <h3 className="text-base font-semibold text-slate-900">Thông tin tổng quan</h3>
- <ul className="mt-3 space-y-2 text-sm text-slate-700">
- <li>Giảng viên: {courseDetail.teacher?.name || "Chưa gán"}</li>
- <li>Email: {courseDetail.teacher?.email || "Chưa có"}</li>
- <li>Danh mục: {courseDetail.category || "Chưa phân loại"}</li>
- <li>Cấp độ: {courseDetail.level || "Chưa xác định"}</li>
- <li>Giá bán: {formatCurrency(courseDetail.price)}</li>
- <li>Học viên đã ghi danh: {courseDetail.enrollments}</li>
- <li>Doanh thu: {formatCurrency(courseDetail.revenue)}</li>
- </ul>
- </div>
-
- <div className="rounded-2xl border border-slate-200 p-4">
- <h3 className="text-base font-semibold text-slate-900">Hành động nhanh</h3>
- <div className="mt-3 flex flex-wrap gap-2">
- {courseDetail.admin_hidden_at ? (
- <button
- type="button"
- onClick={() => void restoreCourse(courseDetail.id)}
- disabled={pendingAction !== null}
- className="rounded-lg -[#FAF7F2] px-3 py-2 text-sm font-semibold -[#2C3039] disabled:cursor-not-allowed disabled:opacity-60"
- >
- {pendingAction === `restore-${courseDetail.id}` ? "Đang khôi phục..." : "Khôi phục vào admin"}
- </button>
- ) : (
- <>
- <button
- type="button"
- onClick={() => void moderateCourse(courseDetail.id, "published")}
- disabled={pendingAction !== null}
- className="rounded-lg -[#FAF7F2] px-3 py-2 text-sm font-semibold -[#2C3039] disabled:cursor-not-allowed disabled:opacity-60"
- >
- {pendingAction === `published-${courseDetail.id}` ? "Đang duyệt..." : "Duyệt khóa học"}
- </button>
- <button
- type="button"
- onClick={() => void moderateCourse(courseDetail.id, "archived")}
- disabled={pendingAction !== null}
- className="rounded-lg bg-amber-100 px-3 py-2 text-sm font-semibold text-amber-800 disabled:cursor-not-allowed disabled:opacity-60"
- >
- {pendingAction === `archived-${courseDetail.id}` ? "Đang gỡ..." : "Gỡ bỏ"}
- </button>
- {courseDetail.status === "archived" && (
- <button
- type="button"
- onClick={() => void deleteCourse(courseDetail.id, courseDetail.status)}
- disabled={pendingAction !== null}
- className="rounded-lg bg-rose-100 px-3 py-2 text-sm font-semibold text-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
- >
- {pendingAction === `delete-${courseDetail.id}` ? "Đang xóa..." : "Xóa khóa học"}
- </button>
- )}
- </>
- )}
- </div>
- </div>
- </aside>
- </div>
- </section>
+ onModerate={moderateCourse}
+ pendingAction={pendingAction}
+ />
  )}
 
  <section className="grid gap-4 xl:grid-cols-2">

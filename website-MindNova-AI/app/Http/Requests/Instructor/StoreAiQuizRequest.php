@@ -11,6 +11,25 @@ class StoreAiQuizRequest extends FormRequest
         return $this->user() && $this->user()->hasRole('teacher');
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('questions') && is_array($this->questions)) {
+            $questions = array_map(function ($q) {
+                if (is_array($q)) {
+                    if (empty($q['content']) && !empty($q['question'])) {
+                        $q['content'] = $q['question'];
+                    }
+                    if (isset($q['type']) && $q['type'] === 'tu_luan') {
+                        $q['type'] = 'essay';
+                    }
+                }
+                return $q;
+            }, $this->questions);
+
+            $this->merge(['questions' => $questions]);
+        }
+    }
+
     public function rules(): array
     {
         return [

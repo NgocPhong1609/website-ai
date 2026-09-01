@@ -316,7 +316,11 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   const [dragSource, setDragSource] = useState<{ chapterId: string; lessonId: string } | null>(null);
 
   // Embedded Quiz Modals State
-  const [aiQuizModal, setAiQuizModal] = useState<{ isOpen: boolean; moduleId?: string }>({ isOpen: false });
+  const [aiQuizModal, setAiQuizModal] = useState<{
+    isOpen: boolean;
+    moduleId?: string;
+    position?: "capability_assessment" | "end_of_course";
+  }>({ isOpen: false });
   const [manualQuizModal, setManualQuizModal] = useState<{ isOpen: boolean; moduleId?: string }>({ isOpen: false });
   
   // Select Quiz Popup Modal State for Course-Level Quizzes
@@ -746,7 +750,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
 
                   <button
                     type="button"
-                    onClick={() => setAiQuizModal({ isOpen: true })}
+                    onClick={() => setAiQuizModal({ isOpen: true, position: "capability_assessment" })}
                     className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
                   >
                     <span>+ Tạo mới</span>
@@ -855,7 +859,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
 
                   <button
                     type="button"
-                    onClick={() => setAiQuizModal({ isOpen: true })}
+                    onClick={() => setAiQuizModal({ isOpen: true, position: "end_of_course" })}
                     className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
                   >
                     <span>+ Tạo mới</span>
@@ -1140,6 +1144,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         onClose={() => setAiQuizModal({ isOpen: false })}
         courseId={courseId}
         moduleId={aiQuizModal.moduleId}
+        position={aiQuizModal.position}
         onSuccessComplete={(savedQuiz) => {
           const targetModId = aiQuizModal.moduleId;
           setAiQuizModal({ isOpen: false });
@@ -1187,7 +1192,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
             : activeFinalQuiz?.id
         }
         onSelectActiveQuiz={handleSetActiveQuiz}
-        onCreateNewQuiz={() => setAiQuizModal({ isOpen: true })}
+        onCreateNewQuiz={() => setAiQuizModal({ isOpen: true, position: selectQuizModal.position })}
         onEditQuiz={(quiz) =>
           setEditingLesson({
             chapterId: "",

@@ -77,7 +77,7 @@ export function Step2ConfigForm({
             />
           </div>
 
-          {embeddedMode && (
+          {embeddedMode && config.source_type !== "course" && (
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1">Chủ đề hoặc Yêu cầu AI sinh câu hỏi</label>
               <input

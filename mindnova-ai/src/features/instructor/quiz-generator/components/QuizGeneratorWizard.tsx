@@ -13,6 +13,7 @@ interface QuizGeneratorWizardProps {
   initialCourseId?: number;
   initialModuleId?: number;
   initialAfterLessonId?: number;
+  initialPosition?: "capability_assessment" | "end_of_course" | "in_module" | "after_lesson";
   embeddedMode?: boolean;
 }
 
@@ -21,6 +22,7 @@ export function QuizGeneratorWizard({
   initialCourseId,
   initialModuleId,
   initialAfterLessonId,
+  initialPosition,
   embeddedMode = false,
 }: QuizGeneratorWizardProps = {}) {
   const {
@@ -45,6 +47,7 @@ export function QuizGeneratorWizard({
     initialCourseId,
     initialModuleId,
     initialAfterLessonId,
+    initialPosition,
     embeddedMode,
     onSuccessComplete,
   });

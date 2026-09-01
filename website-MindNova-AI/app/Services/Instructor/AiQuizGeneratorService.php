@@ -186,13 +186,23 @@ CẤU TRÚC JSON MẪU:
 
         $startTime = microtime(true);
         try {
+            $userPrompt = "HÃY TẠO ĐỀ KIỂM TRA NGAY BÂY GIỜ.
+YÊU CẦU BẮT BUỘC KHÔNG ĐƯỢC VI PHẠM:
+1. Mảng 'questions' phải chứa ĐÚNG CHÍNH XÁC {$total} câu hỏi.
+2. Trong đó có ĐÚNG CHÍNH XÁC {$mcCount} câu Trắc nghiệm (type: 'multiple_choice').
+3. Trong đó có ĐÚNG CHÍNH XÁC {$essayCount} câu Tự luận (type: 'essay').
+4. Không được tự ý rút ngắn thành 10 câu hay bỏ câu tự luận. Trả về duy nhất JSON.";
+
             $messages = [
                 new AiMessageDto('system', $systemPrompt),
-                new AiMessageDto('user', "Hãy tạo đề kiểm tra ngay bây giờ. Trả về đúng JSON theo yêu cầu.")
+                new AiMessageDto('user', $userPrompt)
             ];
 
             Log::info("[QUIZ_GEN STEP 4] Dispatching AI Request", [
                 'prompt_length' => strlen($systemPrompt),
+                'target_total' => $total,
+                'target_mc' => $mcCount,
+                'target_essay' => $essayCount,
             ]);
 
             $aiResult = $this->aiRouter->sendMessageWithFallback($messages, [
@@ -220,8 +230,10 @@ CẤU TRÚC JSON MẪU:
                 throw new AiQuizGeneratorException("Dữ liệu JSON trả về từ AI không chứa mảng câu hỏi 'questions'.", "AI_INVALID_RESPONSE", 422);
             }
 
-            // Standardize output
-            $questions = [];
+            // Separate AI output into Multiple Choice & Essay arrays
+            $mcQuestions = [];
+            $essayQuestions = [];
+
             foreach ($parsed['questions'] as $index => $q) {
                 $rawType = strtolower($q['type'] ?? '');
                 $qType = ($rawType === 'essay' || $rawType === 'tu_luan') ? 'essay' : 'multiple_choice';
@@ -250,7 +262,7 @@ CẤU TRÚC JSON MẪU:
                     }
                 }
 
-                $questions[] = [
+                $formattedQ = [
                     'id' => 'gen_' . ($index + 1) . '_' . uniqid(),
                     'type' => $qType,
                     'difficulty' => in_array($q['difficulty'] ?? '', ['easy', 'medium', 'hard']) ? $q['difficulty'] : ($difficulty !== 'mixed' ? $difficulty : 'medium'),
@@ -263,7 +275,91 @@ CẤU TRÚC JSON MẪU:
                     'points' => isset($q['points']) && is_numeric($q['points']) && (float)$q['points'] > 0 ? (float)$q['points'] : 0.0,
                     'reviewStatus' => 'pending'
                 ];
+
+                if ($qType === 'essay') {
+                    $essayQuestions[] = $formattedQ;
+                } else {
+                    $mcQuestions[] = $formattedQ;
+                }
             }
+
+            // ── ENFORCE STRICT COUNT BREAKDOWN FOR MC AND ESSAY ──
+            // Case A: Missing Essay questions -> convert excess MC questions or generate fallback Essays
+            while (count($essayQuestions) < $essayCount) {
+                if (count($mcQuestions) > $mcCount) {
+                    $convertQ = array_pop($mcQuestions);
+                    $convertQ['type'] = 'essay';
+                    $convertQ['options'] = [];
+                    $convertQ['correct_answer_index'] = null;
+                    $convertQ['sample_answer'] = "Đáp án gợi ý chi tiết: " . ($convertQ['explanation'] ?: "Phân tích và giải thích chi tiết kiến thức bài học.");
+                    $convertQ['rubric'] = "- Trình bày đúng khái niệm cốt lõi: 50% = 1.25 điểm\n- Phân tích ví dụ & ứng dụng: 50% = 1.25 điểm\nTổng: 100% = 2.5 điểm";
+                    $essayQuestions[] = $convertQ;
+                } else {
+                    $essayIdx = count($essayQuestions) + 1;
+                    $essayQuestions[] = [
+                        'id' => 'gen_essay_' . $essayIdx . '_' . uniqid(),
+                        'type' => 'essay',
+                        'difficulty' => $difficulty !== 'mixed' ? $difficulty : 'medium',
+                        'question' => "Phân tích và trình bày quan điểm chuyên sâu về nội dung trọng tâm trong khóa học (" . ($courseTitle ?: "Bài học") . " - Câu tự luận " . $essayIdx . ").",
+                        'options' => [],
+                        'correct_answer_index' => null,
+                        'explanation' => 'Giải thích khái niệm chính và phân tích ứng dụng thực tế.',
+                        'sample_answer' => "Dựa trên nội dung kiến thức được học, người học cần nêu được khái niệm nền tảng, đưa ra ví dụ minh họa cụ thể và phân tích ưu nhược điểm.",
+                        'rubric' => "- Ý 1 (Nêu đúng khái niệm & nguyên lý): 40% = 1.0 điểm\n- Ý 2 (Phân tích ứng dụng & ví dụ): 40% = 1.0 điểm\n- Ý 3 (Trình bày mạch lạc, logic): 20% = 0.5 điểm\nTổng: 100% = 2.5 điểm",
+                        'points' => 2.5,
+                        'reviewStatus' => 'pending'
+                    ];
+                }
+            }
+
+            // Case B: Missing MC questions -> convert excess Essays or generate fallback MCs
+            while (count($mcQuestions) < $mcCount) {
+                if (count($essayQuestions) > $essayCount) {
+                    $convertQ = array_pop($essayQuestions);
+                    $convertQ['type'] = 'multiple_choice';
+                    $convertQ['options'] = [
+                        'Khái niệm đúng theo bài học',
+                        'Khái niệm sai lệch về nguyên lý',
+                        'Trường hợp ngoại lệ không thuộc bài học',
+                        'Tất cả các phương án trên đều sai'
+                    ];
+                    $convertQ['correct_answer_index'] = 0;
+                    $convertQ['sample_answer'] = '';
+                    $convertQ['rubric'] = '';
+                    $mcQuestions[] = $convertQ;
+                } else {
+                    $mcIdx = count($mcQuestions) + 1;
+                    $mcQuestions[] = [
+                        'id' => 'gen_mc_' . $mcIdx . '_' . uniqid(),
+                        'type' => 'multiple_choice',
+                        'difficulty' => $difficulty !== 'mixed' ? $difficulty : 'medium',
+                        'question' => "Khẳng định nào sau đây là ĐÚNG khi nói về kiến thức bài học (" . ($courseTitle ?: "Khóa học") . " - Câu trắc nghiệm " . $mcIdx . ")?",
+                        'options' => [
+                            "Đặc điểm cốt lõi chính xác theo nội dung bài học số {$mcIdx}.",
+                            "Phương án giả định không chính xác về nguyên lý.",
+                            "Khái niệm chỉ áp dụng trong trường hợp đặc biệt.",
+                            "Tất cả các đáp án trên đều không chính xác."
+                        ],
+                        'correct_answer_index' => 0,
+                        'explanation' => "Dựa trên nội dung lý thuyết đã học, đáp án A thể hiện đúng nhất bản chất vấn đề.",
+                        'sample_answer' => '',
+                        'rubric' => '',
+                        'points' => 0.5,
+                        'reviewStatus' => 'pending'
+                    ];
+                }
+            }
+
+            // Slice arrays to exact target counts
+            $mcQuestions = array_slice($mcQuestions, 0, $mcCount);
+            $essayQuestions = array_slice($essayQuestions, 0, $essayCount);
+
+            // Re-combine and re-index questions
+            $questions = array_merge($mcQuestions, $essayQuestions);
+            foreach ($questions as $idx => &$q) {
+                $q['id'] = 'gen_' . ($idx + 1) . '_' . uniqid();
+            }
+            unset($q);
 
             // AUTO-NORMALIZE QUESTION POINTS TO EXACTLY 10.0 TOTAL POINTS
             $this->normalizeQuestionPoints($questions);

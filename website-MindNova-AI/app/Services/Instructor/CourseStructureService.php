@@ -202,6 +202,7 @@ class CourseStructureService
                         'title' => $quiz->title,
                         'time_limit_minutes' => $quiz->time_limit_minutes,
                         'passing_score' => $quiz->passing_score,
+                        'questions' => $this->formatQuizQuestions($quiz),
                     ],
                 ];
                 $fOrder++;
