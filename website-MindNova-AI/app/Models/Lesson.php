@@ -37,6 +37,11 @@ class Lesson extends Model
         return $this->belongsTo(CourseModule::class, 'module_id');
     }
 
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class, 'course_id');
+    }
+
     public function media()
     {
         return $this->hasMany(LessonMedia::class);

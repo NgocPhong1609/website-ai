@@ -212,6 +212,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::get('modules/{module}', [CourseModuleController::class, 'show']);
     Route::post('courses/{course}/modules', [CourseModuleController::class, 'store']);
     Route::put('modules/{module}', [CourseModuleController::class, 'update']);
+    Route::put('modules/{module}/reorder-items', [CourseModuleController::class, 'reorderItems']);
     Route::delete('modules/{module}', [CourseModuleController::class, 'destroy']);
 
     // Lessons
@@ -275,6 +276,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::put('ai-quiz/{quiz}', [QuizGeneratorController::class, 'update']);
     Route::delete('ai-quiz/{quiz}', [QuizGeneratorController::class, 'destroy']);
     Route::post('ai-quiz/{quiz}/attach', [QuizGeneratorController::class, 'attach']);
+    Route::post('ai-quiz/{quiz}/set-active', [QuizGeneratorController::class, 'setActive']);
 
     // AI Course Outline
     Route::post('courses/ai-outline/generate', [CourseOutlineController::class, 'generate']);

@@ -1,11 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/quizGeneratorApi";
 import { QuizSummary } from "@/src/features/instructor/quiz-generator/types/quizGenerator.types";
 import { Loader } from "@/src/shared/components/ui/Loader";
+import { CreateLessonEditModal } from "@/src/features/instructor/create-course/components/CreateLessonEditModal";
+
+const ITEMS_PER_PAGE = 10;
 
 export default function InstructorQuizListPage() {
   const searchParams = useSearchParams();
@@ -13,8 +16,23 @@ export default function InstructorQuizListPage() {
   const courseIdNum = courseIdParam ? Number(courseIdParam) : undefined;
 
   const [quizzes, setQuizzes] = useState<QuizSummary[]>([]);
+  const [coursesList, setCoursesList] = useState<any[]>([]);
+  const [courseModulesList, setCourseModulesList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [courseTitle, setCourseTitle] = useState<string | null>(null);
+
+  // Filter & Pagination States
+  const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState<"all" | "ai" | "manual">("all");
+  const [positionFilter, setPositionFilter] = useState<string>("all");
+  const [courseFilter, setCourseFilter] = useState<string>(courseIdParam ? String(courseIdParam) : "all");
+  const [moduleFilter, setModuleFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "published" | "draft">("all");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "title_asc" | "title_desc">("newest");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  // Quiz Editing Modal State (reusing CreateLessonEditModal / QuizEditor)
+  const [editingQuiz, setEditingQuiz] = useState<QuizSummary | null>(null);
 
   // Deletion modal state
   const [quizToDelete, setQuizToDelete] = useState<QuizSummary | null>(null);
@@ -22,12 +40,13 @@ export default function InstructorQuizListPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Fetch all quizzes and instructor's courses
   const fetchQuizzes = (cId?: number) => {
     setLoading(true);
     quizGeneratorApi
       .getQuizzes(cId)
       .then((res) => {
-        if (res?.data) {
+        if (res?.data && Array.isArray(res.data)) {
           setQuizzes(res.data);
         }
       })
@@ -39,6 +58,16 @@ export default function InstructorQuizListPage() {
 
   useEffect(() => {
     fetchQuizzes(courseIdNum);
+
+    // Load instructor courses list for filter dropdown
+    quizGeneratorApi
+      .getInstructorCourses()
+      .then((res) => {
+        if (res?.data && Array.isArray(res.data)) {
+          setCoursesList(res.data);
+        }
+      })
+      .catch(() => {});
 
     if (courseIdNum) {
       quizGeneratorApi
@@ -55,6 +84,28 @@ export default function InstructorQuizListPage() {
     }
   }, [courseIdNum]);
 
+  // Reset pagination to page 1 when any filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, typeFilter, positionFilter, courseFilter, moduleFilter, statusFilter, sortBy]);
+
+  // Load modules list whenever courseFilter changes
+  useEffect(() => {
+    if (courseFilter !== "all") {
+      quizGeneratorApi
+        .getCourseDetails(Number(courseFilter))
+        .then((res) => {
+          const detail = res?.data || res;
+          const mods = detail?.modules || detail?.items || [];
+          setCourseModulesList(Array.isArray(mods) ? mods : []);
+        })
+        .catch(() => setCourseModulesList([]));
+    } else {
+      setCourseModulesList([]);
+      setModuleFilter("all");
+    }
+  }, [courseFilter]);
+
   const handleDeleteConfirm = async (force: boolean = false) => {
     if (!quizToDelete) return;
     setIsDeleting(true);
@@ -62,7 +113,6 @@ export default function InstructorQuizListPage() {
 
     try {
       await quizGeneratorApi.deleteQuiz(quizToDelete.id, force);
-      // Remove quiz from state immediately without full page reload
       setQuizzes((prev) => prev.filter((item) => item.id !== quizToDelete.id));
       setToastMessage(`Đã xóa thành công bài kiểm tra "${quizToDelete.title}".`);
       setQuizToDelete(null);
@@ -70,17 +120,14 @@ export default function InstructorQuizListPage() {
     } catch (err: any) {
       console.error("Delete quiz error:", err);
       const apiMsg = err.response?.data?.message || err.message;
-      if (apiMsg && typeof apiMsg === "string") {
-        setDeleteError(apiMsg);
-      } else {
-        setDeleteError("Không thể xóa đề kiểm tra. Vui lòng thử lại.");
-      }
+      setDeleteError(typeof apiMsg === "string" ? apiMsg : "Không thể xóa đề kiểm tra. Vui lòng thử lại.");
     } finally {
       setIsDeleting(false);
     }
   };
 
   const getAttachedCourseTitle = (q: QuizSummary): string | null => {
+    if (q.course?.title) return q.course.title;
     if (Array.isArray(q.attachments) && q.attachments.length > 0) {
       const title = q.attachments[0]?.course?.title;
       if (title) return title;
@@ -94,6 +141,107 @@ export default function InstructorQuizListPage() {
     return null;
   };
 
+  const getAttachedModuleTitle = (q: QuizSummary): string | null => {
+    if (q.module?.title) return q.module.title;
+    if (Array.isArray(q.attachments) && q.attachments.length > 0) {
+      const title = q.attachments[0]?.module?.title;
+      if (title) return title;
+    }
+    if ((q as any).lesson?.module?.title) {
+      return (q as any).lesson.module.title;
+    }
+    return null;
+  };
+
+  // Filter & Sort Logic
+  const filteredQuizzes = useMemo(() => {
+    let result = quizzes.filter((q) => {
+      // 1. Search Query
+      if (searchQuery.trim()) {
+        const term = searchQuery.toLowerCase().trim();
+        const titleMatch = q.title?.toLowerCase().includes(term);
+        const descMatch = q.description?.toLowerCase().includes(term);
+        const courseMatch = getAttachedCourseTitle(q)?.toLowerCase().includes(term);
+        const moduleMatch = getAttachedModuleTitle(q)?.toLowerCase().includes(term);
+        if (!titleMatch && !descMatch && !courseMatch && !moduleMatch) return false;
+      }
+
+      // 2. Source Type Filter (AI vs Manual)
+      if (typeFilter === "ai") {
+        if (q.source_type === "manual") return false;
+      } else if (typeFilter === "manual") {
+        if (q.source_type !== "manual") return false;
+      }
+
+      // 3. Quiz Position Scope Filter (General, Final, Module, After Lesson)
+      if (positionFilter !== "all") {
+        const qPos = (q as any).position || q.attachments?.[0]?.position || (q.type === "capability_assessment" ? "capability_assessment" : "end_of_course");
+        if (positionFilter === "capability_assessment" && qPos !== "capability_assessment" && q.type !== "capability_assessment") return false;
+        if (positionFilter === "end_of_course" && qPos !== "end_of_course") return false;
+        if (positionFilter === "in_module" && qPos !== "in_module") return false;
+        if (positionFilter === "after_lesson" && qPos !== "after_lesson") return false;
+      }
+
+      // 4. Course Filter
+      if (courseFilter !== "all") {
+        const targetCourseId = Number(courseFilter);
+        const qCourseId = q.course?.id || q.course_id || q.attachments?.[0]?.course_id || (q as any).lesson?.module?.course_id;
+        if (Number(qCourseId) !== targetCourseId) return false;
+      }
+
+      // 5. Module Filter
+      if (moduleFilter !== "all") {
+        const targetModuleId = Number(moduleFilter);
+        const qModuleId = q.module?.id || q.attachments?.[0]?.module_id || (q as any).lesson?.module_id;
+        if (Number(qModuleId) !== targetModuleId) return false;
+      }
+
+      // 6. Status Filter
+      if (statusFilter !== "all") {
+        if (q.status !== statusFilter) return false;
+      }
+
+      return true;
+    });
+
+    // Sort
+    result.sort((a, b) => {
+      if (sortBy === "oldest") {
+        return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+      }
+      if (sortBy === "title_asc") {
+        return a.title.localeCompare(b.title);
+      }
+      if (sortBy === "title_desc") {
+        return b.title.localeCompare(a.title);
+      }
+      // newest
+      return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+    });
+
+    return result;
+  }, [quizzes, searchQuery, typeFilter, positionFilter, courseFilter, moduleFilter, statusFilter, sortBy]);
+
+  // Paginated Quiz Items (10 items per page)
+  const totalPages = Math.ceil(filteredQuizzes.length / ITEMS_PER_PAGE) || 1;
+  const paginatedQuizzes = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredQuizzes.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredQuizzes, currentPage]);
+
+  const hasActiveFilters = searchQuery.trim() !== "" || typeFilter !== "all" || positionFilter !== "all" || courseFilter !== "all" || moduleFilter !== "all" || statusFilter !== "all";
+
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setTypeFilter("all");
+    setPositionFilter("all");
+    setCourseFilter("all");
+    setModuleFilter("all");
+    setStatusFilter("all");
+    setSortBy("newest");
+    setCurrentPage(1);
+  };
+
   const createAiUrl = courseIdNum
     ? `/instructor/quiz-generator/create?course_id=${courseIdNum}`
     : "/instructor/quiz-generator/create";
@@ -103,8 +251,8 @@ export default function InstructorQuizListPage() {
     : "/instructor/quiz-generator/manual-create";
 
   return (
-    <div className="max-w-6xl mx-auto flex flex-col gap-8 p-6 md:p-8">
-      {/* Toast Banner Notification */}
+    <div className="max-w-6xl mx-auto flex flex-col gap-8 p-6 md:p-8 animate-fadeIn">
+      {/* Toast Notification */}
       {toastMessage && (
         <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center justify-between shadow-sm animate-fadeIn">
           <div className="flex items-center gap-2">
@@ -138,9 +286,7 @@ export default function InstructorQuizListPage() {
                 )}
               </div>
               <p className="text-xs text-gray-300 font-semibold mt-0.5">
-                {courseTitle
-                  ? `Đang lọc danh sách bài kiểm tra dành riêng cho khóa học: ${courseTitle}`
-                  : "Quản lý và khởi tạo bài kiểm tra độc lập với sự hỗ trợ từ AI"}
+                Quản lý và tổng hợp tất cả các bài kiểm tra trắc nghiệm &amp; tự luận của bạn
               </p>
             </div>
           </div>
@@ -177,33 +323,121 @@ export default function InstructorQuizListPage() {
         </div>
       </div>
 
-      {/* Main Quizzes List Table / Grid */}
-      <div className="bg-white rounded-3xl p-6 border border-[#EAEAF4] shadow-sm flex flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-black text-[#1A1A2E]">
-            {courseIdNum
-              ? `Danh Sách Đề Kiểm Tra Thuộc Khóa Học ${courseTitle ? `"${courseTitle}"` : `#${courseIdNum}`}`
-              : "Danh Sách Tất Cả Bài Kiểm Tra Của Bạn"}
+      {/* Filter Controls & Search Section */}
+      <div className="bg-white rounded-3xl p-6 border border-[#EAEAF4] shadow-sm flex flex-col gap-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+          <h2 className="text-base font-black text-[#1A1A2E] flex items-center gap-2">
+            <span>📋</span>
+            <span>Danh Sách Tất Cả Bài Kiểm Tra Của Bạn</span>
           </h2>
-          <span className="text-xs font-bold text-gray-500">Tổng số: {quizzes.length} bài</span>
+
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-extrabold text-[#C0392B] bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-xl">
+              Tổng số: {quizzes.length} bài
+            </span>
+            {hasActiveFilters && (
+              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl">
+                Hiển thị: {filteredQuizzes.length} bài
+              </span>
+            )}
+          </div>
         </div>
 
+        {/* Filter Controls Bar */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+          {/* Search Box */}
+          <div className="lg:col-span-2 relative">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">🔍</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Tìm theo tên Quiz, Khóa học..."
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 bg-[#FAF8FF] text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] transition-all"
+            />
+          </div>
+
+          {/* Position / Scope Filter */}
+          <select
+            value={positionFilter}
+            onChange={(e) => setPositionFilter(e.target.value)}
+            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] shadow-2xs truncate"
+          >
+            <option value="all">Tất cả Vị trí Quiz</option>
+            <option value="capability_assessment">🏆 Kiểm tra tổng quát</option>
+            <option value="end_of_course">🏁 Cuối khóa học</option>
+            <option value="in_module">📦 Trong Module</option>
+            <option value="after_lesson">📖 Sau bài học</option>
+          </select>
+
+          {/* Source Type Filter (AI vs Manual) */}
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value as any)}
+            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] shadow-2xs"
+          >
+            <option value="all">Tất cả nguồn (AI / Manual)</option>
+            <option value="ai">🤖 AI Quiz</option>
+            <option value="manual">✍️ Manual Quiz</option>
+          </select>
+
+          {/* Course Filter */}
+          <select
+            value={courseFilter}
+            onChange={(e) => {
+              setCourseFilter(e.target.value);
+              setModuleFilter("all");
+            }}
+            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] shadow-2xs truncate"
+          >
+            <option value="all">Tất cả khóa học</option>
+            {coursesList.map((c) => (
+              <option key={c.id} value={c.id}>
+                📚 {c.title}
+              </option>
+            ))}
+          </select>
+
+          {/* Sort Selector */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] shadow-2xs"
+          >
+            <option value="newest">Mới nhất</option>
+            <option value="oldest">Cũ nhất</option>
+            <option value="title_asc">Tên A → Z</option>
+            <option value="title_desc">Tên Z → A</option>
+          </select>
+        </div>
+
+        {/* Clear Filters Button */}
+        {hasActiveFilters && (
+          <div className="flex items-center justify-end">
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-extrabold rounded-xl border border-rose-200 transition-all cursor-pointer flex items-center gap-1"
+            >
+              <span>✕ Xóa bộ lọc</span>
+            </button>
+          </div>
+        )}
+
+        {/* Quizzes Grid List */}
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center gap-3">
             <Loader size="md" />
             <span className="text-xs font-bold text-gray-500">Đang tải danh sách bài kiểm tra...</span>
           </div>
         ) : quizzes.length === 0 ? (
+          /* Empty State 1: Instructor has 0 quizzes total */
           <div className="py-16 text-center rounded-2xl bg-gray-50 border border-gray-200 flex flex-col items-center justify-center gap-4 text-gray-500">
             <span className="text-5xl">📋</span>
-            <div className="flex flex-col gap-1">
-              <p className="text-sm font-extrabold text-[#1A1A2E]">
-                {courseIdNum
-                  ? `Khóa học ${courseTitle ? `"${courseTitle}"` : `#${courseIdNum}`} chưa có đề kiểm tra nào.`
-                  : "Chưa có đề kiểm tra nào."}
-              </p>
+            <div className="flex flex-col gap-1 max-w-md">
+              <p className="text-sm font-extrabold text-[#1A1A2E]">Chưa có đề kiểm tra nào.</p>
               <p className="text-xs font-medium text-gray-500">
-                Hãy sử dụng AI Quiz Generator để tạo đề kiểm tra đầu tiên cho khóa học này.
+                Hãy sử dụng AI Quiz Generator hoặc tạo thủ công để xây dựng bộ đề đầu tiên cho sinh viên.
               </p>
             </div>
             <div className="flex items-center gap-3 mt-2">
@@ -221,93 +455,206 @@ export default function InstructorQuizListPage() {
               </Link>
             </div>
           </div>
+        ) : filteredQuizzes.length === 0 ? (
+          /* Empty State 2: Active filters returned 0 results */
+          <div className="py-16 text-center rounded-2xl bg-amber-50/50 border border-amber-200 flex flex-col items-center justify-center gap-3 text-amber-900">
+            <span className="text-4xl">🔍</span>
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-extrabold">Không tìm thấy Quiz nào phù hợp với bộ lọc.</p>
+              <p className="text-xs font-medium text-amber-700">
+                Vui lòng điều chỉnh hoặc xóa bộ lọc tìm kiếm để xem các đề kiểm tra khác.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="mt-2 px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold rounded-xl shadow-2xs transition-all cursor-pointer"
+            >
+              ✕ Xóa bộ lọc tìm kiếm
+            </button>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {quizzes.map((q) => {
-              const attachedTitle = getAttachedCourseTitle(q);
-              return (
-                <div
-                  key={q.id}
-                  className="p-6 rounded-2xl bg-white border border-[#EAEAF4] hover:border-[#C0392B] shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4"
-                >
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center justify-between gap-2 flex-wrap">
-                      <span className="text-[11px] font-black uppercase px-2.5 py-1 rounded-lg bg-indigo-50 text-[#C0392B] border border-indigo-100">
-                        {q.source_type === "course"
-                          ? "Từ khóa học"
-                          : q.source_type === "content"
-                          ? "Từ tài liệu"
-                          : "Từ chủ đề"}
-                      </span>
+          <div className="flex flex-col gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {paginatedQuizzes.map((q) => {
+                const attachedCourseTitle = getAttachedCourseTitle(q);
+                const attachedModuleTitle = getAttachedModuleTitle(q);
+                const isManual = q.source_type === "manual";
+                const qPos = (q as any).position || q.attachments?.[0]?.position || (q.type === "capability_assessment" ? "capability_assessment" : "end_of_course");
+                const isActive = (q as any).is_active || q.attachments?.[0]?.is_active;
 
-                      {attachedTitle ? (
+                return (
+                  <div
+                    key={q.id}
+                    className="p-6 rounded-2xl bg-white border border-[#EAEAF4] hover:border-emerald-500/50 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-4 group"
+                  >
+                    <div className="flex flex-col gap-3">
+                      {/* Badges Row */}
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        {/* Position Badge */}
+                        <span className="text-[11px] font-black uppercase px-2.5 py-1 rounded-lg border flex items-center gap-1 bg-amber-50 text-amber-950 border-amber-200">
+                          {qPos === "capability_assessment" || q.type === "capability_assessment" ? (
+                            <><span>🏆</span><span>Kiểm tra tổng quát</span></>
+                          ) : qPos === "end_of_course" ? (
+                            <><span>🏁</span><span>Cuối khóa học</span></>
+                          ) : qPos === "in_module" ? (
+                            <><span>📦</span><span>Trong Module</span></>
+                          ) : (
+                            <><span>📖</span><span>Sau bài học</span></>
+                          )}
+                        </span>
+
+                        {/* Source Type Badge */}
                         <span
-                          className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-200 flex items-center gap-1.5 line-clamp-1 max-w-[220px]"
-                          title={`Gắn vào khóa học: ${attachedTitle}`}
+                          className={`text-[11px] font-black uppercase px-2.5 py-1 rounded-lg border flex items-center gap-1 ${
+                            isManual
+                              ? "bg-purple-50 text-purple-800 border-purple-200"
+                              : "bg-emerald-50 text-emerald-800 border-emerald-200"
+                          }`}
                         >
-                          <span>🎓</span>
-                          <span className="truncate">
-                            Khóa: <strong className="font-extrabold">{attachedTitle}</strong>
-                          </span>
+                          <span>{isManual ? "✍️" : "🤖"}</span>
+                          <span>{isManual ? "Manual Quiz" : "AI Quiz"}</span>
                         </span>
-                      ) : (
-                        <span className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-gray-100 text-gray-500 border border-gray-200 flex items-center gap-1">
-                          <span>📌</span>
-                          <span>Chưa gắn</span>
-                        </span>
-                      )}
 
-                      <span
-                        className={`text-[11px] font-extrabold px-2.5 py-1 rounded-lg border ${
-                          q.status === "published"
-                            ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                            : "bg-amber-50 text-amber-700 border-amber-200"
+                        {/* Active Badge */}
+                        {isActive && (
+                          <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-600 text-white shadow-2xs">
+                            ✓ Đang sử dụng
+                          </span>
+                        )}
+
+                        {attachedCourseTitle && (
+                          <span
+                            className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-900 border border-indigo-200 flex items-center gap-1 truncate max-w-[180px]"
+                            title={`Khóa học: ${attachedCourseTitle}`}
+                          >
+                            <span>🎓</span>
+                            <span className="truncate">{attachedCourseTitle}</span>
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Quiz Title & Module info */}
+                      <div>
+                        <h3 className="text-base font-extrabold text-[#1A1A2E] group-hover:text-emerald-700 transition-colors line-clamp-1">
+                          {q.title}
+                        </h3>
+                        {attachedModuleTitle && (
+                          <p className="text-[11px] font-bold text-indigo-600 mt-0.5 flex items-center gap-1">
+                            <span>📂 Module:</span>
+                            <span className="truncate">{attachedModuleTitle}</span>
+                          </p>
+                        )}
+                        <p className="text-xs text-gray-500 font-medium line-clamp-2 mt-1">
+                          {q.description || "Không có mô tả chi tiết."}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Metadata Specs & Action Buttons */}
+                    <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs font-semibold text-gray-500">
+                      <div className="flex items-center gap-3 text-[11px]">
+                        <span>❓ {q.questions_count || q.total_questions || 0} câu</span>
+                        <span>⏱️ {q.time_limit_minutes || 15}p</span>
+                        <span>🎯 {q.passing_score || 70}%</span>
+                      </div>
+
+                      {/* Action Buttons: 👁 Xem & Sửa (Modal reuse) & 🗑 Xóa */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditingQuiz(q)}
+                          className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-[11px] font-black rounded-xl transition-all border border-emerald-300 flex items-center gap-1 shadow-2xs cursor-pointer"
+                          title="Xem & Chỉnh sửa Quiz"
+                        >
+                          <span>👁 Xem &amp; Sửa</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setQuizToDelete(q);
+                            setDeleteError(null);
+                          }}
+                          className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl border border-transparent hover:border-rose-200 transition-all cursor-pointer"
+                          title="Xóa đề kiểm tra"
+                        >
+                          <span className="text-sm">🗑</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Pagination Controls Bar */}
+            {filteredQuizzes.length > 0 && totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-100 pt-5 mt-2">
+                <span className="text-xs font-bold text-gray-500">
+                  Hiển thị {Math.min((currentPage - 1) * ITEMS_PER_PAGE + 1, filteredQuizzes.length)} -{" "}
+                  {Math.min(currentPage * ITEMS_PER_PAGE, filteredQuizzes.length)} trên tổng số {filteredQuizzes.length} bài kiểm tra
+                </span>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-extrabold text-gray-700 hover:bg-gray-50 transition-all disabled:opacity-40 disabled:hover:bg-white cursor-pointer disabled:cursor-not-allowed shadow-2xs"
+                  >
+                    ⬅️ Trang trước
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`w-8 h-8 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                          currentPage === pageNum
+                            ? "bg-[#C0392B] text-white shadow-xs"
+                            : "bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200"
                         }`}
                       >
-                        {q.status === "published" ? "Đã xuất bản" : "Bản nháp"}
-                      </span>
-                    </div>
-
-                    <h3 className="text-base font-extrabold text-[#1A1A2E] line-clamp-1">{q.title}</h3>
-                    <p className="text-xs text-gray-500 font-medium line-clamp-2">{q.description || "Không có mô tả"}</p>
-                  </div>
-
-                  <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs font-semibold text-gray-500">
-                    <div className="flex items-center gap-3 text-[11px]">
-                      <span>❓ {q.questions_count || q.total_questions} câu</span>
-                      <span>⏱️ {q.time_limit_minutes}p</span>
-                      <span>🎯 {q.total_points || 100} đ</span>
-                    </div>
-
-                    {/* Action Buttons: Xem đề & Xóa */}
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/instructor/quiz-generator/${q.id}`}
-                        className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-[#C0392B] text-[11px] font-extrabold rounded-xl transition-all flex items-center gap-1 border border-indigo-100"
-                      >
-                        <span>👁</span>
-                        <span>Xem đề</span>
-                      </Link>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setQuizToDelete(q);
-                          setDeleteError(null);
-                        }}
-                        className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-[11px] font-extrabold rounded-xl transition-all flex items-center gap-1 border border-rose-100 cursor-pointer"
-                      >
-                        <span>🗑</span>
-                        <span>Xóa</span>
+                        {pageNum}
                       </button>
-                    </div>
+                    ))}
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-extrabold text-gray-700 hover:bg-gray-50 transition-all disabled:opacity-40 disabled:hover:bg-white cursor-pointer disabled:cursor-not-allowed shadow-2xs"
+                  >
+                    Trang sau ➡️
+                  </button>
                 </div>
-              );
-            })}
+              </div>
+            )}
           </div>
         )}
       </div>
+
+      {/* Embedded Quiz Editor Modal Reuse */}
+      {editingQuiz && (
+        <CreateLessonEditModal
+          lesson={{
+            id: `quiz-${editingQuiz.id}`,
+            quiz_id: editingQuiz.id,
+            title: editingQuiz.title,
+            type: "quiz",
+          } as any}
+          courseId={editingQuiz.course?.id ? String(editingQuiz.course.id) : undefined}
+          onSave={async () => {
+            setEditingQuiz(null);
+            fetchQuizzes(courseIdNum);
+          }}
+          onClose={() => setEditingQuiz(null)}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       {quizToDelete && (

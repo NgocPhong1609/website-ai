@@ -407,7 +407,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: St
           {attachedSuccess ? (
             <button
               type="button"
-              onClick={() => router.push(`/instructor/courses/${selectedCourseId}/lessons`)}
+              onClick={() => router.push(`/instructor/courses/${selectedCourseId}/edit`)}
               className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl shadow-lg transition-all cursor-pointer flex items-center gap-2"
             >
               <span>🚀 Xem Trong Quản Lý Khóa Học</span>

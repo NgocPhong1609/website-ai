@@ -168,16 +168,67 @@ class QuizService
             $order = $maxOrder + 1;
         }
 
+        // Clean module/lesson IDs for course-level positions
+        $moduleId = ($position === 'capability_assessment' || $position === 'end_of_course')
+            ? null
+            : ($attachData['module_id'] ?? null);
+
+        $afterLessonId = ($position === 'capability_assessment' || $position === 'end_of_course' || $position === 'in_module')
+            ? null
+            : ($attachData['after_lesson_id'] ?? null);
+
+        // Check if another active attachment exists for this position in the course
+        $hasActive = QuizCourseAttachment::where('course_id', $attachData['course_id'])
+            ->where('position', $position)
+            ->where('is_active', true)
+            ->exists();
+
+        $isActive = !$hasActive;
+
         return QuizCourseAttachment::updateOrCreate(
             ['quiz_id' => $quiz->id],
             [
                 'course_id' => $attachData['course_id'],
-                'module_id' => $attachData['module_id'] ?? null,
-                'after_lesson_id' => $attachData['after_lesson_id'] ?? null,
+                'module_id' => $moduleId,
+                'after_lesson_id' => $afterLessonId,
                 'position' => $position,
                 'order' => (int) $order,
+                'is_active' => $isActive,
             ]
         );
+    }
+
+    /**
+     * Set a quiz attachment as the active/primary quiz for a specific position in a course.
+     */
+    public function setActiveQuiz(Quiz $quiz, int $courseId, ?string $position = null): bool
+    {
+        $attachment = QuizCourseAttachment::where('quiz_id', $quiz->id)->first();
+
+        if (!$attachment) {
+            // Create attachment if not existing
+            $pos = $position ?? 'capability_assessment';
+            $attachment = $this->attachQuizToCourse($quiz, [
+                'course_id' => $courseId,
+                'position' => $pos,
+            ]);
+        }
+
+        $targetPosition = $position ?? $attachment->position;
+
+        // Reset is_active for all other attachments of this course and position
+        QuizCourseAttachment::where('course_id', $courseId)
+            ->where('position', $targetPosition)
+            ->update(['is_active' => false]);
+
+        // Set target attachment as active
+        $attachment->update([
+            'course_id' => $courseId,
+            'position' => $targetPosition,
+            'is_active' => true,
+        ]);
+
+        return true;
     }
 
     public function detachQuizFromCourse(Quiz $quiz, ?int $courseId = null): bool
@@ -194,10 +245,24 @@ class QuizService
      */
     public function getInstructorQuizzes(User $instructor, ?int $courseId = null)
     {
-        $query = Quiz::where('instructor_id', $instructor->id);
+        $instructorCourseIds = \App\Models\Course::where('teacher_id', $instructor->id)->pluck('id')->toArray();
+
+        $query = Quiz::where(function ($q) use ($instructor, $instructorCourseIds) {
+            $q->where('instructor_id', $instructor->id);
+
+            if (!empty($instructorCourseIds)) {
+                $q->orWhereHas('attachments', function ($att) use ($instructorCourseIds) {
+                    $att->whereIn('course_id', $instructorCourseIds);
+                })->orWhereHas('lesson', function ($les) use ($instructorCourseIds) {
+                    $les->whereIn('course_id', $instructorCourseIds)
+                        ->orWhereHas('module', function ($mod) use ($instructorCourseIds) {
+                            $mod->whereIn('course_id', $instructorCourseIds);
+                        });
+                });
+            }
+        });
 
         if ($courseId) {
-            // Verify that course belongs to instructor
             $ownsCourse = \App\Models\Course::where('id', $courseId)
                 ->where('teacher_id', $instructor->id)
                 ->exists();
@@ -209,18 +274,102 @@ class QuizService
             $query->where(function ($q) use ($courseId) {
                 $q->whereHas('attachments', function ($att) use ($courseId) {
                     $att->where('course_id', $courseId);
-                })->orWhereHas('lesson.module', function ($mod) use ($courseId) {
-                    $mod->where('course_id', $courseId);
                 })->orWhereHas('lesson', function ($les) use ($courseId) {
-                    $les->where('course_id', $courseId);
+                    $les->where('course_id', $courseId)
+                        ->orWhereHas('module', function ($mod) use ($courseId) {
+                            $mod->where('course_id', $courseId);
+                        });
                 });
             });
         }
 
-        return $query->withCount('questions')
-            ->with(['attachments.course', 'lesson.module.course', 'lesson.course'])
+        $quizzes = $query->withCount('questions')
+            ->with(['questions.answers', 'attachments.course', 'attachments.module', 'lesson.module.course', 'lesson.course'])
             ->orderBy('created_at', 'desc')
             ->get();
+
+        return $quizzes->map(function ($quiz) {
+            $attachment = $quiz->attachments->first();
+            $course = $attachment?->course ?? $quiz->lesson?->module?->course ?? $quiz->lesson?->course;
+            $module = $attachment?->module ?? $quiz->lesson?->module;
+
+            $mcCount = $quiz->questions->where('type', 'multiple_choice')->count();
+            $essayCount = $quiz->questions->where('type', 'essay')->count();
+
+            return [
+                'id' => $quiz->id,
+                'instructor_id' => $quiz->instructor_id,
+                'lesson_id' => $quiz->lesson_id,
+                'title' => $quiz->title,
+                'description' => $quiz->description,
+                'source_type' => $quiz->source_type ?? 'topic',
+                'type' => $quiz->type ?? 'normal',
+                'difficulty' => $quiz->difficulty ?? 'mixed',
+                'total_questions' => $quiz->questions_count ?? $quiz->questions->count(),
+                'mc_questions_count' => $mcCount ?: ($quiz->mc_questions_count ?? 0),
+                'essay_questions_count' => $essayCount ?: ($quiz->essay_questions_count ?? 0),
+                'time_limit_minutes' => $quiz->time_limit_minutes ?? 15,
+                'passing_score' => $quiz->passing_score ?? 70,
+                'total_points' => $quiz->total_points ?? 10.0,
+                'status' => $quiz->status ?? 'published',
+                'created_at' => $quiz->created_at ? $quiz->created_at->toISOString() : null,
+                'is_active' => (bool) ($attachment?->is_active ?? false),
+                'position' => $attachment?->position ?? ($quiz->type === 'capability_assessment' ? 'capability_assessment' : 'end_of_course'),
+                'course' => $course ? [
+                    'id' => $course->id,
+                    'title' => $course->title,
+                ] : null,
+                'module' => $module ? [
+                    'id' => $module->id,
+                    'title' => $module->title,
+                ] : null,
+                'attachments' => $quiz->attachments->map(function ($att) {
+                    return [
+                        'id' => $att->id,
+                        'course_id' => $att->course_id,
+                        'module_id' => $att->module_id,
+                        'position' => $att->position,
+                        'is_active' => (bool) $att->is_active,
+                        'course' => $att->course ? ['id' => $att->course->id, 'title' => $att->course->title] : null,
+                        'module' => $att->module ? ['id' => $att->module->id, 'title' => $att->module->title] : null,
+                    ];
+                })->toArray(),
+                'questions' => $quiz->questions->map(function ($q) {
+                    $answers = $q->answers ? $q->answers->map(function ($a) {
+                        return [
+                            'id' => $a->id,
+                            'content' => $a->content,
+                            'is_correct' => (bool) $a->is_correct,
+                        ];
+                    })->values()->toArray() : [];
+
+                    $options = $q->answers ? $q->answers->pluck('content')->toArray() : [];
+                    $correctIdx = 0;
+                    if ($q->answers) {
+                        $found = $q->answers->search(fn($a) => (bool)$a->is_correct);
+                        if ($found !== false) {
+                            $correctIdx = $found;
+                        }
+                    }
+
+                    return [
+                        'id' => $q->id,
+                        'type' => $q->type ?? 'multiple_choice',
+                        'question' => $q->content,
+                        'content' => $q->content,
+                        'explanation' => $q->explanation,
+                        'sample_answer' => $q->sample_answer,
+                        'rubric' => $q->rubric,
+                        'points' => (float) ($q->points ?? 1.0),
+                        'difficulty' => $q->difficulty ?? 'medium',
+                        'order' => $q->order,
+                        'options' => $options,
+                        'correct_answer_index' => $correctIdx,
+                        'answers' => $answers,
+                    ];
+                })->values()->toArray(),
+            ];
+        });
     }
 
     /**

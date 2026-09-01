@@ -14,6 +14,12 @@ class QuizCourseAttachment extends Model
         'after_lesson_id',
         'position',
         'order',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'order' => 'integer',
     ];
 
     public function quiz(): BelongsTo

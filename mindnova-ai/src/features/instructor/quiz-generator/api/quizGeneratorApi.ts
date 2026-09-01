@@ -142,6 +142,15 @@ export const quizGeneratorApi = {
  return res.data;
  },
 
+  // Set active quiz for a course position
+  setActiveQuiz: async (quizId: number, courseId: number, position?: string) => {
+    const res = await axiosClient.post(`/api/instructor/ai-quiz/${quizId}/set-active`, {
+      course_id: courseId,
+      position,
+    });
+    return res.data;
+  },
+
  // Get instructor courses for attachment dropdown
  getInstructorCourses: async (): Promise<{ success: boolean; data: any[] }> => {
  const res = await axiosClient.get("/api/instructor/courses?per_page=100");

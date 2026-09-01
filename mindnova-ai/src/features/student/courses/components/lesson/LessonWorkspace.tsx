@@ -1025,7 +1025,7 @@ function LessonWorkspaceContent() {
               if (typeof window !== "undefined" && window.history.length > 1) {
                 window.close();
               }
-              window.location.href = `/instructor/courses/${parsedCourseId}/lessons`;
+              window.location.href = `/instructor/courses/${parsedCourseId}/edit`;
             }}
             className="px-3.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs transition-all cursor-pointer border border-white/20 shrink-0 flex items-center gap-1.5 shadow-2xs"
           >

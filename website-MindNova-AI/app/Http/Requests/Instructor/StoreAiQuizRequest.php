@@ -18,7 +18,7 @@ class StoreAiQuizRequest extends FormRequest
             'description' => 'nullable|string',
             'source_type' => 'nullable|string|in:content,topic,course',
             'source_content' => 'nullable|string',
-            'course_id' => 'nullable|integer|exists:courses,id',
+            'course_id' => 'required|integer|exists:courses,id',
             'difficulty' => 'nullable|string|in:easy,medium,hard,mixed',
             'time_limit_minutes' => 'nullable|integer|min:0',
             'passing_score' => 'nullable|integer|min:0|max:100',
@@ -34,6 +34,14 @@ class StoreAiQuizRequest extends FormRequest
             'questions.*.answers' => 'required_if:questions.*.type,multiple_choice|array',
             'questions.*.answers.*.content' => 'required|string',
             'questions.*.answers.*.is_correct' => 'required|boolean',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'course_id.required' => 'Vui lòng chọn khóa học trước khi tạo Quiz.',
+            'course_id.exists' => 'Khóa học được chọn không tồn tại trong hệ thống.',
         ];
     }
 

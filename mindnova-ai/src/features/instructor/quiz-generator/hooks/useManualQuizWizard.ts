@@ -24,7 +24,7 @@ export function useManualQuizWizard(options?: {
   const [config, setConfig] = useState<QuizConfig>({
     title: "Bài kiểm tra mới",
     description: "Đề kiểm tra trắc nghiệm & tự luận",
-    source_type: "topic",
+    source_type: "manual" as any,
     course_id: courseIdParam || undefined,
     source_content: "",
     topic: "Kiến thức bài học",
@@ -103,7 +103,7 @@ export function useManualQuizWizard(options?: {
       const response = await quizGeneratorApi.saveQuiz({
         title: config.title,
         description: config.description,
-        source_type: "topic",
+        source_type: "manual",
         source_content: config.title,
         course_id: config.course_id,
         difficulty: config.difficulty,

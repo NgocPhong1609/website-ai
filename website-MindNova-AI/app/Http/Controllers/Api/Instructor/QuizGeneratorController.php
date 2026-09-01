@@ -237,4 +237,25 @@ class QuizGeneratorController extends Controller
             ], 500);
         }
     }
+
+    public function setActive(Request $request, Quiz $quiz)
+    {
+        Gate::authorize('update', $quiz);
+
+        $request->validate([
+            'course_id' => 'required|integer|exists:courses,id',
+            'position' => 'nullable|string|in:capability_assessment,end_of_course,in_module,after_lesson',
+        ]);
+
+        $courseId = (int) $request->input('course_id');
+        $position = $request->input('position');
+
+        $success = $this->quizService->setActiveQuiz($quiz, $courseId, $position);
+
+        if ($success) {
+            return $this->successResponse(null, 'Đã chọn bài kiểm tra làm bài thi chính thành công.');
+        }
+
+        return $this->errorResponse('Không thể cập nhật bài kiểm tra chính.', 400);
+    }
 }

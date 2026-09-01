@@ -18,6 +18,12 @@ export interface LessonNode {
   video_url?: string;
   temp_media_ids?: number[];
   quizData?: unknown;
+  status?: string;
+  position?: string;
+  time_limit_minutes?: number;
+  passing_score?: number;
+  total_questions?: number;
+  quiz_id?: number;
 }
 
 export interface ChapterNode {

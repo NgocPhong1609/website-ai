@@ -112,15 +112,29 @@ export function useUpdateLesson() {
 }
 
 export function useDeleteLesson() {
- const queryClient = useQueryClient();
- return useMutation({
- mutationFn: async ({ courseId, lessonId }: { courseId: string; lessonId: string | number }) => {
- await axiosClient.delete(`/api/instructor/lessons/${lessonId}`);
- },
- onSuccess: (_, { courseId }) => {
- queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId, "modules"] });
- },
- });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ courseId, lessonId }: { courseId: string; lessonId: string | number }) => {
+      await axiosClient.delete(`/api/instructor/lessons/${lessonId}`);
+    },
+    onSuccess: (_, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId, "modules"] });
+    },
+  });
+}
+
+export function useReorderModuleItems() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ courseId, moduleId, items }: { courseId: string; moduleId: string | number; items: Array<{ id: string | number; order: number }> }) => {
+      const { data } = await axiosClient.put(`/api/instructor/modules/${moduleId}/reorder-items`, { items });
+      return data;
+    },
+    onSuccess: (_, { courseId }) => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "courses", courseId, "modules"] });
+      queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId, "modules"] });
+    },
+  });
 }
 
 // ─── Quiz Helper ─────────────────────────────────────────────────────────────

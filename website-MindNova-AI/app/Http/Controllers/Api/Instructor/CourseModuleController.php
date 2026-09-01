@@ -14,6 +14,9 @@ use Illuminate\Http\Request;
 
 use App\Services\Instructor\CourseStructureService;
 
+use App\Models\Lesson;
+use App\Models\QuizCourseAttachment;
+
 class CourseModuleController extends Controller
 {
     use ApiResponse;
@@ -59,6 +62,36 @@ class CourseModuleController extends Controller
         $module = $this->moduleService->updateModule($module, $request->validated());
 
         return $this->successResponse(new CourseModuleResource($module), 'Module updated successfully.');
+    }
+
+    public function reorderItems(Request $request, CourseModule $module)
+    {
+        Gate::authorize('manage', $module);
+
+        $request->validate([
+            'items' => 'required|array',
+            'items.*.id' => 'required',
+            'items.*.order' => 'required|integer',
+        ]);
+
+        foreach ($request->items as $item) {
+            $itemId = (string) $item['id'];
+            $order = (int) $item['order'];
+
+            if (str_starts_with($itemId, 'quiz-')) {
+                $quizId = (int) str_replace('quiz-', '', $itemId);
+                QuizCourseAttachment::where('quiz_id', $quizId)
+                    ->where('course_id', $module->course_id)
+                    ->update(['order' => $order]);
+            } else {
+                $lessonId = (int) $itemId;
+                Lesson::where('id', $lessonId)
+                    ->where('module_id', $module->id)
+                    ->update(['order' => $order]);
+            }
+        }
+
+        return $this->successResponse(null, 'Module items reordered successfully.');
     }
 
     public function destroy(CourseModule $module)
