@@ -35,7 +35,7 @@ class StoreAiQuizRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'source_type' => 'nullable|string|in:content,topic,course',
+            'source_type' => 'nullable|string|in:content,topic,course,manual',
             'source_content' => 'nullable|string',
             'course_id' => 'nullable|integer|exists:courses,id',
             'difficulty' => 'nullable|string|in:easy,medium,hard,mixed',

@@ -47,6 +47,7 @@ class BackupAiService extends AbstractAiService
             'model' => $model,
             'messages' => $openAiMessages,
             'temperature' => 0.7,
+            'max_tokens' => (int) ($options['max_tokens'] ?? 8192),
         ];
         
         if (!empty($options['response_mime_type']) && $options['response_mime_type'] === 'application/json') {

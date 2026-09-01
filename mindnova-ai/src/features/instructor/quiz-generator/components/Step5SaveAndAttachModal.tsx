@@ -301,96 +301,27 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: St
               <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">
                 2. Chọn vị trí xuất hiện bài kiểm tra trong khóa học
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 {[
                   { key: "capability_assessment", label: "Kiểm tra tổng quát", icon: "🏆" },
                   { key: "end_of_course", label: "Cuối khóa học", icon: "🏁" },
-                  { key: "in_module", label: "Trong một Module", icon: "📦" },
-                  { key: "after_lesson", label: "Sau bài học cụ thể", icon: "📖" },
                 ].map((pos) => (
                   <button
                     key={pos.key}
                     type="button"
                     onClick={() => handlePositionChange(pos.key as any)}
-                    className={`p-3 rounded-xl border text-[11px] font-extrabold flex flex-col items-center gap-1 transition-all cursor-pointer text-center ${
+                    className={`p-3.5 rounded-xl border text-xs font-extrabold flex flex-col items-center gap-1.5 transition-all cursor-pointer text-center ${
                       position === pos.key
                         ? "border-[#C0392B] bg-indigo-50 text-[#C0392B] shadow-xs ring-1 ring-[#C0392B]/30"
                         : "border-[#E8E2D9] text-[#8A8478] hover:border-gray-300 bg-white"
                     }`}
                   >
-                    <span className="text-base">{pos.icon}</span>
+                    <span className="text-xl">{pos.icon}</span>
                     <span className="leading-tight">{pos.label}</span>
                   </button>
                 ))}
               </div>
             </div>
-
-            {/* Position Options Dropdowns & Zero-Data Alert Warnings */}
-            {position === "in_module" && (
-              <div className="flex flex-col gap-1.5 animate-fadeIn">
-                <label className="block text-xs font-extrabold text-gray-700">
-                  Chọn Module thuộc khóa học "{courseTitle}":
-                </label>
-                {isLoadingCourseDetails ? (
-                  <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 text-xs font-bold text-gray-400 animate-pulse">
-                    Đang nạp danh sách Module...
-                  </div>
-                ) : modules.length === 0 ? (
-                  <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs font-bold text-amber-800 flex flex-col gap-1">
-                    <span>⚠️ Khóa học "{courseTitle}" chưa có Module nào.</span>
-                    <span className="text-[11px] font-normal text-amber-700">
-                      Không thể gắn bài kiểm tra vào "Trong một Module". Vui lòng chọn vị trí "Cuối khóa học" hoặc "Kiểm tra tổng quát", hoặc tạo Module trong khóa học trước.
-                    </span>
-                  </div>
-                ) : (
-                  <select
-                    value={selectedModuleId || ""}
-                    onChange={(e) => setSelectedModuleId(Number(e.target.value))}
-                    className="w-full p-3 rounded-xl border border-[#E8E2D9] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B] cursor-pointer"
-                  >
-                    <option value="">-- Chọn Module trong khóa học --</option>
-                    {modules.map((m: any) => (
-                      <option key={m.id} value={m.id}>
-                        Module: {m.title}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-            )}
-
-            {position === "after_lesson" && (
-              <div className="flex flex-col gap-1.5 animate-fadeIn">
-                <label className="block text-xs font-extrabold text-gray-700">
-                  Chọn Bài học đứng trước thuộc khóa học "{courseTitle}":
-                </label>
-                {isLoadingCourseDetails ? (
-                  <div className="p-3 rounded-xl bg-gray-50 border border-gray-200 text-xs font-bold text-gray-400 animate-pulse">
-                    Đang nạp danh sách Bài học...
-                  </div>
-                ) : lessons.length === 0 ? (
-                  <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs font-bold text-amber-800 flex flex-col gap-1">
-                    <span>⚠️ Khóa học "{courseTitle}" chưa có Bài học nào.</span>
-                    <span className="text-[11px] font-normal text-amber-700">
-                      Không thể gắn bài kiểm tra "Sau bài học cụ thể". Vui lòng chọn vị trí "Cuối khóa học" hoặc "Kiểm tra tổng quát", hoặc thêm bài học vào khóa học trước.
-                    </span>
-                  </div>
-                ) : (
-                  <select
-                    value={selectedLessonId || ""}
-                    onChange={(e) => setSelectedLessonId(Number(e.target.value))}
-                    className="w-full p-3 rounded-xl border border-[#E8E2D9] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B] cursor-pointer"
-                  >
-                    <option value="">-- Chọn Bài học trong khóa học --</option>
-                    {lessons.map((l: any) => (
-                      <option key={l.id} value={l.id}>
-                        {l.title} {l.module_title ? `(${l.module_title})` : ""}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-            )}
           </div>
         )}
 

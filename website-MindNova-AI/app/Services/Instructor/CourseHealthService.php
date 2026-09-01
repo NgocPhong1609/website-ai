@@ -107,7 +107,7 @@ class CourseHealthService
             return;
         }
 
-        if ($lesson->type === 'quiz_module') {
+        if ($lesson->type === 'quiz_module' || $lesson->type === 'quiz') {
             $quiz = $lesson->quiz;
             $this->require($issues, $quiz !== null, "{$prefix}.quiz", 'Bài quiz chưa có bộ câu hỏi.');
             if (!$quiz) {
@@ -116,7 +116,9 @@ class CourseHealthService
 
             $this->require($issues, $quiz->questions->isNotEmpty(), "{$prefix}.quiz.questions", 'Quiz cần có ít nhất một câu hỏi.');
             foreach ($quiz->questions as $question) {
-                $this->require($issues, $question->answers->count() >= 2, "{$prefix}.quiz.question.{$question->id}", 'Mỗi câu hỏi cần ít nhất hai đáp án.');
+                if ($question->type === 'multiple_choice') {
+                    $this->require($issues, $question->answers->count() >= 2, "{$prefix}.quiz.question.{$question->id}", 'Mỗi câu hỏi trắc nghiệm cần ít nhất hai đáp án.');
+                }
             }
             return;
         }

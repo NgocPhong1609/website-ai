@@ -14,7 +14,7 @@ class GenerateAiQuizRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'source_type' => 'nullable|in:content,topic,course',
+            'source_type' => 'nullable|in:content,topic,course,manual',
             'course_id' => 'nullable|integer|exists:courses,id',
             'content' => 'nullable|string',
             'topic' => 'nullable|string',

@@ -12,6 +12,33 @@ interface QuestionCardEssayProps {
  onRegenerate: (id: string) => void;
 }
 
+const formatToString = (val: any): string => {
+  if (!val) return "";
+  if (typeof val === "string") return val;
+  if (Array.isArray(val)) {
+    return val
+      .map((item) => {
+        if (typeof item === "string") return item;
+        if (typeof item === "object" && item !== null) {
+          const crit = item.criterion || item.title || item.name || item.description || "";
+          const weight = item.weight_percent ? ` (${item.weight_percent}%)` : (item.weight ? ` (${item.weight}%)` : "");
+          const score = item.score !== undefined ? ` = ${item.score} điểm` : (item.points !== undefined ? ` = ${item.points} điểm` : "");
+          return `- ${crit}${weight}${score}`;
+        }
+        return String(item);
+      })
+      .join("\n");
+  }
+  if (typeof val === "object") {
+    try {
+      return JSON.stringify(val, null, 2);
+    } catch {
+      return String(val);
+    }
+  }
+  return String(val);
+};
+
 export function QuestionCardEssay({
  question,
  index,
@@ -21,9 +48,12 @@ export function QuestionCardEssay({
  onRegenerate,
 }: QuestionCardEssayProps) {
  const [isEditing, setIsEditing] = useState(false);
+ const sampleAnswerStr = formatToString(question.sample_answer);
+ const rubricStr = formatToString(question.rubric);
+
  const [draftQ, setDraftQ] = useState(question.question);
- const [draftSampleAnswer, setDraftSampleAnswer] = useState(question.sample_answer);
- const [draftRubric, setDraftRubric] = useState(question.rubric);
+ const [draftSampleAnswer, setDraftSampleAnswer] = useState(sampleAnswerStr);
+ const [draftRubric, setDraftRubric] = useState(rubricStr);
  const [draftPoints, setDraftPoints] = useState(question.points);
 
  const isApproved = question.reviewStatus === "approved" || question.reviewStatus === "edited";
@@ -162,24 +192,24 @@ export function QuestionCardEssay({
  {question.question}
  </h4>
 
- {question.sample_answer && (
+ {sampleAnswerStr && (
  <div className="p-4 rounded-2xl bg-purple-50/60 border -[#FAF7F2] flex flex-col gap-1 text-xs">
  <span className="font-extrabold -[#C0392B] flex items-center gap-1">
  Đáp án tham khảo mẫu:
  </span>
  <p className="text-purple-950 font-medium leading-relaxed whitespace-pre-line">
- {question.sample_answer}
+ {sampleAnswerStr}
  </p>
  </div>
  )}
 
- {question.rubric && (
+ {rubricStr && (
  <div className="p-3.5 rounded-2xl bg-[#FEFCF9] border border-[#E8E2D9] flex flex-col gap-1 text-xs">
  <span className="font-bold text-gray-700 flex items-center gap-1">
  Gợi ý Rubric chấm điểm:
  </span>
  <p className="text-[#8A8478] font-medium whitespace-pre-line leading-relaxed">
- {question.rubric}
+ {rubricStr}
  </p>
  </div>
  )}
