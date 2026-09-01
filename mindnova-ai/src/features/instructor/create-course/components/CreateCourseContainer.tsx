@@ -92,18 +92,26 @@ export function CreateCourseContainer() {
  draftLesson.content = lesson.content;
  }
 
- // Gắn câu hỏi trắc nghiệm cho bài quiz
- if (lessonType === "quiz" && typeof lesson === "object" && Array.isArray(lesson.questions)) {
+ if (typeof lesson === "object" && lesson.quizData) {
+ draftLesson.quizData = lesson.quizData;
+ } else if (lessonType === "quiz" && typeof lesson === "object" && Array.isArray(lesson.questions)) {
  draftLesson.quizData = {
  title: lessonTitle,
  time_limit_minutes: 15,
  passing_score: 80,
  questions: lesson.questions.map((q: any) => ({
  id: uid(),
- content: q.content,
+ type: q.type || "multiple_choice",
+ question: q.content || q.question || "",
+ content: q.content || q.question || "",
+ explanation: q.explanation || "",
+ sample_answer: q.sample_answer || "",
+ rubric: q.rubric || "",
+ points: q.points || (q.type === "essay" ? 5.0 : 1.0),
+ difficulty: q.difficulty || "medium",
  answers: (q.answers || []).map((a: any) => ({
  id: uid(),
- content: a.content,
+ content: a.content || a.answer || "",
  is_correct: a.is_correct === true,
  })),
  })),

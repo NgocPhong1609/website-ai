@@ -243,10 +243,12 @@ class QuizService
                 $totalPoints += (float) ($q['points'] ?? 0.0);
             }
 
+            $teacherId = auth()->id() ?? ($lesson->course->teacher_id ?? ($lesson->module->course->teacher_id ?? null));
+
             $quiz = Quiz::updateOrCreate(
                 ['lesson_id' => $lesson->id],
                 [
-                    'instructor_id' => $lesson->module->course->teacher_id ?? null,
+                    'instructor_id' => $teacherId,
                     'title' => $data['title'],
                     'time_limit_minutes' => $data['time_limit_minutes'] ?? 15,
                     'passing_score' => $data['passing_score'] ?? 70,
@@ -256,6 +258,19 @@ class QuizService
                     'total_points' => round($totalPoints, 2),
                 ]
             );
+
+            $courseId = $lesson->course_id ?? ($lesson->module->course_id ?? null);
+            if ($courseId) {
+                QuizCourseAttachment::updateOrCreate(
+                    ['quiz_id' => $quiz->id],
+                    [
+                        'course_id' => $courseId,
+                        'module_id' => $lesson->module_id,
+                        'after_lesson_id' => $lesson->id,
+                        'position' => 'after_lesson',
+                    ]
+                );
+            }
 
             $quiz->questions()->delete();
 
@@ -274,11 +289,23 @@ class QuizService
                     'ai_insight' => $questionData['ai_insight'] ?? null,
                 ]);
 
-                if ($type !== 'essay' && !empty($questionData['answers'])) {
-                    foreach ($questionData['answers'] as $answerData) {
+                if ($type !== 'essay') {
+                    $answersList = $questionData['answers'] ?? [];
+
+                    if (empty($answersList) && !empty($questionData['options']) && is_array($questionData['options'])) {
+                        $correctIdx = is_numeric($questionData['correct_answer_index'] ?? null) ? (int)$questionData['correct_answer_index'] : 0;
+                        foreach ($questionData['options'] as $optIdx => $optContent) {
+                            $answersList[] = [
+                                'content' => (string) $optContent,
+                                'is_correct' => $optIdx == $correctIdx,
+                            ];
+                        }
+                    }
+
+                    foreach ($answersList as $answerData) {
                         $question->answers()->create([
-                            'content' => $answerData['content'],
-                            'is_correct' => (bool) $answerData['is_correct'],
+                            'content' => $answerData['content'] ?? $answerData['answer'] ?? '',
+                            'is_correct' => !empty($answerData['is_correct']),
                         ]);
                     }
                 }

@@ -370,7 +370,7 @@ SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 
   - [ ] NOT TESTED
 - **Ghi chú khi test**: ................................................................
 +Tạo khóa học thành công.
-+Tạo quiz trắc nghiệm & tự luận lưu thành công vào các bảng DB `quizzes`, `questions`, `answers`.
++Tạo quiz trắc nghiệm & tự luận lưu thành công vào các bảng DB `quizzes`, `questions`, `answers`.x Chưa được
 +Đặt khoảng giá khóa học và flash sale hoạt động chính xác.
 
 **Đã thay đổi**
@@ -516,7 +516,7 @@ SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 
 +Đã test.
 ---
 
-### [v] 14. Quản lý Quiz Thủ công (Manual Quiz Editor)
+### [] 14. Quản lý Quiz Thủ công (Manual Quiz Editor)
 - **Vai trò**: Instructor
 - **Mức độ**: Chức năng chính
 - **Mô tả**: Tự nhập câu hỏi, các đáp án lựa chọn, tích chọn đáp án đúng, giải thích đáp án và thiết lập thời gian làm bài (phút), điểm đạt (passing score).
@@ -534,8 +534,8 @@ SQLSTATE[01000]: Warning: 1265 Data truncated for column 'skill_level' at row 1 
   - Frontend: [QuizEditor.tsx](file:///h:/du_an/website/mindnova-ai/src/features/instructor/create-course/components/QuizEditor.tsx)
   - Backend: [QuizController.php](file:///h:/du_an/website/website-MindNova-AI/app/Http/Controllers/Api/Instructor/QuizController.php)
 - **Kết quả test thủ công**:
-  - [v] PASS
-  - [ ] FAIL
+  - [] PASS
+  - [v] FAIL
   - [ ] PARTIAL
   - [ ] NOT TESTED
 - **Ghi chú khi test**: ................................................................

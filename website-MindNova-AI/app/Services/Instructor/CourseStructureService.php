@@ -125,6 +125,7 @@ class CourseStructureService
 
                 foreach ($afterLessonQuizzes as $att) {
                     if (!$att->quiz) continue;
+                    if ($les->quiz && (int)$les->quiz->id === (int)$att->quiz->id) continue;
                     $quiz = $att->quiz;
                     $moduleItems[] = [
                         'id' => 'quiz-' . $quiz->id,
