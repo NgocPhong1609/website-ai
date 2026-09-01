@@ -63,7 +63,7 @@ export function QuizGeneratorWizard({
                 🪄
               </div>
               <div>
-                <h1 className="text-lg font-black text-[#2C3039]">AI Quiz Generator Co-Creator</h1>
+                <h1 className="text-lg font-black text-[#2C3039]">Trợ Lý Tạo Bài Kiểm Tra AI</h1>
                 <p className="text-xs text-[#8A8478] font-semibold">Tạo bài kiểm tra trắc nghiệm &amp; tự luận bằng AI</p>
               </div>
             </div>

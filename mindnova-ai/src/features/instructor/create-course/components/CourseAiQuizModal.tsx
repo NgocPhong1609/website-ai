@@ -31,13 +31,23 @@ export function CourseAiQuizModal({
     };
   }, [isOpen]);
 
+  const handleSafeClose = () => {
+    if (confirm("Bạn có chắc chắn muốn thoát khỏi tiến trình tạo bài kiểm tra AI? Các nội dung chưa lưu sẽ bị hủy.")) {
+      onClose();
+    }
+  };
+
   if (!isOpen) return null;
 
   const isGeneral = position === "capability_assessment";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto animate-fadeIn [font-family:var(--font-admin-body)]">
-      <div className="relative w-full max-w-5xl bg-[#FDFBF7] rounded-3xl shadow-2xl overflow-hidden my-6 border border-gray-200 max-h-[92vh] flex flex-col">
+      <div 
+        className="absolute inset-0"
+        onClick={handleSafeClose}
+      />
+      <div className="relative w-full max-w-5xl bg-[#FDFBF7] rounded-3xl shadow-2xl overflow-hidden my-6 border border-gray-200 max-h-[92vh] flex flex-col z-10">
         
         {/* Modal Header */}
         <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between shrink-0">
@@ -65,7 +75,7 @@ export function CourseAiQuizModal({
 
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleSafeClose}
             className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-sm transition-all cursor-pointer"
             title="Đóng modal"
           >

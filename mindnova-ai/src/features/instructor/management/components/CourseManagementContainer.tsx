@@ -19,17 +19,19 @@ function CourseManagementContent() {
 
   const { data: courses, isLoading, isError } = useInstructorCourses(urlSearch || undefined);
   const [page, setPage] = useState(1);
-  const [filter, setFilter] = useState<"all" | "active" | "draft">("all");
+  const [filter, setFilter] = useState<"all" | "active" | "pending" | "draft">("all");
   const [searchQuery, setSearchQuery] = useState(urlSearch);
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "price_high" | "price_low" | "title_az">("newest");
 
   const totalCourses = courses?.length || 0;
-  const activeCourses = courses?.filter((c) => c.status === "published").length || 0;
-  const draftCourses = courses?.filter((c) => c.status === "draft").length || 0;
+  const activeCourses = courses?.filter((c) => c.status === "published" || c.status === "approved").length || 0;
+  const pendingCourses = courses?.filter((c) => c.status === "pending" || c.status === "pending_approval" || c.status === "under_review").length || 0;
+  const draftCourses = courses?.filter((c) => c.status === "draft" || (!c.status && c.status !== "published" && c.status !== "pending")).length || 0;
 
   const counts = {
     all: totalCourses,
     active: activeCourses,
+    pending: pendingCourses,
     draft: draftCourses,
   };
 
@@ -37,8 +39,13 @@ function CourseManagementContent() {
     if (!courses) return [];
 
     let list = courses.filter((c) => {
-      if (filter === "active" && c.status !== "published") return false;
-      if (filter === "draft" && c.status !== "draft") return false;
+      const isPublished = c.status === "published" || c.status === "approved";
+      const isPending = c.status === "pending" || c.status === "pending_approval" || c.status === "under_review";
+      const isDraft = c.status === "draft" || (!c.status && !isPublished && !isPending);
+
+      if (filter === "active" && !isPublished) return false;
+      if (filter === "pending" && !isPending) return false;
+      if (filter === "draft" && !isDraft) return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -62,7 +69,7 @@ function CourseManagementContent() {
   const allItems = [...processedCourses, "CREATE_CARD"];
   const paginatedItems = allItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  function handleFilterChange(newFilter: "all" | "active" | "draft") {
+  function handleFilterChange(newFilter: "all" | "active" | "pending" | "draft") {
     setFilter(newFilter);
     setPage(1);
   }

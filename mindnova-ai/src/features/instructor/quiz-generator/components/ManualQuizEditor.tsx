@@ -232,9 +232,16 @@ export function ManualQuizEditor({
             type="button"
             onClick={() => onSave("published")}
             disabled={isSaving || questions.length === 0 || !isValidTotal}
-            className="px-8 py-3 bg-[#C0392B] hover:bg-[#a02c20] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-8 py-3 bg-[#C0392B] hover:bg-[#a02c20] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
           >
-            <span>✨ Hoàn Tất &amp; Thêm Vào Giáo Trình</span>
+            {isSaving ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Đang lưu bài kiểm tra...</span>
+              </>
+            ) : (
+              <span>✨ Hoàn Tất &amp; Thêm Vào Giáo Trình</span>
+            )}
           </button>
         </div>
       </div>

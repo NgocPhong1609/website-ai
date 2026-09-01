@@ -278,7 +278,7 @@ export default function InstructorQuizListPage() {
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-black text-white">AI Quiz Generator Module</h1>
+                <h1 className="text-2xl font-black text-white">Trợ Lý Tạo Bài Kiểm Tra AI</h1>
                 {courseIdNum && (
                   <span className="px-2.5 py-0.5 rounded-md bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 text-[10px] font-mono font-black">
                     Course #{courseIdNum}
@@ -437,7 +437,7 @@ export default function InstructorQuizListPage() {
             <div className="flex flex-col gap-1 max-w-md">
               <p className="text-sm font-extrabold text-[#1A1A2E]">Chưa có đề kiểm tra nào.</p>
               <p className="text-xs font-medium text-gray-500">
-                Hãy sử dụng AI Quiz Generator hoặc tạo thủ công để xây dựng bộ đề đầu tiên cho sinh viên.
+                Hãy sử dụng bộ tạo bài kiểm tra AI hoặc tạo thủ công để xây dựng bộ đề đầu tiên cho học viên.
               </p>
             </div>
             <div className="flex items-center gap-3 mt-2">

@@ -1,6 +1,6 @@
 // ─── Instructor Course Management — Types ─────────────────────────────────────
 
-export type CourseStatus = "published" | "draft";
+export type CourseStatus = "published" | "draft" | "pending" | "pending_approval" | "under_review" | "approved" | "rejected";
 
 export type CourseAction = "upload" | "lessons" | "curriculum" | "pricing";
 

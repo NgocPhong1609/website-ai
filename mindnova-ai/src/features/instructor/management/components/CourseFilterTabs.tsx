@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-type FilterKey = "all" | "active" | "draft";
+type FilterKey = "all" | "active" | "pending" | "draft";
 
 interface Tab {
  key: FilterKey;
@@ -15,11 +15,12 @@ interface Tab {
 const TABS: Tab[] = [
  { key: "all", label: "Tất cả" },
  { key: "active", label: "Đang dạy" },
+ { key: "pending", label: "Đang chờ duyệt" },
  { key: "draft", label: "Bản nháp" },
 ];
 
 interface CourseFilterTabsProps {
- counts: { all: number; active: number; draft: number };
+ counts: { all: number; active: number; pending?: number; draft: number };
  onFilterChange?: (key: FilterKey) => void;
 }
 

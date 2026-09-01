@@ -218,7 +218,7 @@ export function InstructorSidebar() {
  const INSTRUCTOR_NAV: NavItem[] = [
  { label: "Quản lý Khóa học", href: "/instructor/courses", Icon: CourseManagementNavIcon },
  { 
- label: "Quiz Generator", 
+ label: "Tạo bài kiểm tra AI", 
  href: "/instructor/quiz-generator", 
  activePatterns: ["/instructor/quiz-generator"], 
  Icon: QuizNavIcon 

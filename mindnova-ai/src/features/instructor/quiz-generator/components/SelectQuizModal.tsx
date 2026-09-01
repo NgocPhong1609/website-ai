@@ -77,7 +77,7 @@ export function SelectQuizModal({
             <div>
               <h3 className="text-sm font-black text-[#1A1A2E]">Chọn Đề Thi từ Ngân Hàng Quiz</h3>
               <p className="text-[11px] text-gray-500 font-medium">
-                Nhập bài thi đã tạo từ AI Quiz Generator vào bài học này
+                Nhập bài thi đã tạo từ Bộ tạo bài kiểm tra AI vào bài học này
               </p>
             </div>
           </div>
@@ -113,7 +113,7 @@ export function SelectQuizModal({
               <span className="text-3xl">📋</span>
               <p className="text-xs font-bold text-gray-700">Chưa tìm thấy đề thi nào phù hợp</p>
               <p className="text-[11px] text-gray-500">
-                Hãy tạo bài thi mới trên giao diện AI Quiz Generator hoặc tạo trực tiếp câu hỏi ở đây.
+                Hãy tạo bài thi mới trên giao diện Bộ tạo bài kiểm tra AI hoặc tạo trực tiếp câu hỏi ở đây.
               </p>
             </div>
           ) : (

@@ -16,7 +16,7 @@ function getEmbedUrl(url: string): string | null {
 
 interface CreateLessonEditModalProps {
   lesson: DraftLesson;
-  onSave: (id: string, updates: Partial<DraftLesson>) => void;
+  onSave: (id: string, updates: Partial<DraftLesson>) => void | Promise<void>;
   onClose: () => void;
   courseId?: string | number;
 }
@@ -45,10 +45,14 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
   const isDoc = type === 'document' || (type as string) === 'article';
   const isVideo = type === 'video';
 
+  const initialVideoUrl = useRef((lesson as any).videoUrl || (lesson as any).video_url || "").current;
+
   const hasUnsavedChanges = 
     title !== lesson.title ||
     type !== lesson.type ||
     content !== ((lesson as any).content || "") ||
+    videoUrl !== initialVideoUrl ||
+    tempMediaMap.size > 0 ||
     JSON.stringify(quizData || null) !== JSON.stringify(lesson.quizData || null);
 
   const handleVideoUpload = async (file: File, onProgress: (p: number) => void) => {
@@ -129,16 +133,16 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
 
   const handleClose = useCallback(() => {
     if (isSaving) {
-      alert("Hệ thống đang lưu dữ liệu. Vui lòng chờ trong giây lát.");
+      alert("Hệ thống đang trong quá trình lưu dữ liệu. Vui lòng chờ trong giây lát.");
       return;
     }
     if (isUploadingVideo || activeImageUploads > 0) {
-      if (!confirm("Tiến trình tải lên đang diễn ra. Bạn có chắc chắn muốn dừng tải lên và đóng?")) {
+      if (!confirm("Tiến trình tải tệp (video/ảnh) lên đang diễn ra. Bạn có chắc chắn muốn hủy tải lên và thoát mà không lưu?")) {
         return;
       }
       abortControllerRef.current?.abort();
     } else if (hasUnsavedChanges) {
-      if (!confirm("Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn đóng?")) {
+      if (!confirm("Bạn có các thay đổi chưa được lưu. Bạn có chắc chắn muốn thoát mà không lưu?")) {
         return;
       }
     }
@@ -216,12 +220,11 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
             });
           } catch (err: any) {
             console.warn("Không thể cập nhật trực tiếp Quiz ID " + targetQuizId + " trên máy chủ:", err);
-            // Ignore 404 or missing quiz record so local draft save continues smoothly
           }
         }
       }
 
-      onSave(lesson.id, { 
+      await onSave(lesson.id, { 
         title, 
         type, 
         content: finalContent, 
@@ -252,7 +255,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
           <button 
             type="button" 
             onClick={handleClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8A8478] hover:bg-gray-100 hover:text-[#2C3039] transition-colors"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8A8478] hover:bg-gray-100 hover:text-[#2C3039] transition-colors cursor-pointer"
           >
             ✕
           </button>
@@ -294,14 +297,14 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
                     <button 
                       type="button" 
                       onClick={() => handleVideoMethodChange('url')}
-                      className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors ${videoMethod === 'url' ? 'bg-white text-[#2C3039] shadow-2xs' : 'text-[#8A8478] hover:text-gray-700'}`}
+                      className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer ${videoMethod === 'url' ? 'bg-white text-[#2C3039] shadow-2xs' : 'text-[#8A8478] hover:text-gray-700'}`}
                     >
                       Dùng URL
                     </button>
                     <button 
                       type="button" 
                       onClick={() => handleVideoMethodChange('upload')}
-                      className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors ${videoMethod === 'upload' ? 'bg-[#C0392B] text-white shadow-2xs' : 'text-[#8A8478] hover:text-gray-700'}`}
+                      className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer ${videoMethod === 'upload' ? 'bg-[#C0392B] text-white shadow-2xs' : 'text-[#8A8478] hover:text-gray-700'}`}
                     >
                       Tải lên máy chủ
                     </button>
@@ -338,7 +341,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
                           </p>
                           <button
                             type="button"
-                            className="mt-4 px-5 py-2 rounded-xl bg-[#C0392B] hover:bg-[#4338CA] text-white text-xs font-extrabold shadow-2xs transition-all pointer-events-none"
+                            className="mt-4 px-5 py-2 rounded-xl bg-[#C0392B] hover:bg-[#a02c20] text-white text-xs font-extrabold shadow-2xs transition-all pointer-events-none"
                           >
                             Chọn tệp video từ máy tính
                           </button>
@@ -406,13 +409,26 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
             type="button"
             onClick={handleSave}
             disabled={isSaving || isUploadingVideo || activeImageUploads > 0}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-black text-white bg-[#C0392B] shadow-2xs hover:bg-[#4338CA] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-black text-white bg-[#C0392B] shadow-2xs hover:bg-[#a02c20] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
-            {(isSaving || activeImageUploads > 0) ? (
+            {isUploadingVideo ? (
               <>
-                {(activeImageUploads > 0) ? 'Đang tải ảnh...' : 'Đang lưu...'}
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Đang tải video ({videoUploadProgress}%)...</span>
               </>
-            ) : 'Lưu bài học'}
+            ) : activeImageUploads > 0 ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Đang tải ảnh...</span>
+              </>
+            ) : isSaving ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Đang lưu...</span>
+              </>
+            ) : (
+              'Lưu bài học'
+            )}
           </button>
         </div>
 

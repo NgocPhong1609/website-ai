@@ -12,18 +12,33 @@ import {
   ClockIcon,
 } from "./icons";
 
-function StatusBadge({ status }: { status: Course["status"] }) {
-  const isPublished = status === "published";
+function StatusBadge({ status }: { status: Course["status"] | string }) {
+  const isPublished = status === "published" || status === "approved";
+  const isPending = status === "pending" || status === "pending_approval" || status === "under_review";
+  const isRejected = status === "rejected";
+
+  let label = "Bản nháp";
+  let bgClass = "bg-slate-700 text-white/90";
+
+  if (isPublished) {
+    label = "Đang dạy";
+    bgClass = "bg-emerald-600 text-white font-extrabold";
+  } else if (isPending) {
+    label = "Đang chờ duyệt";
+    bgClass = "bg-amber-500 text-white font-black shadow-sm";
+  } else if (isRejected) {
+    label = "Bị từ chối";
+    bgClass = "bg-rose-600 text-white font-extrabold shadow-sm";
+  }
+
   return (
     <span
       className={twMerge(
         "absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[11px] font-extrabold tracking-wide z-10 shadow-2xs",
-        isPublished
-          ? "-[#2C3039] text-white"
-          : "bg-gray-800 text-white/90",
+        bgClass,
       )}
     >
-      {isPublished ? "Published" : "Draft"}
+      {label}
     </span>
   );
 }

@@ -257,7 +257,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
             <p className="text-[11px] font-medium text-gray-500">
               {selectedQuizId
                 ? `Đang liên kết với Bài thi #${selectedQuizId}`
-                : "Bạn có thể chèn một đề thi đã được tạo sẵn từ AI Quiz Generator vào bài học này."}
+                : "Bạn có thể chèn một đề thi đã được tạo sẵn từ Bộ Tạo Bài Kiểm Tra AI vào bài học này."}
             </p>
           </div>
         </div>
