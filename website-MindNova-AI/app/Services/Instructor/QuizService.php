@@ -203,7 +203,13 @@ class QuizService
      */
     public function setActiveQuiz(Quiz $quiz, int $courseId, ?string $position = null): bool
     {
-        $attachment = QuizCourseAttachment::where('quiz_id', $quiz->id)->first();
+        $attachment = QuizCourseAttachment::where('quiz_id', $quiz->id)
+            ->where('course_id', $courseId)
+            ->first();
+
+        if (!$attachment) {
+            $attachment = QuizCourseAttachment::where('quiz_id', $quiz->id)->first();
+        }
 
         if (!$attachment) {
             // Create attachment if not existing

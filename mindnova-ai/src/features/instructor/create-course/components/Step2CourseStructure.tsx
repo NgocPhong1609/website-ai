@@ -21,6 +21,7 @@ import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/q
 
 import { CourseAiQuizModal } from "./CourseAiQuizModal";
 import { CourseManualQuizModal } from "./CourseManualQuizModal";
+import { SelectCourseLevelQuizModal } from "./SelectCourseLevelQuizModal";
 
 function GripIcon({ size = 16 }: { size?: number }) {
   return (
@@ -272,9 +273,12 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   const createQuizMutation = useCreateQuiz();
   const reorderModuleItemsMutation = useReorderModuleItems();
 
-  // Local state for instant reorder UI update in API edit mode
+  // Local state for instant reorder & module editing
   const [localChapters, setLocalChapters] = useState<any[]>([]);
   const [courseLevelQuizzes, setCourseLevelQuizzes] = useState<any[]>([]);
+
+  // Collapse / Expand state for Modules
+  const [collapsedModules, setCollapsedModules] = useState<Record<string, boolean>>({});
 
   const refetchCourseQuizzes = useCallback(() => {
     if (courseId) {
@@ -321,6 +325,15 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   // Embedded Quiz Modals State
   const [aiQuizModal, setAiQuizModal] = useState<{ isOpen: boolean; moduleId?: string }>({ isOpen: false });
   const [manualQuizModal, setManualQuizModal] = useState<{ isOpen: boolean; moduleId?: string }>({ isOpen: false });
+  
+  // Select Quiz Popup Modal State for Course-Level Quizzes
+  const [selectQuizModal, setSelectQuizModal] = useState<{
+    isOpen: boolean;
+    position: "capability_assessment" | "end_of_course";
+  }>({
+    isOpen: false,
+    position: "capability_assessment",
+  });
 
   const handleDetachQuiz = async (quizId: number) => {
     if (!confirm("Bạn có chắc chắn muốn gỡ bài kiểm tra này khỏi khóa học?")) return;
@@ -361,6 +374,15 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
     });
   }, [courseLevelQuizzes]);
 
+  // Determine active quizzes (ONLY display the active quiz in each section)
+  const activeGeneralQuiz = useMemo(() => {
+    return generalQuizzes.find((q) => q.is_active) || generalQuizzes[0] || null;
+  }, [generalQuizzes]);
+
+  const activeFinalQuiz = useMemo(() => {
+    return finalQuizzes.find((q) => q.is_active) || finalQuizzes[0] || null;
+  }, [finalQuizzes]);
+
   const handleAddChapter = async (defaultTitle?: string) => {
     const title = defaultTitle || `Chuyên đề ${displayChapters.length + 1}: Nội dung mới`;
     if (courseId) {
@@ -379,20 +401,55 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
     }
   };
 
-  const handleUpdateChapterTitle = async (chapterId: string, title: string) => {
+  // 1. Instant local title change (prevents 404 on keystroke & provides 0ms latency)
+  const handleLocalModuleTitleChange = (chapterId: string, newTitle: string) => {
     if (courseId) {
-      try {
-        await updateModuleMutation.mutateAsync({
-          courseId,
-          moduleId: chapterId,
-          title,
-        });
-      } catch (err: any) {
-        console.error("Lỗi cập nhật tên chuyên đề:", err);
-      }
+      setLocalChapters((prev) =>
+        prev.map((chap) => (chap.id === chapterId ? { ...chap, title: newTitle } : chap))
+      );
     } else {
-      updateDraftChapterTitle(chapterId, title);
+      updateDraftChapterTitle(chapterId, newTitle);
     }
+  };
+
+  // 2. Safe API sync onBlur when user finishes editing
+  const handleSaveModuleTitleOnBlur = async (chapterId: string, newTitle: string) => {
+    if (!courseId) return;
+    const numId = Number(chapterId);
+    if (isNaN(numId) || numId <= 0) return; // Ignore virtual/string IDs like final-assessment-module
+
+    try {
+      await updateModuleMutation.mutateAsync({
+        courseId,
+        moduleId: numId,
+        title: newTitle,
+      });
+    } catch (err: any) {
+      console.error("Lỗi cập nhật tên chuyên đề:", err);
+    }
+  };
+
+  const displayChapters = (courseId && apiModules) ? localChapters : draftChapters;
+
+  // Collapse / Expand Toggles
+  const toggleModuleCollapse = (moduleId: string) => {
+    setCollapsedModules((prev) => ({
+      ...prev,
+      [moduleId]: !prev[moduleId],
+    }));
+  };
+
+  const areAllCollapsed = useMemo(() => {
+    return displayChapters.length > 0 && displayChapters.every((c: any) => collapsedModules[c.id]);
+  }, [displayChapters, collapsedModules]);
+
+  const toggleCollapseAll = () => {
+    const targetState = !areAllCollapsed;
+    const nextState: Record<string, boolean> = {};
+    displayChapters.forEach((c: any) => {
+      nextState[c.id] = targetState;
+    });
+    setCollapsedModules(nextState);
   };
 
   const handleDeleteChapter = async (chapterId: string) => {
@@ -579,8 +636,6 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
     e.preventDefault();
   }, []);
 
-  const displayChapters = (courseId && apiModules) ? localChapters : draftChapters;
-
   if (courseId && isLoadingModules) {
     return <div className="p-8 text-center text-[#8A8478] font-medium">Đang nạp cấu trúc giáo trình &amp; bài thi...</div>;
   }
@@ -607,14 +662,14 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
               </h3>
             </div>
             <p className="text-xs text-gray-500 font-medium mt-1">
-              Quản lý các bài kiểm tra Đánh giá năng lực tổng quát và bài kiểm tra Cuối khóa học. Bạn có thể tạo nhiều bài thi và chọn bài thi chính đang được sử dụng.
+              Quản lý các bài kiểm tra Đánh giá năng lực tổng quát và bài kiểm tra Cuối khóa học. Chỉ bài thi được chọn chính mới được hiển thị cho học viên.
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Sub-section A: 🏆 Kiểm tra tổng quát */}
             <div className="p-5 rounded-2xl bg-white border border-amber-200/80 shadow-2xs flex flex-col gap-4">
-              <div className="flex items-center justify-between border-b border-amber-100 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-amber-100 pb-3 gap-2">
                 <div className="flex items-center gap-2">
                   <span className="text-xl">🏆</span>
                   <div>
@@ -622,92 +677,108 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                       A. Kiểm tra tổng quát (General Assessment)
                     </h4>
                     <span className="text-[11px] text-amber-700 font-semibold">
-                      Đánh giá kiến thức tổng quan, không gắn vào Module/Lesson
+                      Đánh giá kiến thức tổng quan, không gắn vào Module
                     </span>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setAiQuizModal({ isOpen: true })}
-                  className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
-                >
-                  <span>+ Tạo Quiz tổng quát</span>
-                </button>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setSelectQuizModal({ isOpen: true, position: "capability_assessment" })}
+                    className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                    title="Mở popup chọn bài kiểm tra từ danh sách"
+                  >
+                    <span>📑 Chọn bài thi ({generalQuizzes.length})</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setAiQuizModal({ isOpen: true })}
+                    className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                  >
+                    <span>+ Tạo mới</span>
+                  </button>
+                </div>
               </div>
 
-              {/* List of General Quizzes */}
+              {/* ONLY DISPLAY THE SELECTED/ACTIVE QUIZ CARD */}
               <div className="flex flex-col gap-3">
-                {generalQuizzes.length === 0 ? (
-                  <div className="p-4 rounded-xl bg-amber-50/50 border border-dashed border-amber-200 text-center text-xs font-bold text-amber-800">
-                    Chưa có bài kiểm tra tổng quát nào được gán cho khóa học này.
+                {!activeGeneralQuiz ? (
+                  <div className="p-6 rounded-2xl bg-amber-50/50 border border-dashed border-amber-200 text-center flex flex-col items-center justify-center gap-2">
+                    <span className="text-3xl">🏆</span>
+                    <p className="text-xs font-bold text-amber-900">Chưa có bài kiểm tra tổng quát nào được chọn.</p>
+                    <p className="text-[11px] text-amber-700 max-w-xs">
+                      Bấm nút bên dưới để chọn bài thi chính từ danh sách hoặc tạo bài thi mới.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setSelectQuizModal({ isOpen: true, position: "capability_assessment" })}
+                      className="mt-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-extrabold rounded-xl transition-all shadow-2xs cursor-pointer flex items-center gap-1"
+                    >
+                      <span>📑 Chọn bài thi từ danh sách</span>
+                    </button>
                   </div>
                 ) : (
-                  generalQuizzes.map((quiz) => (
-                    <div
-                      key={quiz.id}
-                      className={`p-4 rounded-2xl border-2 transition-all flex flex-col gap-2.5 ${
-                        quiz.is_active
-                          ? "border-emerald-500 bg-emerald-50/30 shadow-xs"
-                          : "border-gray-200 bg-white hover:border-gray-300"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-base">🏆</span>
-                          <h5 className="text-xs font-black text-[#1A1A2E]">{quiz.title}</h5>
-                        </div>
-
-                        {quiz.is_active ? (
-                          <span className="px-2.5 py-0.5 rounded-lg bg-emerald-600 text-white font-black text-[10px] uppercase shadow-2xs flex items-center gap-1">
-                            <span>✓</span>
-                            <span>ĐANG SỬ DỤNG</span>
+                  <div className="p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/30 shadow-xs flex flex-col gap-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">🏆</span>
+                        <div>
+                          <h5 className="text-xs font-black text-[#1A1A2E]">{activeGeneralQuiz.title}</h5>
+                          <span className="text-[10px] font-bold text-emerald-800">
+                            Bài thi đang được sử dụng chính thức
                           </span>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => handleSetActiveQuiz(quiz.id, "capability_assessment")}
-                            className="px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-emerald-50 text-gray-700 hover:text-emerald-800 border border-gray-200 hover:border-emerald-300 font-extrabold text-[11px] transition-all cursor-pointer flex items-center gap-1"
-                          >
-                            <span>○</span>
-                            <span>Chọn làm bài chính</span>
-                          </button>
-                        )}
+                        </div>
                       </div>
 
-                      <div className="flex items-center justify-between text-[11px] font-bold text-gray-500 border-t border-gray-100 pt-2">
-                        <div className="flex items-center gap-3">
-                          <span>❓ {quiz.total_questions || quiz.questions_count || 0} câu</span>
-                          <span>⏱️ {quiz.time_limit_minutes || 15}p</span>
-                          <span>🎯 {quiz.passing_score || 70}%</span>
-                        </div>
+                      <span className="px-2.5 py-0.5 rounded-lg bg-emerald-600 text-white font-black text-[10px] uppercase shadow-2xs flex items-center gap-1 shrink-0">
+                        <span>✓</span>
+                        <span>ĐANG SỬ DỤNG</span>
+                      </span>
+                    </div>
 
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setEditingLesson({ chapterId: "", lesson: { id: `quiz-${quiz.id}`, quiz_id: quiz.id, title: quiz.title, type: "quiz" } as any })}
-                            className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-[11px] font-black rounded-lg border border-indigo-100 transition-all cursor-pointer"
-                          >
-                            👁 Xem &amp; Sửa
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDetachQuiz(quiz.id)}
-                            className="p-1 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
-                            title="Gỡ khỏi khóa học"
-                          >
-                            <TrashIcon size={14} />
-                          </button>
-                        </div>
+                    <div className="flex items-center justify-between text-[11px] font-bold text-gray-500 border-t border-emerald-200/60 pt-2.5">
+                      <div className="flex items-center gap-3 text-emerald-900">
+                        <span>❓ {activeGeneralQuiz.total_questions || activeGeneralQuiz.questions_count || 0} câu</span>
+                        <span>⏱️ {activeGeneralQuiz.time_limit_minutes || 15}p</span>
+                        <span>🎯 {activeGeneralQuiz.passing_score || 70}%</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectQuizModal({ isOpen: true, position: "capability_assessment" })}
+                          className="px-2.5 py-1 bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer"
+                          title="Đổi sang bài kiểm tra khác"
+                        >
+                          🔄 Đổi bài thi
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingLesson({ chapterId: "", lesson: { id: `quiz-${activeGeneralQuiz.id}`, quiz_id: activeGeneralQuiz.id, title: activeGeneralQuiz.title, type: "quiz" } as any })}
+                          className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-[11px] font-black rounded-lg border border-indigo-100 transition-all cursor-pointer"
+                        >
+                          👁 Xem &amp; Sửa
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDetachQuiz(activeGeneralQuiz.id)}
+                          className="p-1 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
+                          title="Gỡ khỏi khóa học"
+                        >
+                          <TrashIcon size={14} />
+                        </button>
                       </div>
                     </div>
-                  ))
+                  </div>
                 )}
               </div>
             </div>
 
             {/* Sub-section B: 🏁 Kiểm tra cuối khóa học */}
             <div className="p-5 rounded-2xl bg-white border border-indigo-200/80 shadow-2xs flex flex-col gap-4">
-              <div className="flex items-center justify-between border-b border-indigo-100 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-indigo-100 pb-3 gap-2">
                 <div className="flex items-center gap-2">
                   <span className="text-xl">🏁</span>
                   <div>
@@ -715,85 +786,101 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                       B. Kiểm tra cuối khóa học (Final Examination)
                     </h4>
                     <span className="text-[11px] text-indigo-700 font-semibold">
-                      Bài kiểm tra đánh giá hoàn thành toàn bộ khóa học
+                      Đánh giá hoàn thành toàn bộ khóa học
                     </span>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setAiQuizModal({ isOpen: true })}
-                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
-                >
-                  <span>+ Tạo Quiz cuối khóa</span>
-                </button>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setSelectQuizModal({ isOpen: true, position: "end_of_course" })}
+                    className="px-3 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-900 border border-indigo-300 text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                    title="Mở popup chọn bài kiểm tra từ danh sách"
+                  >
+                    <span>📑 Chọn bài thi ({finalQuizzes.length})</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setAiQuizModal({ isOpen: true })}
+                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                  >
+                    <span>+ Tạo mới</span>
+                  </button>
+                </div>
               </div>
 
-              {/* List of Final Quizzes */}
+              {/* ONLY DISPLAY THE SELECTED/ACTIVE QUIZ CARD */}
               <div className="flex flex-col gap-3">
-                {finalQuizzes.length === 0 ? (
-                  <div className="p-4 rounded-xl bg-indigo-50/50 border border-dashed border-indigo-200 text-center text-xs font-bold text-indigo-800">
-                    Chưa có bài kiểm tra cuối khóa nào được gán cho khóa học này.
+                {!activeFinalQuiz ? (
+                  <div className="p-6 rounded-2xl bg-indigo-50/50 border border-dashed border-indigo-200 text-center flex flex-col items-center justify-center gap-2">
+                    <span className="text-3xl">🏁</span>
+                    <p className="text-xs font-bold text-indigo-900">Chưa có bài kiểm tra cuối khóa nào được chọn.</p>
+                    <p className="text-[11px] text-indigo-700 max-w-xs">
+                      Bấm nút bên dưới để chọn bài thi chính từ danh sách hoặc tạo bài thi mới.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setSelectQuizModal({ isOpen: true, position: "end_of_course" })}
+                      className="mt-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl transition-all shadow-2xs cursor-pointer flex items-center gap-1"
+                    >
+                      <span>📑 Chọn bài thi từ danh sách</span>
+                    </button>
                   </div>
                 ) : (
-                  finalQuizzes.map((quiz) => (
-                    <div
-                      key={quiz.id}
-                      className={`p-4 rounded-2xl border-2 transition-all flex flex-col gap-2.5 ${
-                        quiz.is_active
-                          ? "border-emerald-500 bg-emerald-50/30 shadow-xs"
-                          : "border-gray-200 bg-white hover:border-gray-300"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-base">🏁</span>
-                          <h5 className="text-xs font-black text-[#1A1A2E]">{quiz.title}</h5>
-                        </div>
-
-                        {quiz.is_active ? (
-                          <span className="px-2.5 py-0.5 rounded-lg bg-emerald-600 text-white font-black text-[10px] uppercase shadow-2xs flex items-center gap-1">
-                            <span>✓</span>
-                            <span>ĐANG SỬ DỤNG</span>
+                  <div className="p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/30 shadow-xs flex flex-col gap-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">🏁</span>
+                        <div>
+                          <h5 className="text-xs font-black text-[#1A1A2E]">{activeFinalQuiz.title}</h5>
+                          <span className="text-[10px] font-bold text-emerald-800">
+                            Bài thi đang được sử dụng chính thức
                           </span>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => handleSetActiveQuiz(quiz.id, "end_of_course")}
-                            className="px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-emerald-50 text-gray-700 hover:text-emerald-800 border border-gray-200 hover:border-emerald-300 font-extrabold text-[11px] transition-all cursor-pointer flex items-center gap-1"
-                          >
-                            <span>○</span>
-                            <span>Chọn làm bài chính</span>
-                          </button>
-                        )}
+                        </div>
                       </div>
 
-                      <div className="flex items-center justify-between text-[11px] font-bold text-gray-500 border-t border-gray-100 pt-2">
-                        <div className="flex items-center gap-3">
-                          <span>❓ {quiz.total_questions || quiz.questions_count || 0} câu</span>
-                          <span>⏱️ {quiz.time_limit_minutes || 15}p</span>
-                          <span>🎯 {quiz.passing_score || 70}%</span>
-                        </div>
+                      <span className="px-2.5 py-0.5 rounded-lg bg-emerald-600 text-white font-black text-[10px] uppercase shadow-2xs flex items-center gap-1 shrink-0">
+                        <span>✓</span>
+                        <span>ĐANG SỬ DỤNG</span>
+                      </span>
+                    </div>
 
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setEditingLesson({ chapterId: "", lesson: { id: `quiz-${quiz.id}`, quiz_id: quiz.id, title: quiz.title, type: "quiz" } as any })}
-                            className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-[11px] font-black rounded-lg border border-indigo-100 transition-all cursor-pointer"
-                          >
-                            👁 Xem &amp; Sửa
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDetachQuiz(quiz.id)}
-                            className="p-1 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
-                            title="Gỡ khỏi khóa học"
-                          >
-                            <TrashIcon size={14} />
-                          </button>
-                        </div>
+                    <div className="flex items-center justify-between text-[11px] font-bold text-gray-500 border-t border-emerald-200/60 pt-2.5">
+                      <div className="flex items-center gap-3 text-emerald-900">
+                        <span>❓ {activeFinalQuiz.total_questions || activeFinalQuiz.questions_count || 0} câu</span>
+                        <span>⏱️ {activeFinalQuiz.time_limit_minutes || 15}p</span>
+                        <span>🎯 {activeFinalQuiz.passing_score || 70}%</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectQuizModal({ isOpen: true, position: "end_of_course" })}
+                          className="px-2.5 py-1 bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer"
+                          title="Đổi sang bài kiểm tra khác"
+                        >
+                          🔄 Đổi bài thi
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingLesson({ chapterId: "", lesson: { id: `quiz-${activeFinalQuiz.id}`, quiz_id: activeFinalQuiz.id, title: activeFinalQuiz.title, type: "quiz" } as any })}
+                          className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-[11px] font-black rounded-lg border border-indigo-100 transition-all cursor-pointer"
+                        >
+                          👁 Xem &amp; Sửa
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDetachQuiz(activeFinalQuiz.id)}
+                          className="p-1 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
+                          title="Gỡ khỏi khóa học"
+                        >
+                          <TrashIcon size={14} />
+                        </button>
                       </div>
                     </div>
-                  ))
+                  </div>
                 )}
               </div>
             </div>
@@ -813,15 +900,17 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setAiQuizModal({ isOpen: true, moduleId: displayChapters[0]?.id })}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-2xs transition-all cursor-pointer"
-            >
-              <SparklesIcon size={14} />
-              <span>Tạo Quiz AI / Manual</span>
-            </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            {displayChapters.length > 0 && (
+              <button
+                type="button"
+                onClick={toggleCollapseAll}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-extrabold transition-all cursor-pointer"
+                title="Thu gọn hoặc mở rộng tất cả các chuyên đề"
+              >
+                <span>{areAllCollapsed ? "📖 Mở rộng tất cả" : "📂 Thu gọn tất cả"}</span>
+              </button>
+            )}
 
             <button
               type="button"
@@ -852,105 +941,134 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
           />
         ) : (
           <div className="flex flex-col gap-5">
-            {displayChapters.map((chap: any, cIndex: number) => (
-              <div key={chap.id} className="p-5 rounded-2xl bg-white border border-[#E8E2D9] shadow-2xs flex flex-col gap-4">
-                {/* Chapter Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-100 pb-3.5 gap-3">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="w-8 h-8 rounded-xl bg-[#C0392B] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
-                      {cIndex + 1}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <input
-                        type="text"
-                        value={chap.title}
-                        onChange={(e) => handleUpdateChapterTitle(chap.id, e.target.value)}
-                        className="w-full text-sm font-black text-[#2C3039] bg-transparent focus:outline-none focus:border-b-2 focus:border-[#C0392B] transition-colors truncate"
-                        placeholder="Tên chuyên đề..."
-                      />
+            {displayChapters.map((chap: any, cIndex: number) => {
+              const isCollapsed = Boolean(collapsedModules[chap.id]);
+
+              return (
+                <div key={chap.id} className="p-5 rounded-2xl bg-white border border-[#E8E2D9] shadow-2xs flex flex-col gap-4">
+                  {/* Chapter Header */}
+                  <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-100 pb-3.5 gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {/* Collapse / Expand Toggle Button */}
+                      <button
+                        type="button"
+                        onClick={() => toggleModuleCollapse(chap.id)}
+                        className="p-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all cursor-pointer flex items-center justify-center shrink-0"
+                        title={isCollapsed ? "Mở rộng chuyên đề" : "Thu gọn chuyên đề"}
+                      >
+                        <span className={`text-xs font-black transition-transform duration-200 ${isCollapsed ? "-rotate-90 text-gray-500" : "rotate-0 text-[#C0392B]"}`}>
+                          ▼
+                        </span>
+                      </button>
+
+                      <span className="w-8 h-8 rounded-xl bg-[#C0392B] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
+                        {cIndex + 1}
+                      </span>
+
+                      <div className="flex-1 min-w-0 flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={chap.title}
+                          onChange={(e) => handleLocalModuleTitleChange(chap.id, e.target.value)}
+                          onBlur={(e) => handleSaveModuleTitleOnBlur(chap.id, e.target.value)}
+                          className="w-full text-sm font-black text-[#2C3039] bg-transparent focus:outline-none focus:border-b-2 focus:border-[#C0392B] transition-colors truncate"
+                          placeholder="Tên chuyên đề..."
+                        />
+
+                        {isCollapsed && (
+                          <span
+                            onClick={() => toggleModuleCollapse(chap.id)}
+                            className="text-[11px] font-bold text-[#C0392B] bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100 cursor-pointer shrink-0"
+                          >
+                            📂 {chap.lessons.length} bài học
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => handleAddVideoLesson(chap.id, chap.lessons.length)}
+                        className="px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-[#C0392B] border border-indigo-100 text-xs font-bold transition-all cursor-pointer"
+                      >
+                        + Video
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setAiQuizModal({ isOpen: true, moduleId: String(chap.id) })}
+                        className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                      >
+                        <span>🤖 + Quiz AI</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setManualQuizModal({ isOpen: true, moduleId: String(chap.id) })}
+                        className="px-2.5 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                      >
+                        <span>✍️ + Manual Quiz</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleAddDocLesson(chap.id, chap.lessons.length)}
+                        className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-xs font-bold transition-all cursor-pointer"
+                      >
+                        + Doc
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteChapter(chap.id)}
+                        className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 rounded-xl transition-all cursor-pointer flex items-center justify-center shrink-0"
+                        title="Xóa chuyên đề"
+                      >
+                        <TrashIcon size={16} />
+                      </button>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                    <button
-                      type="button"
-                      onClick={() => handleAddVideoLesson(chap.id, chap.lessons.length)}
-                      className="px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-[#C0392B] border border-indigo-100 text-xs font-bold transition-all cursor-pointer"
-                    >
-                      + Video
-                    </button>
+                  {/* Lessons & Quizzes List in Chapter (Hidden when Collapsed) */}
+                  {!isCollapsed && (
+                    <div className="flex flex-col gap-2.5 min-h-[50px] rounded-xl p-2 bg-[#FEFCF9]/70 border border-[#E8E2D9]">
+                      {chap.lessons.length === 0 ? (
+                        <NoData
+                          title="Chưa có bài giảng hoặc bài thi"
+                          description="Chuyên đề này chưa có nội dung. Chọn + Video hoặc + Quiz AI để thêm nội dung."
+                          className="py-6"
+                        />
+                      ) : (
+                        chap.lessons.map((les: any, lIndex: number) => (
+                          <LessonRow
+                            key={les.id}
+                            lesson={les}
+                            chapterId={chap.id}
+                            index={lIndex}
+                            onUpdate={(cid, lid, up) => updateDraftLesson(cid, lid, up)}
+                            onDelete={handleDeleteLesson}
+                            onDetachQuiz={handleDetachQuiz}
+                            onDragStart={handleDragStart}
+                            onDrop={handleDrop}
+                            onDragOver={handleDragOver}
+                            onEdit={(cid, lNode) => setEditingLesson({ chapterId: cid, lesson: lNode })}
+                          />
+                        ))
+                      )}
+                    </div>
+                  )}
 
-                    <button
-                      type="button"
-                      onClick={() => setAiQuizModal({ isOpen: true, moduleId: String(chap.id) })}
-                      className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
-                    >
-                      <span>🤖 + Quiz AI</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setManualQuizModal({ isOpen: true, moduleId: String(chap.id) })}
-                      className="px-2.5 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
-                    >
-                      <span>✍️ + Manual Quiz</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleAddDocLesson(chap.id, chap.lessons.length)}
-                      className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-xs font-bold transition-all cursor-pointer"
-                    >
-                      + Doc
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteChapter(chap.id)}
-                      className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 rounded-xl transition-all cursor-pointer flex items-center justify-center shrink-0"
-                      title="Xóa chuyên đề"
-                    >
-                      <TrashIcon size={16} />
-                    </button>
+                  {/* AI Co-Creator Quick Action Tag */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 text-[11px] font-bold text-gray-400 gap-1">
+                    <span className="flex items-center gap-1 text-[#C0392B]">
+                      ⚡ AI Generator: Tạo bộ câu hỏi trắc nghiệm tự động theo ngữ cảnh bài học của chuyên đề này.
+                    </span>
+                    <span>Tổng {chap.lessons.length} bài học &amp; bài thi</span>
                   </div>
                 </div>
-
-                {/* Lessons & Quizzes List in Chapter */}
-                <div className="flex flex-col gap-2.5 min-h-[50px] rounded-xl p-2 bg-[#FEFCF9]/70 border border-[#E8E2D9]">
-                  {chap.lessons.length === 0 ? (
-                    <NoData
-                      title="Chưa có bài giảng hoặc bài thi"
-                      description="Chuyên đề này chưa có nội dung. Chọn + Video hoặc + Quiz AI để thêm nội dung."
-                      className="py-6"
-                    />
-                  ) : (
-                    chap.lessons.map((les: any, lIndex: number) => (
-                      <LessonRow
-                        key={les.id}
-                        lesson={les}
-                        chapterId={chap.id}
-                        index={lIndex}
-                        onUpdate={(cid, lid, up) => updateDraftLesson(cid, lid, up)}
-                        onDelete={handleDeleteLesson}
-                        onDetachQuiz={handleDetachQuiz}
-                        onDragStart={handleDragStart}
-                        onDrop={handleDrop}
-                        onDragOver={handleDragOver}
-                        onEdit={(cid, lNode) => setEditingLesson({ chapterId: cid, lesson: lNode })}
-                      />
-                    ))
-                  )}
-                </div>
-
-                {/* AI Co-Creator Quick Action Tag */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 text-[11px] font-bold text-gray-400 gap-1">
-                  <span className="flex items-center gap-1 text-[#C0392B]">
-                    ⚡ AI Generator: Tạo bộ câu hỏi trắc nghiệm tự động theo ngữ cảnh bài học của chuyên đề này.
-                  </span>
-                  <span>Tổng {chap.lessons.length} bài học &amp; bài thi</span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -998,6 +1116,33 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
             addDraftLesson(targetModId, savedQuiz?.title || "Bài kiểm tra mới", "quiz");
           }
         }}
+      />
+
+      {/* Course-Level Select Quiz Modal Popup */}
+      <SelectCourseLevelQuizModal
+        isOpen={selectQuizModal.isOpen}
+        onClose={() => setSelectQuizModal({ ...selectQuizModal, isOpen: false })}
+        position={selectQuizModal.position}
+        positionTitle={
+          selectQuizModal.position === "capability_assessment"
+            ? "Kiểm tra tổng quát"
+            : "Kiểm tra cuối khóa học"
+        }
+        quizzes={selectQuizModal.position === "capability_assessment" ? generalQuizzes : finalQuizzes}
+        activeQuizId={
+          selectQuizModal.position === "capability_assessment"
+            ? activeGeneralQuiz?.id
+            : activeFinalQuiz?.id
+        }
+        onSelectActiveQuiz={handleSetActiveQuiz}
+        onCreateNewQuiz={() => setAiQuizModal({ isOpen: true })}
+        onEditQuiz={(quiz) =>
+          setEditingLesson({
+            chapterId: "",
+            lesson: { id: `quiz-${quiz.id}`, quiz_id: quiz.id, title: quiz.title, type: "quiz" } as any,
+          })
+        }
+        onDetachQuiz={handleDetachQuiz}
       />
     </div>
   );
