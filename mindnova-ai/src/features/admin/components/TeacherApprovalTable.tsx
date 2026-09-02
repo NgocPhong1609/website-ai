@@ -26,6 +26,9 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  mime: string;
  } | null>(null);
 
+ const ITEMS_PER_PAGE = 10;
+ const [currentPage, setCurrentPage] = useState(1);
+
  const filteredRows = useMemo(() => {
  if (activeTab === "all") return localRows;
  return localRows.filter((r) => {
@@ -34,6 +37,20 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  return st === activeTab;
  });
  }, [localRows, activeTab]);
+
+ const totalPages = useMemo(() => {
+ return Math.max(1, Math.ceil(filteredRows.length / ITEMS_PER_PAGE));
+ }, [filteredRows]);
+
+ const paginatedRows = useMemo(() => {
+ const start = (currentPage - 1) * ITEMS_PER_PAGE;
+ return filteredRows.slice(start, start + ITEMS_PER_PAGE);
+ }, [filteredRows, currentPage]);
+
+ const handleTabChange = (tabId: string) => {
+ setActiveTab(tabId);
+ setCurrentPage(1);
+ };
 
  const [showApproveConfirmModal, setShowApproveConfirmModal] = useState(false);
  const [actionError, setActionError] = useState("");
@@ -181,7 +198,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  ].map((tab) => (
  <button
  key={tab.id}
- onClick={() => setActiveTab(tab.id)}
+ onClick={() => handleTabChange(tab.id)}
  className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
  activeTab === tab.id
  ? "bg-white text-slate-900 shadow-md border border-slate-200"
@@ -196,20 +213,20 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  {/* Main Table */}
  <section className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
  <div className="overflow-x-auto">
- <table className="w-full text-left text-sm border-collapse">
+ <table className="w-full min-w-[960px] text-left text-sm border-collapse">
  <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 text-xs font-black uppercase tracking-wider">
  <tr>
- <th className="px-6 py-4">Giáo viên</th>
- <th className="px-6 py-4">Chuyên môn</th>
- <th className="px-6 py-4">Số chứng chỉ</th>
- <th className="px-6 py-4">Trạng thái</th>
- <th className="px-6 py-4">Ngày nộp</th>
- <th className="px-6 py-4 text-right">Hành động</th>
+ <th className="px-6 py-4 min-w-[240px]">Giáo viên</th>
+ <th className="px-6 py-4 min-w-[150px] whitespace-nowrap">Chuyên môn</th>
+ <th className="px-6 py-4 min-w-[180px] whitespace-nowrap">Số chứng chỉ</th>
+ <th className="px-6 py-4 min-w-[150px] whitespace-nowrap">Trạng thái</th>
+ <th className="px-6 py-4 min-w-[120px] whitespace-nowrap">Ngày nộp</th>
+ <th className="px-6 py-4 min-w-[190px] text-right whitespace-nowrap">Hành động</th>
  </tr>
  </thead>
  <tbody className="divide-y divide-slate-100">
- {filteredRows.length > 0 ? (
- filteredRows.map((row) => {
+ {paginatedRows.length > 0 ? (
+ paginatedRows.map((row) => {
  const avatar = row.avatar_url || row.avatarUrl;
  const isVer = row.is_verified || row.teacher_verification_status === "approved";
  const statusLabel = isVer
@@ -225,9 +242,9 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
 
  return (
  <tr key={row.id} className="hover:bg-slate-50/80 transition-colors">
- <td className="px-6 py-4">
+ <td className="px-6 py-4 min-w-[240px]">
  <div className="flex items-center gap-3">
- <div className="w-10 h-10 rounded-full -[#FAF7F2] text-[#C0392B] flex items-center justify-center font-black overflow-hidden border -[#FAF7F2] shrink-0">
+ <div className="w-10 h-10 rounded-full bg-amber-50 text-[#C0392B] flex items-center justify-center font-black overflow-hidden border border-amber-100 shrink-0">
  {avatar ? (
  <img src={avatar} alt={row.name} className="w-full h-full object-cover" />
  ) : (
@@ -244,21 +261,21 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  </div>
  </td>
 
- <td className="px-6 py-4 text-slate-600 font-semibold">
+ <td className="px-6 py-4 text-slate-600 font-semibold whitespace-nowrap min-w-[150px]">
  {row.profile?.skill_level || row.expertise || "Chưa cập nhật"}
  </td>
 
- <td className="px-6 py-4 font-semibold text-slate-700">
- <span className="px-2.5 py-1 rounded-lg bg-slate-100 border text-xs font-bold">
+ <td className="px-6 py-4 font-semibold text-slate-700 whitespace-nowrap min-w-[180px]">
+ <span className="px-3 py-1 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold whitespace-nowrap inline-block">
  {certCount} bằng ({approvedCerts} đã duyệt)
  </span>
  </td>
 
- <td className="px-6 py-4">
+ <td className="px-6 py-4 whitespace-nowrap min-w-[150px]">
  <span
- className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border ${
+ className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border whitespace-nowrap ${
  isVer
- ? "bg-emerald-50 -[#2C3039] -[#FAF7F2]"
+ ? "bg-emerald-50 text-emerald-700 border-emerald-200"
  : row.teacher_verification_status === "rejected"
  ? "bg-rose-50 text-rose-700 border-rose-200"
  : row.teacher_verification_status === "revoked"
@@ -270,17 +287,17 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  </span>
  </td>
 
- <td className="px-6 py-4 text-slate-500 text-xs font-semibold">
+ <td className="px-6 py-4 text-slate-500 text-xs font-semibold whitespace-nowrap min-w-[120px]">
  {row.verification_request?.submitted_at
  ? new Date(row.verification_request.submitted_at).toLocaleDateString("vi-VN")
  : row.submittedAt || "-"}
  </td>
 
- <td className="px-6 py-4 text-right">
+ <td className="px-6 py-4 text-right whitespace-nowrap min-w-[190px]">
  <button
  type="button"
  onClick={() => setSelectedRow(row)}
- className="px-4 py-2 rounded-xl border -[#C0392B] bg-cyan-50 -[#C0392B] text-xs font-black hover:-[#FAF7F2] transition-all shadow-xs"
+ className="px-4 py-2 rounded-xl border border-rose-200 bg-rose-50/50 text-[#C0392B] text-xs font-black hover:bg-rose-100 transition-all shadow-xs whitespace-nowrap"
  >
  Xem hồ sơ & Thẩm định
  </button>

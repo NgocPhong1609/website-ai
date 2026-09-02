@@ -255,19 +255,28 @@ class DashboardController extends Controller
             ->join('orders as o', 'o.id', '=', 'oi.order_id')
             ->join('courses as c', 'c.id', '=', 'oi.course_id')
             ->leftJoin('users as teacher', 'teacher.id', '=', 'c.teacher_id')
+            ->leftJoin('teacher_payouts as tp', function ($join) {
+                $join->on('tp.order_id', '=', 'oi.order_id')
+                     ->on('tp.course_id', '=', 'oi.course_id');
+            })
             ->where('o.status', 'completed')
             ->select([
                 'c.id as courseId',
                 'c.title as courseTitle',
+                'c.partnership_tier as partnershipTier',
                 DB::raw('COALESCE(teacher.name, "Unassigned") as instructorName'),
-                DB::raw('SUM(oi.price) as revenue'),
+                DB::raw('SUM(oi.price) as grossRevenue'),
+                DB::raw('COALESCE(SUM(tp.admin_share_amount), SUM(oi.price * IF(c.partnership_tier = "exclusive", 0.15, 0.30))) as adminRevenue'),
+                DB::raw('COALESCE(SUM(tp.teacher_amount), SUM(oi.price * IF(c.partnership_tier = "exclusive", 0.85, 0.70))) as teacherRevenue'),
                 DB::raw('COUNT(DISTINCT o.user_id) as students'),
             ])
-            ->groupBy('c.id', 'c.title', 'teacher.name')
-            ->orderByDesc('revenue')
+            ->groupBy('c.id', 'c.title', 'c.partnership_tier', 'teacher.name')
+            ->orderByDesc('grossRevenue')
             ->get();
 
-        $totalRevenue = (float) $courseSummary->sum('revenue');
+        $totalGrossRevenue = (float) $courseSummary->sum('grossRevenue');
+        $totalAdminRevenue = (float) $courseSummary->sum('adminRevenue');
+        $totalTeacherRevenue = (float) $courseSummary->sum('teacherRevenue');
 
         $courses = $courseSummary->map(function ($row) {
             $students = (int) $row->students;
@@ -276,17 +285,88 @@ class DashboardController extends Controller
                 'courseId' => (int) $row->courseId,
                 'courseTitle' => $row->courseTitle,
                 'instructorName' => $row->instructorName ?? 'Unassigned',
-                'revenue' => (float) $row->revenue,
+                'partnershipTier' => $row->partnershipTier ?? 'standard',
+                'grossRevenue' => (float) $row->grossRevenue,
+                'adminRevenue' => (float) $row->adminRevenue,
+                'teacherRevenue' => (float) $row->teacherRevenue,
+                'revenue' => (float) $row->grossRevenue,
                 'students' => $students,
                 'conversionRate' => $students > 0 ? 100.0 : 0.0,
             ];
         })->values();
 
-        return response()->json([
-            'totalRevenue' => $totalRevenue,
+        $orderHistory = DB::table('orders as o')
+            ->join('order_items as oi', 'oi.order_id', '=', 'o.id')
+            ->join('courses as c', 'c.id', '=', 'oi.course_id')
+            ->join('users as student', 'student.id', '=', 'o.user_id')
+            ->leftJoin('users as teacher', 'teacher.id', '=', 'c.teacher_id')
+            ->leftJoin('revenue_allocations as ra', function ($join) {
+                $join->on('ra.order_id', '=', 'o.id')
+                     ->on('ra.course_id', '=', 'c.id');
+            })
+            ->select([
+                'o.id as orderId',
+                'o.transaction_id as transactionCode',
+                'o.status as orderStatus',
+                'o.created_at as purchasedAt',
+                'student.name as studentName',
+                'student.email as studentEmail',
+                'c.title as courseTitle',
+                'c.partnership_tier as partnershipTier',
+                DB::raw('COALESCE(teacher.name, "Unassigned") as instructorName'),
+                DB::raw('COALESCE(ra.original_price, c.price, oi.price) as originalPrice'),
+                DB::raw('COALESCE(ra.discount_amount, GREATEST(0, COALESCE(c.price, oi.price) - oi.price)) as discountAmount'),
+                DB::raw('oi.price as paidAmount'),
+                DB::raw('COALESCE(ra.instructor_amount, oi.price * IF(c.partnership_tier = "exclusive", 0.85, 0.70)) as teacherAmount'),
+                DB::raw('COALESCE(ra.platform_fee_amount, oi.price * IF(c.partnership_tier = "exclusive", 0.15, 0.30)) as adminAmount'),
+                DB::raw('COALESCE(ra.status, IF(o.status = "refunded", "REFUNDED", "AVAILABLE")) as allocationStatus'),
+                'ra.refunded_at as refundedAt',
+                'o.updated_at as orderUpdatedAt',
+            ])
+            ->orderByDesc('o.created_at')
+            ->take(200)
+            ->get()
+            ->map(function ($row) {
+                $refundedAtFormatted = null;
+                if ($row->allocationStatus === 'REFUNDED' || $row->orderStatus === 'refunded') {
+                    $dt = $row->refundedAt ? $row->refundedAt : $row->orderUpdatedAt;
+                    $refundedAtFormatted = $dt ? \Carbon\Carbon::parse($dt)->format('d/m/Y H:i') : null;
+                }
+
+                return [
+                    'orderId' => (int) $row->orderId,
+                    'transactionCode' => $row->transactionCode ? '#ORD-' . str_pad($row->orderId, 5, '0', STR_PAD_LEFT) : '#ORD-' . str_pad($row->orderId, 5, '0', STR_PAD_LEFT),
+                    'purchasedAt' => \Carbon\Carbon::parse($row->purchasedAt)->format('d/m/Y H:i'),
+                    'studentName' => $row->studentName,
+                    'studentEmail' => $row->studentEmail,
+                    'courseTitle' => $row->courseTitle,
+                    'instructorName' => $row->instructorName,
+                    'partnershipTier' => $row->partnershipTier ?? 'standard',
+                    'originalPrice' => (float) $row->originalPrice,
+                    'discountAmount' => (float) $row->discountAmount,
+                    'paidAmount' => (float) $row->paidAmount,
+                    'teacherAmount' => (float) $row->teacherAmount,
+                    'adminAmount' => (float) $row->adminAmount,
+                    'allocationStatus' => $row->allocationStatus,
+                    'orderStatus' => $row->orderStatus,
+                    'refundedAt' => $refundedAtFormatted,
+                ];
+            })
+            ->values();
+
+        $responseData = [
+            'totalRevenue' => $totalGrossRevenue,
+            'totalAdminRevenue' => $totalAdminRevenue,
+            'totalTeacherRevenue' => $totalTeacherRevenue,
             'courseCount' => $courses->count(),
             'courses' => $courses,
-        ]);
+            'orderHistory' => $orderHistory,
+        ];
+
+        return response()->json(array_merge(
+            ['data' => $responseData],
+            $responseData
+        ));
     }
 
     public function analytics(): JsonResponse

@@ -174,7 +174,6 @@ function CreateCouponDialog({
                 <label className="text-[12px] font-semibold text-[#464554]">Giá trị giảm</label>
                 <div className="flex rounded-xl border border-[#DDDDF0] bg-[#FAFAFE] overflow-hidden focus-within:border-[#E8E2D9] focus-within:ring-2 focus-within:ring-[#C0392B]/15">
                   <input type="number" value={value} onChange={(e) => setValue(e.target.value)} required min="0" placeholder={type === "percent" ? "VD: 100" : "VD: 50000"} className="flex-1 h-10 px-3 text-sm text-[#2C3039] bg-transparent outline-none" />
-                  <span className="h-10 flex items-center px-2.5 text-[11px] font-bold text-[#C0392B] border-l border-[#DDDDF0] bg-[#FAF7F2]">{type === "percent" ? "%" : "VNĐ"}</span>
                 </div>
               </div>
               <div className="flex flex-col gap-1.5">

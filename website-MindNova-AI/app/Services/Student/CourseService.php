@@ -494,7 +494,9 @@ class CourseService
         $enrollments = \App\Models\Enrollment::with('course.modules.lessons')
             ->where('user_id', $userId)
             ->latest('enrolled_at')
-            ->get();
+            ->get()
+            ->unique('course_id')
+            ->values();
 
         $gradients = [
             'from-[#0f0c29] via-[#302b63] to-[#24243e]',

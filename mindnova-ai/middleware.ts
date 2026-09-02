@@ -36,8 +36,7 @@ export function middleware(request: NextRequest) {
       '/checkout',
       '/payment',
       '/messages',
-      '/onboarding',
-      '/updated'
+      '/onboarding'
     ];
 
     if (isInstructorRoute || isAdminRoute || protectedStudentPaths.some(p => pathname.startsWith(p))) {

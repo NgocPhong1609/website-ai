@@ -199,6 +199,11 @@ YÊU CẦU BẮT BUỘC KHÔNG ĐƯỢC VI PHẠM:
 
             $parsed = $this->cleanAndParseJson($aiResult['content']);
 
+            // Support direct array response [ { ... }, { ... } ] from AI
+            if (isset($parsed[0]) && is_array($parsed[0])) {
+                $parsed = ['questions' => $parsed];
+            }
+
             Log::info("[QUIZ_GEN STEP 6] JSON Parsed Successfully", [
                 'parsed_title' => $parsed['title'] ?? null,
                 'questions_count' => count($parsed['questions'] ?? []),
@@ -480,25 +485,43 @@ Trả về CHỈ JSON theo định dạng:
 
         // 2. Extract content from markdown code fences ```json ... ```
         if (preg_match('/```(?:json)?\s*(.*?)\s*```/s', $clean, $matches)) {
-            $clean = $matches[1];
+            $clean = trim($matches[1]);
         }
 
-        // 3. Extract substring between first `{` and last `}`
-        $firstBrace = strpos($clean, '{');
-        $lastBrace = strrpos($clean, '}');
-        if ($firstBrace !== false && $lastBrace !== false && $lastBrace > $firstBrace) {
-            $clean = substr($clean, $firstBrace, $lastBrace - $firstBrace + 1);
-        }
-
-        // 4. Decode JSON
+        // 3. Try direct JSON decode first
         $decoded = json_decode($clean, true);
-
         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
             return $decoded;
         }
 
+        // 4. Extract substring between first '[' or '{' and last ']' or '}'
+        $firstBracket = strpos($clean, '[');
+        $firstBrace = strpos($clean, '{');
+
+        if ($firstBracket !== false && ($firstBrace === false || $firstBracket < $firstBrace)) {
+            // JSON Array: `[ ... ]`
+            $lastBracket = strrpos($clean, ']');
+            if ($lastBracket !== false && $lastBracket > $firstBracket) {
+                $candidate = substr($clean, $firstBracket, $lastBracket - $firstBracket + 1);
+                $decodedCandidate = json_decode($candidate, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decodedCandidate)) {
+                    return $decodedCandidate;
+                }
+            }
+        } elseif ($firstBrace !== false) {
+            // JSON Object: `{ ... }`
+            $lastBrace = strrpos($clean, '}');
+            if ($lastBrace !== false && $lastBrace > $firstBrace) {
+                $candidate = substr($clean, $firstBrace, $lastBrace - $firstBrace + 1);
+                $decodedCandidate = json_decode($candidate, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decodedCandidate)) {
+                    return $decodedCandidate;
+                }
+            }
+        }
+
         // 5. Attempt cleanup on control characters inside JSON strings if initial decode failed
-        $fixedJson = preg_replace_callback('/"([^"\\]*(?:\\.[^"\\]*)*)"/s', function ($m) {
+        $fixedJson = preg_replace_callback('/"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"/s', function ($m) {
             return '"' . str_replace(["\r", "\n", "\t"], ["\\r", "\\n", "\\t"], $m[1]) . '"';
         }, $clean);
 

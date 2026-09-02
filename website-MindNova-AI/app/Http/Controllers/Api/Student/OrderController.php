@@ -85,8 +85,11 @@ class OrderController extends Controller
                 'transaction_id' => $transactionId
             ]);
 
+            $discountFactor = $originalTotal > 0 ? max(0, ($originalTotal - $discountAmount) / $originalTotal) : 1;
+
             foreach ($courses as $course) {
-                OrderItem::create(['order_id' => $order->id, 'course_id' => $course->id, 'price' => $course->price]);
+                $itemNetPrice = round((float) $course->price * $discountFactor, 2);
+                OrderItem::create(['order_id' => $order->id, 'course_id' => $course->id, 'price' => $itemNetPrice]);
             }
 
             if ($totalAmount <= 0) {
@@ -522,6 +525,215 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Check student refund eligibility for a course
+     */
+    public function checkRefundEligibility(Request $request, $courseId)
+    {
+        $user = $request->user('sanctum') ?? $request->user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        $order = Order::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->whereHas('orderItems', function ($q) use ($courseId) {
+                $q->where('course_id', $courseId);
+            })
+            ->latest()
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'is_eligible' => false,
+                    'reason' => 'Bạn chưa mua hoặc khóa học này đã được hoàn tiền trước đó.',
+                ]
+            ]);
+        }
+
+        $daysDiff = (int) now()->diffInDays($order->created_at);
+        $within30Days = $daysDiff <= 30;
+
+        $course = Course::find($courseId);
+        if (!$course) {
+            return response()->json(['success' => false, 'message' => 'Không tìm thấy khóa học.'], 404);
+        }
+
+        $courseService = app(\App\Services\Student\CourseService::class);
+        $progressData = $courseService->calculateStudentProgress($course, $user->id);
+
+        $progressPercentage = $progressData['progress_percentage'] ?? 0;
+        $completedLessonsCount = $progressData['completed_lessons'] ?? 0;
+
+        $progressEligible = ($progressPercentage <= 10) && ($completedLessonsCount <= 5);
+        $isEligible = $within30Days && $progressEligible;
+
+        $reasons = [];
+        if (!$within30Days) {
+            $reasons[] = "Đã quá 30 ngày kể từ khi mua khóa học (Đã mua {$daysDiff} ngày).";
+        }
+        if (!$progressEligible) {
+            $reasons[] = "Tiến độ học vượt quá điều kiện quy định (Yêu cầu tiến độ ≤10% và ≤5 bài. Tiến độ hiện tại của bạn: {$progressPercentage}%, bài đã học: {$completedLessonsCount}).";
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'is_eligible' => $isEligible,
+                'order_id' => $order->id,
+                'course_id' => (int) $courseId,
+                'course_title' => $course->title,
+                'purchased_at' => $order->created_at->format('Y-m-d H:i:s'),
+                'days_since_purchase' => $daysDiff,
+                'within_30_days' => $within30Days,
+                'progress_percentage' => $progressPercentage,
+                'completed_lessons' => $completedLessonsCount,
+                'progress_eligible' => $progressEligible,
+                'reasons' => $reasons,
+                'amount' => (float) $order->total_amount,
+            ]
+        ]);
+    }
+
+    /**
+     * Student Endpoint to request refund for a course
+     */
+    public function requestRefund(Request $request)
+    {
+        $user = $request->user('sanctum') ?? $request->user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        $courseId = $request->input('course_id');
+        $orderId = $request->input('order_id');
+
+        if (!$courseId && !$orderId) {
+            return response()->json(['success' => false, 'message' => 'Vui lòng chọn khóa học hoặc đơn hàng để hoàn tiền.'], 422);
+        }
+
+        $orderQuery = Order::where('user_id', $user->id)->where('status', 'completed');
+        if ($orderId) {
+            $orderQuery->where('id', $orderId);
+        }
+        if ($courseId) {
+            $orderQuery->whereHas('orderItems', function ($q) use ($courseId) {
+                $q->where('course_id', $courseId);
+            });
+        }
+
+        $order = $orderQuery->latest()->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy đơn hàng đủ điều kiện hoặc đơn hàng đã được hoàn tiền trước đó.'
+            ], 404);
+        }
+
+        $daysDiff = (int) now()->diffInDays($order->created_at);
+        if ($daysDiff > 30) {
+            return response()->json([
+                'success' => false,
+                'message' => "Khóa học đã mua quá 30 ngày (Đã mua {$daysDiff} ngày), không đủ điều kiện hoàn tiền theo chính sách."
+            ], 422);
+        }
+
+        $targetCourseId = $courseId;
+        if (!$targetCourseId) {
+            $firstItem = $order->orderItems->first();
+            $targetCourseId = $firstItem ? $firstItem->course_id : null;
+        }
+
+        $course = Course::find($targetCourseId);
+        if (!$course) {
+            return response()->json(['success' => false, 'message' => 'Không tìm thấy khóa học.'], 404);
+        }
+
+        $courseService = app(\App\Services\Student\CourseService::class);
+        $progressData = $courseService->calculateStudentProgress($course, $user->id);
+
+        $progressPercentage = $progressData['progress_percentage'] ?? 0;
+        $completedLessonsCount = $progressData['completed_lessons'] ?? 0;
+
+        $isEligible = ($progressPercentage <= 10) && ($completedLessonsCount <= 5);
+
+        if (!$isEligible) {
+            return response()->json([
+                'success' => false,
+                'message' => "Không đủ điều kiện hoàn tiền. Khóa học chỉ được hoàn tiền khi tiến độ ≤10% và chưa học quá 5 bài. Tiến độ hiện tại của bạn là {$progressPercentage}% ({$completedLessonsCount} bài đã học)."
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Remove enrollment
+            DB::table('enrollments')->where('user_id', $user->id)->where('course_id', $course->id)->delete();
+
+            // Remove from chat group
+            $conversation = \App\Models\ChatConversation::where('course_id', $course->id)->first();
+            if ($conversation) {
+                \App\Models\ChatConversationMember::where('chat_conversation_id', $conversation->id)
+                    ->where('user_id', $user->id)
+                    ->delete();
+            }
+
+            // Record instructor refund transaction
+            if ($course->teacher_id) {
+                $orderItem = OrderItem::where('order_id', $order->id)->where('course_id', $course->id)->first();
+                $itemPrice = $orderItem ? (float)$orderItem->price : (float)$course->price;
+                $commissionRate = ($course->partnership_tier === 'exclusive') ? 0.15 : 0.30;
+                $teacherAmount = round($itemPrice * (1 - $commissionRate), 2);
+
+                // Update RevenueAllocation to REFUNDED
+                $allocation = \App\Models\RevenueAllocation::where('order_id', $order->id)
+                    ->where('course_id', $course->id)
+                    ->first();
+
+                if ($allocation) {
+                    $allocation->update([
+                        'status' => 'REFUNDED',
+                        'refunded_at' => now(),
+                    ]);
+                    $teacherAmount = (float) $allocation->instructor_amount;
+                }
+
+                \App\Models\InstructorTransaction::create([
+                    'instructor_id' => $course->teacher_id,
+                    'type' => 'refund',
+                    'amount' => $teacherAmount,
+                    'status' => 'completed',
+                    'reference_type' => 'App\Models\OrderItem',
+                    'reference_id' => $orderItem ? $orderItem->id : $course->id,
+                    'description' => 'Hoàn tiền cho khóa học: ' . $course->title,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                \App\Models\TeacherPayout::where('order_id', $order->id)->where('course_id', $course->id)->update(['status' => 'refunded']);
+            }
+
+            $order->update(['status' => 'refunded']);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Hoàn tiền khóa học '{$course->title}' thành công! Số tiền " . number_format($order->total_amount) . " VNĐ đã được hoàn trả.",
+                'data' => [
+                    'order_id' => $order->id,
+                    'course_id' => $course->id,
+                    'refunded_amount' => $order->total_amount,
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Lỗi khi xử lý hoàn tiền: ' . $e->getMessage()], 500);
         }
     }
 }

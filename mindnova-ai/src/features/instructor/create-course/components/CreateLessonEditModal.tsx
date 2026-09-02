@@ -185,16 +185,11 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
       finalContent = finalContent.replace(/poster="data:image\/[^"]+"/g, 'poster=""');
 
       const usedTempMediaIds: number[] = [...(lesson.temp_media_ids || [])];
-      
-      const deletePromises: Promise<any>[] = [];
-      Array.from(tempMediaMap.entries()).forEach(([url, id]) => {
-        if (finalContent.includes(url) || (videoUrl && videoUrl.includes(url))) {
+      Array.from(tempMediaMap.values()).forEach((id) => {
+        if (!usedTempMediaIds.includes(id)) {
           usedTempMediaIds.push(id);
-        } else {
-          deletePromises.push(deleteTempMedia.mutateAsync(id).catch(e => console.error(e)));
         }
       });
-      await Promise.all(deletePromises);
 
       if (isQuiz && quizData) {
         const qAny = quizData as any;

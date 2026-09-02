@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Controllers\ClientDashboardController;
-use App\Http\Controllers\Admin\CourseClassController;
 
 Route::get('/', function () {
     return view('welcome');

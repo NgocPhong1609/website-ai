@@ -99,6 +99,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  await updatePrice({ 
  courseId, 
  price: priceNum,
+ partnership_tier: storeSettings.partnershipTier || "standard",
  is_flash_sale: priceNum === 0 ? false : storeSettings.isFlashSale,
  sale_price: priceNum === 0 ? undefined : (storeSettings.salePrice ? Number(String(storeSettings.salePrice).replace(/[^0-9]/g, "")) : undefined),
  sale_start_date: priceNum === 0 ? undefined : storeSettings.saleStartDate,
@@ -260,6 +261,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  courseTitle={basicInfo.title} 
  thumbnailPreview={basicInfo.thumbnailPreview} 
  initialPrice={course?.price}
+ initialTier={(course as any)?.partnership_tier || "standard"}
  initialFlashSale={course?.is_flash_sale}
  initialSalePrice={course?.sale_price}
  initialSaleStartDate={course?.sale_start_date ? course.sale_start_date.split('T')[0] : null}

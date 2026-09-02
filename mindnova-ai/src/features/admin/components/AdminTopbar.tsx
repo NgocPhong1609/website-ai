@@ -201,10 +201,13 @@ export function AdminTopbar() {
  return (
  <header className="flex h-14 shrink-0 items-center gap-4 border-b border-slate-200 bg-white/80 px-5 backdrop-blur-xl">
  <div className="flex flex-1 items-center gap-4">
- <div className="flex items-center gap-2 rounded-full border -[#FAF7F2] bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold -[#2C3039]">
- <span className="h-2 w-2 rounded-full -[#2C3039] animate-pulse" />
- Online sync
- </div>
+      <div className="flex items-center gap-2 rounded-full border border-emerald-300/80 bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-800 shadow-xs">
+        <span className="relative flex h-2.5 w-2.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
+        </span>
+        Online sync
+      </div>
 
  <div className="relative max-w-xl flex-1">
  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">⌕</span>

@@ -17,6 +17,7 @@ class Course extends Model
     'description',
     'thumbnail',
     'price',
+    'partnership_tier',
     'level',
     'status',
     'admin_hidden_at',

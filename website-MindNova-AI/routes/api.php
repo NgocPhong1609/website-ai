@@ -164,6 +164,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // Check Order Status by Transaction ID
         Route::get('/orders/transaction/{transactionId}', [OrderController::class, 'showByTransaction']);
 
+        // Student Course Refund
+        Route::get('/courses/{courseId}/refund-eligibility', [OrderController::class, 'checkRefundEligibility']);
+        Route::post('/orders/refund', [OrderController::class, 'requestRefund']);
+
         // TÍNH NĂNG AI TUTOR & Đánh giá khóa học
         Route::post('/ai-tutor/chat', [AiTutorController::class, 'streamChat']);
         Route::post('/courses/{course}/reviews', [StudentReviewController::class, 'store']);
@@ -249,6 +253,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     // Student Analytics Dashboard
     Route::get('student-analytics/dashboard-metrics', [StudentAnalyticsController::class, 'dashboardMetrics']);
     Route::get('student-analytics/engagement-chart', [StudentAnalyticsController::class, 'engagementChart']);
+    Route::get('student-analytics/ai-insights', [StudentAnalyticsController::class, 'aiInsights']);
 
     // Discussions
     Route::get('discussions', [InstructorDiscussionController::class, 'index']);
@@ -262,6 +267,8 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::post('revenue/withdraw', [RevenueController::class, 'requestWithdraw']);
     Route::get('revenue/transactions', [RevenueController::class, 'getTransactions']);
     Route::get('revenue/sales-report', [RevenueController::class, 'getSalesReport']);
+    Route::get('revenue/payout-methods', [RevenueController::class, 'getPayoutMethods']);
+    Route::post('revenue/payout-methods', [RevenueController::class, 'updatePayoutMethods']);
 
     // Orders
     Route::get('orders', [InstructorOrderController::class, 'index']);

@@ -80,32 +80,35 @@ export function useUploadCourseThumbnail() {
 }
 
 export function useUpdateCoursePrice() {
- const queryClient = useQueryClient();
- return useMutation({
- mutationFn: async ({ 
- courseId, 
- price,
- is_flash_sale,
- sale_price,
- sale_start_date,
- sale_end_date 
- }: { 
- courseId: string; 
- price: number;
- is_flash_sale?: boolean;
- sale_price?: number;
- sale_start_date?: string;
- sale_end_date?: string;
- }) => {
- const { data } = await axiosClient.patch(`/api/instructor/courses/${courseId}/price`, {
- price,
- is_flash_sale,
- sale_price,
- sale_start_date,
- sale_end_date
- });
- return data.data;
- },
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ 
+      courseId, 
+      price,
+      partnership_tier,
+      is_flash_sale,
+      sale_price,
+      sale_start_date,
+      sale_end_date 
+    }: { 
+      courseId: string; 
+      price: number;
+      partnership_tier?: "standard" | "exclusive";
+      is_flash_sale?: boolean;
+      sale_price?: number;
+      sale_start_date?: string;
+      sale_end_date?: string;
+    }) => {
+      const { data } = await axiosClient.patch(`/api/instructor/courses/${courseId}/price`, {
+        price,
+        partnership_tier,
+        is_flash_sale,
+        sale_price,
+        sale_start_date,
+        sale_end_date
+      });
+      return data.data;
+    },
  onSuccess: (_, { courseId }) => {
  queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
  queryClient.invalidateQueries({ queryKey: ["instructor", "course", courseId] });

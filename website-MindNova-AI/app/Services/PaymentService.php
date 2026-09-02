@@ -2,8 +2,17 @@
 
 namespace App\Services;
 
-use App\Models\Payment; // Model Payment
-use Illuminate\Support\Str; // Hỗ trợ chuỗi
+use App\Models\Payment;
+use App\Models\Order;
+use App\Models\User;
+use App\Models\Enrollment;
+use App\Models\Course;
+use App\Models\ChatConversation;
+use App\Models\ChatConversationMember;
+use App\Notifications\StudentEnrolled;
+use App\Services\Instructor\InstructorPayoutService;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class PaymentService
 {
@@ -17,22 +26,22 @@ class PaymentService
     public function checkout(array $data): array
     {
         $payment = Payment::create(array_merge($data, [
-    'status' => $data['status'] ?? 'pending',
-    'transaction_id' => $data['transaction_id'] ?? 'ORD-' . strtoupper(Str::random(6)), // Tạo mã ngắn dạng ORD-XXXXXX
-]));
+            'status' => $data['status'] ?? 'pending',
+            'transaction_id' => $data['transaction_id'] ?? 'ORD-' . strtoupper(Str::random(6)),
+        ]));
 
-        $returnUrl = $data['return_url'] ?? url('/payments/' . $payment->id); // URL trả về khi thanh toán xong
+        $returnUrl = $data['return_url'] ?? url('/payments/' . $payment->id);
 
-        $payload = match (strtolower($payment->provider ?? '')) { // Chọn service theo provider
+        $payload = match (strtolower($payment->provider ?? '')) {
             'momo' => $this->momoService->createPayment($payment, $returnUrl),
             'vnpay' => $this->vnPayService->createPayment($payment, $returnUrl),
             'zalopay' => $this->zaloPayService->createPayment($payment, $returnUrl),
             default => [
-                'message' => 'No gateway selected. Payment recorded as pending.', // Nếu không chọn cổng thì chỉ lưu payment
+                'message' => 'No gateway selected. Payment recorded as pending.',
             ],
         };
 
-        return array_merge(['payment' => $payment], $payload); // Trả về payment và payload cổng nếu có
+        return array_merge(['payment' => $payment], $payload);
     }
 
     public function processCallback(string $provider, array $params): ?Payment
@@ -55,66 +64,125 @@ class PaymentService
         }
 
         $txnRef = (string) $result['payment_id'];
+        $isSuccess = ($result['status'] === 'completed');
 
-        // 1. Tìm payment theo transaction_id hoặc id
+        // 1. Look up Order in orders table by transaction_id (e.g. ORD-XXXXXX)
+        $order = Order::with(['orderItems.course', 'user'])->where('transaction_id', $txnRef)->first();
+
+        // Determine user_id safely
+        $userId = null;
+        if ($order && $order->user_id) {
+            $userId = $order->user_id;
+        } elseif (!empty($params['current_user_id']) && User::where('id', $params['current_user_id'])->exists()) {
+            $userId = (int) $params['current_user_id'];
+        } elseif (auth('sanctum')->check()) {
+            $userId = auth('sanctum')->id();
+        } elseif (request()->user('sanctum')) {
+            $userId = request()->user('sanctum')->id;
+        }
+
+        // Fallback if userId is invalid/deleted
+        if (!$userId || !User::where('id', $userId)->exists()) {
+            $firstUser = User::first();
+            $userId = $firstUser ? $firstUser->id : null;
+        }
+
+        if (!$userId) {
+            return null;
+        }
+
+        // Determine amount and course IDs
+        $amount = isset($params['vnp_Amount'])
+            ? ((float) $params['vnp_Amount']) / 100
+            : ($order ? (float) $order->total_amount : 0);
+
+        $courseIds = $order
+            ? $order->orderItems->pluck('course_id')->filter()->toArray()
+            : (!empty($params['course_id']) ? [(int)$params['course_id']] : []);
+
+        if (!empty($params['course_id']) && !in_array((int)$params['course_id'], $courseIds)) {
+            $courseIds[] = (int) $params['course_id'];
+        }
+
+        // 2. Find or Create Payment record
         $payment = Payment::where('transaction_id', $txnRef)
             ->orWhere('id', $txnRef)
             ->first();
 
-        // 2. Nếu chưa có trong DB, tạo mới cho User hiện tại (ID 201)
         if (! $payment) {
-            $amount = isset($params['vnp_Amount']) ? $params['vnp_Amount'] / 100 : 0;
-            $courseId = $params['course_id'] ?? null;
-            $userId = $params['current_user_id']
-                ?? auth('sanctum')->id()
-                ?? request()->user('sanctum')?->id
-                ?? 201;
-
             $payment = Payment::create([
                 'user_id' => $userId,
                 'amount' => $amount,
-                'provider' => $provider,
-                'status' => 'completed',
+                'provider' => strtolower($provider),
+                'status' => $isSuccess ? 'completed' : 'failed',
                 'transaction_id' => $txnRef,
-                'description' => $params['vnp_OrderInfo'] ?? 'Thanh toán VNPay',
+                'description' => $params['vnp_OrderInfo'] ?? ('Thanh toán ' . strtoupper($provider)),
                 'metadata' => [
-                    'course_ids' => $courseId ? [(int)$courseId] : [],
+                    'course_ids' => array_values(array_unique($courseIds)),
                     'vnp_TransactionNo' => $params['vnp_TransactionNo'] ?? null,
                 ],
             ]);
         } else {
-            // Giữ nguyên transaction_id gốc (ORD-...), không ghi đè mã ngân hàng
             $meta = is_array($payment->metadata) ? $payment->metadata : json_decode($payment->metadata ?? '[]', true) ?? [];
-            if (!empty($params['course_id'])) {
-                $meta['course_ids'] = array_values(array_unique(array_merge($meta['course_ids'] ?? [], [(int)$params['course_id']])));
+            $meta['course_ids'] = array_values(array_unique(array_merge($meta['course_ids'] ?? [], $courseIds)));
+            if (!empty($params['vnp_TransactionNo'])) {
+                $meta['vnp_TransactionNo'] = $params['vnp_TransactionNo'];
             }
-            $meta['vnp_TransactionNo'] = $params['vnp_TransactionNo'] ?? ($meta['vnp_TransactionNo'] ?? null);
 
             $payment->update([
-                'status' => 'completed',
+                'status' => $isSuccess ? 'completed' : 'failed',
+                'user_id' => $userId,
                 'metadata' => $meta,
             ]);
         }
 
-        // 3. Tự động ghi danh vào bảng enrollments (chống trùng lặp và luôn set status = enrolled)
-        $metadata = is_array($payment->metadata) ? $payment->metadata : json_decode($payment->metadata ?? '[]', true) ?? [];
-        $courseIds = $metadata['course_ids'] ?? [];
-        if (!empty($params['course_id']) && !in_array((int)$params['course_id'], $courseIds)) {
-            $courseIds[] = (int)$params['course_id'];
-        }
+        // 3. If Payment is successful, complete Order, create Payouts, and Enroll user
+        if ($isSuccess) {
+            if ($order && $order->status !== 'completed') {
+                $order->update(['status' => 'completed']);
 
-        foreach ($courseIds as $cId) {
-            \App\Models\Enrollment::updateOrCreate(
-                [
-                    'user_id' => $payment->user_id,
-                    'course_id' => (int)$cId,
-                ],
-                [
+                if (class_exists(InstructorPayoutService::class)) {
+                    app(InstructorPayoutService::class)->createForOrder($order);
+                }
+            }
+
+            $studentUser = User::find($userId);
+
+            foreach (array_unique($courseIds) as $cId) {
+                $inserted = DB::table('enrollments')->insertOrIgnore([
+                    'user_id' => $userId,
+                    'course_id' => (int) $cId,
                     'status' => 'enrolled',
-                    'progress_percentage' => 0,
                     'enrolled_at' => now(),
-                ]
-            );
+                ]);
+
+                if ($inserted && $studentUser) {
+                    $courseObj = Course::with('teacher')->find($cId);
+                    if ($courseObj && $courseObj->teacher) {
+                        $courseObj->teacher->notify(new StudentEnrolled($courseObj, $studentUser));
+                    }
+
+                    // Add to chat conversation
+                    if ($courseObj) {
+                        $conversation = ChatConversation::firstOrCreate(
+                            ['course_id' => $cId],
+                            ['title' => $courseObj->title, 'type' => 'course']
+                        );
+
+                        if ($courseObj->teacher_id) {
+                            ChatConversationMember::firstOrCreate([
+                                'chat_conversation_id' => $conversation->id,
+                                'user_id' => $courseObj->teacher_id,
+                            ]);
+                        }
+
+                        ChatConversationMember::firstOrCreate([
+                            'chat_conversation_id' => $conversation->id,
+                            'user_id' => $userId,
+                        ]);
+                    }
+                }
+            }
         }
 
         return $payment;

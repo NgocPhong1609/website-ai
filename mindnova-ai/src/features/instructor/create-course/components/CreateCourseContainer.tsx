@@ -210,8 +210,8 @@ export function CreateCourseContainer() {
  content: lesson.content || "",
  order: lesson.order,
  status: 'published',
- temp_media_ids: lesson.temp_media_ids,
- video_url: lesson.video_url,
+ temp_media_ids: lesson.temp_media_ids || (lesson as any).tempMediaIds || [],
+ video_url: lesson.video_url || (lesson as any).videoUrl || "",
  quizData: lesson.quizData,
  }
  });
@@ -237,6 +237,7 @@ export function CreateCourseContainer() {
  await updatePrice({ 
  courseId, 
  price: priceNum,
+ partnership_tier: settings.partnershipTier || "standard",
  is_flash_sale: isFlashSaleActive,
  sale_price: validSalePrice,
  sale_start_date: isFlashSaleActive ? settings.saleStartDate : undefined,
