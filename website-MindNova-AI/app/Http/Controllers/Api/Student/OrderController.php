@@ -570,7 +570,7 @@ class OrderController extends Controller
         $progressPercentage = $progressData['progress_percentage'] ?? 0;
         $completedLessonsCount = $progressData['completed_lessons'] ?? 0;
 
-        $progressEligible = ($progressPercentage <= 10) || ($completedLessonsCount <= 5);
+        $progressEligible = ($progressPercentage <= 10) && ($completedLessonsCount <= 5);
         $isEligible = $within30Days && $progressEligible;
 
         $reasons = [];
@@ -578,7 +578,7 @@ class OrderController extends Controller
             $reasons[] = "Đã quá 30 ngày kể từ khi mua khóa học (Đã mua {$daysDiff} ngày).";
         }
         if (!$progressEligible) {
-            $reasons[] = "Tiến độ học vượt quá điều kiện quy định (Tiến độ: {$progressPercentage}%, bài đã học: {$completedLessonsCount}).";
+            $reasons[] = "Tiến độ học vượt quá điều kiện quy định (Yêu cầu tiến độ ≤10% và ≤5 bài. Tiến độ hiện tại của bạn: {$progressPercentage}%, bài đã học: {$completedLessonsCount}).";
         }
 
         return response()->json([
@@ -661,12 +661,12 @@ class OrderController extends Controller
         $progressPercentage = $progressData['progress_percentage'] ?? 0;
         $completedLessonsCount = $progressData['completed_lessons'] ?? 0;
 
-        $isEligible = ($progressPercentage <= 10) || ($completedLessonsCount <= 5);
+        $isEligible = ($progressPercentage <= 10) && ($completedLessonsCount <= 5);
 
         if (!$isEligible) {
             return response()->json([
                 'success' => false,
-                'message' => "Không đủ điều kiện hoàn tiền. Khóa học chỉ được hoàn tiền khi tiến độ ≤10% hoặc chưa học quá 5 bài. Tiến độ hiện tại của bạn là {$progressPercentage}% ({$completedLessonsCount} bài đã học)."
+                'message' => "Không đủ điều kiện hoàn tiền. Khóa học chỉ được hoàn tiền khi tiến độ ≤10% và chưa học quá 5 bài. Tiến độ hiện tại của bạn là {$progressPercentage}% ({$completedLessonsCount} bài đã học)."
             ], 422);
         }
 
@@ -689,6 +689,19 @@ class OrderController extends Controller
                 $itemPrice = $orderItem ? (float)$orderItem->price : (float)$course->price;
                 $commissionRate = ($course->partnership_tier === 'exclusive') ? 0.15 : 0.30;
                 $teacherAmount = round($itemPrice * (1 - $commissionRate), 2);
+
+                // Update RevenueAllocation to REFUNDED
+                $allocation = \App\Models\RevenueAllocation::where('order_id', $order->id)
+                    ->where('course_id', $course->id)
+                    ->first();
+
+                if ($allocation) {
+                    $allocation->update([
+                        'status' => 'REFUNDED',
+                        'refunded_at' => now(),
+                    ]);
+                    $teacherAmount = (float) $allocation->instructor_amount;
+                }
 
                 \App\Models\InstructorTransaction::create([
                     'instructor_id' => $course->teacher_id,

@@ -56,6 +56,7 @@ export async function getAdminRevenueData(): Promise<AdminRevenueData> {
     totalTeacherRevenue: raw.totalTeacherRevenue ?? 0,
     courseCount: raw.courseCount ?? 0,
     courses: raw.courses ?? [],
+    orderHistory: raw.orderHistory ?? [],
   };
 }
 

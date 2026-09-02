@@ -123,13 +123,13 @@ export function StudentRefundModal({
                   </div>
                 </div>
 
-                {/* Rule 2: Progress <= 10% OR completed <= 5 */}
+                {/* Rule 2: Progress <= 10% AND completed <= 5 */}
                 <div className="flex items-start gap-2">
                   <span className={twMerge("font-bold", eligibility?.progress_eligible ? "text-emerald-600" : "text-rose-600")}>
                     {eligibility?.progress_eligible ? "✓" : "✕"}
                   </span>
                   <div>
-                    <span className="font-bold text-gray-800">Điều kiện tiến độ (≤10% hoặc ≤5 bài): </span>
+                    <span className="font-bold text-gray-800">Điều kiện tiến độ (≤10% và ≤5 bài): </span>
                     <span className="text-gray-600">
                       Tiến độ hiện tại: <strong>{eligibility?.progress_percentage ?? 0}%</strong> ({eligibility?.completed_lessons ?? 0} bài đã hoàn thành)
                     </span>
@@ -149,7 +149,7 @@ export function StudentRefundModal({
                     <span>Bạn đủ điều kiện nhận lại 100% học phí!</span>
                   </div>
                   <p className="text-[11px] text-emerald-800 leading-relaxed">
-                    Khóa học thỏa mãn điều kiện tiến độ ≤10% (hoặc ≤5 bài) và nằm trong 30 ngày bảo hộ mua sắm.
+                    Khóa học thỏa mãn điều kiện tiến độ ≤10% (và ≤5 bài) và nằm trong 30 ngày bảo hộ mua sắm.
                   </p>
                 </div>
               ) : (

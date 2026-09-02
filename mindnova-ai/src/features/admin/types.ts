@@ -246,12 +246,32 @@ export type AdminRevenueCourseRow = {
   conversionRate: number;
 };
 
+export type AdminOrderHistoryRow = {
+  orderId: number;
+  transactionCode: string;
+  purchasedAt: string;
+  studentName: string;
+  studentEmail: string;
+  courseTitle: string;
+  instructorName: string;
+  partnershipTier: "standard" | "exclusive";
+  originalPrice: number;
+  discountAmount: number;
+  paidAmount: number;
+  teacherAmount: number;
+  adminAmount: number;
+  allocationStatus: string;
+  orderStatus: string;
+  refundedAt?: string | null;
+};
+
 export type AdminRevenueData = {
   totalRevenue: number;
   totalAdminRevenue?: number;
   totalTeacherRevenue?: number;
   courseCount: number;
   courses: AdminRevenueCourseRow[];
+  orderHistory?: AdminOrderHistoryRow[];
 };
 
 export type AdminModerationRow = {
