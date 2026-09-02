@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import type { CourseDetailHeaderInfo } from "../../types";
+import { StudentRefundModal } from "../StudentRefundModal";
 
 const SAVED_COURSES_KEY = "mindnova_saved_courses_v1";
 
@@ -45,6 +46,8 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
  setIsSaved(!isSaved);
  alert(!isSaved ? "Đã lưu khóa học vào danh sách quan tâm của bạn!" : "Đã bỏ lưu khóa học.");
  };
+
+ const [isRefundOpen, setIsRefundOpen] = useState(false);
 
  return (
  <div className="mb-8">
@@ -103,14 +106,14 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
  </div>
 
  {/* Action Buttons */}
- <div className="flex flex-wrap items-center gap-4 pt-2">
+ <div className="flex flex-wrap items-center gap-3 pt-2">
  <Link 
  href={`/courses/lesson?courseId=${info?.id || 1}&lessonId=${nextLessonId}`}
  className="text-decoration-none"
  >
  <button
  type="button"
- className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#C0392B] hover:bg-[#A93226] transition-all cursor-pointer"
+ className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#C0392B] hover:bg-[#A93226] transition-all cursor-pointer shadow-sm"
  >
  <span>Tiếp tục bài học: <strong className="font-normal underline decoration-white/50">{nextLesson}</strong></span>
  </button>
@@ -119,7 +122,7 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
  <button
  type="button"
  onClick={handleSaveToggle}
- className={`flex items-center justify-center min-w-[160px] px-5 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+ className={`flex items-center justify-center px-4 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
  isSaved 
  ? "bg-[#2C3039] border-[#2C3039] text-white" 
  : "bg-white border-[#E8E2D9] text-[#2C3039] hover:bg-[#F5F0E8]"
@@ -127,9 +130,25 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
  >
  <span>{isSaved ? "Đã lưu vào danh mục" : "Lưu khóa học"}</span>
  </button>
+
+ <button
+ type="button"
+ onClick={() => setIsRefundOpen(true)}
+ className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-all cursor-pointer shadow-2xs"
+ title="Yêu cầu hoàn tiền khóa học nếu tiến độ ≤ 10% hoặc chưa học quá 5 bài"
+ >
+ <span>💸 Yêu cầu hoàn tiền</span>
+ </button>
  </div>
  </div>
  </section>
+
+ <StudentRefundModal
+ isOpen={isRefundOpen}
+ onClose={() => setIsRefundOpen(false)}
+ courseId={info?.id || 1}
+ courseTitle={title}
+ />
  </div>
  );
 }

@@ -47,9 +47,16 @@ export async function getAdminAnalyticsData(): Promise<AdminAnalyticsData> {
 }
 
 export async function getAdminRevenueData(): Promise<AdminRevenueData> {
- const payload = await apiClient<ApiEnvelope<AdminRevenueData>>("/admin/revenue");
+  const payload = await apiClient<any>("/admin/revenue");
+  const raw = payload?.data ?? payload ?? {};
 
- return payload.data ?? { totalRevenue: 0, courseCount: 0, courses: [] };
+  return {
+    totalRevenue: raw.totalRevenue ?? 0,
+    totalAdminRevenue: raw.totalAdminRevenue ?? 0,
+    totalTeacherRevenue: raw.totalTeacherRevenue ?? 0,
+    courseCount: raw.courseCount ?? 0,
+    courses: raw.courses ?? [],
+  };
 }
 
 export async function getAdminModerationData(): Promise<AdminModerationData> {

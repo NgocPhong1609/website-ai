@@ -21,39 +21,48 @@ export function FilteredCoursesView() {
  const [activeTab, setActiveTab] = useState<CourseTabStatus>("All");
  const [searchQuery, setSearchQuery] = useState<string>("");
 
+ const uniqueCourses = useMemo(() => {
+   const seen = new Set<string | number>();
+   return initialCourses.filter((c) => {
+     if (seen.has(c.id)) return false;
+     seen.add(c.id);
+     return true;
+   });
+ }, [initialCourses]);
+
  // Debounce both status selection and search text by 300ms using custom hook
  const debouncedTab = useDebounce(activeTab, 300);
  const debouncedQuery = useDebounce(searchQuery, 300);
 
  // Calculate exact counts for all tabs
  const counts = useMemo<Record<CourseTabStatus, number>>(() => {
- const inProg = initialCourses.filter((c) => c.status === "in-progress").length;
- const comp = initialCourses.filter((c) => c.status === "completed").length;
- const notSt = initialCourses.filter((c) => c.status === "not-started").length;
- return {
- All: initialCourses.length,
- "In Progress": inProg,
- Completed: comp,
- "Not Started": notSt,
- };
- }, [initialCourses]);
+   const inProg = uniqueCourses.filter((c) => c.status === "in-progress").length;
+   const comp = uniqueCourses.filter((c) => c.status === "completed").length;
+   const notSt = uniqueCourses.filter((c) => c.status === "not-started").length;
+   return {
+     All: uniqueCourses.length,
+     "In Progress": inProg,
+     Completed: comp,
+     "Not Started": notSt,
+   };
+ }, [uniqueCourses]);
 
  // Filter courses based on debounced tab status and debounced search keyword
  const filteredCourses = useMemo(() => {
- return initialCourses.filter((course) => {
- const matchesStatus =
- debouncedTab === "All" ||
- (debouncedTab === "In Progress" && course.status === "in-progress") ||
- (debouncedTab === "Completed" && course.status === "completed") ||
- (debouncedTab === "Not Started" && course.status === "not-started");
+   return uniqueCourses.filter((course) => {
+     const matchesStatus =
+       debouncedTab === "All" ||
+       (debouncedTab === "In Progress" && course.status === "in-progress") ||
+       (debouncedTab === "Completed" && course.status === "completed") ||
+       (debouncedTab === "Not Started" && course.status === "not-started");
 
- const matchesSearch =
- debouncedQuery.trim() === "" ||
- course.title.toLowerCase().includes(debouncedQuery.toLowerCase());
+     const matchesSearch =
+       debouncedQuery.trim() === "" ||
+       course.title.toLowerCase().includes(debouncedQuery.toLowerCase());
 
- return matchesStatus && matchesSearch;
- });
- }, [initialCourses, debouncedTab, debouncedQuery]);
+     return matchesStatus && matchesSearch;
+   });
+ }, [uniqueCourses, debouncedTab, debouncedQuery]);
 
 
  if (isLoading) {
@@ -86,8 +95,8 @@ export function FilteredCoursesView() {
  {/* Courses Grid with 3-column layout from lg screen width */}
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
  {filteredCourses.length > 0 ? (
- filteredCourses.map((course) => (
- <MyCourseCard key={course.id} course={course} />
+ filteredCourses.map((course, idx) => (
+ <MyCourseCard key={`${course.id}-${idx}`} course={course} />
  ))
  ) : (
  <div className="col-span-full py-12 px-6 text-center bg-white rounded-xl border border-[#E8E2D9] flex flex-col items-center justify-center shadow-sm">

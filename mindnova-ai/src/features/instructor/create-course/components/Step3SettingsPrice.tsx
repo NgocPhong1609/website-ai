@@ -11,6 +11,7 @@ export interface Step3SettingsPriceProps {
  courseTitle?: string;
  thumbnailPreview?: string | null;
  initialPrice?: number | null;
+ initialTier?: "standard" | "exclusive";
  initialFlashSale?: boolean;
  initialSalePrice?: number | null;
  initialSaleStartDate?: string | null;
@@ -23,6 +24,7 @@ export function Step3SettingsPrice({
  courseTitle = "Khóa học AI mới", 
  thumbnailPreview, 
  initialPrice, 
+ initialTier,
  initialFlashSale,
  initialSalePrice,
  initialSaleStartDate,
@@ -48,16 +50,18 @@ export function Step3SettingsPrice({
  initialFlashSale ?? false,
  initialSalePrice ?? undefined,
  initialSaleStartDate ?? undefined,
- initialSaleEndDate ?? undefined
+ initialSaleEndDate ?? undefined,
+ initialTier ?? "standard"
  );
 
  useEffect(() => {
  setSettings("basePrice", String(isFree ? 0 : basePrice));
+ setSettings("partnershipTier", tier);
  setSettings("isFlashSale", isFree ? false : discount.isEnabled);
  setSettings("salePrice", isFree ? "" : String(discount.discountPrice));
  setSettings("saleStartDate", isFree ? "" : discount.startDate);
  setSettings("saleEndDate", isFree ? "" : discount.endDate);
- }, [basePrice, isFree, discount, setSettings]);
+ }, [basePrice, isFree, tier, discount, setSettings]);
 
  return (
  <div className="w-full flex flex-col gap-6 animate-fadeIn">
@@ -257,10 +261,10 @@ export function Step3SettingsPrice({
  </div>
  )}
  <div className="h-px bg-white/10 w-full my-0.5" />
- <div className="flex items-center justify-between -[#FAF7F2]">
- <span>Tỷ lệ phân chia Giảng viên (Hạng PRO):</span>
- <span className="font-extrabold text-white text-sm">80.0%</span>
- </div>
+            <div className="flex items-center justify-between text-white/90">
+              <span>Tỷ lệ phân chia Giảng viên:</span>
+              <span className="font-extrabold text-white text-sm">{tier === "exclusive" ? "85.0%" : "70.0%"}</span>
+            </div>
  <div className="flex items-center justify-between text-sm font-black -[#FAF7F2]">
  <span>Thu Nhập Ròng Tích Lũy:</span>
  <span>{revenue.instructorEarnings.toLocaleString('vi-VN')} VNĐ / học viên</span>

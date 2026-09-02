@@ -35,6 +35,7 @@ class User extends Authenticatable
         'notification_email',
         'weekly_report',
         'ai_suggestions',
+        'payout_info',
     ];
 
     protected $hidden = [
@@ -58,6 +59,7 @@ class User extends Authenticatable
             'notification_email' => 'boolean',
             'weekly_report' => 'boolean',
             'ai_suggestions' => 'boolean',
+            'payout_info' => 'array',
         ];
     }
 
@@ -80,6 +82,21 @@ class User extends Authenticatable
     public function credentials(): HasMany
     {
         return $this->hasMany(TeacherCredential::class);
+    }
+
+    public function teacherCertificates(): HasMany
+    {
+        return $this->hasMany(TeacherCertificate::class, 'teacher_id');
+    }
+
+    public function teacherVerifications(): HasMany
+    {
+        return $this->hasMany(TeacherVerification::class, 'teacher_id');
+    }
+
+    public function teacherVerification(): HasOne
+    {
+        return $this->hasOne(TeacherVerification::class, 'teacher_id')->latestOfMany();
     }
 
     public function subscriptions(): HasMany
@@ -127,7 +144,7 @@ class User extends Authenticatable
      */
     public function isTeacher(): bool
     {
-        return $this->hasRole('teacher');
+        return $this->role === 'teacher' || $this->hasRole('teacher');
     }
 
     public function getRoleAttribute(): ?string

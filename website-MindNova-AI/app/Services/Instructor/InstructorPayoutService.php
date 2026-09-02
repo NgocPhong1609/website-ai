@@ -25,7 +25,7 @@ class InstructorPayoutService
             }
 
             $grossAmount = (float) $item->price;
-            $commissionRate = 0.10;
+            $commissionRate = ($course->partnership_tier === 'exclusive') ? 0.15 : 0.30;
             $adminShareAmount = round($grossAmount * $commissionRate, 2);
             $teacherAmount = round($grossAmount - $adminShareAmount, 2);
 
@@ -45,6 +45,7 @@ class InstructorPayoutService
                     'paid_at' => now(),
                     'metadata' => [
                         'source' => 'order_completion',
+                        'partnership_tier' => $course->partnership_tier ?? 'standard',
                     ],
                 ]
             );

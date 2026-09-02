@@ -255,19 +255,28 @@ class DashboardController extends Controller
             ->join('orders as o', 'o.id', '=', 'oi.order_id')
             ->join('courses as c', 'c.id', '=', 'oi.course_id')
             ->leftJoin('users as teacher', 'teacher.id', '=', 'c.teacher_id')
+            ->leftJoin('teacher_payouts as tp', function ($join) {
+                $join->on('tp.order_id', '=', 'oi.order_id')
+                     ->on('tp.course_id', '=', 'oi.course_id');
+            })
             ->where('o.status', 'completed')
             ->select([
                 'c.id as courseId',
                 'c.title as courseTitle',
+                'c.partnership_tier as partnershipTier',
                 DB::raw('COALESCE(teacher.name, "Unassigned") as instructorName'),
-                DB::raw('SUM(oi.price) as revenue'),
+                DB::raw('SUM(oi.price) as grossRevenue'),
+                DB::raw('COALESCE(SUM(tp.admin_share_amount), SUM(oi.price * IF(c.partnership_tier = "exclusive", 0.15, 0.30))) as adminRevenue'),
+                DB::raw('COALESCE(SUM(tp.teacher_amount), SUM(oi.price * IF(c.partnership_tier = "exclusive", 0.85, 0.70))) as teacherRevenue'),
                 DB::raw('COUNT(DISTINCT o.user_id) as students'),
             ])
-            ->groupBy('c.id', 'c.title', 'teacher.name')
-            ->orderByDesc('revenue')
+            ->groupBy('c.id', 'c.title', 'c.partnership_tier', 'teacher.name')
+            ->orderByDesc('grossRevenue')
             ->get();
 
-        $totalRevenue = (float) $courseSummary->sum('revenue');
+        $totalGrossRevenue = (float) $courseSummary->sum('grossRevenue');
+        $totalAdminRevenue = (float) $courseSummary->sum('adminRevenue');
+        $totalTeacherRevenue = (float) $courseSummary->sum('teacherRevenue');
 
         $courses = $courseSummary->map(function ($row) {
             $students = (int) $row->students;
@@ -276,17 +285,28 @@ class DashboardController extends Controller
                 'courseId' => (int) $row->courseId,
                 'courseTitle' => $row->courseTitle,
                 'instructorName' => $row->instructorName ?? 'Unassigned',
-                'revenue' => (float) $row->revenue,
+                'partnershipTier' => $row->partnershipTier ?? 'standard',
+                'grossRevenue' => (float) $row->grossRevenue,
+                'adminRevenue' => (float) $row->adminRevenue,
+                'teacherRevenue' => (float) $row->teacherRevenue,
+                'revenue' => (float) $row->grossRevenue,
                 'students' => $students,
                 'conversionRate' => $students > 0 ? 100.0 : 0.0,
             ];
         })->values();
 
-        return response()->json([
-            'totalRevenue' => $totalRevenue,
+        $responseData = [
+            'totalRevenue' => $totalGrossRevenue,
+            'totalAdminRevenue' => $totalAdminRevenue,
+            'totalTeacherRevenue' => $totalTeacherRevenue,
             'courseCount' => $courses->count(),
             'courses' => $courses,
-        ]);
+        ];
+
+        return response()->json(array_merge(
+            ['data' => $responseData],
+            $responseData
+        ));
     }
 
     public function analytics(): JsonResponse

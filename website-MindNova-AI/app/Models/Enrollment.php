@@ -12,7 +12,6 @@ class Enrollment extends Model
         'course_id',
         'progress_percentage',
         'enrolled_at',
-        'course_class_id',
         'status',
     ];
 
@@ -44,10 +43,5 @@ class Enrollment extends Model
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
-    }
-
-    public function courseClass(): BelongsTo
-    {
-        return $this->belongsTo(CourseClass::class);
     }
 }

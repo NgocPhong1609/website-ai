@@ -15,6 +15,7 @@ class UpdateCoursePriceRequest extends FormRequest
     {
         $rules = [
             'price' => 'required|numeric|min:0|max:100000000',
+            'partnership_tier' => 'nullable|string|in:standard,exclusive',
             'is_flash_sale' => 'sometimes|boolean',
             'sale_start_date' => 'nullable|date',
             'sale_end_date' => 'nullable|date|after:sale_start_date',

@@ -7,13 +7,13 @@ import { useEffect, useState } from "react";
 const navItems = [
  { label: "Tổng quan", href: "/admin", icon: "⌂" },
  { label: "Người dùng", href: "/admin/users", icon: "◌" },
- { label: "Duyệt giáo viên", href: "/admin/teacher-approvals", icon: "" },
+ { label: "Duyệt giáo viên", href: "/admin/teacher-approvals", icon: "❖" },
  { label: "AI & System", href: "/admin/ai-system", icon: "◫" },
  { label: "Nội dung", href: "/admin/content", icon: "◈" },
  { label: "Mã giảm giá", href: "/admin/coupons", icon: "◌" },
  { label: "Doanh thu", href: "/admin/revenue", icon: "◍" },
  { label: "Báo cáo", href: "/admin/analytics", icon: "▣" },
- { label: "Kiểm duyệt", href: "/admin/moderation-support", icon: "" },
+ { label: "Kiểm duyệt", href: "/admin/moderation-support", icon: "⬟" },
 ];
 
 const systemSlides = [

@@ -41,12 +41,13 @@ export function useInstructorPricing(
   initialFlashSale = false,
   initialSalePrice?: number,
   initialStartDate?: string,
-  initialEndDate?: string
+  initialEndDate?: string,
+  initialTier: PricingTier = "standard"
 ): UseInstructorPricingReturn {
   const isInitiallyFree = initialPrice === 0;
   const [isFree, setIsFreeState] = useState(isInitiallyFree);
   const [basePrice, setBasePriceState] = useState<number>(isInitiallyFree ? 500000 : initialPrice);
-  const [tier, setTier] = useState<PricingTier>("standard");
+  const [tier, setTier] = useState<PricingTier>(initialTier || "standard");
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const [discount, setDiscount] = useState<DiscountConfig>(() => {

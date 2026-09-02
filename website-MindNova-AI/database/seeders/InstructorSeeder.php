@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Course;
-use App\Models\CourseClass;
 use App\Models\CourseModule;
 use App\Models\Discussion;
 use App\Models\DiscussionReply;
@@ -207,31 +206,6 @@ class InstructorSeeder extends Seeder
                 'order' => 1,
                 'is_free' => false,
                 'status' => 'published',
-            ]
-        );
-
-        // 8. Tạo Lớp học (Course Classes)
-        $class1 = CourseClass::updateOrCreate(
-            ['class_name' => 'Lớp NextJS-K01'],
-            [
-                'course_id' => $course1->id,
-                'teacher_id' => $teacher->id,
-                'start_date' => '2026-07-01',
-                'end_date' => '2026-09-30',
-                'schedule' => 'Thứ 2 - 4 - 6 (19h30 - 21h30)',
-                'status' => 'ongoing',
-            ]
-        );
-
-        $class2 = CourseClass::updateOrCreate(
-            ['class_name' => 'Lớp AI-K02'],
-            [
-                'course_id' => $course2->id,
-                'teacher_id' => $teacher->id,
-                'start_date' => '2026-07-15',
-                'end_date' => '2026-10-15',
-                'schedule' => 'Thứ 3 - 5 - 7 (19h30 - 21h30)',
-                'status' => 'ongoing',
             ]
         );
 

@@ -50,7 +50,7 @@ export default async function PaymentCallbackPage({ searchParams }: Props) {
 
  const isVnPay = !!params.vnp_SecureHash;
  const endpoint = isVnPay 
- ? `${apiUrl}/student/payments/callback/vnpay?${queryString}&current_user_id=201`
+ ? `${apiUrl}/student/payments/callback/vnpay?${queryString}`
  : `${apiUrl}/student/orders/transaction/${transactionId}`;
 
  const callbackRes = await fetch(endpoint, { 

@@ -197,44 +197,40 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  setVideoMethod(method);
  };
 
- const handleSave = async () => {
- setIsSaving(true);
- let finalContent = content;
+  const handleSave = async () => {
+    setIsSaving(true);
+    let finalContent = content;
 
- try {
- finalContent = finalContent.replace(/poster="data:image\/[^"]+"/g, 'poster=""');
+    try {
+      finalContent = finalContent.replace(/poster="data:image\/[^"]+"/g, 'poster=""');
 
- const usedTempMediaIds: number[] = [];
- const deletePromises: Promise<any>[] = [];
- Array.from(tempMediaMap.entries()).forEach(([url, id]) => {
- if (finalContent.includes(url) || (videoUrl && videoUrl.includes(url))) {
- usedTempMediaIds.push(id);
- } else {
- deletePromises.push(deleteTempMedia.mutateAsync(id).catch(e => console.error(e)));
- }
- });
- await Promise.all(deletePromises);
+      const usedTempMediaIds: number[] = [];
+      Array.from(tempMediaMap.values()).forEach((id) => {
+        if (!usedTempMediaIds.includes(id)) {
+          usedTempMediaIds.push(id);
+        }
+      });
 
- const payloadType = (type as string) === 'quiz' ? 'quiz_module' : ((type as string) === 'document' ? 'article' : type);
- const updates: any = {
- title,
- type: payloadType,
- status,
- content: finalContent,
- video_url: type === 'video' ? videoUrl : undefined,
- quizData: ((type as string) === 'quiz' || (type as string) === 'quiz_module') ? quizData : undefined,
- temp_media_ids: usedTempMediaIds
- };
- 
- await onSave(lesson.id, updates);
- setTempMediaMap(new Map());
- } catch (e) {
- console.error("Lỗi khi lưu bài học:", e);
- alert("Đã xảy ra lỗi khi lưu bài học. Vui lòng thử lại.");
- } finally {
- setIsSaving(false);
- }
- };
+      const payloadType = (type as string) === 'quiz' ? 'quiz_module' : ((type as string) === 'document' ? 'article' : type);
+      const updates: any = {
+        title,
+        type: payloadType,
+        status,
+        content: finalContent,
+        video_url: type === 'video' ? videoUrl : undefined,
+        quizData: ((type as string) === 'quiz' || (type as string) === 'quiz_module') ? quizData : undefined,
+        temp_media_ids: usedTempMediaIds
+      };
+      
+      await onSave(lesson.id, updates);
+      setTempMediaMap(new Map());
+    } catch (e) {
+      console.error("Lỗi khi lưu bài học:", e);
+      alert("Đã xảy ra lỗi khi lưu bài học. Vui lòng thử lại.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">

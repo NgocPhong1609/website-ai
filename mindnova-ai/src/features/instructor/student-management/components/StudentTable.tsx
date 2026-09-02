@@ -252,23 +252,23 @@ export function StudentTable({
  </td>
  <td className="px-6 py-4">
  <div className="flex flex-col gap-1.5 items-start">
- <div className="flex items-center gap-2">
- <span className={twMerge("font-mono text-xs font-black px-2.5 py-1 rounded-lg border shadow-2xs", st.average_score >= 80 ? "-[#2C3039] bg-emerald-50 -[#FAF7F2]" : (st.average_score !== null ? "text-amber-700 bg-amber-50 border-amber-200" : "text-[#8A8478] bg-[#FEFCF9] border-[#E8E2D9]"))}>
+ <div className="flex items-center gap-2 whitespace-nowrap">
+ <span className={twMerge("font-mono text-xs font-black px-2.5 py-1 rounded-lg border shadow-2xs whitespace-nowrap shrink-0", st.average_score >= 80 ? "-[#2C3039] bg-emerald-50 -[#FAF7F2]" : (st.average_score !== null ? "text-amber-700 bg-amber-50 border-amber-200" : "text-[#8A8478] bg-[#FEFCF9] border-[#E8E2D9]"))}>
  {st.average_score !== null ? `${st.average_score}/100` : "Chưa có"}
  </span>
- <span className="px-2 py-0.5 rounded-md bg-purple-50 -[#C0392B] border -[#FAF7F2] text-[10px] font-black font-mono">
+ <span className="px-2 py-0.5 rounded-md bg-purple-50 -[#C0392B] border -[#FAF7F2] text-[10px] font-black font-mono whitespace-nowrap shrink-0">
  {st.total_credits ? `${st.total_credits} tín` : "0 tín"}
  </span>
  </div>
 
  {/* Quiz Breakdown Tooltip / List */}
  {Array.isArray(st.quiz_scores) && st.quiz_scores.length > 0 && (
- <div className="flex flex-col gap-1 mt-0.5">
+ <div className="flex flex-col gap-1 mt-0.5 w-full">
  {st.quiz_scores.map((q: any) => (
- <div key={q.quiz_id} className="flex items-center gap-1.5 text-[10px] font-semibold text-[#8A8478]">
- <span className="truncate max-w-[140px]" title={q.title}>{q.title}:</span>
- <span className="font-mono font-bold text-[#2C3039]">{q.score}/100</span>
- <span className={`px-1.5 py-0.2 rounded font-black text-[9px] ${q.type === 'capability_assessment' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-gray-100 text-gray-700'}`}>
+ <div key={q.quiz_id} className="flex items-center gap-1.5 text-[10px] font-semibold text-[#8A8478] whitespace-nowrap">
+ <span className="truncate max-w-[130px] shrink-1" title={q.title}>{q.title}:</span>
+ <span className="font-mono font-bold text-[#2C3039] shrink-0">{q.score}/100</span>
+ <span className={`px-1.5 py-0.5 rounded font-black text-[9px] whitespace-nowrap shrink-0 ${q.type === 'capability_assessment' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-amber-100 text-amber-800 border border-amber-200'}`}>
  {q.credits} tín
  </span>
  </div>

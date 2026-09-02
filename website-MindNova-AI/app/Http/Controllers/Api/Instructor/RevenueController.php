@@ -109,4 +109,53 @@ class RevenueController extends Controller
             return response()->json(['message' => 'Lỗi khi lấy báo cáo bán hàng.', 'error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Lấy thông tin tài khoản nhận tiền của giảng viên
+     */
+    public function getPayoutMethods(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if (!$user || !$user->isTeacher()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        return response()->json([
+            'data' => $user->payout_info ?? [
+                'bank_name' => '',
+                'account_number' => '',
+                'account_name' => '',
+            ]
+        ], 200);
+    }
+
+    /**
+     * Cập nhật thông tin tài khoản nhận tiền
+     */
+    public function updatePayoutMethods(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if (!$user || !$user->isTeacher()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $validated = $request->validate([
+            'bank_name' => 'required|string|max:255',
+            'account_number' => 'required|string|max:100',
+            'account_name' => 'required|string|max:255',
+        ], [
+            'bank_name.required' => 'Tên ngân hàng / cổng thanh toán là bắt buộc.',
+            'account_number.required' => 'Số tài khoản / Email là bắt buộc.',
+            'account_name.required' => 'Tên người thụ hưởng là bắt buộc.',
+        ]);
+
+        $user->update(['payout_info' => $validated]);
+
+        return response()->json([
+            'message' => 'Cập nhật thông tin tài khoản nhận tiền thành công.',
+            'data' => $validated
+        ], 200);
+    }
 }

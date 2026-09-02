@@ -234,18 +234,24 @@ export type AdminAnalyticsData = {
 };
 
 export type AdminRevenueCourseRow = {
- courseId: number;
- courseTitle: string;
- instructorName: string;
- revenue: number;
- students: number;
- conversionRate: number;
+  courseId: number;
+  courseTitle: string;
+  instructorName: string;
+  partnershipTier?: "standard" | "exclusive";
+  grossRevenue?: number;
+  adminRevenue?: number;
+  teacherRevenue?: number;
+  revenue: number;
+  students: number;
+  conversionRate: number;
 };
 
 export type AdminRevenueData = {
- totalRevenue: number;
- courseCount: number;
- courses: AdminRevenueCourseRow[];
+  totalRevenue: number;
+  totalAdminRevenue?: number;
+  totalTeacherRevenue?: number;
+  courseCount: number;
+  courses: AdminRevenueCourseRow[];
 };
 
 export type AdminModerationRow = {

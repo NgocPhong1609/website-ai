@@ -93,9 +93,9 @@ export function AdminAnalyticsPage() {
  {data && (
  <>
  <section className="grid gap-4 md:grid-cols-3">
- <Box title="Doanh thu học phí" value={`$${data.financial.tuition_revenue.toFixed(2)}`} />
- <Box title="Chi phí API AI" value={`$${data.financial.ai_api_cost.toFixed(4)}`} />
- <Box title="Lợi nhuận gộp" value={`$${data.financial.gross_margin.toFixed(2)}`} />
+ <Box title="Doanh thu học phí" value={formatCurrency(data.financial.tuition_revenue)} />
+ <Box title="Chi phí API AI" value={formatCurrency(data.financial.ai_api_cost)} />
+ <Box title="Lợi nhuận gộp" value={formatCurrency(data.financial.gross_margin)} />
  </section>
 
  <section className="grid gap-4 xl:grid-cols-2">
@@ -221,9 +221,6 @@ function labelForPeriod(period: string): string {
 }
 
 function formatCurrency(value: number): string {
- return new Intl.NumberFormat("vi-VN", {
- style: "currency",
- currency: "USD",
- minimumFractionDigits: 2,
- }).format(value);
+  const rounded = Math.round(value || 0);
+  return `${new Intl.NumberFormat("vi-VN").format(rounded)} VNĐ`;
 }

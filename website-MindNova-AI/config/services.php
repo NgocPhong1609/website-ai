@@ -50,7 +50,7 @@ return [
     // AI tạo nội dung (course generation, v.v.)
     'gemini' => [
         'api_key' => env('GEMINI_API_KEY'),
-        'model' => env('GEMINI_MODEL', 'gemini-2.0-flash-exp'),
+        'model' => env('GEMINI_MODEL', 'gemini-3.6-flash'),
     ],
 
     // AI trả lời câu hỏi / hỗ trợ học sinh (chat)

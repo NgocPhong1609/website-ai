@@ -416,9 +416,6 @@ function formatDuration(seconds?: number | null): string {
 }
 
 function formatCurrency(value: number): string {
- return new Intl.NumberFormat("vi-VN", {
- style: "currency",
- currency: "USD",
- minimumFractionDigits: 2,
- }).format(value);
+  const rounded = Math.round(value || 0);
+  return `${new Intl.NumberFormat("vi-VN").format(rounded)} VNĐ`;
 }

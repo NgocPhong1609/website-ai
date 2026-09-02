@@ -483,65 +483,23 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
       }
     } else {
       addDraftLesson(chapterId, `Bài học ${currentCount + 1}: Video bài giảng mới`, "video");
-      setEditingLesson({
-        chapterId,
-        lesson: {
-          id: `video_${Date.now()}`,
-          title: `Bài học ${currentCount + 1}: Video bài giảng mới`,
-          type: "video",
-        },
-      });
+      const state = useCreateCourseStore.getState();
+      const targetMod = state.modules.find((m) => m.id === chapterId);
+      if (targetMod && targetMod.lessons.length > 0) {
+        const newlyCreatedLesson = targetMod.lessons[targetMod.lessons.length - 1];
+        setEditingLesson({
+          chapterId,
+          lesson: newlyCreatedLesson as any,
+        });
+      }
     }
   };
 
-  const handleAddQuizLesson = (chapterId: string, currentCount: number, isAi: boolean = false) => {
-    if (courseId) {
-      if (isAi) {
-        setAiQuizModal({ isOpen: true, moduleId: String(chapterId) });
-      } else {
-        setManualQuizModal({ isOpen: true, moduleId: String(chapterId) });
-      }
+  const handleAddQuizLesson = (chapterId: string, _currentCount: number, isAi: boolean = false) => {
+    if (isAi) {
+      setAiQuizModal({ isOpen: true, moduleId: String(chapterId) });
     } else {
-      const quizTitle = isAi ? `Bài kiểm tra AI #${currentCount + 1}` : `Bài kiểm tra trắc nghiệm #${currentCount + 1}`;
-      const defaultQuestions = isAi ? [
-        {
-          id: `q_${Date.now()}_1`,
-          type: "multiple_choice",
-          question: "Câu hỏi trắc nghiệm mẫu 1?",
-          content: "Câu hỏi trắc nghiệm mẫu 1?",
-          explanation: "Giải thích đáp án đúng",
-          points: 1,
-          difficulty: "medium",
-          answers: [
-            { id: `a_${Date.now()}_1`, content: "Đáp án A (Đúng)", is_correct: true },
-            { id: `a_${Date.now()}_2`, content: "Đáp án B", is_correct: false },
-            { id: `a_${Date.now()}_3`, content: "Đáp án C", is_correct: false },
-            { id: `a_${Date.now()}_4`, content: "Đáp án D", is_correct: false },
-          ]
-        }
-      ] : [];
-
-      const initialQuizData = {
-        title: quizTitle,
-        time_limit_minutes: 15,
-        passing_score: 70,
-        questions: defaultQuestions,
-      };
-
-      addDraftLesson(chapterId, quizTitle, "quiz");
-      
-      setTimeout(() => {
-        const state = useCreateCourseStore.getState();
-        const targetChap = state.modules.find((c: any) => c.id === chapterId);
-        if (targetChap && targetChap.lessons.length > 0) {
-          const newLesson = targetChap.lessons[targetChap.lessons.length - 1];
-          updateDraftLesson(chapterId, newLesson.id, { quizData: initialQuizData });
-          setEditingLesson({
-            chapterId,
-            lesson: { ...newLesson, type: "quiz", quizData: initialQuizData } as any,
-          });
-        }
-      }, 50);
+      setManualQuizModal({ isOpen: true, moduleId: String(chapterId) });
     }
   };
 
@@ -565,14 +523,15 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
       }
     } else {
       addDraftLesson(chapterId, `Tài liệu đọc #${currentCount + 1}`, "document");
-      setEditingLesson({
-        chapterId,
-        lesson: {
-          id: `doc_${Date.now()}`,
-          title: `Tài liệu đọc #${currentCount + 1}`,
-          type: "document",
-        },
-      });
+      const state = useCreateCourseStore.getState();
+      const targetMod = state.modules.find((m) => m.id === chapterId);
+      if (targetMod && targetMod.lessons.length > 0) {
+        const newlyCreatedLesson = targetMod.lessons[targetMod.lessons.length - 1];
+        setEditingLesson({
+          chapterId,
+          lesson: newlyCreatedLesson as any,
+        });
+      }
     }
   };
 
@@ -1152,7 +1111,23 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
             refetchModules();
             refetchCourseQuizzes();
           } else if (targetModId) {
-            addDraftLesson(targetModId, savedQuiz?.title || "Bài kiểm tra mới", "quiz");
+            const quizTitle = savedQuiz?.title || "Bài kiểm tra AI mới";
+            const questions = savedQuiz?.questions || savedQuiz?.quizData?.questions || [];
+            const initialQuizData = {
+              title: quizTitle,
+              time_limit_minutes: savedQuiz?.time_limit_minutes || 15,
+              passing_score: savedQuiz?.passing_score || 70,
+              questions: questions,
+            };
+            addDraftLesson(targetModId, quizTitle, "quiz");
+            setTimeout(() => {
+              const state = useCreateCourseStore.getState();
+              const targetChap = state.modules.find((c: any) => c.id === targetModId);
+              if (targetChap && targetChap.lessons.length > 0) {
+                const newLesson = targetChap.lessons[targetChap.lessons.length - 1];
+                updateDraftLesson(targetModId, newLesson.id, { quizData: initialQuizData });
+              }
+            }, 50);
           }
         }}
       />
@@ -1170,7 +1145,23 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
             refetchModules();
             refetchCourseQuizzes();
           } else if (targetModId) {
-            addDraftLesson(targetModId, savedQuiz?.title || "Bài kiểm tra mới", "quiz");
+            const quizTitle = savedQuiz?.title || "Bài kiểm tra trắc nghiệm mới";
+            const questions = savedQuiz?.questions || savedQuiz?.quizData?.questions || [];
+            const initialQuizData = {
+              title: quizTitle,
+              time_limit_minutes: savedQuiz?.time_limit_minutes || 15,
+              passing_score: savedQuiz?.passing_score || 70,
+              questions: questions,
+            };
+            addDraftLesson(targetModId, quizTitle, "quiz");
+            setTimeout(() => {
+              const state = useCreateCourseStore.getState();
+              const targetChap = state.modules.find((c: any) => c.id === targetModId);
+              if (targetChap && targetChap.lessons.length > 0) {
+                const newLesson = targetChap.lessons[targetChap.lessons.length - 1];
+                updateDraftLesson(targetModId, newLesson.id, { quizData: initialQuizData });
+              }
+            }, 50);
           }
         }}
       />

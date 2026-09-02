@@ -118,10 +118,13 @@ class CourseController extends Controller
 
         $price = (float) $request->price;
 
+        $tier = $request->input('partnership_tier', $course->partnership_tier ?? 'standard');
+
         // Free courses: clear all flash sale data for consistency
         if ($price == 0) {
             $course->update([
                 'price' => 0,
+                'partnership_tier' => $tier,
                 'is_flash_sale' => false,
                 'sale_price' => null,
                 'sale_start_date' => null,
@@ -130,6 +133,7 @@ class CourseController extends Controller
         } else {
             $course->update([
                 'price' => $price,
+                'partnership_tier' => $tier,
                 'is_flash_sale' => $request->boolean('is_flash_sale'),
                 'sale_price' => $request->sale_price,
                 'sale_start_date' => $request->sale_start_date,

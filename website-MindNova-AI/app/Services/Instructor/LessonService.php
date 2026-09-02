@@ -193,7 +193,7 @@ class LessonService
 
         // Upload to Cloudflare R2 securely without loading into memory
         Storage::disk('r2')->putFileAs(
-            "lessons/{$lesson->id}/content/{$subfolder}",
+            "Courses/{$lesson->course_id}/Modules/{$lesson->module_id}/Lessons/{$lesson->id}/{$subfolder}",
             $file,
             "{$uuid}.{$extension}"
         );
@@ -309,9 +309,9 @@ class LessonService
                     $contentChanged = true;
                 }
 
-                // Replace old URL with new URL in video_url
-                if (str_contains($videoUrl, $oldUrl)) {
-                    $videoUrl = str_replace($oldUrl, $newUrl, $videoUrl);
+                // If media is video, set official R2 URL to video_url
+                if ($media->media_type === 'video') {
+                    $videoUrl = $newUrl;
                     $contentChanged = true;
                 }
 
@@ -323,7 +323,12 @@ class LessonService
         }
 
         // 2. Clean up orphaned media (files in DB but no longer in HTML content or video_url)
-        $existingMedia = $lesson->media()->where('is_temp', false)->get();
+        // Exclude mediaIds that were just attached!
+        $existingMedia = $lesson->media()
+            ->where('is_temp', false)
+            ->whereNotIn('id', $mediaIds)
+            ->get();
+
         foreach ($existingMedia as $media) {
             $mediaUrl = Storage::disk('r2')->url($media->r2_key);
             // If the URL is no longer in the HTML content or video_url, delete the file and record
@@ -334,7 +339,7 @@ class LessonService
         }
 
         // Save lesson if content or video_url was updated with new URLs
-        if ($contentChanged) {
+        if ($contentChanged || $lesson->isDirty()) {
             $lesson->content = $content;
             $lesson->video_url = $videoUrl;
             $lesson->save();
