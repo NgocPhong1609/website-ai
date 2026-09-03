@@ -236,28 +236,42 @@ class StudentController extends Controller
     {
         $teacherId = $request->user()->id;
         $courseId = $request->input('course_id');
-        $prompt = $request->input('prompt'); // The prompt topic
+        $prompt = $request->input('prompt', 'Cập nhật tiến độ học tập'); // The prompt topic
         $tone = $request->input('tone', 'friendly'); // Tone
 
-        $systemPrompt = "You are an AI teaching assistant. Generate a short, engaging notification (max 3 sentences) for students.
+        $systemPrompt = "You are an AI teaching assistant. Generate a short, engaging notification (max 3 sentences) for students in Vietnamese.
         Topic: {$prompt}
         Tone: {$tone}
         Return ONLY the notification text string. Do not include quotes or markdown.";
 
         try {
-            $response = $this->aiService->sendMessage([
+            /** @var \App\Services\Ai\AiRouterService $aiRouter */
+            $aiRouter = app(\App\Services\Ai\AiRouterService::class);
+            $result = $aiRouter->sendMessageWithFallback([
                 new AiMessageDto("system", $systemPrompt),
-                new AiMessageDto("user", "Generate notification.")
+                new AiMessageDto("user", "Generate notification for topic: {$prompt}")
             ]);
 
-            return response()->json([
-                'generated_content' => trim($response)
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Failed to generate notification: ' . $e->getMessage()
-            ], 500);
+            $generatedContent = trim($result['content'] ?? '');
+            if (!empty($generatedContent)) {
+                return response()->json([
+                    'generated_content' => $generatedContent
+                ], 200);
+            }
+        } catch (\Throwable $e) {
+            logger()->warning('[AiNotification] AI service failed, using template notification fallback: ' . $e->getMessage());
         }
+
+        // High quality fallback notification based on tone & prompt
+        $fallbackContent = match ($tone) {
+            'urgent' => "📢 THÔNG BÁO KHẨN: {$prompt}. Các bạn học viên chú ý theo dõi và thực hiện đúng thời hạn nhé!",
+            'encouraging' => "🌟 Cố gắng lên các bạn! {$prompt}. Hãy tiếp tục hoàn thành các bài học và bài tập hôm nay!",
+            default => "📣 Thông báo mới: {$prompt}. Chúc các bạn học viên học tập hiệu quả cùng MindNova AI!",
+        };
+
+        return response()->json([
+            'generated_content' => $fallbackContent
+        ], 200);
     }
 
     public function getNotificationOptions(Request $request)

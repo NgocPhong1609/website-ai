@@ -9,15 +9,16 @@ export const getEchoInstance = (token: string) => {
     if (!echoInstance) {
         (window as any).Pusher = Pusher;
         Pusher.logToConsole = process.env.NEXT_PUBLIC_ENABLE_PUSHER_LOGS === 'true';
+        const port = Number(process.env.NEXT_PUBLIC_REVERB_PORT || 8080);
         echoInstance = new Echo({
             broadcaster: 'reverb',
-            key: process.env.NEXT_PUBLIC_REVERB_APP_KEY || 'app-key',
+            key: process.env.NEXT_PUBLIC_REVERB_APP_KEY || 'mindnova_chat_key',
             wsHost: process.env.NEXT_PUBLIC_REVERB_HOST || 'localhost',
-            wsPort: process.env.NEXT_PUBLIC_REVERB_PORT || 8080,
-            wssPort: process.env.NEXT_PUBLIC_REVERB_PORT || 8080,
+            wsPort: port,
+            wssPort: port,
             forceTLS: (process.env.NEXT_PUBLIC_REVERB_SCHEME ?? 'http') === 'https',
             enabledTransports: ['ws', 'wss'],
-            authEndpoint: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/broadcasting/auth`,
+            authEndpoint: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/broadcasting/auth`,
             auth: {
                 headers: {
                     Authorization: `Bearer ${token}`

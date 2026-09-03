@@ -120,11 +120,15 @@ class ChatController extends Controller
             $attachment = null;
             if ($request->hasFile('file')) {
                 $file = $request->file('file');
-                $path = $file->store('chat_attachments', 's3'); // or whatever disk is default
+                $disk = config('filesystems.default', 'public');
+                if (!config("filesystems.disks.{$disk}")) {
+                    $disk = 'public';
+                }
+                $path = $file->store('chat_attachments', $disk);
                 
                 $attachment = ChatAttachment::create([
                     'chat_message_id' => $message->id,
-                    'file_url' => Storage::disk('s3')->url($path),
+                    'file_url' => Storage::disk($disk)->url($path),
                     'file_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getMimeType(),
                     'size' => $file->getSize(),
@@ -132,20 +136,24 @@ class ChatController extends Controller
             }
 
             DB::commit();
-
-            $message->load(['sender:id,name,avatar_url', 'attachments']);
-
-            // Broadcast the event
-            broadcast(new ChatMessageSent($message))->toOthers();
-
-            return response()->json([
-                'status' => 'success',
-                'data' => $message
-            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Failed to send message.', 'error' => $e->getMessage()], 500);
         }
+
+        $message->load(['sender:id,name,avatar_url', 'attachments']);
+
+        // Broadcast the event safely so failure to reach Reverb/Pusher does not fail message sending
+        try {
+            broadcast(new ChatMessageSent($message))->toOthers();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Failed to broadcast ChatMessageSent event: " . $e->getMessage());
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $message
+        ]);
     }
 
     /**
@@ -198,7 +206,11 @@ class ChatController extends Controller
         
         $message->load(['sender:id,name,avatar_url', 'attachments']);
 
-        broadcast(new \App\Events\ChatMessageRecalled($message))->toOthers();
+        try {
+            broadcast(new \App\Events\ChatMessageRecalled($message))->toOthers();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Failed to broadcast ChatMessageRecalled event: " . $e->getMessage());
+        }
 
         return response()->json(['status' => 'success', 'data' => $message]);
     }

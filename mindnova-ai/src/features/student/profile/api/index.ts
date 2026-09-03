@@ -11,30 +11,40 @@ export function useGetProfile() {
  const { data } = await axiosClient.get("/api/profile");
  const user = data.data;
 
- const normalizedUser = {
- id: user.id,
- name: user.name || "Học viên",
- email: user.email || "",
- avatar_url: user.avatar_url || user.avatar || null,
- avatar: user.avatar_url || user.avatar || null,
- roles: user.roles || [],
- };
+    const storedUser = readStoredUser();
+    const avatarUrl =
+      user.avatar_url ||
+      user.avatar ||
+      user.profile?.avatar_url ||
+      user.profile?.avatar ||
+      storedUser?.avatar_url ||
+      storedUser?.avatar ||
+      null;
 
- writeStoredUser(normalizedUser);
+    const normalizedUser = {
+      id: user.id,
+      name: user.name || "Học viên",
+      email: user.email || "",
+      avatar_url: avatarUrl,
+      avatar: avatarUrl,
+      roles: user.roles || [],
+    };
 
- const firstName = user.name ? user.name.split(" ").pop() : "";
- const avatarInitials = firstName ? firstName[0].toUpperCase() : "U";
+    writeStoredUser(normalizedUser);
 
- return {
- fullName: user.name || "Học viên",
- email: user.email || "",
- bio: user.profile?.bio || "Chưa có thông tin giới thiệu.",
- major: user.profile?.major || "Chuyên ngành chưa cập nhật",
- avatarInitials,
- avatarUrl: user.avatar_url || user.avatar || null,
- completionPercent: user.profile ? 100 : 50,
- };
- },
+    const firstName = user.name ? user.name.split(" ").pop() : "";
+    const avatarInitials = firstName ? firstName[0].toUpperCase() : "U";
+
+    return {
+      fullName: user.name || "Học viên",
+      email: user.email || "",
+      bio: user.profile?.bio || "Chưa có thông tin giới thiệu.",
+      major: user.profile?.major || "Chuyên ngành chưa cập nhật",
+      avatarInitials,
+      avatarUrl,
+      completionPercent: user.profile ? 100 : 50,
+    };
+  },
  staleTime: 0,
  });
 }

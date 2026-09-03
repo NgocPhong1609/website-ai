@@ -71,12 +71,8 @@ PROMPT;
             . "- Các dạng bài bắt buộc: " . $typesString . "\n"
             . ($validated['custom_prompt'] ? "- Yêu cầu thêm: " . $validated['custom_prompt'] . "\n" : "");
 
-        // 🌟 Lấy danh sách model thực tế từ chính API Key của bạn
-        $availableModels = $this->fetchAvailableGroqModels($groqKey);
-
-        if (empty($availableModels)) {
-            $availableModels = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'llama3-70b-8192'];
-        }
+        // Priority static model selection (avoids wasteful extra cURL request per user call)
+        $availableModels = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
 
         $aiData = null;
         $lastError = '';
@@ -89,7 +85,7 @@ PROMPT;
                     ['role' => 'user', 'content' => $userPrompt],
                 ],
                 'temperature' => 0.35,
-                'max_tokens' => 3500,
+                'max_tokens' => 2500,
             ];
 
             $ch = curl_init('https://api.groq.com/openai/v1/chat/completions');

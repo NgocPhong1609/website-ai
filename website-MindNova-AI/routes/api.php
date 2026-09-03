@@ -96,7 +96,6 @@ Route::prefix('student/practice')->group(function () {
 
 // -- API Student Public Routes --
 Route::prefix('student')->group(function () {
-    Route::get('/dashboard', [StudentDashboardController::class, 'overview']);
     Route::get('/study-plan', [StudentStudyPlanController::class, 'overview']);
     Route::get('/practice/overview', [StudentPracticeController::class, 'overview']);
     Route::get('/progress/overview', [StudentProgressController::class, 'overview']);
@@ -158,6 +157,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // 3. NHÓM API HỌC SINH (Student Authenticated Actions)
     // ==========================================
     Route::prefix('student')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [StudentDashboardController::class, 'overview']);
+
         // Enrolled Courses
         Route::get('/courses/enrolled', [StudentCourseController::class, 'enrolledCourses']);
 
@@ -174,7 +176,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/courses/{course}/reviews/{review}', [StudentReviewController::class, 'update']);
         Route::delete('/courses/{course}/reviews/{review}', [StudentReviewController::class, 'destroy']);
 
-        // Quiz bài học
+        // Quiz bài học & Đánh giá cấp khóa học (General & Final Quiz)
+        Route::get('courses/{courseId}/assessment-status', [StudentCourseController::class, 'assessmentStatus']);
+        Route::get('courses/{courseId}/quiz/{quizType}', [StudentQuizController::class, 'getCourseQuiz']);
+        Route::post('courses/{courseId}/quiz/{quizType}/submit', [StudentQuizController::class, 'submitCourseQuiz']);
+        Route::get('quiz-attempts/{attemptId}', [StudentQuizController::class, 'getAttemptResult']);
         Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
         Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
         Route::post('quiz/grade-essay', [StudentQuizController::class, 'gradeEssay']);

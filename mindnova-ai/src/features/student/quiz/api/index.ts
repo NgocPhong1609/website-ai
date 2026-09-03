@@ -48,31 +48,60 @@ export function useGetStudentQuiz(lessonId: string | number) {
  });
 }
 
+export function useGetCourseQuiz(courseId: string | number, quizType: string) {
+ return useQuery({
+ queryKey: ["student", "course", courseId, "quiz", quizType],
+ queryFn: async (): Promise<StudentQuizData> => {
+ const { data } = await axiosClient.get(`/api/student/courses/${courseId}/quiz/${quizType}`);
+ return data.data;
+ },
+ enabled: !!courseId && !!quizType,
+ retry: false,
+ });
+}
+
+export function useGetQuizAttemptResult(attemptId: string | number) {
+ return useQuery({
+ queryKey: ["student", "quiz-attempt", attemptId],
+ queryFn: async (): Promise<QuizGradingResult> => {
+ const { data } = await axiosClient.get(`/api/student/quiz-attempts/${attemptId}`);
+ return data.data;
+ },
+ enabled: !!attemptId,
+ });
+}
+
 export function useSubmitQuiz() {
  const queryClient = useQueryClient();
  return useMutation({
  mutationFn: async ({
  lessonId,
+ courseId,
+ quizType,
  answers,
  time_taken_seconds,
  }: {
- lessonId: string | number;
+ lessonId?: string | number;
+ courseId?: string | number;
+ quizType?: string;
  answers: Record<string, number | string>;
  time_taken_seconds: number;
  }): Promise<QuizGradingResult> => {
- const { data } = await axiosClient.post(`/api/student/lessons/${lessonId}/quiz/submit`, {
+ const endpoint = (courseId && quizType)
+   ? `/api/student/courses/${courseId}/quiz/${quizType}/submit`
+   : `/api/student/lessons/${lessonId}/quiz/submit`;
+ const { data } = await axiosClient.post(endpoint, {
  answers,
  time_taken_seconds,
  });
  return data.data;
  },
- onSuccess: () => {
- // Đảm bảo dữ liệu UI toàn hệ thống (sidebar, progress) được cập nhật đồng bộ sau khi nộp
+ onSuccess: (_, variables) => {
  queryClient.invalidateQueries({ queryKey: ["student", "practice", "overview"] });
- queryClient.invalidateQueries({ queryKey: ["student", "courses", "detail"] });
- queryClient.invalidateQueries({ queryKey: ["student", "courses", "enrolled"] });
+ queryClient.invalidateQueries({ queryKey: ["student", "courses"] });
  },
  });
 }
 
 export * from "../types";
+

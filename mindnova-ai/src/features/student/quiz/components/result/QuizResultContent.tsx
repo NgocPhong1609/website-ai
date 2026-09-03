@@ -3,12 +3,18 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useGetQuizAttemptResult } from "../../api";
 import type { QuizGradingResult, QuestionResultDetail } from "../../types";
 
 export function QuizResultContent() {
  const router = useRouter();
  const searchParams = useSearchParams();
- const aiQuizId = searchParams.get("aiQuizId");
+ const aiQuizId = searchParams ? searchParams.get("aiQuizId") : null;
+ const attemptId = searchParams ? searchParams.get("attemptId") : null;
+ const courseId = searchParams ? (searchParams.get("courseId") || searchParams.get("course_id")) : null;
+
+ // Fetch attempt result directly from DB if attemptId is present
+ const { data: dbAttemptResult, isLoading: isAttemptLoading } = useGetQuizAttemptResult(attemptId || "");
 
  // State cho đề AI
  const [aiQuiz, setAiQuiz] = useState<any>(null);
@@ -18,7 +24,7 @@ export function QuizResultContent() {
 
  // State cho đề tĩnh & tự luận
  const [staticResult, setStaticResult] = useState<QuizGradingResult | null>(null);
- const [isStaticLoading, setIsStaticLoading] = useState<boolean>(!aiQuizId);
+ const [isStaticLoading, setIsStaticLoading] = useState<boolean>(!aiQuizId && !attemptId);
  const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
  const [selectedFilter, setSelectedFilter] = useState<"all" | "mc" | "essay">("all");
 
@@ -46,22 +52,26 @@ export function QuizResultContent() {
  fetchAiQuizResult();
  }, [aiQuizId, baseUrl]);
 
- // 2. Tải kết quả bài thi tĩnh từ localStorage nếu không có aiQuizId
+ // 2. Ưu tiên dữ liệu từ Database theo attemptId, nếu không có mới dùng localStorage
  useEffect(() => {
  if (aiQuizId) return;
 
- if (typeof window !== "undefined") {
- const stored = localStorage.getItem("mindnova_last_quiz_result");
- if (stored) {
- try {
- setStaticResult(JSON.parse(stored) as QuizGradingResult);
- } catch (e) {
- console.error("Lỗi parse localStorage:", e);
+ if (dbAttemptResult) {
+   setStaticResult(dbAttemptResult);
+   setIsStaticLoading(false);
+ } else if (!attemptId && typeof window !== "undefined") {
+   const stored = localStorage.getItem("mindnova_last_quiz_result");
+   if (stored) {
+     try {
+       setStaticResult(JSON.parse(stored) as QuizGradingResult);
+     } catch (e) {
+       console.error("Lỗi parse localStorage:", e);
+     }
+   }
+   setIsStaticLoading(false);
  }
- }
- }
- setIsStaticLoading(false);
- }, [aiQuizId]);
+ }, [aiQuizId, attemptId, dbAttemptResult]);
+
 
  // Toggle xem giải thích chi tiết AI
  const toggleExplanation = (id: string | number) => {

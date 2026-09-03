@@ -24,7 +24,10 @@ class DashboardController extends Controller
 
     public function overview(Request $request)
     {
-        $user = $request->user();
+        $user = $request->user('sanctum') ?? $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
 
         // 1. Lấy thông tin streak của user
         $streak = UserStreak::firstOrCreate(

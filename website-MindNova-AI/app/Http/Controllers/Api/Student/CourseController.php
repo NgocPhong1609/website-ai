@@ -89,4 +89,16 @@ class CourseController extends Controller
             'Enrolled courses retrieved successfully.'
         );
     }
+
+    /**
+     * Retrieve course assessment status, progress %, General Quiz & Final Quiz status, and unlock conditions.
+     */
+    public function assessmentStatus(Request $request, $courseId): JsonResponse
+    {
+        $user = $request->user('sanctum') ?? $request->user();
+        $data = $this->courseService->getCourseAssessmentStatus((int) $courseId, $user);
+
+        return $this->successResponse($data, 'Lấy trạng thái bài kiểm tra thành công.');
+    }
 }
+

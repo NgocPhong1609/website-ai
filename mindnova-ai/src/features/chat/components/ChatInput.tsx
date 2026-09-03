@@ -70,17 +70,18 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }
  <button
  onClick={handleSubmit}
  disabled={isLoading}
- className="px-4 py-1.5 -[#C0392B] text-white font-medium text-sm rounded-full hover:-[#C0392B] transition-colors disabled:-[#C0392B] flex items-center justify-center h-8"
+ className="px-4 py-1.5 bg-[#C0392B] text-white font-medium text-sm rounded-full hover:bg-[#A93226] transition-colors disabled:bg-[#C0392B]/50 flex items-center justify-center h-8 cursor-pointer shadow-xs"
  >
  {isLoading ? '...' : 'Gửi'}
  </button>
  ) : (
  <button
- disabled={true} // Disabled when empty as per requirements, or just show icon
- className="w-8 h-8 flex items-center justify-center -[#C0392B] rounded-full transition-colors opacity-50 cursor-not-allowed"
+ disabled={true}
+ className="w-8 h-8 flex items-center justify-center bg-[#C0392B] text-white rounded-full transition-colors opacity-40 cursor-not-allowed"
  >
- {/* Using a thumbs-up or paper-plane icon. Design requirement: "Ở bên phải sử dụng icon gửi hiện tại" (Paper plane) */}
- <></>
+ <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+ <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+ </svg>
  </button>
  )}
  </div>

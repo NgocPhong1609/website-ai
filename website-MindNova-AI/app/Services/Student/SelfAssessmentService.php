@@ -48,7 +48,7 @@ class SelfAssessmentService
             throw new Exception("Không tìm thấy dữ liệu khóa học để tạo bài đánh giá năng lực.");
         }
 
-        // 2. Aggregate ALL lesson contents across modules
+        // 2. Aggregate concise lesson summaries across modules (token-optimized)
         $lessonCount = 0;
         $aggregatedContent = "";
 
@@ -56,10 +56,15 @@ class SelfAssessmentService
             foreach ($course->modules as $module) {
                 foreach ($module->lessons as $lesson) {
                     $lessonCount++;
-                    $lessonText = trim(strip_tags($lesson->content ?? ''));
+                    $cleanText = trim(preg_replace('/\s+/', ' ', strip_tags($lesson->content ?? '')));
                     $aggregatedContent .= "=== Bài {$lessonCount}: {$lesson->title} (Module: {$module->title}) ===\n";
-                    if (!empty($lessonText)) {
-                        $aggregatedContent .= $lessonText . "\n\n";
+                    if (!empty($cleanText)) {
+                        $words = explode(' ', $cleanText);
+                        $truncated = implode(' ', array_slice($words, 0, 150));
+                        if (count($words) > 150) {
+                            $truncated .= '...';
+                        }
+                        $aggregatedContent .= $truncated . "\n\n";
                     } else {
                         $aggregatedContent .= "Nội dung bài học về chủ đề: {$lesson->title}.\n\n";
                     }
@@ -70,14 +75,24 @@ class SelfAssessmentService
         if ($lessonCount === 0 && $course->lessons && $course->lessons->isNotEmpty()) {
             foreach ($course->lessons as $lesson) {
                 $lessonCount++;
-                $lessonText = trim(strip_tags($lesson->content ?? ''));
+                $cleanText = trim(preg_replace('/\s+/', ' ', strip_tags($lesson->content ?? '')));
                 $aggregatedContent .= "=== Bài {$lessonCount}: {$lesson->title} ===\n";
-                if (!empty($lessonText)) {
-                    $aggregatedContent .= $lessonText . "\n\n";
+                if (!empty($cleanText)) {
+                    $words = explode(' ', $cleanText);
+                    $truncated = implode(' ', array_slice($words, 0, 150));
+                    if (count($words) > 150) {
+                        $truncated .= '...';
+                    }
+                    $aggregatedContent .= $truncated . "\n\n";
                 } else {
                     $aggregatedContent .= "Nội dung bài học về chủ đề: {$lesson->title}.\n\n";
                 }
             }
+        }
+
+        // Hard cap total aggregated prompt context to 12,000 chars (~2,500 words / ~3,000 tokens)
+        if (mb_strlen($aggregatedContent) > 12000) {
+            $aggregatedContent = mb_substr($aggregatedContent, 0, 12000) . "\n... [Tóm tắt thêm nội dung khóa học]";
         }
 
         if (empty(trim($aggregatedContent))) {
@@ -130,6 +145,7 @@ YÊU CẦU BẮT BUỘC:
             $aiResponseStr = $this->aiRouter->sendMessage($messages, [
                 'feature' => 'self_assessment',
                 'user_id' => $user?->id,
+                'max_tokens' => 2500,
                 'response_mime_type' => 'application/json',
             ]);
 
