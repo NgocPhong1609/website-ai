@@ -88,4 +88,14 @@ class AiRouterService
             throw new Exception("Tất cả các dịch vụ AI đều gặp sự cố. Lỗi Primary: {$primaryError} | Lỗi Backup: {$backupError}", 0, $e);
         }
     }
+
+    /**
+     * Compatibility wrapper for services expecting a direct string response from sendMessage.
+     */
+    public function sendMessage(array $messages, array|string $options = []): string
+    {
+        $opts = is_array($options) ? $options : ['response_format' => $options];
+        $res = $this->sendMessageWithFallback($messages, $opts);
+        return $res['content'] ?? '';
+    }
 }

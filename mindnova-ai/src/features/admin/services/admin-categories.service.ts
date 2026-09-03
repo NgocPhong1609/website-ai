@@ -2,15 +2,20 @@ import { apiClient } from "@/src/shared/lib";
 import type { AdminCategoriesPageData } from "@/src/features/admin/types";
 
 export async function getAdminCategoriesPageData(): Promise<AdminCategoriesPageData> {
- const payload = await apiClient<{ data?: Array<Record<string, unknown>> }>("/admin/categories");
+  try {
+    const payload = await apiClient<{ data?: Array<Record<string, unknown>> }>("/admin/categories");
 
- return {
- rows: (payload.data ?? []).map((row) => ({
- id: Number(row.id ?? 0),
- name: String(row.name ?? ""),
- slug: String(row.slug ?? ""),
- description: String(row.description ?? ""),
- status: String(row.status ?? "active"),
- })),
- };
+    return {
+      rows: (payload.data ?? []).map((row) => ({
+        id: Number(row.id ?? 0),
+        name: String(row.name ?? ""),
+        slug: String(row.slug ?? ""),
+        description: String(row.description ?? ""),
+        status: String(row.status ?? "active"),
+      })),
+    };
+  } catch (error) {
+    console.warn("[AdminCategoriesService] Failed to fetch admin categories data:", error);
+    return { rows: [] };
+  }
 }

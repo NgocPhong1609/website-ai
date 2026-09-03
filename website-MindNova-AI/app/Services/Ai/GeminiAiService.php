@@ -51,8 +51,15 @@ class GeminiAiService extends AbstractAiService
             $payload["systemInstruction"] = $systemInstruction;
         }
 
+        $defaultMaxTokens = match ($options['feature'] ?? 'general') {
+            'ai_notification' => 300,
+            'quiz', 'self_assessment' => 2500,
+            'ai_tutor', 'chat' => 1200,
+            default => 1500,
+        };
+
         $generationConfig = [
-            'maxOutputTokens' => (int) ($options['max_tokens'] ?? 8192)
+            'maxOutputTokens' => (int) ($options['max_tokens'] ?? $defaultMaxTokens)
         ];
 
         if (!empty($options['response_mime_type'])) {
@@ -86,13 +93,11 @@ class GeminiAiService extends AbstractAiService
                     $promptTokens = $data["usageMetadata"]["promptTokenCount"] ?? 0;
                     $completionTokens = $data["usageMetadata"]["candidatesTokenCount"] ?? 0;
 
-                    // Ghi log (co the dieu chinh model, feature, user_id tu $options)
+                    // Ghi log token usage (kể cả user hoặc guest để đảm bảo 100% observability)
                     $userId = $options["user_id"] ?? null;
                     $feature = $options["feature"] ?? "general";
                     
-                    if ($userId) {
-                        $this->logUsage($userId, $model, $feature, $promptTokens, $completionTokens, 0, $payload);
-                    }
+                    $this->logUsage($userId, $model, $feature, $promptTokens, $completionTokens, 0, $payload);
 
                     return $responseContent;
                 }

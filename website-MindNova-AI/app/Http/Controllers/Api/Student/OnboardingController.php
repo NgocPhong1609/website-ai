@@ -45,7 +45,7 @@ class OnboardingController extends Controller
             \"profile\": {
               \"goal\": \"{$goal}\",
               \"level\": \"{$level}\",
-              \"topics_count\": " . count($data['topics']) . ",
+              \"topics_count\": " . (isset($data['topics']) && is_array($data['topics']) ? count($data['topics']) : 1) . ",
               \"est_time\": \"2-4 months\"
             },
             \"learning_path\": [
@@ -136,14 +136,13 @@ class OnboardingController extends Controller
             Log::error("Groq AI Error: " . $e->getMessage());
         }
 
-        // Fallback động theo Goal nếu AI lỗi (Đã sửa lại dấu => chuẩn PHP)
-        return response()->json([
+        $fallbackData = [
             'status' => 'success',
             'data' => [
                 'profile' => [
                     'goal' => $goal,
                     'level' => $level,
-                    'topics_count' => count($data['topics']),
+                    'topics_count' => isset($data['topics']) && is_array($data['topics']) ? count($data['topics']) : 1,
                     'est_time' => '3-6 months'
                 ],
                 'learning_path' => [

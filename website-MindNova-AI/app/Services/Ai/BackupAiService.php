@@ -43,11 +43,18 @@ class BackupAiService extends AbstractAiService
             ];
         }
 
+        $defaultMaxTokens = match ($options['feature'] ?? 'general') {
+            'ai_notification' => 300,
+            'quiz', 'self_assessment' => 2500,
+            'ai_tutor', 'chat' => 1200,
+            default => 1500,
+        };
+
         $payload = [
             'model' => $model,
             'messages' => $openAiMessages,
             'temperature' => 0.7,
-            'max_tokens' => (int) ($options['max_tokens'] ?? 8192),
+            'max_tokens' => (int) ($options['max_tokens'] ?? $defaultMaxTokens),
         ];
         
         if (!empty($options['response_mime_type']) && $options['response_mime_type'] === 'application/json') {
@@ -78,9 +85,7 @@ class BackupAiService extends AbstractAiService
                     
                     $userId = $options["user_id"] ?? null;
                     $feature = $options["feature"] ?? "general";
-                    if ($userId) {
-                        $this->logUsage($userId, $model, $feature, $promptTokens, $completionTokens, 0, $payload);
-                    }
+                    $this->logUsage($userId, $model, $feature, $promptTokens, $completionTokens, 0, $payload);
 
                     return $responseContent;
                 }

@@ -96,7 +96,6 @@ Route::prefix('student/practice')->group(function () {
 
 // -- API Student Public Routes --
 Route::prefix('student')->group(function () {
-    Route::get('/dashboard', [StudentDashboardController::class, 'overview']);
     Route::get('/study-plan', [StudentStudyPlanController::class, 'overview']);
     Route::get('/practice/overview', [StudentPracticeController::class, 'overview']);
     Route::get('/progress/overview', [StudentProgressController::class, 'overview']);
@@ -158,6 +157,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // 3. NHÓM API HỌC SINH (Student Authenticated Actions)
     // ==========================================
     Route::prefix('student')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [StudentDashboardController::class, 'overview']);
+
         // Enrolled Courses
         Route::get('/courses/enrolled', [StudentCourseController::class, 'enrolledCourses']);
 
