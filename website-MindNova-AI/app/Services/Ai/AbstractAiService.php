@@ -21,13 +21,13 @@ abstract class AbstractAiService implements AiProviderInterface
     /**
      * Log usage metrics to database
      */
-    protected function logUsage(int $userId, string $model, string $feature, int $promptTokens, int $completionTokens, float $estimatedCost = 0, array $requestPayload = []): void
+    protected function logUsage(?int $userId = null, string $model = '', string $feature = '', int $promptTokens = 0, int $completionTokens = 0, float $estimatedCost = 0, array $requestPayload = []): void
     {
         try {
             AiUsageLog::create([
                 "user_id" => $userId,
-                "actor_type" => "user",
-                "actor_key" => "user:" . $userId,
+                "actor_type" => $userId ? "user" : "system",
+                "actor_key" => $userId ? "user:" . $userId : "system",
                 "provider" => $this->getProviderName(),
                 "model" => $model,
                 "input_tokens" => $promptTokens,
@@ -42,4 +42,5 @@ abstract class AbstractAiService implements AiProviderInterface
             Log::error("Failed to log AI usage: " . $e->getMessage());
         }
     }
+
 }

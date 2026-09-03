@@ -491,13 +491,17 @@ export function QuizQuestionScreen({
           ) : (
             <div className="flex flex-col gap-3.5">
               {question?.answers?.map((answer: any, i: number) => {
-                const isSelected = currentAnswerVal != null && String(currentAnswerVal).toUpperCase() === String(answer.id).toUpperCase();
-                const letter = answer.id || String.fromCharCode(65 + i);
+                const ansIdStr = String(answer.id || i);
+                const letter = String.fromCharCode(65 + i);
+                const isSelected = currentAnswerVal != null && currentAnswerVal !== "" && (
+                  String(currentAnswerVal).toUpperCase() === ansIdStr.toUpperCase() ||
+                  String(currentAnswerVal).toUpperCase() === letter.toUpperCase()
+                );
 
                 return (
                   <div 
-                    key={String(answer.id || i)}
-                    onClick={() => handleSelectAnswer(question.id, letter)}
+                    key={ansIdStr}
+                    onClick={() => handleSelectAnswer(question.id, answer.id ? String(answer.id) : letter)}
                     className={`group flex items-start sm:items-center p-4 sm:p-4.5 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                       isSelected 
                         ? "border-[#5052EE] bg-[#EEF2FF] shadow-[0_4px_18px_rgba(80,82,238,0.14)] -translate-y-0.5 z-10" 
@@ -528,6 +532,7 @@ export function QuizQuestionScreen({
               })}
             </div>
           )}
+
           
           <div className="mt-8 bg-gradient-to-r from-[#EEF2FF]/80 via-[#F3F4FC] to-[#EAF8F5]/80 border border-[#5052EE]/20 rounded-2xl p-5 shadow-2xs flex gap-4 items-start">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#4648D4] via-[#5052EE] to-[#0D9488] text-white flex items-center justify-center shrink-0">

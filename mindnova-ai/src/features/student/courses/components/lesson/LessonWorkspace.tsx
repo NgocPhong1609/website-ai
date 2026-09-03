@@ -1614,63 +1614,100 @@ function LessonWorkspaceContent() {
  </div>
  )}
 
- <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
-  {/* General Quiz Button */}
-  <button
-    type="button"
-    onClick={() => {
-      if (assessmentStatus?.general_quiz?.is_setup) {
-        window.location.href = `/practice/quiz/question?courseId=${parsedCourseId}&quizType=general&quizId=${assessmentStatus.general_quiz.quiz_id}`;
-      } else if (isPreview) {
-        alert("Khóa học này chưa có bài kiểm tra tổng quát.");
-      } else {
-        alert("Bài kiểm tra tổng quát hiện chưa được giáo viên thiết lập cho khóa học này.");
+  <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+    {/* General Quiz Button */}
+    <button
+      type="button"
+      onClick={() => {
+        if (assessmentStatus?.general_quiz?.is_setup) {
+          if (assessmentStatus.general_quiz.is_passed) {
+            const scoreVal = assessmentStatus.general_quiz.best_score != null ? assessmentStatus.general_quiz.best_score : "";
+            const confirmRetake = confirm(
+              `✨ BÀI THI ĐÃ ĐẠT (Điểm số: ${scoreVal}/10)\n` +
+              `Bạn đã hoàn thành và vượt qua bài kiểm tra tổng quát này.\n\n` +
+              `Bạn có chắc chắn muốn làm lại bài kiểm tra không?`
+            );
+            if (!confirmRetake) return;
+          }
+          window.location.href = `/practice/quiz/question?courseId=${parsedCourseId}&quizType=general&quizId=${assessmentStatus.general_quiz.quiz_id}`;
+        } else if (isPreview) {
+          alert("Khóa học này chưa có bài kiểm tra tổng quát.");
+        } else {
+          alert("Bài kiểm tra tổng quát hiện chưa được giáo viên thiết lập cho khóa học này.");
+        }
+      }}
+      className="flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-[#2C3039] bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-all cursor-pointer shadow-2xs"
+      title={
+        assessmentStatus?.general_quiz?.is_passed
+          ? `Đã đạt (${assessmentStatus.general_quiz.best_score}/10) - Bấm để làm lại`
+          : assessmentStatus?.general_quiz?.is_setup
+          ? "Bắt đầu làm bài kiểm tra tổng quát"
+          : "Chưa thiết lập đề thi tổng quát"
       }
-    }}
-    className="flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-[#2C3039] bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-all cursor-pointer shadow-2xs"
-    title={assessmentStatus?.general_quiz?.is_setup ? "Bắt đầu làm bài kiểm tra tổng quát" : "Chưa thiết lập đề thi tổng quát"}
-  >
-    <span>📝 Kiểm tra tổng quát</span>
-    {assessmentStatus?.general_quiz?.is_passed && (
-      <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-1.5 py-0.5 rounded-md">✓ Đã đạt</span>
-    )}
-  </button>
+    >
+      <span>📝 Kiểm tra tổng quát</span>
+      {assessmentStatus?.general_quiz?.is_passed && (
+        <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-md border border-emerald-300 flex items-center gap-1">
+          <span>✓ Đã đạt</span>
+          <span className="bg-emerald-700 text-white px-1 rounded text-[9px]">
+            {assessmentStatus.general_quiz.best_score}/10
+          </span>
+        </span>
+      )}
+    </button>
 
-  {/* Final Quiz Button (🏁 Làm bài kiểm tra cuối khóa) */}
-  {(() => {
-    const isUnlocked = assessmentStatus?.can_take_final_quiz === true;
-    const lockReason = assessmentStatus?.final_quiz_lock_reason || "🔒 Hoàn thành 100% khóa học & qua bài kiểm tra tổng quát";
+    {/* Final Quiz Button (🏁 Làm bài kiểm tra cuối khóa) */}
+    {(() => {
+      const isUnlocked = assessmentStatus?.can_take_final_quiz === true;
+      const isPassed = assessmentStatus?.final_quiz?.is_passed === true;
+      const bestScore = assessmentStatus?.final_quiz?.best_score;
+      const lockReason = assessmentStatus?.final_quiz_lock_reason || "🔒 Hoàn thành 100% khóa học & qua bài kiểm tra tổng quát";
 
-    return (
-      <div className="relative group">
-        <button
-          type="button"
-          disabled={!isUnlocked}
-          onClick={() => {
-            if (isUnlocked && assessmentStatus?.final_quiz?.quiz_id) {
-              window.location.href = `/practice/quiz/question?courseId=${parsedCourseId}&quizType=final&quizId=${assessmentStatus.final_quiz.quiz_id}`;
-            } else {
-              alert(lockReason);
-            }
-          }}
-          className={twMerge(
-            "flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs",
-            isUnlocked
-              ? "bg-[#065F46] hover:bg-[#044E39] text-white border border-[#065F46] cursor-pointer"
-              : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60 pointer-events-none"
-          )}
-          title={lockReason}
-        >
-          <span>🏁 Làm bài kiểm tra cuối khóa</span>
-          {isUnlocked ? (
-            <span className="text-[10px] bg-emerald-300 text-emerald-950 font-black px-1.5 py-0.5 rounded-md uppercase">MỞ KHÓA</span>
-          ) : (
-            <span className="text-[10px] bg-gray-200 text-gray-600 font-bold px-1.5 py-0.5 rounded-md">ĐANG KHÓA</span>
-          )}
-        </button>
-      </div>
-    );
-  })()}
+      return (
+        <div className="relative group">
+          <button
+            type="button"
+            disabled={!isUnlocked}
+            onClick={() => {
+              if (isUnlocked && assessmentStatus?.final_quiz?.quiz_id) {
+                if (isPassed) {
+                  const scoreVal = bestScore != null ? bestScore : "";
+                  const confirmRetake = confirm(
+                    `🏆 BÀI THI CUỐI KHÓA ĐÃ ĐẠT (Điểm số: ${scoreVal}/10)\n` +
+                    `Bạn đã hoàn thành xuất sắc bài kiểm tra cuối khóa này.\n\n` +
+                    `Bạn có chắc chắn muốn làm lại không?`
+                  );
+                  if (!confirmRetake) return;
+                }
+                window.location.href = `/practice/quiz/question?courseId=${parsedCourseId}&quizType=final&quizId=${assessmentStatus.final_quiz.quiz_id}`;
+              } else {
+                alert(lockReason);
+              }
+            }}
+            className={twMerge(
+              "flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs",
+              isUnlocked
+                ? "bg-[#065F46] hover:bg-[#044E39] text-white border border-[#065F46] cursor-pointer"
+                : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60 pointer-events-none"
+            )}
+            title={isPassed ? `Đã đạt (${bestScore}/10) - Bấm để làm lại` : lockReason}
+          >
+            <span>🏁 Làm bài kiểm tra cuối khóa</span>
+            {isPassed ? (
+              <span className="text-[10px] bg-emerald-100 text-emerald-900 font-extrabold px-2 py-0.5 rounded-md border border-emerald-300 flex items-center gap-1">
+                <span>✓ Đã đạt</span>
+                <span className="bg-emerald-800 text-white px-1 rounded text-[9px]">{bestScore}/10</span>
+              </span>
+            ) : isUnlocked ? (
+              <span className="text-[10px] bg-emerald-300 text-emerald-950 font-black px-1.5 py-0.5 rounded-md uppercase">MỞ KHÓA</span>
+            ) : (
+              <span className="text-[10px] bg-gray-200 text-gray-600 font-bold px-1.5 py-0.5 rounded-md">ĐANG KHÓA</span>
+            )}
+          </button>
+        </div>
+      );
+    })()}
+
 
   <button
     onClick={handleGoNext}

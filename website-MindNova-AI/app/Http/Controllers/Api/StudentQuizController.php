@@ -44,18 +44,18 @@ class StudentQuizController extends Controller
 
         $numericId = is_numeric($param) ? (int) $param : (str_starts_with($paramStr, 'mod') ? (int) filter_var($paramStr, FILTER_SANITIZE_NUMBER_INT) : null);
 
-        // 1. If numeric, first try finding a Lesson that owns a Quiz
+        // 1. If numeric, first try finding direct Quiz ID, then fallback to Lesson ID
         if (is_numeric($param)) {
-            $lesson = Lesson::with(['quiz', 'module.course'])->find($param);
-            if ($lesson && $lesson->quiz) {
-                return $lesson->quiz;
-            }
-            // Or maybe they passed the direct Quiz ID
-            $quiz = Quiz::with(['lesson', 'lesson.module', 'lesson.module.course'])->find($param);
+            $quiz = Quiz::with(['lesson', 'lesson.module', 'lesson.module.course', 'questions.answers'])->find((int) $param);
             if ($quiz) {
                 return $quiz;
             }
+            $lesson = Lesson::with(['quiz', 'module.course'])->find((int) $param);
+            if ($lesson && $lesson->quiz) {
+                return $lesson->quiz;
+            }
         }
+
 
         // 2. Try resolving as a Course ID (passed as 67 or mod67)
         if ($numericId && $numericId > 0) {
