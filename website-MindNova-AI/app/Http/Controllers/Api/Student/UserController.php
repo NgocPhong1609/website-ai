@@ -97,35 +97,73 @@ class UserController extends Controller
     public function uploadAvatar(Request $request)
     {
         $request->validate([
-            // Bắt buộc phải là file ảnh, tối đa 2MB
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'avatar' => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         $user = $request->user();
 
-        if ($request->hasFile('avatar')) {
-            // Xóa ảnh cũ nếu có (tùy chọn, để tiết kiệm dung lượng server)
-            if ($user->avatar_url) {
-                $oldPath = str_replace(asset('storage/'), '', $user->avatar_url);
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
-            }
-
-            // Lưu ảnh mới vào thư mục storage/app/public/avatars
-            $avatarName = time() . '_' . $user->id . '.' . $request->avatar->extension();
-            $path = $request->avatar->storeAs('avatars', $avatarName, 'public');
-
-            // Cập nhật URL vào database
-            $user->update([
-                'avatar_url' => asset('storage/' . $path)
-            ]);
-
+        if (!$request->hasFile('avatar')) {
             return response()->json([
-                'message' => 'Cập nhật ảnh đại diện thành công',
-                'avatar_url' => $user->avatar_url
-            ], 200);
+                'success' => false,
+                'message' => 'Không tìm thấy file ảnh đại diện'
+            ], 400);
         }
 
-        return response()->json(['message' => 'Không tìm thấy file ảnh'], 400);
+        try {
+            $file = $request->file('avatar');
+            $ext = strtolower($file->getClientOriginalExtension());
+            if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
+                $ext = 'png';
+            }
+
+            $filename = 'avatar_' . \Illuminate\Support\Str::random(12) . '.' . $ext;
+            $r2Folder = "Students/{$user->id}/Avatar";
+            $r2Key = "{$r2Folder}/{$filename}";
+
+            // Upload lên Cloudflare R2 với fallback local public disk
+            try {
+                \Illuminate\Support\Facades\Storage::disk('r2')->putFileAs($r2Folder, $file, $filename);
+                $url = \Illuminate\Support\Facades\Storage::disk('r2')->url($r2Key);
+            } catch (\Exception $e) {
+                // Dự phòng nếu R2 không khả dụng
+                $path = $file->storeAs('avatars', $filename, 'public');
+                $url = asset('storage/' . $path);
+            }
+
+            // Xóa ảnh cũ nếu có
+            if ($user->avatar_url) {
+                if (str_contains($user->avatar_url, "Students/{$user->id}/Avatar")) {
+                    $oldKey = parse_url($user->avatar_url, PHP_URL_PATH);
+                    if ($oldKey) {
+                        try {
+                            \Illuminate\Support\Facades\Storage::disk('r2')->delete(ltrim($oldKey, '/'));
+                        } catch (\Exception $e) {
+                            // Suppress deletion error
+                        }
+                    }
+                } elseif (str_contains($user->avatar_url, 'storage/avatars/')) {
+                    $oldPath = str_replace(asset('storage/'), '', $user->avatar_url);
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                }
+            }
+
+            $user->avatar_url = $url;
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật ảnh đại diện thành công',
+                'avatar_url' => $url,
+                'data' => [
+                    'avatar_url' => $url,
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage() ?: 'Có lỗi xảy ra khi tải lên ảnh đại diện.',
+            ], 422);
+        }
     }
 
     // 5. Upload CV (dành cho giáo viên gửi hồ sơ xét duyệt)

@@ -23,62 +23,70 @@ interface ProfileSidebarProps {
 }
 
 interface ProfileAvatarProps {
- name: string;
- avatarUrl?: string | null;
- onClick?: () => void;
+  name: string;
+  avatarUrl?: string | null;
+  onClick?: () => void;
+  isLoading?: boolean;
 }
 
-function ProfileAvatar({ name, avatarUrl, onClick }: ProfileAvatarProps) {
- const initials = name
- .split(" ")
- .map((n) => n[0])
- .filter(Boolean)
- .slice(-2)
- .join("");
+function ProfileAvatar({ name, avatarUrl, onClick, isLoading }: ProfileAvatarProps) {
+  const initials = name
+    .split(" ")
+    .map((n) => n[0])
+    .filter(Boolean)
+    .slice(-2)
+    .join("");
 
- return (
- <div className="relative mx-auto w-24 h-24 group cursor-pointer" onClick={onClick}>
- {/* Soft elegant avatar sphere */}
- <div className="w-full h-full rounded-2xl bg-[#C0392B] p-[2px] shadow-2xs transition-all duration-300 group-hover:shadow-sm group-hover:-translate-y-0.5">
- <div className="w-full h-full rounded-2xl bg-[#F8FAFC] flex items-center justify-center relative overflow-hidden">
- {avatarUrl ? (
- <img
- src={avatarUrl}
- alt={name}
- className="h-full w-full object-cover rounded-[14px]"
- onError={(e) => {
- e.currentTarget.style.display = "none";
- e.currentTarget.parentElement?.querySelector("span")?.removeAttribute("style");
- }}
- />
- ) : null}
- <div className="absolute inset-0 bg-[#C0392B] " />
- <span
- className="text-xl sm:text-2xl font-bold bg-[#2C3039] bg-clip-text text-transparent select-none relative z-10"
- style={avatarUrl ? { display: "none" } : undefined}
- >
- {initials || "NP"}
- </span>
+  return (
+    <div className="relative mx-auto w-24 h-24 group cursor-pointer" onClick={onClick}>
+      {/* Soft elegant avatar sphere */}
+      <div className="w-full h-full rounded-2xl bg-[#C0392B] p-[2px] shadow-2xs transition-all duration-300 group-hover:shadow-sm group-hover:-translate-y-0.5">
+        <div className="w-full h-full rounded-2xl bg-[#F8FAFC] flex items-center justify-center relative overflow-hidden">
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={name}
+              className="h-full w-full object-cover rounded-[14px] relative z-10"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                e.currentTarget.parentElement?.querySelector("span")?.removeAttribute("style");
+              }}
+            />
+          ) : (
+            <span className="text-xl sm:text-2xl font-bold text-[#C0392B] select-none relative z-10">
+              {initials || "NP"}
+            </span>
+          )}
 
- {/* Hover Photo Upload Overlay */}
- <div className="absolute inset-0 bg-[#1A1A2E]/60 backdrop-blur-xs flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 text-white">
- <svg className="w-5 h-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
- <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
- <circle cx="12" cy="13" r="4" />
- </svg>
- <span className="text-[10px] font-medium">Đổi ảnh</span>
- </div>
- </div>
- </div>
+          {/* Loading spinner overlay */}
+          {isLoading ? (
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-30">
+              <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+          ) : (
+            /* Hover Photo Upload Overlay */
+            <div className="absolute inset-0 bg-[#1A1A2E]/60 backdrop-blur-xs flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 text-white">
+              <svg className="w-5 h-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+              <span className="text-[10px] font-medium">Đổi ảnh</span>
+            </div>
+          )}
+        </div>
+      </div>
 
- {/* Verified Online badge */}
- <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-[#2C3039] border-2 border-white flex items-center justify-center shadow-2xs z-30" title="Tài khoản đã được AI xác thực">
- <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
- <polyline points="20 6 9 17 4 12" />
- </svg>
- </span>
- </div>
- );
+      {/* Verified Online badge */}
+      <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-[#2C3039] border-2 border-white flex items-center justify-center shadow-2xs z-30" title="Tài khoản đã được AI xác thực">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      </span>
+    </div>
+  );
 }
 
 interface TabButtonProps {
@@ -139,31 +147,38 @@ export function ProfileSidebar({
  const uploadAvatarMutation = useUploadAvatar();
  const [localPreview, setLocalPreview] = useState<string | null>(null);
 
- const handleAvatarClick = () => {
- fileInputRef.current?.click();
- };
+  const handleAvatarClick = () => {
+    if (uploadAvatarMutation.isPending) return;
+    fileInputRef.current?.click();
+  };
 
- const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
- const file = e.target.files?.[0];
- if (!file) return;
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
- const previewUrl = URL.createObjectURL(file);
- setLocalPreview(previewUrl);
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Kích thước ảnh đại diện vượt quá 5MB. Vui lòng chọn ảnh nhỏ hơn.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
 
- try {
- await uploadAvatarMutation.mutateAsync(file);
- setLocalPreview(null);
- } catch (error: any) {
- console.error("Avatar upload failed:", error);
- alert(error?.response?.data?.message || "Không thể cập nhật ảnh đại diện. Vui lòng thử lại.");
- setLocalPreview(null);
- } finally {
- URL.revokeObjectURL(previewUrl);
- if (fileInputRef.current) {
- fileInputRef.current.value = "";
- }
- }
- };
+    const previewUrl = URL.createObjectURL(file);
+    setLocalPreview(previewUrl);
+
+    try {
+      await uploadAvatarMutation.mutateAsync(file);
+      setLocalPreview(null);
+    } catch (error: any) {
+      console.error("Avatar upload failed:", error);
+      alert(error?.response?.data?.message || "Không thể cập nhật ảnh đại diện. Vui lòng thử lại.");
+      setLocalPreview(null);
+    } finally {
+      URL.revokeObjectURL(previewUrl);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
 
  const displayAvatarUrl = localPreview || avatarUrl;
 
@@ -171,11 +186,16 @@ export function ProfileSidebar({
  <div className="flex flex-col gap-6">
  {/* Avatar + Name */}
  <div className="flex flex-col items-center gap-3 pt-1">
- <ProfileAvatar name={fullName} avatarUrl={displayAvatarUrl} onClick={handleAvatarClick} />
+ <ProfileAvatar
+  name={fullName}
+  avatarUrl={displayAvatarUrl}
+  onClick={handleAvatarClick}
+  isLoading={uploadAvatarMutation.isPending}
+ />
  <input
  ref={fileInputRef}
  type="file"
- accept="image/jpeg,image/png,image/jpg,image/gif,image/svg+xml"
+ accept="image/jpeg,image/png,image/jpg,image/webp"
  className="hidden"
  onChange={handleFileChange}
  />

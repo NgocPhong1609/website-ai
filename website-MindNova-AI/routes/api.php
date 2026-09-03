@@ -176,7 +176,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/courses/{course}/reviews/{review}', [StudentReviewController::class, 'update']);
         Route::delete('/courses/{course}/reviews/{review}', [StudentReviewController::class, 'destroy']);
 
-        // Quiz bài học
+        // Quiz bài học & Đánh giá cấp khóa học (General & Final Quiz)
+        Route::get('courses/{courseId}/assessment-status', [StudentCourseController::class, 'assessmentStatus']);
+        Route::get('courses/{courseId}/quiz/{quizType}', [StudentQuizController::class, 'getCourseQuiz']);
+        Route::post('courses/{courseId}/quiz/{quizType}/submit', [StudentQuizController::class, 'submitCourseQuiz']);
+        Route::get('quiz-attempts/{attemptId}', [StudentQuizController::class, 'getAttemptResult']);
         Route::get('lessons/{lesson}/quiz', [StudentQuizController::class, 'show']);
         Route::post('lessons/{lesson}/quiz/submit', [StudentQuizController::class, 'submit']);
         Route::post('quiz/grade-essay', [StudentQuizController::class, 'gradeEssay']);

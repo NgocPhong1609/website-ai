@@ -545,4 +545,166 @@ class CourseService
             ];
         })->filter()->values()->toArray();
     }
+
+    /**
+     * Retrieve accurate course progress, General Quiz status, Final Quiz status, and lock conditions.
+     */
+    public function getCourseAssessmentStatus(int $courseId, ?User $user = null): array
+    {
+        $course = Course::with(['modules.lessons'])->find($courseId);
+        if (!$course) {
+            return [
+                'course_id' => $courseId,
+                'course_progress' => 0,
+                'general_quiz' => [
+                    'is_setup' => false,
+                    'quiz_id' => null,
+                    'title' => 'Chưa thiết lập',
+                    'time_limit_minutes' => 15,
+                    'passing_score' => 70,
+                    'is_passed' => false,
+                    'best_score' => 0,
+                    'attempts_count' => 0,
+                ],
+                'final_quiz' => [
+                    'is_setup' => false,
+                    'quiz_id' => null,
+                    'title' => 'Chưa thiết lập',
+                    'time_limit_minutes' => 15,
+                    'passing_score' => 70,
+                    'is_passed' => false,
+                    'best_score' => 0,
+                    'attempts_count' => 0,
+                    'is_unlocked' => false,
+                    'lock_reason' => 'Khóa học không tồn tại.',
+                ],
+                'can_take_final_quiz' => false,
+                'final_quiz_lock_reason' => 'Khóa học không tồn tại.',
+            ];
+        }
+
+        $userId = $user ? $user->id : null;
+
+        // 1. Dynamic Course Progress Calculation (DB completed / DB published lessons * 100)
+        $progressData = $this->calculateStudentProgress($course, $userId ?: 0);
+        $courseProgress = $progressData['progress_percentage'];
+
+        // 2. Active General Quiz (capability_assessment) assigned by teacher
+        $generalAttachment = \App\Models\QuizCourseAttachment::where('course_id', $courseId)
+            ->where('position', 'capability_assessment')
+            ->where('is_active', true)
+            ->with('quiz')
+            ->first();
+
+        if (!$generalAttachment) {
+            $generalAttachment = \App\Models\QuizCourseAttachment::where('course_id', $courseId)
+                ->where('position', 'capability_assessment')
+                ->with('quiz')
+                ->latest('id')
+                ->first();
+        }
+
+        $generalQuiz = $generalAttachment ? $generalAttachment->quiz : null;
+
+        // Check if student has passed the General Quiz (score >= passing_score or status = passed)
+        $generalQuizPassed = false;
+        $generalBestScore = 0;
+        $generalAttemptsCount = 0;
+
+        if ($userId && $generalQuiz) {
+            $attempts = \App\Models\UserQuizAttempt::where('user_id', $userId)
+                ->where('quiz_id', $generalQuiz->id)
+                ->get();
+
+            $generalAttemptsCount = $attempts->count();
+            if ($attempts->isNotEmpty()) {
+                $generalBestScore = (float) $attempts->max('score_10');
+                $passingScore = $generalQuiz->passing_score > 0 ? $generalQuiz->passing_score : 70;
+                $generalQuizPassed = $attempts->contains(function ($att) use ($passingScore) {
+                    return $att->status === 'passed' || $att->score >= $passingScore || ($att->score_10 * 10) >= $passingScore;
+                });
+            }
+        }
+
+        // 3. Active Final Quiz (end_of_course) assigned by teacher
+        $finalAttachment = \App\Models\QuizCourseAttachment::where('course_id', $courseId)
+            ->where('position', 'end_of_course')
+            ->where('is_active', true)
+            ->with('quiz')
+            ->first();
+
+        if (!$finalAttachment) {
+            $finalAttachment = \App\Models\QuizCourseAttachment::where('course_id', $courseId)
+                ->where('position', 'end_of_course')
+                ->with('quiz')
+                ->latest('id')
+                ->first();
+        }
+
+        $finalQuiz = $finalAttachment ? $finalAttachment->quiz : null;
+
+        $finalQuizPassed = false;
+        $finalBestScore = 0;
+        $finalAttemptsCount = 0;
+
+        if ($userId && $finalQuiz) {
+            $attempts = \App\Models\UserQuizAttempt::where('user_id', $userId)
+                ->where('quiz_id', $finalQuiz->id)
+                ->get();
+
+            $finalAttemptsCount = $attempts->count();
+            if ($attempts->isNotEmpty()) {
+                $finalBestScore = (float) $attempts->max('score_10');
+                $passingScore = $finalQuiz->passing_score > 0 ? $finalQuiz->passing_score : 70;
+                $finalQuizPassed = $attempts->contains(function ($att) use ($passingScore) {
+                    return $att->status === 'passed' || $att->score >= $passingScore || ($att->score_10 * 10) >= $passingScore;
+                });
+            }
+        }
+
+        // 4. Determine Lock Conditions for Final Quiz
+        $canTakeFinal = false;
+        $lockReason = null;
+
+        if (!$finalQuiz) {
+            $lockReason = 'Bài kiểm tra cuối khóa hiện chưa được giáo viên thiết lập.';
+        } elseif ($courseProgress < 100) {
+            $lockReason = "🔒 Hoàn thành 100% khóa học để mở khóa bài kiểm tra cuối khóa (Hiện tại: {$courseProgress}%)";
+        } elseif (!$generalQuizPassed) {
+            $lockReason = '🔒 Bạn cần vượt qua bài kiểm tra tổng quát trước.';
+        } else {
+            $canTakeFinal = true;
+            $lockReason = '🏁 Bạn đã đủ điều kiện làm bài kiểm tra cuối khóa.';
+        }
+
+        return [
+            'course_id' => $courseId,
+            'course_progress' => $courseProgress,
+            'general_quiz' => [
+                'is_setup' => (bool) $generalQuiz,
+                'quiz_id' => $generalQuiz ? $generalQuiz->id : null,
+                'title' => $generalQuiz ? $generalQuiz->title : 'Chưa thiết lập',
+                'time_limit_minutes' => $generalQuiz ? ($generalQuiz->time_limit_minutes ?: 15) : 15,
+                'passing_score' => $generalQuiz ? ($generalQuiz->passing_score ?: 70) : 70,
+                'is_passed' => $generalQuizPassed,
+                'best_score' => $generalBestScore,
+                'attempts_count' => $generalAttemptsCount,
+            ],
+            'final_quiz' => [
+                'is_setup' => (bool) $finalQuiz,
+                'quiz_id' => $finalQuiz ? $finalQuiz->id : null,
+                'title' => $finalQuiz ? $finalQuiz->title : 'Chưa thiết lập',
+                'time_limit_minutes' => $finalQuiz ? ($finalQuiz->time_limit_minutes ?: 15) : 15,
+                'passing_score' => $finalQuiz ? ($finalQuiz->passing_score ?: 70) : 70,
+                'is_passed' => $finalQuizPassed,
+                'best_score' => $finalBestScore,
+                'attempts_count' => $finalAttemptsCount,
+                'is_unlocked' => $canTakeFinal,
+                'lock_reason' => $lockReason,
+            ],
+            'can_take_final_quiz' => $canTakeFinal,
+            'final_quiz_lock_reason' => $lockReason,
+        ];
+    }
 }
+

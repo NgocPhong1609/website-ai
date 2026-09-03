@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useGetStudentQuiz, useSubmitQuiz } from "../../api";
+import { useGetStudentQuiz, useGetCourseQuiz, useSubmitQuiz } from "../../api";
 import type { QuizGradingResult } from "../../types";
 
 interface QuizQuestionScreenProps {
@@ -20,11 +20,22 @@ export function QuizQuestionScreen({
 
   const aiQuizId = searchParams.get("aiQuizId");
   const queryLessonId = searchParams.get("lessonId");
-  const activeLessonId = propLessonId || queryLessonId || "";
-  const quizStorageId = aiQuizId || activeLessonId || "default";
+  const courseId = searchParams.get("courseId") || searchParams.get("course_id");
+  const quizType = searchParams.get("quizType") || searchParams.get("type") || searchParams.get("position");
 
-  const { data: staticQuiz, isLoading: isStaticLoading, isError: isStaticError } = useGetStudentQuiz(activeLessonId);
+  const activeLessonId = propLessonId || queryLessonId || "";
+  const quizStorageId = aiQuizId || (courseId && quizType ? `${courseId}_${quizType}` : activeLessonId) || "default";
+
+  const { data: lessonQuiz, isLoading: isLessonLoading, isError: isLessonError, error: lessonError } = useGetStudentQuiz(activeLessonId);
+  const { data: courseQuiz, isLoading: isCourseLoading, isError: isCourseError, error: courseError } = useGetCourseQuiz(courseId || "", quizType || "");
+
+  const staticQuiz = (courseId && quizType) ? courseQuiz : lessonQuiz;
+  const isStaticLoading = (courseId && quizType) ? isCourseLoading : isLessonLoading;
+  const isStaticError = (courseId && quizType) ? isCourseError : isLessonError;
+  const staticError = (courseId && quizType) ? courseError : lessonError;
+
   const { mutateAsync: submitStaticQuiz, isPending: isSubmittingStatic } = useSubmitQuiz();
+
 
   const [aiQuizData, setAiQuizData] = useState<any>(null);
   const [isAiLoading, setIsAiLoading] = useState<boolean>(!!aiQuizId);
@@ -158,6 +169,8 @@ export function QuizQuestionScreen({
         const timeTaken = (quiz?.time_limit_minutes || 15) * 60 - timeRemaining;
         const res: QuizGradingResult = await submitStaticQuiz({
           lessonId: activeLessonId,
+          courseId: courseId || undefined,
+          quizType: quizType || undefined,
           answers: finalAnswers,
           time_taken_seconds: timeTaken > 0 ? timeTaken : 180,
         });
@@ -165,8 +178,13 @@ export function QuizQuestionScreen({
         if (typeof window !== "undefined") {
           localStorage.setItem("mindnova_last_quiz_result", JSON.stringify(res));
         }
-        router.push("/practice/quiz/result");
+        if (res && res.attempt_id) {
+          router.push(`/practice/quiz/result?attemptId=${res.attempt_id}${courseId ? `&courseId=${courseId}` : ''}`);
+        } else {
+          router.push("/practice/quiz/result");
+        }
       }
+
     } catch (error) {
       console.error("Lỗi khi nộp bài:", error);
       setErrorNotice("Đã xảy ra sự cố khi nộp bài. Vui lòng thử lại!");
@@ -453,13 +471,6 @@ export function QuizQuestionScreen({
                   Tự động lưu nháp
                 </span>
               </div>
-
-              {question?.rubric && (
-                <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4] text-xs text-[#64647A] space-y-1">
-                  <span className="font-semibold text-[#5052EE] uppercase tracking-wider text-[10px] block">📌 Tiêu chí chấm điểm (Rubric):</span>
-                  <p className="whitespace-pre-line text-xs text-[#374151] leading-relaxed">{question.rubric}</p>
-                </div>
-              )}
 
               <textarea
                 rows={6}

@@ -271,3 +271,47 @@ export function useDeleteCourseReview() {
  },
  });
 }
+
+// ─── Course Assessment Status APIs ─────────────────────────────────────────────
+
+export interface CourseAssessmentStatus {
+  course_id: number;
+  course_progress: number;
+  general_quiz: {
+    is_setup: boolean;
+    quiz_id: number | null;
+    title: string;
+    time_limit_minutes: number;
+    passing_score: number;
+    is_passed: boolean;
+    best_score: number;
+    attempts_count: number;
+  };
+  final_quiz: {
+    is_setup: boolean;
+    quiz_id: number | null;
+    title: string;
+    time_limit_minutes: number;
+    passing_score: number;
+    is_passed: boolean;
+    best_score: number;
+    attempts_count: number;
+    is_unlocked: boolean;
+    lock_reason: string;
+  };
+  can_take_final_quiz: boolean;
+  final_quiz_lock_reason: string;
+}
+
+export function useGetCourseAssessmentStatus(courseId: string | number) {
+  return useQuery({
+    queryKey: ["student", "courses", courseId, "assessment-status"],
+    queryFn: async (): Promise<CourseAssessmentStatus> => {
+      const { data } = await axiosClient.get(`/api/student/courses/${courseId}/assessment-status`);
+      return data.data;
+    },
+    enabled: !!courseId && Number(courseId) > 0,
+    staleTime: 5 * 1000,
+  });
+}
+

@@ -17,9 +17,12 @@ class StudentQuizController extends Controller
 {
     use ApiResponse;
 
-    public function __construct(private readonly QuizGradingService $quizGradingService)
-    {
+    public function __construct(
+        private readonly QuizGradingService $quizGradingService,
+        private readonly \App\Services\Student\CourseService $courseService
+    ) {
     }
+
 
     /**
      * Resolve a real database Quiz instance from URL param ($lessonId can be lesson ID, quiz ID, or modX keyword).
@@ -334,4 +337,238 @@ class StudentQuizController extends Controller
 
         return $this->successResponse($result, 'AI đã chấm bài tự luận thành công.');
     }
+
+    /**
+     * GET /api/student/courses/{courseId}/quiz/{quizType}
+     * Get General Quiz or Final Quiz for a specific course with backend unlock enforcement.
+     */
+    public function getCourseQuiz(Request $request, $courseId, $quizType): JsonResponse
+    {
+        $courseId = (int) $courseId;
+        $user = $request->user('sanctum') ?? $request->user();
+        $type = strtolower(trim((string) $quizType));
+
+        $position = ($type === 'final' || $type === 'end_of_course') ? 'end_of_course' : 'capability_assessment';
+
+        // SECURITY CHECK: Backend lock condition enforcement for Final Quiz
+        if ($position === 'end_of_course') {
+            $assessmentStatus = $this->courseService->getCourseAssessmentStatus($courseId, $user);
+            if (!$assessmentStatus['can_take_final_quiz']) {
+                return $this->errorResponse(
+                    $assessmentStatus['final_quiz_lock_reason'] ?: 'Bạn chưa đủ điều kiện làm bài kiểm tra cuối khóa.',
+                    403
+                );
+            }
+        }
+
+        // Fetch active quiz attached to course
+        $attachment = \App\Models\QuizCourseAttachment::where('course_id', $courseId)
+            ->where('position', $position)
+            ->where('is_active', true)
+            ->with(['quiz.questions.answers'])
+            ->first();
+
+        if (!$attachment) {
+            $attachment = \App\Models\QuizCourseAttachment::where('course_id', $courseId)
+                ->where('position', $position)
+                ->with(['quiz.questions.answers'])
+                ->latest('id')
+                ->first();
+        }
+
+        $quiz = $attachment ? $attachment->quiz : null;
+
+        if (!$quiz) {
+            $quizTypeName = ($position === 'end_of_course') ? 'cuối khóa' : 'tổng quát';
+            return $this->errorResponse("Bài kiểm tra {$quizTypeName} hiện chưa được giáo viên thiết lập.", 404);
+        }
+
+        return $this->formatQuizResponse($quiz);
+    }
+
+    /**
+     * POST /api/student/courses/{courseId}/quiz/{quizType}/submit
+     * Submit General Quiz or Final Quiz for a course.
+     */
+    public function submitCourseQuiz(Request $request, $courseId, $quizType): JsonResponse
+    {
+        $courseId = (int) $courseId;
+        $user = $request->user('sanctum') ?? $request->user();
+        $type = strtolower(trim((string) $quizType));
+        $position = ($type === 'final' || $type === 'end_of_course') ? 'end_of_course' : 'capability_assessment';
+
+        if ($position === 'end_of_course') {
+            $assessmentStatus = $this->courseService->getCourseAssessmentStatus($courseId, $user);
+            if (!$assessmentStatus['can_take_final_quiz']) {
+                return $this->errorResponse(
+                    $assessmentStatus['final_quiz_lock_reason'] ?: 'Bạn chưa đủ điều kiện làm bài kiểm tra cuối khóa.',
+                    403
+                );
+            }
+        }
+
+        $attachment = \App\Models\QuizCourseAttachment::where('course_id', $courseId)
+            ->where('position', $position)
+            ->where('is_active', true)
+            ->with(['quiz'])
+            ->first();
+
+        if (!$attachment) {
+            $attachment = \App\Models\QuizCourseAttachment::where('course_id', $courseId)
+                ->where('position', $position)
+                ->with(['quiz'])
+                ->latest('id')
+                ->first();
+        }
+
+        $quiz = $attachment ? $attachment->quiz : null;
+        if (!$quiz) {
+            return $this->errorResponse('Không tìm thấy bài kiểm tra của khóa học.', 404);
+        }
+
+        return $this->submit($request, $quiz->id);
+    }
+
+    /**
+     * Helper to format quiz payload for frontend.
+     */
+    private function formatQuizResponse(Quiz $quiz): JsonResponse
+    {
+        $quiz->load(['questions.answers']);
+
+        $courseTitle = ($quiz->lesson && $quiz->lesson->module && $quiz->lesson->module->course) 
+            ? $quiz->lesson->module->course->title 
+            : 'MindNova AI Pro';
+
+        $rawQuestions = [];
+        $order = 1;
+
+        foreach ($quiz->questions as $question) {
+            $ansList = [];
+            foreach ($question->answers as $ans) {
+                $ansList[] = [
+                    'id' => (string) $ans->id,
+                    'content' => $ans->content,
+                ];
+            }
+
+            if (count($ansList) > 0) {
+                shuffle($ansList);
+            }
+
+            $rawQuestions[] = [
+                'id' => (string) $question->id,
+                'type' => $question->type ?: 'multiple_choice',
+                'content' => $question->content,
+                'points' => (float) ($question->points > 0 ? $question->points : (($question->type ?: 'multiple_choice') === 'essay' ? 2.5 : 0.5)),
+                'rubric' => $question->rubric ?: null,
+                'order' => $order++,
+                'answers' => $ansList,
+            ];
+        }
+
+        $responsePayload = [
+            'id' => (string) ($quiz->lesson_id ?: $quiz->id),
+            'quiz_id' => $quiz->id,
+            'title' => $quiz->title,
+            'course_title' => $courseTitle,
+            'time_limit_minutes' => $quiz->time_limit_minutes > 0 ? $quiz->time_limit_minutes : 15,
+            'passing_score' => $quiz->passing_score > 0 ? $quiz->passing_score : 70,
+            'questions_count' => count($rawQuestions),
+            'questions' => $rawQuestions,
+            'is_randomized' => true,
+        ];
+
+        return $this->successResponse($responsePayload, 'Tải bài kiểm tra thành công.');
+    }
+
+    /**
+     * GET /api/student/quiz-attempts/{attemptId}
+     * Retrieve complete quiz attempt result report by attemptId from Database.
+     */
+    public function getAttemptResult(Request $request, $attemptId): JsonResponse
+    {
+        $attempt = UserQuizAttempt::with(['quiz.questions', 'answers'])->find($attemptId);
+        if (!$attempt) {
+            return $this->errorResponse('Không tìm thấy bài làm trong hệ thống.', 404);
+        }
+
+        $quiz = $attempt->quiz;
+        if (!$quiz) {
+            return $this->errorResponse('Không tìm thấy thông tin đề thi liên quan.', 404);
+        }
+
+        $timeTaken = $attempt->time_taken_seconds ?: 180;
+        $minutes = floor($timeTaken / 60);
+        $seconds = $timeTaken % 60;
+        $timeFormatted = $minutes > 0 ? "{$minutes} phút {$seconds} giây" : "{$seconds} giây";
+
+        $passed = $attempt->status === 'passed';
+        $scoreLegacy = $attempt->score;
+        $score10 = $attempt->score_10;
+        $accuracy = "{$attempt->accuracy}%";
+
+        // Map itemized answer details
+        $questionResults = [];
+        if ($attempt->answers && $attempt->answers->isNotEmpty()) {
+            $order = 1;
+            foreach ($attempt->answers as $ans) {
+                $q = \App\Models\Question::find($ans->question_id);
+                $questionResults[] = [
+                    'question_id' => $ans->question_id,
+                    'order' => $order++,
+                    'type' => $ans->question_type ?: 'multiple_choice',
+                    'content' => $q ? $q->content : 'Câu hỏi',
+                    'user_answer' => $ans->user_answer,
+                    'user_answer_text' => $ans->user_answer,
+                    'is_correct' => (bool) $ans->is_correct,
+                    'score' => (float) $ans->score,
+                    'max_score' => (float) $ans->max_score,
+                    'feedback' => $ans->feedback,
+                    'ai_analysis' => $ans->ai_analysis,
+                    'grading_status' => $ans->grading_status,
+                ];
+            }
+        }
+
+        $title = $quiz->title;
+        if ($passed) {
+            $aiInsight = "Xuất sắc! Bạn đạt điểm {$score10}/10 (Tỷ lệ chính xác {$accuracy}), thể hiện am hiểu sâu sắc về chuyên đề '{$title}'. các câu hỏi được trình bày rõ ràng, chuẩn xác.";
+            $suggestion = "Năng lực đạt chuẩn xuất sắc cho {$title}. Hãy tự tin tiến lên các thử thách tiếp theo!";
+        } else {
+            $aiInsight = "Kết quả làm bài là {$score10}/10 ({$accuracy}). Hãy xem lại chi tiết nhận xét AI cho từng câu hỏi bên dưới để hoàn thiện nhé!";
+            $suggestion = "Hãy mở ngay 'Bảng soát bài chi tiết' để xem lời giải từ Gia sư AI và luyện tập lại!";
+        }
+
+        $responseReport = [
+            'attempt_id' => $attempt->id,
+            'quiz_id' => $quiz->id,
+            'module_id' => (string) ($quiz->lesson_id ?: $quiz->id),
+            'score' => $scoreLegacy,
+            'score_10' => $score10,
+            'total_score_max' => 10,
+            'accuracy' => $accuracy,
+            'passed' => $passed,
+            'correct_count' => count(array_filter($questionResults, fn($q) => $q['is_correct'])),
+            'total_questions' => count($questionResults) ?: ($quiz->total_questions ?: 1),
+            'time_taken_seconds' => $timeTaken,
+            'time_taken_formatted' => $timeFormatted,
+            'quiz_title' => $quiz->title,
+            'passing_score' => $quiz->passing_score ?: 70,
+            'ai_insight' => $aiInsight,
+            'ai_coach_suggestion' => $suggestion,
+            'question_results' => $questionResults,
+            'topic_performance' => [
+                ['id' => 't1', 'topic_title' => 'Trắc nghiệm Kiến thức Nền tảng', 'sub_title' => 'Nắm vững khái niệm và quy tắc cốt lõi', 'score_percentage' => $attempt->accuracy, 'status_label' => $passed ? "Đạt ({$score10}/10)" : "Cần ôn ({$score10}/10)", 'status_color' => $passed ? 'indigo' : 'rose'],
+                ['id' => 't2', 'topic_title' => 'Vận dụng & Thực hành', 'sub_title' => 'Khả năng tư duy và phân tích chi tiết', 'score_percentage' => max((int)($attempt->accuracy * 0.9), 0), 'status_label' => $passed ? 'Tốt' : 'Cần trau dồi', 'status_color' => $passed ? 'indigo' : 'rose'],
+            ],
+            'action_cards' => [
+                ['id' => 'c1', 'title' => 'Xem lại câu hỏi & Bài làm', 'description' => 'Soát lại từng chi tiết câu trắc nghiệm và bài làm tự luận kèm nhận xét AI.', 'action_text' => 'Bắt đầu soát bài', 'icon_type' => 'review'],
+                ['id' => 'c2', 'title' => 'Luyện tập lại bộ đề này', 'description' => 'Vào thi lại để cải thiện kỹ năng và củng cố kiến thức.', 'action_text' => 'Luyện tập thêm', 'icon_type' => 'practice'],
+            ],
+        ];
+
+        return $this->successResponse($responseReport, 'Lấy báo cáo kết quả thi thành công.');
+    }
 }
+

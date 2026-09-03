@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 import { useQueryClient } from "@tanstack/react-query";
 import { axiosClient } from "@/src/shared/lib/axios";
-import { useGetCourseDetail, useInvalidateCourseDetail, completeLesson, fetchQuiz, checkQuizAnswer, submitQuiz, useGetDiscussions, useCreateDiscussion, useUpdateDiscussion, useDeleteDiscussion } from "../../api";
+import { useGetCourseDetail, useGetCourseAssessmentStatus, useInvalidateCourseDetail, completeLesson, fetchQuiz, checkQuizAnswer, submitQuiz, useGetDiscussions, useCreateDiscussion, useUpdateDiscussion, useDeleteDiscussion } from "../../api";
 import type { CourseDetailLessonItem, CourseDetailData } from "../../types";
 import { CustomVideoPlayer } from "./CustomVideoPlayer";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
@@ -890,7 +890,9 @@ function LessonWorkspaceContent() {
 
   const parsedCourseId = courseIdParam ? Number(courseIdParam) : 0;
   const { data: apiDetail, isLoading, error } = useGetCourseDetail(parsedCourseId);
+  const { data: assessmentStatus } = useGetCourseAssessmentStatus(parsedCourseId);
   const invalidateCourseDetail = useInvalidateCourseDetail();
+
   const queryClient = useQueryClient();
 
   const [instructorModules, setInstructorModules] = useState<any[] | null>(null);
@@ -1612,31 +1614,71 @@ function LessonWorkspaceContent() {
  </div>
  )}
 
- <div className="flex items-center gap-3">
+ <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+  {/* General Quiz Button */}
   <button
-  type="button"
-  onClick={() => {
-  const quizLesson = allLessons.find(l => l.type === 'quiz_module' || l.type === 'quiz');
-  if (quizLesson) {
-  handleSelectLesson(quizLesson.id);
-  } else if (isPreview) {
-  alert("Khóa học này chưa có bài kiểm tra.");
-  } else {
-  window.location.href = `/practice/quiz/question?lessonId=${parsedCourseId}&preview=true`;
-  }
-  }}
-  className="flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-[#2C3039] bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition-all cursor-pointer shadow-2xs"
+    type="button"
+    onClick={() => {
+      if (assessmentStatus?.general_quiz?.is_setup) {
+        window.location.href = `/practice/quiz/question?courseId=${parsedCourseId}&quizType=general&quizId=${assessmentStatus.general_quiz.quiz_id}`;
+      } else if (isPreview) {
+        alert("Khóa học này chưa có bài kiểm tra tổng quát.");
+      } else {
+        alert("Bài kiểm tra tổng quát hiện chưa được giáo viên thiết lập cho khóa học này.");
+      }
+    }}
+    className="flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-[#2C3039] bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-all cursor-pointer shadow-2xs"
+    title={assessmentStatus?.general_quiz?.is_setup ? "Bắt đầu làm bài kiểm tra tổng quát" : "Chưa thiết lập đề thi tổng quát"}
   >
-  <span>📝 Kiểm tra tổng quát</span>
+    <span>📝 Kiểm tra tổng quát</span>
+    {assessmentStatus?.general_quiz?.is_passed && (
+      <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-1.5 py-0.5 rounded-md">✓ Đã đạt</span>
+    )}
   </button>
- <button
- onClick={handleGoNext}
- disabled={!hasNext}
- className="flex items-center gap-2 px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#C0392B] hover:bg-[#A93226] transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm"
- >
- <span>Bài tiếp theo</span>
- <></>
- </button>
+
+  {/* Final Quiz Button (🏁 Làm bài kiểm tra cuối khóa) */}
+  {(() => {
+    const isUnlocked = assessmentStatus?.can_take_final_quiz === true;
+    const lockReason = assessmentStatus?.final_quiz_lock_reason || "🔒 Hoàn thành 100% khóa học & qua bài kiểm tra tổng quát";
+
+    return (
+      <div className="relative group">
+        <button
+          type="button"
+          disabled={!isUnlocked}
+          onClick={() => {
+            if (isUnlocked && assessmentStatus?.final_quiz?.quiz_id) {
+              window.location.href = `/practice/quiz/question?courseId=${parsedCourseId}&quizType=final&quizId=${assessmentStatus.final_quiz.quiz_id}`;
+            } else {
+              alert(lockReason);
+            }
+          }}
+          className={twMerge(
+            "flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs",
+            isUnlocked
+              ? "bg-[#065F46] hover:bg-[#044E39] text-white border border-[#065F46] cursor-pointer"
+              : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60 pointer-events-none"
+          )}
+          title={lockReason}
+        >
+          <span>🏁 Làm bài kiểm tra cuối khóa</span>
+          {isUnlocked ? (
+            <span className="text-[10px] bg-emerald-300 text-emerald-950 font-black px-1.5 py-0.5 rounded-md uppercase">MỞ KHÓA</span>
+          ) : (
+            <span className="text-[10px] bg-gray-200 text-gray-600 font-bold px-1.5 py-0.5 rounded-md">ĐANG KHÓA</span>
+          )}
+        </button>
+      </div>
+    );
+  })()}
+
+  <button
+    onClick={handleGoNext}
+    disabled={!hasNext}
+    className="flex items-center gap-2 px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#C0392B] hover:bg-[#A93226] transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm"
+  >
+    <span>Bài tiếp theo</span>
+  </button>
  </div>
  </div>
  </footer>
