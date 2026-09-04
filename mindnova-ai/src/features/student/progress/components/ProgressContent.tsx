@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { ChevronRightIcon, SparklesIcon } from "./icons";
+import { SparklesIcon, ChevronRightIcon } from "./icons";
+import { Flame, ArrowRight, Zap, Lock, BookOpen, MessageCircle } from "lucide-react";
 import { Loader } from "@/src/shared/components/ui/Loader";
 import { useGetProgressOverview } from "../api";
 
@@ -107,8 +108,8 @@ export function ProgressContent() {
             </div>
 
             <p className="text-xs font-medium text-[#C0392B] mt-3 flex items-center justify-between">
-              <span>🔥 Tiếp tục phát huy nhé!</span>
-              <span className="text-[#C0392B] font-semibold">{overview_card.next_module_label || "Module 2 ➔"}</span>
+              <span className="flex items-center gap-1.5"><Flame size={14} className="text-[#C0392B]"/> Tiếp tục phát huy nhé!</span>
+              <span className="text-[#C0392B] font-semibold flex items-center gap-1">{overview_card.next_module_label || "Module 2"} <ArrowRight size={14} /></span>
             </p>
           </div>
         </div>
@@ -126,8 +127,8 @@ export function ProgressContent() {
               <span className="text-xl sm:text-2xl font-bold text-[#2C3039]">
                 {key_metrics?.study_time?.total_hours || "12.5 Giờ"}
               </span>
-              <span className="text-[11px] font-semibold text-[#C0392B] bg-[#FAF7F2] px-2.5 py-0.5 rounded-full border border-[#C0392B]/20">
-                {key_metrics?.study_time?.weekly_change || "⚡ +2.4h tuần này"}
+              <span className="text-[11px] font-semibold text-[#C0392B] bg-[#FAF7F2] px-2.5 py-0.5 rounded-full border border-[#C0392B]/20 flex items-center gap-1">
+                <Zap size={12} /> {key_metrics?.study_time?.weekly_change || "+2.4h tuần này"}
               </span>
             </div>
           </div>
@@ -261,7 +262,7 @@ export function ProgressContent() {
                               <div className="space-y-1.5">
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <span className="text-[11px] font-semibold text-[#C0392B] bg-[#FAF7F2] px-2.5 py-0.5 rounded-md border border-[#C0392B]/20">{mod.module_number}</span>
-                                  <span className="text-xs font-medium text-[#D97706] bg-[#FFF8EB] px-2.5 py-0.5 rounded-md border border-[#D97706]/20">⚡ Tiếp tục ngay</span>
+                                  <span className="text-xs font-medium text-[#D97706] bg-[#FFF8EB] px-2.5 py-0.5 rounded-md border border-[#D97706]/20 flex items-center gap-1"><Zap size={12} /> Tiếp tục ngay</span>
                                 </div>
                                 <h3 className="text-base sm:text-lg font-bold text-[#2C3039]">{mod.title}</h3>
                                 <p className="text-xs font-normal text-[#8A8478] leading-relaxed">
@@ -271,7 +272,7 @@ export function ProgressContent() {
 
                               <Link href={mod.action_link || "/courses"} className="shrink-0 text-decoration-none">
                                 <button type="button" className="px-5 py-2.5 bg-gradient-to-r from-[#C0392B] via-[#C0392B] to-[#C0392B] hover:brightness-110 text-white rounded-xl font-semibold text-xs shadow-[0_4px_15px_rgba(192,57,43,0.3)] hover:shadow-[0_6px_20px_rgba(192,57,43,0.4)] hover:-translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer">
-                                  <span>{mod.action_text || "▶ Tiếp tục học ➔"}</span>
+                                  <span className="flex items-center gap-1.5">{mod.action_text || "Tiếp tục học"} <ArrowRight size={14} /></span>
                                 </button>
                               </Link>
                             </div>
@@ -310,7 +311,7 @@ export function ProgressContent() {
                           </div>
 
                           <span className="shrink-0 px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#8A8478] font-medium text-xs border border-[#E8E2D9] flex items-center gap-1.5">
-                            <span>{mod.action_text || "🔒 Cần hoàn tất Module trước"}</span>
+                            <span className="flex items-center gap-1.5"><Lock size={14} /> {mod.action_text || "Cần hoàn tất Module trước"}</span>
                           </span>
                         </div>
                       </div>
@@ -354,7 +355,7 @@ export function ProgressContent() {
                         <div className="space-y-2 relative z-10">
                           <div className="flex items-center justify-between">
                             <span className="text-[11px] font-semibold text-[#C0392B] bg-[#FAF7F2] px-2.5 py-0.5 rounded-md border border-[#C0392B]/20">{mod.module_number}</span>
-                            <span className="text-[10px] font-medium text-[#D97706] bg-[#FFF8EB] px-2 py-0.5 rounded-md border border-[#D97706]/20">⚡ Đang học</span>
+                            <span className="text-[10px] font-medium text-[#D97706] bg-[#FFF8EB] px-2 py-0.5 rounded-md border border-[#D97706]/20 flex items-center gap-1"><Zap size={10} /> Đang học</span>
                           </div>
                           <h3 className="text-sm font-bold text-[#2C3039] line-clamp-2">{mod.title}</h3>
                           <p className="text-xs font-normal text-[#8A8478] line-clamp-2 leading-relaxed">{mod.subtitle}</p>
@@ -374,8 +375,8 @@ export function ProgressContent() {
                             </div>
                           </div>
                           <Link href={mod.action_link || "/courses"} className="block text-decoration-none">
-                            <button type="button" className="w-full py-2 bg-gradient-to-r from-[#C0392B] to-[#C0392B] hover:brightness-110 text-white rounded-xl font-semibold text-xs shadow-sm transition-all cursor-pointer text-center">
-                              {mod.action_text || "▶ Tiếp tục học"}
+                            <button type="button" className="w-full py-2 bg-gradient-to-r from-[#C0392B] to-[#C0392B] hover:brightness-110 text-white rounded-xl font-semibold text-xs shadow-sm transition-all cursor-pointer text-center flex items-center justify-center gap-1.5">
+                              {mod.action_text || "Tiếp tục học"} <ArrowRight size={14} />
                             </button>
                           </Link>
                         </div>
@@ -395,8 +396,8 @@ export function ProgressContent() {
                         <p className="text-xs font-normal text-[#9CA3AF] line-clamp-2 leading-relaxed">{mod.subtitle}</p>
                       </div>
                       <div className="pt-3 border-t border-[#E8E2D9]/60">
-                        <span className="block w-full text-center px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#8A8478] font-medium text-[11px] border border-[#E8E2D9]">
-                          {mod.action_text || "🔒 Cần hoàn tất Module trước"}
+                        <span className="flex items-center justify-center gap-1.5 w-full px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#8A8478] font-medium text-[11px] border border-[#E8E2D9]">
+                          {mod.action_text || <><Lock size={12} /> Cần hoàn tất Module trước</>}
                         </span>
                       </div>
                     </div>
@@ -442,8 +443,8 @@ export function ProgressContent() {
                 </p>
                 {rec.action_url && (
                   <Link href={rec.action_url} className="block text-decoration-none">
-                    <span className="text-xs font-semibold text-[#C0392B] hover:text-[#C0392B] inline-flex items-center gap-1 pt-1 cursor-pointer">
-                      <span>{rec.action_label || "📖 Mở bài học ngay ➔"}</span>
+                    <span className="text-xs font-semibold text-[#C0392B] hover:text-[#A93226] inline-flex items-center gap-1.5 pt-1 cursor-pointer">
+                      <BookOpen size={14} /> <span>{rec.action_label || "Mở bài học ngay"}</span> <ArrowRight size={14} />
                     </span>
                   </Link>
                 )}
@@ -475,8 +476,8 @@ export function ProgressContent() {
 
           {/* Supportive Help Card */}
           <div className="bg-white rounded-2xl p-5 border border-[#E8E2D9] shadow-2xs flex items-center gap-4 hover:border-[#C0392B]/30 transition-colors">
-            <div className="w-11 h-11 rounded-xl bg-[#F8FAFC] text-[#C0392B] flex items-center justify-center shrink-0 border border-[#E8E2D9] text-lg">
-              💬
+            <div className="w-11 h-11 rounded-xl bg-[#F8FAFC] text-[#C0392B] flex items-center justify-center shrink-0 border border-[#E8E2D9]">
+              <MessageCircle size={20} />
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="text-xs font-bold text-[#2C3039] mb-0.5">Cần hỗ trợ về lộ trình?</h4>

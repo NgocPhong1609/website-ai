@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
 import { UploadIcon, MoreVerticalIcon, RobotIcon, SendIcon } from "./icons";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Star, Check, Clipboard, Zap } from "lucide-react";
 import type { AiChatMessage } from "../types";
 import { sendAiChatMessage } from "../services/ai-chat.client-service";
 
@@ -367,7 +367,7 @@ export function ChatPanel({
                   <div className="flex items-center gap-2.5">
                     <span className="text-xs font-bold text-[#C0392B]">Nova AI Co-Pilot</span>
                     <span className="text-[11px] font-normal text-[#8888A8]">{msg.timestamp}</span>
-                    {isPinned && <span className="text-[11px] font-medium bg-[#FAF7F2] text-[#8A8478] px-2.5 py-0.5 rounded-full border border-[#8A8478]/20">★ Đã lưu chú thích</span>}
+                    {isPinned && <span className="text-[11px] font-medium bg-[#FAF7F2] text-[#8A8478] px-2.5 py-0.5 rounded-full border border-[#8A8478]/20"><Star size={12} fill="currentColor" className="mr-1 inline" /> Đã lưu chú thích</span>}
                   </div>
                 </div>
                 <div className="bg-white text-[#2B2C40] px-6 py-5 rounded-2xl rounded-tl-sm border border-[#E8EAEF] border-l-4 border-l-[#C0392B] shadow-sm text-sm sm:text-[14.5px] leading-relaxed font-normal transition-all">
@@ -392,7 +392,7 @@ export function ChatPanel({
                     onClick={() => handleCopy(msg.id, msg.text)}
                     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium text-[#8A8478] hover:text-[#C0392B] bg-[#FAF7F2] hover:bg-[#FAF7F2] border border-[#E8E2D9] transition-all cursor-pointer shadow-2xs"
                   >
-                    <span>{isCopied ? "✓" : "📋"}</span>
+                    <span>{isCopied ? <Check size={12} /> : <Clipboard size={12} />}</span>
                     <span>{isCopied ? "Đã chép!" : "Sao chép"}</span>
                   </button>
                   
@@ -405,7 +405,7 @@ export function ChatPanel({
                         : "text-[#8A8478] hover:text-[#8A8478] bg-[#FAF7F2] hover:bg-[#FAF7F2] border-[#E8E2D9]"
                     }`}
                   >
-                    <span>★</span>
+                    <span><Star size={12} fill={isPinned ? "currentColor" : "none"} /></span>
                     <span>{isPinned ? "Đã lưu" : "Lưu chú thích"}</span>
                   </button>
 
@@ -477,7 +477,7 @@ export function ChatPanel({
               <span className="w-2 h-2 rounded-full bg-[#C0392B]" />
               <span>Gợi ý câu hỏi tương tác nhanh</span>
             </span>
-            <span className="text-[11px] font-medium text-[#2C3039] bg-[#F5F0E8] px-2.5 py-0.5 rounded-full border border-[#2C3039]/20">⚡ Nhấp để hỏi ngay</span>
+            <span className="text-[11px] font-medium text-[#2C3039] bg-[#F5F0E8] px-2.5 py-0.5 rounded-full border border-[#2C3039]/20"><Zap size={12} fill="currentColor" className="mr-1 inline" /> Nhấp để hỏi ngay</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {quickPrompts.map((prompt) => (

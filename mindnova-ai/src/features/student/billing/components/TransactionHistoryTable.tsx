@@ -6,6 +6,7 @@ import { TRANSACTIONS, FILTER_PERIODS } from "../constants";
 import type { Transaction, TransactionStatus, FilterPeriod } from "../types";
 import { FilterIcon, ChevronDownSmall } from "./icons";
 import { StudentRefundModal } from "../../courses/components/StudentRefundModal";
+import { Banknote } from "lucide-react";
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
@@ -155,10 +156,10 @@ function TransactionRow({ tx, onRefundClick }: { tx: Transaction; onRefundClick?
  <button
  type="button"
  onClick={() => onRefundClick?.(tx)}
- className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-[#C0392B] bg-[#FADBD8] hover:bg-[#FADBD8]/80 border border-[#C0392B]/20 transition-all duration-150 cursor-pointer shadow-2xs"
+ className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#C0392B] bg-[#FADBD8] hover:bg-[#FADBD8]/80 border border-[#C0392B]/20 transition-all duration-150 cursor-pointer shadow-2xs"
  title="Yêu cầu hoàn tiền khóa học nếu tiến độ ≤ 10% hoặc chưa học quá 5 bài"
  >
- <span>💸 Hoàn tiền</span>
+ <span className="flex items-center gap-1.5"><Banknote size={14} /> Hoàn tiền</span>
  </button>
  )}
  <button

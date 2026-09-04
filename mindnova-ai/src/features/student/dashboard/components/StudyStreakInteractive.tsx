@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { twMerge } from "tailwind-merge";
+import { Flame, Snowflake, X } from "lucide-react";
 import type { StudyStreak } from "../types";
 import { DayOfWeek } from "./DashboardStatsPanel";
 import axios from "axios";
@@ -141,7 +142,9 @@ export function StudyStreakInteractive({
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-[#64647A] group-hover:text-[#D97706] transition-colors">Chuỗi chuyên cần ↗</span>
-            <div className="w-9 h-9 rounded-xl bg-[#FFF9ED] text-[#D97706] flex items-center justify-center text-sm shadow-sm border border-[#F59E0B]/20">🔥</div>
+            <div className="w-9 h-9 rounded-xl bg-[#FFF9ED] text-[#D97706] flex items-center justify-center shadow-sm border border-[#F59E0B]/20">
+              <Flame size={16} fill="currentColor" />
+            </div>
           </div>
           
           <div className="flex items-baseline justify-between">
@@ -179,7 +182,9 @@ export function StudyStreakInteractive({
             className="bg-white w-full max-w-5xl rounded-3xl overflow-hidden shadow-2xl relative flex flex-col lg:flex-row border border-[#EAEAF4]" 
             onClick={(e) => e.stopPropagation()}
           >
-            <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 z-20 text-[#64647A] hover:bg-[#F4F4FA] p-2.5 rounded-full transition-colors bg-white shadow-sm">✕</button>
+            <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 z-20 text-[#64647A] hover:bg-[#F4F4FA] p-2.5 rounded-full transition-colors bg-white shadow-sm">
+              <X size={18} />
+            </button>
 
             <div className="w-full lg:w-7/12 p-6 sm:p-8 bg-[#FAFAFC] border-r border-[#EAEAF4]">
               <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
@@ -190,8 +195,8 @@ export function StudyStreakInteractive({
                 </div>
                 
                 <div className="flex gap-2">
-                  <span className="text-xs font-bold text-[#0284C7] bg-[#E0F2FE] px-3 py-2 rounded-lg flex items-center gap-1 border border-[#0284C7]/20 shadow-sm">
-                    ❄️ Băng bảo vệ: {streakFreezeCount}
+                  <span className="text-xs font-bold text-[#0284C7] bg-[#E0F2FE] px-3 py-2 rounded-lg flex items-center gap-1.5 border border-[#0284C7]/20 shadow-sm">
+                    <Snowflake size={14} fill="currentColor" /> Băng bảo vệ: {streakFreezeCount}
                   </span>
                 </div>
               </div>
@@ -231,7 +236,9 @@ export function StudyStreakInteractive({
 
             <div className="w-full lg:w-5/12 p-6 sm:p-8 flex flex-col bg-white">
               <div className="text-center mb-8 pt-4">
-                <div className="text-7xl mb-4 drop-shadow-xl inline-block">🔥</div>
+                <div className="mb-4 drop-shadow-xl inline-flex text-[#F59E0B]">
+                  <Flame size={72} fill="currentColor" strokeWidth={1} />
+                </div>
                 <h2 className="text-4xl font-black text-[#1A1A2E] tracking-tight">{streakDays} <span className="text-xl font-bold text-[#7878A0]">Ngày</span></h2>
                 <p className="text-sm font-semibold text-[#D97706] mt-2">Duy trì thói quen cực tốt!</p>
               </div>

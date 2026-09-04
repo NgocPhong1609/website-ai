@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useGetCourseDetail } from "../../courses/api";
 import { checkoutService } from "../services/checkout.service";
+import { Ticket, AlertTriangle, Gift, PartyPopper, Sparkles } from "lucide-react";
 import { Loader } from "@/src/shared/components/ui/Loader";
 
 export function CheckoutView({ courseId }: { courseId: number }) {
@@ -151,8 +152,8 @@ export function CheckoutView({ courseId }: { courseId: number }) {
 
           {/* Ô nhập mã giảm giá (Coupon input) */}
           <div className="border-t border-[#F0F0F8] pt-5 mb-6">
-            <label className="text-xs font-black uppercase text-[#2C3039] tracking-wider block mb-2">
-              🎟️ Mã giảm giá / Khuyến mãi
+            <label className="text-xs font-black uppercase text-[#2C3039] tracking-wider flex items-center gap-1.5 mb-2">
+              <Ticket size={16} /> Mã giảm giá / Khuyến mãi
             </label>
 
             {appliedCoupon ? (
@@ -198,8 +199,8 @@ export function CheckoutView({ courseId }: { courseId: number }) {
             )}
 
             {couponError && (
-              <p className="mt-2 text-xs font-bold text-[#C0392B] bg-[#FADBD8] p-2.5 rounded-xl border border-[#C0392B]/20">
-                ⚠️ {couponError}
+              <p className="mt-2 text-xs font-bold text-[#C0392B] bg-[#FADBD8] p-2.5 rounded-xl border border-[#C0392B]/20 flex items-center gap-1.5">
+                <AlertTriangle size={14} /> {couponError}
               </p>
             )}
           </div>
@@ -233,14 +234,19 @@ export function CheckoutView({ courseId }: { courseId: number }) {
         <div className="bg-white rounded-2xl border border-[#E8E2D9] p-6 shadow-sm">
           {isEffectiveFree ? (
             <>
-              <h2 className="text-lg font-bold text-[#2C3039] mb-4 border-b border-[#F0F0F8] pb-4">
-                🎁 Nhận khóa học Miễn phí
+              <h2 className="text-lg font-bold text-[#2C3039] mb-4 border-b border-[#F0F0F8] pb-4 flex items-center gap-2">
+                <Gift size={20} className="text-[#C0392B]" /> Nhận khóa học Miễn phí
               </h2>
               <div className="mb-6 space-y-2.5 p-4 rounded-xl bg-[#E8F8F0] border border-[#27AE60]/20">
-                <p className="text-[#27AE60] text-xs font-bold leading-relaxed">
-                  {appliedCoupon
-                    ? `🎉 Mã giảm giá "${appliedCoupon.code}" đã giảm 100% học phí! Bạn được nhận khóa học này hoàn toàn miễn phí.`
-                    : "Khóa học này hoàn toàn miễn phí."}
+                <p className="text-[#27AE60] text-xs font-bold leading-relaxed flex items-start gap-1.5">
+                  {appliedCoupon ? (
+                    <>
+                      <PartyPopper size={14} className="shrink-0 mt-0.5" />
+                      <span>Mã giảm giá "{appliedCoupon.code}" đã giảm 100% học phí! Bạn được nhận khóa học này hoàn toàn miễn phí.</span>
+                    </>
+                  ) : (
+                    "Khóa học này hoàn toàn miễn phí."
+                  )}
                 </p>
                 <p className="text-[#4A4F5C] text-xs font-medium">
                   Nhấn nút bên dưới để thêm ngay khóa học vào tài khoản của bạn.
@@ -253,7 +259,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
                 disabled={isProcessing}
                 className="w-full py-3.5 rounded-xl text-sm font-black text-white bg-[#27AE60] hover:bg-[#1f8749] shadow-md hover:shadow-lg disabled:opacity-60 transition-all flex justify-center items-center gap-2 cursor-pointer"
               >
-                {isProcessing ? "Đang xử lý..." : "✨ Xác nhận Nhận khóa học ngay"}
+                {isProcessing ? "Đang xử lý..." : <><Sparkles size={16} /> Xác nhận Nhận khóa học ngay</>}
               </button>
             </>
           ) : (

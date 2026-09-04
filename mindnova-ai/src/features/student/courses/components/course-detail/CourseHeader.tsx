@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import type { CourseDetailHeaderInfo } from "../../types";
 import { StudentRefundModal } from "../StudentRefundModal";
+import { Banknote } from "lucide-react";
 
 const SAVED_COURSES_KEY = "mindnova_saved_courses_v1";
 
@@ -139,7 +140,7 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
                   className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-xs font-bold bg-[#FADBD8] hover:bg-[#FADBD8]/80 text-[#C0392B] border border-[#C0392B]/20 transition-all cursor-pointer shadow-2xs"
                   title="Yêu cầu hoàn tiền khóa học nếu tiến độ ≤ 10% hoặc chưa học quá 5 bài"
                 >
-                  <span>💸 Yêu cầu hoàn tiền</span>
+                  <span className="flex items-center gap-1.5"><Banknote size={16} /> Yêu cầu hoàn tiền</span>
                 </button>
               </>
             ) : (

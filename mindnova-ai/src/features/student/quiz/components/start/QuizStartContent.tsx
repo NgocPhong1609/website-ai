@@ -324,18 +324,18 @@ export function QuizStartContent() {
  <label className="text-xs font-bold text-[#374151] block mb-2">3. Chọn độ khó</label>
  <div className="grid grid-cols-4 gap-2">
  {[
- { label: "Dễ", color: "🟢" },
- { label: "Trung bình", color: "🟡" },
- { label: "Khó", color: "🟠" },
- { label: "Ngẫu nhiên", color: "" }
+ { label: "Dễ", colorClass: "bg-[#27AE60]" },
+ { label: "Trung bình", colorClass: "bg-[#F59E0B]" },
+ { label: "Khó", colorClass: "bg-[#E11D48]" },
+ { label: "Ngẫu nhiên", colorClass: "bg-[#64748B]" }
  ].map((d) => (
  <button
  key={d.label}
  type="button"
  onClick={() => setDifficulty(d.label)}
- className={`py-2 rounded-xl text-[11px] font-bold border flex flex-col items-center gap-0.5 cursor-pointer ${difficulty === d.label ? "bg-[#C0392B] text-white border-[#C0392B]" : "bg-[#F8FAFC] text-[#475569] border-[#E2E8F0]"}`}
+ className={`py-2 rounded-xl text-[11px] font-bold border flex flex-col items-center gap-1 cursor-pointer ${difficulty === d.label ? "bg-[#C0392B] text-white border-[#C0392B]" : "bg-[#F8FAFC] text-[#475569] border-[#E2E8F0]"}`}
  >
- <span>{d.color}</span>
+ <span className={`w-2.5 h-2.5 rounded-full ${d.colorClass}`}></span>
  <span>{d.label}</span>
  </button>
  ))}

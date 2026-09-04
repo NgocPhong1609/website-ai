@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Banknote, X, Check, PartyPopper, AlertTriangle } from "lucide-react";
 import { axiosClient } from "@/src/shared/lib/axios";
 
 interface StudentRefundModalProps {
@@ -71,7 +72,7 @@ export function StudentRefundModal({
         {/* Header */}
         <div className="flex items-center justify-between p-5 bg-[#C0392B] text-white">
           <div className="flex items-center gap-2.5">
-            <span className="text-xl">💰</span>
+            <span className="flex items-center justify-center p-1.5 bg-white/20 rounded-xl"><Banknote size={24} /></span>
             <div>
               <h3 className="text-base font-black text-white">Yêu Cầu Hoàn Tiền Khóa Học</h3>
               <p className="text-xs text-white/80">Chính sách bảo vệ quyền lợi học viên MindNova AI</p>
@@ -83,7 +84,7 @@ export function StudentRefundModal({
             aria-label="Đóng"
             className="w-8 h-8 rounded-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
-            ✕
+            <X size={18} />
           </button>
         </div>
 
@@ -110,8 +111,8 @@ export function StudentRefundModal({
               <div className="flex flex-col gap-2 text-xs">
                 {/* Rule 1: Within 30 days */}
                 <div className="flex items-start gap-2">
-                  <span className={twMerge("font-bold", eligibility?.within_30_days ? "text-[#27AE60]" : "text-[#C0392B]")}>
-                    {eligibility?.within_30_days ? "✓" : "✕"}
+                  <span className={twMerge("font-bold flex items-center h-4", eligibility?.within_30_days ? "text-[#27AE60]" : "text-[#C0392B]")}>
+                    {eligibility?.within_30_days ? <Check size={14} strokeWidth={3} /> : <X size={14} strokeWidth={3} />}
                   </span>
                   <div>
                     <span className="font-bold text-gray-800">Thời hạn bảo hộ 30 ngày: </span>
@@ -125,8 +126,8 @@ export function StudentRefundModal({
 
                 {/* Rule 2: Progress <= 10% AND completed <= 5 */}
                 <div className="flex items-start gap-2">
-                  <span className={twMerge("font-bold", eligibility?.progress_eligible ? "text-[#27AE60]" : "text-[#C0392B]")}>
-                    {eligibility?.progress_eligible ? "✓" : "✕"}
+                  <span className={twMerge("font-bold flex items-center h-4", eligibility?.progress_eligible ? "text-[#27AE60]" : "text-[#C0392B]")}>
+                    {eligibility?.progress_eligible ? <Check size={14} strokeWidth={3} /> : <X size={14} strokeWidth={3} />}
                   </span>
                   <div>
                     <span className="font-bold text-gray-800">Điều kiện tiến độ (≤10% và ≤5 bài): </span>
@@ -145,7 +146,7 @@ export function StudentRefundModal({
               {isEligible ? (
                 <div className="p-4 rounded-xl bg-[#E8F8F0] border border-[#27AE60]/20 text-xs text-[#27AE60] flex flex-col gap-2">
                   <div className="flex items-center gap-1.5 font-bold">
-                    <span>🎉</span>
+                    <span className="flex items-center"><PartyPopper size={16} /></span>
                     <span>Bạn đủ điều kiện nhận lại 100% học phí!</span>
                   </div>
                   <p className="text-[11px] text-[#27AE60] leading-relaxed">
@@ -155,7 +156,7 @@ export function StudentRefundModal({
               ) : (
                 <div className="p-4 rounded-xl bg-[#FADBD8] border border-[#C0392B]/20 text-xs text-[#C0392B] flex flex-col gap-2">
                   <div className="flex items-center gap-1.5 font-bold text-[#C0392B]">
-                    <span>⚠️</span>
+                    <span className="flex items-center"><AlertTriangle size={16} /></span>
                     <span>Khóa học KHÔNG ĐỦ ĐIỀU KIỆN hoàn tiền</span>
                   </div>
                   <ul className="list-disc list-inside text-[11px] text-[#A93226] flex flex-col gap-1">

@@ -5,6 +5,7 @@ import { ProfileSidebar } from "./ProfileSidebar";
 import { PersonalInfoPanel } from "./PersonalInfoPanel";
 import { SecurityPanel, SettingsPanel } from "./OtherPanels";
 import { useGetProfile } from "../api";
+import { Shield, Flame, ArrowRight } from "lucide-react";
 import type { ProfileTab, UserProfile } from "../types";
 
 function ActivePanel({ tab, profile }: { tab: ProfileTab; profile: UserProfile }) {
@@ -56,8 +57,8 @@ export default function ProfileContainer() {
               Hồ sơ Học viên • Xác thực hợp lệ
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3039] leading-tight font-[family-name:var(--font-playfair-display)]">
-              Quản lý <span className="text-[#C0392B] font-bold">Tài khoản &amp; Bảo mật 🛡️</span>
+            <h1 className="flex items-center gap-2 text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3039] leading-tight font-[family-name:var(--font-playfair-display)]">
+              Quản lý <span className="text-[#C0392B] font-bold flex items-center gap-2">Tài khoản &amp; Bảo mật <Shield className="w-6 h-6 text-[#C0392B]" /></span>
             </h1>
 
             <p className="text-xs sm:text-sm text-[#4A4F5C] leading-relaxed font-normal">
@@ -92,8 +93,8 @@ export default function ProfileContainer() {
             </div>
 
             <p className="text-xs font-semibold text-[#8A8478] mt-3 flex items-center justify-between gap-4">
-              <span>🔥 Hồ sơ đang được xác minh đầy đủ!</span>
-              <span className="text-[#2C3039] font-bold cursor-pointer hover:underline">Cập nhật ngay ➔</span>
+              <span className="flex items-center gap-1.5"><Flame size={14} className="text-[#C0392B]"/> Hồ sơ đang được xác minh đầy đủ!</span>
+              <span className="text-[#2C3039] font-bold cursor-pointer hover:underline flex items-center gap-1">Cập nhật ngay <ArrowRight size={14} /></span>
             </p>
           </div>
         </div>

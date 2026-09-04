@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { MessageCircle, Sparkles, Trash2, Lightbulb, Target, BookOpen } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
@@ -437,9 +438,9 @@ export function FloatingAiChat() {
   }, [chatMutation]);
 
   const quickSuggestions = [
-    "💡 Tổng hợp tiến độ",
-    "🎯 Kiểm tra kiến thức",
-    "📖 Gợi ý bài học tiếp",
+    { label: "Tổng hợp tiến độ", icon: <Lightbulb size={12} className="mr-1.5" /> },
+    { label: "Kiểm tra kiến thức", icon: <Target size={12} className="mr-1.5" /> },
+    { label: "Gợi ý bài học tiếp", icon: <BookOpen size={12} className="mr-1.5" /> },
   ];
 
   if (pathname === "/study-plan" || pathname?.startsWith("/study-plan/")) {
@@ -480,9 +481,9 @@ export function FloatingAiChat() {
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="text-xs font-bold tracking-normal drop-shadow-2xs pr-1 bg-transparent border-none text-white focus:outline-none cursor-pointer"
+            className="flex items-center text-xs font-bold tracking-normal drop-shadow-2xs pr-1 bg-transparent border-none text-white focus:outline-none cursor-pointer"
           >
-            💬 Hỏi Gia sư AI
+            <MessageCircle size={14} className="mr-1.5" /> Hỏi Gia sư AI
           </button>
         </div>
       )}
@@ -506,7 +507,7 @@ export function FloatingAiChat() {
                 ⋮⋮
               </span>
               <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#C0392B] via-[#A93226] to-[#C0392B] text-white flex items-center justify-center shadow-2xs text-xs font-bold">
-                ✨
+                <Sparkles size={14} />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
@@ -538,7 +539,7 @@ export function FloatingAiChat() {
                 title="Xóa và làm mới cuộc trò chuyện"
                 className="w-7 h-7 rounded-lg hover:bg-[#FEE2E2] text-[#64647A] hover:text-[#DC2626] flex items-center justify-center transition-colors focus:outline-none cursor-pointer text-xs font-normal"
               >
-                🗑️
+                <Trash2 size={14} />
               </button>
               <button
                 type="button"
@@ -634,11 +635,11 @@ export function FloatingAiChat() {
               <button
                 key={idx}
                 type="button"
-                onClick={() => handleSend(item)}
+                onClick={() => handleSend(item.label)}
                 disabled={isGenerating}
-                className="shrink-0 text-xs font-semibold bg-[#F8FAFC] hover:bg-[#EEF2FF] disabled:opacity-50 text-[#64647A] hover:text-[#A93226] border border-[#EAEAF4] hover:border-[#A93226]/30 rounded-xl px-3 py-1.5 transition-all duration-200 focus:outline-none cursor-pointer shadow-2xs"
+                className="shrink-0 flex items-center justify-center text-xs font-semibold bg-[#F8FAFC] hover:bg-[#EEF2FF] disabled:opacity-50 text-[#64647A] hover:text-[#A93226] border border-[#EAEAF4] hover:border-[#A93226]/30 rounded-xl px-3 py-1.5 transition-all duration-200 focus:outline-none cursor-pointer shadow-2xs"
               >
-                {item}
+                {item.icon} {item.label}
               </button>
             ))}
           </div>

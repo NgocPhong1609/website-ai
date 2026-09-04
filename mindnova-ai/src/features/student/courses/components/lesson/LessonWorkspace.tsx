@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
+import { CheckCircle2, AlertTriangle, Lightbulb, Bot, Target, MessageSquare, ClipboardList, Eye, GraduationCap, X, FileEdit, Check, Lock, Flag, Trophy, PartyPopper } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -632,7 +633,7 @@ function QuizRenderer({
           "w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold",
           passed ? "bg-[#FAF7F2] text-[#065F46]" : "bg-[#FAF7F2] text-[#C0392B]"
         )}>
-          {passed ? "🎉" : "⚠️"}
+          {passed ? <PartyPopper size={16} className="inline mr-1" /> : <AlertTriangle size={16} className="inline mr-1" />}
         </div>
 
         <h2 className="text-2xl font-bold text-[#2C3039]">
@@ -737,21 +738,21 @@ function QuizRenderer({
   <div className="flex flex-col gap-3 p-4 rounded-xl bg-white border border-[#E8E2D9] shadow-2xs">
     <div className="flex items-center justify-between pb-2 border-b border-gray-100">
       <div className="flex items-center gap-2">
-        <span className="text-base">🤖</span>
+        <Bot size={16} className="text-[#A93226]" />
         <span className="font-extrabold text-[#2C3039] text-sm">Kết quả đánh giá từ Gia sư AI (Gemini):</span>
       </div>
       <div className="px-3 py-1 rounded-full bg-[#E8F8F0] text-[#27AE60] font-extrabold text-xs">
-        🎯 Điểm: {essayResult[question.id].score} / {essayResult[question.id].max_score || (question as any).points || 2.5} điểm
+        <Target size={14} className="inline mr-1 text-[#27AE60]" /> Điểm: {essayResult[question.id].score} / {essayResult[question.id].max_score || (question as any).points || 2.5} điểm
       </div>
     </div>
 
     <p className="text-[#4A4F5C] font-medium text-xs leading-relaxed bg-[#F5F0E8]/50 p-3 rounded-lg border border-[#E8E2D9]/60">
-      💬 <strong>Nhận xét AI:</strong> {essayResult[question.id].feedback}
+      <MessageSquare size={14} className="inline mr-1 text-[#2C3039]" /> <strong>Nhận xét AI:</strong> {essayResult[question.id].feedback}
     </p>
 
     {Array.isArray(essayResult[question.id].ai_analysis?.matched_points) && essayResult[question.id].ai_analysis.matched_points.length > 0 && (
       <div className="flex flex-col gap-1">
-        <span className="font-bold text-[#27AE60] text-[11px]">✅ Ý trả lời tốt:</span>
+        <span className="font-bold text-[#27AE60] text-[11px]"><CheckCircle2 size={12} className="inline mr-1" /> Ý trả lời tốt:</span>
         <ul className="list-disc list-inside text-[#27AE60] text-xs space-y-0.5 pl-1">
           {essayResult[question.id].ai_analysis.matched_points.map((pt: string, pIdx: number) => (
             <li key={pIdx}>{pt}</li>
@@ -762,7 +763,7 @@ function QuizRenderer({
 
     {Array.isArray(essayResult[question.id].ai_analysis?.missing_points) && essayResult[question.id].ai_analysis.missing_points.length > 0 && (
       <div className="flex flex-col gap-1">
-        <span className="font-bold text-[#C0392B] text-[11px]">⚠️ Cần bổ sung / hoàn thiện:</span>
+        <span className="font-bold text-[#C0392B] text-[11px]"><AlertTriangle size={12} className="inline mr-1" /> Cần bổ sung / hoàn thiện:</span>
         <ul className="list-disc list-inside text-[#A93226] text-xs space-y-0.5 pl-1">
           {essayResult[question.id].ai_analysis.missing_points.map((pt: string, pIdx: number) => (
             <li key={pIdx}>{pt}</li>
@@ -773,13 +774,13 @@ function QuizRenderer({
   </div>
   ) : (
   <div className="p-3 rounded-xl bg-[#E8F8F0] border border-[#27AE60]/20 text-[#27AE60] text-xs font-bold flex items-center justify-between">
-    <span>✅ Đã nộp bài tự luận - Thang điểm: <strong>{(question as any).points || 2.5} điểm</strong></span>
+    <span><CheckCircle2 size={14} className="inline mr-1 text-[#27AE60]" /> Đã nộp bài tự luận - Thang điểm: <strong>{(question as any).points || 2.5} điểm</strong></span>
     <span className="px-2.5 py-0.5 rounded bg-[#27AE60] text-white text-[10px] uppercase font-black">Đã ghi nhận</span>
   </div>
   )}
 
   <div className="flex flex-col gap-1.5">
-    <span className="text-[#2C3039] font-extrabold text-xs">💡 Đáp án tham khảo mẫu từ Giảng viên:</span>
+    <span className="text-[#2C3039] font-extrabold text-xs"><Lightbulb size={12} className="inline mr-1 text-[#D97706]" /> Đáp án tham khảo mẫu từ Giảng viên:</span>
     <p className="text-[#4A4F5C] font-medium leading-relaxed whitespace-pre-line bg-white p-4 rounded-xl border border-[#E8E2D9] shadow-2xs">
       {(question as any).sample_answer || "Yêu cầu học viên phân tích đầy đủ các luận điểm chính trong bài học."}
     </p>
@@ -787,7 +788,7 @@ function QuizRenderer({
 
   {(question as any).rubric && (
   <div className="flex flex-col gap-1.5 pt-2 border-t border-[#E8E2D9]">
-  <span className="font-extrabold text-[#C0392B] text-xs">📋 Thang điểm & Rubric chấm điểm:</span>
+  <span className="font-extrabold text-[#C0392B] text-xs"><ClipboardList size={12} className="inline mr-1 text-[#C0392B]" /> Thang điểm & Rubric chấm điểm:</span>
   <p className="text-[#A93226] font-medium leading-relaxed whitespace-pre-line bg-[#FADBD8]/60 p-3.5 rounded-xl border border-[#C0392B]/20">
     {(question as any).rubric}
   </p>
@@ -862,7 +863,7 @@ function QuizRenderer({
   >
   {submitting ? (
     ((question as any).type === "essay" || !question.answers || question.answers.length === 0)
-      ? "🤖 Gia sư AI đang chấm điểm..."
+      ? <span className="flex items-center gap-1.5"><Bot size={14} /> Gia sư AI đang chấm điểm...</span>
       : "Đang kiểm tra..."
   ) : "Trả lời"}
   </button>
@@ -1168,10 +1169,10 @@ function LessonWorkspaceContent() {
         <div className="sticky top-0 z-50 bg-[#2C3039] text-white px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md border-b border-black animate-fadeIn">
           <div className="flex items-center gap-3">
             <span className="px-2.5 py-0.5 rounded bg-[#C0392B] text-white text-[10px] font-black uppercase tracking-wider shadow-xs">
-              👁️ CHẾ ĐỘ XEM TRƯỚC
+              <Eye size={12} className="inline mr-1 text-[#C0392B]" /> CHẾ ĐỘ XEM TRƯỚC
             </span>
             <span className="text-xs font-bold text-gray-200">
-              🎓 Giao diện Học viên - Giảng viên trải nghiệm Video, Bài đọc &amp; Thi thử Quiz (Dữ liệu tiến độ &amp; bài thi không lưu vào hệ thống)
+              <GraduationCap size={14} className="inline mr-1 text-[#2C3039]" /> Giao diện Học viên - Giảng viên trải nghiệm Video, Bài đọc &amp; Thi thử Quiz (Dữ liệu tiến độ &amp; bài thi không lưu vào hệ thống)
             </span>
           </div>
           <button
@@ -1184,7 +1185,7 @@ function LessonWorkspaceContent() {
             }}
             className="px-3.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs transition-all cursor-pointer border border-white/20 shrink-0 flex items-center gap-1.5 shadow-2xs"
           >
-            <span>✕</span>
+            <X size={20} />
             <span>Thoát xem trước</span>
           </button>
         </div>
@@ -1645,10 +1646,10 @@ function LessonWorkspaceContent() {
           : "Chưa thiết lập đề thi tổng quát"
       }
     >
-      <span>📝 Kiểm tra tổng quát</span>
+      <span><FileEdit size={16} className="inline mr-1.5" /> Kiểm tra tổng quát</span>
       {assessmentStatus?.general_quiz?.is_passed && (
         <span className="text-[10px] bg-[#E8F8F0] text-[#27AE60] font-extrabold px-2 py-0.5 rounded-md border border-[#27AE60]/30 flex items-center gap-1">
-          <span>✓ Đã đạt</span>
+          <span className="flex items-center gap-1"><Check size={14} /> Đã đạt</span>
           <span className="bg-[#27AE60] text-white px-1 rounded text-[9px]">
             {assessmentStatus.general_quiz.best_score}/10
           </span>
@@ -1656,12 +1657,12 @@ function LessonWorkspaceContent() {
       )}
     </button>
 
-    {/* Final Quiz Button (🏁 Làm bài kiểm tra cuối khóa) */}
+    {/* Final Quiz Button (<Flag size={16} className="inline mr-1.5" /> Làm bài kiểm tra cuối khóa) */}
     {(() => {
       const isUnlocked = assessmentStatus?.can_take_final_quiz === true;
       const isPassed = assessmentStatus?.final_quiz?.is_passed === true;
       const bestScore = assessmentStatus?.final_quiz?.best_score;
-      const lockReason = assessmentStatus?.final_quiz_lock_reason || "🔒 Hoàn thành 100% khóa học & qua bài kiểm tra tổng quát";
+      const lockReason = assessmentStatus?.final_quiz_lock_reason || <span className="flex items-center justify-center gap-1.5"><Lock size={14} /> Hoàn thành 100% khóa học & qua bài kiểm tra tổng quát</span>;
 
       return (
         <div className="relative group">
@@ -1692,10 +1693,10 @@ function LessonWorkspaceContent() {
             )}
             title={isPassed ? `Đã đạt (${bestScore}/10) - Bấm để làm lại` : lockReason}
           >
-            <span>🏁 Làm bài kiểm tra cuối khóa</span>
+            <span><Flag size={16} className="inline mr-1.5" /> Làm bài kiểm tra cuối khóa</span>
             {isPassed ? (
               <span className="text-[10px] bg-[#E8F8F0] text-[#27AE60] font-extrabold px-2 py-0.5 rounded-md border border-[#27AE60]/30 flex items-center gap-1">
-                <span>✓ Đã đạt</span>
+                <span className="flex items-center gap-1"><Check size={14} /> Đã đạt</span>
                 <span className="bg-[#27AE60] text-white px-1 rounded text-[9px]">{bestScore}/10</span>
               </span>
             ) : isUnlocked ? (

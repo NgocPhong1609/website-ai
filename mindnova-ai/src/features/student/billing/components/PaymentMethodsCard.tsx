@@ -5,6 +5,7 @@ import { NoData } from "@/src/shared/components/ui/NoData";
 import { PAYMENT_CARDS } from "../constants";
 import type { PaymentCard } from "../types";
 import { PlusIcon, TrashIcon } from "./icons";
+import { ShieldCheck } from "lucide-react";
 
 // ─── Card Brand Logos ─────────────────────────────────────────────────────────
 
@@ -91,8 +92,8 @@ export function PaymentMethodsCard() {
         <div>
           <h2 className="text-base font-semibold text-[#1A1A2E] flex items-center gap-2">
             <span>Phương thức Thanh toán</span>
-            <span className="text-[11px] font-medium text-[#27AE60] bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#27AE60]/20">
-              🛡️ PCI-DSS
+            <span className="text-[11px] font-medium text-[#27AE60] bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#27AE60]/20 flex items-center">
+              <ShieldCheck size={12} className="mr-1" /> PCI-DSS
             </span>
           </h2>
           <p className="text-xs font-normal text-[#7878A0] mt-1">
