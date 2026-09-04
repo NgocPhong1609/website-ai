@@ -7,6 +7,7 @@ import type { Transaction, TransactionStatus, FilterPeriod } from "../types";
 import { FilterIcon, ChevronDownSmall } from "./icons";
 import { StudentRefundModal } from "../../courses/components/StudentRefundModal";
 import { Banknote } from "lucide-react";
+import toast from "react-hot-toast";
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
@@ -164,7 +165,7 @@ function TransactionRow({ tx, onRefundClick }: { tx: Transaction; onRefundClick?
  )}
  <button
  type="button"
- onClick={() => alert(`Yêu cầu hỗ trợ giao dịch ${tx.invoiceId} đã được ghi nhận. Chuyên viên chăm sóc học viên sẽ kết nối qua khung Chat!`)}
+ onClick={() => toast(`Yêu cầu hỗ trợ giao dịch ${tx.invoiceId} đã được ghi nhận. Chuyên viên chăm sóc học viên sẽ kết nối qua khung Chat!`)}
  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#C0392B] bg-[#FAF7F2] hover:bg-[#FAF7F2] hover:text-[#C0392B] border border-[#C0392B]/20 hover:border-[#C0392B]/40 transition-all duration-150 cursor-pointer shadow-2xs"
  title="Yêu cầu hỗ trợ về khoản học phí này"
  >

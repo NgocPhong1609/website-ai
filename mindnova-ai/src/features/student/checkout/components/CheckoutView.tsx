@@ -7,6 +7,7 @@ import { useGetCourseDetail } from "../../courses/api";
 import { checkoutService } from "../services/checkout.service";
 import { Ticket, AlertTriangle, Gift, PartyPopper, Sparkles } from "lucide-react";
 import { Loader } from "@/src/shared/components/ui/Loader";
+import toast from "react-hot-toast";
 
 export function CheckoutView({ courseId }: { courseId: number }) {
   const router = useRouter();
@@ -80,7 +81,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
       const hasToken = typeof window !== "undefined" && !!(window.localStorage.getItem("accessToken") || document.cookie.includes("accessToken="));
       if (!hasToken) {
         setIsProcessing(false);
-        alert("Bạn cần đăng nhập để nhận khóa học hoặc thanh toán.");
+        toast("Bạn cần đăng nhập để nhận khóa học hoặc thanh toán.");
         router.push("/login");
         return;
       }
@@ -90,7 +91,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
 
       if (res.success) {
         if (isEffectiveFree || !res.payment_url) {
-          alert("🎉 Chúc mừng! Bạn đã nhận khóa học thành công.");
+          toast.success("🎉 Chúc mừng! Bạn đã nhận khóa học thành công.");
           router.replace(`/courses/detail?courseId=${courseId}`);
           return;
         }
@@ -104,7 +105,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
             return;
           } catch (e) {
             console.error("Mock payment failed:", e);
-            alert("Lỗi Dev mock payment");
+            toast.error("Lỗi Dev mock payment");
             setIsProcessing(false);
             return;
           }
@@ -114,11 +115,11 @@ export function CheckoutView({ courseId }: { courseId: number }) {
         return;
       }
 
-      alert(res.message || "Có lỗi xảy ra khi tạo thanh toán.");
+      toast.error(res.message || "Có lỗi xảy ra khi tạo thanh toán.");
       setIsProcessing(false);
     } catch (err) {
       console.error(err);
-      alert("Lỗi kết nối đến cổng thanh toán. Vui lòng thử lại sau.");
+      toast.error("Lỗi kết nối đến cổng thanh toán. Vui lòng thử lại sau.");
       setIsProcessing(false);
     }
   };

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { NoData } from "@/src/shared/components/ui/NoData";
 import type { CourseDetailModuleItem, CourseDetailLessonItem } from "../../types";
+import toast from "react-hot-toast";
 
 // ─── Lesson Item Row ──────────────────────────────────────────────────────────
 function LessonItemRow({ lesson, courseId }: { lesson: CourseDetailLessonItem; courseId: string | number }) {
@@ -74,7 +75,7 @@ function LessonItemRow({ lesson, courseId }: { lesson: CourseDetailLessonItem; c
  if (isLocked) {
  return (
  <div 
- onClick={() => alert("Vui lòng hoàn tất các bài học trước để tự động mở khóa bài học này!")}
+ onClick={() => toast("Vui lòng hoàn tất các bài học trước để tự động mở khóa bài học này!")}
  className="block cursor-not-allowed"
  >
  {content}

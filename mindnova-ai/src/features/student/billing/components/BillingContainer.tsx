@@ -5,6 +5,7 @@ import { PromoCodeCard } from "./PromoCodeCard";
 import { TransactionHistoryTable } from "./TransactionHistoryTable";
 import { BillingFooter } from "./BillingFooter";
 import { UPCOMING_PAYMENT } from "../constants";
+import toast from "react-hot-toast";
 
 export default function BillingContainer() {
  return (
@@ -35,7 +36,7 @@ export default function BillingContainer() {
  <div className="flex flex-wrap items-center gap-3 pt-1">
  <button
  type="button"
- onClick={() => alert("Bạn đang trải nghiệm trọn vẹn quyền lợi cao cấp của gói MindNova Pro AI!")}
+ onClick={() => toast("Bạn đang trải nghiệm trọn vẹn quyền lợi cao cấp của gói MindNova Pro AI!")}
  className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#C0392B] shadow-[0_4px_14px_rgba(192,57,43,0.35)] hover:shadow-[0_6px_22px_rgba(192,57,43,0.5)] transition-all duration-200 cursor-pointer focus:outline-none flex items-center gap-2"
  >
  <span> Nâng cấp Gói học Pro</span>

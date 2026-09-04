@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useGetPracticeOverview } from "../../api";
 import { SelfAssessmentModal } from "../self-assessment/SelfAssessmentModal";
+import toast from "react-hot-toast";
 
 export function QuizStartContent() {
  const { data, isLoading, isError } = useGetPracticeOverview();
@@ -66,11 +67,11 @@ export function QuizStartContent() {
  setMyHistoryQuizzes((prev) => prev.filter((q) => q.id !== quizId));
  if (reviewingQuiz?.id === quizId) setReviewingQuiz(null);
  } else {
- alert("Xóa bài thi thất bại!");
+ toast.error("Xóa bài thi thất bại!");
  }
  } catch (err) {
  console.error(err);
- alert("Đã xảy ra lỗi khi xóa bài thi.");
+ toast.error("Đã xảy ra lỗi khi xóa bài thi.");
  }
  };
 
@@ -134,7 +135,7 @@ export function QuizStartContent() {
 
  const handleGenerateAiQuiz = async () => {
  if (!topic.trim()) {
- alert("Vui lòng nhập chủ đề bạn muốn kiểm tra!");
+ toast("Vui lòng nhập chủ đề bạn muốn kiểm tra!");
  return;
  }
 
@@ -162,11 +163,11 @@ export function QuizStartContent() {
  setGeneratedQuiz(json.data);
  fetchMyHistory();
  } else {
- alert(json.message || "Tạo đề thi thất bại, vui lòng thử lại!");
+ toast.error(json.message || "Tạo đề thi thất bại, vui lòng thử lại!");
  }
  } catch (err: any) {
  console.error(err);
- alert("Đã xảy ra lỗi kết nối đến máy chủ.");
+ toast.error("Đã xảy ra lỗi kết nối đến máy chủ.");
  } finally {
  setIsGenerating(false);
  }

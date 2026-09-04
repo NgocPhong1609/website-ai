@@ -1,4 +1,5 @@
 import { ShieldIcon, LockIcon } from "./icons";
+import toast from "react-hot-toast";
 
 // ─── Security Footer ──────────────────────────────────────────────────────────
 
@@ -26,7 +27,7 @@ export function BillingFooter() {
  Bạn cần trợ giúp về hóa đơn?{" "}
  <button
  type="button"
- onClick={() => alert("Chuyên viên tài chính của MindNova đang sẵn sàng hỗ trợ bạn 24/7 qua Live Chat!")}
+ onClick={() => toast("Chuyên viên tài chính của MindNova đang sẵn sàng hỗ trợ bạn 24/7 qua Live Chat!")}
  className="font-semibold text-[#C0392B] hover:text-[#C0392B] underline underline-offset-2 transition-colors duration-150 cursor-pointer focus:outline-none"
  >
  Liên hệ Trung tâm Hỗ trợ

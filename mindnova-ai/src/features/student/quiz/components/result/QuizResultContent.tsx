@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGetQuizAttemptResult } from "../../api";
 import type { QuizGradingResult, QuestionResultDetail } from "../../types";
+import toast from "react-hot-toast";
 
 export function QuizResultContent() {
  const router = useRouter();
@@ -108,11 +109,11 @@ export function QuizResultContent() {
  if (res.ok && json.data?.id) {
  router.push(`/practice/quiz/question?aiQuizId=${json.data.id}`);
  } else {
- alert("Chưa tạo được bộ đề tương tự, vui lòng thử lại!");
+ toast.error("Chưa tạo được bộ đề tương tự, vui lòng thử lại!");
  }
  } catch (e) {
  console.error(e);
- alert("Đã xảy ra lỗi khi tạo bộ đề mới.");
+ toast.error("Đã xảy ra lỗi khi tạo bộ đề mới.");
  } finally {
  setIsGeneratingSimilar(false);
  }

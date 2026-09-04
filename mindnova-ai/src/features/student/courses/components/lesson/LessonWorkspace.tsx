@@ -13,6 +13,7 @@ import type { CourseDetailLessonItem, CourseDetailData } from "../../types";
 import { CustomVideoPlayer } from "./CustomVideoPlayer";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/quizGeneratorApi";
+import toast from "react-hot-toast";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 function CheckIcon({ className = "w-4 h-4" }: { className?: string }) {
@@ -1632,9 +1633,9 @@ function LessonWorkspaceContent() {
           }
           window.location.href = `/practice/quiz/question?courseId=${parsedCourseId}&quizType=general&quizId=${assessmentStatus.general_quiz.quiz_id}`;
         } else if (isPreview) {
-          alert("Khóa học này chưa có bài kiểm tra tổng quát.");
+          toast.error("Khóa học này chưa có bài kiểm tra tổng quát.");
         } else {
-          alert("Bài kiểm tra tổng quát hiện chưa được giáo viên thiết lập cho khóa học này.");
+          toast.error("Bài kiểm tra tổng quát hiện chưa được giáo viên thiết lập cho khóa học này.");
         }
       }}
       className="flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-[#2C3039] bg-[#FEFCF9] border border-[#E8E2D9] hover:bg-[#F5F0E8] transition-all cursor-pointer shadow-2xs"
@@ -1682,7 +1683,7 @@ function LessonWorkspaceContent() {
                 }
                 window.location.href = `/practice/quiz/question?courseId=${parsedCourseId}&quizType=final&quizId=${assessmentStatus.final_quiz.quiz_id}`;
               } else {
-                alert(lockReason);
+                toast(lockReason);
               }
             }}
             className={twMerge(
@@ -1691,7 +1692,7 @@ function LessonWorkspaceContent() {
                 ? "bg-[#065F46] hover:bg-[#044E39] text-white border border-[#065F46] cursor-pointer"
                 : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60 pointer-events-none"
             )}
-            title={isPassed ? `Đã đạt (${bestScore}/10) - Bấm để làm lại` : lockReason}
+            title={isPassed ? `Đã đạt (${bestScore}/10) - Bấm để làm lại` : (typeof lockReason === 'string' ? lockReason : "Hoàn thành 100% khóa học & qua bài kiểm tra tổng quát")}
           >
             <span><Flag size={16} className="inline mr-1.5" /> Làm bài kiểm tra cuối khóa</span>
             {isPassed ? (

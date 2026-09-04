@@ -6,6 +6,7 @@ import { useGetCourseDetail, useGetCourseReviews, useCreateCourseReview, useUpda
 import { CourseHeader } from "./CourseHeader";
 import { CurriculumAccordion } from "./CurriculumAccordion";
 import { CourseSidebar } from "./CourseSidebar";
+import toast from "react-hot-toast";
 
 function CourseReviewSection({ courseId }: { courseId: string | number }) {
  const { data: reviewsData, isLoading: isReviewsLoading } = useGetCourseReviews(courseId);
@@ -65,7 +66,7 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  });
  setEditingReviewId(null);
  } catch (error: any) {
- alert(error?.response?.data?.message || "Không thể cập nhật nhận xét.");
+ toast.error(error?.response?.data?.message || "Không thể cập nhật nhận xét.");
  }
  };
 
@@ -78,7 +79,7 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  reviewId,
  });
  } catch (error: any) {
- alert(error?.response?.data?.message || "Không thể xóa nhận xét.");
+ toast.error(error?.response?.data?.message || "Không thể xóa nhận xét.");
  }
  };
 

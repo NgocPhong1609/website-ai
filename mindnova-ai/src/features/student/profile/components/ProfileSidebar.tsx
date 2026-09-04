@@ -7,6 +7,7 @@ import { PersonalInfoIcon, SecurityIcon, SettingsIcon } from "./icons";
 import { PROFILE_TABS } from "../constants";
 import { useUploadAvatar } from "../api";
 import { writeStoredUser } from "@/src/shared/lib/userStorage";
+import toast from "react-hot-toast";
 
 const TAB_ICON_MAP = {
  "personal-info": PersonalInfoIcon,
@@ -157,7 +158,7 @@ export function ProfileSidebar({
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      alert("Kích thước ảnh đại diện vượt quá 5MB. Vui lòng chọn ảnh nhỏ hơn.");
+      toast.error("Kích thước ảnh đại diện vượt quá 5MB. Vui lòng chọn ảnh nhỏ hơn.");
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -170,7 +171,7 @@ export function ProfileSidebar({
       setLocalPreview(null);
     } catch (error: any) {
       console.error("Avatar upload failed:", error);
-      alert(error?.response?.data?.message || "Không thể cập nhật ảnh đại diện. Vui lòng thử lại.");
+      toast.error(error?.response?.data?.message || "Không thể cập nhật ảnh đại diện. Vui lòng thử lại.");
       setLocalPreview(null);
     } finally {
       URL.revokeObjectURL(previewUrl);

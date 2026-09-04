@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Source_Sans_3 } from "next/font/google";
 import { Providers } from "@shared/providers";
 import "@shared/styles/globals.css";
+import { Toaster } from "react-hot-toast";
 
 const playfairDisplay = Playfair_Display({
  variable: "--font-playfair-display",
@@ -39,6 +40,7 @@ export default function RootLayout({
  <html lang="vi" suppressHydrationWarning>
  <body className={`${playfairDisplay.variable} ${sourceSans3.variable}`} suppressHydrationWarning>
  <Providers>{children}</Providers>
+ <Toaster position="top-right" reverseOrder={false} />
  </body>
  </html>
  );

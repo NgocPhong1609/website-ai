@@ -19,6 +19,7 @@ import {
 import { Loader } from "@/src/shared/components/ui/Loader";
 import { useGetHistoryOverview } from "../api";
 import type { HistoryTimelineItem } from "../types";
+import toast from "react-hot-toast";
 
 export function LearningHistory() {
  const [filterType, setFilterType] = useState<"all" | "quiz" | "milestone" | "lesson">("all");
@@ -139,7 +140,7 @@ export function LearningHistory() {
  <div className="shrink-0 pt-3 sm:pt-0 border-t sm:border-0 border-[#F59E0B]/20">
  <button
  type="button"
- onClick={() => alert(" Đã sao chép liên kết chứng nhận huy hiệu để chia sẻ với bạn bè!")}
+ onClick={() => toast.success(" Đã sao chép liên kết chứng nhận huy hiệu để chia sẻ với bạn bè!")}
  className="w-full sm:w-auto px-4 py-2 bg-[#FFF3DF] hover:bg-[#FDE68A]/60 border border-[#F59E0B]/30 text-[#D97706] rounded-xl text-xs font-medium transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer"
  >
  <span>{item.share_label || " Chia sẻ thành tích"}</span>

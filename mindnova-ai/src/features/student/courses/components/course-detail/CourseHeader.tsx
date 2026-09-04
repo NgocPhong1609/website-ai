@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { CourseDetailHeaderInfo } from "../../types";
 import { StudentRefundModal } from "../StudentRefundModal";
 import { Banknote } from "lucide-react";
+import toast from "react-hot-toast";
 
 const SAVED_COURSES_KEY = "mindnova_saved_courses_v1";
 
@@ -47,7 +48,7 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
 
     window.localStorage.setItem(SAVED_COURSES_KEY, JSON.stringify(nextSavedIds));
     setIsSaved(!isSaved);
-    alert(!isSaved ? "Đã lưu khóa học vào danh sách quan tâm của bạn!" : "Đã bỏ lưu khóa học.");
+    toast.success(!isSaved ? "Đã lưu khóa học vào danh sách quan tâm của bạn!" : "Đã bỏ lưu khóa học.");
   };
 
   return (

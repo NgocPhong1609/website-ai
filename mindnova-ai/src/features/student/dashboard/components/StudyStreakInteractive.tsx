@@ -7,6 +7,7 @@ import { Flame, Snowflake, X } from "lucide-react";
 import type { StudyStreak } from "../types";
 import { DayOfWeek } from "./DashboardStatsPanel";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 interface StudyStreakInteractiveProps {
   data: StudyStreak;
@@ -104,7 +105,7 @@ export function StudyStreakInteractive({
       const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
 
       if (!token) {
-        alert("Không tìm thấy thông tin đăng nhập (Token). Vui lòng đăng nhập lại!");
+        toast.error("Không tìm thấy thông tin đăng nhập (Token). Vui lòng đăng nhập lại!");
         setIsLoading(false);
         return;
       }
@@ -127,7 +128,7 @@ export function StudyStreakInteractive({
 
     } catch (error: any) {
       console.error("Lỗi đồng bộ hệ thống:", error);
-      alert(error.response?.data?.message || "Lỗi điểm danh! Hãy thử lại.");
+      toast.error(error.response?.data?.message || "Lỗi điểm danh! Hãy thử lại.");
     } finally {
       setIsLoading(false);
     }

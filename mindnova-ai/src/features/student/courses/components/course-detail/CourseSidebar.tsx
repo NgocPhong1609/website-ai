@@ -114,7 +114,7 @@ function ResourcesCard({ resources = [] }: { resources?: CourseDetailResourceIte
  const displayList = resources && resources.length > 0 ? resources : defaultResources;
 
  const handleResourceClick = (res: CourseDetailResourceItem) => {
- alert(`Đang kích hoạt tải/kết nối tới tài liệu: "${res.title}"...`);
+ toast(`Đang kích hoạt tải/kết nối tới tài liệu: "${res.title}"...`);
  };
 
  return (
@@ -161,6 +161,7 @@ function ResourcesCard({ resources = [] }: { resources?: CourseDetailResourceIte
 
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 import { Avatar } from "@/src/shared/components/ui/Avatar";
+import toast from "react-hot-toast";
 
 function InstructorCard({ instructor }: { instructor?: CourseDetailInstructor & { is_verified?: boolean; avatar_url?: string } }) {
  const name = instructor?.name || "TS. Nguyễn Ngọc Phong";
@@ -195,7 +196,7 @@ function InstructorCard({ instructor }: { instructor?: CourseDetailInstructor & 
 
  <button
  type="button"
- onClick={() => alert(`Đang kết nối tới trang hồ sơ cá nhân và lịch trực giảng chi tiết của ${name}...`)}
+ onClick={() => toast(`Đang kết nối tới trang hồ sơ cá nhân và lịch trực giảng chi tiết của ${name}...`)}
  className="w-full py-2.5 rounded-lg text-xs font-bold text-[#2C3039] bg-white hover:bg-[#F5F0E8] border border-[#E8E2D9] hover:border-[#B8B0A3] transition-all cursor-pointer"
  >
  Xem hồ sơ giảng viên

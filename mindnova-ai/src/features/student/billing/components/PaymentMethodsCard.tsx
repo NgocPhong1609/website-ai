@@ -6,6 +6,7 @@ import { PAYMENT_CARDS } from "../constants";
 import type { PaymentCard } from "../types";
 import { PlusIcon, TrashIcon } from "./icons";
 import { ShieldCheck } from "lucide-react";
+import toast from "react-hot-toast";
 
 // ─── Card Brand Logos ─────────────────────────────────────────────────────────
 
@@ -82,7 +83,7 @@ export function PaymentMethodsCard() {
   }
 
   function handleAddNew() {
-    alert("Hệ thống kết nối luồng thêm thẻ an toàn SSL 256-bit qua cổng Napas & Quốc tế.");
+    toast("Hệ thống kết nối luồng thêm thẻ an toàn SSL 256-bit qua cổng Napas & Quốc tế.");
   }
 
   return (

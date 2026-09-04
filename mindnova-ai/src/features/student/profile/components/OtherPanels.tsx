@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { MonitorIcon } from "./icons";
+import toast from "react-hot-toast";
 
 function ActiveSessionsBox() {
  return (
@@ -19,7 +20,7 @@ function ActiveSessionsBox() {
  
  <button
  type="button"
- onClick={() => alert("Hệ thống an ninh ghi nhận: Không có truy cập bất thường nào từ các thiết bị lạ.")}
+ onClick={() => toast.error("Hệ thống an ninh ghi nhận: Không có truy cập bất thường nào từ các thiết bị lạ.")}
  className="shrink-0 px-4 py-2 rounded-xl bg-white hover:bg-[#FAF7F2] border border-[#E8E2D9] hover:border-[#C0392B]/30 text-xs font-semibold text-[#C0392B] transition-all duration-200 shadow-2xs cursor-pointer focus:outline-none"
  >
  Kiểm tra nhật ký kết nối
@@ -55,7 +56,7 @@ export function SecurityPanel() {
  }, 2500);
  } catch (error: any) {
  const message = error?.response?.data?.message || error?.response?.data?.errors?.new_password?.[0] || "Không thể đổi mật khẩu. Vui lòng thử lại.";
- alert(message);
+ toast(message);
  }
  }
 
@@ -159,7 +160,7 @@ export function SettingsPanel() {
  });
  } catch (error) {
  console.error("Failed to save setting:", error);
- alert("Không thể lưu cài đặt. Vui lòng thử lại.");
+ toast.error("Không thể lưu cài đặt. Vui lòng thử lại.");
  } finally {
  setIsSaving(false);
  }

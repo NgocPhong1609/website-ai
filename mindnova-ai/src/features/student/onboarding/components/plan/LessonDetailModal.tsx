@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@shared/components/ui";
+import toast from "react-hot-toast";
 
 interface LessonModalProps {
  lessonTitle: string;
@@ -137,7 +138,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  </div>
  
  <Button 
- onClick={() => alert(`Chuyển hướng mua khóa học: ${course.title}`)}
+ onClick={() => toast(`Chuyển hướng mua khóa học: ${course.title}`)}
  className="w-full mt-1 py-2 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white text-[11px] font-bold shadow-sm transition-all cursor-pointer"
  >
  Course →
