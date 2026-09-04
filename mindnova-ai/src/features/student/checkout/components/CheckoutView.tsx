@@ -156,9 +156,9 @@ export function CheckoutView({ courseId }: { courseId: number }) {
             </label>
 
             {appliedCoupon ? (
-              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-3 shadow-2xs">
-                <div className="flex items-center gap-2 text-xs font-bold text-emerald-950">
-                  <span className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-mono text-xs font-black uppercase shadow-2xs">
+              <div className="p-4 rounded-2xl bg-[#E8F8F0] border border-[#27AE60]/20 flex items-center justify-between gap-3 shadow-2xs">
+                <div className="flex items-center gap-2 text-xs font-bold text-[#2C3039]">
+                  <span className="px-2.5 py-1 rounded-lg bg-[#27AE60] text-white font-mono text-xs font-black uppercase shadow-2xs">
                     {appliedCoupon.code}
                   </span>
                   <span>
@@ -170,7 +170,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
                 <button
                   type="button"
                   onClick={handleRemoveCoupon}
-                  className="text-xs font-extrabold text-rose-600 hover:text-rose-800 underline cursor-pointer"
+                  className="text-xs font-extrabold text-[#C0392B] hover:text-[#A93226] underline cursor-pointer"
                 >
                   Hủy bỏ mã
                 </button>
@@ -198,7 +198,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
             )}
 
             {couponError && (
-              <p className="mt-2 text-xs font-bold text-rose-600 bg-rose-50 p-2.5 rounded-xl border border-rose-200">
+              <p className="mt-2 text-xs font-bold text-[#C0392B] bg-[#FADBD8] p-2.5 rounded-xl border border-[#C0392B]/20">
                 ⚠️ {couponError}
               </p>
             )}
@@ -212,7 +212,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
             </div>
 
             {appliedCoupon && (
-              <div className="flex justify-between text-sm text-emerald-700 font-bold">
+              <div className="flex justify-between text-sm text-[#27AE60] font-bold">
                 <span>Khuyến mãi ({appliedCoupon.code})</span>
                 <span>- {discountAmount.toLocaleString()} VND</span>
               </div>
@@ -236,13 +236,13 @@ export function CheckoutView({ courseId }: { courseId: number }) {
               <h2 className="text-lg font-bold text-[#2C3039] mb-4 border-b border-[#F0F0F8] pb-4">
                 🎁 Nhận khóa học Miễn phí
               </h2>
-              <div className="mb-6 space-y-2.5 p-4 rounded-xl bg-emerald-50/60 border border-emerald-100">
-                <p className="text-emerald-900 text-xs font-bold leading-relaxed">
+              <div className="mb-6 space-y-2.5 p-4 rounded-xl bg-[#E8F8F0] border border-[#27AE60]/20">
+                <p className="text-[#27AE60] text-xs font-bold leading-relaxed">
                   {appliedCoupon
                     ? `🎉 Mã giảm giá "${appliedCoupon.code}" đã giảm 100% học phí! Bạn được nhận khóa học này hoàn toàn miễn phí.`
                     : "Khóa học này hoàn toàn miễn phí."}
                 </p>
-                <p className="text-slate-600 text-xs font-medium">
+                <p className="text-[#4A4F5C] text-xs font-medium">
                   Nhấn nút bên dưới để thêm ngay khóa học vào tài khoản của bạn.
                 </p>
               </div>
@@ -251,7 +251,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
                 type="button"
                 onClick={handleCheckout}
                 disabled={isProcessing}
-                className="w-full py-3.5 rounded-xl text-sm font-black text-white bg-emerald-600 hover:bg-emerald-700 shadow-md hover:shadow-lg disabled:opacity-60 transition-all flex justify-center items-center gap-2 cursor-pointer"
+                className="w-full py-3.5 rounded-xl text-sm font-black text-white bg-[#27AE60] hover:bg-[#1f8749] shadow-md hover:shadow-lg disabled:opacity-60 transition-all flex justify-center items-center gap-2 cursor-pointer"
               >
                 {isProcessing ? "Đang xử lý..." : "✨ Xác nhận Nhận khóa học ngay"}
               </button>

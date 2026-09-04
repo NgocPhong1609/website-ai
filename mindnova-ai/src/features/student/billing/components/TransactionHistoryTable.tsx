@@ -155,7 +155,7 @@ function TransactionRow({ tx, onRefundClick }: { tx: Transaction; onRefundClick?
  <button
  type="button"
  onClick={() => onRefundClick?.(tx)}
- className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all duration-150 cursor-pointer shadow-2xs"
+ className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-[#C0392B] bg-[#FADBD8] hover:bg-[#FADBD8]/80 border border-[#C0392B]/20 transition-all duration-150 cursor-pointer shadow-2xs"
  title="Yêu cầu hoàn tiền khóa học nếu tiến độ ≤ 10% hoặc chưa học quá 5 bài"
  >
  <span>💸 Hoàn tiền</span>

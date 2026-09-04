@@ -11,7 +11,7 @@ export default function BillingContainer() {
  <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-8">
  
  {/* ─── Synchronized Universal Hero Banner matching /courses & /study-plan ─── */}
- <section className="relative overflow-hidden rounded-2xl bg-[#FEFCF9] border border-[#E8E2D9] p-6 sm:p-7 shadow-[0_8px_30px_rgba(107,107,255,0.07)] transition-all duration-300 hover:shadow-[0_12px_36px_rgba(107,107,255,0.12)] w-full">
+ <section className="relative overflow-hidden rounded-2xl bg-[#FEFCF9] border border-[#E8E2D9] p-6 sm:p-7 shadow-[0_8px_30px_rgba(192,57,43,0.07)] transition-all duration-300 hover:shadow-[0_12px_36px_rgba(192,57,43,0.12)] w-full">
  <div className="absolute -top-16 -right-16 w-60 h-60 rounded-full bg-[#FAF7F2] blur-3xl pointer-events-none animate-pulse" />
  <div className="absolute -bottom-16 -left-16 w-60 h-60 rounded-full bg-[#C0392B]/15 blur-3xl pointer-events-none" />
 
@@ -36,7 +36,7 @@ export default function BillingContainer() {
  <button
  type="button"
  onClick={() => alert("Bạn đang trải nghiệm trọn vẹn quyền lợi cao cấp của gói MindNova Pro AI!")}
- className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#C0392B] shadow-[0_4px_14px_rgba(80,82,238,0.35)] hover:shadow-[0_6px_22px_rgba(80,82,238,0.5)] transition-all duration-200 cursor-pointer focus:outline-none flex items-center gap-2"
+ className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#C0392B] shadow-[0_4px_14px_rgba(192,57,43,0.35)] hover:shadow-[0_6px_22px_rgba(192,57,43,0.5)] transition-all duration-200 cursor-pointer focus:outline-none flex items-center gap-2"
  >
  <span> Nâng cấp Gói học Pro</span>
  <span></span>
@@ -65,7 +65,7 @@ export default function BillingContainer() {
 
  <div className="w-full h-2 bg-[#E8E2D9] rounded-full mt-2.5 overflow-hidden p-0.5 border border-[#E8E2D9]">
  <div
- className="h-full bg-[#C0392B] rounded-full shadow-[0_0_8px_rgba(107,107,255,0.4)] transition-all duration-1000 group-hover:brightness-110"
+ className="h-full bg-[#C0392B] rounded-full shadow-[0_0_8px_rgba(192,57,43,0.4)] transition-all duration-1000 group-hover:brightness-110"
  style={{ width: "100%" }}
  />
  </div>

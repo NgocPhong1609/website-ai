@@ -86,7 +86,7 @@ function StepBadge() {
 function CelebrationBanner({ goal }: { goal: string }) {
  return (
  <div className="relative w-full max-w-4xl bg-[#C0392B] via-[#818cf8]/6 border border-[#E8E2D9] rounded-2xl px-6 py-4 overflow-hidden">
- <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_50%,rgba(107,107,255,0.12)_0%,transparent_60%)]" aria-hidden="true" />
+ <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_50%,rgba(192,57,43,0.12)_0%,transparent_60%)]" aria-hidden="true" />
  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_100%_50%,rgba(76,215,246,0.10)_0%,transparent_60%)]" aria-hidden="true" />
 
  <div className="relative flex items-center gap-4">
@@ -161,9 +161,9 @@ export default function PlanContainer() {
  "relative px-14 py-4 rounded-2xl text-sm font-bold tracking-wide",
  "text-white cursor-pointer",
  " bg-[#C0392B] ",
- "shadow-[0_6px_24px_rgba(107,107,255,0.45)]",
- "hover:shadow-[0_8px_32px_rgba(107,107,255,0.6)] hover:-translate-y-0.5",
- "active:translate-y-0 active:shadow-[0_3px_14px_rgba(107,107,255,0.35)]",
+ "shadow-[0_6px_24px_rgba(192,57,43,0.45)]",
+ "hover:shadow-[0_8px_32px_rgba(192,57,43,0.6)] hover:-translate-y-0.5",
+ "active:translate-y-0 active:shadow-[0_3px_14px_rgba(192,57,43,0.35)]",
  "transition-all duration-200 ease-out",
  ].join(" ")}
  rightIcon={<RocketIcon />}

@@ -44,7 +44,7 @@ export function ProgressContent() {
   return (
     <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-8">
       {/* ─── Synchronized Hero Banner matching /courses & /study-plan ─── */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#FAF7F2]/90 via-[#F5F0E8] to-[#FAF7F2]/80 border border-[#C0392B]/25 p-6 sm:p-8 shadow-[0_8px_30px_rgba(107,107,255,0.07)] transition-all duration-300 hover:shadow-[0_12px_36px_rgba(107,107,255,0.12)]">
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#FAF7F2]/90 via-[#F5F0E8] to-[#FAF7F2]/80 border border-[#C0392B]/25 p-6 sm:p-8 shadow-[0_8px_30px_rgba(192,57,43,0.07)] transition-all duration-300 hover:shadow-[0_12px_36px_rgba(192,57,43,0.12)]">
         {/* Subtle animated background glow balls */}
         <div className="absolute -top-16 -right-16 w-60 h-60 rounded-full bg-[#C0392B]/10 blur-3xl pointer-events-none animate-pulse" />
         <div className="absolute -bottom-16 -left-16 w-60 h-60 rounded-full bg-[#C0392B]/15 blur-3xl pointer-events-none" />
@@ -63,8 +63,8 @@ export function ProgressContent() {
             </div>
 
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-[#C0392B]/30 text-xs font-semibold text-[#C0392B] shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
-              <span className="w-2 h-2 rounded-full bg-[#10B981] absolute" />
+              <span className="w-2 h-2 rounded-full bg-[#27AE60] animate-ping" />
+              <span className="w-2 h-2 rounded-full bg-[#27AE60] absolute" />
               {overview_card.term_tag || "Đang học trực tuyến • Học kỳ II"}
             </div>
 
@@ -84,7 +84,7 @@ export function ProgressContent() {
           <div className="group shrink-0 bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-[#C0392B]/20 flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm hover:border-[#C0392B]/50 hover:-translate-y-0.5 transition-all duration-300">
             <div className="w-full flex items-center justify-between gap-4 mb-2">
               <span className="text-xs font-semibold text-[#8A8478] group-hover:text-[#C0392B] transition-colors">Tổng quan tiến độ ↗</span>
-              <span className="text-[11px] font-semibold text-[#C0392B] bg-[#FAF7F2] px-2.5 py-0.5 rounded-full border border-[#10B981]/20">
+              <span className="text-[11px] font-semibold text-[#C0392B] bg-[#FAF7F2] px-2.5 py-0.5 rounded-full border border-[#27AE60]/20">
                 {overview_card.status_badge || "Vượt chỉ tiêu"}
               </span>
             </div>
@@ -101,7 +101,7 @@ export function ProgressContent() {
 
             <div className="w-full h-2 bg-[#F4F4FA] rounded-full mt-2.5 overflow-hidden p-0.5 border border-[#E8E2D9]/80">
               <div
-                className="h-full bg-gradient-to-r from-[#C0392B] via-[#C0392B] to-[#10B981] rounded-full shadow-[0_0_8px_rgba(107,107,255,0.4)] transition-all duration-1000 group-hover:brightness-110"
+                className="h-full bg-gradient-to-r from-[#C0392B] via-[#C0392B] to-[#27AE60] rounded-full shadow-[0_0_8px_rgba(192,57,43,0.4)] transition-all duration-1000 group-hover:brightness-110"
                 style={{ width: `${overview_card.completion_percentage || 65}%` }}
               />
             </div>
@@ -216,7 +216,7 @@ export function ProgressContent() {
             {viewMode === "linear" ? (
               <div className="relative pl-2 py-2">
                 {/* Vertical Connector Line */}
-                <div className="absolute left-[19px] top-6 bottom-6 w-0.5 bg-gradient-to-b from-[#10B981] via-[#C0392B] to-[#D1D5DB]" />
+                <div className="absolute left-[19px] top-6 bottom-6 w-0.5 bg-gradient-to-b from-[#27AE60] via-[#C0392B] to-[#D1D5DB]" />
 
                 <div className="flex flex-col gap-7">
                   {roadmap_modules && roadmap_modules.map((mod, i) => {
@@ -252,7 +252,7 @@ export function ProgressContent() {
                     if (isActive) {
                       return (
                         <div key={mod.id || i} className="relative flex items-start gap-5">
-                          <div className="relative z-10 w-8 h-8 rounded-full bg-[#FAF7F2] border-2 border-white flex items-center justify-center shrink-0 shadow-[0_0_0_4px_rgba(80,82,238,0.2)] mt-6 animate-pulse">
+                          <div className="relative z-10 w-8 h-8 rounded-full bg-[#FAF7F2] border-2 border-white flex items-center justify-center shrink-0 shadow-[0_0_0_4px_rgba(192,57,43,0.2)] mt-6 animate-pulse">
                             <div className="w-3.5 h-3.5 rounded-full bg-[#C0392B]" />
                           </div>
 
@@ -270,7 +270,7 @@ export function ProgressContent() {
                               </div>
 
                               <Link href={mod.action_link || "/courses"} className="shrink-0 text-decoration-none">
-                                <button type="button" className="px-5 py-2.5 bg-gradient-to-r from-[#C0392B] via-[#C0392B] to-[#C0392B] hover:brightness-110 text-white rounded-xl font-semibold text-xs shadow-[0_4px_15px_rgba(80,82,238,0.3)] hover:shadow-[0_6px_20px_rgba(80,82,238,0.4)] hover:-translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer">
+                                <button type="button" className="px-5 py-2.5 bg-gradient-to-r from-[#C0392B] via-[#C0392B] to-[#C0392B] hover:brightness-110 text-white rounded-xl font-semibold text-xs shadow-[0_4px_15px_rgba(192,57,43,0.3)] hover:shadow-[0_6px_20px_rgba(192,57,43,0.4)] hover:-translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer">
                                   <span>{mod.action_text || "▶ Tiếp tục học ➔"}</span>
                                 </button>
                               </Link>
@@ -417,7 +417,7 @@ export function ProgressContent() {
             
             <div className="flex items-center justify-between border-b border-[#E8E2D9] pb-4">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C0392B] to-[#C0392B] text-white flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(80,82,238,0.3)]">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C0392B] to-[#C0392B] text-white flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(192,57,43,0.3)]">
                   <SparklesIcon className="w-5 h-5 animate-spin-slow" />
                 </div>
                 <div className="min-w-0">
@@ -425,7 +425,7 @@ export function ProgressContent() {
                   <p className="text-[11px] font-normal text-[#8A8478] truncate">{ai_insights?.subtitle || "Cập nhật trí tuệ nhân tạo theo thời gian thực"}</p>
                 </div>
               </div>
-              <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-ping shrink-0" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#27AE60] animate-ping shrink-0" />
             </div>
 
             {/* AI Recommendations Mapping */}

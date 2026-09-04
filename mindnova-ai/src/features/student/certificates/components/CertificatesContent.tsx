@@ -17,7 +17,7 @@ export function CertificatesContent() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
         <div className="flex-1">
-          <h3 className="text-[11px] font-bold tracking-widest text-[#6B6BFF] uppercase mb-2">
+          <h3 className="text-[11px] font-bold tracking-widest text-[#8A8478] uppercase mb-2">
             Your Achievements
           </h3>
           <h1 className="text-3xl font-bold text-[#1A1A2E] leading-tight mb-3">
@@ -28,11 +28,11 @@ export function CertificatesContent() {
           </p>
         </div>
         <div className="flex items-center gap-3 shrink-0 flex-wrap">
-          <button className="flex items-center gap-2 px-5 py-3 bg-[#F0F0FF] text-[#6B6BFF] rounded-xl text-[14px] font-bold hover:bg-[#EAEAF4] transition-colors shadow-sm">
+          <button className="flex items-center gap-2 px-5 py-3 bg-[#F0F0FF] text-[#8A8478] rounded-xl text-[14px] font-bold hover:bg-[#EAEAF4] transition-colors shadow-sm">
             <UploadIcon className="w-4 h-4" />
             Export All
           </button>
-          <button className="flex items-center gap-2 px-6 py-3 bg-[#5153DF] text-white rounded-xl text-[14px] font-bold hover:bg-[#4648D4] transition-colors shadow-md">
+          <button className="flex items-center gap-2 px-6 py-3 bg-[#C0392B] text-white rounded-xl text-[14px] font-bold hover:bg-[#C0392B] transition-colors shadow-md">
             <ShareIcon className="w-4 h-4" />
             Share Portfolio
           </button>
@@ -40,13 +40,13 @@ export function CertificatesContent() {
       </div>
 
       {/* Claim Banner */}
-      <div className="bg-white border border-[#6B6BFF]/20 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm relative overflow-hidden">
+      <div className="bg-white border border-[#8A8478]/20 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm relative overflow-hidden">
         {/* Subtle background glow */}
         <div className="absolute top-0 left-0 w-64 h-full bg-gradient-to-r from-[#F0F0FF] to-transparent pointer-events-none" />
         
         <div className="flex items-center gap-5 relative z-10 w-full md:w-auto">
           <div className="w-16 h-16 rounded-full bg-[#EAEAF4] flex items-center justify-center shrink-0">
-            <PartyPopperIcon className="w-8 h-8 text-[#5153DF]" />
+            <PartyPopperIcon className="w-8 h-8 text-[#C0392B]" />
           </div>
           <div>
             <h2 className="text-[18px] font-bold text-[#1A1A2E] mb-1">Ready to claim!</h2>
@@ -55,7 +55,7 @@ export function CertificatesContent() {
             </p>
           </div>
         </div>
-        <button className="w-full md:w-auto px-8 py-3.5 bg-[#5153DF] text-white rounded-xl text-[15px] font-bold flex items-center justify-center gap-2 hover:bg-[#4648D4] transition-colors shadow-[0_4px_14px_rgba(107,107,255,0.35)] relative z-10 shrink-0">
+        <button className="w-full md:w-auto px-8 py-3.5 bg-[#C0392B] text-white rounded-xl text-[15px] font-bold flex items-center justify-center gap-2 hover:bg-[#C0392B] transition-colors shadow-[0_4px_14px_rgba(192,57,43,0.35)] relative z-10 shrink-0">
           Claim Your Certificate
           <ArrowRightIcon className="w-4 h-4" />
         </button>
@@ -82,14 +82,14 @@ export function CertificatesContent() {
           <div className="flex-1 flex flex-col">
             <div className="flex items-start justify-between gap-2 mb-1">
               <h3 className="text-[17px] font-bold text-[#1A1A2E] leading-tight">Next.js Fullstack</h3>
-              <VerifiedBadgeIcon className="w-5 h-5 text-[#5153DF] shrink-0 mt-0.5" />
+              <VerifiedBadgeIcon className="w-5 h-5 text-[#C0392B] shrink-0 mt-0.5" />
             </div>
             <p className="text-[13px] text-[#A0A0C0] mb-5">Completed on Oct 12, 2023</p>
             
             <div className="flex items-center gap-2 flex-wrap mt-auto">
               <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">React</span>
               <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Node.js</span>
-              <span className="px-2.5 py-1 bg-[#F0F0FF] text-[#6B6BFF] border border-[#6B6BFF]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Expert</span>
+              <span className="px-2.5 py-1 bg-[#F0F0FF] text-[#8A8478] border border-[#8A8478]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Expert</span>
             </div>
           </div>
         </div>
@@ -110,7 +110,7 @@ export function CertificatesContent() {
           <div className="flex-1 flex flex-col">
             <div className="flex items-start justify-between gap-2 mb-1">
               <h3 className="text-[17px] font-bold text-[#1A1A2E] leading-tight">Machine Learning Foundations</h3>
-              <VerifiedBadgeIcon className="w-5 h-5 text-[#5153DF] shrink-0 mt-0.5" />
+              <VerifiedBadgeIcon className="w-5 h-5 text-[#C0392B] shrink-0 mt-0.5" />
             </div>
             <p className="text-[13px] text-[#A0A0C0] mb-5">Completed on Aug 05, 2023</p>
             
@@ -130,9 +130,9 @@ export function CertificatesContent() {
               <div className="text-[8px] text-[#7878A0] text-center px-4">Has successfully completed the Advanced UI Design course on MindNova AI.</div>
               {/* Ribbon */}
               <div className="absolute bottom-3 right-3 flex flex-col items-center">
-                <div className="w-6 h-6 rounded-full bg-[#5153DF] border-2 border-white shadow-sm relative z-10" />
-                <div className="w-2 h-4 bg-[#6B6BFF] transform -rotate-12 translate-x-1 -translate-y-2 absolute bottom-[-8px] right-2" />
-                <div className="w-2 h-4 bg-[#6B6BFF] transform rotate-12 -translate-x-1 -translate-y-2 absolute bottom-[-8px] left-2" />
+                <div className="w-6 h-6 rounded-full bg-[#C0392B] border-2 border-white shadow-sm relative z-10" />
+                <div className="w-2 h-4 bg-[#8A8478] transform -rotate-12 translate-x-1 -translate-y-2 absolute bottom-[-8px] right-2" />
+                <div className="w-2 h-4 bg-[#8A8478] transform rotate-12 -translate-x-1 -translate-y-2 absolute bottom-[-8px] left-2" />
               </div>
             </div>
           </div>
@@ -140,7 +140,7 @@ export function CertificatesContent() {
           <div className="flex-1 flex flex-col">
             <div className="flex items-start justify-between gap-2 mb-1">
               <h3 className="text-[17px] font-bold text-[#1A1A2E] leading-tight">Advanced UI Design</h3>
-              <VerifiedBadgeIcon className="w-5 h-5 text-[#5153DF] shrink-0 mt-0.5" />
+              <VerifiedBadgeIcon className="w-5 h-5 text-[#C0392B] shrink-0 mt-0.5" />
             </div>
             <p className="text-[13px] text-[#A0A0C0] mb-5">Completed on June 20, 2023</p>
             
@@ -158,7 +158,7 @@ export function CertificatesContent() {
         
         {/* Total Certificates */}
         <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 flex items-center gap-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
-          <div className="w-14 h-14 rounded-2xl bg-[#F0F0FF] text-[#6B6BFF] flex items-center justify-center shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-[#F0F0FF] text-[#8A8478] flex items-center justify-center shrink-0">
             <GraduationCapIcon className="w-6 h-6" />
           </div>
           <div>
@@ -180,7 +180,7 @@ export function CertificatesContent() {
 
         {/* Skill Points */}
         <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 flex items-center gap-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
-          <div className="w-14 h-14 rounded-2xl bg-[#F0F0FF] text-[#6B6BFF] flex items-center justify-center shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-[#F0F0FF] text-[#8A8478] flex items-center justify-center shrink-0">
             <MedalIcon className="w-6 h-6" />
           </div>
           <div>

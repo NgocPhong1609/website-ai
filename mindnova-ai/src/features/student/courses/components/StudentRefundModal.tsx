@@ -110,7 +110,7 @@ export function StudentRefundModal({
               <div className="flex flex-col gap-2 text-xs">
                 {/* Rule 1: Within 30 days */}
                 <div className="flex items-start gap-2">
-                  <span className={twMerge("font-bold", eligibility?.within_30_days ? "text-emerald-600" : "text-rose-600")}>
+                  <span className={twMerge("font-bold", eligibility?.within_30_days ? "text-[#27AE60]" : "text-[#C0392B]")}>
                     {eligibility?.within_30_days ? "✓" : "✕"}
                   </span>
                   <div>
@@ -125,7 +125,7 @@ export function StudentRefundModal({
 
                 {/* Rule 2: Progress <= 10% AND completed <= 5 */}
                 <div className="flex items-start gap-2">
-                  <span className={twMerge("font-bold", eligibility?.progress_eligible ? "text-emerald-600" : "text-rose-600")}>
+                  <span className={twMerge("font-bold", eligibility?.progress_eligible ? "text-[#27AE60]" : "text-[#C0392B]")}>
                     {eligibility?.progress_eligible ? "✓" : "✕"}
                   </span>
                   <div>
@@ -143,22 +143,22 @@ export function StudentRefundModal({
           {!isLoading && (
             <div>
               {isEligible ? (
-                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex flex-col gap-2">
+                <div className="p-4 rounded-xl bg-[#E8F8F0] border border-[#27AE60]/20 text-xs text-[#27AE60] flex flex-col gap-2">
                   <div className="flex items-center gap-1.5 font-bold">
                     <span>🎉</span>
                     <span>Bạn đủ điều kiện nhận lại 100% học phí!</span>
                   </div>
-                  <p className="text-[11px] text-emerald-800 leading-relaxed">
+                  <p className="text-[11px] text-[#27AE60] leading-relaxed">
                     Khóa học thỏa mãn điều kiện tiến độ ≤10% (và ≤5 bài) và nằm trong 30 ngày bảo hộ mua sắm.
                   </p>
                 </div>
               ) : (
-                <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 flex flex-col gap-2">
-                  <div className="flex items-center gap-1.5 font-bold text-rose-700">
+                <div className="p-4 rounded-xl bg-[#FADBD8] border border-[#C0392B]/20 text-xs text-[#C0392B] flex flex-col gap-2">
+                  <div className="flex items-center gap-1.5 font-bold text-[#C0392B]">
                     <span>⚠️</span>
                     <span>Khóa học KHÔNG ĐỦ ĐIỀU KIỆN hoàn tiền</span>
                   </div>
-                  <ul className="list-disc list-inside text-[11px] text-rose-800 flex flex-col gap-1">
+                  <ul className="list-disc list-inside text-[11px] text-[#A93226] flex flex-col gap-1">
                     {eligibility?.reasons?.map((r: string, idx: number) => (
                       <li key={idx}>{r}</li>
                     )) || <li>Vui lòng kiểm tra lại tiến độ học tập hoặc thời hạn đơn hàng.</li>}
@@ -186,7 +186,7 @@ export function StudentRefundModal({
           )}
 
           {statusMsg && (
-            <div className={twMerge("p-3 rounded-xl text-xs font-bold", isError ? "bg-rose-100 text-rose-700 border border-rose-300" : "bg-slate-900 text-white")}>
+            <div className={twMerge("p-3 rounded-xl text-xs font-bold", isError ? "bg-[#FADBD8] text-[#C0392B] border border-[#C0392B]/30" : "bg-[#2C3039] text-white")}>
               {statusMsg}
             </div>
           )}

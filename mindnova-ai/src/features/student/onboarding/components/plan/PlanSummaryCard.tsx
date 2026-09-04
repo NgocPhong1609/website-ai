@@ -47,7 +47,7 @@ function NeuralMap() {
  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(76,215,246,0.18)_0%,transparent_50%)]" />
 
  {/* Pulsing active overlay */}
- <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(107,107,255,0.20)_0%,transparent_70%)] animate-pulse" />
+ <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(192,57,43,0.20)_0%,transparent_70%)] animate-pulse" />
 
  {/* Neural nodes */}
  {NEURAL_NODES.map((node, i) => (
@@ -144,14 +144,14 @@ export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSumm
  <div className="w-[240px] shrink-0 flex flex-col gap-3">
  {/* Header label */}
  <div className="flex items-center gap-2">
- <div className="w-6 h-6 rounded-lg bg-[#C0392B] flex items-center justify-center shadow-[0_2px_8px_rgba(107,107,255,0.4)]">
+ <div className="w-6 h-6 rounded-lg bg-[#C0392B] flex items-center justify-center shadow-[0_2px_8px_rgba(192,57,43,0.4)]">
  <BoltIcon />
  </div>
  <h2 className="text-sm font-bold text-[#131B2E]">Your Profile</h2>
  </div>
 
  {/* Main card */}
- <div className="bg-white border border-[#E8E8F0] rounded-2xl p-4 shadow-[0_2px_12px_rgba(107,107,255,0.06)]">
+ <div className="bg-white border border-[#E8E8F0] rounded-2xl p-4 shadow-[0_2px_12px_rgba(192,57,43,0.06)]">
  {/* Goal */}
  <SummaryRow
  icon={<TargetIcon />}

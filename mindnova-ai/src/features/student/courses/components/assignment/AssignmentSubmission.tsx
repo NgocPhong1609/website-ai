@@ -124,7 +124,7 @@ export function AssignmentSubmission() {
  {/* AI Pre-Check Card */}
  <div className="bg-white border border-[#E8E2D9] rounded-2xl p-6 shadow-sm">
  <div className="flex items-center gap-4 mb-6">
- <div className="w-12 h-12 rounded-2xl bg-[#5153DF] text-white flex items-center justify-center shrink-0 shadow-md">
+ <div className="w-12 h-12 rounded-2xl bg-[#C0392B] text-white flex items-center justify-center shrink-0 shadow-md">
  <SparklesIcon className="w-6 h-6" />
  </div>
  <div>
@@ -139,7 +139,7 @@ export function AssignmentSubmission() {
  <span className="text-[#C0392B]">72%</span>
  </div>
  <div className="w-full h-1.5 bg-[#F0F0F8] rounded-full overflow-hidden">
- <div className="w-[72%] h-full from-[#5153DF] to-[#00D2FF] rounded-full" />
+ <div className="w-[72%] h-full from-[#C0392B] to-[#00D2FF] rounded-full" />
  </div>
  </div>
 
@@ -166,7 +166,7 @@ export function AssignmentSubmission() {
  </div>
  </div>
 
- <button className="w-full py-3.5 bg-[#5153DF] text-white rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 hover:bg-[#C0392B] shadow-md transition-colors">
+ <button className="w-full py-3.5 bg-[#C0392B] text-white rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 hover:bg-[#C0392B] shadow-md transition-colors">
  <RefreshCwIcon className="w-4 h-4" />
  Refresh AI Analysis
  </button>
@@ -183,7 +183,7 @@ export function AssignmentSubmission() {
  <span className="text-[13px] font-bold text-[#2C3039]">0 files</span>
  </div>
 
- <button className="mt-5 w-full py-4 from-[#5153DF] text-white rounded-xl text-[15px] font-bold shadow-[0_4px_14px_rgba(107,107,255,0.35)] hover:shadow-[0_6px_20px_rgba(107,107,255,0.45)] transition-all">
+ <button className="mt-5 w-full py-4 from-[#C0392B] text-white rounded-xl text-[15px] font-bold shadow-[0_4px_14px_rgba(192,57,43,0.35)] hover:shadow-[0_6px_20px_rgba(192,57,43,0.45)] transition-all">
  Final Submission
  </button>
  <p className="text-[10px] text-[#A0A0C0] text-center mt-4 leading-relaxed px-2">

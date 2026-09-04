@@ -30,13 +30,13 @@ function renderFormattedText(text: string) {
       const token = match[0];
       if (token.startsWith("**") && token.endsWith("**")) {
         parts.push(
-          <strong key={`bold-${idx++}`} className="font-semibold text-[#5052EE] bg-[#EEF2FF]/70 px-1.5 py-0.5 rounded-md border border-[#5052EE]/15">
+          <strong key={`bold-${idx++}`} className="font-semibold text-[#A93226] bg-[#EEF2FF]/70 px-1.5 py-0.5 rounded-md border border-[#A93226]/15">
             {token.slice(2, -2)}
           </strong>
         );
       } else if (token.startsWith("*") && token.endsWith("*")) {
         parts.push(
-          <span key={`italic-${idx++}`} className="font-medium text-[#0D9488] bg-[#EAF8F5]/80 px-1.5 py-0.5 rounded-md border border-[#0D9488]/15">
+          <span key={`italic-${idx++}`} className="font-medium text-[#27AE60] bg-[#EAF8F5]/80 px-1.5 py-0.5 rounded-md border border-[#27AE60]/15">
             {token.slice(1, -1)}
           </span>
         );
@@ -461,7 +461,7 @@ export function FloatingAiChat() {
         <div
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
-          className="group flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-[#5052EE] via-[#6063EE] to-[#4CD7F6] text-white font-bold shadow-[0_6px_24px_rgba(80,82,238,0.35)] hover:shadow-[0_8px_32px_rgba(80,82,238,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 border border-white/25 cursor-move select-none"
+          className="group flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-[#C0392B] via-[#A93226] to-[#C0392B] text-white font-bold shadow-[0_6px_24px_rgba(192,57,43,0.35)] hover:shadow-[0_8px_32px_rgba(192,57,43,0.5)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 border border-white/25 cursor-move select-none"
           title="Nhấn và kéo để di chuyển vị trí, hoặc bấm nút để mở cửa sổ chat"
         >
           {/* Subtle drag handle grip dots */}
@@ -472,8 +472,8 @@ export function FloatingAiChat() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
             </svg>
             <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-80" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10B981] border border-white" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#27AE60] opacity-80" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#27AE60] border border-white" />
             </span>
           </div>
           
@@ -490,7 +490,7 @@ export function FloatingAiChat() {
       {/* Expanded Floating Modal Window - 5% Larger Dimensions (340px x 445px) with Draggable Header */}
       <div
         className={`w-[calc(100vw-2rem)] sm:w-[340px] h-[445px] max-h-[80vh] bg-white rounded-2xl shadow-[0_16px_48px_rgba(26,26,46,0.22)] border border-[#E4E6F0] flex-col overflow-hidden transition-transform duration-250 animate-in fade-in zoom-in-95 origin-bottom-right ${
-          isDragging ? "ring-2 ring-[#5052EE]/50 shadow-2xl scale-[1.01]" : ""
+          isDragging ? "ring-2 ring-[#A93226]/50 shadow-2xl scale-[1.01]" : ""
         } ${isOpen ? "flex" : "hidden"}`}
       >
           {/* Interactive Draggable Header */}
@@ -502,10 +502,10 @@ export function FloatingAiChat() {
           >
             <div className="flex items-center gap-2.5">
               {/* Grip icon indicating dragging capability */}
-              <span className="text-[#A0A0C0] group-hover/header:text-[#5052EE] text-xs font-bold tracking-tighter transition-colors">
+              <span className="text-[#A0A0C0] group-hover/header:text-[#A93226] text-xs font-bold tracking-tighter transition-colors">
                 ⋮⋮
               </span>
-              <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#5052EE] via-[#6063EE] to-[#4CD7F6] text-white flex items-center justify-center shadow-2xs text-xs font-bold">
+              <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#C0392B] via-[#A93226] to-[#C0392B] text-white flex items-center justify-center shadow-2xs text-xs font-bold">
                 ✨
               </div>
               <div>
@@ -513,9 +513,9 @@ export function FloatingAiChat() {
                   <h3 className="text-xs font-bold text-[#1A1A2E] tracking-tight">
                     Nova AI Co-Pilot
                   </h3>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" title="Online" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#27AE60]" title="Online" />
                 </div>
-                <p className="text-[10px] font-medium text-[#7878A0]">Trợ lý học tập 24/7 • <span className="italic text-[#5052EE]/80">Kéo để di chuyển</span></p>
+                <p className="text-[10px] font-medium text-[#7878A0]">Trợ lý học tập 24/7 • <span className="italic text-[#A93226]/80">Kéo để di chuyển</span></p>
               </div>
             </div>
 
@@ -545,7 +545,7 @@ export function FloatingAiChat() {
                 onClick={() => setIsOpen(false)}
                 aria-label="Thu nhỏ"
                 title="Thu nhỏ cửa sổ"
-                className="w-7 h-7 rounded-lg hover:bg-[#E0E5FF] text-[#64647A] hover:text-[#5052EE] flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
+                className="w-7 h-7 rounded-lg hover:bg-[#E0E5FF] text-[#64647A] hover:text-[#A93226] flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -564,7 +564,7 @@ export function FloatingAiChat() {
                 }`}
               >
                 {msg.sender === "ai" ? (
-                  <div className="w-6.5 h-6.5 rounded-lg bg-[#EEF2FF] text-[#5052EE] flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 shadow-2xs border border-[#5052EE]/20">
+                  <div className="w-6.5 h-6.5 rounded-lg bg-[#EEF2FF] text-[#A93226] flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 shadow-2xs border border-[#A93226]/20">
                     N
                   </div>
                 ) : (
@@ -584,7 +584,7 @@ export function FloatingAiChat() {
                   <div
                     className={`p-3 rounded-xl text-[12.5px] leading-relaxed whitespace-pre-line ${
                       msg.sender === "user"
-                        ? "bg-gradient-to-r from-[#5052EE] via-[#5C5EF0] to-[#686AF4] text-white rounded-tr-none shadow-2xs font-medium"
+                        ? "bg-gradient-to-r from-[#A93226] via-[#5C5EF0] to-[#686AF4] text-white rounded-tr-none shadow-2xs font-medium"
                         : "bg-[#F4F6FC] text-[#1A1A2E] border border-[#E4E6F0] rounded-tl-none font-normal"
                     }`}
                   >
@@ -613,14 +613,14 @@ export function FloatingAiChat() {
             {/* Live Typing Indicator */}
             {chatMutation.isPending && (
               <div className="flex items-start gap-2.5 max-w-[80%]">
-                <div className="w-6.5 h-6.5 rounded-lg bg-[#EEF2FF] text-[#5052EE] flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 shadow-2xs border border-[#5052EE]/20 animate-pulse">
+                <div className="w-6.5 h-6.5 rounded-lg bg-[#EEF2FF] text-[#A93226] flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 shadow-2xs border border-[#A93226]/20 animate-pulse">
                   N
                 </div>
                 <div className="bg-[#F4F6FC] border border-[#E4E6F0] px-3.5 py-2.5 rounded-xl rounded-tl-none flex items-center gap-1.5 shadow-2xs">
-                  <span className="text-xs font-semibold text-[#5052EE] mr-1">Nova đang nghĩ...</span>
-                  <div className="w-1.5 h-1.5 bg-[#5052EE] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <div className="w-1.5 h-1.5 bg-[#5052EE] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <div className="w-1.5 h-1.5 bg-[#5052EE] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <span className="text-xs font-semibold text-[#A93226] mr-1">Nova đang nghĩ...</span>
+                  <div className="w-1.5 h-1.5 bg-[#A93226] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <div className="w-1.5 h-1.5 bg-[#A93226] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <div className="w-1.5 h-1.5 bg-[#A93226] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                 </div>
               </div>
             )}
@@ -636,7 +636,7 @@ export function FloatingAiChat() {
                 type="button"
                 onClick={() => handleSend(item)}
                 disabled={isGenerating}
-                className="shrink-0 text-xs font-semibold bg-[#F8FAFC] hover:bg-[#EEF2FF] disabled:opacity-50 text-[#64647A] hover:text-[#5052EE] border border-[#EAEAF4] hover:border-[#5052EE]/30 rounded-xl px-3 py-1.5 transition-all duration-200 focus:outline-none cursor-pointer shadow-2xs"
+                className="shrink-0 text-xs font-semibold bg-[#F8FAFC] hover:bg-[#EEF2FF] disabled:opacity-50 text-[#64647A] hover:text-[#A93226] border border-[#EAEAF4] hover:border-[#A93226]/30 rounded-xl px-3 py-1.5 transition-all duration-200 focus:outline-none cursor-pointer shadow-2xs"
               >
                 {item}
               </button>
@@ -658,7 +658,7 @@ export function FloatingAiChat() {
                 onChange={(e) => setInput(e.target.value)}
                 disabled={isGenerating}
                 placeholder={isGenerating ? "Nova đang trả lời..." : "Nhập câu hỏi cho Nova..."}
-                className="flex-1 bg-[#F8FAFC] focus:bg-white disabled:bg-gray-100 border border-[#EAEAF4] focus:border-[#5052EE] rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#1A1A2E] placeholder:text-[#9496A8] focus:outline-none focus:ring-2 focus:ring-[#5052EE]/25 transition-all duration-200"
+                className="flex-1 bg-[#F8FAFC] focus:bg-white disabled:bg-gray-100 border border-[#EAEAF4] focus:border-[#A93226] rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#1A1A2E] placeholder:text-[#9496A8] focus:outline-none focus:ring-2 focus:ring-[#A93226]/25 transition-all duration-200"
               />
               {isGenerating ? (
                 <button
@@ -677,7 +677,7 @@ export function FloatingAiChat() {
                   type="submit"
                   aria-label="Gửi tin nhắn"
                   disabled={!input.trim()}
-                  className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#4648D4] via-[#5052EE] to-[#0D9488] hover:opacity-95 disabled:opacity-50 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-sm active:scale-95 cursor-pointer"
+                  className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#C0392B] via-[#A93226] to-[#C0392B] hover:opacity-95 disabled:opacity-50 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-sm active:scale-95 cursor-pointer"
                 >
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />

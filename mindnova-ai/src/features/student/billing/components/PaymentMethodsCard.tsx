@@ -37,7 +37,7 @@ interface CardRowProps {
 
 function CardRow({ card, onRemove }: CardRowProps) {
   return (
-    <div className="flex items-center justify-between py-3 px-3.5 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC]/60 hover:bg-white hover:border-[#6B6BFF]/30 transition-all duration-200 shadow-2xs group">
+    <div className="flex items-center justify-between py-3 px-3.5 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC]/60 hover:bg-white hover:border-[#8A8478]/30 transition-all duration-200 shadow-2xs group">
       <div className="flex items-center gap-3.5 min-w-0">
         {card.brand === "visa" ? <VisaLogo /> : <MastercardLogo />}
 
@@ -47,7 +47,7 @@ function CardRow({ card, onRemove }: CardRowProps) {
               Thẻ {card.brand === "visa" ? "Visa" : "Mastercard"} •••• {card.last4}
             </span>
             {card.isDefault && (
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold text-[#5052EE] bg-[#EEF2FF] border border-[#5052EE]/25 shrink-0">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold text-[#A93226] bg-[#EEF2FF] border border-[#A93226]/25 shrink-0">
                 Mặc định
               </span>
             )}
@@ -91,7 +91,7 @@ export function PaymentMethodsCard() {
         <div>
           <h2 className="text-base font-semibold text-[#1A1A2E] flex items-center gap-2">
             <span>Phương thức Thanh toán</span>
-            <span className="text-[11px] font-medium text-[#10B981] bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#10B981]/20">
+            <span className="text-[11px] font-medium text-[#27AE60] bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#27AE60]/20">
               🛡️ PCI-DSS
             </span>
           </h2>
@@ -103,7 +103,7 @@ export function PaymentMethodsCard() {
         <button
           type="button"
           onClick={handleAddNew}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#5052EE] bg-[#EEF2FF] hover:bg-[#E2E6FF] border border-[#5052EE]/20 transition-all duration-150 cursor-pointer shrink-0"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#A93226] bg-[#EEF2FF] hover:bg-[#E2E6FF] border border-[#A93226]/20 transition-all duration-150 cursor-pointer shrink-0"
         >
           <PlusIcon size={13} />
           <span>Thêm thẻ mới</span>

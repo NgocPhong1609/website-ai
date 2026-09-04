@@ -705,7 +705,7 @@ function QuizRenderer({
  {timeLeft !== null && (
  <span className={twMerge(
  "text-sm font-semibold px-3 py-1 rounded-full",
- timeLeft < 60 ? "bg-red-100 text-red-700 animate-pulse" : "bg-[#F5F0E8] text-[#4A4F5C]"
+ timeLeft < 60 ? "bg-[#FADBD8] text-[#C0392B] animate-pulse" : "bg-[#F5F0E8] text-[#4A4F5C]"
  )}>
  {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
  </span>
@@ -732,27 +732,27 @@ function QuizRenderer({
   />
 
   {answered && (
-  <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-indigo-100 flex flex-col gap-4 text-xs animate-fadeIn mt-2 shadow-2xs">
+  <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E8E2D9] flex flex-col gap-4 text-xs animate-fadeIn mt-2 shadow-2xs">
   {essayResult[question.id] ? (
-  <div className="flex flex-col gap-3 p-4 rounded-xl bg-white border border-indigo-100 shadow-2xs">
+  <div className="flex flex-col gap-3 p-4 rounded-xl bg-white border border-[#E8E2D9] shadow-2xs">
     <div className="flex items-center justify-between pb-2 border-b border-gray-100">
       <div className="flex items-center gap-2">
         <span className="text-base">🤖</span>
-        <span className="font-extrabold text-indigo-900 text-sm">Kết quả đánh giá từ Gia sư AI (Gemini):</span>
+        <span className="font-extrabold text-[#2C3039] text-sm">Kết quả đánh giá từ Gia sư AI (Gemini):</span>
       </div>
-      <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-xs">
+      <div className="px-3 py-1 rounded-full bg-[#E8F8F0] text-[#27AE60] font-extrabold text-xs">
         🎯 Điểm: {essayResult[question.id].score} / {essayResult[question.id].max_score || (question as any).points || 2.5} điểm
       </div>
     </div>
 
-    <p className="text-gray-800 font-medium text-xs leading-relaxed bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/60">
+    <p className="text-[#4A4F5C] font-medium text-xs leading-relaxed bg-[#F5F0E8]/50 p-3 rounded-lg border border-[#E8E2D9]/60">
       💬 <strong>Nhận xét AI:</strong> {essayResult[question.id].feedback}
     </p>
 
     {Array.isArray(essayResult[question.id].ai_analysis?.matched_points) && essayResult[question.id].ai_analysis.matched_points.length > 0 && (
       <div className="flex flex-col gap-1">
-        <span className="font-bold text-emerald-800 text-[11px]">✅ Ý trả lời tốt:</span>
-        <ul className="list-disc list-inside text-emerald-900 text-xs space-y-0.5 pl-1">
+        <span className="font-bold text-[#27AE60] text-[11px]">✅ Ý trả lời tốt:</span>
+        <ul className="list-disc list-inside text-[#27AE60] text-xs space-y-0.5 pl-1">
           {essayResult[question.id].ai_analysis.matched_points.map((pt: string, pIdx: number) => (
             <li key={pIdx}>{pt}</li>
           ))}
@@ -762,8 +762,8 @@ function QuizRenderer({
 
     {Array.isArray(essayResult[question.id].ai_analysis?.missing_points) && essayResult[question.id].ai_analysis.missing_points.length > 0 && (
       <div className="flex flex-col gap-1">
-        <span className="font-bold text-amber-800 text-[11px]">⚠️ Cần bổ sung / hoàn thiện:</span>
-        <ul className="list-disc list-inside text-amber-900 text-xs space-y-0.5 pl-1">
+        <span className="font-bold text-[#C0392B] text-[11px]">⚠️ Cần bổ sung / hoàn thiện:</span>
+        <ul className="list-disc list-inside text-[#A93226] text-xs space-y-0.5 pl-1">
           {essayResult[question.id].ai_analysis.missing_points.map((pt: string, pIdx: number) => (
             <li key={pIdx}>{pt}</li>
           ))}
@@ -772,23 +772,23 @@ function QuizRenderer({
     )}
   </div>
   ) : (
-  <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs font-bold flex items-center justify-between">
+  <div className="p-3 rounded-xl bg-[#E8F8F0] border border-[#27AE60]/20 text-[#27AE60] text-xs font-bold flex items-center justify-between">
     <span>✅ Đã nộp bài tự luận - Thang điểm: <strong>{(question as any).points || 2.5} điểm</strong></span>
-    <span className="px-2.5 py-0.5 rounded bg-emerald-600 text-white text-[10px] uppercase font-black">Đã ghi nhận</span>
+    <span className="px-2.5 py-0.5 rounded bg-[#27AE60] text-white text-[10px] uppercase font-black">Đã ghi nhận</span>
   </div>
   )}
 
   <div className="flex flex-col gap-1.5">
-    <span className="text-indigo-900 font-extrabold text-xs">💡 Đáp án tham khảo mẫu từ Giảng viên:</span>
-    <p className="text-gray-800 font-medium leading-relaxed whitespace-pre-line bg-white p-4 rounded-xl border border-indigo-50 shadow-2xs">
+    <span className="text-[#2C3039] font-extrabold text-xs">💡 Đáp án tham khảo mẫu từ Giảng viên:</span>
+    <p className="text-[#4A4F5C] font-medium leading-relaxed whitespace-pre-line bg-white p-4 rounded-xl border border-[#E8E2D9] shadow-2xs">
       {(question as any).sample_answer || "Yêu cầu học viên phân tích đầy đủ các luận điểm chính trong bài học."}
     </p>
   </div>
 
   {(question as any).rubric && (
-  <div className="flex flex-col gap-1.5 pt-2 border-t border-indigo-100">
-  <span className="font-extrabold text-amber-900 text-xs">📋 Thang điểm & Rubric chấm điểm:</span>
-  <p className="text-amber-950 font-medium leading-relaxed whitespace-pre-line bg-amber-50/60 p-3.5 rounded-xl border border-amber-200/60">
+  <div className="flex flex-col gap-1.5 pt-2 border-t border-[#E8E2D9]">
+  <span className="font-extrabold text-[#C0392B] text-xs">📋 Thang điểm & Rubric chấm điểm:</span>
+  <p className="text-[#A93226] font-medium leading-relaxed whitespace-pre-line bg-[#FADBD8]/60 p-3.5 rounded-xl border border-[#C0392B]/20">
     {(question as any).rubric}
   </p>
   </div>
@@ -801,7 +801,7 @@ function QuizRenderer({
   {question.answers.map((ans: any, idx: number) => {
   const letter = String.fromCharCode(65 + idx);
   const isSelected = selectedAnswer === ans.id;
-  let ansStyle = "bg-white border-[#E8E2D9] hover:border-[#A5B4FC] hover:bg-[#FEFCF9]";
+  let ansStyle = "bg-white border-[#E8E2D9] hover:border-[#C0392B] hover:bg-[#FEFCF9]";
 
   if (answered && isSelected) {
   ansStyle = answerResult
@@ -1165,7 +1165,7 @@ function LessonWorkspaceContent() {
     <div className="flex flex-col min-h-screen bg-white pb-24 relative">
       {/* ─── Instructor Preview Mode Sticky Banner ─── */}
       {isPreview && (
-        <div className="sticky top-0 z-50 bg-[#1E233E] text-white px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md border-b border-indigo-900 animate-fadeIn">
+        <div className="sticky top-0 z-50 bg-[#2C3039] text-white px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md border-b border-black animate-fadeIn">
           <div className="flex items-center gap-3">
             <span className="px-2.5 py-0.5 rounded bg-[#C0392B] text-white text-[10px] font-black uppercase tracking-wider shadow-xs">
               👁️ CHẾ ĐỘ XEM TRƯỚC
@@ -1365,28 +1365,28 @@ function LessonWorkspaceContent() {
  value={editDiscussionText}
  onChange={(e) => setEditDiscussionText(e.target.value)}
  rows={3}
- className="w-full resize-none rounded-xl border border-[#D8DCEB] bg-white px-4 py-3 text-sm text-[#2C3039] outline-none focus:border-[#C0392B]"
+ className="w-full resize-none rounded-xl border border-[var(--border-color)] bg-white px-4 py-3 text-sm text-[#2C3039] outline-none focus:border-[var(--primary-color)]"
  />
  <div className="flex justify-end gap-2">
  <button
  type="button"
  onClick={() => setEditingDiscussionId(null)}
- className="rounded-xl border border-[#E8E2D9] px-4 py-2 text-xs font-semibold text-[#8A8478] hover:bg-[#FEFCF9]"
+ className="rounded-xl border border-[var(--border-color)] px-4 py-2 text-xs font-semibold text-[#8A8478] hover:bg-[#FEFCF9]"
  >
  Hủy
  </button>
  <button
  type="submit"
  disabled={isUpdatingDiscussion}
- className="rounded-xl bg-[#C0392B] px-4 py-2 text-xs font-semibold text-white hover:bg-[#A93226] disabled:opacity-60"
+ className="rounded-xl bg-[var(--primary-color)] px-4 py-2 text-xs font-semibold text-white hover:bg-[var(--primary-hover)] disabled:opacity-60"
  >
  {isUpdatingDiscussion ? "Đang lưu..." : "Lưu"}
  </button>
  </div>
  </form>
  ) : (
- <div className="p-4 sm:p-5 rounded-xl border transition-all flex items-start gap-3.5 bg-white border-[#E8E2D9]">
- <div className="w-10 h-10 rounded-full flex items-center justify-center -[#FAF7F2] -[#C0392B] font-bold shrink-0 border -[#FAF7F2]">
+ <div className="p-4 sm:p-5 rounded-xl border transition-all flex items-start gap-3.5 bg-white border-[var(--border-color)]">
+ <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--bg-light)] text-[var(--primary-color)] font-bold shrink-0 border border-[var(--bg-light)]">
  {item.student.name.slice(0, 2).toUpperCase()}
  </div>
  <div className="flex-1 min-w-0">
@@ -1396,14 +1396,14 @@ function LessonWorkspaceContent() {
  <span className="text-xs text-[#8A8478]">{new Date(item.created_at).toLocaleString('vi-VN')}</span>
  <button
  onClick={() => handleEditDiscussion(item.id, item.content)}
- className="text-xs font-semibold text-[#2C3039] hover:text-[#A93226] transition-colors"
+ className="text-xs font-semibold text-[#2C3039] hover:text-[var(--primary-hover)] transition-colors"
  >
  Sửa
  </button>
  <button
  onClick={() => handleDeleteDiscussion(item.id)}
  disabled={isDeletingDiscussion}
- className="text-xs font-semibold text-red-500 hover:text-red-700 transition-colors disabled:opacity-60"
+ className="text-xs font-semibold text-[var(--primary-color)] hover:text-[var(--primary-hover)] transition-colors disabled:opacity-60"
  >
  Xóa
  </button>
@@ -1416,8 +1416,8 @@ function LessonWorkspaceContent() {
  
  {/* Teacher Replies */}
  {item.replies.map((reply) => (
- <div key={reply.id} className="ml-8 p-4 sm:p-5 rounded-xl border transition-all flex items-start gap-3.5 bg-[#F5F0E8]/50 border-[#C7D2FE]">
- <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[#C0392B] text-white font-bold shrink-0 border border-[#C7D2FE]">
+ <div key={reply.id} className="ml-8 p-4 sm:p-5 rounded-xl border transition-all flex items-start gap-3.5 bg-[var(--bg-light)]/50 border-[var(--border-color)]">
+ <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--primary-color)] text-white font-bold shrink-0 border border-[var(--primary-color)]">
  GV
  </div>
  <div className="flex-1 min-w-0">
@@ -1425,7 +1425,7 @@ function LessonWorkspaceContent() {
  <span className="font-bold text-sm text-[#2C3039] flex items-center gap-1.5">
  <span>{reply.user.name}</span>
  <VerifiedTeacherBadge isVerified={(reply.user as any).is_verified ?? true} size="xs" />
- <span className="px-2 py-0.5 rounded text-[10px] font-bold text-white bg-[#C0392B] uppercase tracking-wider">Giảng viên</span>
+ <span className="px-2 py-0.5 rounded text-[10px] font-bold text-white bg-[var(--primary-color)] uppercase tracking-wider">Giảng viên</span>
  </span>
  <span className="text-xs text-[#8A8478]">{new Date(reply.created_at).toLocaleString('vi-VN')}</span>
  </div>
@@ -1447,7 +1447,7 @@ function LessonWorkspaceContent() {
  <aside className="lg:col-span-4 w-full flex flex-col gap-5 sticky top-24 max-h-[calc(100vh-100px)] overflow-y-auto pr-1">
 
  {/* Progress Header */}
- <div className="bg-white rounded-2xl border border-[#E8E2D9] shadow-sm p-5 flex flex-col gap-3.5 shrink-0">
+ <div className="bg-white rounded-2xl border border-[var(--border-color)] shadow-sm p-5 flex flex-col gap-3.5 shrink-0">
  <div className="flex items-center justify-between">
  <div>
  <h2 className="text-[17px] font-extrabold text-[#2C3039] flex items-center gap-2">
@@ -1455,12 +1455,12 @@ function LessonWorkspaceContent() {
  </h2>
  <p className="text-[12px] font-medium text-[#8A8478] mt-0.5">Tiến trình hoàn thành toàn khóa</p>
  </div>
- <span className="text-xs font-bold text-[#2C3039] bg-[#F5F0E8] border border-[#C7D2FE]/60 px-3 py-1.5 rounded-full shrink-0 shadow-2xs">
+ <span className="text-xs font-bold text-[#2C3039] bg-[var(--bg-light)] border border-[var(--primary-light)]/60 px-3 py-1.5 rounded-full shrink-0 shadow-2xs">
  {completedCount}/{totalLessonCount} Bài học
  </span>
  </div>
- <div className="w-full h-2.5 bg-[#F5F0E8] rounded-full overflow-hidden p-0.5 border border-[#E8E2D9]">
- <div className="h-full bg-[#C0392B] rounded-full transition-all duration-700 shadow-[0_0_8px_rgba(79,70,229,0.35)]" style={{ width: `${computedProgressPercentage}%` }} />
+ <div className="w-full h-2.5 bg-[var(--bg-light)] rounded-full overflow-hidden p-0.5 border border-[var(--border-color)]">
+ <div className="h-full bg-[var(--primary-color)] rounded-full transition-all duration-700 shadow-[0_0_8px_rgba(79,70,229,0.35)]" style={{ width: `${computedProgressPercentage}%` }} />
  </div>
  </div>
 
@@ -1477,7 +1477,7 @@ function LessonWorkspaceContent() {
  key={mod.id}
  className={twMerge(
  "rounded-2xl border transition-all duration-200 overflow-hidden shadow-sm",
- isModuleCurrent ? "bg-[#F8FAFC] border-[#A5B4FC]" : "bg-white border-[#E8E2D9]"
+ isModuleCurrent ? "bg-[#F8FAFC] border-[var(--primary-light)]" : "bg-white border-[var(--border-color)]"
  )}
  >
  {/* Module Header */}
@@ -1488,8 +1488,8 @@ function LessonWorkspaceContent() {
  <div className="flex items-start gap-3.5 min-w-0 pr-2">
  <div className={twMerge(
  "w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shrink-0 mt-0.5 transition-all shadow-2xs",
- isModuleCompleted ? "bg-[#C0392B] text-white" :
- isModuleCurrent ? "bg-white border-2 border-[#C0392B] text-[#2C3039]" :
+ isModuleCompleted ? "bg-[var(--primary-color)] text-white" :
+ isModuleCurrent ? "bg-white border-2 border-[var(--primary-color)] text-[#2C3039]" :
  "bg-gray-100 text-[#8A8478]"
  )}>
  {isModuleCompleted ? "" : moduleIndex + 1}
@@ -1501,7 +1501,7 @@ function LessonWorkspaceContent() {
  <span className="text-[12px] font-semibold text-[#8A8478]">
  {modCompletedCount}/{mod.lessons.length} bài đã học
  </span>
- {isModuleCurrent && <span className="w-1.5 h-1.5 rounded-full bg-[#C0392B]" />}
+ {isModuleCurrent && <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary-color)]" />}
  </div>
  </div>
  </div>
@@ -1512,7 +1512,7 @@ function LessonWorkspaceContent() {
 
  {/* Lessons */}
  {isExpanded && (
- <div className="flex flex-col border-t border-[#E8E2D9] pt-2.5 pb-3 px-3 gap-2 bg-white/60">
+ <div className="flex flex-col border-t border-[var(--border-color)] pt-2.5 pb-3 px-3 gap-2 bg-white/60">
  {mod.lessons.map((lesson) => {
  const isCurrent = lesson.id === activeLessonId;
  const isCompleted = lesson.completed;
@@ -1523,10 +1523,10 @@ function LessonWorkspaceContent() {
  onClick={() => handleSelectLesson(lesson.id)}
  className={twMerge(
  "flex items-center justify-between py-3 px-3.5 rounded-xl relative cursor-pointer transition-all duration-150 border",
- isCurrent ? "bg-[#F5F0E8] border-[#A5B4FC] shadow-xs" : "bg-white border-[#E8E2D9]/60 hover:border-[#E8E2D9] hover:bg-[#FEFCF9]"
+ isCurrent ? "bg-[var(--bg-light)] border-[var(--primary-light)] shadow-xs" : "bg-white border-[var(--border-color)]/60 hover:border-[var(--border-color)] hover:bg-[#FEFCF9]"
  )}
  >
- {isCurrent && <div className="absolute left-0 top-2 bottom-2 w-[3.5px] bg-[#C0392B] rounded-r-full" />}
+ {isCurrent && <div className="absolute left-0 top-2 bottom-2 w-[3.5px] bg-[var(--primary-color)] rounded-r-full" />}
 
  <div className="flex items-center gap-3 min-w-0 pr-2">
  <div className={twMerge(
@@ -1636,7 +1636,7 @@ function LessonWorkspaceContent() {
           alert("Bài kiểm tra tổng quát hiện chưa được giáo viên thiết lập cho khóa học này.");
         }
       }}
-      className="flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-[#2C3039] bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-all cursor-pointer shadow-2xs"
+      className="flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-[#2C3039] bg-[#FEFCF9] border border-[#E8E2D9] hover:bg-[#F5F0E8] transition-all cursor-pointer shadow-2xs"
       title={
         assessmentStatus?.general_quiz?.is_passed
           ? `Đã đạt (${assessmentStatus.general_quiz.best_score}/10) - Bấm để làm lại`
@@ -1647,9 +1647,9 @@ function LessonWorkspaceContent() {
     >
       <span>📝 Kiểm tra tổng quát</span>
       {assessmentStatus?.general_quiz?.is_passed && (
-        <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-md border border-emerald-300 flex items-center gap-1">
+        <span className="text-[10px] bg-[#E8F8F0] text-[#27AE60] font-extrabold px-2 py-0.5 rounded-md border border-[#27AE60]/30 flex items-center gap-1">
           <span>✓ Đã đạt</span>
-          <span className="bg-emerald-700 text-white px-1 rounded text-[9px]">
+          <span className="bg-[#27AE60] text-white px-1 rounded text-[9px]">
             {assessmentStatus.general_quiz.best_score}/10
           </span>
         </span>
@@ -1694,12 +1694,12 @@ function LessonWorkspaceContent() {
           >
             <span>🏁 Làm bài kiểm tra cuối khóa</span>
             {isPassed ? (
-              <span className="text-[10px] bg-emerald-100 text-emerald-900 font-extrabold px-2 py-0.5 rounded-md border border-emerald-300 flex items-center gap-1">
+              <span className="text-[10px] bg-[#E8F8F0] text-[#27AE60] font-extrabold px-2 py-0.5 rounded-md border border-[#27AE60]/30 flex items-center gap-1">
                 <span>✓ Đã đạt</span>
-                <span className="bg-emerald-800 text-white px-1 rounded text-[9px]">{bestScore}/10</span>
+                <span className="bg-[#27AE60] text-white px-1 rounded text-[9px]">{bestScore}/10</span>
               </span>
             ) : isUnlocked ? (
-              <span className="text-[10px] bg-emerald-300 text-emerald-950 font-black px-1.5 py-0.5 rounded-md uppercase">MỞ KHÓA</span>
+              <span className="text-[10px] bg-[#27AE60] text-white font-black px-1.5 py-0.5 rounded-md uppercase">MỞ KHÓA</span>
             ) : (
               <span className="text-[10px] bg-gray-200 text-gray-600 font-bold px-1.5 py-0.5 rounded-md">ĐANG KHÓA</span>
             )}

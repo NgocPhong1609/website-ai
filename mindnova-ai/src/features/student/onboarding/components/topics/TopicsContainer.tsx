@@ -140,9 +140,9 @@ export default function TopicsContainer() {
  className={[
  "relative px-12 py-3.5 rounded-xl text-sm font-semibold text-white",
  " bg-[#C0392B] ",
- "shadow-[0_4px_20px_rgba(107,107,255,0.4)]",
- "hover:shadow-[0_6px_28px_rgba(107,107,255,0.55)] hover:-translate-y-0.5",
- "active:translate-y-0 active:shadow-[0_2px_12px_rgba(107,107,255,0.3)]",
+ "shadow-[0_4px_20px_rgba(192,57,43,0.4)]",
+ "hover:shadow-[0_6px_28px_rgba(192,57,43,0.55)] hover:-translate-y-0.5",
+ "active:translate-y-0 active:shadow-[0_2px_12px_rgba(192,57,43,0.3)]",
  "transition-all duration-200 ease-out",
  "disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none",
  ].join(" ")}

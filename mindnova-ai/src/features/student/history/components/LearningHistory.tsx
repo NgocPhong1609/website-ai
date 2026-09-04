@@ -222,7 +222,7 @@ export function LearningHistory() {
  <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-7">
  
  {/* ─── Synchronized Hero Banner matching /courses, /study-plan, /practice & /progress ─── */}
- <section className="relative overflow-hidden rounded-2xl bg-[#FEFCF9] border border-[#E8E2D9] p-6 sm:p-8 shadow-[0_8px_30px_rgba(107,107,255,0.07)] transition-all duration-300 hover:shadow-[0_12px_36px_rgba(107,107,255,0.12)]">
+ <section className="relative overflow-hidden rounded-2xl bg-[#FEFCF9] border border-[#E8E2D9] p-6 sm:p-8 shadow-[0_8px_30px_rgba(192,57,43,0.07)] transition-all duration-300 hover:shadow-[0_12px_36px_rgba(192,57,43,0.12)]">
  <div className="absolute -top-16 -right-16 w-60 h-60 rounded-full bg-[#FAF7F2] blur-3xl pointer-events-none animate-pulse" />
  <div className="absolute -bottom-16 -left-16 w-60 h-60 rounded-full bg-[#C0392B]/15 blur-3xl pointer-events-none" />
 
@@ -279,7 +279,7 @@ export function LearningHistory() {
  </div>
 
  <div className="w-full h-2 bg-[#E8E2D9] rounded-full mt-2.5 overflow-hidden p-0.5 border border-[#E8E2D9]">
- <div className="h-full bg-[#C0392B] rounded-full shadow-[0_0_8px_rgba(107,107,255,0.3)] transition-all duration-1000 w-full group-hover:brightness-105" />
+ <div className="h-full bg-[#C0392B] rounded-full shadow-[0_0_8px_rgba(192,57,43,0.3)] transition-all duration-1000 w-full group-hover:brightness-105" />
  </div>
 
  <p className="text-xs font-medium text-[#C0392B] mt-3 flex items-center justify-between">

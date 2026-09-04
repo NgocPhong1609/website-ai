@@ -206,9 +206,9 @@ export function StudyStreakInteractive({
                 ))}
                 
                 {calendarDays.map((date) => {
-                  let bgClass = "bg-white border border-[#EAEAF4] text-[#A0A0C0] hover:border-[#6B6BFF]/30 cursor-default"; 
+                  let bgClass = "bg-white border border-[#EAEAF4] text-[#A0A0C0] hover:border-[#8A8478]/30 cursor-default"; 
                   if (date.isCheckedIn) {
-                    bgClass = "bg-gradient-to-tr from-[#10B981] to-[#34D399] text-white shadow-md border-transparent font-bold";
+                    bgClass = "bg-gradient-to-tr from-[#27AE60] to-[#34D399] text-white shadow-md border-transparent font-bold";
                   } else if (date.isPast) {
                     bgClass = "bg-[#FEE2E2] text-[#EF4444] border-transparent font-bold opacity-70"; 
                   }
@@ -246,7 +246,7 @@ export function StudyStreakInteractive({
               )}
 
               <div className="mt-auto bg-[#F8FAFC] rounded-2xl p-5 border border-[#EAEAF4] relative">
-                 <div className="absolute -top-3 left-4 bg-gradient-to-r from-[#4648D4] to-[#6063EE] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5">
+                 <div className="absolute -top-3 left-4 bg-gradient-to-r from-[#C0392B] to-[#C0392B] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> AI Lịch trình
                  </div>
                  
@@ -255,7 +255,7 @@ export function StudyStreakInteractive({
                      {aiInsight.message}
                    </p>
                    {aiInsight.actionLabel && (
-                     <button className="mt-4 w-full py-2.5 bg-white border border-[#4648D4] text-[#4648D4] font-bold text-xs rounded-xl hover:bg-[#EEF2FF] transition-colors">
+                     <button className="mt-4 w-full py-2.5 bg-white border border-[#C0392B] text-[#C0392B] font-bold text-xs rounded-xl hover:bg-[#EEF2FF] transition-colors">
                        {aiInsight.actionLabel}
                      </button>
                    )}

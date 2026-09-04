@@ -310,8 +310,8 @@ export function ChatPanel({
           <div className="relative w-11 h-11 rounded-xl bg-[#FAF7F2] text-[#C0392B] border border-[#E8E2D9] flex items-center justify-center font-bold shadow-2xs shrink-0">
             <Sparkles className="w-4 h-4 text-white" />
             <span className="absolute -top-1 -right-1 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75" />
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#10B981] border-2 border-white" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#27AE60] opacity-75" />
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#27AE60] border-2 border-white" />
             </span>
           </div>
           <div>
@@ -319,8 +319,8 @@ export function ChatPanel({
               <h2 className="text-base font-bold tracking-tight text-[#2C3039]">
                 Nova Neural AI Co-Pilot
               </h2>
-              <span className="inline-flex items-center gap-1.5 text-[11px] text-[#2C3039] font-semibold bg-[#D1FAE5]/70 px-2.5 py-0.5 rounded-full border border-[#10B981]/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+              <span className="inline-flex items-center gap-1.5 text-[11px] text-[#2C3039] font-semibold bg-[#D1FAE5]/70 px-2.5 py-0.5 rounded-full border border-[#27AE60]/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#27AE60]" />
                 Active Engine
               </span>
             </div>
@@ -359,7 +359,7 @@ export function ChatPanel({
           return isAi ? (
             /* Nova AI Message with Micro-actions */
             <div key={msg.id} className="flex items-start gap-4 max-w-[92%] sm:max-w-[85%] group">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#C0392B] via-[#5A5DF2] to-[#C0392B] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-[0_6px_16px_rgba(107,107,255,0.35)] text-xs font-bold transform group-hover:scale-105 group-hover:rotate-6 transition-all duration-300">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#C0392B] via-[#A93226] to-[#C0392B] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-[0_6px_16px_rgba(192,57,43,0.35)] text-xs font-bold transform group-hover:scale-105 group-hover:rotate-6 transition-all duration-300">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <div className="flex flex-col gap-2 flex-1 min-w-0">
@@ -455,13 +455,13 @@ export function ChatPanel({
             </div>
             <div className="bg-white border border-[#E8E2D9] px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm flex flex-col gap-2 w-fit">
               <div className="flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
+                <span className="w-2 h-2 rounded-full bg-[#27AE60] animate-ping" />
                 <span className="text-xs font-semibold text-[#C0392B]">Nova đang tổng hợp câu trả lời cho bạn...</span>
               </div>
               <div className="flex items-center gap-1.5 pl-1">
                 <div className="w-1.5 h-1.5 bg-[#C0392B] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                 <div className="w-1.5 h-1.5 bg-[#C0392B] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                <div className="w-1.5 h-1.5 bg-[#10B981] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                <div className="w-1.5 h-1.5 bg-[#27AE60] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                 <span className="text-[11px] font-normal text-[#808298] pl-2">Đang xử lý biểu diễn logic và kiến thức bài giảng</span>
               </div>
             </div>

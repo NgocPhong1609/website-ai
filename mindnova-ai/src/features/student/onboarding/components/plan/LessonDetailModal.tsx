@@ -102,8 +102,8 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  </h4>
  <ul className="flex flex-col gap-2">
  {details.key_takeaways?.map((point: string, idx: number) => (
- <li key={idx} className="text-xs text-gray-700 flex items-start gap-2.5 bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-50">
- <span className="w-1.5 h-1.5 rounded-full bg-[#FAF7F2] mt-1.5 shrink-0" />
+ <li key={idx} className="text-xs text-[#4A4F5C] flex items-start gap-2.5 bg-[#F5F0E8] p-2.5 rounded-xl border border-[#E8E2D9]">
+ <span className="w-1.5 h-1.5 rounded-full bg-[#D4A574] mt-1.5 shrink-0" />
  <span className="leading-relaxed">{point}</span>
  </li>
  ))}
@@ -118,12 +118,12 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  </h4>
 
  {details.recommended_courses?.map((course, idx) => (
- <div key={idx} className=" bg-[#C0392B] border border-[#E8E2D9] rounded-2xl p-4 flex flex-col gap-2.5 hover:shadow-md transition-all">
+ <div key={idx} className="bg-white border border-[#E8E2D9] rounded-2xl p-4 flex flex-col gap-2.5 hover:shadow-md transition-all hover:border-[#B8B0A3]">
  <div className="flex justify-between items-center">
- <span className="text-[10px] font-bold px-2 py-0.5 bg-[#FAF7F2] text-white rounded-full">
+ <span className="text-[10px] font-bold px-2 py-0.5 bg-[#D4A574] text-white rounded-full">
  {course.badge || "Featured"}
  </span>
- <span className="text-xs font-bold -[#2C3039]">{course.price || "$49.00"}</span>
+ <span className="text-xs font-bold text-[#C0392B]">{course.price || "$49.00"}</span>
  </div>
 
  <div>
@@ -131,15 +131,18 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  {course.title}
  </h5>
  <p className="text-[11px] text-[#8A8478] mt-1">Instructor: <span className="font-semibold text-gray-700">{course.instructor}</span></p>
- <p className="text-[11px] text-amber-500 font-medium mt-0.5"> {course.rating}</p>
+ <div className="flex items-center gap-1">
+ <span className="text-yellow-400">⭐</span>
+ <p className="text-[11px] text-[#C0392B] font-medium mt-0.5">{course.rating}</p>
  </div>
-
+ 
  <Button 
  onClick={() => alert(`Chuyển hướng mua khóa học: ${course.title}`)}
- className="w-full mt-1 py-2 rounded-xl bg-[#FAF7F2] hover:bg-[#5757EE] text-white text-[11px] font-bold shadow-sm transition-all cursor-pointer"
+ className="w-full mt-1 py-2 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white text-[11px] font-bold shadow-sm transition-all cursor-pointer"
  >
- Enroll Course →
+ Course →
  </Button>
+ </div>
  </div>
  ))}
  </div>

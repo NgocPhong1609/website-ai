@@ -23,7 +23,7 @@ export function TopicsGrid({ selectedIds, onToggle }: TopicsGridProps) {
  const selectedCount = selectedIds.size;
 
  return (
- <div className="flex-1 bg-white border border-[#E8E8F0] rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_16px_rgba(107,107,255,0.04)]">
+ <div className="flex-1 bg-white border border-[#E8E8F0] rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_16px_rgba(192,57,43,0.04)]">
  {/* Header */}
  <div className="flex items-center justify-between px-5 py-4 border-b border-[#F0F0F7]">
  <div className="flex items-center gap-2">

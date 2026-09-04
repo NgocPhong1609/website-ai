@@ -156,9 +156,9 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  {statusMessage && (
  <div
  className={`mb-3 p-3 rounded-xl text-xs font-medium border ${
- statusMessage.includes("thành công")
- ? "bg-emerald-50 -[#2C3039] -[#FAF7F2]"
- : "bg-red-50 text-red-600 border-red-200"
+  statusMessage.includes("thành công")
+  ? "bg-[#E8F8F0] text-[#27AE60] border-[#27AE60]/20"
+  : "bg-[#FADBD8] text-[#C0392B] border-[#C0392B]/30"
  }`}
  >
  {statusMessage}
@@ -261,7 +261,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  <button
  type="submit"
  disabled={isLoading || !canSubmit}
- className="mt-1 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#C0392B] shadow-[0_4px_18px_rgba(107,107,255,0.45)] hover:shadow-[0_8px_28px_rgba(107,107,255,0.55)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#C0392B]/30"
+ className="mt-1 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#C0392B] shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#C0392B]/30"
  >
  {isLoading ? "Creating account..." : <>Sign Up <ArrowRightIcon /></>}
  </button>

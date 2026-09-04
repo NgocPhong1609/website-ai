@@ -152,7 +152,7 @@ export function SelfAssessmentModal({
 
  {/* Error Banner */}
  {errorMsg && (
- <div className="mx-6 mt-4 p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-center justify-between">
+ <div className="mx-6 mt-4 p-3.5 bg-[#FADBD8] border border-[#C0392B] text-[#C0392B] text-xs rounded-xl flex items-center justify-between">
  <span>️ {errorMsg}</span>
  <button onClick={() => setErrorMsg("")} className="font-bold underline">Ẩn</button>
  </div>
@@ -270,7 +270,7 @@ export function SelfAssessmentModal({
  className={`p-4 rounded-xl border text-xs sm:text-sm cursor-pointer transition-all flex items-center justify-between ${
  isSelected
  ? "bg-[#FAF7F2] border-[#C0392B] text-[#1E1B4B] font-semibold ring-1 ring-[#C0392B]"
- : "bg-white border-[#E8E2D9] text-gray-700 hover:-[#C0392B] hover:bg-[#FEFCF9]"
+ : "bg-white border-[#E8E2D9] text-gray-700 hover:bg-[#FEFCF9]"
  }`}
  >
  <span className="leading-relaxed">{opt.content}</span>
@@ -302,7 +302,7 @@ export function SelfAssessmentModal({
  <button
  type="button"
  onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
- className="px-5 py-2.5 rounded-xl bg-[#C0392B] text-white text-xs font-semibold hover:bg-[#4338CA] transition-colors"
+ className="px-5 py-2.5 rounded-xl bg-[#C0392B] text-white text-xs font-semibold hover:bg-[#A93226] transition-colors"
  >
  Câu tiếp theo →
  </button>
@@ -310,7 +310,7 @@ export function SelfAssessmentModal({
  <button
  type="button"
  onClick={handleSubmitQuiz}
- className="px-6 py-2.5 rounded-xl bg-[#2C3039] text-white text-xs font-bold hover:bg-[#0F766E] shadow-sm transition-colors flex items-center gap-1.5"
+ className="px-6 py-2.5 rounded-xl bg-[#2C3039] text-white text-xs font-bold hover:bg-[#1E1B4B] shadow-sm transition-colors flex items-center gap-1.5"
  >
  <span> Nộp Bài Đánh Giá</span>
  </button>
@@ -387,7 +387,7 @@ export function SelfAssessmentModal({
  <div
  key={det.id}
  className={`p-3.5 rounded-xl border text-xs space-y-1.5 ${
- det.is_correct ? "bg-emerald-50/60 -[#FAF7F2] -[#2C3039]" : "bg-rose-50/60 border-rose-200 text-rose-900"
+ det.is_correct ? "bg-[#E8F8F0] border-[#E8F8F0] text-[#2C3039]" : "bg-[#FADBD8] border-[#C0392B] text-[#C0392B]"
  }`}
  >
  <div className="flex items-start justify-between gap-2">
@@ -395,7 +395,7 @@ export function SelfAssessmentModal({
  {idx + 1}. {det.content}
  </span>
  <span className={`px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ${
- det.is_correct ? "-[#FAF7F2] -[#2C3039]" : "bg-rose-100 text-rose-800"
+ det.is_correct ? "bg-[#27AE60] text-white" : "bg-[#C0392B] text-white"
  }`}>
  {det.is_correct ? " Đúng" : " Chưa chính xác"}
  </span>

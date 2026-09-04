@@ -730,7 +730,7 @@ export function QuizResultContent() {
  {/* Footer Buttons */}
  <div className="flex flex-wrap justify-center items-center gap-4 pt-4">
  <Link href="/practice" className="text-decoration-none">
- <button type="button" className="px-7 py-3 bg-[#C0392B] hover:opacity-95 text-white rounded-xl font-semibold text-xs sm:text-sm shadow-[0_6px_20px_rgba(80,82,238,0.3)] hover:-translate-y-0.5 transition-all cursor-pointer flex items-center gap-2">
+ <button type="button" className="px-7 py-3 bg-[#C0392B] hover:opacity-95 text-white rounded-xl font-semibold text-xs sm:text-sm shadow-[0_6px_20px_rgba(192,57,43,0.3)] hover:-translate-y-0.5 transition-all cursor-pointer flex items-center gap-2">
  <span></span>
  <span>Quay lại Trung tâm đánh giá</span>
  </button>
