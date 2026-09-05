@@ -56,10 +56,10 @@ function ComplexityMeter({ label, percent, level }: ComplexityMeterProps) {
  <div className="flex items-center gap-2.5">
  <ComplexityIcon />
  <div className="min-w-0">
- <p className="text-xs font-bold text-[#131B2E] truncate">
+ <p className="text-xs font-bold text-[#2C3039] truncate">
  Skill Complexity
  </p>
- <p className="text-[11px] text-[#84849A] truncate">{label}</p>
+ <p className="text-[11px] text-[#8A8478] truncate">{label}</p>
  </div>
  </div>
 
@@ -142,7 +142,7 @@ const TIME_ESTIMATES: Record<number, string> = {
 function TimeEstimate({ level }: { level: number }) {
  return (
  <div className="flex items-center justify-between text-[11px]">
- <span className="text-[#ADADC0]">Est. time to proficiency</span>
+ <span className="text-[#B8B0A3]">Est. time to proficiency</span>
  <span className="font-semibold text-[#C0392B]">
  {TIME_ESTIMATES[level] ?? "—"}
  </span>
@@ -161,7 +161,7 @@ export function AiProjectionCard({ selectedCount }: AiProjectionCardProps) {
  {/* Title */}
  <div className="flex items-center gap-2">
  
- <h2 className="text-sm font-bold text-[#131B2E]">AI Projection</h2>
+ <h2 className="text-sm font-bold text-[#2C3039]">AI Projection</h2>
  </div>
 
  {/* Complexity card */}
@@ -192,7 +192,7 @@ export function AiProjectionCard({ selectedCount }: AiProjectionCardProps) {
  <p
  className={twMerge(
  "text-[10.5px] leading-relaxed transition-colors duration-300",
- hasSelection ? "text-[#C0392B]" : "text-[#ADADC0]",
+ hasSelection ? "text-[#C0392B]" : "text-[#B8B0A3]",
  )}
  >
  {hasSelection ? AI_INSIGHT_ACTIVE : AI_INSIGHT_PLACEHOLDER}

@@ -157,7 +157,7 @@ export function ForgotPasswordFlow() {
  </button>
  <div className="text-center mt-3 text-xs">
  {countdown > 0 ? (
- <span className="text-[#A0A0C0]">Gửi lại mã sau {countdown}s</span>
+ <span className="text-[#8A8478]">Gửi lại mã sau {countdown}s</span>
  ) : (
  <button type="button" onClick={requestOtp} className="text-[#C0392B] hover:underline font-semibold">Gửi lại mã</button>
  )}
@@ -177,7 +177,7 @@ export function ForgotPasswordFlow() {
  onChange={(e) => setNewPassword(e.target.value)}
  leftIcon={<LockIcon />}
  rightElement={
- <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[#B0B0C8] hover:text-[#C0392B]">
+ <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[#B8B0A3] hover:text-[#C0392B]">
  {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
  </button>
  }
@@ -191,7 +191,7 @@ export function ForgotPasswordFlow() {
  onChange={(e) => setConfirmPassword(e.target.value)}
  leftIcon={<LockIcon />}
  rightElement={
- <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="text-[#B0B0C8] hover:text-[#C0392B]">
+ <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="text-[#B8B0A3] hover:text-[#C0392B]">
  {showConfirmPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
  </button>
  }

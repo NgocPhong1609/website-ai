@@ -337,7 +337,7 @@ export function ChatPanel({
                 localStorage.setItem(storageKey, JSON.stringify(initialMessages));
               }
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFF5F5] hover:bg-[#FEE2E2] border border-[#FECACA] text-[#DC2626] text-xs font-semibold transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFF5F5] hover:bg-[#FEE2E2] border border-[#FECACA] text-[#C0392B] text-xs font-semibold transition-colors cursor-pointer"
             title="Xóa và làm mới cuộc trò chuyện"
           >
             <span></span>
@@ -366,11 +366,11 @@ export function ChatPanel({
                 <div className="flex items-center justify-between ml-1">
                   <div className="flex items-center gap-2.5">
                     <span className="text-xs font-bold text-[#C0392B]">Nova AI Co-Pilot</span>
-                    <span className="text-[11px] font-normal text-[#8888A8]">{msg.timestamp}</span>
+                    <span className="text-[11px] font-normal text-[#8A8478]">{msg.timestamp}</span>
                     {isPinned && <span className="text-[11px] font-medium bg-[#FAF7F2] text-[#8A8478] px-2.5 py-0.5 rounded-full border border-[#8A8478]/20"><Star size={12} fill="currentColor" className="mr-1 inline" /> Đã lưu chú thích</span>}
                   </div>
                 </div>
-                <div className="bg-white text-[#2B2C40] px-6 py-5 rounded-2xl rounded-tl-sm border border-[#E8EAEF] border-l-4 border-l-[#C0392B] shadow-sm text-sm sm:text-[14.5px] leading-relaxed font-normal transition-all">
+                <div className="bg-white text-[#2C3039] px-6 py-5 rounded-2xl rounded-tl-sm border border-[#E8EAEF] border-l-4 border-l-[#C0392B] shadow-sm text-sm sm:text-[14.5px] leading-relaxed font-normal transition-all">
                   {msg.animate ? (
                     <TypewriterText
                       id={msg.id}
@@ -436,8 +436,8 @@ export function ChatPanel({
               </div>
               <div className="flex flex-col gap-1 items-end flex-1 min-w-0">
                 <div className="flex items-center gap-2 mr-1">
-                  <span className="text-[11px] font-normal text-[#8888A8]">{msg.timestamp}</span>
-                  <span className="text-xs font-semibold text-[#3A3B50]">Bạn</span>
+                  <span className="text-[11px] font-normal text-[#8A8478]">{msg.timestamp}</span>
+                  <span className="text-xs font-semibold text-[#2C3039]">Bạn</span>
                 </div>
                 <div className="bg-gradient-to-r from-[#C0392B] to-[#6669F6] text-white px-4.5 py-3 rounded-2xl rounded-tr-sm text-sm leading-relaxed shadow-sm font-normal whitespace-pre-line border border-white/15">
                   {msg.text}
@@ -462,7 +462,7 @@ export function ChatPanel({
                 <div className="w-1.5 h-1.5 bg-[#C0392B] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                 <div className="w-1.5 h-1.5 bg-[#C0392B] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
                 <div className="w-1.5 h-1.5 bg-[#27AE60] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-                <span className="text-[11px] font-normal text-[#808298] pl-2">Đang xử lý biểu diễn logic và kiến thức bài giảng</span>
+                <span className="text-[11px] font-normal text-[#8A8478] pl-2">Đang xử lý biểu diễn logic và kiến thức bài giảng</span>
               </div>
             </div>
           </div>
@@ -473,7 +473,7 @@ export function ChatPanel({
         {/* ─── Interactive Quick-Prompts ─── */}
         <div className="mt-6 pt-5 border-t border-[#E8EAEF] flex flex-col gap-3.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[#545574] flex items-center gap-2">
+            <span className="text-xs font-semibold text-[#8A8478] flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#C0392B]" />
               <span>Gợi ý câu hỏi tương tác nhanh</span>
             </span>
@@ -492,11 +492,11 @@ export function ChatPanel({
                   <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-lg border ${prompt.color}`}>
                     {prompt.tag}
                   </span>
-                  <span className="w-5 h-5 rounded-md bg-[#F4F5FB] group-hover:bg-[#C0392B] group-hover:text-white text-[#8888A8] flex items-center justify-center text-xs font-bold transition-all">
+                  <span className="w-5 h-5 rounded-md bg-[#F4F5FB] group-hover:bg-[#C0392B] group-hover:text-white text-[#8A8478] flex items-center justify-center text-xs font-bold transition-all">
                     ↗
                   </span>
                 </div>
-                <p className="text-xs font-normal text-[#3C3D5A] group-hover:text-[#C0392B] leading-relaxed transition-colors">
+                <p className="text-xs font-normal text-[#2C3039] group-hover:text-[#C0392B] leading-relaxed transition-colors">
                   {prompt.text}
                 </p>
               </button>
@@ -519,7 +519,7 @@ export function ChatPanel({
                 placeholder={isGenerating ? "Nova đang tổng hợp câu trả lời cho bạn..." : "Hỏi Nova bất cứ điều gì về bài tập hay lộ trình học bối rối nhé..."}
                 className="w-full bg-[#FAF7F2] focus:bg-white disabled:bg-gray-100 border border-[#E8E2D9] focus:border-[#C0392B] rounded-xl pl-4 pr-24 py-2.5 text-xs sm:text-sm text-[#2C3039] placeholder:text-[#9092A8] shadow-inner focus:outline-none focus:ring-2 focus:ring-[#C0392B]/15 transition-all duration-200 font-medium"
               />
-              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-bold text-[#9496A8] hidden sm:block">
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-bold text-[#8A8478] hidden sm:block">
                 <span>Enter ↵</span>
               </div>
             </div>

@@ -84,7 +84,7 @@ export default function TopicsContainer() {
 
  {/* Header */}
  <div className="flex flex-col items-center gap-3 text-center max-w-2xl">
- <h1 className="text-4xl font-bold text-[#131B2E] leading-tight tracking-tight">
+ <h1 className="text-4xl font-bold text-[#2C3039] leading-tight tracking-tight">
  Bạn có bao nhiêu{" "}
  <span className="text-transparent bg-clip-text bg-[#C0392B] ">
  thời gian rảnh
@@ -101,7 +101,7 @@ export default function TopicsContainer() {
  <div className="flex-1 bg-white border border-[#E8E8F0] rounded-3xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col gap-4">
  <div className="flex items-center gap-2 mb-2">
  <div className="w-1.5 h-1.5 rounded-full bg-[#FAF7F2]" />
- <h3 className="text-xs font-bold text-[#84849A] uppercase tracking-wider">Thời gian rảnh</h3>
+ <h3 className="text-xs font-bold text-[#8A8478] uppercase tracking-wider">Thời gian rảnh</h3>
  </div>
 
  <div className="flex flex-col gap-3 min-h-[120px] content-start">
@@ -115,7 +115,7 @@ export default function TopicsContainer() {
  className={`px-4 py-3.5 flex items-center justify-between gap-2 rounded-xl text-sm font-semibold transition-all border ${
  isSelected
  ? "bg-[#FAF7F2] text-[#C0392B] border-[#E8E2D9] shadow-sm"
- : "bg-white text-[#464554] border-[#E8E8F0] hover:border-[#C7C4D7] hover:bg-[#F8F8FF]"
+ : "bg-white text-[#2C3039] border-[#E8E8F0] hover:border-[#C7C4D7] hover:bg-[#F8F8FF]"
  }`}
  >
  <span>{time}</span>
@@ -151,7 +151,7 @@ export default function TopicsContainer() {
  Generate My Learning Path
  </Button>
 
- <p className="flex items-center gap-1.5 text-[11px] text-[#ADADC0]">
+ <p className="flex items-center gap-1.5 text-[11px] text-[#B8B0A3]">
  <ShieldCheckIcon />
  <span>
  Data-driven pathing based on{" "}

@@ -40,7 +40,7 @@ export function TopicChip({
               "text-[#C0392B] shadow-[0_2px_12px_rgba(192,57,43,0.2)]",
             ]
           : [
-              "border-[#E2E2EA] bg-white text-[#464554]",
+              "border-[#E2E2EA] bg-white text-[#2C3039]",
               "hover:border-[#8A8478]/50 hover:bg-[#F8F9FE] hover:text-[#C0392B]",
               "hover:shadow-[0_2px_8px_rgba(192,57,43,0.1)]",
             ],
@@ -52,7 +52,7 @@ export function TopicChip({
           "flex items-center justify-center w-5 h-5 rounded-md transition-all duration-200",
           isSelected
             ? "bg-[#8A8478]/15 text-[#8A8478]"
-            : "bg-[#F3F3F8] text-[#84849A] group-hover:bg-[#8A8478]/10 group-hover:text-[#8A8478]",
+            : "bg-[#F3F3F8] text-[#8A8478] group-hover:bg-[#8A8478]/10 group-hover:text-[#8A8478]",
         )}
       >
         <Icon />

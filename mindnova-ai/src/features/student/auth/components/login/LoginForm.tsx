@@ -181,7 +181,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  <button
  type="button"
  onClick={togglePassword}
- className="text-[#B0B0C8] hover:text-[#C0392B] transition-colors focus:outline-none"
+ className="text-[#B8B0A3] hover:text-[#C0392B] transition-colors focus:outline-none"
  >
  {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
  </button>
@@ -232,7 +232,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
 
  {/* Footer — bám sát phía dưới */}
  <div className="mt-auto text-center">
- <p className="text-[11px] text-[#C0C0D4] leading-relaxed">
+ <p className="text-[11px] text-[#B8B0A3] leading-relaxed">
  © 2024 MindNova AI. Empowering global learners through intelligence.
  </p>
  </div>

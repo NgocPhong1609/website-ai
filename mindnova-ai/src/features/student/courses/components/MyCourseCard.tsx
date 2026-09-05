@@ -80,7 +80,7 @@ export function MyCourseCard({ course }: { course: MyCourse }) {
  <div className="p-5 flex flex-col flex-1 bg-white justify-between gap-4">
  <div>
  <Link href={`/courses/detail?courseId=${course.id}`} className="block text-decoration-none focus:outline-none min-w-0 group/title">
- <h3 className="text-base sm:text-lg font-bold text-[#2C3039] leading-snug line-clamp-1 group-hover/card:text-[#C0392B] group-hover/title:text-[#C0392B] transition-colors font-[family-name:var(--font-playfair-display)]">
+ <h3 className="text-base sm:text-lg font-bold text-[#2C3039] leading-snug line-clamp-1 group-hover/card:text-[#C0392B] group-hover/title:text-[#C0392B] transition-colors font-serif">
  {course.title}
  </h3>
  </Link>

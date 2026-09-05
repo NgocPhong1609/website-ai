@@ -249,7 +249,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
                     "Khóa học này hoàn toàn miễn phí."
                   )}
                 </p>
-                <p className="text-[#4A4F5C] text-xs font-medium">
+                <p className="text-[#8A8478] text-xs font-medium">
                   Nhấn nút bên dưới để thêm ngay khóa học vào tài khoản của bạn.
                 </p>
               </div>

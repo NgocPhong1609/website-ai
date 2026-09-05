@@ -18,7 +18,7 @@ export function AdvancedRecommendationsSection({ recommendations = [] }: Advance
  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E8F6F3] text-[#2C3039] text-xs font-semibold border border-[#2C3039]/20">
  Đề xuất AI dành riêng cho bạn
  </span>
- <h2 className="text-xl sm:text-2xl font-bold text-[#2C3039] tracking-tight font-[family-name:var(--font-playfair-display)]">
+ <h2 className="text-xl sm:text-2xl font-bold text-[#2C3039] tracking-tight font-serif">
  Lộ trình học tập <span className="text-[#C0392B]">chuyên sâu AI</span>
  </h2>
  <p className="text-xs font-normal text-[#8A8478] leading-relaxed">
@@ -91,14 +91,14 @@ export function AdvancedRecommendationsSection({ recommendations = [] }: Advance
  <div className="p-5 flex-1 flex flex-col justify-between gap-3">
  <div>
  <Link href="/explore" className="block text-decoration-none focus:outline-none min-w-0 group/title">
- <h3 className="text-base sm:text-lg font-bold text-[#2C3039] leading-snug line-clamp-2 group-hover:text-[#C0392B] group-hover/title:text-[#C0392B] transition-colors duration-200 font-[family-name:var(--font-playfair-display)]">
+ <h3 className="text-base sm:text-lg font-bold text-[#2C3039] leading-snug line-clamp-2 group-hover:text-[#C0392B] group-hover/title:text-[#C0392B] transition-colors duration-200 font-serif">
  {rec.title}
  </h3>
  </Link>
 
  {/* Instructor & Rating */}
  <div className="flex items-center justify-between gap-2 text-xs text-[#8A8478] mt-3 pb-3 border-b border-[#F5F0E8]">
- <span className="truncate font-medium text-[#4A4F5C] flex items-center gap-1.5">
+ <span className="truncate font-medium text-[#8A8478] flex items-center gap-1.5">
  <span>{rec.instructor.split("•")[0]}</span>
  <VerifiedTeacherBadge isVerified={true} size="xs" />
  </span>
@@ -114,7 +114,7 @@ export function AdvancedRecommendationsSection({ recommendations = [] }: Advance
  {displayTags.map((tag) => (
  <span
  key={tag}
- className="px-2.5 py-0.5 rounded-md bg-[#FAF7F2] group-hover:bg-[#F5F0E8] text-[#4A4F5C] text-xs font-medium transition-colors duration-200 border border-[#E8E2D9] truncate max-w-[140px]"
+ className="px-2.5 py-0.5 rounded-md bg-[#FAF7F2] group-hover:bg-[#F5F0E8] text-[#8A8478] text-xs font-medium transition-colors duration-200 border border-[#E8E2D9] truncate max-w-[140px]"
  >
  #{tag}
  </span>

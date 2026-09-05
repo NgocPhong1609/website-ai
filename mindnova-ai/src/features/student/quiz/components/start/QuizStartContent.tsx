@@ -237,7 +237,7 @@ export function QuizStartContent() {
  <div className="space-y-4">
  <div className="flex items-center justify-between">
 
- <span className={`text-[11px] font-bold px-3 py-1 rounded-full ${isSelected ? "bg-[#C0392B] text-white" : isSpecialAi ? "bg-[#FAF7F2] text-[#C0392B]" : "bg-[#F1F5F9] text-[#64748B]"}`}>
+ <span className={`text-[11px] font-bold px-3 py-1 rounded-full ${isSelected ? "bg-[#C0392B] text-white" : isSpecialAi ? "bg-[#FAF7F2] text-[#C0392B]" : "bg-[#F1F5F9] text-[#8A8478]"}`}>
  {isSpecialAi ? "AI Tùy Biến" : `Module ${index}`}
  </span>
  </div>
@@ -281,7 +281,7 @@ export function QuizStartContent() {
  {/* 1. Thông tin chính */}
  <div className="space-y-4">
  <div>
- <label className="text-xs font-bold text-[#374151] block mb-1.5">1. Chủ đề bài kiểm tra <span className="text-red-500">*</span></label>
+ <label className="text-xs font-bold text-[#2C3039] block mb-1.5">1. Chủ đề bài kiểm tra <span className="text-red-500">*</span></label>
  <input
  type="text"
  placeholder="Ví dụ: React Hooks, Vue 3 Composition API, Laravel Authentication, Toán 12..."
@@ -292,7 +292,7 @@ export function QuizStartContent() {
  </div>
 
  <div>
- <label className="text-xs font-bold text-[#374151] block mb-1.5">Tên bài kiểm tra <span className="text-xs font-normal text-[#94A3B8]">(Để trống AI sẽ tự đặt)</span></label>
+ <label className="text-xs font-bold text-[#2C3039] block mb-1.5">Tên bài kiểm tra <span className="text-xs font-normal text-[#8A8478]">(Để trống AI sẽ tự đặt)</span></label>
  <input
  type="text"
  placeholder="Ví dụ: Khảo sát kiến thức chuyên sâu"
@@ -306,14 +306,14 @@ export function QuizStartContent() {
  {/* 2 & 3. Số câu & Độ khó */}
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2">
  <div>
- <label className="text-xs font-bold text-[#374151] block mb-2">2. Số lượng câu hỏi</label>
+ <label className="text-xs font-bold text-[#2C3039] block mb-2">2. Số lượng câu hỏi</label>
  <div className="flex gap-2">
  {[5, 10, 15, 20].map((num) => (
  <button
  key={num}
  type="button"
  onClick={() => setQuestionCount(num)}
- className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${questionCount === num ? "bg-[#C0392B] text-white border-[#C0392B]" : "bg-[#F8FAFC] text-[#475569] border-[#E2E8F0]"}`}
+ className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${questionCount === num ? "bg-[#C0392B] text-white border-[#C0392B]" : "bg-[#F8FAFC] text-[#2C3039] border-[#E2E8F0]"}`}
  >
  {num} câu
  </button>
@@ -322,7 +322,7 @@ export function QuizStartContent() {
  </div>
 
  <div>
- <label className="text-xs font-bold text-[#374151] block mb-2">3. Chọn độ khó</label>
+ <label className="text-xs font-bold text-[#2C3039] block mb-2">3. Chọn độ khó</label>
  <div className="grid grid-cols-4 gap-2">
  {[
  { label: "Dễ", colorClass: "bg-[#27AE60]" },
@@ -334,7 +334,7 @@ export function QuizStartContent() {
  key={d.label}
  type="button"
  onClick={() => setDifficulty(d.label)}
- className={`py-2 rounded-xl text-[11px] font-bold border flex flex-col items-center gap-1 cursor-pointer ${difficulty === d.label ? "bg-[#C0392B] text-white border-[#C0392B]" : "bg-[#F8FAFC] text-[#475569] border-[#E2E8F0]"}`}
+ className={`py-2 rounded-xl text-[11px] font-bold border flex flex-col items-center gap-1 cursor-pointer ${difficulty === d.label ? "bg-[#C0392B] text-white border-[#C0392B]" : "bg-[#F8FAFC] text-[#2C3039] border-[#E2E8F0]"}`}
  >
  <span className={`w-2.5 h-2.5 rounded-full ${d.colorClass}`}></span>
  <span>{d.label}</span>
@@ -346,7 +346,7 @@ export function QuizStartContent() {
 
  {/* 4. Dạng câu hỏi */}
  <div className="pt-2">
- <label className="text-xs font-bold text-[#374151] block mb-2">4. Dạng câu hỏi</label>
+ <label className="text-xs font-bold text-[#2C3039] block mb-2">4. Dạng câu hỏi</label>
  <div className="flex flex-wrap gap-2.5">
  {["Trắc nghiệm", "Đúng / Sai", "Điền vào chỗ trống", "Tự luận ngắn"].map((type) => {
  const isChecked = questionTypes.includes(type);
@@ -355,7 +355,7 @@ export function QuizStartContent() {
  key={type}
  type="button"
  onClick={() => handleToggleType(type)}
- className={`px-3.5 py-2 rounded-xl text-xs font-semibold border flex items-center gap-2 cursor-pointer ${isChecked ? "bg-[#FAF7F2] border-[#C0392B] text-[#C0392B]" : "bg-white border-[#E2E8F0] text-[#64748B]"}`}
+ className={`px-3.5 py-2 rounded-xl text-xs font-semibold border flex items-center gap-2 cursor-pointer ${isChecked ? "bg-[#FAF7F2] border-[#C0392B] text-[#C0392B]" : "bg-white border-[#E2E8F0] text-[#8A8478]"}`}
  >
  <span>{isChecked ? "" : "○"}</span>
  {type}
@@ -367,7 +367,7 @@ export function QuizStartContent() {
 
  {/* 5. Thời gian làm bài */}
  <div className="pt-2">
- <label className="text-xs font-bold text-[#374151] block mb-2">5. Thời gian làm bài</label>
+ <label className="text-xs font-bold text-[#2C3039] block mb-2">5. Thời gian làm bài</label>
  <div className="flex flex-wrap gap-2">
  {[
  { label: "Không giới hạn", value: 0 },
@@ -380,7 +380,7 @@ export function QuizStartContent() {
  key={t.label}
  type="button"
  onClick={() => setTimeLimit(t.value)}
- className={`px-4 py-2 rounded-xl text-xs font-semibold border cursor-pointer ${timeLimit === t.value ? "bg-[#2C3039] text-white border-[#2C3039]" : "bg-[#F8FAFC] text-[#475569] border-[#E2E8F0]"}`}
+ className={`px-4 py-2 rounded-xl text-xs font-semibold border cursor-pointer ${timeLimit === t.value ? "bg-[#2C3039] text-white border-[#2C3039]" : "bg-[#F8FAFC] text-[#2C3039] border-[#E2E8F0]"}`}
  >
  {t.label}
  </button>
@@ -390,7 +390,7 @@ export function QuizStartContent() {
 
  {/* 6. Yêu cầu thêm */}
  <div className="pt-2">
- <label className="text-xs font-bold text-[#374151] block mb-1.5">6. Yêu cầu thêm cho AI</label>
+ <label className="text-xs font-bold text-[#2C3039] block mb-1.5">6. Yêu cầu thêm cho AI</label>
  <textarea
  rows={3}
  placeholder="Ví dụ: Ưu tiên các bài toán thực tế, giải thích chi tiết..."
@@ -463,7 +463,7 @@ export function QuizStartContent() {
  </div>
  </div>
 
- <p className="text-sm text-[#374151] leading-relaxed">
+ <p className="text-sm text-[#2C3039] leading-relaxed">
  {generatedQuiz.description}
  </p>
 
@@ -530,7 +530,7 @@ export function QuizStartContent() {
  </div>
  </div>
 
- <p className="text-sm text-[#374151] leading-relaxed">
+ <p className="text-sm text-[#2C3039] leading-relaxed">
  {currentMod.description}
  </p>
  </div>
@@ -542,7 +542,7 @@ export function QuizStartContent() {
  <span></span>
  <h3 className="text-base font-semibold text-[#2C3039]">Hướng dẫn &amp; Quy định kiểm tra</h3>
  </div>
- <div className="space-y-2 text-xs sm:text-sm text-[#475569]">
+ <div className="space-y-2 text-xs sm:text-sm text-[#2C3039]">
  <p>• Các đề thi do AI tạo sẽ được tự động lưu vào danh mục lịch sử cá nhân ở góc bên phải.</p>
  <p>• Bất kỳ lúc nào bạn cũng có thể bấm vào từng đề cũ để xem lại đáp án và giải thích chi tiết của AI.</p>
  </div>
@@ -563,7 +563,7 @@ export function QuizStartContent() {
  </div>
 
  {myHistoryQuizzes.length === 0 ? (
- <div className="text-center py-8 text-xs text-[#94A3B8] space-y-2">
+ <div className="text-center py-8 text-xs text-[#8A8478] space-y-2">
  <p>Bạn chưa tạo bài kiểm tra AI nào.</p>
  <p className="text-[11px] text-[#C0392B]">Hãy tạo thử 1 đề ở cột bên trái nhé!</p>
  </div>
@@ -594,14 +594,14 @@ export function QuizStartContent() {
  type="button"
  onClick={(e) => handleDeleteQuiz(quiz.id, e)}
  title="Xóa bài thi này"
- className="w-6 h-6 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#C0392B] hover:bg-[#FAF7F2] transition-colors cursor-pointer"
+ className="w-6 h-6 rounded-lg flex items-center justify-center text-[#8A8478] hover:text-[#C0392B] hover:bg-[#FAF7F2] transition-colors cursor-pointer"
  >
  <></>
  </button>
  </div>
  </div>
 
- <div className="flex items-center justify-between text-[11px] text-[#64748B] pt-1 border-t border-[#F0F2F8]">
+ <div className="flex items-center justify-between text-[11px] text-[#8A8478] pt-1 border-t border-[#F0F2F8]">
  <span>{quiz.questions_count} câu • {quiz.difficulty}</span>
 
  <div className="flex items-center gap-3">
@@ -658,7 +658,7 @@ export function QuizStartContent() {
  <div>
  <span className="text-xs font-bold text-[#C0392B] uppercase tracking-wider">Xem lại kết quả bài thi</span>
  <h3 className="text-lg font-bold text-[#2C3039]">{reviewingQuiz.title}</h3>
- <p className="text-xs text-[#64748B] mt-0.5">
+ <p className="text-xs text-[#8A8478] mt-0.5">
  Điểm số: <strong className={reviewingQuiz.score >= 70 ? "text-[#2C3039]" : "text-[#C0392B]"}>{reviewingQuiz.score}%</strong> 
  {" • "} Đúng: {reviewingQuiz.correct_count || 0}/{reviewingQuiz.questions_count} câu
  </p>
@@ -666,7 +666,7 @@ export function QuizStartContent() {
  <button
  type="button"
  onClick={() => setReviewingQuiz(null)}
- className="w-9 h-9 rounded-full bg-white border border-[#E8E2D9] flex items-center justify-center text-sm font-bold text-[#64748B] hover:bg-[#FAF7F2] hover:text-[#C0392B] transition-all cursor-pointer"
+ className="w-9 h-9 rounded-full bg-white border border-[#E8E2D9] flex items-center justify-center text-sm font-bold text-[#8A8478] hover:bg-[#FAF7F2] hover:text-[#C0392B] transition-all cursor-pointer"
  >
  
  </button>
@@ -709,8 +709,8 @@ export function QuizStartContent() {
  {isEssayOrFill ? (
  <div className="space-y-2 text-xs">
  <div className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
- <span className="font-semibold text-[#64748B] block mb-1">️ Bài làm của bạn:</span>
- <p className="text-[#2C3039]">{userAns || <em className="text-[#94A3B8]">Chưa nhập câu trả lời</em>}</p>
+ <span className="font-semibold text-[#8A8478] block mb-1">️ Bài làm của bạn:</span>
+ <p className="text-[#2C3039]">{userAns || <em className="text-[#8A8478]">Chưa nhập câu trả lời</em>}</p>
  </div>
  <div className="p-3 rounded-xl bg-[#FAF7F2]/40 border border-[#2C3039]/30">
  <span className="font-semibold text-[#065F46] block mb-1"> Đáp án chuẩn / Hướng dẫn:</span>
@@ -724,11 +724,11 @@ export function QuizStartContent() {
  const isChosen = cleanUserLetter === optKey;
  const isRightKey = cleanCorrectLetter === optKey;
 
- let optStyle = "bg-[#F8FAFC] border-[#E8E2D9] text-[#475569]";
+ let optStyle = "bg-[#F8FAFC] border-[#E8E2D9] text-[#2C3039]";
  if (isRightKey) {
  optStyle = "bg-[#FAF7F2]/70 border-[#2C3039] text-[#065F46] font-bold";
  } else if (isChosen && !isRightKey) {
- optStyle = "bg-[#FAF7F2]/70 border-[#C0392B] text-[#991B1B] font-bold";
+ optStyle = "bg-[#FAF7F2]/70 border-[#C0392B] text-[#C0392B] font-bold";
  }
 
  return (
@@ -746,7 +746,7 @@ export function QuizStartContent() {
  )}
 
  {q.explanation && (
- <div className="p-3.5 rounded-xl bg-[#FAF7F2]/70 border border-[#C0392B]/20 text-xs text-[#374151] space-y-1">
+ <div className="p-3.5 rounded-xl bg-[#FAF7F2]/70 border border-[#C0392B]/20 text-xs text-[#2C3039] space-y-1">
  <span className="font-bold text-[#C0392B] block"> Lời giải thích của AI:</span>
  <p className="leading-relaxed">{q.explanation}</p>
  </div>

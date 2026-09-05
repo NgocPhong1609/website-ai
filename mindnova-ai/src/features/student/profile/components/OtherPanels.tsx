@@ -81,7 +81,7 @@ export function SecurityPanel() {
  { id: "confirm-pw", label: "Xác nhận mật khẩu mới", value: confirmPw, set: setConfirmPw, placeholder: "Nhập lại mật khẩu mới vừa đặt..." },
  ].map(({ id, label, value, set, placeholder }) => (
  <div key={id}>
- <label htmlFor={id} className="block text-xs sm:text-sm font-medium text-[#4A4A68] mb-1.5">
+ <label htmlFor={id} className="block text-xs sm:text-sm font-medium text-[#8A8478] mb-1.5">
  {label}
  </label>
  <input

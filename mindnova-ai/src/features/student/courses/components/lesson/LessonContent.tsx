@@ -16,16 +16,16 @@ export function LessonContent() {
  </div>
 
  {/* Title & Description */}
- <h1 className="text-3xl sm:text-4xl font-bold text-[#2C3039] mb-4 tracking-tight font-[family-name:var(--font-playfair-display)]">
+ <h1 className="text-3xl sm:text-4xl font-bold text-[#2C3039] mb-4 tracking-tight font-serif">
  Route Handlers in Next.js
  </h1>
- <p className="text-[#4A4F5C] text-lg mb-8 leading-relaxed">
+ <p className="text-[#8A8478] text-lg mb-8 leading-relaxed">
  Tìm hiểu cách tạo custom request handlers cho các định tuyến thông qua Web Request và Response APIs. Tính năng Route Handlers chỉ khả dụng bên trong thư mục app.
  </p>
 
  {/* Subheading & Content */}
- <h2 className="text-2xl font-bold text-[#2C3039] mb-4 font-[family-name:var(--font-playfair-display)]">Handling Requests</h2>
- <p className="text-[#4A4F5C] mb-6 leading-relaxed">
+ <h2 className="text-2xl font-bold text-[#2C3039] mb-4 font-serif">Handling Requests</h2>
+ <p className="text-[#8A8478] mb-6 leading-relaxed">
  Route Handlers cho phép bạn tạo custom request handlers cho một định tuyến bất kỳ thông qua Web Request và Response APIs. Chúng tương đương với API Routes trong Pages Router, nhưng được khai báo bên trong thư mục app.
  </p>
 

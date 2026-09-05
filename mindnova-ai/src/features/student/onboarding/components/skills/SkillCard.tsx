@@ -54,10 +54,10 @@ export default function SkillCard({
  </div>
 
  {/* Title */}
- <h3 className="text-[20px] font-semibold text-[#131B2E] mb-3">{level}</h3>
+ <h3 className="text-[20px] font-semibold text-[#2C3039] mb-3">{level}</h3>
 
  {/* Description */}
- <p className="text-[14px] text-[#464554] leading-relaxed mb-8">
+ <p className="text-[14px] text-[#2C3039] leading-relaxed mb-8">
  {description}
  </p>
 

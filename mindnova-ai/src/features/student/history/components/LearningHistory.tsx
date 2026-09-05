@@ -234,7 +234,7 @@ export function LearningHistory() {
  <Link href="/courses" className="hover:text-[#C0392B] transition-colors text-decoration-none font-medium">
  Khoá học của tôi
  </Link>
- <ChevronRightIcon className="w-3.5 h-3.5 text-[#A0A0C0]" />
+ <ChevronRightIcon className="w-3.5 h-3.5 text-[#8A8478]" />
  <span className="text-[#2C3039] font-medium bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#2C3039]/20">
  Lịch sử học tập
  </span>

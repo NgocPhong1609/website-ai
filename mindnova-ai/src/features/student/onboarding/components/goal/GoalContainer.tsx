@@ -34,10 +34,10 @@ export default function GoalContainer() {
  MINDNOVA AI
  </span>
  </div>
- <h1 className="text-[48px] font-bold text-[#131B2E]">
+ <h1 className="text-[48px] font-bold text-[#2C3039]">
  What is your learning goal?
  </h1>
- <p className="text-lg text-[#464554]">
+ <p className="text-lg text-[#2C3039]">
  Choose one main goal to help MindNova AI personalize your experience.
  </p>
  </div>
@@ -66,13 +66,13 @@ export default function GoalContainer() {
  className={`py-[21.6px] px-[57.6px] rounded-lg transition-colors text-[14.4px] ${
  selectedId !== null
  ? "bg-[#FAF7F2] text-white shadow-md hover:bg-[#5757EE]"
- : "bg-[#E2E8F0] text-[#464554]/40 cursor-not-allowed"
+ : "bg-[#E2E8F0] text-[#2C3039]/40 cursor-not-allowed"
  }`}
  rightIcon={<ArrowRightIcon />}
  >
  Continue
  </Button>
- <span className="text-[14px] text-[#464554]">
+ <span className="text-[14px] text-[#2C3039]">
  You can always change your goal later in settings.
  </span>
  </div>

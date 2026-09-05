@@ -142,14 +142,14 @@ export function StudyStreakInteractive({
       >
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[#64647A] group-hover:text-[#D97706] transition-colors">Chuỗi chuyên cần ↗</span>
+            <span className="text-xs font-semibold text-[#8A8478] group-hover:text-[#D97706] transition-colors">Chuỗi chuyên cần ↗</span>
             <div className="w-9 h-9 rounded-xl bg-[#FFF9ED] text-[#D97706] flex items-center justify-center shadow-sm border border-[#F59E0B]/20">
               <Flame size={16} fill="currentColor" />
             </div>
           </div>
           
           <div className="flex items-baseline justify-between">
-             <span className="text-3xl font-black text-[#1A1A2E]">{streakDays} <span className="text-sm font-bold text-[#7878A0]">Ngày</span></span>
+             <span className="text-3xl font-black text-[#2C3039]">{streakDays} <span className="text-sm font-bold text-[#8A8478]">Ngày</span></span>
             <button
               onClick={(e) => { e.stopPropagation(); handleCheckIn(); }}
               disabled={isCheckedIn || isLoading}
@@ -166,7 +166,7 @@ export function StudyStreakInteractive({
         <div className="grid grid-cols-7 gap-1.5 pt-4 border-t border-[#F0F0F8] mt-auto">
           {weekDays.map((d) => (
              <div key={d} className="flex flex-col items-center gap-1.5">
-               <span className="text-[10px] font-bold text-[#A0A0C0] uppercase">{d}</span>
+               <span className="text-[10px] font-bold text-[#8A8478] uppercase">{d}</span>
                <div className={twMerge(
                  "w-full h-1.5 rounded-full transition-all duration-300",
                  activeDays[d] || (d === todayKey && isCheckedIn) ? "bg-gradient-to-r from-[#F59E0B] to-[#D97706]" : "bg-[#F4F4FA]",
@@ -183,16 +183,16 @@ export function StudyStreakInteractive({
             className="bg-white w-full max-w-5xl rounded-3xl overflow-hidden shadow-2xl relative flex flex-col lg:flex-row border border-[#EAEAF4]" 
             onClick={(e) => e.stopPropagation()}
           >
-            <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 z-20 text-[#64647A] hover:bg-[#F4F4FA] p-2.5 rounded-full transition-colors bg-white shadow-sm">
+            <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 z-20 text-[#8A8478] hover:bg-[#F4F4FA] p-2.5 rounded-full transition-colors bg-white shadow-sm">
               <X size={18} />
             </button>
 
             <div className="w-full lg:w-7/12 p-6 sm:p-8 bg-[#FAFAFC] border-r border-[#EAEAF4]">
               <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
                 <div className="flex items-center gap-4 bg-white px-2 py-1 rounded-xl shadow-sm border border-[#EAEAF4]">
-                  <button onClick={handlePrevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F4F4FA] text-[#64647A] font-bold transition-colors">&lt;</button>
-                  <h3 className="text-lg font-black text-[#1A1A2E] min-w-[140px] text-center">Tháng {viewMonth + 1}, {viewYear}</h3>
-                  <button onClick={handleNextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F4F4FA] text-[#64647A] font-bold transition-colors">&gt;</button>
+                  <button onClick={handlePrevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F4F4FA] text-[#8A8478] font-bold transition-colors">&lt;</button>
+                  <h3 className="text-lg font-black text-[#2C3039] min-w-[140px] text-center">Tháng {viewMonth + 1}, {viewYear}</h3>
+                  <button onClick={handleNextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F4F4FA] text-[#8A8478] font-bold transition-colors">&gt;</button>
                 </div>
                 
                 <div className="flex gap-2">
@@ -203,7 +203,7 @@ export function StudyStreakInteractive({
               </div>
               
               <div className="grid grid-cols-7 gap-2 text-center mb-3">
-                {weekDays.map(d => <div key={d} className="text-[11px] font-black text-[#A0A0C0] uppercase tracking-wider">{d}</div>)}
+                {weekDays.map(d => <div key={d} className="text-[11px] font-black text-[#8A8478] uppercase tracking-wider">{d}</div>)}
               </div>
               
               <div className="grid grid-cols-7 gap-2 sm:gap-3">
@@ -212,11 +212,11 @@ export function StudyStreakInteractive({
                 ))}
                 
                 {calendarDays.map((date) => {
-                  let bgClass = "bg-white border border-[#EAEAF4] text-[#A0A0C0] hover:border-[#8A8478]/30 cursor-default"; 
+                  let bgClass = "bg-white border border-[#EAEAF4] text-[#8A8478] hover:border-[#8A8478]/30 cursor-default"; 
                   if (date.isCheckedIn) {
                     bgClass = "bg-gradient-to-tr from-[#27AE60] to-[#34D399] text-white shadow-md border-transparent font-bold";
                   } else if (date.isPast) {
-                    bgClass = "bg-[#FEE2E2] text-[#EF4444] border-transparent font-bold opacity-70"; 
+                    bgClass = "bg-[#FEE2E2] text-[#C0392B] border-transparent font-bold opacity-70"; 
                   }
                   
                   return (
@@ -240,7 +240,7 @@ export function StudyStreakInteractive({
                 <div className="mb-4 drop-shadow-xl inline-flex text-[#F59E0B]">
                   <Flame size={72} fill="currentColor" strokeWidth={1} />
                 </div>
-                <h2 className="text-4xl font-black text-[#1A1A2E] tracking-tight">{streakDays} <span className="text-xl font-bold text-[#7878A0]">Ngày</span></h2>
+                <h2 className="text-4xl font-black text-[#2C3039] tracking-tight">{streakDays} <span className="text-xl font-bold text-[#8A8478]">Ngày</span></h2>
                 <p className="text-sm font-semibold text-[#D97706] mt-2">Duy trì thói quen cực tốt!</p>
               </div>
 
@@ -259,7 +259,7 @@ export function StudyStreakInteractive({
                  </div>
                  
                  <div className="mt-3">
-                   <p className="text-sm text-[#1A1A2E] font-medium leading-relaxed">
+                   <p className="text-sm text-[#2C3039] font-medium leading-relaxed">
                      {aiInsight.message}
                    </p>
                    {aiInsight.actionLabel && (

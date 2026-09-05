@@ -100,7 +100,7 @@ export function FilteredCoursesView() {
  ))
  ) : (
  <div className="col-span-full py-12 px-6 text-center bg-white rounded-xl border border-[#E8E2D9] flex flex-col items-center justify-center shadow-sm">
- <h3 className="text-base sm:text-lg font-bold text-[#2C3039] mb-1.5 font-[family-name:var(--font-playfair-display)]">Không tìm thấy khoá học phù hợp</h3>
+ <h3 className="text-base sm:text-lg font-bold text-[#2C3039] mb-1.5 font-serif">Không tìm thấy khoá học phù hợp</h3>
  <p className="text-xs sm:text-sm font-normal text-[#8A8478] max-w-md mb-5 leading-relaxed">
  Hệ thống không tìm thấy khoá học nào trong mục "{TAB_LABELS[activeTab]}"{searchQuery ? ` với từ khoá "${searchQuery}"` : ""}. Bạn hãy thử thay đổi tiêu chí bộ lọc hoặc tìm kiếm từ khoá khác.
  </p>

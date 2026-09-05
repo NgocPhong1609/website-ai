@@ -10,7 +10,7 @@ export function AiSuggestionCard({ suggestion = AI_SUGGESTION }: AiSuggestionCar
  return (
  <div className="group relative overflow-hidden rounded-xl bg-white border border-[#E8E2D9] p-5 hover:border-[#B8B0A3] transition-all duration-300 w-full">
  <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
- <div className="w-11 h-11 rounded-xl bg-[#2C3039] text-white flex items-center justify-center shrink-0 text-sm font-bold font-[family-name:var(--font-playfair-display)]">
+ <div className="w-11 h-11 rounded-xl bg-[#2C3039] text-white flex items-center justify-center shrink-0 text-sm font-bold font-serif">
  AI
  </div>
 
@@ -31,7 +31,7 @@ export function AiSuggestionCard({ suggestion = AI_SUGGESTION }: AiSuggestionCar
  </div>
 
  {/* Message Content */}
- <p className="text-sm sm:text-base font-bold text-[#2C3039] tracking-tight leading-snug group-hover:text-[#C0392B] transition-colors duration-200 font-[family-name:var(--font-playfair-display)]">
+ <p className="text-sm sm:text-base font-bold text-[#2C3039] tracking-tight leading-snug group-hover:text-[#C0392B] transition-colors duration-200 font-serif">
  {suggestion?.message || "Chúng tôi nhận thấy bạn vừa dành 20 phút xử lý vướng mắc về Hydration errors. Hãy thử ôn tập chuyên sâu học phần Server vs Client Leaf Node Components nhé!"}
  </p>
 

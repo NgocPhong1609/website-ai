@@ -9,6 +9,8 @@ import { readStoredUser } from "@/src/shared/lib/userStorage";
 import { twMerge } from "tailwind-merge";
 import { NotificationModal } from "./NotificationModal";
 import { useChatGlobalUnread } from "@/src/hooks/useChatGlobalUnread";
+import { NoDataAvailable } from "@/src/shared/components/ui";
+import { BellOff } from "lucide-react";
 
 function BellIcon() {
  return (
@@ -165,10 +167,13 @@ export function DashboardTopbar() {
 
  <div className="max-h-[360px] overflow-y-auto">
  {notifications.length === 0 ? (
- <div className="p-6 text-center">
- <p className="text-sm text-[#B8B0A3] font-medium">
- Bạn chưa có thông báo nào
- </p>
+ <div className="p-4">
+ <NoDataAvailable
+ icon={BellOff}
+ title="Không có thông báo"
+ description="Bạn chưa có thông báo nào."
+ variant="compact"
+ />
  </div>
  ) : (
  <div className="flex flex-col divide-y divide-[#F5F0E8]">

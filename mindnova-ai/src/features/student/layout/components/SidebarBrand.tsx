@@ -26,7 +26,7 @@ export function SidebarBrand({ isCollapsed }: { isCollapsed?: boolean }) {
  <LogoMark />
  {!isCollapsed && (
  <div className="flex flex-col leading-tight overflow-hidden whitespace-nowrap">
- <span className="text-[14px] font-bold text-[#2C3039] tracking-tight group-hover:text-[#C0392B] transition-colors duration-150 font-[family-name:var(--font-playfair-display)]">
+ <span className="text-[14px] font-bold text-[#2C3039] tracking-tight group-hover:text-[#C0392B] transition-colors duration-150 font-serif">
  MindNova AI
  </span>
  <span className="text-[10px] text-[#B8B0A3] font-medium tracking-wide">

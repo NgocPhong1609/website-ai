@@ -22,10 +22,10 @@ export function DashboardContent() {
  {/* ─── Banner ────────────────────────────────────────────────────────────── */}
  <div className="bg-[#FEFCF9] rounded-2xl p-8 lg:p-10 flex flex-col md:flex-row justify-between items-start md:items-center relative overflow-hidden border border-[#E8E2D9]">
  <div className="relative z-10">
- <h1 className="text-[28px] md:text-[32px] font-bold text-[#2C3039] leading-tight tracking-tight font-[family-name:var(--font-playfair-display)]">
+ <h1 className="text-[28px] md:text-[32px] font-bold text-[#2C3039] leading-tight tracking-tight font-serif">
  Tuyệt vời quá, {user?.name || "Học viên"}!
  </h1>
- <p className="text-[15px] text-[#4A4F5C] mt-2 font-medium leading-relaxed">
+ <p className="text-[15px] text-[#8A8478] mt-2 font-medium leading-relaxed">
  Bạn đang làm rất tốt. Hãy tiếp tục duy trì chuỗi học tập nhé!
  </p>
  </div>
@@ -52,12 +52,12 @@ export function DashboardContent() {
 
  <div className="flex flex-col md:flex-row gap-6 items-start mt-8 md:mt-0">
  <div className="w-16 h-16 bg-[#2C3039] rounded-xl flex items-center justify-center text-white shrink-0">
- <span className="text-lg font-bold font-[family-name:var(--font-playfair-display)]">AI</span>
+ <span className="text-lg font-bold font-serif">AI</span>
  </div>
  
  <div className="flex-1">
- <h3 className="font-bold text-[22px] text-[#2C3039] leading-tight font-[family-name:var(--font-playfair-display)]">Bước tiếp theo</h3>
- <p className="text-[15px] text-[#4A4F5C] mt-2 leading-relaxed max-w-lg">
+ <h3 className="font-bold text-[22px] text-[#2C3039] leading-tight font-serif">Bước tiếp theo</h3>
+ <p className="text-[15px] text-[#8A8478] mt-2 leading-relaxed max-w-lg">
  {aiSuggestion?.message || "Hãy bắt đầu một khóa học mới để phát triển kỹ năng của bạn ngay hôm nay!"}
  </p>
  <button className="mt-6 bg-[#C0392B] hover:bg-[#A93226] text-white px-6 py-3 rounded-lg font-bold text-[14px] flex items-center gap-2 hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-2 focus:ring-[#C0392B]/30">
@@ -79,7 +79,7 @@ export function DashboardContent() {
  
  <div className="mt-6 mb-8">
  <div className="flex items-baseline gap-2">
- <span className="text-[56px] font-bold text-[#2C3039] leading-none tracking-tighter font-[family-name:var(--font-playfair-display)]">{overallProgress}%</span>
+ <span className="text-[56px] font-bold text-[#2C3039] leading-none tracking-tighter font-serif">{overallProgress}%</span>
  <span className="text-[13px] font-semibold text-[#B8B0A3]">Hoàn thành</span>
  </div>
  </div>
@@ -133,7 +133,7 @@ export function DashboardContent() {
  {/* Focus Areas */}
  <div className="bg-white rounded-2xl p-6 border border-[#E8E2D9]">
  <div className="flex items-center gap-2 mb-2">
- <h3 className="font-bold text-[18px] text-[#2C3039] font-[family-name:var(--font-playfair-display)]">Focus Areas</h3>
+ <h3 className="font-bold text-[18px] text-[#2C3039] font-serif">Focus Areas</h3>
  </div>
  <p className="text-[13px] text-[#8A8478] mb-6 leading-relaxed">
  AI detected these topics need more attention:
@@ -178,12 +178,12 @@ export function DashboardContent() {
  
  <div className="flex gap-4">
  {/* Badge 1 */}
- <div className="w-14 h-14 rounded-full bg-[#2C3039] flex items-center justify-center text-white shadow-sm hover:scale-105 transition-transform cursor-pointer text-sm font-bold font-[family-name:var(--font-playfair-display)]">
+ <div className="w-14 h-14 rounded-full bg-[#2C3039] flex items-center justify-center text-white shadow-sm hover:scale-105 transition-transform cursor-pointer text-sm font-bold font-serif">
  1st
  </div>
  
  {/* Badge 2 */}
- <div className="w-14 h-14 rounded-full bg-[#2C3039] flex items-center justify-center text-white shadow-sm hover:scale-105 transition-transform cursor-pointer text-sm font-bold font-[family-name:var(--font-playfair-display)]">
+ <div className="w-14 h-14 rounded-full bg-[#2C3039] flex items-center justify-center text-white shadow-sm hover:scale-105 transition-transform cursor-pointer text-sm font-bold font-serif">
  Top
  </div>
 

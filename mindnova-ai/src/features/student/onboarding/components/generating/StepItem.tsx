@@ -40,7 +40,7 @@ const STATUS_LABEL: Record<GeneratingStepStatus, string> = {
 const STATUS_LABEL_CLASS: Record<GeneratingStepStatus, string> = {
   completed: "text-[#C0392B] font-semibold",
   "in-progress": "text-[#00A896] font-semibold",
-  pending: "text-[#84849A]",
+  pending: "text-[#8A8478]",
 };
 
 // ─── Progress Bar (only for in-progress) ─────────────────────────────────────
@@ -85,7 +85,7 @@ export function StepItem({ label, status }: StepItemProps) {
           <span
             className={twMerge(
               "text-sm font-medium",
-              isPending ? "text-[#84849A]" : "text-[#131B2E]",
+              isPending ? "text-[#8A8478]" : "text-[#2C3039]",
             )}
           >
             {label}

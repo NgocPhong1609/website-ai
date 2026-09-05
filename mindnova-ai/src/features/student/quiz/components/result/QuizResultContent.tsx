@@ -124,7 +124,7 @@ export function QuizResultContent() {
  <div className="flex-1 min-h-screen bg-[#F8F9FC] flex items-center justify-center p-6">
  <div className="flex flex-col items-center gap-3">
  
- <span className="text-sm font-semibold text-[#64748B]">Đang tổng hợp báo cáo đánh giá năng lực từ AI...</span>
+ <span className="text-sm font-semibold text-[#8A8478]">Đang tổng hợp báo cáo đánh giá năng lực từ AI...</span>
  </div>
  </div>
  );
@@ -160,7 +160,7 @@ export function QuizResultContent() {
  }`}>
  <div className="space-y-2 text-center md:text-left">
  <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block ${
- isPassed ? "bg-[#FAF7F2] text-[#065F46]" : "bg-[#FAF7F2] text-[#991B1B]"
+ isPassed ? "bg-[#FAF7F2] text-[#065F46]" : "bg-[#FAF7F2] text-[#C0392B]"
  }`}>
  {isPassed ? " Đạt Chuẩn Đánh Giá" : " Cần Cố Gắng Thêm"}
  </span>
@@ -216,7 +216,7 @@ export function QuizResultContent() {
  Câu {idx + 1}: {q.question}
  </h3>
  <span className={`text-xs font-bold px-3 py-1 rounded-full shrink-0 ${
- isCorrect ? "bg-[#FAF7F2] text-[#065F46]" : "bg-[#FAF7F2] text-[#991B1B]"
+ isCorrect ? "bg-[#FAF7F2] text-[#065F46]" : "bg-[#FAF7F2] text-[#C0392B]"
  }`}>
  {isCorrect ? " Chính xác" : " Chưa đúng"}
  </span>
@@ -225,8 +225,8 @@ export function QuizResultContent() {
  {isEssayOrFill ? (
  <div className="space-y-2 text-xs sm:text-sm">
  <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
- <span className="font-semibold text-[#64748B] block mb-1">️ Bài làm của bạn:</span>
- <p className="text-[#2C3039]">{userAns || <em className="text-[#94A3B8]">Bỏ trống</em>}</p>
+ <span className="font-semibold text-[#8A8478] block mb-1">️ Bài làm của bạn:</span>
+ <p className="text-[#2C3039]">{userAns || <em className="text-[#8A8478]">Bỏ trống</em>}</p>
  </div>
  <div className="p-3.5 rounded-xl bg-[#FAF7F2]/40 border border-[#2C3039]/30">
  <span className="font-semibold text-[#065F46] block mb-1"> Đáp số / Gợi ý chuẩn:</span>
@@ -240,11 +240,11 @@ export function QuizResultContent() {
  const isChosen = cleanUser === optKey;
  const isRightKey = cleanCorrect === optKey;
 
- let style = "bg-[#F8FAFC] border-[#E8E2D9] text-[#475569]";
+ let style = "bg-[#F8FAFC] border-[#E8E2D9] text-[#2C3039]";
  if (isRightKey) {
  style = "bg-[#FAF7F2]/70 border-[#2C3039] text-[#065F46] font-bold";
  } else if (isChosen && !isRightKey) {
- style = "bg-[#FAF7F2]/70 border-[#C0392B] text-[#991B1B] font-bold";
+ style = "bg-[#FAF7F2]/70 border-[#C0392B] text-[#C0392B] font-bold";
  }
 
  return (
@@ -276,12 +276,12 @@ export function QuizResultContent() {
  </button>
  </div>
 
- <p className="text-xs sm:text-sm text-[#374151] leading-relaxed">
+ <p className="text-xs sm:text-sm text-[#2C3039] leading-relaxed">
  {q.explanation || "Áp dụng định lý và công thức đặc trưng để tìm ra đáp số."}
  </p>
 
  {isExpanded && (
- <div className="mt-3 pt-3 border-t border-[#C0392B]/15 text-xs text-[#475569] space-y-1 bg-white/80 p-3 rounded-lg">
+ <div className="mt-3 pt-3 border-t border-[#C0392B]/15 text-xs text-[#2C3039] space-y-1 bg-white/80 p-3 rounded-lg">
  <strong className="text-[#C0392B] block"> Phương pháp ghi nhớ:</strong>
  <p>• Xác định điều kiện xác định và áp dụng đúng công thức tổng quát trước khi thay số.</p>
  <p>• Thử các trường hợp đặc biệt để loại trừ nhanh các phương án sai.</p>
@@ -297,7 +297,7 @@ export function QuizResultContent() {
  {/* Action Footer */}
  <div className="p-6 rounded-3xl bg-white border border-[#E8E2D9] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
  <Link href="/practice" className="w-full sm:w-auto">
- <button type="button" className="w-full sm:w-auto px-6 py-3 rounded-xl border border-[#E8E2D9] text-xs sm:text-sm font-semibold text-[#475569] hover:bg-[#F8FAFC] cursor-pointer">
+ <button type="button" className="w-full sm:w-auto px-6 py-3 rounded-xl border border-[#E8E2D9] text-xs sm:text-sm font-semibold text-[#2C3039] hover:bg-[#F8FAFC] cursor-pointer">
  ← Về Trung tâm Đánh giá
  </button>
  </Link>
@@ -437,7 +437,7 @@ export function QuizResultContent() {
  ? "bg-[#EAF8F5] text-[#2C3039] border-[#2C3039]/20" 
  : item.score > 0 
  ? "bg-[#F5F0E8] text-[#D97706] border-[#D97706]/30"
- : "bg-[#FFF2F2] text-[#E11D48] border-[#E11D48]/20"
+ : "bg-[#FFF2F2] text-[#C0392B] border-[#E11D48]/20"
  }`}>
  Điểm: {item.score} / {item.max_score} điểm
  </span>
@@ -455,7 +455,7 @@ export function QuizResultContent() {
  <p className="text-xs sm:text-sm text-[#2C3039] whitespace-pre-line leading-relaxed font-normal">
  {item.user_answer_text && item.user_answer_text.trim() !== "" 
  ? item.user_answer_text 
- : <span className="text-[#E11D48] italic">(Học viên chưa nhập câu trả lời)</span>
+ : <span className="text-[#C0392B] italic">(Học viên chưa nhập câu trả lời)</span>
  }
  </p>
  </div>
@@ -473,7 +473,7 @@ export function QuizResultContent() {
  <span className="text-[11px] font-bold uppercase tracking-wider text-[#C0392B] flex items-center gap-1.5">
  <span> Nhận xét đánh giá từ Gia sư AI MindNova:</span>
  </span>
- <p className="text-xs sm:text-sm text-[#374151] leading-relaxed">
+ <p className="text-xs sm:text-sm text-[#2C3039] leading-relaxed">
  {item.feedback || "Đã ghi nhận bài làm."}
  </p>
 
@@ -505,7 +505,7 @@ export function QuizResultContent() {
  <div className={`p-3.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center gap-2 ${
  item.is_correct 
  ? "bg-[#EAF8F5] border-[#2C3039]/20 text-[#2C3039]" 
- : "bg-[#FFF2F2] border-[#E11D48]/20 text-[#E11D48]"
+ : "bg-[#FFF2F2] border-[#E11D48]/20 text-[#C0392B]"
  }`}>
  <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 text-white font-bold" style={{ backgroundColor: item.is_correct ? '#2C3039' : '#E11D48' }}>
  {item.is_correct ? '' : ''}
@@ -523,7 +523,7 @@ export function QuizResultContent() {
  <p className="text-[11px] font-semibold tracking-wide text-[#C0392B] uppercase flex items-center gap-1.5">
  <span> Gia sư AI MindNova giải thích</span>
  </p>
- <p className="text-xs sm:text-sm text-[#374151] font-normal leading-relaxed">
+ <p className="text-xs sm:text-sm text-[#2C3039] font-normal leading-relaxed">
  {item.feedback || "Các yêu cầu trắc nghiệm được đánh giá theo dữ liệu chuẩn xác."}
  </p>
  </div>
@@ -572,7 +572,7 @@ export function QuizResultContent() {
  <div className="absolute top-0 right-0 w-44 h-44 rounded-full bg-[#FAF7F2] blur-2xl pointer-events-none" />
  <div className="absolute bottom-0 left-0 w-44 h-44 rounded-full bg-[#C0392B]/10 blur-2xl pointer-events-none" />
 
- <div className={`absolute top-5 right-5 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-2xs border ${displayData.passed ? "bg-[#EAF8F5] text-[#2C3039] border-[#2C3039]/20" : "bg-[#FFF2F2] text-[#E11D48] border-[#E11D48]/20"}`}>
+ <div className={`absolute top-5 right-5 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-2xs border ${displayData.passed ? "bg-[#EAF8F5] text-[#2C3039] border-[#2C3039]/20" : "bg-[#FFF2F2] text-[#C0392B] border-[#E11D48]/20"}`}>
  <span className={`w-2 h-2 rounded-full ${displayData.passed ? "bg-[#2C3039]" : "bg-[#E11D48]"} animate-pulse`} />
  {displayData.passed ? "Đạt Yêu Cầu (Passed)" : "Chưa Đạt (Need Practice)"}
  </div>
@@ -617,7 +617,7 @@ export function QuizResultContent() {
  </span>
  </div>
 
- <p className="text-xs sm:text-sm text-[#374151] leading-relaxed font-normal bg-[#F8FAFC] p-4 rounded-xl border border-[#E8E2D9]">
+ <p className="text-xs sm:text-sm text-[#2C3039] leading-relaxed font-normal bg-[#F8FAFC] p-4 rounded-xl border border-[#E8E2D9]">
  &ldquo;{displayData.ai_insight || "Bạn đã nắm vững nền tảng kiến thức và trình bày bài làm rất ấn tượng!"}&rdquo;
  </p>
  </div>
@@ -651,7 +651,7 @@ export function QuizResultContent() {
  <h4 className="font-semibold text-sm sm:text-base text-[#2C3039]">{t.topic_title}</h4>
  <p className="text-xs text-[#8A8478] mt-0.5">{t.sub_title}</p>
  </div>
- <span className={`self-start sm:self-center px-3 py-1 rounded-full text-xs font-medium border ${t.score_percentage >= 80 ? "bg-[#EAF8F5] text-[#2C3039] border-[#2C3039]/20" : t.score_percentage >= 60 ? "bg-[#FAF7F2] text-[#C0392B] border-[#C0392B]/20" : "bg-[#FFF2F2] text-[#E11D48] border-[#E11D48]/20"}`}>
+ <span className={`self-start sm:self-center px-3 py-1 rounded-full text-xs font-medium border ${t.score_percentage >= 80 ? "bg-[#EAF8F5] text-[#2C3039] border-[#2C3039]/20" : t.score_percentage >= 60 ? "bg-[#FAF7F2] text-[#C0392B] border-[#C0392B]/20" : "bg-[#FFF2F2] text-[#C0392B] border-[#E11D48]/20"}`}>
  {t.status_label}
  </span>
  </div>
@@ -738,7 +738,7 @@ export function QuizResultContent() {
  </Link>
 
  <Link href={`/practice/quiz/question?lessonId=${targetModuleId}`} className="text-decoration-none">
- <button type="button" className="px-7 py-3 bg-white border border-[#E8E2D9] hover:bg-[#F8FAFC] text-[#374151] rounded-xl font-medium text-xs sm:text-sm shadow-2xs hover:border-[#C0392B]/30 transition-all cursor-pointer flex items-center gap-2">
+ <button type="button" className="px-7 py-3 bg-white border border-[#E8E2D9] hover:bg-[#F8FAFC] text-[#2C3039] rounded-xl font-medium text-xs sm:text-sm shadow-2xs hover:border-[#C0392B]/30 transition-all cursor-pointer flex items-center gap-2">
  <span></span>
  <span>Làm lại bài với đề mới</span>
  </button>

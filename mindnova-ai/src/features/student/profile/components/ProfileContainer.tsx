@@ -32,7 +32,7 @@ export default function ProfileContainer() {
   if (isError || !profile) {
     return (
       <div className="p-8 flex flex-col items-center justify-center gap-4">
-        <p className="text-sm text-[#64647A]">
+        <p className="text-sm text-[#8A8478]">
           {error instanceof Error && error.message.includes("401")
             ? "Phiên đăng nhập đã hết hạn. Đang chuyển hướng..."
             : "Không thể tải thông tin hồ sơ. Vui lòng thử lại sau."}
@@ -57,11 +57,11 @@ export default function ProfileContainer() {
               Hồ sơ Học viên • Xác thực hợp lệ
             </div>
 
-            <h1 className="flex items-center gap-2 text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3039] leading-tight font-[family-name:var(--font-playfair-display)]">
+            <h1 className="flex items-center gap-2 text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3039] leading-tight font-serif">
               Quản lý <span className="text-[#C0392B] font-bold flex items-center gap-2">Tài khoản &amp; Bảo mật <Shield className="w-6 h-6 text-[#C0392B]" /></span>
             </h1>
 
-            <p className="text-xs sm:text-sm text-[#4A4F5C] leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm text-[#8A8478] leading-relaxed font-normal">
               Cập nhật thông tin nhận dạng cá nhân, thiết lập danh tính, và tùy chỉnh cấu hình bảo mật hệ thống. Dữ liệu của bạn được AI đồng bộ và bảo vệ định kỳ.
             </p>
           </div>

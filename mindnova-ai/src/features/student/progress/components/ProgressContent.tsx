@@ -22,7 +22,7 @@ export function ProgressContent() {
   if (isError || !data) {
     return (
       <div className="p-6 md:p-12 max-w-[1400px] mx-auto min-h-[60vh] flex flex-col items-center justify-center text-center gap-3">
-        <div className="w-16 h-16 rounded-2xl bg-[#FEF2F2] text-[#DC2626] flex items-center justify-center text-2xl mb-1 shadow-sm border border-[#FCA5A5]/40">
+        <div className="w-16 h-16 rounded-2xl bg-[#FEF2F2] text-[#C0392B] flex items-center justify-center text-2xl mb-1 shadow-sm border border-[#FCA5A5]/40">
           
         </div>
         <h3 className="text-lg font-bold text-[#2C3039]">Không thể tải dữ liệu tiến trình học tập</h3>
@@ -304,10 +304,10 @@ export function ProgressContent() {
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
                               <span className="text-[11px] font-semibold text-[#8A8478] bg-[#E8E2D9] px-2 py-0.5 rounded-md">{mod.module_number}</span>
-                              <span className="text-xs font-normal text-[#9CA3AF]">{mod.lesson_count_text}</span>
+                              <span className="text-xs font-normal text-[#8A8478]">{mod.lesson_count_text}</span>
                             </div>
-                            <h3 className="text-sm sm:text-base font-semibold text-[#4B5563]">{mod.title}</h3>
-                            <p className="text-xs font-normal text-[#9CA3AF] leading-relaxed">{mod.subtitle}</p>
+                            <h3 className="text-sm sm:text-base font-semibold text-[#2C3039]">{mod.title}</h3>
+                            <p className="text-xs font-normal text-[#8A8478] leading-relaxed">{mod.subtitle}</p>
                           </div>
 
                           <span className="shrink-0 px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#8A8478] font-medium text-xs border border-[#E8E2D9] flex items-center gap-1.5">
@@ -390,10 +390,10 @@ export function ProgressContent() {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-[11px] font-semibold text-[#8A8478] bg-[#E8E2D9] px-2 py-0.5 rounded-md">{mod.module_number}</span>
-                          <span className="text-[10px] font-normal text-[#9CA3AF]">{mod.lesson_count_text}</span>
+                          <span className="text-[10px] font-normal text-[#8A8478]">{mod.lesson_count_text}</span>
                         </div>
-                        <h3 className="text-sm font-semibold text-[#4B5563] line-clamp-2">{mod.title}</h3>
-                        <p className="text-xs font-normal text-[#9CA3AF] line-clamp-2 leading-relaxed">{mod.subtitle}</p>
+                        <h3 className="text-sm font-semibold text-[#2C3039] line-clamp-2">{mod.title}</h3>
+                        <p className="text-xs font-normal text-[#8A8478] line-clamp-2 leading-relaxed">{mod.subtitle}</p>
                       </div>
                       <div className="pt-3 border-t border-[#E8E2D9]/60">
                         <span className="flex items-center justify-center gap-1.5 w-full px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#8A8478] font-medium text-[11px] border border-[#E8E2D9]">
@@ -438,7 +438,7 @@ export function ProgressContent() {
                   </h4>
                   <span className="text-[10px] bg-[#FAF7F2] text-[#C0392B] px-2 py-0.5 rounded-full font-semibold">{rec.priority_tag}</span>
                 </div>
-                <p className="text-xs font-normal text-[#374151] leading-relaxed">
+                <p className="text-xs font-normal text-[#2C3039] leading-relaxed">
                   {rec.content}
                 </p>
                 {rec.action_url && (
@@ -463,7 +463,7 @@ export function ProgressContent() {
                 <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white border border-[#E8E2D9]/80">
                   <div className="flex items-center gap-2.5">
                     <span className="text-base">{stat.icon || "⭐"}</span>
-                    <span className="text-xs font-medium text-[#4B5563]">{stat.label}</span>
+                    <span className="text-xs font-medium text-[#2C3039]">{stat.label}</span>
                   </div>
                   <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${stat.tag_class || "text-[#C0392B] bg-[#FAF7F2] border-[#C0392B]/20"}`}>
                     {stat.value}

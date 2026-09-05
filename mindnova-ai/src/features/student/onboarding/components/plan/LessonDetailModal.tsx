@@ -68,7 +68,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  <div className="flex justify-between items-start border-b pb-4">
  <div>
  <span className="text-xs font-bold text-[#C0392B] uppercase tracking-wider">AI Curriculum Analyst</span>
- <h2 className="text-2xl font-bold text-[#131B2E] mt-1">{lessonTitle}</h2>
+ <h2 className="text-2xl font-bold text-[#2C3039] mt-1">{lessonTitle}</h2>
  </div>
  <button 
  onClick={onClose}
@@ -89,7 +89,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  {/* Cột trái (7 phần): Phân tích chi tiết của AI độc lập theo bài học */}
  <div className="md:col-span-7 flex flex-col gap-5">
  <div>
- <h4 className="text-sm font-bold text-[#131B2E] mb-1.5 flex items-center gap-2">
+ <h4 className="text-sm font-bold text-[#2C3039] mb-1.5 flex items-center gap-2">
  <span></span> Overview & Objective
  </h4>
  <p className="text-xs text-[#8A8478] leading-relaxed bg-[#FEFCF9] p-3.5 rounded-2xl border border-gray-100">
@@ -98,12 +98,12 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  </div>
 
  <div>
- <h4 className="text-sm font-bold text-[#131B2E] mb-2.5 flex items-center gap-2">
+ <h4 className="text-sm font-bold text-[#2C3039] mb-2.5 flex items-center gap-2">
  <span></span> Key Takeaways
  </h4>
  <ul className="flex flex-col gap-2">
  {details.key_takeaways?.map((point: string, idx: number) => (
- <li key={idx} className="text-xs text-[#4A4F5C] flex items-start gap-2.5 bg-[#F5F0E8] p-2.5 rounded-xl border border-[#E8E2D9]">
+ <li key={idx} className="text-xs text-[#8A8478] flex items-start gap-2.5 bg-[#F5F0E8] p-2.5 rounded-xl border border-[#E8E2D9]">
  <span className="w-1.5 h-1.5 rounded-full bg-[#D4A574] mt-1.5 shrink-0" />
  <span className="leading-relaxed">{point}</span>
  </li>
@@ -114,7 +114,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
 
  {/* Cột phải (5 phần): Danh sách khóa học liên quan */}
  <div className="md:col-span-5 flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-1">
- <h4 className="text-xs font-bold text-[#84849A] uppercase tracking-wider mb-1">
+ <h4 className="text-xs font-bold text-[#8A8478] uppercase tracking-wider mb-1">
  Recommended Instructor Courses
  </h4>
 
@@ -128,7 +128,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  </div>
 
  <div>
- <h5 className="text-xs font-bold text-[#131B2E] leading-snug line-clamp-2">
+ <h5 className="text-xs font-bold text-[#2C3039] leading-snug line-clamp-2">
  {course.title}
  </h5>
  <p className="text-[11px] text-[#8A8478] mt-1">Instructor: <span className="font-semibold text-gray-700">{course.instructor}</span></p>

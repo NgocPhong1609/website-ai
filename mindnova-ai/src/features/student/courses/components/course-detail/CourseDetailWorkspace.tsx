@@ -2,6 +2,8 @@
 
 import React from "react";
 import { Loader } from "@/src/shared/components/ui/Loader";
+import { NoDataAvailable } from "@/src/shared/components/ui";
+import { MessageSquareOff } from "lucide-react";
 import { useGetCourseDetail, useGetCourseReviews, useCreateCourseReview, useUpdateCourseReview, useDeleteCourseReview } from "../../api";
 import { CourseHeader } from "./CourseHeader";
 import { CurriculumAccordion } from "./CurriculumAccordion";
@@ -88,7 +90,7 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
  <div>
  <p className="text-xs font-bold uppercase tracking-widest text-[#B8B0A3]">Bình luận & nhận xét</p>
- <h3 className="mt-2 text-2xl font-bold text-[#2C3039] font-[family-name:var(--font-playfair-display)]">Đánh giá khóa học</h3>
+ <h3 className="mt-2 text-2xl font-bold text-[#2C3039] font-serif">Đánh giá khóa học</h3>
  </div>
  <div className="rounded-lg border border-[#E8E2D9] bg-[#FAF7F2] px-4 py-2 text-sm font-semibold text-[#2C3039]">
  Đánh giá: {averageRating.toFixed(1)} / 5
@@ -143,15 +145,18 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  {isReviewsLoading ? (
  <div className="flex items-center justify-center py-8 text-sm text-[#8A8478]">Đang tải bình luận...</div>
  ) : reviews.length === 0 ? (
- <div className="rounded-xl border border-dashed border-[#B8B0A3] bg-[#FEFCF9] p-6 text-center text-sm text-[#8A8478]">
- Chưa có nhận xét nào cho khóa học này.
- </div>
+ <NoDataAvailable
+  icon={MessageSquareOff}
+  title="Chưa có nhận xét"
+  description="Chưa có nhận xét nào cho khóa học này. Hãy trở thành người đầu tiên đánh giá khóa học!"
+  variant="compact"
+ />
  ) : (
  reviews.map((review) => (
  <div key={review.id} className="rounded-xl border border-[#E8E2D9] bg-[#FEFCF9] p-4">
  <div className="flex items-start justify-between gap-3">
  <div className="flex items-center gap-3">
- <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2C3039] text-sm font-bold text-white font-[family-name:var(--font-playfair-display)]">
+ <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2C3039] text-sm font-bold text-white font-serif">
  {(review.user?.name ?? "H").charAt(0).toUpperCase()}
  </div>
  <div>
@@ -210,7 +215,7 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  </form>
  ) : (
  <>
- <p className="mt-3 text-sm leading-relaxed text-[#4A4F5C]">{review.comment}</p>
+ <p className="mt-3 text-sm leading-relaxed text-[#8A8478]">{review.comment}</p>
  <div className="mt-3 flex items-center justify-end gap-3 pt-3 border-t border-[#E8E2D9]">
  <button
  onClick={() => handleEdit(review)}
@@ -253,7 +258,7 @@ export function CourseDetailWorkspace({ courseId = 1 }: { courseId?: string | nu
  <div className="px-4 py-1.5 rounded-md bg-[#C0392B] text-white text-xs font-bold tracking-widest uppercase mb-1">
  LỖI
  </div>
- <h3 className="text-lg font-bold text-[#2C3039] font-[family-name:var(--font-playfair-display)]">Không thể tải thông tin khóa học</h3>
+ <h3 className="text-lg font-bold text-[#2C3039] font-serif">Không thể tải thông tin khóa học</h3>
  <p className="text-xs text-[#8A8478] max-w-md leading-relaxed">
  Đã xảy ra sự cố khi kết nối tới máy chủ khóa học MindNova AI. Vui lòng kiểm tra kết nối mạng và thử tải lại sau ít phút.
  </p>

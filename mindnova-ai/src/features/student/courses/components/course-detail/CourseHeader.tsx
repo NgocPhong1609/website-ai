@@ -80,16 +80,16 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
 
           {/* Title & Description */}
           <div className="space-y-3">
-            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-tight text-[#2C3039] leading-tight font-[family-name:var(--font-playfair-display)]">
+            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-tight text-[#2C3039] leading-tight font-serif">
               {title}
             </h1>
-            <p className="text-xs sm:text-sm text-[#4A4F5C] leading-relaxed max-w-3xl">
+            <p className="text-xs sm:text-sm text-[#8A8478] leading-relaxed max-w-3xl">
               {description}
             </p>
           </div>
 
           {/* Metadata Badges Row */}
-          <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-[#4A4F5C] pt-2 border-t border-[#E8E2D9]">
+          <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-[#8A8478] pt-2 border-t border-[#E8E2D9]">
             <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-[#E8E2D9]">
               <span className="font-semibold text-[#8A8478]">Thời lượng:</span>
               <span>{durationText}</span>

@@ -12,6 +12,7 @@ import { useGetCourseDetail, useGetCourseAssessmentStatus, useInvalidateCourseDe
 import type { CourseDetailLessonItem, CourseDetailData } from "../../types";
 import { CustomVideoPlayer } from "./CustomVideoPlayer";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
+import { NoDataAvailable } from "@/src/shared/components/ui";
 import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/quizGeneratorApi";
 import toast from "react-hot-toast";
 
@@ -123,7 +124,7 @@ function getLessonTypeColor(type: string): string {
  case 'video': return 'bg-[#F5F0E8] text-[#2C3039]';
  case 'article': return 'bg-[#ECFDF5] text-[#2C3039]';
  case 'quiz_module': return 'bg-[#FFF7ED] text-[#EA580C]';
- default: return 'bg-[#F5F0E8] text-[#4A4F5C]';
+ default: return 'bg-[#F5F0E8] text-[#8A8478]';
  }
 }
 
@@ -202,10 +203,10 @@ function ArticleRenderer({
  [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-[#2C3039] [&_h1]:mb-4 [&_h1]:mt-6
  [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-[#2C3039] [&_h2]:mb-3 [&_h2]:mt-5
  [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-[#2C3039] [&_h3]:mb-2 [&_h3]:mt-4
- [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-[#374151] [&_h4]:mb-2
- [&_p]:text-[15px] [&_p]:text-[#374151] [&_p]:leading-relaxed [&_p]:mb-4
- [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ul]:text-[#374151]
- [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_ol]:text-[#374151]
+ [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-[#2C3039] [&_h4]:mb-2
+ [&_p]:text-[15px] [&_p]:text-[#2C3039] [&_p]:leading-relaxed [&_p]:mb-4
+ [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ul]:text-[#2C3039]
+ [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_ol]:text-[#2C3039]
  [&_li]:mb-1.5 [&_li]:text-[15px] [&_li]:leading-relaxed
  [&_a]:text-[#2C3039] [&_a]:underline [&_a]:hover:text-[#A93226]
  [&_img]:rounded-xl [&_img]:shadow-sm [&_img]:my-4 [&_img]:max-w-full [&_img]:h-auto
@@ -707,7 +708,7 @@ function QuizRenderer({
  {timeLeft !== null && (
  <span className={twMerge(
  "text-sm font-semibold px-3 py-1 rounded-full",
- timeLeft < 60 ? "bg-[#FADBD8] text-[#C0392B] animate-pulse" : "bg-[#F5F0E8] text-[#4A4F5C]"
+ timeLeft < 60 ? "bg-[#FADBD8] text-[#C0392B] animate-pulse" : "bg-[#F5F0E8] text-[#8A8478]"
  )}>
  {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
  </span>
@@ -747,7 +748,7 @@ function QuizRenderer({
       </div>
     </div>
 
-    <p className="text-[#4A4F5C] font-medium text-xs leading-relaxed bg-[#F5F0E8]/50 p-3 rounded-lg border border-[#E8E2D9]/60">
+    <p className="text-[#8A8478] font-medium text-xs leading-relaxed bg-[#F5F0E8]/50 p-3 rounded-lg border border-[#E8E2D9]/60">
       <MessageSquare size={14} className="inline mr-1 text-[#2C3039]" /> <strong>Nhận xét AI:</strong> {essayResult[question.id].feedback}
     </p>
 
@@ -782,7 +783,7 @@ function QuizRenderer({
 
   <div className="flex flex-col gap-1.5">
     <span className="text-[#2C3039] font-extrabold text-xs"><Lightbulb size={12} className="inline mr-1 text-[#D97706]" /> Đáp án tham khảo mẫu từ Giảng viên:</span>
-    <p className="text-[#4A4F5C] font-medium leading-relaxed whitespace-pre-line bg-white p-4 rounded-xl border border-[#E8E2D9] shadow-2xs">
+    <p className="text-[#8A8478] font-medium leading-relaxed whitespace-pre-line bg-white p-4 rounded-xl border border-[#E8E2D9] shadow-2xs">
       {(question as any).sample_answer || "Yêu cầu học viên phân tích đầy đủ các luận điểm chính trong bài học."}
     </p>
   </div>
@@ -808,7 +809,7 @@ function QuizRenderer({
   if (answered && isSelected) {
   ansStyle = answerResult
   ? "bg-[#FAF7F2] border-[#34D399] text-[#065F46]"
-  : "bg-[#FAF7F2] border-[#F87171] text-[#991B1B]";
+  : "bg-[#FAF7F2] border-[#F87171] text-[#C0392B]";
   } else if (isSelected) {
   ansStyle = "bg-[#F5F0E8] border-[#C0392B]";
   }
@@ -844,7 +845,7 @@ function QuizRenderer({
   {answered && !((question as any).type === "essay" || !question.answers || question.answers.length === 0) && (
   <div className={twMerge(
   "p-4 rounded-xl mb-4 text-sm font-semibold",
-  answerResult ? "bg-[#FAF7F2] text-[#065F46]" : "bg-[#FAF7F2] text-[#991B1B]"
+  answerResult ? "bg-[#FAF7F2] text-[#065F46]" : "bg-[#FAF7F2] text-[#C0392B]"
   )}>
   {answerResult ? " Chính xác!" : " Chưa đúng. Hãy cố gắng ở câu tiếp theo!"}
   </div>
@@ -1198,7 +1199,7 @@ function LessonWorkspaceContent() {
  <div className="flex items-center gap-3 min-w-0">
  <Link
  href={`/courses/detail?courseId=${parsedCourseId}`}
- className="w-9 h-9 rounded-xl bg-white border border-[#E8E2D9] hover:bg-[#FEFCF9] flex items-center justify-center text-[#4A4F5C] hover:text-[#2C3039] transition-colors shrink-0 text-decoration-none shadow-2xs"
+ className="w-9 h-9 rounded-xl bg-white border border-[#E8E2D9] hover:bg-[#FEFCF9] flex items-center justify-center text-[#8A8478] hover:text-[#2C3039] transition-colors shrink-0 text-decoration-none shadow-2xs"
  title="Quay lại chi tiết Khóa học"
  >
  <></>
@@ -1229,11 +1230,11 @@ function LessonWorkspaceContent() {
  <main className="lg:col-span-8 flex flex-col gap-6 w-full min-w-0">
 
  {/* AI Notice */}
- <div className="w-full p-4 rounded-xl bg-[#F5F0E8] border border-[#C7D2FE] flex items-center justify-between gap-3 text-[#1E1B4B]">
+ <div className="w-full p-4 rounded-xl bg-[#F5F0E8] border border-[#C7D2FE] flex items-center justify-between gap-3 text-[#2C3039]">
  <div className="flex items-center gap-2.5 min-w-0">
  <span className="w-2 h-2 rounded-full bg-[#C0392B] shrink-0" />
  <span className="text-[#2C3039] font-bold text-xs sm:text-sm shrink-0">Gia sư AI Nova:</span>
- <span className="text-xs sm:text-sm text-[#4A4F5C] truncate">
+ <span className="text-xs sm:text-sm text-[#8A8478] truncate">
  {activeLesson.type === 'video' ? "Video bài giảng nhúng trực tiếp. Hãy theo dõi thực hành mã nguồn ở các thẻ Tab phía dưới!" :
  activeLesson.type === 'article' ? "Đọc kỹ nội dung bài học. Thời gian đọc sẽ được ghi nhận tự động." :
  "Hãy hoàn thành bài kiểm tra để đánh giá kiến thức của bạn!"}
@@ -1292,7 +1293,7 @@ function LessonWorkspaceContent() {
  )}
  >
  <span>Thảo luận & Ghi chú</span>
- <span className="px-2 py-0.5 rounded-full bg-[#F5F0E8] text-[#4A4F5C] text-[10px] font-bold">{apiDiscussions?.length || 0}</span>
+ <span className="px-2 py-0.5 rounded-full bg-[#F5F0E8] text-[#8A8478] text-[10px] font-bold">{apiDiscussions?.length || 0}</span>
  </button>
  </div>
 
@@ -1304,7 +1305,7 @@ function LessonWorkspaceContent() {
  <span className={twMerge("inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold", getLessonTypeColor(activeLesson.type))}>
  {getLessonTypeLabel(activeLesson.type)}
  </span>
- <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#F5F0E8] text-[#4A4F5C]">
+ <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#F5F0E8] text-[#8A8478]">
  <span>Thời lượng:</span> {activeLesson.duration}
  </span>
  {activeLesson.completed ? (
@@ -1343,7 +1344,7 @@ function LessonWorkspaceContent() {
  value={newCommentText}
  onChange={(e) => setNewCommentText(e.target.value)}
  placeholder="Nhập câu hỏi hoặc ghi chú học tập cá nhân..."
- className="w-full p-3.5 rounded-xl border border-[#E8E2D9] bg-white text-[#2C3039] text-sm placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#C0392B] focus:ring-2 focus:ring-[#C0392B]/20 transition-all resize-none"
+ className="w-full p-3.5 rounded-xl border border-[#E8E2D9] bg-white text-[#2C3039] text-sm placeholder:text-[#8A8478] focus:outline-none focus:border-[#C0392B] focus:ring-2 focus:ring-[#C0392B]/20 transition-all resize-none"
  />
  <div className="flex justify-end">
  <button disabled={isSubmittingDiscussion} type="submit" className="px-5 py-2.5 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-sm">
@@ -1356,7 +1357,14 @@ function LessonWorkspaceContent() {
  {isDiscussionsLoading ? (
  <div className="p-8 text-center text-[#8A8478]">Đang tải thảo luận...</div>
  ) : apiDiscussions?.length === 0 ? (
- <div className="p-8 text-center text-[#8A8478]">Chưa có thảo luận nào cho bài học này.</div>
+ <div className="py-6">
+ <NoDataAvailable
+ icon={MessageSquare}
+ title="Chưa có thảo luận"
+ description="Chưa có thảo luận nào cho bài học này. Hãy để lại câu hỏi để tương tác cùng AI hoặc giảng viên!"
+ variant="compact"
+ />
+ </div>
  ) : (
  apiDiscussions?.map((item) => (
  <div key={item.id} className="flex flex-col gap-3">
@@ -1411,7 +1419,7 @@ function LessonWorkspaceContent() {
  </button>
  </div>
  </div>
- <p className="text-xs sm:text-sm text-[#4A4F5C] leading-relaxed">{item.content}</p>
+ <p className="text-xs sm:text-sm text-[#8A8478] leading-relaxed">{item.content}</p>
  </div>
  </div>
  )}
@@ -1431,7 +1439,7 @@ function LessonWorkspaceContent() {
  </span>
  <span className="text-xs text-[#8A8478]">{new Date(reply.created_at).toLocaleString('vi-VN')}</span>
  </div>
- <p className="text-xs sm:text-sm text-[#4A4F5C] leading-relaxed">{reply.content}</p>
+ <p className="text-xs sm:text-sm text-[#8A8478] leading-relaxed">{reply.content}</p>
  </div>
  </div>
  ))}
@@ -1507,7 +1515,7 @@ function LessonWorkspaceContent() {
  </div>
  </div>
  </div>
- <button className="text-[#9CA3AF] group-hover:text-[#2C3039] transition-colors p-1 shrink-0">
+ <button className="text-[#8A8478] group-hover:text-[#2C3039] transition-colors p-1 shrink-0">
  ↕
  </button>
  </div>
@@ -1572,7 +1580,7 @@ function LessonWorkspaceContent() {
  </div>
  </div>
 
- <div className="shrink-0 text-[#9CA3AF]">
+ <div className="shrink-0 text-[#8A8478]">
  {isCurrent ? (
  <span className="w-2.5 h-2.5 rounded-full bg-[#C0392B] inline-block animate-ping" />
  ) : (
@@ -1597,7 +1605,7 @@ function LessonWorkspaceContent() {
  <button
  onClick={handleGoPrevious}
  disabled={!hasPrevious}
- className="flex items-center gap-2 px-5 py-2 rounded-xl border border-[#E8E2D9] bg-white hover:bg-[#FEFCF9] text-[#4A4F5C] font-semibold text-xs sm:text-sm transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm"
+ className="flex items-center gap-2 px-5 py-2 rounded-xl border border-[#E8E2D9] bg-white hover:bg-[#FEFCF9] text-[#8A8478] font-semibold text-xs sm:text-sm transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm"
  >
  <></>
  <span>Bài trước</span>

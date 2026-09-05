@@ -94,11 +94,11 @@ interface SummaryRowProps {
 function SummaryRow({ icon, label, value }: SummaryRowProps) {
  return (
  <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0F7] last:border-0">
- <div className="flex items-center gap-2 text-[11px] text-[#84849A]">
+ <div className="flex items-center gap-2 text-[11px] text-[#8A8478]">
  {icon}
  <span>{label}</span>
  </div>
- <div className="text-[11px] font-semibold text-[#131B2E]">{value}</div>
+ <div className="text-[11px] font-semibold text-[#2C3039]">{value}</div>
  </div>
  );
 }
@@ -138,7 +138,7 @@ function BoltIcon() {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSummaryCardProps) {
- const levelClass = LEVEL_BADGE_CLASS[level] ?? "bg-[#F0F0F7] text-[#84849A] border-[#E2E2EA]";
+ const levelClass = LEVEL_BADGE_CLASS[level] ?? "bg-[#F0F0F7] text-[#8A8478] border-[#E2E2EA]";
 
  return (
  <div className="w-[240px] shrink-0 flex flex-col gap-3">
@@ -147,7 +147,7 @@ export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSumm
  <div className="w-6 h-6 rounded-lg bg-[#C0392B] flex items-center justify-center shadow-[0_2px_8px_rgba(192,57,43,0.4)]">
  <BoltIcon />
  </div>
- <h2 className="text-sm font-bold text-[#131B2E]">Your Profile</h2>
+ <h2 className="text-sm font-bold text-[#2C3039]">Your Profile</h2>
  </div>
 
  {/* Main card */}
@@ -212,7 +212,7 @@ export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSumm
  </span>
  ))}
  {topics.length > 4 && (
- <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-[#F0F0F7] text-[#84849A]">
+ <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-[#F0F0F7] text-[#8A8478]">
  +{topics.length - 4} more
  </span>
  )}

@@ -77,10 +77,10 @@ export default function GeneratingContainer() {
 
  <div className="relative z-10 flex flex-col items-center gap-8 w-full max-w-lg">
  <div className="flex flex-col items-center gap-3 text-center">
- <h1 className="text-[32px] font-bold text-[#131B2E] leading-tight">
+ <h1 className="text-[32px] font-bold text-[#2C3039] leading-tight">
  AI đang thiết kế lộ trình...
  </h1>
- <p className="text-sm text-[#84849A] max-w-sm leading-relaxed">
+ <p className="text-sm text-[#8A8478] max-w-sm leading-relaxed">
  Hệ thống đang cá nhân hóa nội dung học tập theo mục tiêu và thời gian rảnh của bạn.
  </p>
  </div>
@@ -93,7 +93,7 @@ export default function GeneratingContainer() {
  ))}
  </div>
 
- <p className="text-xs text-center text-[#84849A] leading-relaxed max-w-sm">
+ <p className="text-xs text-center text-[#8A8478] leading-relaxed max-w-sm">
  MindNova AI uses GPT-4 and custom models to generate your curriculum.{" "}
  <br />
  This usually takes less than 30 seconds.

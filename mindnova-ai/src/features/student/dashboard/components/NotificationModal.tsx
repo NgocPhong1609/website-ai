@@ -79,7 +79,7 @@ export function NotificationModal({ isOpen, onClose, notification }: Notificatio
  >
  <XIcon />
  </button>
- <h2 className="text-[16px] font-bold text-[#2C3039] tracking-tight w-full text-center pr-8 font-[family-name:var(--font-playfair-display)]">
+ <h2 className="text-[16px] font-bold text-[#2C3039] tracking-tight w-full text-center pr-8 font-serif">
  Chi tiết thông báo
  </h2>
  </div>
@@ -104,11 +104,11 @@ export function NotificationModal({ isOpen, onClose, notification }: Notificatio
  </div>
  </div>
 
- <h3 className="text-[18px] font-bold text-[#2C3039] mb-3 leading-snug font-[family-name:var(--font-playfair-display)]">
+ <h3 className="text-[18px] font-bold text-[#2C3039] mb-3 leading-snug font-serif">
  {notification.title}
  </h3>
 
- <div className="text-[15px] text-[#4A4F5C] leading-relaxed whitespace-pre-wrap">
+ <div className="text-[15px] text-[#8A8478] leading-relaxed whitespace-pre-wrap">
  {notification.content}
  </div>
  </div>

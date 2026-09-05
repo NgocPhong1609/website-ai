@@ -15,7 +15,7 @@ function FormLabel({ htmlFor, children, required = false }: { htmlFor: string; c
  return (
  <label
  htmlFor={htmlFor}
- className="block text-xs sm:text-sm font-medium text-[#4A4A68] mb-1.5"
+ className="block text-xs sm:text-sm font-medium text-[#8A8478] mb-1.5"
  >
  {children}
  {required && <span className="text-[#C0392B] ml-1 font-normal">*</span>}

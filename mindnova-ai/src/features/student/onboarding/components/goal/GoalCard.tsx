@@ -33,10 +33,10 @@ export default function GoalCard({
  <div className="w-12 h-12 bg-[#EAEDFF] rounded-lg flex justify-center items-center">
  <Image src={icon} width={24} height={24} alt="" aria-hidden="true" />
  </div>
- <h3 className="max-w-[275.33px] w-full text-[20px] font-semibold text-[#131B2E]">
+ <h3 className="max-w-[275.33px] w-full text-[20px] font-semibold text-[#2C3039]">
  {title}
  </h3>
- <p className="max-w-[275.33px] w-full text-[14px] text-[#464554]">
+ <p className="max-w-[275.33px] w-full text-[14px] text-[#2C3039]">
  {description}
  </p>
  </div>

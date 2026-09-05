@@ -27,9 +27,9 @@ export function AssignmentSubmission() {
  {/* Breadcrumbs */}
  <div className="flex items-center gap-2 text-[12px] font-bold text-[#C0392B] mb-4">
  <span className="cursor-pointer hover:underline">My Courses</span>
- <ChevronRightIcon className="w-3.5 h-3.5 text-[#A0A0C0]" />
+ <ChevronRightIcon className="w-3.5 h-3.5 text-[#8A8478]" />
  <span className="cursor-pointer hover:underline">Neuro-Linguistic Programming</span>
- <ChevronRightIcon className="w-3.5 h-3.5 text-[#A0A0C0]" />
+ <ChevronRightIcon className="w-3.5 h-3.5 text-[#8A8478]" />
  <span className="text-[#2C3039]">Assignment Submission</span>
  </div>
 
@@ -60,10 +60,10 @@ export function AssignmentSubmission() {
  <FileTextIcon className="w-5 h-5 text-[#C0392B]" />
  <h2 className="text-[16px] font-bold text-[#2C3039]">Assignment Instructions</h2>
  </div>
- <p className="text-[14px] text-[#4A4B68] leading-relaxed mb-4">
+ <p className="text-[14px] text-[#8A8478] leading-relaxed mb-4">
  Develop a 1,500-word critical analysis comparing <span className="font-bold">Word2Vec</span> and <span className="font-bold">Transformer-based</span> embeddings. Your response should address the following:
  </p>
- <ul className="list-disc list-inside text-[14px] text-[#4A4B68] space-y-2 mb-6 ml-2">
+ <ul className="list-disc list-inside text-[14px] text-[#8A8478] space-y-2 mb-6 ml-2">
  <li>Architectural differences in handling polysemy.</li>
  <li>Computational efficiency in large-scale corpora.</li>
  <li>Practical application case study for each model.</li>
@@ -71,7 +71,7 @@ export function AssignmentSubmission() {
  
  <div className="bg-[#F4FAFA] border-l-4 border-[#20B2AA] rounded-r-xl rounded-l-sm p-4 flex gap-3 items-start">
  <InfoIcon className="w-5 h-5 text-[#20B2AA] shrink-0 mt-0.5" />
- <p className="text-[13px] text-[#4A4B68] italic leading-relaxed">
+ <p className="text-[13px] text-[#8A8478] italic leading-relaxed">
  Ensure all technical terms are defined upon first use. Cite at least 4 peer-reviewed sources from the course reading list.
  </p>
  </div>
@@ -81,15 +81,15 @@ export function AssignmentSubmission() {
  <div className="bg-white border border-[#E8E2D9] rounded-2xl flex flex-col shadow-sm overflow-hidden">
  <div className="bg-[#FBFBFC] border-b border-[#E8E2D9] px-4 py-3 flex items-center justify-between">
  <div className="flex items-center gap-1.5">
- <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#4A4B68] hover:bg-[#EAEAF4] transition-colors"><BoldIcon className="w-4 h-4" /></button>
- <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#4A4B68] hover:bg-[#EAEAF4] transition-colors"><ItalicIcon className="w-4 h-4" /></button>
- <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#4A4B68] hover:bg-[#EAEAF4] transition-colors"><ListIcon className="w-4 h-4" /></button>
+ <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8A8478] hover:bg-[#EAEAF4] transition-colors"><BoldIcon className="w-4 h-4" /></button>
+ <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8A8478] hover:bg-[#EAEAF4] transition-colors"><ItalicIcon className="w-4 h-4" /></button>
+ <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8A8478] hover:bg-[#EAEAF4] transition-colors"><ListIcon className="w-4 h-4" /></button>
  <div className="w-px h-5 bg-[#EAEAF4] mx-1" />
- <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#4A4B68] hover:bg-[#EAEAF4] transition-colors"><LinkIcon className="w-4 h-4" /></button>
- <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#4A4B68] hover:bg-[#EAEAF4] transition-colors"><QuoteIcon className="w-4 h-4" /></button>
+ <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8A8478] hover:bg-[#EAEAF4] transition-colors"><LinkIcon className="w-4 h-4" /></button>
+ <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8A8478] hover:bg-[#EAEAF4] transition-colors"><QuoteIcon className="w-4 h-4" /></button>
  </div>
  <div className="flex items-center gap-4 text-[11px] font-bold tracking-widest uppercase">
- <span className="text-[#A0A0C0]">0 words</span>
+ <span className="text-[#8A8478]">0 words</span>
  <span className="flex items-center gap-1.5 text-[#20B2AA]">
  <CheckCircleIcon className="w-3.5 h-3.5" />
  Auto-Saved
@@ -111,7 +111,7 @@ export function AssignmentSubmission() {
  <p className="text-[13px] text-[#8A8478] mb-6 max-w-sm">
  PDF, DOCX, or ZIP (Max 25MB). You can also include code repositories.
  </p>
- <button className="px-6 py-2.5 bg-white border border-[#E8E2D9] text-[#4A4B68] font-bold text-[13px] rounded-xl hover:bg-[#F0F0F8] shadow-sm transition-colors">
+ <button className="px-6 py-2.5 bg-white border border-[#E8E2D9] text-[#8A8478] font-bold text-[13px] rounded-xl hover:bg-[#F0F0F8] shadow-sm transition-colors">
  Browse Files
  </button>
  </div>
@@ -148,19 +148,19 @@ export function AssignmentSubmission() {
  <div className="flex flex-col gap-5 mb-6">
  <div className="flex gap-3 items-start">
  <AlertTriangleIcon className="w-4 h-4 text-[#2C3039] shrink-0 mt-0.5" />
- <p className="text-[13px] text-[#4A4B68] leading-relaxed">
+ <p className="text-[13px] text-[#8A8478] leading-relaxed">
  Your analysis of <span className="font-bold">polysemy</span> lacks specific architectural diagrams or descriptions.
  </p>
  </div>
  <div className="flex gap-3 items-start">
  <CheckCircleIcon className="w-4 h-4 text-[#2C3039] shrink-0 mt-0.5" />
- <p className="text-[13px] text-[#4A4B68] leading-relaxed">
+ <p className="text-[13px] text-[#8A8478] leading-relaxed">
  Citations for <span className="font-bold">Vaswani et al. (2017)</span> correctly formatted.
  </p>
  </div>
  <div className="flex gap-3 items-start">
  <LightbulbIcon className="w-4 h-4 text-[#C0392B] shrink-0 mt-0.5" />
- <p className="text-[13px] text-[#4A4B68] leading-relaxed">
+ <p className="text-[13px] text-[#8A8478] leading-relaxed">
  Suggestion: Compare inference times for real-time applications.
  </p>
  </div>
@@ -186,11 +186,11 @@ export function AssignmentSubmission() {
  <button className="mt-5 w-full py-4 from-[#C0392B] text-white rounded-xl text-[15px] font-bold shadow-[0_4px_14px_rgba(192,57,43,0.35)] hover:shadow-[0_6px_20px_rgba(192,57,43,0.45)] transition-all">
  Final Submission
  </button>
- <p className="text-[10px] text-[#A0A0C0] text-center mt-4 leading-relaxed px-2">
+ <p className="text-[10px] text-[#8A8478] text-center mt-4 leading-relaxed px-2">
  By submitting, you agree to the Academic Integrity Policy and MindNova&apos;s Terms of Service.
  </p>
 
- <button className="mt-4 w-full py-3.5 bg-[#F0F0F8] text-[#4A4B68] rounded-xl text-[14px] font-bold hover:bg-[#EAEAF4] transition-colors">
+ <button className="mt-4 w-full py-3.5 bg-[#F0F0F8] text-[#8A8478] rounded-xl text-[14px] font-bold hover:bg-[#EAEAF4] transition-colors">
  Save as Draft
  </button>
  </div>
@@ -203,7 +203,7 @@ export function AssignmentSubmission() {
  
  <div className="relative z-10 flex flex-col justify-end h-32">
  <h3 className="text-[16px] font-bold mb-1.5">Stuck on semantics?</h3>
- <p className="text-[13px] text-[#A0A0C0] font-medium">Ask Nova for a refresher.</p>
+ <p className="text-[13px] text-[#8A8478] font-medium">Ask Nova for a refresher.</p>
  </div>
  </div>
 

@@ -93,7 +93,7 @@ function CelebrationBanner({ goal }: { goal: string }) {
  
 
  <div className="flex flex-col gap-0.5">
- <span className="text-sm font-bold text-[#131B2E]">
+ <span className="text-sm font-bold text-[#2C3039]">
  Your personalized learning path is ready! 
  </span>
  <span className="text-xs text-[#8A8478]">
@@ -119,7 +119,7 @@ export default function PlanContainer() {
  <StepBadge />
 
  <div className="flex flex-col items-center gap-3 text-center max-w-2xl">
- <h1 className="text-[44px] font-bold text-[#131B2E] leading-tight tracking-tight">
+ <h1 className="text-[44px] font-bold text-[#2C3039] leading-tight tracking-tight">
  Here&apos;s your{" "}
  <span className="text-transparent bg-clip-text bg-[#C0392B] via-[#818cf8] ">
  AI-crafted path
@@ -148,7 +148,7 @@ export default function PlanContainer() {
  onClick={handleBack}
  size="unstyled"
  variant="unstyled"
- className="px-6 py-4 rounded-2xl text-sm font-semibold text-[#84849A] border border-[#E2E2EA] bg-white hover:border-[#E8E2D9] hover:text-[#C0392B] transition-all duration-200 cursor-pointer"
+ className="px-6 py-4 rounded-2xl text-sm font-semibold text-[#8A8478] border border-[#E2E2EA] bg-white hover:border-[#E8E2D9] hover:text-[#C0392B] transition-all duration-200 cursor-pointer"
  >
  ← Back
  </Button>
@@ -172,7 +172,7 @@ export default function PlanContainer() {
  </Button>
  </div>
 
- <p className="flex items-center gap-1.5 text-[11px] text-[#ADADC0]">
+ <p className="flex items-center gap-1.5 text-[11px] text-[#B8B0A3]">
  <ShieldCheckIcon />
  <span>
  AI-powered intelligent curriculum generation engine

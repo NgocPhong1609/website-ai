@@ -3,29 +3,32 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { AvailableCourse } from "../types";
-
+import { NoDataAvailable } from "@/src/shared/components/ui";
+import { GraduationCap } from "lucide-react";
 interface CourseCatalogViewProps {
  courses: AvailableCourse[];
 }
 
 export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
- if (!courses || courses.length === 0) {
- return (
- <div className="w-full flex flex-col items-center justify-center py-20 px-6 text-center bg-white/50 backdrop-blur-md rounded-3xl border border-[#E8E2D9] shadow-sm">
- 
- <h2 className="text-xl sm:text-2xl font-bold text-[#2C3039] mb-3">Bạn đã đăng ký toàn bộ khóa học!</h2>
- <p className="text-sm text-[#8A8478] max-w-md leading-relaxed mb-6">
- Tuyệt vời! Bạn đang theo học tất cả các khóa học có sẵn trên hệ thống. Hãy hoàn thành các lộ trình hiện tại hoặc quay lại sau để đón chờ những khóa học mới nhé.
- </p>
- <Link
- href="/courses"
- className="px-6 py-3 bg-[#C0392B] text-white rounded-xl font-medium text-sm transition-colors hover:bg-[#3234a8] shadow-md"
- >
- Quay lại khóa học của tôi
- </Link>
- </div>
- );
- }
+  if (!courses || courses.length === 0) {
+    return (
+      <div className="py-20 px-6 max-w-3xl mx-auto">
+        <NoDataAvailable
+          icon={GraduationCap}
+          title="Bạn đã đăng ký toàn bộ khóa học!"
+          description="Tuyệt vời! Bạn đang theo học tất cả các khóa học có sẵn trên hệ thống. Hãy hoàn thành các lộ trình hiện tại hoặc quay lại sau để đón chờ những khóa học mới nhé."
+          action={
+            <Link
+              href="/courses"
+              className="px-6 py-3 bg-[#C0392B] text-white rounded-xl font-medium text-sm transition-colors hover:bg-[#3234a8] shadow-md"
+            >
+              Quay lại khóa học của tôi
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
 
  // Hàm phụ trợ để chuẩn hóa URL, tránh lỗi "Invalid URL" của Next.js
  const getValidImageUrl = (url: string | null | undefined) => {
@@ -100,7 +103,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
  </div>
  
  {/* Logic giá & thời gian đã được gộp mượt mà */}
- <div className="flex items-center justify-between text-xs font-semibold text-[#8888A8] border-t border-[#F0F0F8] pt-4 mt-auto">
+ <div className="flex items-center justify-between text-xs font-semibold text-[#8A8478] border-t border-[#F0F0F8] pt-4 mt-auto">
  <span className="flex items-center gap-1.5">
  {course.duration_hours !== undefined ? `${course.duration_hours} giờ` : 'Đang cập nhật'}
  </span>

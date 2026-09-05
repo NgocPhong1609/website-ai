@@ -39,7 +39,7 @@ export function CoursesHeader({
  Danh mục Đào tạo • AI Co-Pilot
  </div>
 
- <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3039] leading-tight font-[family-name:var(--font-playfair-display)]">
+ <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3039] leading-tight font-serif">
  Khóa học của bạn
  </h1>
 
@@ -57,7 +57,7 @@ export function CoursesHeader({
  </span>
  </div>
 
- <div className="text-3xl font-bold text-[#2C3039] my-1 flex items-baseline justify-between gap-6 font-[family-name:var(--font-playfair-display)]">
+ <div className="text-3xl font-bold text-[#2C3039] my-1 flex items-baseline justify-between gap-6 font-serif">
  <div>
  <span className="text-[#C0392B]">{completionPercentage}%</span>
  <span className="text-xs font-medium text-[#B8B0A3] ml-1.5">hoàn thành</span>

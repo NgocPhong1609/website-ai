@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
-import { NoData } from "@/src/shared/components/ui/NoData";
+import { NoDataAvailable } from "@/src/shared/components/ui";
+import { BookX } from "lucide-react";
 import type { CourseDetailModuleItem, CourseDetailLessonItem } from "../../types";
 import toast from "react-hot-toast";
 
@@ -37,7 +38,7 @@ function LessonItemRow({ lesson, courseId }: { lesson: CourseDetailLessonItem; c
  <div className="min-w-0">
  <span className={twMerge(
  "text-xs sm:text-sm font-bold truncate block transition-colors",
- isLocked ? "text-[#8A8478]" : (isCurrent ? "text-[#2C3039]" : "text-[#4A4F5C] group-hover/lesson:text-[#2C3039]")
+ isLocked ? "text-[#8A8478]" : (isCurrent ? "text-[#2C3039]" : "text-[#8A8478] group-hover/lesson:text-[#2C3039]")
  )}>
  {lesson.title}
  </span>
@@ -124,13 +125,13 @@ export function CurriculumAccordion({ modules = [], courseId = 1 }: { modules?: 
  Giáo trình & Học phần
  </span>
  </div>
- <h2 className="text-xl sm:text-2xl font-bold text-[#2C3039] font-[family-name:var(--font-playfair-display)]">
+ <h2 className="text-xl sm:text-2xl font-bold text-[#2C3039] font-serif">
  Nội dung chương trình đào tạo
  </h2>
  </div>
 
  <div className="flex items-center gap-3 shrink-0">
- <div className="px-3.5 py-1.5 rounded-lg border border-[#E8E2D9] bg-[#FAF7F2] text-xs font-bold text-[#4A4F5C]">
+ <div className="px-3.5 py-1.5 rounded-lg border border-[#E8E2D9] bg-[#FAF7F2] text-xs font-bold text-[#8A8478]">
  {modules.length} Modules • <strong className="text-[#2C3039]">{totalLessons} Bài giảng</strong>
  </div>
 
@@ -174,7 +175,7 @@ export function CurriculumAccordion({ modules = [], courseId = 1 }: { modules?: 
  className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-4 bg-transparent hover:bg-[#FAF7F2] transition-colors cursor-pointer focus:outline-none"
  >
  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
- <div className="w-10 h-10 rounded border border-[#E8E2D9] bg-white text-[#2C3039] font-bold text-xs sm:text-sm flex items-center justify-center shrink-0 font-[family-name:var(--font-playfair-display)]">
+ <div className="w-10 h-10 rounded border border-[#E8E2D9] bg-white text-[#2C3039] font-bold text-xs sm:text-sm flex items-center justify-center shrink-0 font-serif">
  {String(modIdx + 1).padStart(2, "0")}
  </div>
  <div className="min-w-0">
@@ -217,7 +218,7 @@ export function CurriculumAccordion({ modules = [], courseId = 1 }: { modules?: 
  );
  })
  ) : (
- <NoData title="Chưa có bài giảng" description="Hiện chưa có danh sách bài giảng cho học phần này." />
+ <NoDataAvailable icon={BookX} title="Chưa có bài giảng" description="Hiện chưa có danh sách bài giảng cho học phần này." variant="compact" />
  )}
  </div>
  </div>

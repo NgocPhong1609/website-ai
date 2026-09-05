@@ -25,7 +25,7 @@ function OverallProgressCard({ data }: { data: OverallProgress }) {
 
  <div className="flex items-baseline justify-between">
  <div className="flex items-baseline gap-2">
- <span className="text-2xl font-bold text-[#2C3039] tracking-tight font-[family-name:var(--font-playfair-display)]">
+ <span className="text-2xl font-bold text-[#2C3039] tracking-tight font-serif">
  {percent}%
  </span>
  <span className="text-xs font-semibold text-[#27AE60] bg-[#E8F8F0] px-2 py-0.5 rounded-md">

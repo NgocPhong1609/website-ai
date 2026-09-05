@@ -15,7 +15,7 @@ const STATUS_CONFIG: Record<
 > = {
   ready:    { dotClass: "bg-[#C0392B]",        labelClass: "text-[#C0392B] font-semibold",  label: "Ready"    },
   upcoming: { dotClass: "bg-[#00A896]",        labelClass: "text-[#00A896] font-semibold",  label: "Up Next"  },
-  locked:   { dotClass: "bg-[#C7C4D7]",        labelClass: "text-[#ADADC0]",                label: "Locked"   },
+  locked:   { dotClass: "bg-[#C7C4D7]",        labelClass: "text-[#B8B0A3]",                label: "Locked"   },
 };
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -64,7 +64,7 @@ function PhaseHeader({ phase, phaseIndex }: PhaseHeaderProps) {
           {phaseIndex + 1}
         </div>
         <div>
-          <span className="text-xs font-bold tracking-wide text-[#131B2E]">
+          <span className="text-xs font-bold tracking-wide text-[#2C3039]">
             {phase.phase_name}
           </span>
         </div>
@@ -104,7 +104,7 @@ function PlanItemRow({ course, isLast, onLessonClick }: PlanItemRowProps) {
         {/* Bấm vào tên khóa học */}
         <span
           onClick={() => onLessonClick(course.title)}
-          className="text-xs leading-snug transition-colors text-[#464554] font-medium hover:text-[#8A8478] cursor-pointer underline-offset-4 hover:underline"
+          className="text-xs leading-snug transition-colors text-[#2C3039] font-medium hover:text-[#8A8478] cursor-pointer underline-offset-4 hover:underline"
         >
           {course.title}
         </span>
@@ -128,7 +128,7 @@ function PhaseBlock({ phase, phaseIndex, onLessonClick }: PhaseBlockProps) {
   return (
     <div className="rounded-2xl border p-4 transition-all duration-300 bg-white border-[#E8E8F0] shadow-[0_2px_12px_rgba(192,57,43,0.06)]">
       <PhaseHeader phase={phase} phaseIndex={phaseIndex} />
-      <p className="text-xs text-[#84849A] mb-3 leading-relaxed">{phase.description}</p>
+      <p className="text-xs text-[#8A8478] mb-3 leading-relaxed">{phase.description}</p>
       <div className="pl-1 space-y-0.5">
         {phase.courses.map((course, idx) => (
           <PlanItemRow 
@@ -162,7 +162,7 @@ export function LearningPathCard({ phases }: LearningPathCardProps) {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#8A8478] opacity-60" />
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#8A8478]" />
             </span>
-            <span className="text-xs font-bold text-[#84849A] uppercase tracking-[0.12em]">
+            <span className="text-xs font-bold text-[#8A8478] uppercase tracking-[0.12em]">
               Your Learning Path
             </span>
           </div>
@@ -183,7 +183,7 @@ export function LearningPathCard({ phases }: LearningPathCardProps) {
             />
           ))}
 
-          <p className="text-[11px] text-[#ADADC0] text-center leading-relaxed mt-1">
+          <p className="text-[11px] text-[#B8B0A3] text-center leading-relaxed mt-1">
             Complete each phase to unlock the next — powered by adaptive AI. Click any lesson to view AI insights & recommended instructor courses.
           </p>
         </div>

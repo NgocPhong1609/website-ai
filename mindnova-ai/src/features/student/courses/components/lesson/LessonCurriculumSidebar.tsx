@@ -2,7 +2,7 @@ export function LessonCurriculumSidebar() {
  return (
  <aside className="w-[300px] shrink-0 border-r border-[#E8E2D9] bg-white h-full overflow-y-auto hidden lg:block">
  <div className="p-6">
- <h2 className="text-lg font-bold text-[#2C3039] mb-4 font-[family-name:var(--font-playfair-display)]">Next.js Fundamentals</h2>
+ <h2 className="text-lg font-bold text-[#2C3039] mb-4 font-serif">Next.js Fundamentals</h2>
  
  {/* Progress Bar */}
  <div className="mb-6">

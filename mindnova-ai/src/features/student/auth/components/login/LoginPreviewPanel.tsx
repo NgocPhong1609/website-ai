@@ -10,7 +10,7 @@ function LearningVelocityCard() {
  <div className="bg-white rounded-2xl p-5 shadow-[0_4px_24px_rgba(70,72,212,0.1)] border border-white/80">
  <div className="flex items-start justify-between mb-4">
  <div>
- <p className="text-[10px] font-bold text-[#ADADC0] uppercase tracking-[0.12em] mb-1">
+ <p className="text-[10px] font-bold text-[#B8B0A3] uppercase tracking-[0.12em] mb-1">
  Learning Velocity
  </p>
  <p className="text-[18px] font-extrabold text-[#C0392B] leading-tight">
@@ -49,7 +49,7 @@ function AiTutorCard() {
  AI Tutor
  </span>
  </div>
- <p className="text-[11.5px] text-[#4A4A6A] leading-[1.6]">
+ <p className="text-[11.5px] text-[#8A8478] leading-[1.6]">
  &ldquo;I&apos;ve identified a gap in your Quantum Physics modules. Should we focus on
  Wave-Particle Duality next?&rdquo;
  </p>
@@ -85,7 +85,7 @@ function UserStreakCard() {
 function NextSessionCard() {
  return (
  <div className="bg-white rounded-2xl p-4 shadow-[0_4px_24px_rgba(70,72,212,0.08)] border border-white/80 space-y-2.5">
- <p className="text-[9px] font-black text-[#C0C0D8] uppercase tracking-[0.2em]">
+ <p className="text-[9px] font-black text-[#B8B0A3] uppercase tracking-[0.2em]">
  Recommended Focus
  </p>
 
@@ -124,7 +124,7 @@ export function LoginPreviewPanel() {
  <p className="text-xs font-bold text-[#C0392B]/70 uppercase tracking-[0.2em] mb-1">
  Your dashboard preview
  </p>
- <p className="text-[15px] font-bold text-[#2A2A4A] leading-snug">
+ <p className="text-[15px] font-bold text-[#2C3039] leading-snug">
  Everything you need to accelerate<br />your learning journey
  </p>
  </div>
@@ -153,7 +153,7 @@ export function LoginPreviewPanel() {
  </div>
 
  {/* Bottom caption */}
- <p className="relative mt-8 text-[11px] text-[#B0B0CC] tracking-wide text-center">
+ <p className="relative mt-8 text-[11px] text-[#B8B0A3] tracking-wide text-center">
  Powered by MindNova AI · Trusted by 50,000+ learners
  </p>
  </div>

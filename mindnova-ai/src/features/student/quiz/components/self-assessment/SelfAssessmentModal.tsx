@@ -133,7 +133,7 @@ export function SelfAssessmentModal({
  <div className="flex items-center gap-2.5">
  <span className="text-xl"></span>
  <div>
- <h3 className="text-base font-bold text-[#1E1B4B]">
+ <h3 className="text-base font-bold text-[#2C3039]">
  Đánh giá Năng lực AI — {courseTitle}
  </h3>
  <span className="text-[11px] font-semibold text-[#2C3039]">
@@ -269,7 +269,7 @@ export function SelfAssessmentModal({
  onClick={() => handleOptionSelect(q.id, opt.id)}
  className={`p-4 rounded-xl border text-xs sm:text-sm cursor-pointer transition-all flex items-center justify-between ${
  isSelected
- ? "bg-[#FAF7F2] border-[#C0392B] text-[#1E1B4B] font-semibold ring-1 ring-[#C0392B]"
+ ? "bg-[#FAF7F2] border-[#C0392B] text-[#2C3039] font-semibold ring-1 ring-[#C0392B]"
  : "bg-white border-[#E8E2D9] text-gray-700 hover:bg-[#FEFCF9]"
  }`}
  >

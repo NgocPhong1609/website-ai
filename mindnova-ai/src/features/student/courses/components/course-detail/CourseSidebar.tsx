@@ -22,7 +22,7 @@ function ProgressCard({ progress }: { progress?: CourseDetailProgressCard }) {
  <div className="flex items-center justify-between gap-2 mb-3">
  <div>
  <span className="text-xs font-bold text-[#8A8478] uppercase tracking-wider block">Tiến độ khóa học</span>
- <h3 className="text-2xl font-bold text-[#2C3039] mt-1 font-[family-name:var(--font-playfair-display)]">{percentage}% Hoàn thành</h3>
+ <h3 className="text-2xl font-bold text-[#2C3039] mt-1 font-serif">{percentage}% Hoàn thành</h3>
  </div>
  <span className="text-[11px] font-bold text-[#2C3039] bg-[#E8F6F3] px-2.5 py-1 rounded-md border border-[#2C3039]/20">
  {statusTag}
@@ -61,7 +61,7 @@ function AiInsightCard({ aiInsight }: { aiInsight?: CourseDetailAIInsight }) {
 
  <div className="flex items-center justify-between mb-4">
  <div className="flex items-center gap-2">
- <div className="w-8 h-8 rounded-lg bg-[#2C3039] text-white flex items-center justify-center font-bold text-xs font-[family-name:var(--font-playfair-display)]">
+ <div className="w-8 h-8 rounded-lg bg-[#2C3039] text-white flex items-center justify-center font-bold text-xs font-serif">
  AI
  </div>
  <span className="text-xs sm:text-sm font-bold text-[#2C3039]">{title}</span>
@@ -71,7 +71,7 @@ function AiInsightCard({ aiInsight }: { aiInsight?: CourseDetailAIInsight }) {
  </div>
  </div>
 
- <p className="text-xs sm:text-[13px] text-[#4A4F5C] leading-relaxed font-normal">
+ <p className="text-xs sm:text-[13px] text-[#8A8478] leading-relaxed font-normal">
  {summaryText}
  </p>
 
@@ -186,11 +186,11 @@ function InstructorCard({ instructor }: { instructor?: CourseDetailInstructor & 
  </span>
 
  <div className="flex items-center gap-1 mb-1">
- <h3 className="text-base font-bold text-[#2C3039] font-[family-name:var(--font-playfair-display)]">{name}</h3>
+ <h3 className="text-base font-bold text-[#2C3039] font-serif">{name}</h3>
  <VerifiedTeacherBadge isVerified={isVerified} size="sm" />
  </div>
  <p className="text-xs text-[#8A8478] font-bold mb-3">{role}</p>
- <p className="text-xs text-[#4A4F5C] leading-relaxed max-w-xs font-normal mb-5 border-t border-[#E8E2D9] pt-4">
+ <p className="text-xs text-[#8A8478] leading-relaxed max-w-xs font-normal mb-5 border-t border-[#E8E2D9] pt-4">
  {bio}
  </p>
 
@@ -213,7 +213,7 @@ function EnrollCard({ price, courseId }: { price?: number, courseId?: string | n
  <div className="flex items-center justify-between gap-2 mb-3 pb-3 border-b border-[#E8E2D9]">
  <div>
  <span className="text-xs font-bold text-[#C0392B] uppercase tracking-wider block">Phí Đăng Ký</span>
- <h3 className="text-2xl font-bold text-[#2C3039] mt-1 font-[family-name:var(--font-playfair-display)]">
+ <h3 className="text-2xl font-bold text-[#2C3039] mt-1 font-serif">
  {Number(price) === 0 ? 'Miễn phí' : `${Number(price).toLocaleString()} VND`}
  </h3>
  </div>

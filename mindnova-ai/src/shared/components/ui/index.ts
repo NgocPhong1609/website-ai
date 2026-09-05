@@ -10,3 +10,6 @@ export { default as Card, CardHeader, CardTitle, CardDescription, CardContent, C
 export type { CardProps, CardVariant, CardHoverEffect, CardPadding } from "./Card";
 
 export { ArrowRightIcon } from "../icons/ArrowRightIcon";
+
+export { NoDataAvailable } from "./NoDataAvailable";
+export type { NoDataAvailableProps } from "./NoDataAvailable";

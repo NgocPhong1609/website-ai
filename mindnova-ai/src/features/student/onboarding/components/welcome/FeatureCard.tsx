@@ -13,8 +13,8 @@ export default function FeatureCard({
  <div className="w-10 h-10 rounded-lg bg-[#C0392B]/10 flex justify-center items-center">
  <Image src={icon} alt="" aria-hidden="true" width={16} height={20} />
  </div>
- <h3 className="text-[13px] font-medium text-[#131B2E]">{title}</h3>
- <p className="text-[11px] text-[#464554]">{description}</p>
+ <h3 className="text-[13px] font-medium text-[#2C3039]">{title}</h3>
+ <p className="text-[11px] text-[#2C3039]">{description}</p>
  </div>
  );
 }

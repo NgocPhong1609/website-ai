@@ -20,10 +20,10 @@ export function CertificatesContent() {
           <h3 className="text-[11px] font-bold tracking-widest text-[#8A8478] uppercase mb-2">
             Your Achievements
           </h3>
-          <h1 className="text-3xl font-bold text-[#1A1A2E] leading-tight mb-3">
+          <h1 className="text-3xl font-bold text-[#2C3039] leading-tight mb-3">
             Certificates &amp; Credentials
           </h1>
-          <p className="text-[14px] text-[#7878A0] max-w-2xl leading-relaxed">
+          <p className="text-[14px] text-[#8A8478] max-w-2xl leading-relaxed">
             Celebrate your hard work. Here you can find all your verified AI-powered certifications, ready to be shared with the world.
           </p>
         </div>
@@ -49,9 +49,9 @@ export function CertificatesContent() {
             <PartyPopperIcon className="w-8 h-8 text-[#C0392B]" />
           </div>
           <div>
-            <h2 className="text-[18px] font-bold text-[#1A1A2E] mb-1">Ready to claim!</h2>
-            <p className="text-[14px] text-[#7878A0]">
-              You&apos;ve completed 100% of <span className="font-bold text-[#1A1A2E]">Neural Networks 101</span>.
+            <h2 className="text-[18px] font-bold text-[#2C3039] mb-1">Ready to claim!</h2>
+            <p className="text-[14px] text-[#8A8478]">
+              You&apos;ve completed 100% of <span className="font-bold text-[#2C3039]">Neural Networks 101</span>.
             </p>
           </div>
         </div>
@@ -81,10 +81,10 @@ export function CertificatesContent() {
           
           <div className="flex-1 flex flex-col">
             <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="text-[17px] font-bold text-[#1A1A2E] leading-tight">Next.js Fullstack</h3>
+              <h3 className="text-[17px] font-bold text-[#2C3039] leading-tight">Next.js Fullstack</h3>
               <VerifiedBadgeIcon className="w-5 h-5 text-[#C0392B] shrink-0 mt-0.5" />
             </div>
-            <p className="text-[13px] text-[#A0A0C0] mb-5">Completed on Oct 12, 2023</p>
+            <p className="text-[13px] text-[#8A8478] mb-5">Completed on Oct 12, 2023</p>
             
             <div className="flex items-center gap-2 flex-wrap mt-auto">
               <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">React</span>
@@ -109,10 +109,10 @@ export function CertificatesContent() {
           
           <div className="flex-1 flex flex-col">
             <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="text-[17px] font-bold text-[#1A1A2E] leading-tight">Machine Learning Foundations</h3>
+              <h3 className="text-[17px] font-bold text-[#2C3039] leading-tight">Machine Learning Foundations</h3>
               <VerifiedBadgeIcon className="w-5 h-5 text-[#C0392B] shrink-0 mt-0.5" />
             </div>
-            <p className="text-[13px] text-[#A0A0C0] mb-5">Completed on Aug 05, 2023</p>
+            <p className="text-[13px] text-[#8A8478] mb-5">Completed on Aug 05, 2023</p>
             
             <div className="flex items-center gap-2 flex-wrap mt-auto">
               <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Python</span>
@@ -126,8 +126,8 @@ export function CertificatesContent() {
           {/* Certificate Preview Graphic */}
           <div className="w-full h-[180px] rounded-xl mb-5 relative bg-[#F8F9FB] p-4 flex flex-col items-center justify-center shadow-inner border border-[#EAEAF4]">
             <div className="w-[85%] h-[85%] bg-white shadow-sm border border-[#EAEAF4] flex flex-col items-center justify-center relative p-3">
-              <div className="text-[14px] font-serif text-[#1A1A2E] mb-2 border-b border-[#EAEAF4] pb-1">Alex Chen</div>
-              <div className="text-[8px] text-[#7878A0] text-center px-4">Has successfully completed the Advanced UI Design course on MindNova AI.</div>
+              <div className="text-[14px] font-serif text-[#2C3039] mb-2 border-b border-[#EAEAF4] pb-1">Alex Chen</div>
+              <div className="text-[8px] text-[#8A8478] text-center px-4">Has successfully completed the Advanced UI Design course on MindNova AI.</div>
               {/* Ribbon */}
               <div className="absolute bottom-3 right-3 flex flex-col items-center">
                 <div className="w-6 h-6 rounded-full bg-[#C0392B] border-2 border-white shadow-sm relative z-10" />
@@ -139,10 +139,10 @@ export function CertificatesContent() {
           
           <div className="flex-1 flex flex-col">
             <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="text-[17px] font-bold text-[#1A1A2E] leading-tight">Advanced UI Design</h3>
+              <h3 className="text-[17px] font-bold text-[#2C3039] leading-tight">Advanced UI Design</h3>
               <VerifiedBadgeIcon className="w-5 h-5 text-[#C0392B] shrink-0 mt-0.5" />
             </div>
-            <p className="text-[13px] text-[#A0A0C0] mb-5">Completed on June 20, 2023</p>
+            <p className="text-[13px] text-[#8A8478] mb-5">Completed on June 20, 2023</p>
             
             <div className="flex items-center gap-2 flex-wrap mt-auto">
               <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Design Systems</span>
@@ -162,8 +162,8 @@ export function CertificatesContent() {
             <GraduationCapIcon className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[13px] font-semibold text-[#7878A0] mb-0.5">Total Certificates</p>
-            <p className="text-2xl font-bold text-[#1A1A2E]">08</p>
+            <p className="text-[13px] font-semibold text-[#8A8478] mb-0.5">Total Certificates</p>
+            <p className="text-2xl font-bold text-[#2C3039]">08</p>
           </div>
         </div>
 
@@ -173,8 +173,8 @@ export function CertificatesContent() {
             <StopwatchIcon className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[13px] font-semibold text-[#7878A0] mb-0.5">Learning Hours</p>
-            <p className="text-2xl font-bold text-[#1A1A2E]">240h</p>
+            <p className="text-[13px] font-semibold text-[#8A8478] mb-0.5">Learning Hours</p>
+            <p className="text-2xl font-bold text-[#2C3039]">240h</p>
           </div>
         </div>
 
@@ -184,8 +184,8 @@ export function CertificatesContent() {
             <MedalIcon className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[13px] font-semibold text-[#7878A0] mb-0.5">Skill Points</p>
-            <p className="text-2xl font-bold text-[#1A1A2E]">1,250</p>
+            <p className="text-[13px] font-semibold text-[#8A8478] mb-0.5">Skill Points</p>
+            <p className="text-2xl font-bold text-[#2C3039]">1,250</p>
           </div>
         </div>
 

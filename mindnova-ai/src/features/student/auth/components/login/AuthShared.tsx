@@ -140,7 +140,7 @@ export function FormField({ id, label, leftIcon, rightElement, labelRight, error
  {labelRight}
  </div>
  <div className="relative group">
- <div className={`pointer-events-none absolute inset-y-0 left-4 flex items-center transition-colors duration-200 ${error ? "text-red-400 group-focus-within:text-red-500" : "text-[#B0B0C8] group-focus-within:text-[#C0392B]"}`}>
+ <div className={`pointer-events-none absolute inset-y-0 left-4 flex items-center transition-colors duration-200 ${error ? "text-red-400 group-focus-within:text-red-500" : "text-[#B8B0A3] group-focus-within:text-[#C0392B]"}`}>
  {leftIcon}
  </div>
  <input

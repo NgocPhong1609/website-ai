@@ -28,7 +28,7 @@ export function TopicsGrid({ selectedIds, onToggle }: TopicsGridProps) {
  <div className="flex items-center justify-between px-5 py-4 border-b border-[#F0F0F7]">
  <div className="flex items-center gap-2">
  <div className="w-2 h-2 rounded-full bg-[#FAF7F2] animate-pulse" />
- <span className="text-xs font-semibold text-[#84849A] uppercase tracking-wider">
+ <span className="text-xs font-semibold text-[#8A8478] uppercase tracking-wider">
  Available Topics
  </span>
  </div>
@@ -55,7 +55,7 @@ export function TopicsGrid({ selectedIds, onToggle }: TopicsGridProps) {
  </div>
 
  {/* Footer hint */}
- <p className="mt-4 text-[11px] text-[#ADADC0] leading-relaxed">
+ <p className="mt-4 text-[11px] text-[#B8B0A3] leading-relaxed">
  Select all that apply — more selections create richer AI pathways.
  </p>
  </div>

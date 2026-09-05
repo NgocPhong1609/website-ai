@@ -25,10 +25,10 @@ export default function SkillContainer() {
 
  {/* Header */}
  <div className="w-full flex flex-col items-center gap-3">
- <h1 className="font-bold text-[32px] text-[#131B2E]">
+ <h1 className="font-bold text-[32px] text-[#2C3039]">
  What is your current skill level?
  </h1>
- <p className="text-[16px] max-w-127.5 w-full text-center text-[#464554]">
+ <p className="text-[16px] max-w-127.5 w-full text-center text-[#2C3039]">
  This helps our AI tailor the complexity of your study plan and
  practice exercises to your specific needs.
  </p>
@@ -57,7 +57,7 @@ export default function SkillContainer() {
  className={`py-[21.6px] px-[57.6px] rounded-lg transition-colors text-[14.4px] mt-8 ${
  selectedId !== null
  ? "bg-[#FAF7F2] text-white shadow-md hover:bg-[#5757EE]"
- : "bg-[#E2E8F0] text-[#464554]/40 cursor-not-allowed"
+ : "bg-[#E2E8F0] text-[#2C3039]/40 cursor-not-allowed"
  }`}
  rightIcon={<ArrowRightIcon />}
  >
