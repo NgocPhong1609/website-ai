@@ -93,15 +93,20 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
     
     let optionsList: string[] = ["Đáp án 1", "Đáp án 2", "Đáp án 3", "Đáp án 4"];
     let correctIdx = 0;
+    let correctIndices: number[] = [0];
 
     if (isMcq) {
       if (Array.isArray(q.options) && q.options.length > 0) {
         optionsList = q.options;
         correctIdx = typeof q.correct_answer_index === "number" ? q.correct_answer_index : 0;
+        correctIndices = Array.isArray(q.correct_answer_indices) ? q.correct_answer_indices : [correctIdx];
       } else if (Array.isArray(q.answers) && q.answers.length > 0) {
         optionsList = q.answers.map((a: any) => a.content || a.answer || "");
         const foundIdx = q.answers.findIndex((a: any) => Boolean(a.is_correct));
         correctIdx = foundIdx >= 0 ? foundIdx : 0;
+        correctIndices = q.answers
+          .map((answer: any, answerIndex: number) => Boolean(answer.is_correct) ? answerIndex : -1)
+          .filter((answerIndex: number) => answerIndex >= 0);
       }
     } else {
       optionsList = [];
@@ -111,9 +116,11 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
     return {
       id: q.id ? String(q.id) : `q_${Date.now()}_${idx}`,
       type: isEssay ? "essay" : "multiple_choice",
+      selection_type: isEssay ? undefined : (q.selection_type || "single_choice"),
       question: q.question || q.content || `Câu hỏi #${idx + 1}`,
       options: isEssay ? [] : optionsList,
       correct_answer_index: isEssay ? null : correctIdx,
+      correct_answer_indices: isEssay ? [] : correctIndices,
       explanation: q.explanation || "",
       sample_answer: q.sample_answer || "",
       rubric: q.rubric || "",
@@ -197,9 +204,11 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
         ? {
             id: `q_${Date.now()}`,
             type: "multiple_choice",
+            selection_type: "single_choice",
             question: "Nội dung câu hỏi trắc nghiệm mới...",
             options: ["Lựa chọn A", "Lựa chọn B", "Lựa chọn C", "Lựa chọn D"],
             correct_answer_index: 0,
+            correct_answer_indices: [0],
             explanation: "Giải thích đáp án...",
             points: 0.5,
             difficulty: "medium",

@@ -62,10 +62,12 @@ export function useManualQuizWizard(options?: {
       {
         id: `manual_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         type,
+        selection_type: "single_choice",
         difficulty: "medium",
         question: "",
         options: type === "multiple_choice" ? ["", "", "", ""] : [],
         correct_answer_index: type === "multiple_choice" ? 0 : null,
+        correct_answer_indices: type === "multiple_choice" ? [0] : [],
         explanation: "",
         sample_answer: "",
         rubric: "",

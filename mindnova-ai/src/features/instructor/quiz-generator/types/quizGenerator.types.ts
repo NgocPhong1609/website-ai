@@ -1,15 +1,18 @@
 export type SourceType = "content" | "topic" | "course";
 export type DifficultyType = "easy" | "medium" | "hard" | "mixed";
 export type QuestionType = "multiple_choice" | "essay";
+export type SelectionType = "single_choice" | "multiple_choice";
 export type ReviewStatus = "pending" | "approved" | "edited" | "discarded";
 
 export interface GeneratedQuestion {
  id: string;
  type: QuestionType;
+ selection_type?: SelectionType;
  difficulty: DifficultyType | "easy" | "medium" | "hard";
  question: string;
  options: string[];
  correct_answer_index: number | null;
+ correct_answer_indices?: number[];
  explanation: string;
  sample_answer?: string;
  rubric?: string;

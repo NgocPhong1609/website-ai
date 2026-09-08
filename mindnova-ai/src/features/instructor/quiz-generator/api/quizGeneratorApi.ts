@@ -1,5 +1,6 @@
 import { axiosClient } from "@/src/shared/lib/axios";
 import { QuizConfig, GeneratedQuestion, QuizSummary, QuizAttachmentPayload } from "../types/quizGenerator.types";
+import { serializeQuizQuestion } from "./serializeQuizQuestion";
 
 export const quizGeneratorApi = {
  // Generate quiz questions via AI
@@ -55,6 +56,7 @@ export const quizGeneratorApi = {
  ...quizData,
  questions: quizData.questions.map((q: any) => ({
  type: q.type === "trac_nghiem" ? "multiple_choice" : (q.type === "tu_luan" ? "essay" : q.type),
+ selection_type: q.selection_type || "single_choice",
  difficulty: q.difficulty || "medium",
  content: q.content || q.question || "",
  explanation: q.explanation || "",
@@ -69,7 +71,9 @@ export const quizGeneratorApi = {
  : (q.type === "multiple_choice" || q.type === "trac_nghiem") && Array.isArray(q.options)
  ? q.options.map((opt: string, idx: number) => ({
  content: opt,
- is_correct: idx === q.correct_answer_index,
+ is_correct: q.selection_type === "multiple_choice"
+ ? (q.correct_answer_indices || []).includes(idx)
+ : idx === q.correct_answer_index,
  }))
  : undefined,
  })),
@@ -94,31 +98,7 @@ export const quizGeneratorApi = {
  }) => {
  const payload = {
  ...quizData,
- questions: quizData.questions.map((q: any) => {
- const isEssay = q.type === "essay" || q.type === "tu_luan";
- return {
- type: isEssay ? "essay" : "multiple_choice",
- difficulty: q.difficulty || "medium",
- content: q.question || q.content || "",
- explanation: q.explanation || "",
- sample_answer: isEssay ? (q.sample_answer || "") : undefined,
- rubric: isEssay ? (q.rubric || "") : undefined,
- points: parseFloat(q.points) || (isEssay ? 2.5 : 0.5),
- answers: !isEssay
- ? (Array.isArray(q.answers)
- ? q.answers.map((a: any) => ({
- content: a.content || a.text || "",
- is_correct: Boolean(a.is_correct),
- }))
- : (Array.isArray(q.options)
- ? q.options.map((opt: string, idx: number) => ({
- content: opt,
- is_correct: idx === q.correct_answer_index,
- }))
- : []))
- : undefined,
- };
- }),
+ questions: quizData.questions.map(serializeQuizQuestion),
  };
 
  const res = await axiosClient.post("/api/instructor/ai-quiz/store", payload);

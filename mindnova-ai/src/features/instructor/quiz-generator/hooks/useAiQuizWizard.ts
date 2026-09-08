@@ -94,6 +94,8 @@ export function useAiQuizWizard(options?: {
  if (response.success && response.data?.questions) {
  const genQuestions: GeneratedQuestion[] = response.data.questions.map((q: any) => ({
  ...q,
+ selection_type: q.selection_type || "single_choice",
+ correct_answer_indices: q.type === "multiple_choice" ? [q.correct_answer_index ?? 0] : [],
  reviewStatus: "pending",
  }));
  setQuestions(genQuestions);

@@ -203,6 +203,7 @@ export function formatQuizPayloadForBackend(payload: any) {
     const content = q.content || q.question || "Nội dung câu hỏi";
     const points = typeof q.points === "number" ? q.points : (parseFloat(q.points) || (type === "essay" ? 5.0 : 1.0));
     const explanation = q.explanation || "";
+    const selectionType = q.selection_type === "multiple_choice" ? "multiple_choice" : "single_choice";
 
     if (type === "essay") {
       return {
@@ -224,9 +225,10 @@ export function formatQuizPayloadForBackend(payload: any) {
       }));
     } else if (Array.isArray(q.options) && q.options.length > 0) {
       const correctIdx = typeof q.correct_answer_index === "number" ? q.correct_answer_index : 0;
+      const correctIndices = Array.isArray(q.correct_answer_indices) ? q.correct_answer_indices : [correctIdx];
       answers = q.options.map((opt: any, i: number) => ({
         content: String(opt),
-        is_correct: i === correctIdx,
+        is_correct: selectionType === "multiple_choice" ? correctIndices.includes(i) : i === correctIdx,
       }));
     }
 
@@ -239,7 +241,7 @@ export function formatQuizPayloadForBackend(payload: any) {
     const correctCount = answers.filter((a) => a.is_correct).length;
     if (correctCount === 0) {
       answers[0].is_correct = true;
-    } else if (correctCount > 1) {
+    } else if (selectionType === "single_choice" && correctCount > 1) {
       let firstFound = false;
       answers = answers.map((a) => {
         if (a.is_correct && !firstFound) {
@@ -252,6 +254,7 @@ export function formatQuizPayloadForBackend(payload: any) {
 
     return {
       type: "multiple_choice",
+      selection_type: selectionType,
       content,
       explanation,
       points,
