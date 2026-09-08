@@ -15,6 +15,8 @@ describe("Instructor quiz thumbnails", () => {
     const missing = screen.getByRole("img", { name: "Ảnh đại diện quiz Quiz chưa có ảnh" });
     expect(stored).toHaveAttribute("src", "https://cdn.example/cover.png");
     expect(missing).toHaveAttribute("src", "/icons/exam.svg");
+    expect(stored).toHaveClass("aspect-square");
+    expect(stored).toHaveClass("shrink-0");
 
     fireEvent.error(stored);
     expect(stored).toHaveAttribute("src", "/icons/exam.svg");

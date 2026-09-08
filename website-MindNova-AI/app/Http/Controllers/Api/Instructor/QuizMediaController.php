@@ -17,11 +17,17 @@ class QuizMediaController extends Controller
 
     public function store(UploadQuizMediaRequest $request)
     {
-        $media = $this->quizMediaService->uploadTemporary(
-            $request->user(),
-            $request->file('file'),
-            $request->validated('purpose'),
-        );
+        try {
+            $media = $this->quizMediaService->uploadTemporary(
+                $request->user(),
+                $request->file('file'),
+                $request->validated('purpose'),
+            );
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return $this->errorResponse('Không thể tải ảnh lên. Vui lòng thử lại.', 500);
+        }
 
         return $this->createdResponse($media, 'Quiz media uploaded successfully.');
     }

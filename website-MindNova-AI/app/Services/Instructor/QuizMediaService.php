@@ -11,18 +11,25 @@ use Illuminate\Validation\ValidationException;
 
 class QuizMediaService
 {
+    private const PUBLIC_KEY_PREFIX = 'public:';
+
     public function uploadTemporary(User $instructor, UploadedFile $file, string $purpose): array
     {
+        $diskName = $this->mediaDisk();
+        $disk = Storage::disk($diskName);
         $extension = strtolower($file->getClientOriginalExtension());
         $directory = "temp/quiz-media/{$instructor->id}";
         $filename = Str::uuid().".{$extension}";
         $key = "{$directory}/{$filename}";
 
-        Storage::disk('r2')->putFileAs($directory, $file, $filename);
+        if ($disk->putFileAs($directory, $file, $filename) === false) {
+            throw new \RuntimeException('Không thể lưu ảnh. Vui lòng thử lại.');
+        }
 
         return [
-            'url' => Storage::disk('r2')->url($key),
-            'r2_key' => $key,
+            'url' => $disk->url($key),
+            'r2_key' => $this->encodeKey($diskName, $key),
+            'storage_disk' => $diskName,
             'mime_type' => $file->getMimeType() ?: 'application/octet-stream',
             'size_bytes' => $file->getSize(),
             'purpose' => $purpose,
@@ -90,9 +97,42 @@ class QuizMediaService
 
     public function deleteKeys(array $keys): void
     {
-        if ($keys !== []) {
-            Storage::disk('r2')->delete(array_values(array_unique($keys)));
+        $keysByDisk = [];
+        foreach (array_unique($keys) as $storedKey) {
+            [$diskName, $key] = $this->decodeKey($storedKey);
+            if ($diskName === 'r2' && !$this->r2Configured()) {
+                continue;
+            }
+            $keysByDisk[$diskName][] = $key;
         }
+
+        foreach ($keysByDisk as $diskName => $diskKeys) {
+            Storage::disk($diskName)->delete($diskKeys);
+        }
+    }
+
+    public function isManagedKeyValid(User $instructor, ?Quiz $quiz, string $storedKey): bool
+    {
+        [$diskName, $key] = $this->decodeKey($storedKey);
+        $tempPrefix = "temp/quiz-media/{$instructor->id}/";
+        $quizPrefix = $quiz ? "quizzes/{$quiz->id}/" : null;
+        $hasAllowedPrefix = str_starts_with($key, $tempPrefix)
+            || ($quizPrefix && str_starts_with($key, $quizPrefix));
+
+        if (!$hasAllowedPrefix) {
+            return false;
+        }
+
+        if ($quizPrefix && str_starts_with($key, $quizPrefix)
+            && in_array($storedKey, $this->managedKeys($quiz), true)) {
+            return true;
+        }
+
+        if ($diskName === 'r2' && !$this->r2Configured()) {
+            return false;
+        }
+
+        return Storage::disk($diskName)->exists($key);
     }
 
     private function promotePair(
@@ -108,23 +148,70 @@ class QuizMediaService
             return [$url, null];
         }
 
+        [$diskName, $storageKey] = $this->decodeKey($key);
         $quizPrefix = "quizzes/{$quiz->id}/";
-        if (str_starts_with($key, $quizPrefix) && Storage::disk('r2')->exists($key)) {
-            return [Storage::disk('r2')->url($key), $key];
+        if ($diskName === 'r2' && !$this->r2Configured()) {
+            if (str_starts_with($storageKey, $quizPrefix)
+                && in_array($key, $this->managedKeys($quiz), true)) {
+                return [$url, $key];
+            }
+
+            throw ValidationException::withMessages([
+                $errorPath => 'Cloudflare R2 chưa được cấu hình để xử lý ảnh này.',
+            ]);
+        }
+
+        $disk = Storage::disk($diskName);
+
+        if (str_starts_with($storageKey, $quizPrefix) && $disk->exists($storageKey)) {
+            return [$disk->url($storageKey), $key];
         }
 
         $tempPrefix = "temp/quiz-media/{$instructor->id}/";
-        if (!str_starts_with($key, $tempPrefix) || !Storage::disk('r2')->exists($key)) {
+        if (!str_starts_with($storageKey, $tempPrefix) || !$disk->exists($storageKey)) {
             throw ValidationException::withMessages([
                 $errorPath => 'Managed quiz media key is invalid or not owned by this instructor.',
             ]);
         }
 
-        $extension = strtolower(pathinfo($key, PATHINFO_EXTENSION));
+        $extension = strtolower(pathinfo($storageKey, PATHINFO_EXTENSION));
         $newKey = "{$quizPrefix}{$directory}/".Str::uuid().".{$extension}";
-        Storage::disk('r2')->move($key, $newKey);
-        $promotedKeys[] = $newKey;
+        if (!$disk->move($storageKey, $newKey)) {
+            throw ValidationException::withMessages([
+                $errorPath => 'Không thể lưu ảnh vào bài kiểm tra. Vui lòng thử lại.',
+            ]);
+        }
+        $promotedKeys[] = $this->encodeKey($diskName, $newKey);
 
-        return [Storage::disk('r2')->url($newKey), $newKey];
+        return [$disk->url($newKey), $this->encodeKey($diskName, $newKey)];
+    }
+
+    private function mediaDisk(): string
+    {
+        return $this->r2Configured() ? 'r2' : 'public';
+    }
+
+    private function r2Configured(): bool
+    {
+        $r2 = config('filesystems.disks.r2', []);
+
+        return !empty($r2['key'])
+            && !empty($r2['secret'])
+            && !empty($r2['bucket'])
+            && !empty($r2['endpoint']);
+    }
+
+    private function encodeKey(string $diskName, string $key): string
+    {
+        return $diskName === 'public' ? self::PUBLIC_KEY_PREFIX.$key : $key;
+    }
+
+    private function decodeKey(string $storedKey): array
+    {
+        if (str_starts_with($storedKey, self::PUBLIC_KEY_PREFIX)) {
+            return ['public', substr($storedKey, strlen(self::PUBLIC_KEY_PREFIX))];
+        }
+
+        return ['r2', $storedKey];
     }
 }

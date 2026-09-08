@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Instructor;
 
+use App\Services\Instructor\QuizMediaService;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Storage;
 
 class StoreAiQuizRequest extends FormRequest
 {
@@ -165,16 +165,13 @@ class StoreAiQuizRequest extends FormRequest
             }
         }
 
-        $tempPrefix = 'temp/quiz-media/'.$this->user()->id.'/';
         $quiz = $this->route('quiz');
-        $quizPrefix = $quiz ? "quizzes/{$quiz->id}/" : null;
+        $media = app(QuizMediaService::class);
         foreach ($pairs as $pair) {
             if (!$pair['key']) {
                 continue;
             }
-            $hasAllowedPrefix = str_starts_with($pair['key'], $tempPrefix)
-                || ($quizPrefix && str_starts_with($pair['key'], $quizPrefix));
-            if (!$hasAllowedPrefix || !Storage::disk('r2')->exists($pair['key'])) {
+            if (!$media->isManagedKeyValid($this->user(), $quiz, $pair['key'])) {
                 $validator->errors()->add($pair['path'], 'Managed quiz media key is invalid or not owned by this instructor.');
             }
         }

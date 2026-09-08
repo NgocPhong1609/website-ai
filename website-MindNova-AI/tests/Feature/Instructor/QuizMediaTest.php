@@ -3,6 +3,7 @@
 use App\Models\Quiz;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\Instructor\QuizMediaService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -10,6 +11,12 @@ use Illuminate\Support\Facades\Storage;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    config([
+        'filesystems.disks.r2.key' => 'test-key',
+        'filesystems.disks.r2.secret' => 'test-secret',
+        'filesystems.disks.r2.bucket' => 'test-bucket',
+        'filesystems.disks.r2.endpoint' => 'https://example.test',
+    ]);
     $teacherRole = Role::firstOrCreate(['name' => 'teacher']);
     $this->teacher = User::factory()->create();
     $this->teacher->roles()->attach($teacherRole);
@@ -116,6 +123,42 @@ test('teacher can upload quiz media into an owned temporary namespace', function
     Storage::disk('r2')->assertExists($key);
 });
 
+test('quiz media upload falls back to public storage when r2 is not configured', function () {
+    config([
+        'filesystems.disks.r2.key' => null,
+        'filesystems.disks.r2.secret' => null,
+        'filesystems.disks.r2.bucket' => null,
+        'filesystems.disks.r2.endpoint' => null,
+    ]);
+    Storage::fake('public');
+
+    $response = $this->actingAs($this->teacher)->postJson('/api/instructor/quiz-media', [
+        'purpose' => 'thumbnail',
+        'file' => UploadedFile::fake()->create('cover.png', 200, 'image/png'),
+    ]);
+
+    $response->assertCreated()
+        ->assertJsonPath('success', true)
+        ->assertJsonPath('data.storage_disk', 'public');
+
+    $temporaryKey = $response->json('data.r2_key');
+    expect($temporaryKey)->toStartWith('public:temp/quiz-media/');
+    Storage::disk('public')->assertExists(substr($temporaryKey, strlen('public:')));
+
+    $payload = ($this->mediaPayload)();
+    $payload['thumbnail_url'] = $response->json('data.url');
+    $payload['thumbnail_r2_key'] = $temporaryKey;
+
+    $stored = $this->actingAs($this->teacher)
+        ->postJson('/api/instructor/ai-quiz/store', $payload)
+        ->assertCreated();
+
+    $permanentKey = $stored->json('data.thumbnail_r2_key');
+    expect($permanentKey)->toStartWith('public:quizzes/');
+    Storage::disk('public')->assertMissing(substr($temporaryKey, strlen('public:')));
+    Storage::disk('public')->assertExists(substr($permanentKey, strlen('public:')));
+});
+
 test('quiz media upload validates size format and purpose', function () {
     Storage::fake('r2');
 
@@ -133,6 +176,21 @@ test('quiz media upload validates size format and purpose', function () {
         'purpose' => 'cover',
         'file' => UploadedFile::fake()->create('image.jpg', 10, 'image/jpeg'),
     ])->assertUnprocessable()->assertJsonValidationErrors(['purpose']);
+});
+
+test('quiz media upload returns a clear error when storage fails', function () {
+    $service = Mockery::mock(QuizMediaService::class);
+    $service->shouldReceive('uploadTemporary')
+        ->once()
+        ->andThrow(new RuntimeException('storage offline'));
+    app()->instance(QuizMediaService::class, $service);
+
+    $this->actingAs($this->teacher)->postJson('/api/instructor/quiz-media', [
+        'purpose' => 'question',
+        'file' => UploadedFile::fake()->create('question.png', 20, 'image/png'),
+    ])->assertStatus(500)
+        ->assertJsonPath('success', false)
+        ->assertJsonPath('message', 'Không thể tải ảnh lên. Vui lòng thử lại.');
 });
 
 test('quiz media upload requires an authenticated teacher', function () {
@@ -187,6 +245,66 @@ test('store rejects foreign stale and arbitrary managed keys', function () {
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['thumbnail_r2_key']);
     }
+});
+
+test('existing r2 media remains editable when r2 is temporarily unavailable', function () {
+    Storage::fake('r2');
+    $thumbnail = ($this->uploadMedia)($this->teacher, 'thumbnail');
+    $payload = ($this->mediaPayload)();
+    $payload['thumbnail_url'] = $thumbnail['url'];
+    $payload['thumbnail_r2_key'] = $thumbnail['r2_key'];
+    $quizId = $this->actingAs($this->teacher)
+        ->postJson('/api/instructor/ai-quiz/store', $payload)
+        ->assertCreated()
+        ->json('data.id');
+    $storedKey = Quiz::findOrFail($quizId)->thumbnail_r2_key;
+
+    config([
+        'filesystems.disks.r2.key' => null,
+        'filesystems.disks.r2.secret' => null,
+        'filesystems.disks.r2.bucket' => null,
+        'filesystems.disks.r2.endpoint' => null,
+    ]);
+    $payload['title'] = 'Updated without R2 credentials';
+    $payload['thumbnail_url'] = Quiz::findOrFail($quizId)->thumbnail_url;
+    $payload['thumbnail_r2_key'] = $storedKey;
+
+    $this->actingAs($this->teacher)
+        ->putJson("/api/instructor/ai-quiz/{$quizId}", $payload)
+        ->assertOk()
+        ->assertJsonPath('data.thumbnail_r2_key', $storedKey);
+
+    Storage::disk('r2')->assertExists($storedKey);
+});
+
+test('public media promotion records disk-aware keys for rollback cleanup', function () {
+    config([
+        'filesystems.disks.r2.key' => null,
+        'filesystems.disks.r2.secret' => null,
+        'filesystems.disks.r2.bucket' => null,
+        'filesystems.disks.r2.endpoint' => null,
+    ]);
+    Storage::fake('public');
+    $quizId = $this->actingAs($this->teacher)
+        ->postJson('/api/instructor/ai-quiz/store', ($this->mediaPayload)())
+        ->assertCreated()
+        ->json('data.id');
+    $uploaded = ($this->uploadMedia)($this->teacher, 'thumbnail');
+    $payload = ($this->mediaPayload)();
+    $payload['thumbnail_url'] = $uploaded['url'];
+    $payload['thumbnail_r2_key'] = $uploaded['r2_key'];
+
+    $promotion = app(QuizMediaService::class)->promotePayload(
+        $this->teacher,
+        Quiz::findOrFail($quizId),
+        $payload,
+    );
+
+    expect($promotion['promoted_keys'])->toHaveCount(1)
+        ->and($promotion['promoted_keys'][0])->toStartWith('public:quizzes/');
+
+    app(QuizMediaService::class)->deleteKeys($promotion['promoted_keys']);
+    Storage::disk('public')->assertMissing(substr($promotion['promoted_keys'][0], strlen('public:')));
 });
 
 test('replacing and deleting a quiz cleans managed media but never external urls', function () {

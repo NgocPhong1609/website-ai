@@ -5,6 +5,7 @@ import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/q
 import { QuestionCardMultipleChoice } from "@/src/features/instructor/quiz-generator/components/QuestionCardMultipleChoice";
 import { QuestionCardEssay } from "@/src/features/instructor/quiz-generator/components/QuestionCardEssay";
 import { SelectQuizModal } from "@/src/features/instructor/quiz-generator/components/SelectQuizModal";
+import { QuizImageField } from "@/src/features/instructor/quiz-generator/components/QuizImageField";
 import type { GeneratedQuestion, DifficultyType } from "@/src/features/instructor/quiz-generator/types/quizGenerator.types";
 import type { DraftQuizData } from "../types";
 
@@ -21,6 +22,8 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
   const [selectedQuizId, setSelectedQuizId] = useState<number | undefined>(quizId || value?.id || value?.quiz_id);
   const [title, setTitle] = useState<string>(value?.title || "Bài kiểm tra mới");
   const [description, setDescription] = useState<string>(value?.description || "");
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(value?.thumbnail_url || null);
+  const [thumbnailR2Key, setThumbnailR2Key] = useState<string | null>(value?.thumbnail_r2_key || null);
   const [timeLimit, setTimeLimit] = useState<number>(value?.time_limit_minutes || 15);
   const [passingScore, setPassingScore] = useState<number>(value?.passing_score || 70);
   const [difficulty, setDifficulty] = useState<DifficultyType>(value?.difficulty || "mixed");
@@ -42,6 +45,8 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
     if (value && !hasLoadedFromApiRef.current) {
       if (value.title) setTitle(value.title);
       if (value.description !== undefined) setDescription(value.description || "");
+      if (value.thumbnail_url !== undefined) setThumbnailUrl(value.thumbnail_url || null);
+      if (value.thumbnail_r2_key !== undefined) setThumbnailR2Key(value.thumbnail_r2_key || null);
       if (value.time_limit_minutes !== undefined) setTimeLimit(value.time_limit_minutes);
       if (value.passing_score !== undefined) setPassingScore(value.passing_score);
       if (value.difficulty) setDifficulty(value.difficulty);
@@ -62,6 +67,8 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
             hasLoadedFromApiRef.current = true;
             if (data.title) setTitle(data.title);
             if (data.description) setDescription(data.description || "");
+            setThumbnailUrl(data.thumbnail_url || null);
+            setThumbnailR2Key(data.thumbnail_r2_key || null);
             if (data.time_limit_minutes) setTimeLimit(data.time_limit_minutes);
             if (data.passing_score) setPassingScore(data.passing_score);
             if (data.difficulty) setDifficulty(data.difficulty);
@@ -144,7 +151,9 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
     newScore = passingScore,
     newDiff = difficulty,
     newDesc = description,
-    forcedQuizId?: number
+    forcedQuizId?: number,
+    newThumbnailUrl = thumbnailUrl,
+    newThumbnailR2Key = thumbnailR2Key,
   ) => {
     if (!hasMountedRef.current) return;
     const targetId = forcedQuizId || selectedQuizId || effectiveQuizId;
@@ -153,6 +162,8 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
       quiz_id: targetId,
       title: newTitle,
       description: newDesc,
+      thumbnail_url: newThumbnailUrl,
+      thumbnail_r2_key: newThumbnailR2Key,
       time_limit_minutes: newTime,
       passing_score: newScore,
       difficulty: newDiff,
@@ -173,6 +184,8 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
     setSelectedQuizId(newQuizId);
     if (quizDetails.title) setTitle(quizDetails.title);
     if (quizDetails.description) setDescription(quizDetails.description || "");
+    setThumbnailUrl(quizDetails.thumbnail_url || null);
+    setThumbnailR2Key(quizDetails.thumbnail_r2_key || null);
     if (quizDetails.time_limit_minutes) setTimeLimit(quizDetails.time_limit_minutes);
     if (quizDetails.passing_score) setPassingScore(quizDetails.passing_score);
     if (quizDetails.difficulty) setDifficulty(quizDetails.difficulty);
@@ -188,7 +201,9 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
       quizDetails.passing_score || passingScore,
       quizDetails.difficulty || difficulty,
       quizDetails.description || description,
-      newQuizId
+      newQuizId,
+      quizDetails.thumbnail_url || null,
+      quizDetails.thumbnail_r2_key || null,
     );
   };
 
@@ -299,6 +314,26 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
 
       {/* Quiz Meta Settings */}
       <div className="p-6 rounded-3xl bg-[#FAF8FF] border border-indigo-100 flex flex-col gap-4">
+        <QuizImageField
+          label="Ảnh đại diện Quiz"
+          purpose="thumbnail"
+          value={{ url: thumbnailUrl, r2_key: thumbnailR2Key }}
+          onChange={(image) => {
+            setThumbnailUrl(image.url);
+            setThumbnailR2Key(image.r2_key);
+            notifyParent(
+              questions,
+              title,
+              timeLimit,
+              passingScore,
+              difficulty,
+              description,
+              undefined,
+              image.url,
+              image.r2_key,
+            );
+          }}
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-black text-[#1A1A2E] mb-1">Tên bài kiểm tra <span className="text-rose-500">*</span></label>

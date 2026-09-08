@@ -30,6 +30,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
 
   const [tempMediaMap, setTempMediaMap] = useState<Map<string, number>>(new Map());
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   
   const [videoMethod, setVideoMethod] = useState<'upload' | 'url'>('upload');
   const [videoUrl, setVideoUrl] = useState((lesson as any).videoUrl || (lesson as any).video_url || "");
@@ -181,6 +182,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
 
   const handleSave = async () => {
     setIsSaving(true);
+    setSaveError(null);
     try {
       let finalContent = content;
       finalContent = finalContent.replace(/poster="data:image\/[^"]+"/g, 'poster=""');
@@ -192,6 +194,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
         }
       });
 
+      let savedQuizData = quizData;
       if (isQuiz && quizData) {
         const qAny = quizData as any;
         const targetQuizId =
@@ -205,17 +208,20 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
             : undefined);
 
         if (targetQuizId && !isNaN(Number(targetQuizId))) {
-          try {
-            await quizGeneratorApi.updateQuiz(Number(targetQuizId), {
-              title: qAny.title || title,
-              description: qAny.description || "",
-              time_limit_minutes: qAny.time_limit_minutes || 15,
-              passing_score: qAny.passing_score || 70,
-              difficulty: qAny.difficulty || "mixed",
-              questions: qAny.questions || [],
-            });
-          } catch (err: any) {
-            console.warn("Không thể cập nhật trực tiếp Quiz ID " + targetQuizId + " trên máy chủ:", err);
+          const response = await quizGeneratorApi.updateQuiz(Number(targetQuizId), {
+            title: qAny.title || title,
+            description: qAny.description || "",
+            thumbnail_url: qAny.thumbnail_url || null,
+            thumbnail_r2_key: qAny.thumbnail_r2_key || null,
+            time_limit_minutes: qAny.time_limit_minutes || 15,
+            passing_score: qAny.passing_score || 70,
+            difficulty: qAny.difficulty || "mixed",
+            questions: qAny.questions || [],
+          });
+          const updatedQuiz = response?.data || response;
+          if (updatedQuiz) {
+            savedQuizData = { ...qAny, ...updatedQuiz };
+            setQuizData(savedQuizData);
           }
         }
       }
@@ -224,12 +230,18 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
         title, 
         type, 
         content: finalContent, 
-        quizData: isQuiz ? quizData : undefined, 
+        quizData: isQuiz ? savedQuizData : undefined,
         video_url: isVideo ? videoUrl : undefined,
         videoUrl: isVideo ? videoUrl : undefined,
         temp_media_ids: usedTempMediaIds 
       } as any);
       setTempMediaMap(new Map());
+    } catch (error: any) {
+      setSaveError(
+        error?.response?.data?.message
+        || error?.message
+        || "Không thể lưu thay đổi. Vui lòng thử lại.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -256,6 +268,12 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
             ✕
           </button>
         </div>
+
+        {saveError && (
+          <div role="alert" className="mx-6 mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-bold text-rose-700">
+            {saveError}
+          </div>
+        )}
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-6">
