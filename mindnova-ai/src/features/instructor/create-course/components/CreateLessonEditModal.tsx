@@ -6,6 +6,7 @@ import { QuizEditor } from "./QuizEditor";
 import type { DraftLesson, DraftLessonType, DraftQuizData } from "../types";
 import { useUploadTempMedia, useDeleteTempMedia } from "../api";
 import { quizGeneratorApi } from "../../quiz-generator/api/quizGeneratorApi";
+import { LessonAttachments } from "../../lesson-management/components/LessonAttachments";
 
 function getEmbedUrl(url: string): string | null {
   if (!url) return null;
@@ -386,6 +387,16 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
                   onVideoUpload={handleVideoUpload}
                   onImageUpload={handleImageUpload}
                 />
+                {/^\d+$/.test(String(lesson.id)) ? (
+                  <LessonAttachments
+                    lessonId={lesson.id}
+                    initialAttachments={(lesson as any).attachments ?? []}
+                  />
+                ) : (
+                  <p className="text-xs text-[#8A8478]">
+                    Lưu bài học trước để tải tài liệu đính kèm.
+                  </p>
+                )}
               </>
             ) : null}
           </div>

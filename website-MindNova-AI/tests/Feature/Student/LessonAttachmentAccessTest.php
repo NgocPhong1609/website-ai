@@ -63,6 +63,23 @@ function publishAttachmentLesson(\App\Models\Lesson $lesson, User $teacher): voi
     ]);
 }
 
+function publishAttachmentCourse(Course $course, User $teacher): void
+{
+    $version = ContentVersion::create([
+        'versionable_type' => $course::class,
+        'versionable_id' => $course->id,
+        'version_number' => 1,
+        'snapshot_data' => ['title' => $course->title],
+        'status' => 'published',
+        'is_published' => true,
+        'created_by' => $teacher->id,
+    ]);
+    $course->update([
+        'status' => 'published',
+        'published_version_id' => $version->id,
+    ]);
+}
+
 test('enrolled student can request a signed URL for a published lesson attachment', function () {
     Storage::fake('r2');
     Storage::disk('r2')->buildTemporaryUrlsUsing(
@@ -151,4 +168,30 @@ test('instructor lesson response includes attachment metadata without a signed U
         ->assertOk()
         ->assertJsonPath('data.attachments.0.display_name', 'Slides')
         ->assertJsonMissingPath('data.attachments.0.signed_url');
+});
+
+test('student course detail includes attachment metadata for article lessons', function () {
+    $teacher = createStudentAccessTeacher();
+    $lesson = createStudentAccessLesson($teacher);
+    publishAttachmentCourse($lesson->course, $teacher);
+    publishAttachmentLesson($lesson, $teacher);
+    $lesson->attachments()->create([
+        'uploaded_by' => $teacher->id,
+        'display_name' => 'Workbook',
+        'original_name' => 'workbook.xlsx',
+        'mime_type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'extension' => 'xlsx',
+        'size_bytes' => 1024,
+        'r2_key' => "lessons/{$lesson->id}/attachments/workbook.xlsx",
+    ]);
+
+    $student = User::factory()->create();
+    $detail = app(\App\Services\Student\CourseService::class)->getCourseDetail($lesson->course_id, $student);
+
+    expect($detail['modules'][0]['lessons'][0]['attachments'][0])
+        ->toMatchArray([
+            'display_name' => 'Workbook',
+            'extension' => 'xlsx',
+            'size_bytes' => 1024,
+        ]);
 });

@@ -13,6 +13,56 @@ export interface Lesson {
  signed_url?: string;
  order: number;
  quizData?: any;
+ attachments?: LessonAttachment[];
+}
+
+export interface LessonAttachment {
+ id: number;
+ display_name: string;
+ original_name: string;
+ mime_type: string;
+ extension: string;
+ size_bytes: number;
+}
+
+export async function uploadLessonAttachments(
+ lessonId: string | number,
+ files: File[],
+): Promise<LessonAttachment[]> {
+ const formData = new FormData();
+ files.forEach((file) => formData.append("attachments[]", file));
+ const { data } = await axiosClient.post(`/api/instructor/lessons/${lessonId}/attachments`, formData);
+ return data.data;
+}
+
+export async function renameLessonAttachment(
+ lessonId: string | number,
+ attachmentId: number,
+ displayName: string,
+): Promise<LessonAttachment> {
+ const { data } = await axiosClient.patch(
+ `/api/instructor/lessons/${lessonId}/attachments/${attachmentId}`,
+ { display_name: displayName },
+ );
+ return data.data;
+}
+
+export async function deleteLessonAttachment(
+ lessonId: string | number,
+ attachmentId: number,
+): Promise<void> {
+ await axiosClient.delete(`/api/instructor/lessons/${lessonId}/attachments/${attachmentId}`);
+}
+
+export async function downloadLessonAttachment(
+ lessonId: string | number,
+ attachmentId: number,
+ audience: "instructor" | "student" = "instructor",
+): Promise<string> {
+ const { data } = await axiosClient.get(
+ `/api/${audience}/lessons/${lessonId}/attachments/${attachmentId}/download`,
+ );
+ return data.data.signed_url;
 }
 
 export interface Chapter {

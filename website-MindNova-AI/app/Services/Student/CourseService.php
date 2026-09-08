@@ -106,14 +106,14 @@ class CourseService
         try {
             if (class_exists(Course::class)) {
                 // ── SECURITY: Only fetch published courses ──
-                $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])
+                $dbCourse = Course::with(['modules.lessons.attachments', 'teacher', 'category'])
                     ->where('status', 'published')
                     ->whereNotNull('published_version_id')
                     ->find($courseId);
                 
                 if (!$dbCourse) {
                     // Fallback to first published course
-                    $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])
+                    $dbCourse = Course::with(['modules.lessons.attachments', 'teacher', 'category'])
                         ->where('status', 'published')
                         ->whereNotNull('published_version_id')
                         ->first();
@@ -318,6 +318,14 @@ class CourseService
                                         'video_url' => $les->video_url,
                                         'has_uploaded_video' => $les->media()->where('media_type', 'video')->where('status', 'ready')->exists(),
                                         'content' => $lessonType === 'article' ? $les->content : null,
+                                        'attachments' => $les->attachments->map(fn ($attachment) => [
+                                            'id' => $attachment->id,
+                                            'display_name' => $attachment->display_name,
+                                            'original_name' => $attachment->original_name,
+                                            'mime_type' => $attachment->mime_type,
+                                            'extension' => $attachment->extension,
+                                            'size_bytes' => $attachment->size_bytes,
+                                        ])->values()->toArray(),
                                         'quiz_id' => $quizId,
                                         'quizData' => $quizDataPayload,
                                         'quiz' => $quizDataPayload,
@@ -707,4 +715,3 @@ class CourseService
         ];
     }
 }
-
