@@ -209,6 +209,8 @@ export function formatQuizPayloadForBackend(payload: any) {
       return {
         type: "essay",
         content,
+        image_url: q.image_url || null,
+        image_r2_key: q.image_r2_key || null,
         explanation,
         sample_answer: q.sample_answer || "",
         rubric: q.rubric || "",
@@ -219,9 +221,11 @@ export function formatQuizPayloadForBackend(payload: any) {
 
     let answers: Array<{ content: string; is_correct: boolean }> = [];
     if (Array.isArray(q.answers) && q.answers.length > 0) {
-      answers = q.answers.map((a: any) => ({
+      answers = q.answers.map((a: any, index: number) => ({
         content: String(a.content || a.answer || ""),
         is_correct: Boolean(a.is_correct),
+        image_url: a.image_url || q.answer_images?.[index]?.url || null,
+        image_r2_key: a.image_r2_key || q.answer_images?.[index]?.r2_key || null,
       }));
     } else if (Array.isArray(q.options) && q.options.length > 0) {
       const correctIdx = typeof q.correct_answer_index === "number" ? q.correct_answer_index : 0;
@@ -229,6 +233,8 @@ export function formatQuizPayloadForBackend(payload: any) {
       answers = q.options.map((opt: any, i: number) => ({
         content: String(opt),
         is_correct: selectionType === "multiple_choice" ? correctIndices.includes(i) : i === correctIdx,
+        image_url: q.answer_images?.[i]?.url || null,
+        image_r2_key: q.answer_images?.[i]?.r2_key || null,
       }));
     }
 
@@ -256,6 +262,8 @@ export function formatQuizPayloadForBackend(payload: any) {
       type: "multiple_choice",
       selection_type: selectionType,
       content,
+      image_url: q.image_url || null,
+      image_r2_key: q.image_r2_key || null,
       explanation,
       points,
       answers,
@@ -264,6 +272,8 @@ export function formatQuizPayloadForBackend(payload: any) {
 
   return {
     title,
+    thumbnail_url: payload.thumbnail_url || null,
+    thumbnail_r2_key: payload.thumbnail_r2_key || null,
     time_limit_minutes: timeLimit,
     passing_score: passingScore,
     questions: formattedQuestions,

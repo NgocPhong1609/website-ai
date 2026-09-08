@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { GeneratedQuestion } from "../types/quizGenerator.types";
+import { QuizImageField } from "./QuizImageField";
 
 interface QuestionCardEssayProps {
  question: GeneratedQuestion;
@@ -52,6 +53,7 @@ export function QuestionCardEssay({
  const rubricStr = formatToString(question.rubric);
 
  const [draftQ, setDraftQ] = useState(question.question);
+ const [draftQuestionImage, setDraftQuestionImage] = useState({ url: question.image_url || null, r2_key: question.image_r2_key || null });
  const [draftSampleAnswer, setDraftSampleAnswer] = useState(sampleAnswerStr);
  const [draftRubric, setDraftRubric] = useState(rubricStr);
  const [draftPoints, setDraftPoints] = useState(question.points);
@@ -61,6 +63,8 @@ export function QuestionCardEssay({
  const handleSaveEdit = () => {
  onUpdate(question.id, {
  question: draftQ,
+ image_url: draftQuestionImage.url,
+ image_r2_key: draftQuestionImage.r2_key,
  sample_answer: draftSampleAnswer,
  rubric: draftRubric,
  points: draftPoints,
@@ -145,6 +149,13 @@ export function QuestionCardEssay({
  />
  </div>
 
+ <QuizImageField
+ label="Ảnh câu hỏi"
+ purpose="question"
+ value={draftQuestionImage}
+ onChange={setDraftQuestionImage}
+ />
+
  <div>
  <label className="block text-xs font-bold -[#C0392B] mb-1">Đáp án tham khảo mẫu (Sample Answer)</label>
  <textarea
@@ -191,6 +202,7 @@ export function QuestionCardEssay({
  <h4 className="text-base font-extrabold text-[#2C3039] leading-snug">
  {question.question}
  </h4>
+ {question.image_url && <img src={question.image_url} alt={`Ảnh câu hỏi ${index + 1}`} className="max-h-64 rounded-xl border object-contain" />}
 
  {sampleAnswerStr && (
  <div className="p-4 rounded-2xl bg-purple-50/60 border -[#FAF7F2] flex flex-col gap-1 text-xs">

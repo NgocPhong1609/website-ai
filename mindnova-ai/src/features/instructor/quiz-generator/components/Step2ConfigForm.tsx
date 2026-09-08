@@ -2,6 +2,7 @@
 
 import React from "react";
 import { QuizConfig, DifficultyType } from "../types/quizGenerator.types";
+import { QuizImageField } from "./QuizImageField";
 
 interface Step2ConfigFormProps {
   config: QuizConfig;
@@ -100,6 +101,13 @@ export function Step2ConfigForm({
               placeholder="Mô tả mục tiêu của bài kiểm tra..."
             />
           </div>
+
+          <QuizImageField
+            label="Ảnh đại diện Quiz"
+            purpose="thumbnail"
+            value={{ url: config.thumbnail_url || null, r2_key: config.thumbnail_r2_key || null }}
+            onChange={(image) => onChangeConfig({ thumbnail_url: image.url, thumbnail_r2_key: image.r2_key })}
+          />
 
           {/* Difficulty Selector */}
           <div>

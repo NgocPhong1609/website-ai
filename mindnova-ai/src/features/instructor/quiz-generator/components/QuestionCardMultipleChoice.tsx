@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { GeneratedQuestion, SelectionType } from "../types/quizGenerator.types";
+import { QuizImageField } from "./QuizImageField";
 
 interface QuestionCardMultipleChoiceProps {
  question: GeneratedQuestion;
@@ -22,6 +23,7 @@ export function QuestionCardMultipleChoice({
 }: QuestionCardMultipleChoiceProps) {
  const [isEditing, setIsEditing] = useState(false);
  const [draftQ, setDraftQ] = useState(question.question);
+ const [draftQuestionImage, setDraftQuestionImage] = useState({ url: question.image_url || null, r2_key: question.image_r2_key || null });
  const [draftOptions, setDraftOptions] = useState<string[]>([...question.options]);
  const [draftSelectionType, setDraftSelectionType] = useState<SelectionType>(question.selection_type ?? "single_choice");
  const [draftCorrectIndices, setDraftCorrectIndices] = useState<number[]>(
@@ -30,6 +32,9 @@ export function QuestionCardMultipleChoice({
  : [question.correct_answer_index ?? 0],
  );
  const [draftExplanation, setDraftExplanation] = useState(question.explanation);
+ const [draftAnswerImages, setDraftAnswerImages] = useState(
+ question.options.map((_, index) => question.answer_images?.[index] || { url: null, r2_key: null }),
+ );
  const [draftPoints, setDraftPoints] = useState(question.points);
  const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -47,10 +52,13 @@ export function QuestionCardMultipleChoice({
  }
  onUpdate(question.id, {
  question: draftQ,
+ image_url: draftQuestionImage.url,
+ image_r2_key: draftQuestionImage.r2_key,
  options: draftOptions,
  selection_type: draftSelectionType,
  correct_answer_index: draftCorrectIndices[0] ?? 0,
  correct_answer_indices: draftCorrectIndices,
+ answer_images: draftAnswerImages,
  explanation: draftExplanation,
  points: draftPoints,
  });
@@ -179,6 +187,13 @@ export function QuestionCardMultipleChoice({
  />
  </div>
 
+ <QuizImageField
+ label="Ảnh câu hỏi"
+ purpose="question"
+ value={draftQuestionImage}
+ onChange={setDraftQuestionImage}
+ />
+
  <div className="flex flex-col gap-2">
  <label className="block text-xs font-bold text-gray-700">
  Các đáp án ({draftSelectionType === "multiple_choice" ? "chọn ít nhất 2 đáp án đúng" : "chọn 1 đáp án đúng"})
@@ -206,6 +221,14 @@ export function QuestionCardMultipleChoice({
  draftCorrectIndices.includes(oIdx) ? "-[#2C3039] bg-emerald-50/50 font-bold -[#2C3039]" : "border-[#E8E2D9]"
  }`}
  />
+ <div className="w-full">
+ <QuizImageField
+ label={`Ảnh đáp án ${String.fromCharCode(65 + oIdx)}`}
+ purpose="answer"
+ value={draftAnswerImages[oIdx] || { url: null, r2_key: null }}
+ onChange={(image) => setDraftAnswerImages((current) => current.map((value, index) => index === oIdx ? image : value))}
+ />
+ </div>
  </div>
  ))}
  </div>
@@ -241,6 +264,7 @@ export function QuestionCardMultipleChoice({
  <h4 className="text-base font-extrabold text-[#2C3039] leading-snug">
  {question.question}
  </h4>
+ {question.image_url && <img src={question.image_url} alt={`Ảnh câu hỏi ${index + 1}`} className="max-h-64 rounded-xl border object-contain" />}
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
  {question.options.map((opt, oIdx) => {
@@ -265,6 +289,7 @@ export function QuestionCardMultipleChoice({
  {String.fromCharCode(65 + oIdx)}
  </span>
  <span>{opt}</span>
+ {question.answer_images?.[oIdx]?.url && <img src={question.answer_images[oIdx].url!} alt={`Ảnh đáp án ${String.fromCharCode(65 + oIdx)}`} className="h-16 w-20 rounded-lg object-contain" />}
  {isCorrect && <span className="ml-auto -[#2C3039] font-extrabold text-xs"> Đáp án đúng</span>}
  </div>
  );

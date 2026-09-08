@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/quizGeneratorApi";
 import { Loader } from "@/src/shared/components/ui/Loader";
+import { QuizImageField } from "@/src/features/instructor/quiz-generator/components/QuizImageField";
 
 export default function QuizDetailPage() {
  const params = useParams();
@@ -112,6 +113,29 @@ export default function QuizDetailPage() {
  });
  };
 
+ const handleUpdateQuestionImage = (qIndex: number, image: { url: string | null; r2_key: string | null }) => {
+ setEditedQuestions((previous) => previous.map((question, index) => index === qIndex
+ ? { ...question, image_url: image.url, image_r2_key: image.r2_key }
+ : question));
+ };
+
+ const handleUpdateAnswerImage = (qIndex: number, answerIndex: number, image: { url: string | null; r2_key: string | null }) => {
+ setEditedQuestions((previous) => previous.map((question, index) => {
+ if (index !== qIndex) return question;
+ if (Array.isArray(question.answers)) {
+ return {
+ ...question,
+ answers: question.answers.map((answer: any, currentIndex: number) => currentIndex === answerIndex
+ ? { ...answer, image_url: image.url, image_r2_key: image.r2_key }
+ : answer),
+ };
+ }
+ const answerImages = Array.isArray(question.answer_images) ? [...question.answer_images] : [];
+ answerImages[answerIndex] = image;
+ return { ...question, answer_images: answerImages };
+ }));
+ };
+
  const handleSavePoints = async () => {
  if (!isValidTotal) return;
 
@@ -123,6 +147,8 @@ export default function QuizDetailPage() {
  const res = await quizGeneratorApi.updateQuiz(quizId, {
  title: quiz.title,
  description: quiz.description,
+ thumbnail_url: quiz.thumbnail_url || null,
+ thumbnail_r2_key: quiz.thumbnail_r2_key || null,
  source_type: quiz.source_type,
  source_content: quiz.source_content,
  course_id: quiz.attachments?.[0]?.course_id || quiz.course_id || null,
@@ -224,7 +250,7 @@ export default function QuizDetailPage() {
  className="px-4 py-2 rounded-xl bg-indigo-50 border -[#FAF7F2] text-[#C0392B] text-xs font-extrabold hover:bg-[#C0392B] hover:text-white transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
  >
  <span>️</span>
- <span>Sửa điểm</span>
+ <span>Chỉnh sửa Quiz</span>
  </button>
  ) : (
  <>
@@ -280,7 +306,16 @@ export default function QuizDetailPage() {
  )}
 
  {/* Main Quiz Overview Header Card */}
+ {isEditMode && (
+ <QuizImageField
+ label="Ảnh đại diện Quiz"
+ purpose="thumbnail"
+ value={{ url: quiz.thumbnail_url || null, r2_key: quiz.thumbnail_r2_key || null }}
+ onChange={(image) => setQuiz((current: any) => ({ ...current, thumbnail_url: image.url, thumbnail_r2_key: image.r2_key }))}
+ />
+ )}
  <div className="p-8 rounded-3xl from-[#1E233E] via-[#2B2D62] to-[#121626] text-white flex flex-col gap-5 shadow-xl border border-white/10 relative overflow-hidden">
+ {quiz.thumbnail_url && <img src={quiz.thumbnail_url} alt={`Ảnh đại diện ${quiz.title}`} className="h-44 w-full rounded-2xl bg-white/10 object-cover" />}
  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
  <div className="flex items-center gap-2 flex-wrap">
  <span className="px-3 py-1 -[#C0392B]/30 -[#FAF7F2] border -[#C0392B]/30 text-[10px] font-black rounded-lg uppercase tracking-wider">
@@ -488,21 +523,35 @@ export default function QuizDetailPage() {
  <h3 className="text-base font-extrabold text-[#1A1A2E] leading-relaxed">
  {q.content || q.question}
  </h3>
+ {isEditMode ? (
+ <QuizImageField
+ label={`Ảnh câu hỏi ${idx + 1}`}
+ purpose="question"
+ value={{ url: q.image_url || null, r2_key: q.image_r2_key || null }}
+ onChange={(image) => handleUpdateQuestionImage(idx, image)}
+ />
+ ) : q.image_url ? (
+ <img src={q.image_url} alt={`Ảnh câu hỏi ${idx + 1}`} className="max-h-72 rounded-xl border object-contain" />
+ ) : null}
 
  {/* Multiple Choice Options */}
  {isMcq && (
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
  {(() => {
- let opts: Array<{ text: string; isCorrect: boolean }> = [];
+ let opts: Array<{ text: string; isCorrect: boolean; imageUrl?: string | null; imageKey?: string | null }> = [];
  if (Array.isArray(q.answers) && q.answers.length > 0) {
  opts = q.answers.map((a: any) => ({
  text: a.content,
  isCorrect: Boolean(a.is_correct),
+ imageUrl: a.image_url,
+ imageKey: a.image_r2_key,
  }));
  } else if (Array.isArray(q.options)) {
  opts = q.options.map((optStr: string, optIdx: number) => ({
  text: optStr,
  isCorrect: optIdx === q.correct_answer_index,
+ imageUrl: q.answer_images?.[optIdx]?.url,
+ imageKey: q.answer_images?.[optIdx]?.r2_key,
  }));
  }
 
@@ -528,11 +577,20 @@ export default function QuizDetailPage() {
  {letter}
  </span>
  <span>{opt.text}</span>
+ {opt.imageUrl && <img src={opt.imageUrl} alt={`Ảnh đáp án ${letter}`} className="h-14 w-20 rounded-lg object-contain" />}
  </div>
  {opt.isCorrect && (
  <span className="px-2.5 py-0.5 rounded-lg -[#2C3039] text-white text-[10px] font-black uppercase">
  Đáp án đúng
  </span>
+ )}
+ {isEditMode && (
+ <QuizImageField
+ label={`Ảnh đáp án ${letter}`}
+ purpose="answer"
+ value={{ url: opt.imageUrl || null, r2_key: opt.imageKey || null }}
+ onChange={(image) => handleUpdateAnswerImage(idx, optIdx, image)}
+ />
  )}
  </div>
  );
