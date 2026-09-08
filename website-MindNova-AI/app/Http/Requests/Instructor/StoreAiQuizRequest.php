@@ -35,6 +35,8 @@ class StoreAiQuizRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'thumbnail_url' => 'nullable|url:http,https|max:2048',
+            'thumbnail_r2_key' => 'nullable|string|max:2048',
             'source_type' => 'nullable|string|in:content,topic,course,manual',
             'source_content' => 'nullable|string',
             'course_id' => 'nullable|integer|exists:courses,id',
@@ -46,6 +48,8 @@ class StoreAiQuizRequest extends FormRequest
             'questions.*.type' => 'required|string|in:multiple_choice,essay',
             'questions.*.selection_type' => 'nullable|string|in:single_choice,multiple_choice',
             'questions.*.content' => 'required|string',
+            'questions.*.image_url' => 'nullable|url:http,https|max:2048',
+            'questions.*.image_r2_key' => 'nullable|string|max:2048',
             'questions.*.difficulty' => 'nullable|string|in:easy,medium,hard',
             'questions.*.explanation' => 'nullable|string',
             'questions.*.sample_answer' => 'nullable|string',
@@ -54,6 +58,8 @@ class StoreAiQuizRequest extends FormRequest
             'questions.*.answers' => 'required_if:questions.*.type,multiple_choice|array',
             'questions.*.answers.*.content' => 'required|string',
             'questions.*.answers.*.is_correct' => 'required|boolean',
+            'questions.*.answers.*.image_url' => 'nullable|url:http,https|max:2048',
+            'questions.*.answers.*.image_r2_key' => 'nullable|string|max:2048',
         ];
     }
 

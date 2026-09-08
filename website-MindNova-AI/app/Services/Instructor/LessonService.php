@@ -462,6 +462,8 @@ class LessonService
                     'instructor_id' => $teacherId ?? $foundQuiz->instructor_id,
                     'title' => $quizData['title'] ?? $foundQuiz->title,
                     'description' => $quizData['description'] ?? $foundQuiz->description,
+                    'thumbnail_url' => array_key_exists('thumbnail_url', $quizData) ? $quizData['thumbnail_url'] : $foundQuiz->thumbnail_url,
+                    'thumbnail_r2_key' => array_key_exists('thumbnail_r2_key', $quizData) ? $quizData['thumbnail_r2_key'] : $foundQuiz->thumbnail_r2_key,
                     'time_limit_minutes' => $quizData['time_limit_minutes'] ?? $foundQuiz->time_limit_minutes ?? 15,
                     'passing_score' => $quizData['passing_score'] ?? $foundQuiz->passing_score ?? 70,
                     'difficulty' => $quizData['difficulty'] ?? $foundQuiz->difficulty ?? 'mixed',
@@ -481,6 +483,8 @@ class LessonService
                     'instructor_id' => $teacherId,
                     'title' => $quizData['title'] ?? 'Bài kiểm tra',
                     'description' => $quizData['description'] ?? null,
+                    'thumbnail_url' => $quizData['thumbnail_url'] ?? null,
+                    'thumbnail_r2_key' => $quizData['thumbnail_r2_key'] ?? null,
                     'time_limit_minutes' => $quizData['time_limit_minutes'] ?? 15,
                     'passing_score' => $quizData['passing_score'] ?? 70,
                     'difficulty' => $quizData['difficulty'] ?? 'mixed',
@@ -518,6 +522,8 @@ class LessonService
                     'type' => $type,
                     'selection_type' => $qData['selection_type'] ?? 'single_choice',
                     'content' => $content,
+                    'image_url' => $qData['image_url'] ?? null,
+                    'image_r2_key' => $qData['image_r2_key'] ?? null,
                     'explanation' => $qData['explanation'] ?? null,
                     'sample_answer' => $type === 'essay' ? ($qData['sample_answer'] ?? null) : null,
                     'rubric' => $type === 'essay' ? ($qData['rubric'] ?? null) : null,
@@ -543,6 +549,8 @@ class LessonService
                         $question->answers()->create([
                             'content' => $aData['content'] ?? $aData['answer'] ?? '',
                             'is_correct' => !empty($aData['is_correct']),
+                            'image_url' => $aData['image_url'] ?? null,
+                            'image_r2_key' => $aData['image_r2_key'] ?? null,
                         ]);
                     }
                 }

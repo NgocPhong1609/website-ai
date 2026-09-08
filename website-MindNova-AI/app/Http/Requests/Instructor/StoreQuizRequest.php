@@ -15,12 +15,16 @@ class StoreQuizRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
+            'thumbnail_url' => 'nullable|url:http,https|max:2048',
+            'thumbnail_r2_key' => 'nullable|string|max:2048',
             'time_limit_minutes' => 'nullable|integer|min:0',
             'passing_score' => 'nullable|numeric|min:0|max:100',
             'questions' => 'required|array|min:1',
             'questions.*.type' => 'nullable|string|in:multiple_choice,essay,true_false',
             'questions.*.selection_type' => 'nullable|string|in:single_choice,multiple_choice',
             'questions.*.content' => 'required|string',
+            'questions.*.image_url' => 'nullable|url:http,https|max:2048',
+            'questions.*.image_r2_key' => 'nullable|string|max:2048',
             'questions.*.explanation' => 'nullable|string',
             'questions.*.sample_answer' => 'nullable|string',
             'questions.*.rubric' => 'nullable|string',
@@ -28,6 +32,8 @@ class StoreQuizRequest extends FormRequest
             'questions.*.answers' => 'nullable|array',
             'questions.*.answers.*.content' => 'required_with:questions.*.answers|string',
             'questions.*.answers.*.is_correct' => 'required_with:questions.*.answers|boolean',
+            'questions.*.answers.*.image_url' => 'nullable|url:http,https|max:2048',
+            'questions.*.answers.*.image_r2_key' => 'nullable|string|max:2048',
         ];
     }
 

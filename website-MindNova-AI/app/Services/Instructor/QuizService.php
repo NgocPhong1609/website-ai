@@ -36,6 +36,8 @@ class QuizService
                 'instructor_id' => $instructor->id,
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,
+                'thumbnail_url' => $data['thumbnail_url'] ?? null,
+                'thumbnail_r2_key' => $data['thumbnail_r2_key'] ?? null,
                 'source_type' => $data['source_type'] ?? 'topic',
                 'source_content' => $data['source_content'] ?? null,
                 'type' => $data['type'] ?? 'normal',
@@ -86,6 +88,8 @@ class QuizService
             $quiz->update([
                 'title' => $data['title'] ?? $quiz->title,
                 'description' => $data['description'] ?? $quiz->description,
+                'thumbnail_url' => array_key_exists('thumbnail_url', $data) ? $data['thumbnail_url'] : $quiz->thumbnail_url,
+                'thumbnail_r2_key' => array_key_exists('thumbnail_r2_key', $data) ? $data['thumbnail_r2_key'] : $quiz->thumbnail_r2_key,
                 'source_type' => $data['source_type'] ?? $quiz->source_type,
                 'source_content' => $data['source_content'] ?? $quiz->source_content,
                 'difficulty' => $data['difficulty'] ?? $quiz->difficulty,
@@ -131,6 +135,8 @@ class QuizService
                 'selection_type' => $qData['selection_type'] ?? 'single_choice',
                 'difficulty' => $qData['difficulty'] ?? 'medium',
                 'content' => $qData['content'] ?? $qData['question'] ?? '',
+                'image_url' => $qData['image_url'] ?? null,
+                'image_r2_key' => $qData['image_r2_key'] ?? null,
                 'explanation' => $qData['explanation'] ?? null,
                 'sample_answer' => $type === 'essay' ? ($qData['sample_answer'] ?? null) : null,
                 'rubric' => $type === 'essay' ? ($qData['rubric'] ?? null) : null,
@@ -155,6 +161,8 @@ class QuizService
                     $question->answers()->create([
                         'content' => $aData['content'] ?? $aData['answer'] ?? '',
                         'is_correct' => !empty($aData['is_correct']),
+                        'image_url' => $aData['image_url'] ?? null,
+                        'image_r2_key' => $aData['image_r2_key'] ?? null,
                     ]);
                 }
             }
@@ -323,6 +331,8 @@ class QuizService
                 'lesson_id' => $quiz->lesson_id,
                 'title' => $quiz->title,
                 'description' => $quiz->description,
+                'thumbnail_url' => $quiz->thumbnail_url,
+                'thumbnail_r2_key' => $quiz->thumbnail_r2_key,
                 'source_type' => $quiz->source_type ?? 'topic',
                 'type' => $quiz->type ?? 'normal',
                 'difficulty' => $quiz->difficulty ?? 'mixed',
@@ -361,6 +371,8 @@ class QuizService
                             'id' => $a->id,
                             'content' => $a->content,
                             'is_correct' => (bool) $a->is_correct,
+                            'image_url' => $a->image_url,
+                            'image_r2_key' => $a->image_r2_key,
                         ];
                     })->values()->toArray() : [];
 
@@ -377,6 +389,8 @@ class QuizService
                         'id' => $q->id,
                         'type' => $q->type ?? 'multiple_choice',
                         'selection_type' => $q->selection_type ?? 'single_choice',
+                        'image_url' => $q->image_url,
+                        'image_r2_key' => $q->image_r2_key,
                         'question' => $q->content,
                         'content' => $q->content,
                         'explanation' => $q->explanation,
@@ -427,6 +441,8 @@ class QuizService
                         'instructor_id' => $teacherId ?? $foundQuiz->instructor_id,
                         'title' => $data['title'] ?? $foundQuiz->title,
                         'description' => $data['description'] ?? $foundQuiz->description,
+                        'thumbnail_url' => array_key_exists('thumbnail_url', $data) ? $data['thumbnail_url'] : $foundQuiz->thumbnail_url,
+                        'thumbnail_r2_key' => array_key_exists('thumbnail_r2_key', $data) ? $data['thumbnail_r2_key'] : $foundQuiz->thumbnail_r2_key,
                         'time_limit_minutes' => $data['time_limit_minutes'] ?? $foundQuiz->time_limit_minutes ?? 15,
                         'passing_score' => $data['passing_score'] ?? $foundQuiz->passing_score ?? 70,
                         'difficulty' => $data['difficulty'] ?? $foundQuiz->difficulty ?? 'mixed',
@@ -446,6 +462,8 @@ class QuizService
                         'instructor_id' => $teacherId,
                         'title' => $data['title'],
                         'description' => $data['description'] ?? null,
+                        'thumbnail_url' => $data['thumbnail_url'] ?? null,
+                        'thumbnail_r2_key' => $data['thumbnail_r2_key'] ?? null,
                         'time_limit_minutes' => $data['time_limit_minutes'] ?? 15,
                         'passing_score' => $data['passing_score'] ?? 70,
                         'difficulty' => $data['difficulty'] ?? 'mixed',
@@ -478,6 +496,8 @@ class QuizService
                     'type' => $type,
                     'selection_type' => $questionData['selection_type'] ?? 'single_choice',
                     'content' => $questionData['content'] ?? $questionData['question'] ?? '',
+                    'image_url' => $questionData['image_url'] ?? null,
+                    'image_r2_key' => $questionData['image_r2_key'] ?? null,
                     'explanation' => $questionData['explanation'] ?? null,
                     'sample_answer' => $type === 'essay' ? ($questionData['sample_answer'] ?? null) : null,
                     'rubric' => $type === 'essay' ? ($questionData['rubric'] ?? null) : null,
@@ -505,6 +525,8 @@ class QuizService
                         $question->answers()->create([
                             'content' => $answerData['content'] ?? $answerData['answer'] ?? '',
                             'is_correct' => !empty($answerData['is_correct']),
+                            'image_url' => $answerData['image_url'] ?? null,
+                            'image_r2_key' => $answerData['image_r2_key'] ?? null,
                         ]);
                     }
                 }

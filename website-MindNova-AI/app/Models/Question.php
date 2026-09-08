@@ -15,6 +15,8 @@ class Question extends Model
         'selection_type',
         'difficulty',
         'content',
+        'image_url',
+        'image_r2_key',
         'explanation',
         'sample_answer',
         'rubric',
