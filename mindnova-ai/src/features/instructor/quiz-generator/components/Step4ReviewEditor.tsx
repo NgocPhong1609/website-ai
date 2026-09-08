@@ -15,6 +15,8 @@ interface Step4ReviewEditorProps {
   onSave: (status: "draft" | "published") => void;
   onBack: () => void;
   isSaving: boolean;
+  isReviewConfirmed: boolean;
+  onConfirmAll: () => void;
 }
 
 export function Step4ReviewEditor({
@@ -27,6 +29,8 @@ export function Step4ReviewEditor({
   onSave,
   onBack,
   isSaving,
+  isReviewConfirmed,
+  onConfirmAll,
 }: Step4ReviewEditorProps) {
   const [filterType, setFilterType] = useState<"all" | "multiple_choice" | "essay">("all");
 
@@ -205,6 +209,15 @@ export function Step4ReviewEditor({
         </button>
 
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onConfirmAll}
+            disabled={isSaving || questions.length === 0 || !isValidTotal || isReviewConfirmed}
+            className="px-5 py-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold text-xs transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isReviewConfirmed ? "✓ Đã xác nhận toàn bộ" : "✓ Xác nhận toàn bộ câu hỏi"}
+          </button>
+
           {!isValidTotal && (
             <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-2 rounded-xl border border-amber-200">
               ⚠️ Tổng điểm phải bằng 10 để lưu.
@@ -214,7 +227,7 @@ export function Step4ReviewEditor({
           <button
             type="button"
             onClick={() => onSave("draft")}
-            disabled={isSaving || !isValidTotal}
+            disabled={isSaving || !isValidTotal || !isReviewConfirmed}
             className="px-6 py-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-extrabold text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isSaving ? "Đang lưu..." : "💾 Lưu Nháp"}
@@ -223,7 +236,7 @@ export function Step4ReviewEditor({
           <button
             type="button"
             onClick={() => onSave("published")}
-            disabled={isSaving || questions.length === 0 || !isValidTotal}
+            disabled={isSaving || questions.length === 0 || !isValidTotal || !isReviewConfirmed}
             className="px-8 py-3 bg-[#C0392B] hover:bg-[#a02c20] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
           >
             {isSaving ? (

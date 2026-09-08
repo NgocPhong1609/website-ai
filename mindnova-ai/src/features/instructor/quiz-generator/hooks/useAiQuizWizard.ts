@@ -27,6 +27,7 @@ export function useAiQuizWizard(options?: {
  const [step, setStep] = useState<number>(options?.embeddedMode ? 2 : 1);
  const [isGenerating, setIsGenerating] = useState<boolean>(false);
  const [isSaving, setIsSaving] = useState<boolean>(false);
+ const [isReviewConfirmed, setIsReviewConfirmed] = useState<boolean>(false);
  const [error, setError] = useState<string | null>(null);
  const [savedQuiz, setSavedQuiz] = useState<QuizSummary | null>(null);
 
@@ -85,6 +86,7 @@ export function useAiQuizWizard(options?: {
 
  // Generate Questions from AI
  const handleGenerate = useCallback(async () => {
+ setIsReviewConfirmed(false);
  setIsGenerating(true);
  setError(null);
  setErrorInfo(null);
@@ -136,6 +138,7 @@ export function useAiQuizWizard(options?: {
 
  // Question editing
  const updateQuestion = useCallback((id: string, updatedFields: Partial<GeneratedQuestion>) => {
+ setIsReviewConfirmed(false);
  setQuestions((prev) =>
  prev.map((q) => (q.id === id ? { ...q, ...updatedFields, reviewStatus: "edited" } : q))
  );
@@ -148,11 +151,17 @@ export function useAiQuizWizard(options?: {
  }, []);
 
  const deleteQuestion = useCallback((id: string) => {
+ setIsReviewConfirmed(false);
  setQuestions((prev) => prev.filter((q) => q.id !== id));
+ }, []);
+
+ const confirmAllQuestions = useCallback(() => {
+ setIsReviewConfirmed(true);
  }, []);
 
  // Regenerate Single Question
  const regenerateSingleQuestion = useCallback(async (id: string, type: "multiple_choice" | "essay", difficulty: string) => {
+ setIsReviewConfirmed(false);
  try {
  const contextText = config.source_type === "content" ? config.source_content : config.topic;
  const res = await quizGeneratorApi.regenerateSingleQuestion(type, difficulty, contextText);
@@ -253,6 +262,7 @@ export function useAiQuizWizard(options?: {
  questions,
  isGenerating,
  isSaving,
+ isReviewConfirmed,
  error,
  errorInfo,
  setError,
@@ -262,6 +272,7 @@ export function useAiQuizWizard(options?: {
  updateQuestion,
  approveQuestion,
  deleteQuestion,
+ confirmAllQuestions,
  regenerateSingleQuestion,
  handleSaveQuiz,
  approvedCount,

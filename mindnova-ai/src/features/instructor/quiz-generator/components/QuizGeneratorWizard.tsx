@@ -33,6 +33,7 @@ export function QuizGeneratorWizard({
     questions,
     isGenerating,
     isSaving,
+    isReviewConfirmed,
     error,
     errorInfo,
     clearError,
@@ -41,6 +42,7 @@ export function QuizGeneratorWizard({
     updateQuestion,
     approveQuestion,
     deleteQuestion,
+    confirmAllQuestions,
     regenerateSingleQuestion,
     handleSaveQuiz,
   } = useAiQuizWizard({
@@ -184,6 +186,8 @@ export function QuizGeneratorWizard({
           onSave={handleSaveQuiz}
           onBack={() => setStep(2)}
           isSaving={isSaving}
+          isReviewConfirmed={isReviewConfirmed}
+          onConfirmAll={confirmAllQuestions}
         />
       )}
 
