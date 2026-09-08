@@ -153,6 +153,7 @@ class CourseService
                                 'id' => (string) $quizObj->id,
                                 'quiz_id' => $quizObj->id,
                                 'title' => $quizObj->title,
+                                'thumbnail_url' => $quizObj->thumbnail_url,
                                 'time_limit_minutes' => $quizObj->time_limit_minutes ?? 15,
                                 'passing_score' => $quizObj->passing_score ?? 70,
                                 'questions_count' => count($quizObj->questions),
@@ -163,21 +164,13 @@ class CourseService
                                             'content' => $a->content,
                                             'text' => $a->content,
                                             'option' => $a->content,
-                                            'is_correct' => (bool) $a->is_correct,
+                                            'image_url' => $a->image_url,
                                         ];
                                     })->values()->toArray() : [];
 
                                     $optionsArr = !empty($answersArr)
                                         ? array_column($answersArr, 'content')
                                         : (is_string($q->options) ? json_decode($q->options, true) : ($q->options ?? []));
-
-                                    $correctAnswer = null;
-                                    foreach ($answersArr as $a) {
-                                        if (!empty($a['is_correct'])) {
-                                            $correctAnswer = $a['content'];
-                                            break;
-                                        }
-                                    }
 
                                     $text = $q->content ?? $q->question ?? $q->question_text ?? '';
                                     return [
@@ -186,13 +179,13 @@ class CourseService
                                         'question_text' => $text,
                                         'content' => $text,
                                         'title' => $text,
+                                        'image_url' => $q->image_url,
                                         'answers' => $answersArr,
                                         'options' => $optionsArr,
                                         'choices' => $optionsArr,
-                                        'correct_answer' => $correctAnswer,
-                                        'answer' => $correctAnswer,
                                         'explanation' => $q->explanation,
                                         'type' => $q->type ?? 'multiple_choice',
+                                        'selection_type' => $q->selection_type ?? 'single_choice',
                                     ];
                                 })->values()->toArray(),
                             ];
@@ -262,6 +255,7 @@ class CourseService
                                             'id' => (string) $quizObj->id,
                                             'quiz_id' => $quizObj->id,
                                             'title' => $quizObj->title ?: $les->title,
+                                            'thumbnail_url' => $quizObj->thumbnail_url,
                                             'time_limit_minutes' => $quizObj->time_limit_minutes ?? 15,
                                             'passing_score' => $quizObj->passing_score ?? 70,
                                             'questions_count' => count($quizObj->questions),
@@ -272,21 +266,13 @@ class CourseService
                                                         'content' => $a->content,
                                                         'text' => $a->content,
                                                         'option' => $a->content,
-                                                        'is_correct' => (bool) $a->is_correct,
+                                                        'image_url' => $a->image_url,
                                                     ];
                                                 })->values()->toArray() : [];
 
                                                 $optionsArr = !empty($answersArr)
                                                     ? array_column($answersArr, 'content')
                                                     : (is_string($q->options) ? json_decode($q->options, true) : ($q->options ?? []));
-
-                                                $correctAnswer = null;
-                                                foreach ($answersArr as $a) {
-                                                    if (!empty($a['is_correct'])) {
-                                                        $correctAnswer = $a['content'];
-                                                        break;
-                                                    }
-                                                }
 
                                                 $text = $q->content ?? $q->question ?? $q->question_text ?? '';
                                                 return [
@@ -295,13 +281,13 @@ class CourseService
                                                     'question_text' => $text,
                                                     'content' => $text,
                                                     'title' => $text,
+                                                    'image_url' => $q->image_url,
                                                     'answers' => $answersArr,
                                                     'options' => $optionsArr,
                                                     'choices' => $optionsArr,
-                                                    'correct_answer' => $correctAnswer,
-                                                    'answer' => $correctAnswer,
                                                     'explanation' => $q->explanation,
                                                     'type' => $q->type ?? 'multiple_choice',
+                                                    'selection_type' => $q->selection_type ?? 'single_choice',
                                                 ];
                                             })->values()->toArray(),
                                         ];

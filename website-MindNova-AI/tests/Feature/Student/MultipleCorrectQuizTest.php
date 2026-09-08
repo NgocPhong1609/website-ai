@@ -103,3 +103,62 @@ test('student submission rejects an answer id outside its question', function ()
     )->assertUnprocessable()
         ->assertJsonValidationErrors(["answers.{$question->id}"]);
 });
+
+test('student quiz and result responses expose media without leaking correctness before submission', function () {
+    $user = User::factory()->create();
+    $quiz = Quiz::create([
+        'instructor_id' => $user->id,
+        'title' => 'Illustrated quiz',
+        'thumbnail_url' => 'https://cdn.example/quiz-cover.png',
+        'total_questions' => 1,
+        'total_points' => 2,
+        'status' => 'published',
+    ]);
+    $question = $quiz->questions()->create([
+        'type' => 'multiple_choice',
+        'selection_type' => 'multiple_choice',
+        'content' => 'Identify both diagrams',
+        'image_url' => 'https://cdn.example/question.png',
+        'points' => 2,
+        'order' => 1,
+    ]);
+    $correct = $question->answers()->create([
+        'content' => 'Diagram A',
+        'image_url' => 'https://cdn.example/answer-a.png',
+        'is_correct' => true,
+    ]);
+    $question->answers()->create([
+        'content' => 'Diagram B',
+        'image_url' => 'https://cdn.example/answer-b.png',
+        'is_correct' => true,
+    ]);
+
+    $show = $this->actingAs($user)->getJson("/api/student/lessons/quiz-{$quiz->id}/quiz");
+
+    $show->assertOk()
+        ->assertJsonPath('data.thumbnail_url', 'https://cdn.example/quiz-cover.png')
+        ->assertJsonPath('data.questions.0.image_url', 'https://cdn.example/question.png')
+        ->assertJsonFragment(['image_url' => 'https://cdn.example/answer-a.png'])
+        ->assertJsonMissing(['is_correct' => true]);
+
+    $submit = $this->actingAs($user)->postJson(
+        "/api/student/lessons/quiz-{$quiz->id}/quiz/submit",
+        ['answers' => [(string) $question->id => [$correct->id]]],
+    );
+
+    $submit->assertOk()
+        ->assertJsonPath('data.question_results.0.image_url', 'https://cdn.example/question.png')
+        ->assertJsonFragment([
+            'content' => 'Diagram A',
+            'image_url' => 'https://cdn.example/answer-a.png',
+        ]);
+
+    $attemptId = $submit->json('data.attempt_id');
+    $this->actingAs($user)->getJson("/api/student/quiz-attempts/{$attemptId}")
+        ->assertOk()
+        ->assertJsonPath('data.question_results.0.image_url', 'https://cdn.example/question.png')
+        ->assertJsonFragment([
+            'content' => 'Diagram B',
+            'image_url' => 'https://cdn.example/answer-b.png',
+        ]);
+});

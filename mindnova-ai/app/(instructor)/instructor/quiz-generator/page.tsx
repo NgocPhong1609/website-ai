@@ -7,6 +7,7 @@ import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/q
 import { QuizSummary } from "@/src/features/instructor/quiz-generator/types/quizGenerator.types";
 import { Loader } from "@/src/shared/components/ui/Loader";
 import { CreateLessonEditModal } from "@/src/features/instructor/create-course/components/CreateLessonEditModal";
+import { QuizThumbnail } from "@/src/features/instructor/quiz-generator/components/QuizThumbnail";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -489,6 +490,7 @@ export default function InstructorQuizListPage() {
                     className="p-6 rounded-2xl bg-white border border-[#EAEAF4] hover:border-emerald-500/50 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-4 group"
                   >
                     <div className="flex flex-col gap-3">
+                      <QuizThumbnail title={q.title} src={q.thumbnail_url} />
                       {/* Badges Row */}
                       <div className="flex items-center justify-between gap-2 flex-wrap">
                         {/* Position Badge */}

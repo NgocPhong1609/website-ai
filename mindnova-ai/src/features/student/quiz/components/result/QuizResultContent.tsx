@@ -447,6 +447,13 @@ export function QuizResultContent() {
  <h4 className="text-sm sm:text-base font-semibold text-[#2C3039] leading-relaxed">
  {item.content}
  </h4>
+ {item.image_url && (
+ <img
+ src={item.image_url}
+ alt={`Hình minh họa câu hỏi: ${item.content}`}
+ className="max-h-72 w-full rounded-xl border border-[#E8E2D9] bg-white object-contain"
+ />
+ )}
 
  {item.type === 'essay' ? (
  <div className="space-y-3 pt-1">
@@ -531,7 +538,16 @@ export function QuizResultContent() {
 
  return (
  <div key={answer.id} data-answer-state={state} className={`p-3.5 rounded-xl border text-xs sm:text-sm flex items-center justify-between ${style}`}>
- <span>{answer.content}</span>
+ <span className="flex-1">
+ {answer.content}
+ {answer.image_url && (
+ <img
+ src={answer.image_url}
+ alt={`Hình minh họa đáp án: ${answer.content}`}
+ className="mt-2 max-h-40 w-full rounded-lg border border-current/15 bg-white object-contain"
+ />
+ )}
+ </span>
  {label && <span className="text-[11px] font-semibold">{label}</span>}
  </div>
  );
@@ -555,6 +571,18 @@ export function QuizResultContent() {
  <span>Đáp án chuẩn xác từ CSDL: {item.correct_answer}</span>
  </div>
  )}
+ {item.answer_options
+ ?.filter((answer) => answer.image_url && (
+ answer.content === item.user_answer_text || answer.content === item.correct_answer
+ ))
+ .map((answer) => (
+ <img
+ key={answer.id}
+ src={answer.image_url || undefined}
+ alt={`Hình minh họa đáp án: ${answer.content}`}
+ className="max-h-40 w-full rounded-lg border border-[#E8E2D9] bg-white object-contain"
+ />
+ ))}
  </>
  )}
 

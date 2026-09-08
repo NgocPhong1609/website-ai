@@ -474,6 +474,13 @@ export function QuizQuestionScreen({
               </h1>
               <span className="text-xs font-medium text-[#8A8478] mb-1 shrink-0 ml-4">Tiến độ: {progress}%</span>
             </div>
+            {question?.image_url && (
+              <img
+                src={question.image_url}
+                alt={`Hình minh họa câu hỏi: ${question.content}`}
+                className="mt-4 max-h-80 w-full rounded-2xl border border-[#EAEAF4] bg-white object-contain"
+              />
+            )}
             
             <div className="w-full h-1.5 bg-[#EAEAF4] rounded-full mt-4 overflow-hidden p-0.5">
               <div className="h-full bg-gradient-to-r from-[#C0392B] via-[#A93226] to-[#C0392B] rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
@@ -557,6 +564,13 @@ export function QuizQuestionScreen({
                       isSelected ? "font-bold text-[#2C3039]" : "font-normal text-[#2C3039]"
                     }`}>
                       {answer.content}
+                      {answer.image_url && (
+                        <img
+                          src={answer.image_url}
+                          alt={`Hình minh họa đáp án ${letter}: ${answer.content}`}
+                          className="mt-2 max-h-48 w-full rounded-xl border border-[#EAEAF4] bg-white object-contain"
+                        />
+                      )}
                     </span>
 
                     {isSelected && (

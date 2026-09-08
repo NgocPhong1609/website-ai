@@ -102,6 +102,7 @@ export interface QuestionResultDetail {
  question_id: number | string;
  order: number;
  content: string;
+ image_url?: string | null;
  type: 'multiple_choice' | 'essay';
  selection_type?: 'single_choice' | 'multiple_choice';
  user_answer?: string | number[];
@@ -109,7 +110,7 @@ export interface QuestionResultDetail {
  correct_answer?: string;
  selected_answer_ids?: number[] | null;
  correct_answer_ids?: number[] | null;
- answer_options?: Array<{ id: number; content: string }>;
+ answer_options?: Array<{ id: number; content: string; image_url?: string | null }>;
  sample_answer?: string;
  rubric?: string;
  is_correct: boolean;

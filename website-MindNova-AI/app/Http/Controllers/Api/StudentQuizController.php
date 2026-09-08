@@ -130,6 +130,7 @@ class StudentQuizController extends Controller
                 $ansList[] = [
                     'id' => (string) $ans->id,
                     'content' => $ans->content,
+                    'image_url' => $ans->image_url,
                 ];
             }
 
@@ -143,6 +144,7 @@ class StudentQuizController extends Controller
                 'type' => $question->type ?: 'multiple_choice',
                 'selection_type' => $question->selection_type ?? 'single_choice',
                 'content' => $question->content,
+                'image_url' => $question->image_url,
                 'points' => (float) ($question->points > 0 ? $question->points : (($question->type ?: 'multiple_choice') === 'essay' ? 2.5 : 0.5)),
                 'rubric' => $question->rubric ?: null,
                 'order' => $order++,
@@ -161,6 +163,7 @@ class StudentQuizController extends Controller
             'id' => (string) ($quiz->lesson_id ?: $quiz->id),
             'quiz_id' => $quiz->id,
             'title' => $quiz->title,
+            'thumbnail_url' => $quiz->thumbnail_url,
             'course_title' => $courseTitle,
             'time_limit_minutes' => $quiz->time_limit_minutes > 0 ? $quiz->time_limit_minutes : 15,
             'passing_score' => $quiz->passing_score > 0 ? $quiz->passing_score : 70,
@@ -494,6 +497,7 @@ class StudentQuizController extends Controller
                 $ansList[] = [
                     'id' => (string) $ans->id,
                     'content' => $ans->content,
+                    'image_url' => $ans->image_url,
                 ];
             }
 
@@ -506,6 +510,7 @@ class StudentQuizController extends Controller
                 'type' => $question->type ?: 'multiple_choice',
                 'selection_type' => $question->selection_type ?? 'single_choice',
                 'content' => $question->content,
+                'image_url' => $question->image_url,
                 'points' => (float) ($question->points > 0 ? $question->points : (($question->type ?: 'multiple_choice') === 'essay' ? 2.5 : 0.5)),
                 'rubric' => $question->rubric ?: null,
                 'order' => $order++,
@@ -517,6 +522,7 @@ class StudentQuizController extends Controller
             'id' => (string) ($quiz->lesson_id ?: $quiz->id),
             'quiz_id' => $quiz->id,
             'title' => $quiz->title,
+            'thumbnail_url' => $quiz->thumbnail_url,
             'course_title' => $courseTitle,
             'time_limit_minutes' => $quiz->time_limit_minutes > 0 ? $quiz->time_limit_minutes : 15,
             'passing_score' => $quiz->passing_score > 0 ? $quiz->passing_score : 70,
@@ -567,16 +573,18 @@ class StudentQuizController extends Controller
                     'type' => $ans->question_type ?: 'multiple_choice',
                     'selection_type' => $q?->selection_type ?? 'single_choice',
                     'content' => $q ? $q->content : 'Câu hỏi',
+                    'image_url' => $q?->image_url,
                     'user_answer' => $ans->user_answer,
                     'user_answer_text' => $ans->user_answer,
                     'selected_answer_ids' => $isMultipleSelection ? ($ans->selected_answer_ids ?? []) : null,
                     'correct_answer_ids' => $isMultipleSelection && $q
                         ? $q->answers->where('is_correct', true)->pluck('id')->map(fn ($id) => (int) $id)->values()->all()
                         : null,
-                    'answer_options' => $isMultipleSelection && $q
+                    'answer_options' => $q
                         ? $q->answers->map(fn ($answer) => [
                             'id' => (int) $answer->id,
                             'content' => (string) $answer->content,
+                            'image_url' => $answer->image_url,
                         ])->values()->all()
                         : null,
                     'is_correct' => (bool) $ans->is_correct,

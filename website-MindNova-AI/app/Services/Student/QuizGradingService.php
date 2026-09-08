@@ -46,6 +46,7 @@ class QuizGradingService
                         'question_id' => $question->id,
                         'order' => $question->order ?: ($index + 1),
                         'content' => $question->content,
+                        'image_url' => $question->image_url,
                         'type' => 'essay',
                         'user_answer' => '',
                         'user_answer_text' => 'Chưa nhập câu trả lời',
@@ -76,6 +77,7 @@ class QuizGradingService
                         'question_id' => $question->id,
                         'order' => $question->order ?: ($index + 1),
                         'content' => $question->content,
+                        'image_url' => $question->image_url,
                         'type' => 'essay',
                         'user_answer' => $userText,
                         'user_answer_text' => $userText,
@@ -104,6 +106,7 @@ class QuizGradingService
                         'question_id' => $question->id,
                         'order' => $question->order ?: ($index + 1),
                         'content' => $question->content,
+                        'image_url' => $question->image_url,
                         'type' => $qType,
                         'selection_type' => 'multiple_choice',
                         'user_answer' => $resolved['selected_answer_ids'],
@@ -139,10 +142,16 @@ class QuizGradingService
                     'question_id' => $question->id,
                     'order' => $question->order ?: ($index + 1),
                     'content' => $question->content,
+                    'image_url' => $question->image_url,
                     'type' => $qType,
                     'user_answer' => $resolved['chosen_value'],
                     'user_answer_text' => $resolved['display_text'] ?: 'Chưa chọn',
                     'correct_answer' => $resolved['correct_text'],
+                    'answer_options' => $question->answers->map(fn ($answer) => [
+                        'id' => (int) $answer->id,
+                        'content' => (string) $answer->content,
+                        'image_url' => $answer->image_url,
+                    ])->values()->all(),
                     'is_correct' => $isCorrect,
                     'score' => $earnedScore,
                     'max_score' => $maxScore,
@@ -253,6 +262,7 @@ class QuizGradingService
                 ->map(fn ($answer) => [
                     'id' => (int) $answer->id,
                     'content' => (string) $answer->content,
+                    'image_url' => $answer->image_url,
                 ])
                 ->values()
                 ->all(),
