@@ -69,6 +69,14 @@ class LessonResource extends JsonResource
             'order' => $this->order,
             'status' => $this->status,
             'quizData' => $quizData,
+            'attachments' => $this->attachments()->orderBy('id')->get()->map(fn ($attachment) => [
+                'id' => $attachment->id,
+                'display_name' => $attachment->display_name,
+                'original_name' => $attachment->original_name,
+                'mime_type' => $attachment->mime_type,
+                'extension' => $attachment->extension,
+                'size_bytes' => $attachment->size_bytes,
+            ])->values()->toArray(),
             // ── Versioning info ──
             'current_version' => $this->current_version,
             'published_version_id' => $this->published_version_id,

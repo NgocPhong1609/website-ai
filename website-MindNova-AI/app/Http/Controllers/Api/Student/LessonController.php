@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Answer;
 use App\Models\Enrollment;
 use App\Models\Lesson;
+use App\Models\LessonAttachment;
 use App\Models\LessonCompletion;
 use App\Models\UserQuizAttempt;
 use App\Traits\ApiResponse;
@@ -70,6 +71,37 @@ class LessonController extends Controller
         }
 
         return $this->notFoundResponse('Không tìm thấy video cho bài học này.');
+    }
+
+    public function attachmentDownloadUrl(
+        Request $request,
+        Lesson $lesson,
+        LessonAttachment $attachment,
+    ): JsonResponse {
+        $user = $request->user('sanctum') ?? $request->user();
+        if (!$user) {
+            return $this->unauthorizedResponse('Bạn cần đăng nhập.');
+        }
+
+        if ($lesson->status !== 'published' || $lesson->published_version_id === null) {
+            return $this->notFoundResponse('Không tìm thấy bài học.');
+        }
+
+        if ($attachment->lesson_id !== $lesson->id) {
+            return $this->notFoundResponse('Không tìm thấy tài liệu.');
+        }
+
+        $courseId = $lesson->module?->course_id;
+        if (!$courseId || !Enrollment::where('user_id', $user->id)->where('course_id', $courseId)->exists()) {
+            return $this->forbiddenResponse('Bạn chưa đăng ký khóa học này.');
+        }
+
+        $expiresAt = now()->addHour();
+
+        return $this->successResponse([
+            'signed_url' => Storage::disk('r2')->temporaryUrl($attachment->r2_key, $expiresAt),
+            'expires_at' => $expiresAt,
+        ], 'Attachment URL generated.');
     }
 
     /**
