@@ -12,6 +12,7 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 
 class StudentQuizController extends Controller
 {
@@ -140,6 +141,7 @@ class StudentQuizController extends Controller
             $rawQuestions[] = [
                 'id' => (string) $question->id,
                 'type' => $question->type ?: 'multiple_choice',
+                'selection_type' => $question->selection_type ?? 'single_choice',
                 'content' => $question->content,
                 'points' => (float) ($question->points > 0 ? $question->points : (($question->type ?: 'multiple_choice') === 'essay' ? 2.5 : 0.5)),
                 'rubric' => $question->rubric ?: null,
@@ -205,6 +207,8 @@ class StudentQuizController extends Controller
             return $this->errorResponse('Bài thi chưa có câu hỏi nào trong CSDL.', 400);
         }
 
+        $this->validateMultipleChoiceSelections($quiz, $submittedAnswers);
+
         // GRADE ATTEMPT VIA QuizGradingService (MCQ + AI Essay Grading)
         $grading = $this->quizGradingService->gradeAttempt($quiz, $submittedAnswers, $user);
 
@@ -234,11 +238,13 @@ class StudentQuizController extends Controller
                 // Save per-question attempt answers if user_quiz_attempt_answers table exists
                 if (Schema::hasTable('user_quiz_attempt_answers')) {
                     foreach ($grading['question_results'] as $qRes) {
+                        $isMultipleSelection = ($qRes['selection_type'] ?? 'single_choice') === 'multiple_choice';
                         UserQuizAttemptAnswer::create([
                             'user_quiz_attempt_id' => $attempt->id,
                             'question_id' => $qRes['question_id'],
                             'question_type' => $qRes['type'],
-                            'user_answer' => (string) $qRes['user_answer'],
+                            'user_answer' => $isMultipleSelection ? null : (string) $qRes['user_answer'],
+                            'selected_answer_ids' => $isMultipleSelection ? $qRes['selected_answer_ids'] : null,
                             'is_correct' => $qRes['is_correct'],
                             'score' => $qRes['score'],
                             'max_score' => $qRes['max_score'],
@@ -306,6 +312,45 @@ class StudentQuizController extends Controller
         ];
 
         return $this->successResponse($responseReport, 'Chấm điểm tự luận và trắc nghiệm hoàn tất.');
+    }
+
+    private function validateMultipleChoiceSelections(Quiz $quiz, array $submittedAnswers): void
+    {
+        $errors = [];
+
+        foreach ($quiz->questions->values() as $index => $question) {
+            if (($question->selection_type ?? 'single_choice') !== 'multiple_choice') {
+                continue;
+            }
+
+            $questionId = (string) $question->id;
+            $selection = $submittedAnswers[$questionId]
+                ?? $submittedAnswers[(string) $index]
+                ?? $submittedAnswers[$index]
+                ?? null;
+
+            if ($selection === null) {
+                continue;
+            }
+
+            if (!is_array($selection)) {
+                $errors["answers.{$questionId}"][] = 'Câu hỏi nhiều đáp án phải được gửi dưới dạng danh sách.';
+                continue;
+            }
+
+            $allowedIds = $question->answers->pluck('id')->map(fn ($id) => (int) $id)->all();
+            foreach ($selection as $answerId) {
+                $isIntegerId = is_int($answerId) || (is_string($answerId) && ctype_digit($answerId));
+                if (!$isIntegerId || !in_array((int) $answerId, $allowedIds, true)) {
+                    $errors["answers.{$questionId}"][] = 'Đáp án đã chọn không thuộc câu hỏi này.';
+                    break;
+                }
+            }
+        }
+
+        if ($errors !== []) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 
     /**
@@ -459,6 +504,7 @@ class StudentQuizController extends Controller
             $rawQuestions[] = [
                 'id' => (string) $question->id,
                 'type' => $question->type ?: 'multiple_choice',
+                'selection_type' => $question->selection_type ?? 'single_choice',
                 'content' => $question->content,
                 'points' => (float) ($question->points > 0 ? $question->points : (($question->type ?: 'multiple_choice') === 'essay' ? 2.5 : 0.5)),
                 'rubric' => $question->rubric ?: null,
@@ -488,7 +534,7 @@ class StudentQuizController extends Controller
      */
     public function getAttemptResult(Request $request, $attemptId): JsonResponse
     {
-        $attempt = UserQuizAttempt::with(['quiz.questions', 'answers'])->find($attemptId);
+        $attempt = UserQuizAttempt::with(['quiz.questions.answers', 'answers'])->find($attemptId);
         if (!$attempt) {
             return $this->errorResponse('Không tìm thấy bài làm trong hệ thống.', 404);
         }
@@ -513,14 +559,20 @@ class StudentQuizController extends Controller
         if ($attempt->answers && $attempt->answers->isNotEmpty()) {
             $order = 1;
             foreach ($attempt->answers as $ans) {
-                $q = \App\Models\Question::find($ans->question_id);
+                $q = $quiz->questions->firstWhere('id', $ans->question_id);
+                $isMultipleSelection = ($q?->selection_type ?? 'single_choice') === 'multiple_choice';
                 $questionResults[] = [
                     'question_id' => $ans->question_id,
                     'order' => $order++,
                     'type' => $ans->question_type ?: 'multiple_choice',
+                    'selection_type' => $q?->selection_type ?? 'single_choice',
                     'content' => $q ? $q->content : 'Câu hỏi',
                     'user_answer' => $ans->user_answer,
                     'user_answer_text' => $ans->user_answer,
+                    'selected_answer_ids' => $isMultipleSelection ? ($ans->selected_answer_ids ?? []) : null,
+                    'correct_answer_ids' => $isMultipleSelection && $q
+                        ? $q->answers->where('is_correct', true)->pluck('id')->map(fn ($id) => (int) $id)->values()->all()
+                        : null,
                     'is_correct' => (bool) $ans->is_correct,
                     'score' => (float) $ans->score,
                     'max_score' => (float) $ans->max_score,
@@ -571,4 +623,3 @@ class StudentQuizController extends Controller
         return $this->successResponse($responseReport, 'Lấy báo cáo kết quả thi thành công.');
     }
 }
-

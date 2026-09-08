@@ -93,6 +93,38 @@ class QuizGradingService
                 }
             } else {
                 // OBJECTIVE QUESTION (MCQ, True/False, Fill in Blank)
+                if (($question->selection_type ?? 'single_choice') === 'multiple_choice') {
+                    $resolved = $this->resolveMultipleAnswerMatch($question, $rawUserAns, $maxScore);
+
+                    if ($resolved['is_correct']) {
+                        $correctCount++;
+                    }
+
+                    $questionResults[] = [
+                        'question_id' => $question->id,
+                        'order' => $question->order ?: ($index + 1),
+                        'content' => $question->content,
+                        'type' => $qType,
+                        'selection_type' => 'multiple_choice',
+                        'user_answer' => $resolved['selected_answer_ids'],
+                        'user_answer_text' => $resolved['display_text'] ?: 'Chưa chọn',
+                        'selected_answer_ids' => $resolved['selected_answer_ids'],
+                        'correct_answer_ids' => $resolved['correct_answer_ids'],
+                        'invalid_answer_ids' => $resolved['invalid_answer_ids'],
+                        'is_correct' => $resolved['is_correct'],
+                        'score' => $resolved['score'],
+                        'max_score' => $maxScore,
+                        'feedback' => $resolved['is_correct']
+                            ? 'Đáp án hoàn toàn chính xác!'
+                            : ($question->explanation ?: 'Bạn đã nhận điểm cho các đáp án đúng đã chọn.'),
+                        'ai_analysis' => null,
+                        'grading_status' => 'graded',
+                    ];
+
+                    $totalEarnedPoints += $resolved['score'];
+                    continue;
+                }
+
                 $resolved = $this->resolveAnswerMatch($question, $rawUserAns);
 
                 $isCorrect = $resolved['is_correct'];
@@ -155,6 +187,72 @@ class QuizGradingService
             'total_questions' => count($quiz->questions),
             'has_failed_ai_grading' => $hasFailedAiGrading,
             'question_results' => $questionResults,
+        ];
+    }
+
+    /**
+     * Resolve and score an explicit multiple-correct answer set.
+     */
+    private function resolveMultipleAnswerMatch(Question $question, mixed $rawUserAns, float $maxScore): array
+    {
+        if (is_array($rawUserAns) && array_key_exists('answer', $rawUserAns)) {
+            $rawUserAns = $rawUserAns['answer'];
+        }
+
+        $submittedValues = is_array($rawUserAns)
+            ? $rawUserAns
+            : (($rawUserAns === null || $rawUserAns === '') ? [] : [$rawUserAns]);
+
+        $submittedIds = collect($submittedValues)
+            ->filter(fn ($value) => is_int($value) || (is_string($value) && ctype_digit($value)))
+            ->map(fn ($value) => (int) $value)
+            ->filter(fn (int $value) => $value > 0)
+            ->unique()
+            ->values();
+
+        $answersById = $question->answers->keyBy(fn ($answer) => (int) $answer->id);
+        $validSelectedIds = $submittedIds
+            ->filter(fn (int $id) => $answersById->has($id))
+            ->values();
+        $invalidAnswerIds = $submittedIds
+            ->reject(fn (int $id) => $answersById->has($id))
+            ->values();
+        $correctAnswerIds = $question->answers
+            ->filter(fn ($answer) => (bool) $answer->is_correct)
+            ->map(fn ($answer) => (int) $answer->id)
+            ->values();
+        $selectedCorrectCount = $validSelectedIds
+            ->filter(fn (int $id) => $correctAnswerIds->containsStrict($id))
+            ->count();
+        $selectedWrongCount = $validSelectedIds->count() - $selectedCorrectCount;
+        $totalCorrect = $correctAnswerIds->count();
+
+        $score = $totalCorrect > 0
+            ? $maxScore * ($selectedCorrectCount / $totalCorrect)
+            : 0.0;
+
+        if ($selectedWrongCount > 0 || $invalidAnswerIds->isNotEmpty()) {
+            $wrongAnswerCap = $totalCorrect > 0
+                ? $maxScore * (($totalCorrect - 1) / $totalCorrect)
+                : 0.0;
+            $score = min($score, $wrongAnswerCap);
+        }
+
+        $score = round(max(0.0, min($score, $maxScore)), 2);
+        $isCorrect = $totalCorrect > 0
+            && $invalidAnswerIds->isEmpty()
+            && $selectedWrongCount === 0
+            && $selectedCorrectCount === $totalCorrect;
+
+        return [
+            'selected_answer_ids' => $validSelectedIds->all(),
+            'correct_answer_ids' => $correctAnswerIds->all(),
+            'invalid_answer_ids' => $invalidAnswerIds->all(),
+            'display_text' => $validSelectedIds
+                ->map(fn (int $id) => (string) $answersById->get($id)->content)
+                ->implode(', '),
+            'is_correct' => $isCorrect,
+            'score' => $score,
         ];
     }
 

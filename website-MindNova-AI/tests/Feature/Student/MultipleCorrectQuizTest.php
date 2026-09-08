@@ -41,3 +41,65 @@ test('schema keeps legacy questions single choice and stores selected answer ids
         ->and($attemptAnswer->fresh()->selected_answer_ids)->toBe([11, 13])
         ->and($attemptAnswer->fresh()->user_answer)->toBe('11');
 })->group('schema');
+
+test('student submission persists multiple selections and returns partial scoring detail', function () {
+    $user = User::factory()->create();
+    $quiz = Quiz::create([
+        'instructor_id' => $user->id,
+        'title' => 'Multiple correct quiz',
+        'total_questions' => 1,
+        'total_points' => 2,
+        'passing_score' => 70,
+        'status' => 'published',
+    ]);
+    $question = $quiz->questions()->create([
+        'type' => 'multiple_choice',
+        'selection_type' => 'multiple_choice',
+        'content' => 'Select both correct answers',
+        'points' => 2,
+        'order' => 1,
+    ]);
+    $firstCorrect = $question->answers()->create(['content' => 'A', 'is_correct' => true]);
+    $question->answers()->create(['content' => 'B', 'is_correct' => true]);
+    $question->answers()->create(['content' => 'C', 'is_correct' => false]);
+
+    $response = $this->actingAs($user)->postJson(
+        "/api/student/lessons/quiz-{$quiz->id}/quiz/submit",
+        ['answers' => [(string) $question->id => [$firstCorrect->id]]],
+    );
+
+    $response->assertOk()
+        ->assertJsonPath('data.question_results.0.selection_type', 'multiple_choice')
+        ->assertJsonPath('data.question_results.0.selected_answer_ids.0', $firstCorrect->id)
+        ->assertJsonPath('data.question_results.0.score', 1)
+        ->assertJsonPath('data.question_results.0.max_score', 2);
+
+    $attemptAnswer = UserQuizAttemptAnswer::latest('id')->firstOrFail();
+    expect($attemptAnswer->selected_answer_ids)->toBe([$firstCorrect->id])
+        ->and($attemptAnswer->user_answer)->toBeNull();
+});
+
+test('student submission rejects an answer id outside its question', function () {
+    $user = User::factory()->create();
+    $quiz = Quiz::create([
+        'instructor_id' => $user->id,
+        'title' => 'Answer membership quiz',
+        'total_questions' => 1,
+        'total_points' => 2,
+        'status' => 'published',
+    ]);
+    $question = $quiz->questions()->create([
+        'type' => 'multiple_choice',
+        'selection_type' => 'multiple_choice',
+        'content' => 'Select valid answers',
+        'points' => 2,
+    ]);
+    $question->answers()->create(['content' => 'A', 'is_correct' => true]);
+    $question->answers()->create(['content' => 'B', 'is_correct' => true]);
+
+    $this->actingAs($user)->postJson(
+        "/api/student/lessons/quiz-{$quiz->id}/quiz/submit",
+        ['answers' => [(string) $question->id => [999999]]],
+    )->assertUnprocessable()
+        ->assertJsonValidationErrors(["answers.{$question->id}"]);
+});
