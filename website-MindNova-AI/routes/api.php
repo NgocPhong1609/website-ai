@@ -236,6 +236,10 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::post('lessons/{lesson}/video', [LessonController::class, 'uploadVideo']);
     Route::get('lessons/{lesson}/video-url', [LessonController::class, 'getVideoUrl']);
     Route::post('lessons/{lesson}/content-media', [LessonController::class, 'uploadContentMedia']);
+    Route::post('lessons/{lesson}/attachments', [LessonController::class, 'uploadAttachments']);
+    Route::patch('lessons/{lesson}/attachments/{attachment}', [LessonController::class, 'renameAttachment']);
+    Route::delete('lessons/{lesson}/attachments/{attachment}', [LessonController::class, 'deleteAttachment']);
+    Route::get('lessons/{lesson}/attachments/{attachment}/download', [LessonController::class, 'attachmentDownloadUrl']);
 
     // Temporary Media
     Route::post('media/temp', [MediaController::class, 'uploadTemp']);

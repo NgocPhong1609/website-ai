@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api\Instructor;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Instructor\StoreLessonRequest;
+use App\Http\Requests\Instructor\UpdateLessonAttachmentRequest;
+use App\Http\Requests\Instructor\UploadLessonAttachmentRequest;
 use App\Http\Resources\LessonResource;
 use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Models\LessonAttachment;
 use App\Services\Instructor\LessonService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -123,4 +126,55 @@ class LessonController extends Controller
 
         return $this->successResponse($result, 'Content media uploaded to R2 successfully.');
     }
+
+    public function uploadAttachments(UploadLessonAttachmentRequest $request, Lesson $lesson)
+    {
+        Gate::authorize('manage', $lesson);
+
+        $attachments = $this->lessonService->uploadAttachments(
+            $lesson,
+            $request->file('attachments'),
+            $request->user()->id,
+        );
+
+        return $this->createdResponse($attachments, 'Lesson attachments uploaded successfully.');
+    }
+
+    public function renameAttachment(
+        UpdateLessonAttachmentRequest $request,
+        Lesson $lesson,
+        LessonAttachment $attachment,
+    ) {
+        Gate::authorize('manage', $lesson);
+        abort_unless($attachment->lesson_id === $lesson->id, 404);
+
+        $attachment = $this->lessonService->renameAttachment(
+            $attachment,
+            $request->validated('display_name'),
+        );
+
+        return $this->successResponse($attachment, 'Lesson attachment renamed successfully.');
+    }
+
+    public function deleteAttachment(Lesson $lesson, LessonAttachment $attachment)
+    {
+        Gate::authorize('manage', $lesson);
+        abort_unless($attachment->lesson_id === $lesson->id, 404);
+
+        $this->lessonService->deleteAttachment($attachment);
+
+        return $this->noContentResponse();
+    }
+
+    public function attachmentDownloadUrl(Lesson $lesson, LessonAttachment $attachment)
+    {
+        Gate::authorize('manage', $lesson);
+        abort_unless($attachment->lesson_id === $lesson->id, 404);
+
+        return $this->successResponse(
+            $this->lessonService->attachmentDownloadUrl($attachment),
+            'Signed attachment URL generated.',
+        );
+    }
+
 }

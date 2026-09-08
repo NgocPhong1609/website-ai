@@ -6,11 +6,14 @@ use App\Models\ContentVersion;
 use App\Models\CourseModule;
 use App\Models\DeletionRequest;
 use App\Models\Lesson;
+use App\Models\LessonAttachment;
 use App\Models\LessonMedia;
 use App\Services\ContentAuditService;
 use App\Services\ContentReviewService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Throwable;
 
 class LessonService
 {
@@ -122,8 +125,79 @@ class LessonService
             Storage::disk('r2')->delete($media->r2_key);
         }
 
+        foreach ($lesson->attachments as $attachment) {
+            Storage::disk('r2')->delete($attachment->r2_key);
+        }
+
         $lesson->delete();
     }
+
+    /**
+     * @param array<int, UploadedFile> $files
+     * @return array<int, LessonAttachment>
+     */
+    public function uploadAttachments(Lesson $lesson, array $files, int $uploaderId): array
+    {
+        $uploadedKeys = [];
+        $attachments = [];
+
+        try {
+            foreach ($files as $file) {
+                $extension = strtolower($file->getClientOriginalExtension());
+                $key = "lessons/{$lesson->id}/attachments/".Str::uuid().".{$extension}";
+
+                Storage::disk('r2')->putFileAs(
+                    "lessons/{$lesson->id}/attachments",
+                    $file,
+                    basename($key),
+                );
+                $uploadedKeys[] = $key;
+
+                $attachments[] = $lesson->attachments()->create([
+                    'uploaded_by' => $uploaderId,
+                    'display_name' => $file->getClientOriginalName(),
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getMimeType() ?: 'application/octet-stream',
+                    'extension' => $extension,
+                    'size_bytes' => $file->getSize(),
+                    'r2_key' => $key,
+                ]);
+            }
+        } catch (Throwable $exception) {
+            Storage::disk('r2')->delete($uploadedKeys);
+            foreach ($attachments as $attachment) {
+                $attachment->delete();
+            }
+
+            throw $exception;
+        }
+
+        return $attachments;
+    }
+
+    public function renameAttachment(LessonAttachment $attachment, string $displayName): LessonAttachment
+    {
+        $attachment->update(['display_name' => trim($displayName)]);
+
+        return $attachment->fresh();
+    }
+
+    public function deleteAttachment(LessonAttachment $attachment): void
+    {
+        Storage::disk('r2')->delete($attachment->r2_key);
+        $attachment->delete();
+    }
+
+    public function attachmentDownloadUrl(LessonAttachment $attachment): array
+    {
+        $expiresAt = now()->addHour();
+
+        return [
+            'signed_url' => Storage::disk('r2')->temporaryUrl($attachment->r2_key, $expiresAt),
+            'expires_at' => $expiresAt,
+        ];
+    }
+
 
     /**
      * Request deletion of a published lesson.
