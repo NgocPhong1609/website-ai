@@ -573,6 +573,12 @@ class StudentQuizController extends Controller
                     'correct_answer_ids' => $isMultipleSelection && $q
                         ? $q->answers->where('is_correct', true)->pluck('id')->map(fn ($id) => (int) $id)->values()->all()
                         : null,
+                    'answer_options' => $isMultipleSelection && $q
+                        ? $q->answers->map(fn ($answer) => [
+                            'id' => (int) $answer->id,
+                            'content' => (string) $answer->content,
+                        ])->values()->all()
+                        : null,
                     'is_correct' => (bool) $ans->is_correct,
                     'score' => (float) $ans->score,
                     'max_score' => (float) $ans->max_score,

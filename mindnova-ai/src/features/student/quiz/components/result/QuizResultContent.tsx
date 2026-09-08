@@ -502,6 +502,43 @@ export function QuizResultContent() {
  </div>
  ) : (
  <div className="space-y-3 pt-1">
+ {item.selection_type === 'multiple_choice' && item.answer_options ? (
+ <div className="space-y-2">
+ {item.answer_options.map((answer) => {
+ const isSelected = item.selected_answer_ids?.includes(answer.id) ?? false;
+ const isCorrectAnswer = item.correct_answer_ids?.includes(answer.id) ?? false;
+ const state = isSelected && isCorrectAnswer
+ ? 'selected-correct'
+ : isSelected
+ ? 'selected-incorrect'
+ : isCorrectAnswer
+ ? 'missed-correct'
+ : 'neutral';
+ const style = state === 'selected-correct'
+ ? 'bg-[#EAF8F5] border-[#2C3039]/30 text-[#2C3039]'
+ : state === 'selected-incorrect'
+ ? 'bg-[#FFF2F2] border-[#E11D48]/30 text-[#C0392B]'
+ : state === 'missed-correct'
+ ? 'bg-[#FFF8E7] border-[#D97706]/30 text-[#92400E]'
+ : 'bg-[#F8FAFC] border-[#E8E2D9] text-[#8A8478]';
+ const label = state === 'selected-correct'
+ ? 'Đã chọn · đúng'
+ : state === 'selected-incorrect'
+ ? 'Đã chọn · chưa đúng'
+ : state === 'missed-correct'
+ ? 'Đáp án đúng bị bỏ lỡ'
+ : '';
+
+ return (
+ <div key={answer.id} data-answer-state={state} className={`p-3.5 rounded-xl border text-xs sm:text-sm flex items-center justify-between ${style}`}>
+ <span>{answer.content}</span>
+ {label && <span className="text-[11px] font-semibold">{label}</span>}
+ </div>
+ );
+ })}
+ </div>
+ ) : (
+ <>
  <div className={`p-3.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center gap-2 ${
  item.is_correct 
  ? "bg-[#EAF8F5] border-[#2C3039]/20 text-[#2C3039]" 
@@ -517,6 +554,8 @@ export function QuizResultContent() {
  <div className="p-3.5 rounded-xl bg-[#EAF8F5] border border-[#2C3039]/20 text-xs sm:text-sm font-semibold text-[#2C3039]">
  <span>Đáp án chuẩn xác từ CSDL: {item.correct_answer}</span>
  </div>
+ )}
+ </>
  )}
 
  <div className="bg-[#F8FAFC] p-4 rounded-xl border border-[#E8E2D9] space-y-1.5">

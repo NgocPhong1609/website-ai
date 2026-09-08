@@ -103,9 +103,13 @@ export interface QuestionResultDetail {
  order: number;
  content: string;
  type: 'multiple_choice' | 'essay';
- user_answer?: string;
+ selection_type?: 'single_choice' | 'multiple_choice';
+ user_answer?: string | number[];
  user_answer_text?: string;
  correct_answer?: string;
+ selected_answer_ids?: number[] | null;
+ correct_answer_ids?: number[] | null;
+ answer_options?: Array<{ id: number; content: string }>;
  sample_answer?: string;
  rubric?: string;
  is_correct: boolean;

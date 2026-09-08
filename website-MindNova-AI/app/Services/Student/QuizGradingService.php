@@ -111,6 +111,7 @@ class QuizGradingService
                         'selected_answer_ids' => $resolved['selected_answer_ids'],
                         'correct_answer_ids' => $resolved['correct_answer_ids'],
                         'invalid_answer_ids' => $resolved['invalid_answer_ids'],
+                        'answer_options' => $resolved['answer_options'],
                         'is_correct' => $resolved['is_correct'],
                         'score' => $resolved['score'],
                         'max_score' => $maxScore,
@@ -248,6 +249,13 @@ class QuizGradingService
             'selected_answer_ids' => $validSelectedIds->all(),
             'correct_answer_ids' => $correctAnswerIds->all(),
             'invalid_answer_ids' => $invalidAnswerIds->all(),
+            'answer_options' => $question->answers
+                ->map(fn ($answer) => [
+                    'id' => (int) $answer->id,
+                    'content' => (string) $answer->content,
+                ])
+                ->values()
+                ->all(),
             'display_text' => $validSelectedIds
                 ->map(fn (int $id) => (string) $answersById->get($id)->content)
                 ->implode(', '),
