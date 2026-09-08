@@ -19,6 +19,7 @@ class StoreQuizRequest extends FormRequest
             'passing_score' => 'nullable|numeric|min:0|max:100',
             'questions' => 'required|array|min:1',
             'questions.*.type' => 'nullable|string|in:multiple_choice,essay,true_false',
+            'questions.*.selection_type' => 'nullable|string|in:single_choice,multiple_choice',
             'questions.*.content' => 'required|string',
             'questions.*.explanation' => 'nullable|string',
             'questions.*.sample_answer' => 'nullable|string',
@@ -31,7 +32,7 @@ class StoreQuizRequest extends FormRequest
     }
 
     /**
-     * Custom validation: multiple choice questions must have at least 2 answers and exactly one correct answer.
+     * Custom validation for single- and multiple-correct questions.
      */
     public function withValidator($validator): void
     {
@@ -51,10 +52,18 @@ class StoreQuizRequest extends FormRequest
                     continue;
                 }
                 $correctCount = collect($answers)->where('is_correct', true)->count();
-                if ($correctCount !== 1) {
+                $selectionType = $question['selection_type'] ?? 'single_choice';
+                $validCorrectCount = $selectionType === 'multiple_choice'
+                    ? $correctCount >= 2
+                    : $correctCount === 1;
+
+                if (!$validCorrectCount) {
+                    $requirement = $selectionType === 'multiple_choice'
+                        ? 'ít nhất 2 đáp án đúng'
+                        : 'đúng 1 đáp án đúng';
                     $validator->errors()->add(
                         "questions.{$qIndex}.answers",
-                        "Câu hỏi " . ($qIndex + 1) . " phải có đúng 1 đáp án đúng (hiện có {$correctCount})."
+                        "Câu hỏi " . ($qIndex + 1) . " phải có {$requirement} (hiện có {$correctCount})."
                     );
                 }
             }

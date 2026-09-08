@@ -21,6 +21,20 @@ beforeEach(function () {
 
     $this->student = User::factory()->create();
     $this->student->roles()->attach($this->studentRole);
+
+    $this->quizPayload = fn (array $questionOverrides = []) => [
+        'title' => 'Quiz selection mode',
+        'questions' => [array_merge([
+            'type' => 'multiple_choice',
+            'content' => 'Chọn đáp án đúng',
+            'points' => 10,
+            'answers' => [
+                ['content' => 'A', 'is_correct' => true],
+                ['content' => 'B', 'is_correct' => false],
+                ['content' => 'C', 'is_correct' => false],
+            ],
+        ], $questionOverrides)],
+    ];
 });
 
 test('unauthenticated user cannot access ai quiz generator endpoints', function () {
@@ -161,6 +175,59 @@ test('instructor can store standalone quiz with mcq and essay questions', functi
         'essay_questions_count' => 1,
         'total_points' => 10.0
     ]);
+});
+
+test('legacy quiz question defaults to single choice with one correct answer', function () {
+    $response = $this->actingAs($this->teacher)
+        ->postJson('/api/instructor/ai-quiz/store', ($this->quizPayload)());
+
+    $response->assertCreated()
+        ->assertJsonPath('data.questions.0.selection_type', 'single_choice');
+});
+
+test('single choice question rejects more than one correct answer', function () {
+    $payload = ($this->quizPayload)([
+        'selection_type' => 'single_choice',
+        'answers' => [
+            ['content' => 'A', 'is_correct' => true],
+            ['content' => 'B', 'is_correct' => true],
+        ],
+    ]);
+
+    $this->actingAs($this->teacher)
+        ->postJson('/api/instructor/ai-quiz/store', $payload)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['questions.0.answers']);
+});
+
+test('multiple choice question rejects fewer than two correct answers', function () {
+    $payload = ($this->quizPayload)(['selection_type' => 'multiple_choice']);
+
+    $this->actingAs($this->teacher)
+        ->postJson('/api/instructor/ai-quiz/store', $payload)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['questions.0.answers']);
+});
+
+test('multiple choice question stores every correct answer', function () {
+    $payload = ($this->quizPayload)([
+        'selection_type' => 'multiple_choice',
+        'answers' => [
+            ['content' => 'A', 'is_correct' => true],
+            ['content' => 'B', 'is_correct' => true],
+            ['content' => 'C', 'is_correct' => false],
+        ],
+    ]);
+
+    $response = $this->actingAs($this->teacher)
+        ->postJson('/api/instructor/ai-quiz/store', $payload);
+
+    $response->assertCreated()
+        ->assertJsonPath('data.questions.0.selection_type', 'multiple_choice');
+
+    $quiz = Quiz::where('title', 'Quiz selection mode')->firstOrFail();
+    expect($quiz->questions()->firstOrFail()->answers()->where('is_correct', true)->count())
+        ->toBe(2);
 });
 
 test('instructor cannot attach quiz owned by another teacher', function () {

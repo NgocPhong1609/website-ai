@@ -37,6 +37,7 @@ class QuizResource extends JsonResource
                     return [
                         'id' => $q->id,
                         'type' => $q->type ?? 'multiple_choice',
+                        'selection_type' => $q->selection_type ?? 'single_choice',
                         'question' => $q->content,
                         'content' => $q->content,
                         'explanation' => $q->explanation,

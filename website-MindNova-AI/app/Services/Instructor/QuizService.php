@@ -128,6 +128,7 @@ class QuizService
 
             $question = $quiz->questions()->create([
                 'type' => $type,
+                'selection_type' => $qData['selection_type'] ?? 'single_choice',
                 'difficulty' => $qData['difficulty'] ?? 'medium',
                 'content' => $qData['content'] ?? $qData['question'] ?? '',
                 'explanation' => $qData['explanation'] ?? null,
@@ -375,6 +376,7 @@ class QuizService
                     return [
                         'id' => $q->id,
                         'type' => $q->type ?? 'multiple_choice',
+                        'selection_type' => $q->selection_type ?? 'single_choice',
                         'question' => $q->content,
                         'content' => $q->content,
                         'explanation' => $q->explanation,
@@ -474,6 +476,7 @@ class QuizService
                 $type = $questionData['type'] ?? 'multiple_choice';
                 $question = $quiz->questions()->create([
                     'type' => $type,
+                    'selection_type' => $questionData['selection_type'] ?? 'single_choice',
                     'content' => $questionData['content'] ?? $questionData['question'] ?? '',
                     'explanation' => $questionData['explanation'] ?? null,
                     'sample_answer' => $type === 'essay' ? ($questionData['sample_answer'] ?? null) : null,

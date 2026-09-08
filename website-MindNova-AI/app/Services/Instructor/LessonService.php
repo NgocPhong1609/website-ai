@@ -516,6 +516,7 @@ class LessonService
 
                 $question = $quiz->questions()->create([
                     'type' => $type,
+                    'selection_type' => $qData['selection_type'] ?? 'single_choice',
                     'content' => $content,
                     'explanation' => $qData['explanation'] ?? null,
                     'sample_answer' => $type === 'essay' ? ($qData['sample_answer'] ?? null) : null,
