@@ -9,6 +9,7 @@ use App\Http\Requests\Instructor\StoreAiQuizRequest;
 use App\Models\Quiz;
 use App\Services\Instructor\AiQuizGeneratorService;
 use App\Services\Instructor\QuizService;
+use App\Services\Instructor\QuizMediaService;
 use App\Traits\ApiResponse;
 use Exception;
 use Illuminate\Http\Request;
@@ -20,7 +21,8 @@ class QuizGeneratorController extends Controller
 
     public function __construct(
         private readonly AiQuizGeneratorService $aiQuizGeneratorService,
-        private readonly QuizService $quizService
+        private readonly QuizService $quizService,
+        private readonly QuizMediaService $quizMediaService,
     ) {
     }
 
@@ -177,6 +179,8 @@ class QuizGeneratorController extends Controller
             return $this->errorResponse('Không thể xóa đề kiểm tra này vì đề đang được gắn vào khóa học.', 422);
         }
 
+        $managedMediaKeys = $this->quizMediaService->managedKeys($quiz);
+
         \Illuminate\Support\Facades\DB::transaction(function () use ($quiz) {
             foreach ($quiz->questions as $question) {
                 $question->answers()->delete();
@@ -189,6 +193,8 @@ class QuizGeneratorController extends Controller
             }
             $quiz->delete();
         });
+
+        $this->quizMediaService->deleteKeys($managedMediaKeys);
 
         return $this->successResponse(null, $force ? 'Đã gỡ bài thi khỏi khóa học và xóa thành công.' : 'Đã xóa bài kiểm tra thành công.');
     }

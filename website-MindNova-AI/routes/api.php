@@ -51,6 +51,7 @@ use App\Http\Controllers\Api\Instructor\CourseController;
 use App\Http\Controllers\Api\Instructor\CourseModuleController;
 use App\Http\Controllers\Api\Instructor\LessonController;
 use App\Http\Controllers\Api\Instructor\MediaController;
+use App\Http\Controllers\Api\Instructor\QuizMediaController;
 use App\Http\Controllers\Api\Instructor\QuizController;
 use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentController;
 use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscussionController;
@@ -244,6 +245,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
 
     // Temporary Media
     Route::post('media/temp', [MediaController::class, 'uploadTemp']);
+    Route::post('quiz-media', [QuizMediaController::class, 'store']);
     Route::delete('media/temp/{media}', [MediaController::class, 'deleteTemp']);
 
     // Quiz (Instructor CRUD)

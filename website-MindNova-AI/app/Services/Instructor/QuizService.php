@@ -12,12 +12,19 @@ use Illuminate\Support\Facades\DB;
 
 class QuizService
 {
+    public function __construct(private readonly QuizMediaService $quizMediaService)
+    {
+    }
+
     /**
      * Create a standalone quiz with MCQ and Essay questions.
      */
     public function createStandaloneQuiz(User $instructor, array $data): Quiz
     {
-        return DB::transaction(function () use ($instructor, $data) {
+        $promotedKeys = [];
+
+        try {
+            return DB::transaction(function () use ($instructor, $data, &$promotedKeys) {
             $questionsData = $data['questions'] ?? [];
             $mcCount = 0;
             $essayCount = 0;
@@ -51,6 +58,15 @@ class QuizService
                 'status' => $data['status'] ?? 'published',
             ]);
 
+            $promotion = $this->quizMediaService->promotePayload($instructor, $quiz, $data);
+            $data = $promotion['data'];
+            $promotedKeys = $promotion['promoted_keys'];
+            $questionsData = $data['questions'] ?? [];
+            $quiz->update([
+                'thumbnail_url' => $data['thumbnail_url'] ?? null,
+                'thumbnail_r2_key' => $data['thumbnail_r2_key'] ?? null,
+            ]);
+
             if (!empty($data['course_id'])) {
                 QuizCourseAttachment::create([
                     'quiz_id' => $quiz->id,
@@ -62,7 +78,11 @@ class QuizService
             $this->saveQuestionsAndAnswers($quiz, $questionsData);
 
             return $quiz->load('questions.answers', 'attachments.course');
-        });
+            });
+        } catch (\Throwable $exception) {
+            $this->quizMediaService->deleteKeys($promotedKeys);
+            throw $exception;
+        }
     }
 
     /**
@@ -70,7 +90,14 @@ class QuizService
      */
     public function updateStandaloneQuiz(Quiz $quiz, array $data): Quiz
     {
-        return DB::transaction(function () use ($quiz, $data) {
+        $oldManagedKeys = $this->quizMediaService->managedKeys($quiz);
+        $promotedKeys = [];
+
+        try {
+            $updatedQuiz = DB::transaction(function () use ($quiz, $data, &$promotedKeys) {
+            $promotion = $this->quizMediaService->promotePayload($quiz->instructor, $quiz, $data);
+            $data = $promotion['data'];
+            $promotedKeys = $promotion['promoted_keys'];
             $questionsData = $data['questions'] ?? [];
             $mcCount = 0;
             $essayCount = 0;
@@ -117,7 +144,16 @@ class QuizService
             $this->saveQuestionsAndAnswers($quiz, $questionsData);
 
             return $quiz->load('questions.answers', 'attachments.course');
-        });
+            });
+        } catch (\Throwable $exception) {
+            $this->quizMediaService->deleteKeys($promotedKeys);
+            throw $exception;
+        }
+
+        $currentKeys = $this->quizMediaService->managedKeys($updatedQuiz);
+        $this->quizMediaService->deleteKeys(array_values(array_diff($oldManagedKeys, $currentKeys)));
+
+        return $updatedQuiz;
     }
 
     /**
@@ -413,7 +449,11 @@ class QuizService
      */
     public function createOrUpdateQuiz(Lesson $lesson, array $data): Quiz
     {
-        return DB::transaction(function () use ($lesson, $data) {
+        $oldManagedKeys = [];
+        $promotedKeys = [];
+
+        try {
+            $savedQuiz = DB::transaction(function () use ($lesson, $data, &$oldManagedKeys, &$promotedKeys) {
             $questionsData = $data['questions'] ?? [];
             $mcCount = 0;
             $essayCount = 0;
@@ -432,6 +472,13 @@ class QuizService
 
             $targetQuizId = $data['quiz_id'] ?? ($data['id'] ?? null);
             $quiz = null;
+
+            $existingQuiz = $targetQuizId && is_numeric($targetQuizId)
+                ? Quiz::find((int) $targetQuizId)
+                : Quiz::where('lesson_id', $lesson->id)->first();
+            if ($existingQuiz) {
+                $oldManagedKeys = $this->quizMediaService->managedKeys($existingQuiz);
+            }
 
             if ($targetQuizId && is_numeric($targetQuizId)) {
                 $foundQuiz = Quiz::find((int) $targetQuizId);
@@ -474,6 +521,16 @@ class QuizService
                     ]
                 );
             }
+
+            $instructor = auth()->user() ?? User::findOrFail($teacherId);
+            $promotion = $this->quizMediaService->promotePayload($instructor, $quiz, $data);
+            $data = $promotion['data'];
+            $promotedKeys = $promotion['promoted_keys'];
+            $questionsData = $data['questions'] ?? [];
+            $quiz->update([
+                'thumbnail_url' => $data['thumbnail_url'] ?? null,
+                'thumbnail_r2_key' => $data['thumbnail_r2_key'] ?? null,
+            ]);
 
             $courseId = $lesson->course_id ?? ($lesson->module->course_id ?? null);
             if ($courseId) {
@@ -537,7 +594,16 @@ class QuizService
             ]);
 
             return $quiz->load('questions.answers');
-        });
+            });
+        } catch (\Throwable $exception) {
+            $this->quizMediaService->deleteKeys($promotedKeys);
+            throw $exception;
+        }
+
+        $currentKeys = $this->quizMediaService->managedKeys($savedQuiz);
+        $this->quizMediaService->deleteKeys(array_values(array_diff($oldManagedKeys, $currentKeys)));
+
+        return $savedQuiz;
     }
 
     public function getQuizWithDetails(Lesson $lesson): ?Quiz
@@ -549,7 +615,12 @@ class QuizService
 
     public function deleteQuiz(Lesson $lesson): void
     {
-        Quiz::where('lesson_id', $lesson->id)->delete();
+        $quizzes = Quiz::where('lesson_id', $lesson->id)->with('questions.answers')->get();
+        foreach ($quizzes as $quiz) {
+            $keys = $this->quizMediaService->managedKeys($quiz);
+            $quiz->delete();
+            $this->quizMediaService->deleteKeys($keys);
+        }
     }
 
     public function gradeSubmission(Quiz $quiz, array $submittedAnswers): array

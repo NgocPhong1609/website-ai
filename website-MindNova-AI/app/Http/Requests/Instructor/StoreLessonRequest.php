@@ -42,6 +42,8 @@ class StoreLessonRequest extends FormRequest
             'temp_media_ids' => 'nullable|array',
             'temp_media_ids.*' => 'integer|exists:lesson_media,id',
             'quizData' => 'nullable|array',
+            'quizData.thumbnail_url' => 'nullable|string|max:2048',
+            'quizData.thumbnail_r2_key' => 'nullable|string|max:2048',
             'quizData.time_limit_minutes' => 'nullable|integer',
             'quizData.passing_score' => 'nullable|numeric',
             'quizData.questions' => 'nullable|array',

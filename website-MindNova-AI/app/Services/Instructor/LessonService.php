@@ -20,6 +20,7 @@ class LessonService
     public function __construct(
         private readonly ContentAuditService $auditService,
         private readonly ContentReviewService $reviewService,
+        private readonly QuizMediaService $quizMediaService,
     ) {}
 
     public function createLesson(CourseModule $module, array $data): Lesson
@@ -127,6 +128,10 @@ class LessonService
 
         foreach ($lesson->attachments as $attachment) {
             Storage::disk('r2')->delete($attachment->r2_key);
+        }
+
+        if ($lesson->quiz) {
+            $this->quizMediaService->deleteKeys($this->quizMediaService->managedKeys($lesson->quiz));
         }
 
         $lesson->delete();
@@ -453,6 +458,10 @@ class LessonService
 
         $targetQuizId = $quizData['quiz_id'] ?? ($quizData['id'] ?? null);
         $quiz = null;
+        $existingQuiz = $targetQuizId && is_numeric($targetQuizId)
+            ? \App\Models\Quiz::find((int) $targetQuizId)
+            : \App\Models\Quiz::where('lesson_id', $lesson->id)->first();
+        $oldManagedKeys = $existingQuiz ? $this->quizMediaService->managedKeys($existingQuiz) : [];
 
         if ($targetQuizId && is_numeric($targetQuizId)) {
             $foundQuiz = \App\Models\Quiz::find((int) $targetQuizId);
@@ -495,6 +504,15 @@ class LessonService
                 ]
             );
         }
+
+        $instructor = auth()->user() ?? \App\Models\User::findOrFail($teacherId);
+        $promotion = $this->quizMediaService->promotePayload($instructor, $quiz, $quizData);
+        $quizData = $promotion['data'];
+        $questionsData = $quizData['questions'] ?? [];
+        $quiz->update([
+            'thumbnail_url' => $quizData['thumbnail_url'] ?? null,
+            'thumbnail_r2_key' => $quizData['thumbnail_r2_key'] ?? null,
+        ]);
 
         $courseId = $lesson->course_id ?? ($lesson->module->course_id ?? null);
         if ($courseId) {
@@ -556,5 +574,8 @@ class LessonService
                 }
             }
         }
+
+        $currentKeys = $this->quizMediaService->managedKeys($quiz->fresh());
+        $this->quizMediaService->deleteKeys(array_values(array_diff($oldManagedKeys, $currentKeys)));
     }
 }

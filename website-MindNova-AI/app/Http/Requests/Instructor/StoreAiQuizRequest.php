@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Instructor;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Storage;
 
 class StoreAiQuizRequest extends FormRequest
 {
@@ -35,7 +36,7 @@ class StoreAiQuizRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'thumbnail_url' => 'nullable|url:http,https|max:2048',
+            'thumbnail_url' => $this->mediaUrlRules('thumbnail_r2_key'),
             'thumbnail_r2_key' => 'nullable|string|max:2048',
             'source_type' => 'nullable|string|in:content,topic,course,manual',
             'source_content' => 'nullable|string',
@@ -48,7 +49,7 @@ class StoreAiQuizRequest extends FormRequest
             'questions.*.type' => 'required|string|in:multiple_choice,essay',
             'questions.*.selection_type' => 'nullable|string|in:single_choice,multiple_choice',
             'questions.*.content' => 'required|string',
-            'questions.*.image_url' => 'nullable|url:http,https|max:2048',
+            'questions.*.image_url' => $this->mediaUrlRules('questions.*.image_r2_key'),
             'questions.*.image_r2_key' => 'nullable|string|max:2048',
             'questions.*.difficulty' => 'nullable|string|in:easy,medium,hard',
             'questions.*.explanation' => 'nullable|string',
@@ -58,7 +59,7 @@ class StoreAiQuizRequest extends FormRequest
             'questions.*.answers' => 'required_if:questions.*.type,multiple_choice|array',
             'questions.*.answers.*.content' => 'required|string',
             'questions.*.answers.*.is_correct' => 'required|boolean',
-            'questions.*.answers.*.image_url' => 'nullable|url:http,https|max:2048',
+            'questions.*.answers.*.image_url' => $this->mediaUrlRules('questions.*.answers.*.image_r2_key'),
             'questions.*.answers.*.image_r2_key' => 'nullable|string|max:2048',
         ];
     }
@@ -126,6 +127,56 @@ class StoreAiQuizRequest extends FormRequest
                     );
                 }
             }
+
+            $this->validateManagedMediaKeys($validator);
         });
+    }
+
+    private function mediaUrlRules(string $keyPath): array
+    {
+        return ['nullable', 'string', 'max:2048', function (string $attribute, mixed $value, \Closure $fail) use ($keyPath) {
+            $resolvedKeyPath = $keyPath;
+            preg_match_all('/\.([0-9]+)(?:\.|$)/', $attribute, $matches);
+            foreach ($matches[1] as $index) {
+                $resolvedKeyPath = preg_replace('/\*/', $index, $resolvedKeyPath, 1);
+            }
+
+            if (data_get($this->all(), $resolvedKeyPath)) {
+                return;
+            }
+
+            $scheme = is_string($value) ? strtolower((string) parse_url($value, PHP_URL_SCHEME)) : '';
+            if (!filter_var($value, FILTER_VALIDATE_URL) || !in_array($scheme, ['http', 'https'], true)) {
+                $fail('The :attribute field must be a valid HTTP or HTTPS URL.');
+            }
+        }];
+    }
+
+    private function validateManagedMediaKeys($validator): void
+    {
+        $pairs = [[
+            'path' => 'thumbnail_r2_key',
+            'key' => $this->input('thumbnail_r2_key'),
+        ]];
+        foreach ($this->input('questions', []) as $qIndex => $question) {
+            $pairs[] = ['path' => "questions.{$qIndex}.image_r2_key", 'key' => $question['image_r2_key'] ?? null];
+            foreach ($question['answers'] ?? [] as $aIndex => $answer) {
+                $pairs[] = ['path' => "questions.{$qIndex}.answers.{$aIndex}.image_r2_key", 'key' => $answer['image_r2_key'] ?? null];
+            }
+        }
+
+        $tempPrefix = 'temp/quiz-media/'.$this->user()->id.'/';
+        $quiz = $this->route('quiz');
+        $quizPrefix = $quiz ? "quizzes/{$quiz->id}/" : null;
+        foreach ($pairs as $pair) {
+            if (!$pair['key']) {
+                continue;
+            }
+            $hasAllowedPrefix = str_starts_with($pair['key'], $tempPrefix)
+                || ($quizPrefix && str_starts_with($pair['key'], $quizPrefix));
+            if (!$hasAllowedPrefix || !Storage::disk('r2')->exists($pair['key'])) {
+                $validator->errors()->add($pair['path'], 'Managed quiz media key is invalid or not owned by this instructor.');
+            }
+        }
     }
 }
