@@ -12,6 +12,7 @@ class Question extends Model
         'quiz_id',
         'topic_id',
         'type',
+        'selection_type',
         'difficulty',
         'content',
         'explanation',

@@ -12,6 +12,7 @@ class UserQuizAttemptAnswer extends Model
         'question_id',
         'question_type',
         'user_answer',
+        'selected_answer_ids',
         'is_correct',
         'score',
         'max_score',
@@ -24,6 +25,7 @@ class UserQuizAttemptAnswer extends Model
         'is_correct' => 'boolean',
         'score' => 'float',
         'max_score' => 'float',
+        'selected_answer_ids' => 'array',
         'ai_analysis' => 'array',
     ];
 
