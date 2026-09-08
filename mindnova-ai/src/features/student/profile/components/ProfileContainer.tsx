@@ -22,106 +22,83 @@ function ActivePanel({ tab, profile }: { tab: ProfileTab; profile: UserProfile }
 }
 
 export default function ProfileContainer() {
-  const [activeTab, setActiveTab] = useState<ProfileTab>("personal-info");
-  const { data: profile, isLoading, isError, error } = useGetProfile();
+ const [activeTab, setActiveTab] = useState<ProfileTab>("personal-info");
+ const { data: profile, isLoading, isError, error } = useGetProfile();
 
-  if (isLoading) {
-    return <div className="p-8 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-[#C0392B] border-t-transparent rounded-full" /></div>;
-  }
+ if (isLoading) {
+ return <div className="p-8 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
+ }
 
-  if (isError || !profile) {
-    return (
-      <div className="p-8 flex flex-col items-center justify-center gap-4">
-        <p className="text-sm text-[#8A8478]">
-          {error instanceof Error && error.message.includes("401")
-            ? "Phiên đăng nhập đã hết hạn. Đang chuyển hướng..."
-            : "Không thể tải thông tin hồ sơ. Vui lòng thử lại sau."}
-        </p>
-      </div>
-    );
-  }
+ if (isError || !profile) {
+ return (
+ <div className="p-8 flex flex-col items-center justify-center gap-4">
+ <p className="text-sm text-muted-foreground">
+ {error instanceof Error && error.message.includes("401")
+ ? "Phiên đăng nhập đã hết hạn. Đang chuyển hướng..."
+ : "Không thể tải thông tin hồ sơ. Vui lòng thử lại sau."}
+ </p>
+ </div>
+ );
+ }
 
-  return (
-    <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-8">
-      
-      {/* ─── Synchronized Universal Hero Banner matching /courses & /study-plan ─── */}
-      <section className="relative overflow-hidden rounded-2xl bg-[#FEFCF9] border border-[#E8E2D9] p-6 sm:p-7 transition-all duration-300 w-full">
-        <div className="absolute -top-16 -right-16 w-60 h-60 rounded-full bg-[#C0392B]/5 blur-3xl pointer-events-none animate-pulse" />
-        <div className="absolute -bottom-16 -left-16 w-60 h-60 rounded-full bg-[#E8E2D9]/50 blur-3xl pointer-events-none" />
+ return (
+ <div className="p-6 md:p-8 max-w-[1200px] mx-auto min-h-full flex flex-col gap-10">
+ 
+ {/* ─── Minimalist Synchronized Universal Hero Banner ─── */}
+ <section className="relative w-full pb-6 border-b border-border/40">
+ <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 w-full">
+ <div className="space-y-4 max-w-xl">
+ <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground leading-tight">
+ Quản lý Tài khoản <span className="text-muted-foreground font-normal">&amp; Bảo mật</span>
+ </h1>
 
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 w-full">
-          <div className="space-y-3 max-w-xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#E8E2D9] text-xs font-semibold text-[#8A8478] shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-[#27AE60] animate-ping" />
-              <span className="w-2 h-2 rounded-full bg-[#27AE60] absolute" />
-              Hồ sơ Học viên • Xác thực hợp lệ
-            </div>
+ <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
+ Cập nhật thông tin nhận dạng cá nhân, thiết lập danh tính, và tùy chỉnh cấu hình bảo mật. Dữ liệu của bạn được AI đồng bộ an toàn.
+ </p>
+ </div>
 
-            <h1 className="flex items-center gap-2 text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3039] leading-tight font-serif">
-              Quản lý <span className="text-[#C0392B] font-bold flex items-center gap-2">Tài khoản &amp; Bảo mật <Shield className="w-6 h-6 text-[#C0392B]" /></span>
-            </h1>
+ {/* Universal Wide Mastery Card - Minimalist Version */}
+ <div className="group shrink-0 flex flex-col justify-center min-w-[320px] sm:min-w-[340px]">
+ <div className="w-full flex items-center justify-between gap-4 mb-2">
+ <span className="text-sm font-medium text-muted-foreground">Độ hoàn thiện hồ sơ</span>
+ <span className="text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+ Cấp độ Bảo mật A+
+ </span>
+ </div>
 
-            <p className="text-xs sm:text-sm text-[#8A8478] leading-relaxed font-normal">
-              Cập nhật thông tin nhận dạng cá nhân, thiết lập danh tính, và tùy chỉnh cấu hình bảo mật hệ thống. Dữ liệu của bạn được AI đồng bộ và bảo vệ định kỳ.
-            </p>
-          </div>
+ <div className="text-3xl font-bold text-foreground my-1 flex items-baseline justify-start gap-2">
+ <span>{profile.completionPercent}%</span>
+ <span className="text-sm font-medium text-muted-foreground">hoàn tất</span>
+ </div>
 
-          {/* Universal Wide Mastery Card matching /study-plan & /courses */}
-          <div className="group shrink-0 bg-white rounded-2xl p-5 border border-[#E8E2D9] flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm hover:border-[#C0392B]/30 hover:-translate-y-0.5 transition-all duration-300">
-            <div className="w-full flex items-center justify-between gap-4 mb-2">
-              <span className="text-xs font-semibold text-[#8A8478] group-hover:text-[#2C3039] transition-colors">Độ hoàn thiện hồ sơ ↗</span>
-              <span className="text-[11px] font-bold text-[#27AE60] bg-[#E8F8F0] px-2.5 py-0.5 rounded-full border border-[#27AE60]/20">
-                Tốt nhất
-              </span>
-            </div>
+ <div className="w-full h-1.5 bg-muted rounded-full mt-3 overflow-hidden">
+ <div
+ className="h-full bg-primary rounded-full transition-all duration-1000"
+ style={{ width: `${profile.completionPercent}%` }}
+ />
+ </div>
+ </div>
+ </div>
+ </section>
 
-            <div className="text-3xl font-bold text-[#2C3039] my-1 flex items-baseline justify-between gap-6">
-              <div>
-                <span className="text-[#C0392B]">{profile.completionPercent}%</span>
-                <span className="text-xs font-medium text-[#8A8478] ml-1.5">hoàn tất</span>
-              </div>
-              <span className="text-xs font-semibold text-[#8A8478]">
-                Cấp độ Bảo mật A+
-              </span>
-            </div>
+ {/* Main workspace: Left sidebar card + Right content card */}
+ <div className="flex flex-col lg:flex-row items-start gap-12 flex-1 min-h-0">
+ {/* Left Column (Profile Sidebar) */}
+ <div className="w-full lg:w-64 shrink-0 sticky top-24">
+ <ProfileSidebar
+ activeTab={activeTab}
+ onTabChange={setActiveTab}
+ fullName={profile.fullName}
+ major={profile.major}
+ avatarUrl={profile.avatarUrl}
+ />
+ </div>
 
-            <div className="w-full h-2 bg-[#F5F0E8] rounded-full mt-2 overflow-hidden p-0.5 border border-[#E8E2D9]">
-              <div
-                className="h-full bg-[#C0392B] rounded-full transition-all duration-1000"
-                style={{ width: `${profile.completionPercent}%` }}
-              />
-            </div>
-
-            <p className="text-xs font-semibold text-[#8A8478] mt-3 flex items-center justify-between gap-4">
-              <span className="flex items-center gap-1.5"><Flame size={14} className="text-[#C0392B]"/> Hồ sơ đang được xác minh đầy đủ!</span>
-              <span className="text-[#2C3039] font-bold cursor-pointer hover:underline flex items-center gap-1">Cập nhật ngay <ArrowRight size={14} /></span>
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Main workspace: Left sidebar card + Right content card */}
-      <div className="flex flex-col lg:flex-row items-start gap-8 flex-1 min-h-0">
-        {/* Left Card (Profile Sidebar) */}
-        <div className="w-full lg:w-80 shrink-0 sticky top-24">
-          <div className="rounded-2xl bg-white border border-[#EAEAF4] shadow-2xs p-5 transition-all duration-300 hover:shadow-sm">
-            <ProfileSidebar
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              fullName={profile.fullName}
-              major={profile.major}
-              avatarUrl={profile.avatarUrl}
-            />
-          </div>
-        </div>
-
-        {/* Right Column (Active Panel) */}
-        <div className="flex flex-col gap-6 flex-1 min-w-0 w-full">
-          <div className="rounded-2xl bg-white border border-[#EAEAF4] shadow-2xs p-6 sm:p-8 flex-1 transition-all duration-300 hover:shadow-sm">
-            <ActivePanel tab={activeTab} profile={profile} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+ {/* Right Column (Active Panel) */}
+ <div className="flex flex-col gap-6 flex-1 min-w-0 w-full">
+ <ActivePanel tab={activeTab} profile={profile} />
+ </div>
+ </div>
+ </div>
+ );
 }

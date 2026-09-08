@@ -239,7 +239,7 @@ export function ForgotPasswordFlow() {
  </div>
 
  {errorMsg && (
- <div className="mb-4 p-3 rounded-xl text-xs font-medium bg-red-50 text-red-600 border border-red-200">
+ <div className="mb-4 p-3 rounded-xl text-xs font-medium bg-primary-muted text-primary border border-red-200">
  {errorMsg}
  </div>
  )}

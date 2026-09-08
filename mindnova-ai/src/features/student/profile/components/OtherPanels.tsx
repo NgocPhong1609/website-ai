@@ -7,21 +7,21 @@ import toast from "react-hot-toast";
 
 function ActiveSessionsBox() {
  return (
- <div className="mt-2 rounded-2xl border border-[#E8E2D9] bg-[#F8FAFC] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
+ <div className="mt-4 p-4 rounded-xl bg-transparent border border-border/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
  <div className="flex items-start gap-3.5">
- <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#FAF7F2] text-[#C0392B] border border-[#C0392B]/15 shrink-0 shadow-2xs">
+ <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/5 text-primary shrink-0">
  <MonitorIcon />
  </div>
  <div className="space-y-1">
- <p className="text-sm font-semibold text-[#2C3039] leading-tight">Quản lý Thiết bị &amp; Phiên Đăng nhập</p>
- <p className="text-xs font-normal text-[#8A8478] leading-relaxed">Phát hiện 2 trình duyệt/thiết bị đang duy trì kết nối an toàn với tài khoản này.</p>
+ <p className="text-sm font-semibold text-foreground leading-tight">Quản lý Thiết bị &amp; Phiên Đăng nhập</p>
+ <p className="text-xs font-normal text-muted-foreground leading-relaxed">Phát hiện 2 trình duyệt/thiết bị đang duy trì kết nối an toàn với tài khoản này.</p>
  </div>
  </div>
  
  <button
  type="button"
  onClick={() => toast.error("Hệ thống an ninh ghi nhận: Không có truy cập bất thường nào từ các thiết bị lạ.")}
- className="shrink-0 px-4 py-2 rounded-xl bg-white hover:bg-[#FAF7F2] border border-[#E8E2D9] hover:border-[#C0392B]/30 text-xs font-semibold text-[#C0392B] transition-all duration-200 shadow-2xs cursor-pointer focus:outline-none"
+ className="shrink-0 px-4 py-2 rounded-full bg-transparent hover:bg-muted text-xs font-semibold text-primary transition-all duration-200 cursor-pointer focus:outline-none"
  >
  Kiểm tra nhật ký kết nối
  </button>
@@ -62,14 +62,14 @@ export function SecurityPanel() {
 
  return (
  <div className="flex flex-col gap-6">
- <div className="border-b border-[#E8E2D9] pb-4 flex items-center justify-between">
+ <div className="pb-2 flex items-center justify-between">
  <div>
- <h2 className="text-base sm:text-lg font-semibold text-[#2C3039] tracking-normal">Bảo mật &amp; Mật khẩu</h2>
- <p className="text-xs sm:text-sm font-normal text-[#8A8478] mt-1 leading-relaxed">
+ <h2 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">Bảo mật &amp; Mật khẩu</h2>
+ <p className="text-xs sm:text-sm font-normal text-muted-foreground mt-1.5 leading-relaxed">
  Quản lý khóa bảo vệ riêng tư và theo dõi các phiên kết nối thiết bị của bạn.
  </p>
  </div>
- <span className="hidden sm:inline-flex px-3 py-1 rounded-xl bg-[#EAF8F5] text-[#2C3039] border border-[#2C3039]/20 text-xs font-medium">
+ <span className="hidden sm:inline-flex px-3 py-1 rounded-full bg-success/10 text-success text-xs font-medium">
  Bảo mật chuẩn SSL 256-bit
  </span>
  </div>
@@ -81,7 +81,7 @@ export function SecurityPanel() {
  { id: "confirm-pw", label: "Xác nhận mật khẩu mới", value: confirmPw, set: setConfirmPw, placeholder: "Nhập lại mật khẩu mới vừa đặt..." },
  ].map(({ id, label, value, set, placeholder }) => (
  <div key={id}>
- <label htmlFor={id} className="block text-xs sm:text-sm font-medium text-[#8A8478] mb-1.5">
+ <label htmlFor={id} className="block text-xs sm:text-sm font-medium text-muted-foreground mb-1.5">
  {label}
  </label>
  <input
@@ -90,34 +90,30 @@ export function SecurityPanel() {
  value={value}
  onChange={(e) => set(e.target.value)}
  placeholder={placeholder}
- className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm font-normal text-[#2C3039] bg-[#F8FAFC] focus:bg-white border border-[#E4E6F0] focus:border-[#C0392B] shadow-2xs focus:outline-none focus:ring-2 focus:ring-[#C0392B]/15 placeholder-[#989AAB] transition-all duration-200"
+ className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm font-normal text-foreground bg-transparent border border-border/60 focus:border-primary focus:bg-primary/5 focus:outline-none transition-all duration-200"
  />
  </div>
  ))}
 
  {newPw.length > 0 && newPw !== confirmPw && (
- <p className="text-xs font-medium text-[#C0392B] bg-[#FAF7F2] px-3 py-2 rounded-xl border border-[#EF4444]/20 flex items-center gap-1.5">
+ <p className="text-xs font-medium text-primary bg-primary/5 px-3 py-2 rounded-xl flex items-center gap-1.5">
  <span>️</span>
  <span>Mật khẩu xác nhận chưa trùng khớp với mật khẩu mới.</span>
  </p>
  )}
 
- <div className="flex justify-end pt-2 border-t border-[#F0F2FA]">
+ <div className="flex justify-end pt-4">
  <button
  type="button"
  onClick={handleUpdate}
  disabled={!canSave && !updated}
- className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#C0392B] shadow-sm hover:opacity-95 active:scale-98 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer flex items-center gap-2"
+ className="px-8 py-2.5 rounded-full text-sm font-medium text-primary-foreground bg-primary hover:opacity-90 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer flex items-center gap-2"
  >
- <></>
  <span>{updated ? "Đã cập nhật mật khẩu an toàn!" : "Cập nhật Mật khẩu"}</span>
  </button>
  </div>
  </div>
 
- <hr className="border-t border-[#E8E2D9] mt-1" />
-
- {/* Active Sessions Embedded into Security Panel */}
  <ActiveSessionsBox />
  </div>
  );
@@ -130,7 +126,6 @@ export function SettingsPanel() {
  const [isLoading, setIsLoading] = useState(true);
  const [isSaving, setIsSaving] = useState(false);
 
- // Load settings from backend on mount
  useEffect(() => {
  const loadSettings = async () => {
  try {
@@ -151,7 +146,6 @@ export function SettingsPanel() {
  loadSettings();
  }, []);
 
- // Save setting to backend
  const saveSetting = async (key: string, value: boolean) => {
  setIsSaving(true);
  try {
@@ -166,21 +160,18 @@ export function SettingsPanel() {
  }
  };
 
- // Handle notification toggle
  const handleNotificationToggle = () => {
  const newValue = !notifications;
  setNotifications(newValue);
  saveSetting("notification_email", newValue);
  };
 
- // Handle weekly report toggle
  const handleWeeklyReportToggle = () => {
  const newValue = !weeklyReport;
  setWeeklyReport(newValue);
  saveSetting("weekly_report", newValue);
  };
 
- // Handle AI suggestions toggle
  const handleAiSuggestionsToggle = () => {
  const newValue = !aiSuggestions;
  setAiSuggestions(newValue);
@@ -214,15 +205,15 @@ export function SettingsPanel() {
  if (isLoading) {
  return (
  <div className="flex flex-col gap-6">
- <div className="border-b border-[#E8E2D9] pb-4">
- <h2 className="text-base sm:text-lg font-semibold text-[#2C3039] tracking-normal">Cài đặt Thông báo &amp; Hệ thống</h2>
- <p className="text-xs sm:text-sm font-normal text-[#8A8478] mt-1 leading-relaxed">
+ <div className="pb-2">
+ <h2 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">Cài đặt Thông báo &amp; Hệ thống</h2>
+ <p className="text-xs sm:text-sm font-normal text-muted-foreground mt-1.5 leading-relaxed">
  Tùy biến trải nghiệm rèn luyện trực tuyến và các kênh tương tác của hệ thống.
  </p>
  </div>
  <div className="animate-pulse">
  {[1, 2, 3].map((i) => (
- <div key={i} className="h-20 bg-[#F0F0F8] rounded-2xl mb-3.5" />
+ <div key={i} className="h-16 bg-muted/50 rounded-xl mb-2" />
  ))}
  </div>
  </div>
@@ -231,23 +222,23 @@ export function SettingsPanel() {
 
  return (
  <div className="flex flex-col gap-6">
- <div className="border-b border-[#E8E2D9] pb-4">
- <h2 className="text-base sm:text-lg font-semibold text-[#2C3039] tracking-normal">Cài đặt Thông báo &amp; Hệ thống</h2>
- <p className="text-xs sm:text-sm font-normal text-[#8A8478] mt-1 leading-relaxed">
+ <div className="pb-2">
+ <h2 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">Cài đặt Thông báo &amp; Hệ thống</h2>
+ <p className="text-xs sm:text-sm font-normal text-muted-foreground mt-1.5 leading-relaxed">
  Tùy biến trải nghiệm rèn luyện trực tuyến và các kênh tương tác của hệ thống.
  </p>
  </div>
 
- <div className="flex flex-col gap-3.5">
+ <div className="flex flex-col">
  {toggles.map(({ id, label, description, value, handler }) => (
  <div
  key={id}
  onClick={handler}
- className={`group flex items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl border border-[#E2E4F0] bg-[#F8FAFC]/70 hover:bg-white transition-all duration-200 shadow-2xs hover:shadow-sm ${isSaving ? "opacity-75 cursor-not-allowed" : "cursor-pointer"}`}
+ className={`group flex items-center justify-between gap-4 py-4 border-b border-border/40 last:border-0 hover:bg-muted/30 transition-all duration-200 px-2 sm:px-4 rounded-xl ${isSaving ? "opacity-75 cursor-not-allowed" : "cursor-pointer"}`}
  >
  <div className="space-y-1">
- <p className="text-sm font-semibold text-[#2C3039] group-hover:text-[#C0392B] transition-colors">{label}</p>
- <p className="text-xs font-normal text-[#8A8478] leading-relaxed">{description}</p>
+ <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{label}</p>
+ <p className="text-xs font-normal text-muted-foreground leading-relaxed">{description}</p>
  </div>
  <button
  type="button"
@@ -258,12 +249,12 @@ export function SettingsPanel() {
  handler();
  }}
  disabled={isSaving}
- className={`relative w-12 h-6.5 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#C0392B]/30 shrink-0 ${isSaving ? "cursor-not-allowed" : "cursor-pointer"} ${
- value ? " bg-[#C0392B] " : "bg-[#CBD5E1]"
+ className={`relative w-12 h-6.5 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/30 shrink-0 ${isSaving ? "cursor-not-allowed" : "cursor-pointer"} ${
+ value ? " bg-primary " : "bg-muted-foreground/30"
  }`}
  >
  <span
- className={`absolute top-1 left-1 w-4.5 h-4.5 rounded-full bg-white shadow-md transition-transform duration-200 ${
+ className={`absolute top-1 left-1 w-4.5 h-4.5 rounded-full bg-card shadow-sm transition-transform duration-200 ${
  value ? "translate-x-5.5" : "translate-x-0"
  }`}
  />
