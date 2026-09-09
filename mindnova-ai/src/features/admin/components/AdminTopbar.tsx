@@ -271,7 +271,7 @@ export function AdminTopbar() {
  aria-label="Làm mới dữ liệu"
  onClick={() => void handleRefreshData()}
  disabled={isRefreshing}
- className="rounded-2xl -[#C0392B] -[#C0392B] px-3 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_-15px_rgba(79,70,229,0.9)] transition hover:-[#C0392B] hover:-[#C0392B] disabled:cursor-not-allowed disabled:opacity-60 sm:px-4"
+ className="rounded-xl bg-teal-700 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:cursor-not-allowed disabled:opacity-60 sm:px-4"
  >
  <span aria-hidden="true">{isRefreshing ? "↻" : "↻"}</span>
  <span className="hidden sm:inline">{isRefreshing ? "Đang làm mới..." : "Làm mới dữ liệu"}</span>
