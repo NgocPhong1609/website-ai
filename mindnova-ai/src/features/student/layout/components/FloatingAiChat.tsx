@@ -675,21 +675,21 @@ export function FloatingAiChat() {
           </div>
 
           {/* Footer Input Bar */}
-          <div role="group" aria-label="Khung nhập tin nhắn AI" className="p-2.5 bg-white border-t border-[#E8E9F2] shrink-0">
+          <div role="group" aria-label="Khung nhập tin nhắn AI" className="w-full min-w-0 p-2.5 bg-white border-t border-[#E8E9F2] shrink-0">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 if (!isGenerating && !isQuotaBlocked) handleSend();
               }}
-              className="flex items-center gap-2"
+              className="flex min-w-0 items-center gap-2"
             >
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                disabled={isGenerating || isQuotaBlocked}
+                disabled={isGenerating}
                 placeholder={isGenerating ? "Nova đang trả lời..." : "Nhập câu hỏi cho Nova..."}
-                className="flex-1 bg-[#F8FAFC] focus:bg-white disabled:bg-gray-100 border border-[#EAEAF4] focus:border-[#A93226] rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#2C3039] placeholder:text-[#8A8478] focus:outline-none focus:ring-2 focus:ring-[#A93226]/25 transition-all duration-200"
+                className="min-w-0 flex-1 bg-[#F8FAFC] focus:bg-white disabled:bg-gray-100 border border-[#EAEAF4] focus:border-[#A93226] rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#2C3039] placeholder:text-[#8A8478] focus:outline-none focus:ring-2 focus:ring-[#A93226]/25 transition-all duration-200"
               />
               {isGenerating ? (
                 <button

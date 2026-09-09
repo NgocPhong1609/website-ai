@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AiQuotaError, sendAiChatMessage } from "../../../ai-study-plan/services/ai-chat.client-service";
 import { FloatingAiChat } from "../FloatingAiChat";
@@ -38,20 +38,6 @@ async function openAndSubmitQuestion() {
   fireEvent.click(screen.getByRole("button", { name: "Gửi tin nhắn" }));
 }
 
-function controlledRect(left: number, top: number, width: number, height: number): DOMRect {
-  return {
-    x: left,
-    y: top,
-    left,
-    top,
-    width,
-    height,
-    right: left + width,
-    bottom: top + height,
-    toJSON: () => ({}),
-  } as DOMRect;
-}
-
 describe("FloatingAiChat quota", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -60,7 +46,10 @@ describe("FloatingAiChat quota", () => {
     Object.defineProperty(window, "innerHeight", { configurable: true, value: 844 });
   });
 
-  afterEach(cleanup);
+  afterEach(() => {
+    vi.useRealTimers();
+    cleanup();
+  });
 
   it("shows the authoritative remaining quota after a successful reply", async () => {
     vi.mocked(sendAiChatMessage).mockResolvedValue({
@@ -74,36 +63,67 @@ describe("FloatingAiChat quota", () => {
     expect(await screen.findByLabelText("Hạn mức AI hôm nay")).toHaveTextContent("Còn 4/5 lượt hôm nay");
   });
 
-  it("renders the backend exhaustion message and disables sending before reset", async () => {
+  it("blocks typed, form, quick, and programmatic sends after a successful final allowance", async () => {
     const exhaustedQuota = { ...quota, used: 5, remaining: 0 };
-    vi.mocked(sendAiChatMessage).mockRejectedValue(
-      new AiQuotaError("Bạn đã sử dụng hết 5 lượt AI hôm nay.", exhaustedQuota)
-    );
+    vi.mocked(sendAiChatMessage).mockResolvedValue({
+      message: { id: "ai-final", sender: "ai", timestamp: "Vừa xong", text: "Đã trả lời" },
+      quota: exhaustedQuota,
+    });
     renderFloatingChat();
 
     await openAndSubmitQuestion();
 
-    expect(await screen.findByText("Bạn đã sử dụng hết 5 lượt AI hôm nay.")).toBeVisible();
-    expect(screen.getByLabelText("Hạn mức AI hôm nay")).toHaveTextContent("Còn 0/5 lượt hôm nay");
-    await waitFor(() => expect(screen.getByRole("button", { name: "Gửi tin nhắn" })).toBeDisabled());
-  });
-
-  it("allows another backend check after the authoritative reset time", async () => {
-    const resetQuota = { ...quota, used: 5, remaining: 0, resets_at: "2000-01-01T00:00:00Z" };
-    vi.mocked(sendAiChatMessage).mockRejectedValue(
-      new AiQuotaError("Bạn đã sử dụng hết 5 lượt AI hôm nay.", resetQuota)
-    );
-    renderFloatingChat();
-
-    await openAndSubmitQuestion();
-
-    expect(await screen.findByText("Bạn đã sử dụng hết 5 lượt AI hôm nay.")).toBeVisible();
+    expect(await screen.findByLabelText("Hạn mức AI hôm nay")).toHaveTextContent("Còn 0/5 lượt hôm nay");
     await waitFor(() => expect(screen.getByRole("textbox")).toBeEnabled());
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Kiểm tra hạn mức mới" } });
-    expect(screen.getByRole("button", { name: "Gửi tin nhắn" })).toBeEnabled();
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Câu hỏi bị chặn" } });
+    expect(screen.getByRole("button", { name: "Gửi tin nhắn" })).toBeDisabled();
+    fireEvent.submit(screen.getByRole("textbox").closest("form")!);
+    expect(sendAiChatMessage).toHaveBeenCalledTimes(1);
+    for (const label of ["Tổng hợp tiến độ", "Kiểm tra kiến thức", "Gợi ý bài học tiếp"]) {
+      fireEvent.click(screen.getByRole("button", { name: label }));
+      expect(sendAiChatMessage).toHaveBeenCalledTimes(1);
+    }
+    act(() => {
+      window.dispatchEvent(new CustomEvent("open-ai-tutor-chat", {
+        detail: { initialQuery: "Câu hỏi chương trình bị chặn", autoSend: true },
+      }));
+    });
+
+    expect(sendAiChatMessage).toHaveBeenCalledTimes(1);
   });
 
-  it("keeps the quota label within the input region at a 390px viewport", async () => {
+  it("blocks a 429 quota state, then sends again and replaces quota after its future reset", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-09T00:00:00Z"));
+    const resetQuota = { ...quota, used: 5, remaining: 0, resets_at: "2026-09-09T00:00:01Z" };
+    vi.mocked(sendAiChatMessage)
+      .mockRejectedValueOnce(new AiQuotaError("Bạn đã sử dụng hết 5 lượt AI hôm nay.", resetQuota))
+      .mockResolvedValueOnce({
+        message: { id: "ai-reset", sender: "ai", timestamp: "Vừa xong", text: "Hạn mức đã làm mới" },
+        quota,
+      });
+    renderFloatingChat();
+
+    await openAndSubmitQuestion();
+    await act(async () => { await vi.advanceTimersByTimeAsync(900); });
+
+    expect(screen.getByLabelText("Hạn mức AI hôm nay")).toHaveTextContent("Còn 0/5 lượt hôm nay");
+    expect(screen.getByText("Bạn đã sử dụng hết 5 lượt AI hôm nay.")).toBeVisible();
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Kiểm tra hạn mức mới" } });
+    expect(screen.getByRole("button", { name: "Gửi tin nhắn" })).toBeDisabled();
+    fireEvent.submit(screen.getByRole("textbox").closest("form")!);
+    expect(sendAiChatMessage).toHaveBeenCalledTimes(1);
+
+    await act(async () => { await vi.advanceTimersByTimeAsync(101); });
+    expect(screen.getByRole("button", { name: "Gửi tin nhắn" })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: "Gửi tin nhắn" }));
+    await act(async () => { await vi.advanceTimersByTimeAsync(1); });
+
+    expect(sendAiChatMessage).toHaveBeenCalledTimes(2);
+    expect(screen.getByLabelText("Hạn mức AI hôm nay")).toHaveTextContent("Còn 4/5 lượt hôm nay");
+  });
+
+  it("places the quota in a shrinkable input region at a 390px viewport", async () => {
     vi.mocked(sendAiChatMessage).mockResolvedValue({
       message: { id: "ai-2", sender: "ai", timestamp: "Vừa xong", text: "Câu trả lời" },
       quota,
@@ -113,21 +133,13 @@ describe("FloatingAiChat quota", () => {
 
     const inputRegion = await screen.findByLabelText("Khung nhập tin nhắn AI");
     const quotaLabel = within(inputRegion).getByLabelText("Hạn mức AI hôm nay");
-    Object.defineProperty(inputRegion, "getBoundingClientRect", {
-      configurable: true,
-      value: () => controlledRect(26, 744, 340, 76),
-    });
-    Object.defineProperty(quotaLabel, "getBoundingClientRect", {
-      configurable: true,
-      value: () => controlledRect(110, 794, 172, 16),
-    });
+    const form = within(inputRegion).getByRole("textbox").closest("form");
 
-    const containerBounds = inputRegion.getBoundingClientRect();
-    const labelBounds = quotaLabel.getBoundingClientRect();
-    expect(containerBounds.width).toBeGreaterThan(0);
-    expect(containerBounds.right).toBeLessThanOrEqual(window.innerWidth);
-    expect(labelBounds.width).toBeGreaterThan(0);
-    expect(labelBounds.left).toBeGreaterThanOrEqual(containerBounds.left);
-    expect(labelBounds.right).toBeLessThanOrEqual(containerBounds.right);
+    expect(window.innerWidth).toBe(390);
+    expect(inputRegion).toContainElement(quotaLabel);
+    expect(inputRegion).toHaveClass("w-full", "min-w-0");
+    expect(form).toHaveClass("min-w-0");
+    expect(within(inputRegion).getByRole("textbox")).toHaveClass("min-w-0");
+    expect(quotaLabel).toHaveClass("block");
   });
 });
