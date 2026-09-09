@@ -1,5 +1,6 @@
 "use client";
 
+import { twMerge } from "tailwind-merge";
 import { SIDEBAR_MENU } from "@/src/features/student/layout/constants/data-menu";
 import { NavItem } from "./NavItem";
 
@@ -10,7 +11,10 @@ import { NavItem } from "./NavItem";
 export function SidebarNav({ isCollapsed }: { isCollapsed?: boolean }) {
  return (
  <nav
- className="flex-1 overflow-y-auto px-3 py-2"
+ className={twMerge(
+ "flex-1 overflow-y-auto px-3 py-2",
+ isCollapsed && "scrollbar-hide"
+ )}
  aria-label="Main navigation"
  >
  <ul className="flex flex-col gap-0.5">

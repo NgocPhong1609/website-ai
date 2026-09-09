@@ -228,3 +228,12 @@ input[type="date"], input[type="datetime-local"] {
   margin-bottom: 0.5em;
   line-height: 1.6;
 }
+
+/* Custom scrollbar hiding */
+@utility scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

@@ -8,14 +8,6 @@ import { SidebarNav } from "./SidebarNav";
 
 // ─── Icons (KEPT – Sidebar icons preserved) ───────────────────────────────────
 
-function SparkleIcon() {
- return (
- <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
- <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
- </svg>
- );
-}
-
 function HelpIcon() {
  return (
  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -132,21 +124,6 @@ export default function Sidebar() {
  </svg>
  {!isCollapsed && <span>Test Onboarding</span>}
  </Link>
-
- {/* Upgrade to Pro */}
- <button
- type="button"
- title={isCollapsed ? "Upgrade to Pro" : undefined}
- className={twMerge(
- "flex items-center justify-center transition-all duration-200 text-white bg-[#2C3039] focus:outline-none focus:ring-2 focus:ring-[#2C3039]/30",
- isCollapsed
- ? "w-10 h-10 rounded-lg shadow-sm"
- : "w-full gap-2 py-3 px-4 rounded-lg text-sm font-semibold shadow-sm hover:bg-[#1C1D23] hover:-translate-y-0.5 active:translate-y-0"
- )}
- >
- <SparkleIcon />
- {!isCollapsed && <span>Upgrade to Pro</span>}
- </button>
 
  {/* Help + Auth */}
  <div className="flex flex-col gap-0.5 w-full">

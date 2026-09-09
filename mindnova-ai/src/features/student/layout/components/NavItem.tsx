@@ -28,9 +28,9 @@ export function NavItem({ label, iconKey, href, isCollapsed }: NavItemProps) {
  title={isCollapsed ? label : undefined}
  aria-current={isActive ? "page" : undefined}
  className={twMerge(
- "group relative flex items-center px-3 py-2.5 rounded-lg text-sm font-medium",
+ "group relative flex items-center rounded-lg text-sm font-medium",
  "transition-all duration-150",
- isCollapsed ? "justify-center" : "gap-3",
+ isCollapsed ? "w-10 h-10 justify-center mx-auto" : "px-3 py-2.5 gap-3",
  isActive
  ? "bg-[#C0392B]/8 text-[#C0392B]"
  : "text-[#8A8478] hover:bg-[#F5F0E8] hover:text-[#2C3039]",
