@@ -28,8 +28,8 @@ class AiUsageSummaryService
             'to' => $to->toDateString(),
             'coverage' => 'recorded_requests',
             'requests' => $requests,
-            'tokens' => $this->tokenSummary(clone $query),
-            'cost' => $this->costSummary(clone $query),
+            'tokens' => $this->tokenSummary(clone $query, $requests['total']),
+            'cost' => $this->costSummary(clone $query, $requests['total']),
             'daily_trend' => $this->dailyTrend(clone $query, $from, $days),
             'provider_breakdown' => $this->providerBreakdown(clone $query),
         ];
@@ -55,7 +55,7 @@ class AiUsageSummaryService
         ];
     }
 
-    private function tokenSummary(Builder $query): array
+    private function tokenSummary(Builder $query, int $recordedRequests): array
     {
         $trusted = $query->whereIn('token_source', self::TRUSTED_SOURCES);
         $totals = (clone $trusted)
@@ -64,12 +64,17 @@ class AiUsageSummaryService
             ->selectRaw('COALESCE(SUM(output_tokens), 0) as output_tokens')
             ->first();
 
-        if ((int) ($totals?->sourced_records ?? 0) === 0) {
+        $sourcedRequests = (int) ($totals?->sourced_records ?? 0);
+
+        if ($sourcedRequests === 0) {
             return [
                 'input' => null,
                 'output' => null,
                 'available' => false,
                 'source' => 'unavailable',
+                'coverage' => 'unavailable',
+                'sourced_requests' => 0,
+                'recorded_requests' => $recordedRequests,
             ];
         }
 
@@ -80,15 +85,20 @@ class AiUsageSummaryService
             'source' => $this->combinedSource(
                 (clone $trusted)->distinct()->pluck('token_source')->all()
             ),
+            'coverage' => $this->metricCoverage($sourcedRequests, $recordedRequests),
+            'sourced_requests' => $sourcedRequests,
+            'recorded_requests' => $recordedRequests,
         ];
     }
 
-    private function costSummary(Builder $query): array
+    private function costSummary(Builder $query, int $recordedRequests): array
     {
-        $costs = $query
+        $trusted = $query
             ->whereIn('cost_source', self::TRUSTED_SOURCES)
             ->whereNotNull('cost_amount')
-            ->whereNotNull('cost_currency')
+            ->whereNotNull('cost_currency');
+        $sourcedRequests = (clone $trusted)->count();
+        $costs = $trusted
             ->selectRaw('cost_currency, cost_source, SUM(cost_amount) as amount')
             ->groupBy('cost_currency', 'cost_source')
             ->get();
@@ -99,6 +109,9 @@ class AiUsageSummaryService
                 'currency' => null,
                 'available' => false,
                 'source' => 'unavailable',
+                'coverage' => 'unavailable',
+                'sourced_requests' => 0,
+                'recorded_requests' => $recordedRequests,
             ];
         }
 
@@ -110,6 +123,9 @@ class AiUsageSummaryService
                 'currency' => null,
                 'available' => false,
                 'source' => 'mixed',
+                'coverage' => $this->metricCoverage($sourcedRequests, $recordedRequests),
+                'sourced_requests' => $sourcedRequests,
+                'recorded_requests' => $recordedRequests,
             ];
         }
 
@@ -118,6 +134,9 @@ class AiUsageSummaryService
             'currency' => (string) $currencies->first(),
             'available' => true,
             'source' => $this->combinedSource($costs->pluck('cost_source')->all()),
+            'coverage' => $this->metricCoverage($sourcedRequests, $recordedRequests),
+            'sourced_requests' => $sourcedRequests,
+            'recorded_requests' => $recordedRequests,
         ];
     }
 
@@ -169,5 +188,14 @@ class AiUsageSummaryService
         }
 
         return (string) ($sources->first() ?? 'unavailable');
+    }
+
+    private function metricCoverage(int $sourcedRequests, int $recordedRequests): string
+    {
+        if ($sourcedRequests === 0) {
+            return 'unavailable';
+        }
+
+        return $sourcedRequests === $recordedRequests ? 'complete' : 'partial';
     }
 }

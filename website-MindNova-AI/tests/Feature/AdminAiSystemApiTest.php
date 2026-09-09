@@ -311,12 +311,18 @@ it('summarizes usage within application timezone boundaries', function () {
             'output' => 65,
             'available' => true,
             'source' => 'mixed',
+            'coverage' => 'partial',
+            'sourced_requests' => 2,
+            'recorded_requests' => 3,
         ])
         ->cost->toBe([
             'amount' => 0.15,
             'currency' => 'USD',
             'available' => true,
             'source' => 'mixed',
+            'coverage' => 'partial',
+            'sourced_requests' => 2,
+            'recorded_requests' => 3,
         ])
         ->and($summary['daily_trend'])->toHaveCount(7)
         ->and($summary['daily_trend'][0])->toBe(['date' => '2026-09-03', 'requests' => 1])
@@ -347,12 +353,18 @@ it('keeps unavailable usage cost and tokens distinct from real zero values', fun
             'output' => null,
             'available' => false,
             'source' => 'unavailable',
+            'coverage' => 'unavailable',
+            'sourced_requests' => 0,
+            'recorded_requests' => 1,
         ])
         ->and($unavailable['cost'])->toBe([
             'amount' => null,
             'currency' => null,
             'available' => false,
             'source' => 'unavailable',
+            'coverage' => 'unavailable',
+            'sourced_requests' => 0,
+            'recorded_requests' => 1,
         ]);
 
     AiUsageLog::query()->delete();
@@ -370,11 +382,17 @@ it('keeps unavailable usage cost and tokens distinct from real zero values', fun
         'output' => 0,
         'available' => true,
         'source' => 'provider',
+        'coverage' => 'complete',
+        'sourced_requests' => 1,
+        'recorded_requests' => 1,
     ])->and($realZero['cost'])->toBe([
         'amount' => 0.0,
         'currency' => 'USD',
         'available' => true,
         'source' => 'provider',
+        'coverage' => 'complete',
+        'sourced_requests' => 1,
+        'recorded_requests' => 1,
     ]);
 });
 
@@ -391,7 +409,13 @@ it('returns zero recorded usage and defaults an unsupported usage period to seve
             'status_unavailable' => 0,
         ])
         ->and($summary['tokens']['available'])->toBeFalse()
+        ->and($summary['tokens']['coverage'])->toBe('unavailable')
+        ->and($summary['tokens']['sourced_requests'])->toBe(0)
+        ->and($summary['tokens']['recorded_requests'])->toBe(0)
         ->and($summary['cost']['available'])->toBeFalse()
+        ->and($summary['cost']['coverage'])->toBe('unavailable')
+        ->and($summary['cost']['sourced_requests'])->toBe(0)
+        ->and($summary['cost']['recorded_requests'])->toBe(0)
         ->and($summary['daily_trend'])->toHaveCount(7)
         ->and(collect($summary['daily_trend'])->sum('requests'))->toBe(0)
         ->and($summary['provider_breakdown'])->toBe([]);
@@ -406,6 +430,15 @@ it('returns the stored usage summary through the canonical admin API', function 
         'cost_amount' => null,
         'cost_source' => 'unavailable',
     ]);
+    aiUsageRecord([
+        'status' => null,
+        'input_tokens' => 999,
+        'output_tokens' => 999,
+        'token_source' => 'unavailable',
+        'cost_estimate' => 99,
+        'cost_amount' => null,
+        'cost_source' => 'unavailable',
+    ]);
 
     $response = $this->actingAs(adminForAiConfig(), 'sanctum')
         ->getJson('/api/admin/ai-config?period=30d');
@@ -413,8 +446,14 @@ it('returns the stored usage summary through the canonical admin API', function 
     $response->assertOk()
         ->assertJsonPath('usage.period', '30d')
         ->assertJsonPath('usage.available', true)
-        ->assertJsonPath('usage.requests.total', 1)
+        ->assertJsonPath('usage.requests.total', 2)
         ->assertJsonPath('usage.tokens.input', 10)
+        ->assertJsonPath('usage.tokens.coverage', 'partial')
+        ->assertJsonPath('usage.tokens.sourced_requests', 1)
+        ->assertJsonPath('usage.tokens.recorded_requests', 2)
         ->assertJsonPath('usage.cost.amount', null)
-        ->assertJsonPath('usage.cost.available', false);
+        ->assertJsonPath('usage.cost.available', false)
+        ->assertJsonPath('usage.cost.coverage', 'unavailable')
+        ->assertJsonPath('usage.cost.sourced_requests', 0)
+        ->assertJsonPath('usage.cost.recorded_requests', 2);
 });
