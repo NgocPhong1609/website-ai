@@ -270,17 +270,17 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
   const isValidTotal = Math.abs(totalPoints - 10) < 0.001;
   const isLess = totalPoints < 10;
 
-  if (isLoading) {
-    return (
-      <div className="p-12 text-center flex flex-col items-center justify-center gap-3 bg-white rounded-3xl border border-gray-100">
-        <div className="w-8 h-8 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin" />
-        <span className="text-xs font-bold text-gray-500">Đang tải dữ liệu bài kiểm tra...</span>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-6 animate-fadeIn">
+    <div className="flex flex-col gap-6 animate-fadeIn relative">
+      {/* Loading overlay — shown on top of content, does NOT destroy form state */}
+      {isLoading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 rounded-3xl backdrop-blur-[2px]">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin" />
+            <span className="text-xs font-bold text-gray-500">Đang tải dữ liệu bài kiểm tra...</span>
+          </div>
+        </div>
+      )}
       {/* Import from Bank Banner */}
       <div className="flex items-center justify-between p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100">
         <div className="flex items-center gap-3">

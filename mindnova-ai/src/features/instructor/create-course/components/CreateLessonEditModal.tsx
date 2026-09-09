@@ -6,6 +6,7 @@ import { QuizEditor } from "./QuizEditor";
 import type { DraftLesson, DraftLessonType, DraftQuizData } from "../types";
 import { useUploadTempMedia, useDeleteTempMedia } from "../api";
 import { quizGeneratorApi } from "../../quiz-generator/api/quizGeneratorApi";
+import { serializeQuizQuestion } from "../../quiz-generator/api/serializeQuizQuestion";
 import { LessonAttachments } from "../../lesson-management/components/LessonAttachments";
 
 function getEmbedUrl(url: string): string | null {
@@ -197,6 +198,14 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
       let savedQuizData = quizData;
       if (isQuiz && quizData) {
         const qAny = quizData as any;
+        const serializedQuestions = Array.isArray(qAny.questions)
+          ? qAny.questions.map(serializeQuizQuestion)
+          : [];
+        savedQuizData = {
+          ...qAny,
+          questions: serializedQuestions,
+        };
+
         const targetQuizId =
           (lesson as any).quiz_id ||
           (lesson as any).quizData?.quiz_id ||
@@ -216,7 +225,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
             time_limit_minutes: qAny.time_limit_minutes || 15,
             passing_score: qAny.passing_score || 70,
             difficulty: qAny.difficulty || "mixed",
-            questions: qAny.questions || [],
+            questions: serializedQuestions,
           });
           const updatedQuiz = response?.data || response;
           if (updatedQuiz) {
@@ -247,11 +256,27 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
     }
   };
 
+  // Track whether mousedown originated on the backdrop to prevent
+  // accidental modal close when native file picker dialog dismisses.
+  const backdropMouseDownRef = useRef(false);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div 
         className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
-        onClick={handleClose}
+        onMouseDown={(e) => {
+          // Only mark if the mousedown is directly on the backdrop itself
+          if (e.target === e.currentTarget) {
+            backdropMouseDownRef.current = true;
+          }
+        }}
+        onClick={(e) => {
+          // Only close if mousedown also originated on the backdrop
+          if (e.target === e.currentTarget && backdropMouseDownRef.current) {
+            handleClose();
+          }
+          backdropMouseDownRef.current = false;
+        }}
       />
       <div className={`relative w-full ${isQuiz ? 'max-w-5xl' : 'max-w-4xl'} bg-white rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-fadeIn`}>
         

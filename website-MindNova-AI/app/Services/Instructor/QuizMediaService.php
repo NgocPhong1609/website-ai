@@ -62,6 +62,23 @@ class QuizMediaService
             );
 
             $answers = $question['answers'] ?? [];
+            if (empty($answers) && !empty($question['options']) && is_array($question['options'])) {
+                $correctIdx = is_numeric($question['correct_answer_index'] ?? null) ? (int)$question['correct_answer_index'] : 0;
+                $correctIndices = is_array($question['correct_answer_indices'] ?? null) ? $question['correct_answer_indices'] : [$correctIdx];
+                $answers = [];
+                foreach ($question['options'] as $oIdx => $optContent) {
+                    $isCorrect = ($question['selection_type'] ?? 'single_choice') === 'multiple_choice'
+                        ? in_array($oIdx, $correctIndices, true)
+                        : $oIdx === $correctIdx;
+                    $answers[] = [
+                        'content' => (string) $optContent,
+                        'is_correct' => $isCorrect,
+                        'image_url' => $question['answer_images'][$oIdx]['url'] ?? null,
+                        'image_r2_key' => $question['answer_images'][$oIdx]['r2_key'] ?? null,
+                    ];
+                }
+            }
+
             foreach ($answers as $answerIndex => &$answer) {
                 [$answer['image_url'], $answer['image_r2_key']] = $this->promotePair(
                     $instructor,

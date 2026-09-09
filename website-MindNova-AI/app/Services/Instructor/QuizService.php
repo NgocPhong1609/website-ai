@@ -185,10 +185,16 @@ class QuizService
 
                 if (empty($answersList) && !empty($qData['options']) && is_array($qData['options'])) {
                     $correctIdx = is_numeric($qData['correct_answer_index'] ?? null) ? (int)$qData['correct_answer_index'] : 0;
+                    $correctIndices = is_array($qData['correct_answer_indices'] ?? null) ? $qData['correct_answer_indices'] : [$correctIdx];
                     foreach ($qData['options'] as $idx => $optContent) {
+                        $isCorrect = ($qData['selection_type'] ?? 'single_choice') === 'multiple_choice'
+                            ? in_array($idx, $correctIndices, true)
+                            : $idx === $correctIdx;
                         $answersList[] = [
                             'content' => (string) $optContent,
-                            'is_correct' => $idx == $correctIdx,
+                            'is_correct' => $isCorrect,
+                            'image_url' => $qData['answer_images'][$idx]['url'] ?? null,
+                            'image_r2_key' => $qData['answer_images'][$idx]['r2_key'] ?? null,
                         ];
                     }
                 }

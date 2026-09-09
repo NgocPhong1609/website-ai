@@ -9,18 +9,30 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('quizzes', function (Blueprint $table) {
-            $table->text('thumbnail_url')->nullable();
-            $table->text('thumbnail_r2_key')->nullable();
+            if (!Schema::hasColumn('quizzes', 'thumbnail_url')) {
+                $table->text('thumbnail_url')->nullable();
+            }
+            if (!Schema::hasColumn('quizzes', 'thumbnail_r2_key')) {
+                $table->text('thumbnail_r2_key')->nullable();
+            }
         });
 
         Schema::table('questions', function (Blueprint $table) {
-            $table->text('image_url')->nullable();
-            $table->text('image_r2_key')->nullable();
+            if (!Schema::hasColumn('questions', 'image_url')) {
+                $table->text('image_url')->nullable();
+            }
+            if (!Schema::hasColumn('questions', 'image_r2_key')) {
+                $table->text('image_r2_key')->nullable();
+            }
         });
 
         Schema::table('answers', function (Blueprint $table) {
-            $table->text('image_url')->nullable();
-            $table->text('image_r2_key')->nullable();
+            if (!Schema::hasColumn('answers', 'image_url')) {
+                $table->text('image_url')->nullable();
+            }
+            if (!Schema::hasColumn('answers', 'image_r2_key')) {
+                $table->text('image_r2_key')->nullable();
+            }
         });
     }
 

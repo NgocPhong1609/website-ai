@@ -338,3 +338,72 @@ test('replacing and deleting a quiz cleans managed media but never external urls
     Storage::disk('r2')->assertMissing($newKey);
     Storage::disk('r2')->assertExists('unrelated/external-marker.png');
 });
+
+test('persists and promotes question and answer media when saving quiz inside a lesson', function () {
+    Storage::fake('public');
+    config([
+        'filesystems.disks.r2.key' => null,
+        'filesystems.disks.r2.secret' => null,
+        'filesystems.disks.r2.bucket' => null,
+        'filesystems.disks.r2.endpoint' => null,
+    ]);
+
+    $course = \App\Models\Course::create([
+        'teacher_id' => $this->teacher->id,
+        'title' => 'Test Course for Quiz Media',
+        'slug' => 'test-course-quiz-media-'.\Illuminate\Support\Str::uuid(),
+        'description' => 'Test course description',
+        'price' => 100000,
+        'level' => 'beginner',
+        'status' => 'published',
+    ]);
+    $module = \App\Models\CourseModule::create([
+        'course_id' => $course->id,
+        'title' => 'Test Module',
+        'order' => 1,
+    ]);
+
+    $thumb = ($this->uploadMedia)($this->teacher, 'thumbnail', 'thumb.png');
+    $qMedia = ($this->uploadMedia)($this->teacher, 'question', 'q1.png');
+    $aMedia = ($this->uploadMedia)($this->teacher, 'answer', 'a1.png');
+
+    $payload = [
+        'title' => 'Lesson with Quiz Media',
+        'type' => 'quiz_module',
+        'quizData' => [
+            'title' => 'Quiz inside Lesson',
+            'thumbnail_url' => $thumb['url'],
+            'thumbnail_r2_key' => $thumb['r2_key'],
+            'questions' => [
+                [
+                    'type' => 'multiple_choice',
+                    'selection_type' => 'single_choice',
+                    'content' => 'Question 1 with image',
+                    'image_url' => $qMedia['url'],
+                    'image_r2_key' => $qMedia['r2_key'],
+                    'points' => 1.0,
+                    'options' => ['Option A', 'Option B'],
+                    'correct_answer_index' => 0,
+                    'answer_images' => [
+                        ['url' => $aMedia['url'], 'r2_key' => $aMedia['r2_key']],
+                        ['url' => null, 'r2_key' => null],
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $response = $this->actingAs($this->teacher)
+        ->postJson("/api/instructor/modules/{$module->id}/lessons", $payload);
+
+    $response->assertCreated()
+        ->assertJsonPath('data.quizData.thumbnail_r2_key', fn ($val) => str_contains($val, 'quizzes/'))
+        ->assertJsonPath('data.quizData.questions.0.image_r2_key', fn ($val) => str_contains($val, 'quizzes/'))
+        ->assertJsonPath('data.quizData.questions.0.answers.0.image_r2_key', fn ($val) => str_contains($val, 'quizzes/'));
+
+    $lessonId = $response->json('data.id');
+    $showResp = $this->actingAs($this->teacher)->getJson("/api/instructor/lessons/{$lessonId}");
+    $showResp->assertOk()
+        ->assertJsonPath('data.quizData.questions.0.image_url', fn ($val) => !empty($val))
+        ->assertJsonPath('data.quizData.questions.0.answers.0.image_url', fn ($val) => !empty($val));
+});
