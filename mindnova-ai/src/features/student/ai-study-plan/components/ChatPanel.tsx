@@ -541,7 +541,7 @@ export function ChatPanel({
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={handleKeyDown}
-                disabled={isGenerating}
+                disabled={isGenerating || isQuotaBlocked}
                 placeholder={isGenerating ? "Nova đang tổng hợp câu trả lời cho bạn..." : "Hỏi Nova bất cứ điều gì về bài tập hay lộ trình học bối rối nhé..."}
                 className="w-full bg-[#FAF7F2] focus:bg-white disabled:bg-gray-100 border border-[#E8E2D9] focus:border-[#C0392B] rounded-xl pl-4 pr-24 py-2.5 text-xs sm:text-sm text-[#2C3039] placeholder:text-[#9092A8] shadow-inner focus:outline-none focus:ring-2 focus:ring-[#C0392B]/15 transition-all duration-200 font-medium"
               />

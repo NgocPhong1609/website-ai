@@ -81,7 +81,8 @@ describe("ChatPanel quota", () => {
     await submitQuestion();
 
     expect(await screen.findByLabelText("Hạn mức AI hôm nay")).toHaveTextContent("Còn 0/5 lượt hôm nay");
-    await waitFor(() => expect(screen.getByRole("textbox")).toBeEnabled());
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send message" })).toBeDisabled());
+    expect(screen.getByRole("textbox")).toBeDisabled();
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "Câu hỏi bị chặn" } });
     expect(screen.getByRole("button", { name: "Send message" })).toBeDisabled();
     fireEvent.keyDown(screen.getByRole("textbox"), { key: "Enter" });
@@ -118,12 +119,14 @@ describe("ChatPanel quota", () => {
 
     expect(screen.getByLabelText("Hạn mức AI hôm nay")).toHaveTextContent("Còn 0/5 lượt hôm nay");
     expect(screen.getByText("Bạn đã sử dụng hết 5 lượt AI hôm nay.")).toBeVisible();
+    expect(screen.getByRole("textbox")).toBeDisabled();
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "Kiểm tra hạn mức mới" } });
     expect(screen.getByRole("button", { name: "Send message" })).toBeDisabled();
     fireEvent.keyDown(screen.getByRole("textbox"), { key: "Enter" });
     expect(sendAiChatMessage).toHaveBeenCalledTimes(1);
 
     await act(async () => { await vi.advanceTimersByTimeAsync(101); });
+    expect(screen.getByRole("textbox")).toBeEnabled();
     expect(screen.getByRole("button", { name: "Send message" })).toBeEnabled();
     fireEvent.click(screen.getByRole("button", { name: "Send message" }));
     await act(async () => { await vi.advanceTimersByTimeAsync(1); });
