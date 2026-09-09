@@ -174,33 +174,6 @@ export type AdminTeacherApprovalData = {
  rows: AdminTeacherApprovalRow[];
 };
 
-export type AiProviderConfig = {
- provider: string;
- model: string;
- status: "connected" | "warning" | "offline";
- apiKeyHint: string;
-};
-
-export type AiQuotaConfig = {
- label: string;
- limit: number;
- used: number;
-};
-
-export type SystemPromptItem = {
- id: number;
- name: string;
- purpose: string;
- status: "active" | "draft";
- updatedAt: string;
-};
-
-export type AdminAiConfigData = {
- providers: AiProviderConfig[];
- quotas: AiQuotaConfig[];
- systemPrompts: SystemPromptItem[];
-};
-
 export type AdminContentRow = {
  id: number;
  title: string;
