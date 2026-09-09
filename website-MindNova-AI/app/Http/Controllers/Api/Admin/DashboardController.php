@@ -10,6 +10,8 @@ use App\Models\Enrollment;
 use App\Models\Order;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Services\Ai\AiUsageSummaryService;
+use App\Settings\AiSettingsRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,7 +28,7 @@ class DashboardController extends Controller
         $previous = (clone $query)->whereBetween($column, [now()->subDays(60), now()->subDays(30)])->count();
 
         if ($previous === 0) {
-            return $current > 0 ? '+100%' : '0%';
+            return $current > 0 ? '' : '0%';
         }
 
         $change = (($current - $previous) / $previous) * 100;
@@ -34,12 +36,11 @@ class DashboardController extends Controller
         return ($change >= 0 ? '+' : '') . number_format($change, 1) . '%';
     }
 
-    public function overview(Request $request): JsonResponse
+    public function overview(AiSettingsRepository $settings, AiUsageSummaryService $usage): JsonResponse
     {
         $totalUsers = User::count();
         $totalCourses = Course::count();
         $totalRevenue = (float) Order::where('status', 'completed')->sum('total_amount');
-        $activeSubscriptions = Subscription::where('status', 'active')->count();
         $completedEnrollments = Enrollment::where('status', 'completed')->count();
         $totalEnrollments = Enrollment::count();
         $completionRate = $totalEnrollments > 0 ? round(($completedEnrollments / $totalEnrollments) * 100, 1) : 0;
@@ -60,6 +61,7 @@ class DashboardController extends Controller
                 }
 
                 return [
+                    'id' => $user->id,
                     'name' => $user->name,
                     'role' => $roleLabel,
                     'status' => $user->status === 'active' ? 'Đang hoạt động' : 'Ngưng hoạt động',
@@ -81,33 +83,28 @@ class DashboardController extends Controller
         $failedJobs = DB::table('failed_jobs')->count();
         $freeBytes = @disk_free_space(storage_path());
         $totalBytes = @disk_total_space(storage_path());
-        $freePercent = ($freeBytes && $totalBytes) ? ($freeBytes / $totalBytes) * 100 : 100;
+        $freePercent = ($freeBytes !== false && $totalBytes !== false && $totalBytes > 0)
+            ? ($freeBytes / $totalBytes) * 100 : null;
 
         $health = [
-            ['title' => 'API Laravel', 'status' => 'Ổn định', 'color' => 'bg-emerald-500'],
             [
                 'title' => 'Hàng đợi tác vụ',
-                'status' => $failedJobs > 0 ? 'Cảnh báo' : 'Ổn định',
+                'status' => $failedJobs . ' tác vụ thất bại được ghi nhận',
                 'color' => $failedJobs > 0 ? 'bg-amber-500' : 'bg-cyan-500',
             ],
             [
                 'title' => 'Lưu trữ',
-                'status' => $freePercent < 15 ? 'Cảnh báo' : 'Ổn định',
-                'color' => $freePercent < 15 ? 'bg-amber-500' : 'bg-emerald-500',
-            ],
-            [
-                'title' => 'Dịch vụ AI',
-                'status' => filled(config('services.groq.key')) ? 'Ổn định' : 'Cảnh báo',
-                'color' => filled(config('services.groq.key')) ? 'bg-violet-500' : 'bg-amber-500',
+                'status' => $freePercent === null ? 'Chưa có dữ liệu' : round($freePercent, 1) . '% dung lượng trống',
+                'color' => $freePercent === null || $freePercent < 15 ? 'bg-amber-500' : 'bg-emerald-500',
             ],
         ];
 
         return response()->json([
             'hero' => [
                 'title' => 'Xin chào, Quản trị viên',
-                'description' => 'Trang quản trị để bạn theo dõi người dùng, khóa học, doanh thu và trạng thái hệ thống theo thời gian thực.',
-                'primaryAction' => 'Thêm mới',
-                'secondaryAction' => 'Xuất báo cáo',
+                'description' => 'Tổng quan người dùng, khóa học, doanh thu và dữ liệu AI đã ghi nhận.',
+                'primaryAction' => 'Quản lý nội dung',
+                'secondaryAction' => 'Xem báo cáo',
             ],
             'stats' => [
                 [
@@ -117,21 +114,21 @@ class DashboardController extends Controller
                     'note' => 'so với 30 ngày trước',
                 ],
                 [
-                    'label' => 'Khóa học đang hoạt động',
+                    'label' => 'Tổng khóa học',
                     'value' => number_format($totalCourses),
                     'trend' => $this->percentChange(Course::query()),
                     'note' => 'so với 30 ngày trước',
                 ],
                 [
                     'label' => 'Doanh thu',
-                    'value' => '$' . number_format($totalRevenue, 1),
-                    'trend' => $this->percentChange(Order::where('status', 'completed')),
+                    'value' => number_format($totalRevenue, 0, ',', '.') . ' VNĐ',
+                    'trend' => '',
                     'note' => 'tổng doanh số đã thanh toán',
                 ],
                 [
                     'label' => 'Tỉ lệ hoàn thành',
                     'value' => $completionRate . '%',
-                    'trend' => $this->percentChange(Enrollment::where('status', 'completed'), 'enrolled_at'),
+                    'trend' => '',
                     'note' => 'trên tổng số lượt ghi danh',
                 ],
             ],
@@ -144,6 +141,10 @@ class DashboardController extends Controller
                 'Lọc và tìm kiếm khóa học',
                 'Kiểm duyệt và khóa người dùng',
                 'Gửi email thông báo',
+            ],
+            'ai_summary' => [
+                'providers' => $settings->providerReadiness(),
+                'usage' => $usage->summarize('7d'),
             ],
         ]);
     }

@@ -334,6 +334,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
 // 5. NHÓM API QUẢN TRỊ (Dành riêng cho Admin)
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/overview', [AdminDashboardController::class, 'overview']);
 
     // 1) User management & Teacher Verification Review
     Route::get('/users', [AdminUserManagementController::class, 'index']);

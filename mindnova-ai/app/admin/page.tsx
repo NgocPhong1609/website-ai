@@ -1,5 +1,1 @@
-import { AdminAnalyticsPage } from "@/src/features/admin/components/AdminAnalyticsPage";
-
-export default function AdminPage() {
- return <AdminAnalyticsPage />;
-}
+export { AdminOverviewPage as default } from "@/src/features/admin/components/AdminOverviewPage";

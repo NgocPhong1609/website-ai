@@ -14,23 +14,14 @@ export function AdminStatsGrid({ stats }: AdminStatsGridProps) {
  >
  <div className="flex items-center justify-between text-sm text-slate-500">
  <span>{item.label}</span>
- <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold -[#2C3039] ring-1 ring-emerald-100">
+ {item.trend && <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700">
  {item.trend}
- </span>
+ </span>}
  </div>
 
  <div className="mt-5 flex items-end justify-between gap-3">
  <div className="text-[30px] font-semibold leading-none text-slate-900 [font-family:var(--font-admin-head)]">
  {item.value}
- </div>
- <div className="flex h-10 w-16 items-end gap-1 rounded-xl bg-slate-100 p-2">
- {[28, 40, 32, 48, 36, 60, 50].map((height, index) => (
- <span
- key={`${item.label}-${index}`}
- className="w-full rounded-t-md -[#C0392B] -[#C0392B]"
- style={{ height: `${height}%` }}
- />
- ))}
  </div>
  </div>
 
