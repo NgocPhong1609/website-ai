@@ -50,6 +50,10 @@ test('student can fetch study plan overview data through the api with localized 
         'email_verified_at' => now(),
     ]);
 
+    CourseAiTutorServiceTest::enrolledLesson($student)->update([
+        'title' => 'Superposition (Chồng chập lượng tử)',
+    ]);
+
     $response = $this->actingAs($student, 'sanctum')->getJson('/api/student/study-plan');
 
     $response->assertOk()
