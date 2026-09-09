@@ -2,11 +2,14 @@
 
 namespace Tests\Feature\Student;
 
+use App\Models\ActivityLog;
 use App\Models\AdminSetting;
 use App\Models\AiUsageLog;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Services\Ai\AiUsageSummaryService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -77,8 +80,68 @@ class AiTutorEntitlementTest extends TestCase
         $this->assertNull($log->input_text);
         $this->assertNull($log->output_text);
         $this->assertNull($log->system_prompt);
+        $activity = ActivityLog::where('action', 'ai_prompt_submitted')->sole();
+        $this->assertSame('provider', $activity->metadata['token_source']);
+        $this->assertSame(11, $activity->metadata['input_tokens']);
+        $this->assertSame(3, $activity->metadata['output_tokens']);
         $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', ['message' => 'Another question'])
             ->assertStatus(429)->assertJsonPath('meta.used', 2);
         Http::assertSentCount(1);
+    }
+
+    public static function providerFailures(): array
+    {
+        return [['http', 'http_503'], ['connection', 'connection_error']];
+    }
+
+    #[DataProvider('providerFailures')]
+    public function test_failed_tutor_requests_do_not_invent_usage(string $failure, string $errorCode): void
+    {
+        $user = User::factory()->create();
+        config(['services.ai_tutor.provider' => 'groq', 'services.groq.key' => 'secret-key']);
+        Http::fake(['api.groq.com/*' => $failure === 'http'
+            ? Http::response(['error' => 'private-provider-body'], 503)
+            : fn () => throw new ConnectionException('private-connection-detail')]);
+
+        $response = $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', ['message' => 'Explain addition']);
+        $response->assertOk();
+        $this->assertSame('He thong AI tam thoi gian doan. Vui long thu lai sau.', $response->streamedContent());
+        $log = AiUsageLog::sole();
+        $this->assertSame('failed', $log->status);
+        $this->assertSame($errorCode, $log->error_code);
+        $this->assertSame('unavailable', $log->token_source);
+        $this->assertSame(0, $log->input_tokens);
+        $this->assertSame(0, $log->output_tokens);
+        $activity = ActivityLog::where('action', 'ai_prompt_submitted')->sole();
+        $this->assertSame('unavailable', $activity->metadata['token_source']);
+        $this->assertArrayNotHasKey('input_tokens', $activity->metadata);
+        $this->assertArrayNotHasKey('output_tokens', $activity->metadata);
+        $tokens = app(AiUsageSummaryService::class)->summarize('7d')['tokens'];
+        $this->assertFalse($tokens['available']);
+        $this->assertNull($tokens['input']);
+        $this->assertNull($tokens['output']);
+    }
+
+    public function test_successful_tutor_estimates_are_explicit_in_usage_and_activity_logs(): void
+    {
+        $user = User::factory()->create();
+        config(['services.ai_tutor.provider' => 'groq', 'services.groq.key' => 'secret-key']);
+        AdminSetting::create(['key' => 'ai.prompts', 'value' => ['ai_tro_giang' => 'Tutor instruction']]);
+        Http::fake(['api.groq.com/*' => Http::response([
+            'choices' => [['message' => ['content' => 'Two plus two equals four']]],
+        ])]);
+
+        $response = $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', ['message' => 'Explain addition']);
+        $response->assertOk();
+        $this->assertSame('Two plus two equals four', $response->streamedContent());
+        $log = AiUsageLog::sole();
+        $this->assertSame('success', $log->status);
+        $this->assertSame('estimated', $log->token_source);
+        $this->assertSame(6, $log->input_tokens);
+        $this->assertSame(7, $log->output_tokens);
+        $activity = ActivityLog::where('action', 'ai_prompt_submitted')->sole();
+        $this->assertSame('estimated', $activity->metadata['token_source']);
+        $this->assertSame(6, $activity->metadata['input_tokens']);
+        $this->assertSame(7, $activity->metadata['output_tokens']);
     }
 }

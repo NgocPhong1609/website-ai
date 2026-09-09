@@ -151,8 +151,16 @@ class AiTutorController extends Controller
                 $providerInputTokens = $response?->json('usage.prompt_tokens');
                 $providerOutputTokens = $response?->json('usage.completion_tokens');
                 $hasProviderTokens = is_int($providerInputTokens) && is_int($providerOutputTokens);
-                $inputTokens = $hasProviderTokens ? $providerInputTokens : $this->estimateTokens($userMessage.' '.$systemPrompt);
-                $outputTokens = $hasProviderTokens ? $providerOutputTokens : $this->estimateTokens($assistantOutput);
+                $tokenSource = $hasProviderTokens ? 'provider' : ($status === 'success' ? 'estimated' : 'unavailable');
+                $inputTokens = 0;
+                $outputTokens = 0;
+                if ($hasProviderTokens) {
+                    $inputTokens = $providerInputTokens;
+                    $outputTokens = $providerOutputTokens;
+                } elseif ($status === 'success') {
+                    $inputTokens = $this->estimateTokens($userMessage.' '.$systemPrompt);
+                    $outputTokens = $this->estimateTokens($assistantOutput);
+                }
 
                 AiUsageLog::create([
                     'user_id' => $user?->id,
@@ -168,7 +176,7 @@ class AiTutorController extends Controller
                     'fallback_used' => false,
                     'input_tokens' => $inputTokens,
                     'output_tokens' => $outputTokens,
-                    'token_source' => $hasProviderTokens ? 'provider' : ($status === 'success' ? 'estimated' : 'unavailable'),
+                    'token_source' => $tokenSource,
                     'cost_source' => 'unavailable',
                     'cost_amount' => null,
                     'cost_currency' => null,
@@ -178,6 +186,16 @@ class AiTutorController extends Controller
                 ]);
 
                 if ($user) {
+                    $activityMetadata = [
+                        'provider' => $provider,
+                        'model' => $model,
+                        'token_source' => $tokenSource,
+                    ];
+                    if ($tokenSource !== 'unavailable') {
+                        $activityMetadata['input_tokens'] = $inputTokens;
+                        $activityMetadata['output_tokens'] = $outputTokens;
+                    }
+
                     ActivityLog::create([
                         'user_id' => $user->id,
                         'action' => 'ai_prompt_submitted',
@@ -185,12 +203,7 @@ class AiTutorController extends Controller
                         'subject_id' => $user->id,
                         'ip_address' => $request->ip(),
                         'user_agent' => $request->userAgent(),
-                        'metadata' => [
-                            'provider' => $provider,
-                            'model' => $model,
-                            'input_tokens' => $inputTokens,
-                            'output_tokens' => $outputTokens,
-                        ],
+                        'metadata' => $activityMetadata,
                     ]);
                 }
             }

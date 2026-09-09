@@ -148,3 +148,62 @@ exit 0
 ## Commit
 
 Implementation and report are committed together with message `fix: apply AI package quotas and usage provenance`; the resulting hash is supplied in the task handoff.
+
+## Fix round 1 — Failed tutor requests do not invent token usage
+
+### Finding and implementation
+
+The tutor's `finally` block estimated tokens even after an HTTP or connection failure. This could assign input tokens to an unmeasured failed call and output tokens to a locally generated friendly error message, then copy those counters into activity metadata without provenance.
+
+- The existing `input_tokens` and `output_tokens` schema columns are non-nullable unsigned integers. Failed calls without provider usage now use the canonical storage representation `0/0` plus `token_source = unavailable`.
+- Token estimation runs only for successful tutor responses without provider counts, and retains `token_source = estimated`.
+- Activity metadata always includes token provenance. It includes input/output counters only for `provider` or `estimated` sources; unavailable counts are omitted.
+- Genuine provider-supplied counts remain preferred. The streamed response and error text are unchanged.
+
+Changed files: `AiTutorController.php`, `AiTutorEntitlementTest.php`, and this report.
+
+### RED
+
+Run through the same disposable MySQL/container wrapper documented above:
+
+```text
+php artisan test tests/Feature/Student/AiTutorEntitlementTest.php
+FAIL Tests\Feature\Student\AiTutorEntitlementTest
+  HTTP failure: expected input_tokens 0, received 23
+  Connection failure: expected input_tokens 0, received 23
+  Provider success activity metadata: token_source missing
+  Estimated success activity metadata: token_source missing
+Tests: 4 failed, 4 passed (52 assertions)
+Duration: 38.75s
+```
+
+### GREEN
+
+```text
+php artisan test tests/Feature/Student/AiTutorEntitlementTest.php tests/Feature/AiUsageObservabilityTest.php tests/Feature/AiFallbackTest.php tests/Feature/Student/GeminiAiServiceTest.php tests/Feature/AdminAiSystemApiTest.php
+PASS Tests\Feature\Student\AiTutorEntitlementTest (8 tests)
+PASS Tests\Feature\AiUsageObservabilityTest (8 tests)
+PASS Tests\Feature\AiFallbackTest (6 tests)
+PASS Tests\Feature\Student\GeminiAiServiceTest (1 test)
+PASS Tests\Feature\AdminAiSystemApiTest (15 tests)
+Tests: 38 passed (267 assertions)
+Duration: 45.19s
+
+php -l app/Http/Controllers/Api/Student/AiTutorController.php
+No syntax errors detected
+php -l tests/Feature/Student/AiTutorEntitlementTest.php
+No syntax errors detected
+vendor/bin/pint --test app/Http/Controllers/Api/Student/AiTutorController.php tests/Feature/Student/AiTutorEntitlementTest.php
+PASS (2 files)
+git diff --check
+exit 0
+```
+
+### Self-review
+
+- Both HTTP and connection failures assert zero stored counters, unavailable provenance, no activity counters, and unavailable/null token totals from the real admin summary service.
+- Successful estimates have independent literal expectations (6 input and 7 output tokens) and explicit provenance in both usage and activity logs.
+- The existing provider-success fixture now also verifies provider provenance and its 11/3 counts in activity metadata.
+- No migration, provider routing, endpoint protocol, or quota behavior changed. Existing historical rows are not rewritten.
+
+Fix commit message: `fix: avoid estimated usage for failed tutor requests`.
