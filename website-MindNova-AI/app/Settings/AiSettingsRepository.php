@@ -9,7 +9,7 @@ class AiSettingsRepository
 {
     private const PACKAGE_DEFAULTS = [
         'free' => [
-            'daily_requests' => 30,
+            'daily_requests' => 5,
             'daily_tokens' => null,
         ],
         'premium' => [
