@@ -40,7 +40,6 @@ export const Avatar: React.FC<AvatarProps> = ({
   if (src && !error) {
     return (
       <div className={mergedClasses}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
           alt={alt}

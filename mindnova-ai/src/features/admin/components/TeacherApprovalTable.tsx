@@ -378,7 +378,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  </div>
  {selectedRow.teacher_verification_note && (
  <p className="text-xs text-slate-600 italic pt-1">
- Ghi chú: "{selectedRow.teacher_verification_note}"
+ Ghi chú: &quot;{selectedRow.teacher_verification_note}&quot;
  </p>
  )}
  </div>
