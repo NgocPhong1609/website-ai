@@ -36,12 +36,13 @@ final class CourseAiContextService
         $lesson = $lessonId === null
             ? $this->resolveImplicitLesson($user)
             : $this->resolveExplicitLesson($user, $lessonId);
+        $courseSnapshot = $lesson->course->publishedVersion?->snapshot ?? [];
 
         return [
             'course_id' => $lesson->course->id,
-            'course_title' => $lesson->course->title,
+            'course_title' => (string) ($courseSnapshot['title'] ?? ''),
             'course_description' => mb_substr(
-                $this->plainText($lesson->course->description),
+                $this->plainText($courseSnapshot['description'] ?? null),
                 0,
                 self::COURSE_DESCRIPTION_LIMIT,
             ),
@@ -94,9 +95,14 @@ final class CourseAiContextService
         $lesson = $enrollment === null
             ? null
             : $this->publishedLessons()
-                ->where('course_id', $enrollment->course_id)
-                ->orderBy('order')
-                ->orderBy('id')
+                ->where('lessons.course_id', $enrollment->course_id)
+                ->leftJoin('course_modules as context_modules', 'context_modules.id', '=', 'lessons.module_id')
+                ->select('lessons.*')
+                ->orderByRaw('context_modules.id IS NULL')
+                ->orderBy('context_modules.order')
+                ->orderBy('context_modules.id')
+                ->orderBy('lessons.order')
+                ->orderBy('lessons.id')
                 ->first();
 
         if ($lesson === null) {
@@ -109,15 +115,20 @@ final class CourseAiContextService
     private function publishedLessons(): Builder
     {
         return Lesson::query()
-            ->where('status', 'published')
-            ->whereHas('course', fn (Builder $query) => $query->where('status', 'published'))
+            ->where('lessons.status', 'published')
+            ->whereHas('course', fn (Builder $query) => $query
+                ->where('status', 'published')
+                ->whereHas('publishedVersion', fn (Builder $versionQuery) => $versionQuery
+                    ->where('status', 'published')
+                    ->where('is_published', true)))
             ->where(function (Builder $query): void {
-                $query->whereNull('module_id')
+                $query->whereNull('lessons.module_id')
                     ->orWhereHas('module', fn (Builder $moduleQuery) => $moduleQuery
                         ->where('status', 'published'));
             })
             ->with([
-                'course:id,title,description',
+                'course:id,published_version_id',
+                'course.publishedVersion:id,snapshot_data',
                 'module:id,course_id,title',
             ]);
     }

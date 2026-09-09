@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\CourseAiContextException;
+use App\Models\ContentVersion;
 use App\Models\Course;
 use App\Models\CourseModule;
 use App\Models\Enrollment;
@@ -15,7 +16,7 @@ uses(RefreshDatabase::class);
 
 function createCourseAiTestCourse(User $teacher, array $attributes = []): Course
 {
-    return Course::create(array_merge([
+    $course = Course::create(array_merge([
         'teacher_id' => $teacher->id,
         'title' => 'Khóa học Laravel',
         'slug' => 'khoa-hoc-laravel-'.Str::uuid(),
@@ -24,6 +25,22 @@ function createCourseAiTestCourse(User $teacher, array $attributes = []): Course
         'level' => 'beginner',
         'status' => 'published',
     ], $attributes));
+
+    $version = ContentVersion::create([
+        'versionable_type' => Course::class,
+        'versionable_id' => $course->id,
+        'version_number' => 1,
+        'snapshot_data' => [
+            'title' => $course->title,
+            'description' => $course->description,
+        ],
+        'status' => 'published',
+        'is_published' => true,
+        'created_by' => $teacher->id,
+    ]);
+    $course->update(['published_version_id' => $version->id]);
+
+    return $course;
 }
 
 function createCourseAiTestLesson(Course $course, array $attributes = []): Lesson
@@ -91,6 +108,35 @@ test('context contains only the enrolled published lesson', function () {
         ->not->toContain('secret.pdf');
 });
 
+test('context uses approved course metadata instead of unpublished working edits', function () {
+    $teacher = User::factory()->create();
+    $student = User::factory()->create();
+    $course = createCourseAiTestCourse($teacher, [
+        'title' => 'Tiêu đề đã duyệt',
+        'description' => '<p>Mô tả đã duyệt</p>',
+    ]);
+    Enrollment::create([
+        'user_id' => $student->id,
+        'course_id' => $course->id,
+        'status' => 'enrolled',
+        'enrolled_at' => now(),
+    ]);
+    $lesson = createCourseAiTestLesson($course);
+    $course->update([
+        'title' => 'Tiêu đề nháp chưa duyệt',
+        'description' => '<p>Mô tả nháp chưa duyệt</p>',
+    ]);
+
+    $context = app(CourseAiContextService::class)->resolve($student, $lesson->id);
+
+    expect($context)
+        ->course_title->toBe('Tiêu đề đã duyệt')
+        ->course_description->toBe('Mô tả đã duyệt');
+    expect(json_encode($context))
+        ->not->toContain('Tiêu đề nháp chưa duyệt')
+        ->not->toContain('Mô tả nháp chưa duyệt');
+});
+
 test('another students lesson and a missing lesson have the same generic forbidden failure', function () {
     $teacher = User::factory()->create();
     $student = User::factory()->create();
@@ -144,7 +190,7 @@ test('explicit context rejects unpublished course module or lesson content', fun
     'draft lesson' => [['course' => 'published', 'module' => 'published', 'lesson' => 'draft']],
 ]);
 
-test('missing lesson id resolves the first published lesson from the latest active enrollment', function () {
+test('missing lesson id resolves by module then lesson order from the latest active enrollment', function () {
     $teacher = User::factory()->create();
     $student = User::factory()->create();
     $olderCourse = createCourseAiTestCourse($teacher, ['title' => 'Khóa cũ']);
@@ -163,14 +209,16 @@ test('missing lesson id resolves the first published lesson from the latest acti
     ]);
     createCourseAiTestLesson($olderCourse, ['title' => 'Bài khóa cũ']);
     createCourseAiTestLesson($latestCourse, [
-        'title' => 'Bài thứ hai',
-        'order' => 2,
+        'module_title' => 'Module sau',
+        'module_order' => 2,
+        'title' => 'Bài đầu module sau',
+        'order' => 1,
     ]);
     $firstLesson = createCourseAiTestLesson($latestCourse, [
-        'module_title' => 'Nhập môn',
+        'module_title' => 'Module trước',
         'module_order' => 1,
-        'title' => 'Bài đầu tiên',
-        'order' => 1,
+        'title' => 'Bài thứ hai module trước',
+        'order' => 2,
     ]);
 
     $context = app(CourseAiContextService::class)->resolve($student, null);
@@ -178,7 +226,7 @@ test('missing lesson id resolves the first published lesson from the latest acti
     expect($context)
         ->course_id->toBe($latestCourse->id)
         ->lesson_id->toBe($firstLesson->id)
-        ->lesson_title->toBe('Bài đầu tiên');
+        ->lesson_title->toBe('Bài thứ hai module trước');
 });
 
 test('student without usable implicit context receives an unprocessable failure', function () {
