@@ -5,6 +5,31 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+test('live tutor requires authentication', function () {
+    $this->postJson('/api/student/study-plan/chat', ['message' => 'Giải thích bài học'])
+        ->assertUnauthorized();
+});
+
+test('live tutor validates bounded lesson and history input', function () {
+    $student = User::factory()->create([
+        'role' => 'student',
+        'email_verified_at' => now(),
+    ]);
+
+    $this->actingAs($student, 'sanctum')->postJson('/api/student/study-plan/chat', [
+        'message' => 'Giải thích bài học',
+        'lesson_id' => 0,
+        'history' => [
+            ['sender' => 'user', 'text' => '1'],
+            ['sender' => 'ai', 'text' => '2'],
+            ['sender' => 'user', 'text' => '3'],
+            ['sender' => 'ai', 'text' => '4'],
+            ['sender' => 'user', 'text' => str_repeat('x', 2001)],
+        ],
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors(['lesson_id', 'history', 'history.4.text']);
+});
+
 test('student can fetch study plan overview data through the api with localized content', function () {
     $student = User::factory()->create([
         'role' => 'student',

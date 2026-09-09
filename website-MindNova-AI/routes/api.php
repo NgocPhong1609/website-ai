@@ -104,7 +104,6 @@ Route::prefix('student')->group(function () {
     Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
     Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
     Route::get('/courses/{course}/reviews', [StudentReviewController::class, 'index']);
-    Route::post('/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:10,1');
     Route::post('/onboarding', [OnboardingController::class, 'store']);
     Route::get('/available-topics', [OnboardingController::class, 'getAvailableTopics']);
     Route::post('/analyze-lesson', [AnalyzeLessonController::class, 'analyze']);
@@ -158,6 +157,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // 3. NHÓM API HỌC SINH (Student Authenticated Actions)
     // ==========================================
     Route::prefix('student')->group(function () {
+        Route::post('/study-plan/chat', [StudentStudyPlanController::class, 'chat'])
+            ->middleware('throttle:10,1');
+
         // Dashboard
         Route::get('/dashboard', [StudentDashboardController::class, 'overview']);
 
