@@ -49,7 +49,10 @@ class AiSettingsRepository
             return self::PROMPT_DEFAULTS;
         }
 
-        return array_replace(self::PROMPT_DEFAULTS, array_intersect_key($storedPrompts, self::PROMPT_DEFAULTS));
+        return array_replace(self::PROMPT_DEFAULTS, array_filter(
+            array_intersect_key($storedPrompts, self::PROMPT_DEFAULTS),
+            is_string(...)
+        ));
     }
 
     public function packageForUser(?User $user): string
@@ -71,6 +74,20 @@ class AiSettingsRepository
         return 'free';
     }
 
+    public function tutorProvider(): string
+    {
+        $configured = config('services.ai_tutor.provider');
+        if (is_string($configured) && trim($configured) !== '') {
+            return $configured;
+        }
+
+        $legacyProviders = $this->settingValue('ai.providers');
+        $legacyPrimary = is_array($legacyProviders) ? ($legacyProviders['primary'] ?? null) : null;
+
+        // Only the existing OpenAI-compatible deployments participate in legacy fallback.
+        return in_array($legacyPrimary, ['openai', 'groq'], true) ? $legacyPrimary : 'groq';
+    }
+
     public function providerReadiness(): array
     {
         $primary = config('services.gemini');
@@ -82,7 +99,8 @@ class AiSettingsRepository
         }
         $backupApiKey = $backup['api_key'] ?? null;
 
-        if (! $this->configured($backupApiKey)) {
+        // Match BackupAiService's effective key selection and missing-key check exactly.
+        if (empty($backupApiKey)) {
             $backupApiKey = $backupProvider === 'groq'
                 ? config('services.groq.key')
                 : config('services.openai.key');
@@ -97,7 +115,7 @@ class AiSettingsRepository
             'backup' => [
                 'name' => $backupProvider,
                 'model' => $backup['model'] ?? null,
-                'configured' => $this->configured($backupApiKey),
+                'configured' => ! empty($backupApiKey),
             ],
         ];
     }

@@ -80,7 +80,7 @@ class AiTutorController extends Controller
             ], 422);
         }
 
-        $provider = (string) config('services.ai_tutor.provider', 'groq');
+        $provider = $this->settings->tutorProvider();
         $systemPrompt = $this->settings->prompts()['ai_tro_giang'];
         $model = (string) config('services.ai_tutor.model', 'llama-3.1-8b-instant');
 

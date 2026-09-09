@@ -145,6 +145,7 @@ class DashboardController extends Controller
             'ai_summary' => [
                 'providers' => $settings->providerReadiness(),
                 'usage' => $usage->summarize('7d'),
+                'packages' => $settings->packages(),
             ],
         ]);
     }

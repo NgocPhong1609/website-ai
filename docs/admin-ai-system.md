@@ -1,12 +1,12 @@
 # Admin AI configuration and usage
 
-The writable AI configuration is at `/admin/ai-system`. `/admin` is the general Overview and ends with a read-only seven-day AI summary. `/admin/analytics` remains the dedicated Analytics page.
+The writable AI configuration is at `/admin/ai-system`. `/admin` is the general Overview and ends with a read-only seven-day AI summary, including the canonical Free/Premium daily request limits. `/admin/analytics` remains the dedicated Analytics page.
 
 ## API and access
 
 `GET /api/admin/ai-config?period=7d` returns the canonical, unwrapped `providers`, `usage`, `packages`, `prompts`, and `updated_at` payload. `30d` selects thirty calendar days; absent or unsupported periods select seven. `PUT /api/admin/ai-config` accepts only `packages` and `prompts`. Both routes, and `GET /api/admin/overview`, require Sanctum authentication and the admin role.
 
-Unknown keys at every writable level return validation errors. Provider names, models, credentials, and connection objects cannot be saved through this API. The response contains no credential values, suffixes, or masked references. After saving, the UI reloads the current period. Cancel restores the loaded values. Refreshing or switching periods with unsaved edits asks before replacing them.
+Unknown keys at every writable level return validation errors. Provider names, models, credentials, and connection objects cannot be saved through this API. The response contains no credential values, suffixes, or masked references. After saving, the UI reloads the current period. Save failures preserve the draft and offer another save; client validation focuses the first invalid field. Only fetch failures offer reload. Cancel restores the loaded values. Refreshing or switching periods with unsaved edits asks before replacing them.
 
 The frontend uses `NEXT_PUBLIC_API_URL` for browser requests and `BACKEND_URL` for server-rendered Overview requests; point both at the same Laravel deployment. The Laravel CORS configuration must allow the frontend origin.
 
@@ -21,15 +21,17 @@ Keys belong in the server deployment environment and Laravel configuration, neve
 | Backup key fallback | With no backup key, exact provider `groq` uses `GROQ_API_KEY`; other provider values use `OPENAI_API_KEY` |
 | Existing tutor stream | `AI_TUTOR_PROVIDER`, `AI_DEFAULT_MODEL`, and that provider's server-side key/base URI settings |
 
-Set the backup model to one supported by the configured backup endpoint. A displayed model is the configured identifier, not proof that the provider accepts it. Provider cards report only whether a nonblank key is configured; they do not make a connection, validate a key/model, measure latency, or assert service health. Empty backup provider display names normalize to `openai`; runtime branch selection remains the existing exact `groq` comparison. Avoid whitespace or placeholder values in credentials/provider names.
+Set the backup model to one supported by the configured backup endpoint. A displayed model is the configured identifier, not proof that the provider accepts it. Provider cards report configuration presence; they do not make a connection, validate a key/model, measure latency, or assert service health. Backup readiness matches the runtime's existing PHP `empty()` checks: `"0"` is treated as missing, while whitespace passes the presence check and does not select a fallback key. Empty backup provider display names normalize to `openai`; runtime branch selection remains the existing exact `groq` comparison. Avoid whitespace or placeholder values in credentials/provider names.
 
 `AiRouterService` still tries Gemini first: at most two primary attempts, then one backup attempt on a transient failure. Authentication/configuration failures do not trigger fallback. The original prompt is preserved across attempts. Provider error bodies and original connection exceptions do not reach public exceptions through these shared services. `AI_FORCE_PRIMARY_FAILURE` remains an existing diagnostic switch and should be disabled in normal operation.
 
-The student tutor stream retains its separate, existing OpenAI-compatible endpoint selection. The primary/backup cards describe the router topology; editing package limits does not switch the tutor's provider or make its stream use the router.
+The student tutor stream retains its separate, existing OpenAI-compatible endpoint selection. An explicit, nonblank `AI_TUTOR_PROVIDER` wins. If absent or blank, a legacy `ai.providers.primary` value of `openai` or `groq` remains effective; other values fall back to `groq`. Model, base URI, and credentials continue to come from server configuration. The primary/backup cards describe the router topology; editing package limits does not switch the tutor's provider or make its stream use the router.
 
 After a server environment change, rebuild Laravel's configuration cache using the deployment's normal process (`php artisan config:cache`) and restart any long-running application/queue workers. No secret-editing endpoint or organization credential setting was added.
 
 ## Package settings and prompts
+
+Legacy null or non-string prompt values are read as the canonical nonempty defaults. Stored strings are retained. This normalization does not rewrite historical settings until an administrator saves.
 
 `AdminSetting` stores package configuration as JSON under `ai.packages.v1`:
 

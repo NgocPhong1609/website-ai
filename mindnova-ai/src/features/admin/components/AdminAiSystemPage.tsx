@@ -4,26 +4,30 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { adminApi } from "@/src/features/admin/lib/admin-api";
 import type { AdminAiSystemData, AiPeriod, WritableAiConfig } from "../ai-system/types";
 import { validateAiConfig, type AiConfigErrors } from "../ai-system/validation";
+import { normalizeAiPrompts } from "../ai-system/prompts";
 import { AiUsageSummary } from "./ai-system/AiUsageSummary";
 import { AiProviderStatus } from "./ai-system/AiProviderStatus";
 import { AiPackageEditor } from "./ai-system/AiPackageEditor";
 import { AiPromptEditor } from "./ai-system/AiPromptEditor";
 
 function writable(data: AdminAiSystemData): WritableAiConfig {
-  return { packages: data.packages, prompts: data.prompts };
+  return { packages: data.packages, prompts: normalizeAiPrompts(data.prompts) };
 }
+
+type PageError = { message: string; origin: "load" | "save" | "validation" };
 
 export function AdminAiSystemPage() {
   const [data, setData] = useState<AdminAiSystemData | null>(null);
   const [draft, setDraft] = useState<WritableAiConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<PageError | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [errors, setErrors] = useState<AiConfigErrors>({});
   const [pendingPeriod, setPendingPeriod] = useState<AiPeriod | null>(null);
   const inFlight = useRef(false);
   const keepEditingButton = useRef<HTMLButtonElement>(null);
+  const form = useRef<HTMLFormElement>(null);
   const period = data?.usage.period ?? "7d";
   const dirty = Boolean(data && draft && JSON.stringify(writable(data)) !== JSON.stringify(draft));
 
@@ -37,7 +41,7 @@ export function AdminAiSystemPage() {
       setErrors({});
       return true;
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Không thể tải cấu hình AI.");
+      setError({ origin: "load", message: cause instanceof Error ? cause.message : "Không thể tải cấu hình AI." });
       return false;
     } finally {
       setLoading(false);
@@ -51,7 +55,7 @@ export function AdminAiSystemPage() {
       setData(payload);
       setDraft(writable(payload));
     }).catch((cause: unknown) => {
-      if (active) setError(cause instanceof Error ? cause.message : "Không thể tải cấu hình AI.");
+      if (active) setError({ origin: "load", message: cause instanceof Error ? cause.message : "Không thể tải cấu hình AI." });
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []);
@@ -77,6 +81,10 @@ export function AdminAiSystemPage() {
 
   useEffect(() => { if (pendingPeriod) keepEditingButton.current?.focus(); }, [pendingPeriod]);
 
+  useEffect(() => {
+    if (error?.origin === "validation") form.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+  }, [error]);
+
   const save = async () => {
     if (!draft || saving || loading || inFlight.current) return;
     const nextErrors = validateAiConfig(draft);
@@ -84,7 +92,7 @@ export function AdminAiSystemPage() {
     setMessage(null);
     setError(null);
     if (Object.keys(nextErrors).length) {
-      setError("Kiểm tra các trường được đánh dấu trước khi lưu.");
+      setError({ origin: "validation", message: "Kiểm tra các trường được đánh dấu trước khi lưu." });
       return;
     }
     inFlight.current = true;
@@ -94,7 +102,7 @@ export function AdminAiSystemPage() {
       setMessage("Đã lưu cấu hình AI.");
       await loadData(period);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Lưu cấu hình thất bại.");
+      setError({ origin: "save", message: cause instanceof Error ? cause.message : "Lưu cấu hình thất bại." });
     } finally {
       setSaving(false);
       inFlight.current = false;
@@ -118,8 +126,9 @@ export function AdminAiSystemPage() {
     </header>
 
     {error && <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-red-50 p-3 text-sm text-[#C0392B]">
-      <p>{error}</p>
-      <button type="button" disabled={loading || saving} onClick={() => void refresh(period)} className="rounded-xl border border-red-200 px-3 py-2 font-semibold disabled:opacity-60">Thử lại</button>
+      <div><p>{error.message}</p>{error.origin === "save" && <p className="mt-1">Thay đổi của bạn vẫn được giữ. Kiểm tra cấu hình rồi lưu lại.</p>}</div>
+      {error.origin === "load" && <button type="button" disabled={loading || saving} onClick={() => void refresh(period)} className="rounded-xl border border-red-200 px-3 py-2 font-semibold disabled:opacity-60">Thử lại</button>}
+      {error.origin === "save" && <button type="button" disabled={loading || saving} onClick={() => void save()} className="rounded-xl border border-red-200 px-3 py-2 font-semibold disabled:opacity-60">Lưu lại</button>}
     </div>}
     {message && <p role="status" className="rounded-xl bg-teal-50 p-3 text-sm text-teal-800">{message}</p>}
 
@@ -150,7 +159,7 @@ export function AdminAiSystemPage() {
       </div>}
       <AiUsageSummary usage={data.usage} />
       <AiProviderStatus providers={data.providers} />
-      <form noValidate onSubmit={(event) => { event.preventDefault(); void save(); }} className="space-y-4">
+      <form ref={form} noValidate onSubmit={(event) => { event.preventDefault(); void save(); }} className="space-y-4">
         <AiPackageEditor packages={draft.packages} errors={errors.packages} disabled={loading || saving}
           onChange={(tier, field, value) => setDraft((current) => current ? { ...current, packages: { ...current.packages, [tier]: { ...current.packages[tier], [field]: value } } } : current)} />
         <AiPromptEditor prompts={draft.prompts} errors={errors.prompts} disabled={loading || saving}

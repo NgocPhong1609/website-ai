@@ -1,12 +1,15 @@
 <?php
 
+use App\DTOs\AiMessageDto;
 use App\Models\AdminSetting;
 use App\Models\AiUsageLog;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Services\Ai\AiUsageSummaryService;
+use App\Services\Ai\BackupAiService;
 use App\Settings\AiSettingsRepository;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Http;
 
 afterEach(function () {
     CarbonImmutable::setTestNow();
@@ -165,6 +168,70 @@ it('persists exactly the writable free premium packages and prompts', function (
             'ai_cham_bai' => 'Prompt cham bai moi.',
         ]);
 });
+
+it('returns canonical defaults for null and non-string legacy prompts', function (mixed $value) {
+    AdminSetting::create(['key' => 'ai.prompts', 'value' => [
+        'ai_tro_giang' => $value, 'ai_cham_bai' => $value,
+    ]]);
+
+    $this->actingAs(adminForAiConfig(), 'sanctum')->getJson('/api/admin/ai-config')
+        ->assertOk()
+        ->assertJsonPath('prompts.ai_tro_giang', 'Ban la AI tro giang, tra loi ngan gon, de hieu, uu tien tieng Viet.')
+        ->assertJsonPath('prompts.ai_cham_bai', 'Ban la AI cham bai, phan tich theo tieu chi ro rang va cong bang.');
+})->with([null, 42, false, [['nested' => 'invalid']]]);
+
+it('preserves stored string prompts independently of invalid legacy values', function () {
+    AdminSetting::create(['key' => 'ai.prompts', 'value' => [
+        'ai_tro_giang' => 'Stored tutor instruction', 'ai_cham_bai' => null,
+    ]]);
+
+    $this->actingAs(adminForAiConfig(), 'sanctum')->getJson('/api/admin/ai-config')
+        ->assertOk()
+        ->assertJsonPath('prompts.ai_tro_giang', 'Stored tutor instruction')
+        ->assertJsonPath('prompts.ai_cham_bai', 'Ban la AI cham bai, phan tich theo tieu chi ro rang va cong bang.');
+});
+
+it('reports backup readiness using the same effective key as runtime', function ($provider, $direct, $fallback, $ready, $expectedAuthorization) {
+    config([
+        'services.backup_ai.provider' => $provider,
+        'services.backup_ai.api_key' => $direct,
+        'services.openai.key' => $fallback,
+        'services.groq.key' => $fallback,
+    ]);
+    Http::preventStrayRequests();
+    $host = $provider === 'groq' ? 'api.groq.com' : 'api.openai.com';
+    Http::fake([$host.'/*' => Http::response(['choices' => [['message' => ['content' => 'Backup answer']]]])]);
+
+    $response = $this->actingAs(adminForAiConfig(), 'sanctum')->getJson('/api/admin/ai-config');
+    $response->assertOk()->assertJsonPath('providers.backup.configured', $ready);
+    expect($response->json('providers.backup'))->toHaveCount(3);
+    expect($response->getContent())->not->toContain('fixture-key');
+
+    $caught = null;
+    $answer = null;
+    try {
+        $answer = app(BackupAiService::class)->sendMessage([new AiMessageDto('user', 'Question')]);
+    } catch (Exception $exception) {
+        $caught = $exception;
+    }
+    if ($ready) {
+        expect($caught)->toBeNull()->and($answer)->toBe('Backup answer');
+        Http::assertSent(fn ($request) => $request->hasHeader('Authorization', $expectedAuthorization));
+        Http::assertSentCount(1);
+    } else {
+        expect($caught)->toBeInstanceOf(Exception::class);
+        Http::assertNothingSent();
+    }
+})->with([
+    'zero direct without fallback' => ['openai', '0', null, false, null],
+    'zero direct with fallback' => ['groq', '0', 'fixture-key', true, 'Bearer fixture-key'],
+    'whitespace direct without fallback' => ['openai', '   ', null, true, 'Bearer'],
+    'whitespace direct before fallback' => ['groq', '   ', 'fixture-key', true, 'Bearer'],
+    'zero fallback' => ['openai', null, '0', false, null],
+    'whitespace fallback' => ['groq', null, '   ', true, 'Bearer'],
+    'empty keys' => ['openai', '', '', false, null],
+    'direct key' => ['groq', 'direct-fixture-key', 'fixture-key', true, 'Bearer direct-fixture-key'],
+]);
 
 it('uses the legacy student quota as the free package fallback', function () {
     AdminSetting::create([

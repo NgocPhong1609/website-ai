@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AdminSetting;
 use App\Models\AiUsageLog;
 use App\Models\Order;
 use App\Models\User;
@@ -38,7 +39,7 @@ test('admin can fetch dashboard overview data through the api', function () {
             'health' => [['title', 'status', 'color']],
             'users' => [['id', 'name', 'role', 'status']],
             'quickActions' => ['0'],
-            'ai_summary' => ['providers' => ['primary', 'backup'], 'usage'],
+            'ai_summary' => ['providers' => ['primary', 'backup'], 'usage', 'packages' => ['free', 'premium']],
         ])
         ->assertJsonPath('stats.0.value', '3')
         ->assertJsonPath('activities.6.value', 3)
@@ -49,12 +50,31 @@ test('admin can fetch dashboard overview data through the api', function () {
         ->assertJsonPath('ai_summary.usage.tokens.input', 12)
         ->assertJsonPath('ai_summary.usage.tokens.output', 8)
         ->assertJsonPath('ai_summary.usage.cost.available', false)
-        ->assertJsonPath('ai_summary.usage.cost.amount', null);
+        ->assertJsonPath('ai_summary.usage.cost.amount', null)
+        ->assertJsonPath('ai_summary.packages.free.daily_requests', 30)
+        ->assertJsonPath('ai_summary.packages.premium.daily_requests', 200);
 
     foreach (['overview-primary-secret', 'overview-backup-secret', 'private-question', 'private-response', 'private-prompt', 'latency', 'apiKeyHint', 'Ổn định'] as $forbidden) {
         expect(json_encode($response->json(), JSON_UNESCAPED_UNICODE))->not->toContain($forbidden);
     }
-    expect($response->json('ai_summary'))->not->toHaveKeys(['packages', 'prompts', 'systemPrompts', 'quotas']);
+    expect($response->json('ai_summary'))->not->toHaveKeys(['prompts', 'systemPrompts', 'quotas']);
+});
+
+test('overview returns canonical stored and legacy package limits', function () {
+    AdminSetting::create(['key' => 'ai.quotas', 'value' => ['student_daily_questions' => 77]]);
+    $this->actingAs(User::factory()->create(['role' => 'admin']), 'sanctum')
+        ->getJson('/api/admin/overview')->assertOk()
+        ->assertJsonPath('ai_summary.packages.free.daily_requests', 77)
+        ->assertJsonPath('ai_summary.packages.premium.daily_requests', 200);
+
+    AdminSetting::create(['key' => 'ai.packages.v1', 'value' => [
+        'free' => ['daily_requests' => 42, 'daily_tokens' => null],
+        'premium' => ['daily_requests' => 600, 'daily_tokens' => 9000],
+    ]]);
+    $this->getJson('/api/admin/overview')->assertOk()
+        ->assertJsonPath('ai_summary.packages.free.daily_requests', 42)
+        ->assertJsonPath('ai_summary.packages.premium.daily_requests', 600)
+        ->assertJsonPath('ai_summary.packages.premium.daily_tokens', 9000);
 });
 
 test('overview distinguishes zero recorded requests from unavailable AI measurements', function () {

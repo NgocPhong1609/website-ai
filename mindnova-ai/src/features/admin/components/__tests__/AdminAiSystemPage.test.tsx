@@ -86,6 +86,8 @@ describe("AdminAiSystemPage", () => {
     fireEvent.change(screen.getByLabelText("AI Trợ giảng"), { target: { value: " " } });
     fireEvent.click(screen.getByRole("button", { name: "Lưu cấu hình" }));
     expect(screen.getByRole("alert")).toHaveTextContent(/Kiểm tra/);
+    expect(screen.queryByRole("button", { name: "Thử lại" })).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Premium · Yêu cầu / ngày")).toHaveFocus();
     expect(screen.getByLabelText("Premium · Yêu cầu / ngày")).toHaveAttribute("aria-invalid", "true");
     expect(screen.getByLabelText("AI Trợ giảng")).toHaveAccessibleDescription(/Nội dung bắt buộc/);
     expect(vi.mocked(adminApi).mock.calls.some(([, options]) => options?.method === "PUT")).toBe(false);
@@ -116,6 +118,41 @@ describe("AdminAiSystemPage", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Không thể lưu");
     expect(screen.getByLabelText("AI Trợ giảng")).toHaveValue("Giải thích từng bước");
     expect(screen.getByRole("button", { name: "Lưu cấu hình" })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: "Thử lại" })).not.toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(/Thay đổi của bạn vẫn được giữ/);
+    const refreshed = fixture();
+    refreshed.prompts.ai_tro_giang = "Giải thích từng bước";
+    vi.mocked(adminApi).mockResolvedValueOnce({ message: "Saved" }).mockResolvedValueOnce(refreshed);
+    fireEvent.click(screen.getByRole("button", { name: "Lưu lại" }));
+    await screen.findByText("Đã lưu cấu hình AI.");
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("AI Trợ giảng")).toHaveValue("Giải thích từng bước");
+    expect(vi.mocked(adminApi).mock.calls.map(([, options]) => options?.method ?? "GET")).toEqual(["GET", "PUT", "PUT", "GET"]);
+  });
+
+  it.each([null, 42, false, { nested: "invalid" }])("renders usable canonical prompt defaults for a legacy %j response", async (legacy) => {
+    const data = fixture();
+    Object.assign(data.prompts, { ai_tro_giang: legacy, ai_cham_bai: legacy });
+    vi.mocked(adminApi).mockResolvedValueOnce(data);
+    await loaded();
+    expect(screen.getByLabelText("AI Trợ giảng")).toHaveValue("Ban la AI tro giang, tra loi ngan gon, de hieu, uu tien tieng Viet.");
+    expect(screen.getByLabelText("AI Chấm bài")).toHaveValue("Ban la AI cham bai, phan tich theo tieu chi ro rang va cong bang.");
+    expect(screen.getByLabelText("AI Trợ giảng")).toHaveAccessibleDescription(/67\/4000/);
+    fireEvent.change(screen.getByLabelText("AI Chấm bài"), { target: { value: "Updated grading prompt" } });
+    fireEvent.click(screen.getByRole("button", { name: "Hủy thay đổi" }));
+    expect(screen.getByLabelText("AI Chấm bài")).toHaveValue("Ban la AI cham bai, phan tich theo tieu chi ro rang va cong bang.");
+    expect(screen.getByRole("button", { name: "Lưu cấu hình" })).toBeDisabled();
+  });
+
+  it("offers reload when the canonical fetch after a successful save fails", async () => {
+    await loaded();
+    vi.mocked(adminApi).mockResolvedValueOnce({ message: "Saved" }).mockRejectedValueOnce(new Error("Tải lại thất bại"));
+    fireEvent.change(screen.getByLabelText("Free · Yêu cầu / ngày"), { target: { value: "80" } });
+    fireEvent.click(screen.getByRole("button", { name: "Lưu cấu hình" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Tải lại thất bại");
+    expect(screen.getByRole("button", { name: "Thử lại" })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: "Lưu lại" })).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Free · Yêu cầu / ngày")).toHaveValue(80);
   });
 
   it("asks before refresh replaces dirty edits and supports keeping or discarding them", async () => {
@@ -195,5 +232,6 @@ describe("AdminAiSystemPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Bỏ thay đổi và tải lại" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Tải lại thất bại");
     expect(screen.getByLabelText("Free · Yêu cầu / ngày")).toHaveValue(80);
+    expect(screen.getByRole("button", { name: "Thử lại" })).toBeEnabled();
   });
 });

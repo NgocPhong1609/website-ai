@@ -62,7 +62,7 @@ return [
 
     // The existing tutor stream uses the OpenAI-compatible chat endpoint.
     'ai_tutor' => [
-        'provider' => env('AI_TUTOR_PROVIDER', 'groq'),
+        'provider' => env('AI_TUTOR_PROVIDER'),
         'model' => env('AI_DEFAULT_MODEL', 'llama-3.1-8b-instant'),
         'openai_base_uri' => env('OPENAI_BASE_URI', ''),
         'gemini_base_uri' => env('GEMINI_BASE_URI', ''),

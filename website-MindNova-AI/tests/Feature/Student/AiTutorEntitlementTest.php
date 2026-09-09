@@ -94,6 +94,48 @@ class AiTutorEntitlementTest extends TestCase
         return [['http', 'http_503'], ['connection', 'connection_error']];
     }
 
+    public static function tutorProviders(): array
+    {
+        return [
+            'missing setting preserves legacy openai' => [null, 'openai', 'openai'],
+            'blank setting preserves legacy openai' => ['', 'openai', 'openai'],
+            'whitespace setting preserves legacy openai' => ['   ', 'openai', 'openai'],
+            'legacy groq stays supported' => [null, 'groq', 'groq'],
+            'explicit groq wins over legacy openai' => ['groq', 'openai', 'groq'],
+            'explicit openai wins over legacy groq' => ['openai', 'groq', 'openai'],
+            'unsupported legacy provider uses safe default' => [null, 'claude', 'groq'],
+            'legacy gemini does not select the router primary' => [null, 'gemini', 'groq'],
+            'absent legacy primary uses safe default' => [null, null, 'groq'],
+        ];
+    }
+
+    #[DataProvider('tutorProviders')]
+    public function test_tutor_provider_compatibility(?string $configured, ?string $legacy, string $expected): void
+    {
+        config([
+            'services.ai_tutor.provider' => $configured,
+            'services.ai_tutor.openai_base_uri' => 'https://api.openai.com/v1',
+            'services.openai.key' => 'openai-fixture-key',
+            'services.groq.key' => 'groq-fixture-key',
+        ]);
+        AdminSetting::create(['key' => 'ai.providers', 'value' => ['primary' => $legacy]]);
+        Http::preventStrayRequests();
+        $host = $expected === 'openai' ? 'api.openai.com' : 'api.groq.com';
+        Http::fake([$host.'/*' => Http::response([
+            'choices' => [['message' => ['content' => 'Compatible tutor answer']]],
+        ])]);
+
+        $response = $this->actingAs(User::factory()->create())
+            ->postJson('/api/student/ai-tutor/chat', ['message' => 'Explain addition']);
+        $response->assertOk();
+        $this->assertSame('Compatible tutor answer', $response->streamedContent());
+        Http::assertSent(fn ($request) => $request->url() === 'https://'.$host.'/'.($expected === 'groq' ? 'openai/' : '').'v1/chat/completions'
+            && $request->hasHeader('Authorization', 'Bearer '.$expected.'-fixture-key'));
+        Http::assertSentCount(1);
+        $this->assertSame($expected, AiUsageLog::sole()->provider);
+        $this->assertStringNotContainsString('fixture-key', AiUsageLog::sole()->toJson());
+    }
+
     #[DataProvider('providerFailures')]
     public function test_failed_tutor_requests_do_not_invent_usage(string $failure, string $errorCode): void
     {

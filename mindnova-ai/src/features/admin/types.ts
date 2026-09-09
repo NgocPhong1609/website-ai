@@ -96,7 +96,7 @@ export type AdminInvoicesPageData = {
 
 export type AdminOverviewData = {
  error?: string;
- ai_summary: Pick<AdminAiSystemData, "providers" | "usage"> | null;
+ ai_summary: Pick<AdminAiSystemData, "providers" | "usage" | "packages"> | null;
  hero: {
  title: string;
  description: string;

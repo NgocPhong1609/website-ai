@@ -84,12 +84,15 @@ class AiUsageObservabilityTest extends TestCase
     public function test_authentication_and_configuration_errors_never_fall_back(int $status): void
     {
         Http::fake(['generativelanguage.googleapis.com/*' => Http::response('private-provider-body', $status)]);
+        $exception = null;
         try {
             $this->send();
-            $this->fail('Expected a provider exception');
-        } catch (\Exception $exception) {
-            $this->assertStringNotContainsString('private-provider-body', $exception->getMessage());
+        } catch (\Exception $caught) {
+            $exception = $caught;
         }
+        $this->assertInstanceOf(\Exception::class, $exception, 'Expected a provider exception');
+        $this->assertStringNotContainsString('private-provider-body', $exception->getMessage());
+        $this->assertNull($exception->getPrevious());
         Http::assertSentCount(1);
         $log = AiUsageLog::sole();
         $this->assertSame('failed', $log->status);
@@ -104,12 +107,15 @@ class AiUsageObservabilityTest extends TestCase
             'generativelanguage.googleapis.com/*' => fn () => throw new ConnectionException('cURL private-key private-prompt'),
             'api.openai.com/*' => Http::response('private-provider-body', 401),
         ]);
+        $exception = null;
         try {
             $this->send();
-            $this->fail('Expected both providers to fail');
-        } catch (\Exception $exception) {
-            $this->assertStringNotContainsString('private-', $exception->getMessage());
+        } catch (\Exception $caught) {
+            $exception = $caught;
         }
+        $this->assertInstanceOf(\Exception::class, $exception, 'Expected both providers to fail');
+        $this->assertStringNotContainsString('private-', $exception->getMessage());
+        $this->assertNull($exception->getPrevious());
         foreach (['error', 'warning', 'info'] as $level) {
             Log::shouldNotHaveReceived($level, fn ($message, $context = []) => str_contains($message.json_encode($context), 'private-'));
         }

@@ -18,6 +18,7 @@ function fixture(): AdminOverviewData {
     activities: [{ label: "Mon", value: 3 }, { label: "Tue", value: 8 }],
     health: [], users: [], quickActions: [],
     ai_summary: {
+      packages: { free: { daily_requests: 42, daily_tokens: null }, premium: { daily_requests: 600, daily_tokens: 9000 } },
       providers: {
         primary: { name: "gemini", model: "gemini-test", configured: true },
         backup: { name: "openai", model: "backup-test", configured: false },
@@ -46,6 +47,12 @@ it("mounts Overview at /admin with the final read-only AI summary and configurat
   expect(within(summary).getByRole("link", { name: "Cấu hình AI & Hệ thống" })).toHaveAttribute("href", "/admin/ai-system");
   expect(within(summary).queryByRole("textbox")).not.toBeInTheDocument();
   expect(within(summary).queryByRole("button")).not.toBeInTheDocument();
+  expect(within(summary).queryByRole("spinbutton")).not.toBeInTheDocument();
+  const limits = within(summary).getByRole("region", { name: "Hạn mức AI Trợ giảng" });
+  expect(within(limits).getByText("Free")).toBeVisible();
+  expect(within(limits).getByText("42 yêu cầu / ngày")).toBeVisible();
+  expect(within(limits).getByText("Premium")).toBeVisible();
+  expect(within(limits).getByText("600 yêu cầu / ngày")).toBeVisible();
 });
 
 it("shows configured providers, true zero requests and unavailable token/cost values", async () => {
@@ -96,4 +103,5 @@ it("renders a fully shaped unavailable state when Overview cannot be fetched", a
   expect(screen.getByText("Chưa có dữ liệu AI.")).toBeVisible();
   expect(screen.getByRole("link", { name: "Cấu hình AI & Hệ thống" })).toHaveAttribute("href", "/admin/ai-system");
   expect(screen.queryByText("Đã cấu hình")).not.toBeInTheDocument();
+  expect(screen.queryByRole("region", { name: "Hạn mức AI Trợ giảng" })).not.toBeInTheDocument();
 });
