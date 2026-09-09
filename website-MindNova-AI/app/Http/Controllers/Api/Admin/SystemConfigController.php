@@ -4,13 +4,17 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateAiConfigRequest;
+use App\Services\Ai\AiUsageSummaryService;
 use App\Settings\AiSettingsRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SystemConfigController extends Controller
 {
-    public function __construct(private readonly AiSettingsRepository $settings) {}
+    public function __construct(
+        private readonly AiSettingsRepository $settings,
+        private readonly AiUsageSummaryService $usage,
+    ) {}
 
     public function show(Request $request): JsonResponse
     {
@@ -18,10 +22,7 @@ class SystemConfigController extends Controller
 
         return response()->json([
             'providers' => $this->settings->providerReadiness(),
-            'usage' => [
-                'period' => $period,
-                'available' => false,
-            ],
+            'usage' => $this->usage->summarize($period),
             'packages' => $this->settings->packages(),
             'prompts' => $this->settings->prompts(),
             'updated_at' => $this->settings->updatedAt(),

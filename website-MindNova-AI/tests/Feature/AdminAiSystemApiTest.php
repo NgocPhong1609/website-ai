@@ -1,9 +1,16 @@
 <?php
 
 use App\Models\AdminSetting;
+use App\Models\AiUsageLog;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Services\Ai\AiUsageSummaryService;
 use App\Settings\AiSettingsRepository;
+use Carbon\CarbonImmutable;
+
+afterEach(function () {
+    CarbonImmutable::setTestNow();
+});
 
 function aiConfigPayload(array $overrides = []): array
 {
@@ -25,6 +32,29 @@ function adminForAiConfig(): User
         'role' => 'admin',
         'email_verified_at' => now(),
     ]);
+}
+
+function aiUsageRecord(array $attributes = []): AiUsageLog
+{
+    $createdAt = $attributes['created_at'] ?? now();
+    unset($attributes['created_at']);
+
+    $log = AiUsageLog::query()->create(array_replace([
+        'actor_type' => 'system',
+        'actor_key' => 'system',
+        'provider' => 'gemini',
+        'model' => 'gemini-2.5-flash',
+        'input_tokens' => 0,
+        'output_tokens' => 0,
+        'cost_estimate' => 0,
+    ], $attributes));
+
+    $log->forceFill([
+        'created_at' => $createdAt,
+        'updated_at' => $createdAt,
+    ])->saveQuietly();
+
+    return $log;
 }
 
 it('requires authentication to read the admin AI configuration', function () {
@@ -206,4 +236,185 @@ it('resolves only a current active premium subscription as premium', function ()
     expect($repository->packageForUser($premiumUser))->toBe('premium')
         ->and($repository->packageForUser($expiredPremiumUser))->toBe('free')
         ->and($repository->packageForUser(null))->toBe('free');
+});
+
+it('summarizes usage within application timezone boundaries', function () {
+    config()->set('app.timezone', 'Asia/Ho_Chi_Minh');
+    CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-09-09 12:00:00', 'Asia/Ho_Chi_Minh'));
+
+    aiUsageRecord([
+        'provider' => 'gemini',
+        'model' => 'gemini-2.5-flash',
+        'status' => 'success',
+        'input_tokens' => 100,
+        'output_tokens' => 50,
+        'token_source' => 'provider',
+        'cost_amount' => 0.12,
+        'cost_currency' => 'USD',
+        'cost_source' => 'provider',
+        'created_at' => CarbonImmutable::parse('2026-09-03 00:00:00', 'Asia/Ho_Chi_Minh'),
+    ]);
+    aiUsageRecord([
+        'provider' => 'openai',
+        'model' => 'gpt-5-mini',
+        'status' => 'failed',
+        'input_tokens' => 30,
+        'output_tokens' => 15,
+        'token_source' => 'estimated',
+        'cost_amount' => 0.03,
+        'cost_currency' => 'USD',
+        'cost_source' => 'estimated',
+        'created_at' => CarbonImmutable::parse('2026-09-09 11:00:00', 'Asia/Ho_Chi_Minh'),
+    ]);
+    aiUsageRecord([
+        'provider' => 'gemini',
+        'model' => 'gemini-2.5-flash',
+        'status' => null,
+        'token_source' => 'unavailable',
+        'cost_amount' => null,
+        'cost_source' => 'unavailable',
+        'created_at' => CarbonImmutable::parse('2026-09-09 11:30:00', 'Asia/Ho_Chi_Minh'),
+    ]);
+
+    aiUsageRecord([
+        'status' => 'success',
+        'token_source' => 'provider',
+        'cost_amount' => 99,
+        'cost_currency' => 'USD',
+        'cost_source' => 'provider',
+        'created_at' => CarbonImmutable::parse('2026-09-02 23:59:59', 'Asia/Ho_Chi_Minh'),
+    ]);
+    aiUsageRecord([
+        'status' => 'success',
+        'token_source' => 'provider',
+        'cost_amount' => 99,
+        'cost_currency' => 'USD',
+        'cost_source' => 'provider',
+        'created_at' => CarbonImmutable::parse('2026-09-10 00:00:00', 'Asia/Ho_Chi_Minh'),
+    ]);
+
+    $summary = app(AiUsageSummaryService::class)->summarize('7d');
+
+    expect($summary)
+        ->period->toBe('7d')
+        ->from->toBe('2026-09-03')
+        ->to->toBe('2026-09-09')
+        ->coverage->toBe('recorded_requests')
+        ->requests->toBe([
+            'total' => 3,
+            'successful' => 1,
+            'failed' => 1,
+            'status_unavailable' => 1,
+        ])
+        ->tokens->toBe([
+            'input' => 130,
+            'output' => 65,
+            'available' => true,
+            'source' => 'mixed',
+        ])
+        ->cost->toBe([
+            'amount' => 0.15,
+            'currency' => 'USD',
+            'available' => true,
+            'source' => 'mixed',
+        ])
+        ->and($summary['daily_trend'])->toHaveCount(7)
+        ->and($summary['daily_trend'][0])->toBe(['date' => '2026-09-03', 'requests' => 1])
+        ->and($summary['daily_trend'][6])->toBe(['date' => '2026-09-09', 'requests' => 2])
+        ->and($summary['provider_breakdown'])->toBe([
+            ['provider' => 'gemini', 'model' => 'gemini-2.5-flash', 'requests' => 2],
+            ['provider' => 'openai', 'model' => 'gpt-5-mini', 'requests' => 1],
+        ]);
+});
+
+it('keeps unavailable usage cost and tokens distinct from real zero values', function () {
+    CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-09-09 12:00:00', config('app.timezone')));
+
+    aiUsageRecord([
+        'input_tokens' => 120,
+        'output_tokens' => 80,
+        'cost_estimate' => 4.25,
+        'token_source' => 'unavailable',
+        'cost_amount' => null,
+        'cost_source' => 'unavailable',
+    ]);
+
+    $unavailable = app(AiUsageSummaryService::class)->summarize('7d');
+
+    expect($unavailable['requests']['total'])->toBe(1)
+        ->and($unavailable['tokens'])->toBe([
+            'input' => null,
+            'output' => null,
+            'available' => false,
+            'source' => 'unavailable',
+        ])
+        ->and($unavailable['cost'])->toBe([
+            'amount' => null,
+            'currency' => null,
+            'available' => false,
+            'source' => 'unavailable',
+        ]);
+
+    AiUsageLog::query()->delete();
+    aiUsageRecord([
+        'token_source' => 'provider',
+        'cost_amount' => 0,
+        'cost_currency' => 'USD',
+        'cost_source' => 'provider',
+    ]);
+
+    $realZero = app(AiUsageSummaryService::class)->summarize('7d');
+
+    expect($realZero['tokens'])->toBe([
+        'input' => 0,
+        'output' => 0,
+        'available' => true,
+        'source' => 'provider',
+    ])->and($realZero['cost'])->toBe([
+        'amount' => 0.0,
+        'currency' => 'USD',
+        'available' => true,
+        'source' => 'provider',
+    ]);
+});
+
+it('returns zero recorded usage and defaults an unsupported usage period to seven days', function () {
+    CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-09-09 12:00:00', config('app.timezone')));
+
+    $summary = app(AiUsageSummaryService::class)->summarize('yearly');
+
+    expect($summary['period'])->toBe('7d')
+        ->and($summary['requests'])->toBe([
+            'total' => 0,
+            'successful' => 0,
+            'failed' => 0,
+            'status_unavailable' => 0,
+        ])
+        ->and($summary['tokens']['available'])->toBeFalse()
+        ->and($summary['cost']['available'])->toBeFalse()
+        ->and($summary['daily_trend'])->toHaveCount(7)
+        ->and(collect($summary['daily_trend'])->sum('requests'))->toBe(0)
+        ->and($summary['provider_breakdown'])->toBe([]);
+});
+
+it('returns the stored usage summary through the canonical admin API', function () {
+    aiUsageRecord([
+        'status' => 'success',
+        'input_tokens' => 10,
+        'output_tokens' => 4,
+        'token_source' => 'provider',
+        'cost_amount' => null,
+        'cost_source' => 'unavailable',
+    ]);
+
+    $response = $this->actingAs(adminForAiConfig(), 'sanctum')
+        ->getJson('/api/admin/ai-config?period=30d');
+
+    $response->assertOk()
+        ->assertJsonPath('usage.period', '30d')
+        ->assertJsonPath('usage.available', true)
+        ->assertJsonPath('usage.requests.total', 1)
+        ->assertJsonPath('usage.tokens.input', 10)
+        ->assertJsonPath('usage.cost.amount', null)
+        ->assertJsonPath('usage.cost.available', false);
 });
