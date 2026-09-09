@@ -3,13 +3,18 @@
 namespace Tests\Feature;
 
 use App\DTOs\AiMessageDto;
+use App\Models\AdminSetting;
+use App\Models\AiTutorMessage;
 use App\Models\AiUsageLog;
+use App\Models\User;
 use App\Services\Ai\AiRouterService;
+use App\Services\Student\StudyPlanService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Feature\Student\CourseAiTutorServiceTest;
 use Tests\TestCase;
 
 class AiUsageObservabilityTest extends TestCase
@@ -28,6 +33,45 @@ class AiUsageObservabilityTest extends TestCase
     {
         return app(AiRouterService::class)->sendMessageWithFallback([new AiMessageDto('user', 'private-prompt')],
             ['feature' => 'ai_tutor', 'authorization' => 'Bearer private-key', 'ip' => '192.0.2.1', 'user_agent' => 'private-agent']);
+    }
+
+    public function test_live_tutor_fallback_logs_only_safe_metrics_and_persists_only_actual_chat_content(): void
+    {
+        $student = User::factory()->create();
+        $lesson = CourseAiTutorServiceTest::enrolledLesson($student);
+        AdminSetting::create(['key' => 'ai.prompts', 'value' => ['ai_tro_giang' => 'private-admin-style']]);
+        config(['services.gemini.force_failure' => false]);
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response('private-provider-body secret-key', 503),
+            'api.openai.com/*' => Http::response([
+                'id' => 'backup-tutor-response', 'choices' => [['message' => ['content' => 'private-answer']]],
+                'usage' => ['prompt_tokens' => 20, 'completion_tokens' => 8],
+            ]),
+        ]);
+
+        $answer = app(StudyPlanService::class)->askAiTutor($student, 'private-question', $lesson->id, [
+            ['sender' => 'ai', 'text' => 'private-history'],
+        ]);
+
+        $this->assertSame('private-answer', $answer['text']);
+        $logs = AiUsageLog::orderBy('id')->get();
+        $this->assertSame(['gemini', 'gemini', 'backup'], $logs->pluck('provider')->all());
+        $this->assertSame(['failed', 'failed', 'success'], $logs->pluck('status')->all());
+        $this->assertSame(['http_503', 'http_503', null], $logs->pluck('error_code')->all());
+        $this->assertSame([false, false, true], $logs->pluck('fallback_used')->all());
+        $this->assertCount(1, $logs->pluck('request_id')->unique());
+        foreach ($logs as $log) {
+            $this->assertSame($student->id, $log->user_id);
+            $this->assertSame(['feature' => 'ai_tutor'], $log->meta);
+            foreach (['private-', 'secret-key', 'backup-secret', 'COURSE_CONTEXT', 'Laravel căn bản', '192.0.2.1', 'user_agent'] as $secret) {
+                $this->assertStringNotContainsString($secret, $log->toJson(JSON_UNESCAPED_UNICODE));
+            }
+        }
+        $this->assertSame(20, $logs->last()->input_tokens);
+        $this->assertSame(8, $logs->last()->output_tokens);
+        $this->assertSame('backup-tutor-response', $logs->last()->provider_request_id);
+        $this->assertSame(['private-question', 'private-answer'], AiTutorMessage::orderBy('id')->pluck('message')->all());
+        Http::assertSentCount(3);
     }
 
     public function test_primary_success_logs_provider_tokens_and_only_safe_metadata(): void

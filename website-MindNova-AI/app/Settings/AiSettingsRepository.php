@@ -41,6 +41,9 @@ class AiSettingsRepository
         return $packages;
     }
 
+    /**
+     * Editable teaching style; the course Tutor applies immutable platform rules separately.
+     */
     public function prompts(): array
     {
         $storedPrompts = $this->settingValue('ai.prompts');
