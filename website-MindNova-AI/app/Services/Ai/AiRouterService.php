@@ -3,10 +3,10 @@
 namespace App\Services\Ai;
 
 use App\Contracts\AiProviderInterface;
-use App\DTOs\AiMessageDto;
 use App\Exceptions\AiTransientException;
-use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class AiRouterService
 {
@@ -18,7 +18,7 @@ class AiRouterService
     ) {
         $this->providers = [
             'primary' => $primaryProvider,
-            'backup' => $backupProvider
+            'backup' => $backupProvider,
         ];
     }
 
@@ -29,32 +29,30 @@ class AiRouterService
      */
     public function sendMessageWithFallback(array $messages, array $options = []): array
     {
-        $requestId = uniqid('ai_req_');
+        $requestId = (string) Str::uuid();
         $startTime = microtime(true);
-        $primaryOptions = array_merge($options, ['max_retries' => 2]); // Total 2 attempts (1 initial + 1 retry)
-        $backupOptions = array_merge($options, ['max_retries' => 1]);  // Total 1 attempt (0 retries)
+        $primaryOptions = array_merge($options, ['max_retries' => 2, 'request_id' => $requestId, 'fallback_used' => false]); // Total 2 attempts
+        $backupOptions = array_merge($options, ['max_retries' => 1, 'request_id' => $requestId, 'fallback_used' => true]); // Total 1 attempt
 
-        $primaryError = "Unknown error";
         try {
             Log::info("[AI Router] Primary provider: {$this->primaryProvider->getProviderName()}");
             $response = $this->primaryProvider->sendMessage($messages, $primaryOptions);
-            
+
             $duration = round((microtime(true) - $startTime) * 1000);
             Log::info("AI Request Route: [{$requestId}] Primary Success. Duration: {$duration}ms");
-            
+
             return [
                 'content' => $response,
                 'meta' => [
                     'provider' => $this->primaryProvider->getProviderName(),
                     'fallbackUsed' => false,
                     'requestId' => $requestId,
-                    'durationMs' => $duration
-                ]
+                    'durationMs' => $duration,
+                ],
             ];
-            
-        } catch (\Throwable $e) {
-            $primaryError = $e->getMessage();
-            Log::warning("[AI Router] Primary provider failed ({$this->primaryProvider->getProviderName()}): {$e->getMessage()}");
+
+        } catch (AiTransientException $e) {
+            Log::warning("[AI Router] Primary provider unavailable ({$this->primaryProvider->getProviderName()})", ['request_id' => $requestId]);
             Log::warning("[AI Router] Switching to Backup AI provider ({$this->backupProvider->getProviderName()})");
         }
 
@@ -62,13 +60,13 @@ class AiRouterService
         try {
             $fallbackStartTime = microtime(true);
             Log::info("[AI Router] Backup provider: {$this->backupProvider->getProviderName()}");
-            Log::info("[AI Router] Backup request started");
+            Log::info('[AI Router] Backup request started');
             $response = $this->backupProvider->sendMessage($messages, $backupOptions);
-            
+
             $duration = round((microtime(true) - $fallbackStartTime) * 1000);
             $totalDuration = round((microtime(true) - $startTime) * 1000);
-            Log::info("[AI Router] Backup request succeeded");
-            Log::info("[AI Router] fallbackUsed=true");
+            Log::info('[AI Router] Backup request succeeded');
+            Log::info('[AI Router] fallbackUsed=true');
 
             return [
                 'content' => $response,
@@ -76,16 +74,14 @@ class AiRouterService
                     'provider' => $this->backupProvider->getProviderName(),
                     'fallbackUsed' => true,
                     'requestId' => $requestId,
-                    'durationMs' => $totalDuration
-                ]
+                    'durationMs' => $totalDuration,
+                ],
             ];
-            
+
         } catch (Exception $e) {
             $duration = round((microtime(true) - $startTime) * 1000);
-            Log::error("[AI Router] Backup failed: {$e->getMessage()}. Total Duration: {$duration}ms");
-            
-            $backupError = $e->getMessage();
-            throw new Exception("Tất cả các dịch vụ AI đều gặp sự cố. Lỗi Primary: {$primaryError} | Lỗi Backup: {$backupError}", 0, $e);
+            Log::error("[AI Router] Backup failed. Total Duration: {$duration}ms", ['request_id' => $requestId]);
+            throw new Exception('Tất cả các dịch vụ AI đều gặp sự cố. Vui lòng thử lại sau.');
         }
     }
 
@@ -96,6 +92,7 @@ class AiRouterService
     {
         $opts = is_array($options) ? $options : ['response_format' => $options];
         $res = $this->sendMessageWithFallback($messages, $opts);
+
         return $res['content'] ?? '';
     }
 }

@@ -51,12 +51,25 @@ return [
     'gemini' => [
         'api_key' => env('GEMINI_API_KEY'),
         'model' => env('GEMINI_MODEL', 'gemini-3.6-flash'),
+        'force_failure' => env('AI_FORCE_PRIMARY_FAILURE', false),
     ],
 
     // AI trả lời câu hỏi / hỗ trợ học sinh (chat)
     'groq' => [
         'key' => env('GROQ_API_KEY'),
         'model' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+    ],
+
+    // The existing tutor stream uses the OpenAI-compatible chat endpoint.
+    'ai_tutor' => [
+        'provider' => env('AI_TUTOR_PROVIDER', 'groq'),
+        'model' => env('AI_DEFAULT_MODEL', 'llama-3.1-8b-instant'),
+        'openai_base_uri' => env('OPENAI_BASE_URI', ''),
+        'gemini_base_uri' => env('GEMINI_BASE_URI', ''),
+        'claude_base_uri' => env('CLAUDE_BASE_URI', ''),
+        'internal_base_uri' => env('INTERNAL_AI_BASE_URI', ''),
+        'claude_key' => env('CLAUDE_API_KEY'),
+        'internal_key' => env('INTERNAL_AI_KEY'),
     ],
 
     'backup_ai' => [

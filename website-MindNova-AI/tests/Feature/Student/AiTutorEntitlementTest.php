@@ -1,0 +1,84 @@
+<?php
+
+namespace Tests\Feature\Student;
+
+use App\Models\AdminSetting;
+use App\Models\AiUsageLog;
+use App\Models\Subscription;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\TestCase;
+
+class AiTutorEntitlementTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public static function packages(): array
+    {
+        return [['none', 2], ['active', 4], ['expired', 2], ['overlapping', 4]];
+    }
+
+    #[DataProvider('packages')]
+    public function test_package_boundary_blocks_http(string $subscription, int $limit): void
+    {
+        $user = User::factory()->create();
+        AdminSetting::create(['key' => 'ai.packages.v1', 'value' => [
+            'free' => ['daily_requests' => 2], 'premium' => ['daily_requests' => 4],
+        ]]);
+        if ($subscription !== 'none') {
+            Subscription::create(['user_id' => $user->id, 'plan' => 'premium', 'status' => 'active',
+                'expires_at' => $subscription === 'expired' ? now()->subDay() : now()->addDay(),
+                'created_at' => now()->subDays(2)]);
+        }
+        if ($subscription === 'overlapping') {
+            Subscription::create(['user_id' => $user->id, 'plan' => 'premium', 'status' => 'cancelled',
+                'expires_at' => now()->addDays(2)]);
+        }
+        for ($i = 0; $i < $limit; $i++) {
+            AiUsageLog::create(['user_id' => $user->id, 'meta' => ['feature' => 'ai_tutor']]);
+        }
+        Http::fake();
+        $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', ['message' => 'Explain addition'])
+            ->assertStatus(429)->assertJsonPath('meta.daily_limit', $limit)->assertJsonPath('meta.used', $limit);
+        Http::assertNothingSent();
+    }
+
+    public function test_only_tutor_rows_count_and_stream_records_sanitized_provider_usage(): void
+    {
+        $user = User::factory()->create();
+        config(['services.ai_tutor.provider' => 'groq', 'services.groq.key' => 'secret-key']);
+        AdminSetting::create(['key' => 'ai.packages.v1', 'value' => ['free' => ['daily_requests' => 2]]]);
+        AdminSetting::create(['key' => 'ai.prompts', 'value' => ['ai_tro_giang' => 'Stored tutor instruction']]);
+        AiUsageLog::create(['user_id' => $user->id, 'meta' => ['feature' => 'quiz']]);
+        AiUsageLog::create(['user_id' => $user->id, 'meta' => ['feature' => 'ai_notification']]);
+        // Legacy tutor rows have no feature but retain tutor content; unrelated system rows do not.
+        AiUsageLog::create(['user_id' => $user->id, 'input_text' => 'Legacy question', 'system_prompt' => 'Legacy tutor instruction']);
+        Http::fake(['api.groq.com/*' => Http::response([
+            'id' => 'chat-request-1', 'choices' => [['message' => ['content' => 'Four']]],
+            'usage' => ['prompt_tokens' => 11, 'completion_tokens' => 3],
+        ])]);
+        $response = $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', ['message' => 'What is two plus two?']);
+        $response->assertOk()->assertHeader('Content-Type', 'text/event-stream; charset=UTF-8');
+        $this->assertSame('Four', $response->streamedContent());
+        Http::assertSent(fn ($request) => $request['messages'][0]['content'] === 'Stored tutor instruction');
+        $log = AiUsageLog::latest('id')->first();
+        $this->assertSame(['feature' => 'ai_tutor'], $log->meta);
+        $this->assertSame('provider', $log->token_source);
+        $this->assertSame(11, $log->input_tokens);
+        $this->assertSame(3, $log->output_tokens);
+        $this->assertSame('success', $log->status);
+        $this->assertSame('chat-request-1', $log->provider_request_id);
+        $this->assertNotNull($log->request_id);
+        $this->assertNotNull($log->duration_ms);
+        $this->assertNull($log->cost_amount);
+        $this->assertSame('unavailable', $log->cost_source);
+        $this->assertNull($log->input_text);
+        $this->assertNull($log->output_text);
+        $this->assertNull($log->system_prompt);
+        $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', ['message' => 'Another question'])
+            ->assertStatus(429)->assertJsonPath('meta.used', 2);
+        Http::assertSentCount(1);
+    }
+}

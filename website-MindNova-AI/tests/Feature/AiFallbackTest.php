@@ -6,6 +6,7 @@ use App\Services\Ai\AiRouterService;
 use App\Services\Ai\GeminiAiService;
 use App\Services\Ai\BackupAiService;
 use App\DTOs\AiMessageDto;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
@@ -13,6 +14,8 @@ use Tests\TestCase;
 
 class AiFallbackTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();

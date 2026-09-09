@@ -4,16 +4,20 @@ namespace App\Http\Controllers\Api\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
-use App\Models\AdminSetting;
 use App\Models\AiModerationFlag;
 use App\Models\AiUsageLog;
 use App\Models\User;
+use App\Settings\AiSettingsRepository;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AiTutorController extends Controller
 {
+    public function __construct(private readonly AiSettingsRepository $settings) {}
+
     public function streamChat(Request $request)
     {
         $userMessage = trim((string) $request->input('message', ''));
@@ -26,19 +30,21 @@ class AiTutorController extends Controller
 
         $user = $request->user();
         $actorType = $this->resolveActorType($user);
-        $actorKey = $user ? 'user:' . $user->id : sha1(($request->ip() ?? 'unknown') . '|' . ($request->userAgent() ?? 'unknown'));
+        $actorKey = $user ? 'user:'.$user->id : sha1(($request->ip() ?? 'unknown').'|'.($request->userAgent() ?? 'unknown'));
 
-        $quotas = $this->getSetting('ai.quotas', [
-            'student_daily_questions' => 30,
-            'guest_daily_questions' => 5,
-        ]);
-
-        $dailyLimit = $actorType === 'guest'
-            ? (int) ($quotas['guest_daily_questions'] ?? 5)
-            : (int) ($quotas['student_daily_questions'] ?? 30);
+        $package = $this->settings->packageForUser($user);
+        $dailyLimit = (int) $this->settings->packages()[$package]['daily_requests'];
 
         $todayCount = AiUsageLog::query()
             ->whereDate('created_at', now()->toDateString())
+            ->where(function ($query) {
+                $query->where('meta->feature', 'ai_tutor')
+                    ->orWhere(function ($legacy) {
+                        // Older tutor rows retained these fields but had no feature metadata.
+                        $legacy->whereNull('meta->feature')
+                            ->whereNotNull('input_text')->whereNotNull('system_prompt');
+                    });
+            })
             ->where(function ($query) use ($user, $actorKey) {
                 if ($user) {
                     $query->where('user_id', $user->id);
@@ -74,16 +80,9 @@ class AiTutorController extends Controller
             ], 422);
         }
 
-        $providers = $this->getSetting('ai.providers', [
-            'primary' => 'groq',
-        ]);
-        $prompts = $this->getSetting('ai.prompts', [
-            'ai_tro_giang' => 'Ban la Nova, tro giang AI than thien, tra loi ngan gon va de hieu bang tieng Viet.',
-        ]);
-
-        $provider = (string) ($providers['primary'] ?? 'groq');
-        $systemPrompt = (string) ($prompts['ai_tro_giang'] ?? 'Ban la tro giang AI than thien, tra loi bang tieng Viet.');
-        $model = (string) env('AI_DEFAULT_MODEL', 'llama-3.1-8b-instant');
+        $provider = (string) config('services.ai_tutor.provider', 'groq');
+        $systemPrompt = $this->settings->prompts()['ai_tro_giang'];
+        $model = (string) config('services.ai_tutor.model', 'llama-3.1-8b-instant');
 
         $apiKey = $this->resolveApiKey($provider);
         $baseUri = $this->resolveBaseUri($provider);
@@ -107,28 +106,36 @@ class AiTutorController extends Controller
             $request
         ) {
             $assistantOutput = '';
+            $startedAt = microtime(true);
+            $requestId = (string) Str::uuid();
+            $response = null;
+            $status = 'failed';
+            $errorCode = null;
 
             try {
-                $endpoint = rtrim($baseUri, '/') . '/chat/completions';
+                $endpoint = rtrim($baseUri, '/').'/chat/completions';
 
                 $response = Http::withToken($apiKey)
                     ->acceptJson()
                     ->timeout(90)
                     ->post($endpoint, [
-                    'model' => $model,
-                    'messages' => [
-                        [
-                            'role' => 'system',
-                            'content' => $systemPrompt,
+                        'model' => $model,
+                        'messages' => [
+                            [
+                                'role' => 'system',
+                                'content' => $systemPrompt,
+                            ],
+                            [
+                                'role' => 'user',
+                                'content' => $userMessage,
+                            ],
                         ],
-                        [
-                            'role' => 'user',
-                            'content' => $userMessage,
-                        ],
-                    ],
-                ]);
+                    ]);
 
-                $assistantOutput = (string) data_get($response->json(), 'choices.0.message.content', '');
+                $assistantOutput = $response->successful()
+                    ? (string) data_get($response->json(), 'choices.0.message.content', '') : '';
+                $status = $response->successful() && $assistantOutput !== '' ? 'success' : 'failed';
+                $errorCode = $response->successful() ? ($assistantOutput === '' ? 'empty_response' : null) : 'http_'.$response->status();
 
                 if ($assistantOutput === '') {
                     $assistantOutput = 'He thong AI tam thoi gian doan. Vui long thu lai sau.';
@@ -138,10 +145,14 @@ class AiTutorController extends Controller
                 ob_flush();
                 flush();
             } catch (\Throwable $exception) {
+                $errorCode = $exception instanceof ConnectionException ? 'connection_error' : 'request_error';
                 echo 'He thong AI tam thoi gian doan. Vui long thu lai sau.';
             } finally {
-                $inputTokens = $this->estimateTokens($userMessage . ' ' . $systemPrompt);
-                $outputTokens = $this->estimateTokens($assistantOutput);
+                $providerInputTokens = $response?->json('usage.prompt_tokens');
+                $providerOutputTokens = $response?->json('usage.completion_tokens');
+                $hasProviderTokens = is_int($providerInputTokens) && is_int($providerOutputTokens);
+                $inputTokens = $hasProviderTokens ? $providerInputTokens : $this->estimateTokens($userMessage.' '.$systemPrompt);
+                $outputTokens = $hasProviderTokens ? $providerOutputTokens : $this->estimateTokens($assistantOutput);
 
                 AiUsageLog::create([
                     'user_id' => $user?->id,
@@ -149,15 +160,20 @@ class AiTutorController extends Controller
                     'actor_key' => $actorKey,
                     'provider' => $provider,
                     'model' => $model,
-                    'input_text' => $userMessage,
-                    'output_text' => $assistantOutput,
+                    'request_id' => $requestId,
+                    'provider_request_id' => $response?->json('id') ?? $response?->header('x-request-id'),
+                    'status' => $status,
+                    'error_code' => $errorCode,
+                    'duration_ms' => (int) round((microtime(true) - $startedAt) * 1000),
+                    'fallback_used' => false,
                     'input_tokens' => $inputTokens,
                     'output_tokens' => $outputTokens,
-                    'cost_estimate' => $this->estimateCost($inputTokens, $outputTokens),
-                    'system_prompt' => $systemPrompt,
+                    'token_source' => $hasProviderTokens ? 'provider' : ($status === 'success' ? 'estimated' : 'unavailable'),
+                    'cost_source' => 'unavailable',
+                    'cost_amount' => null,
+                    'cost_currency' => null,
                     'meta' => [
-                        'ip' => $request->ip(),
-                        'user_agent' => $request->userAgent(),
+                        'feature' => 'ai_tutor',
                     ],
                 ]);
 
@@ -212,7 +228,7 @@ class AiTutorController extends Controller
 
     private function resolveActorType(?User $user): string
     {
-        if (!$user) {
+        if (! $user) {
             return 'guest';
         }
 
@@ -229,21 +245,21 @@ class AiTutorController extends Controller
     private function resolveApiKey(string $provider): string
     {
         return match ($provider) {
-            'openai' => (string) env('OPENAI_API_KEY', ''),
-            'gemini' => (string) env('GEMINI_API_KEY', ''),
-            'claude' => (string) env('CLAUDE_API_KEY', ''),
-            'internal' => (string) env('INTERNAL_AI_KEY', ''),
-            default => (string) env('GROQ_API_KEY', ''),
+            'openai' => (string) config('services.openai.key', ''),
+            'gemini' => (string) config('services.gemini.api_key', ''),
+            'claude' => (string) config('services.ai_tutor.claude_key', ''),
+            'internal' => (string) config('services.ai_tutor.internal_key', ''),
+            default => (string) config('services.groq.key', ''),
         };
     }
 
     private function resolveBaseUri(string $provider): string
     {
         return match ($provider) {
-            'gemini' => (string) env('GEMINI_BASE_URI', ''),
-            'claude' => (string) env('CLAUDE_BASE_URI', ''),
-            'internal' => (string) env('INTERNAL_AI_BASE_URI', ''),
-            'openai' => (string) env('OPENAI_BASE_URI', ''),
+            'gemini' => (string) config('services.ai_tutor.gemini_base_uri', ''),
+            'claude' => (string) config('services.ai_tutor.claude_base_uri', ''),
+            'internal' => (string) config('services.ai_tutor.internal_base_uri', ''),
+            'openai' => (string) config('services.ai_tutor.openai_base_uri', ''),
             default => 'https://api.groq.com/openai/v1',
         };
     }
@@ -251,20 +267,7 @@ class AiTutorController extends Controller
     private function estimateTokens(string $text): int
     {
         $words = str_word_count($text);
+
         return max(1, (int) ceil($words * 1.33));
-    }
-
-    private function estimateCost(int $inputTokens, int $outputTokens): float
-    {
-        $inputCostPerThousand = 0.0002;
-        $outputCostPerThousand = 0.0004;
-
-        return round((($inputTokens / 1000) * $inputCostPerThousand) + (($outputTokens / 1000) * $outputCostPerThousand), 6);
-    }
-
-    private function getSetting(string $key, mixed $default): mixed
-    {
-        $setting = AdminSetting::where('key', $key)->first();
-        return $setting?->value ?? $default;
     }
 }
