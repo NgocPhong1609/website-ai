@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use App\Models\AiModerationFlag;
 use App\Models\AiUsageLog;
 use App\Models\User;
+use App\Services\Ai\AiDailyQuotaService;
 use App\Settings\AiSettingsRepository;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
@@ -16,7 +17,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AiTutorController extends Controller
 {
-    public function __construct(private readonly AiSettingsRepository $settings) {}
+    public function __construct(
+        private readonly AiSettingsRepository $settings,
+        private readonly AiDailyQuotaService $quota,
+    ) {}
 
     public function streamChat(Request $request)
     {
@@ -32,38 +36,6 @@ class AiTutorController extends Controller
         $actorType = $this->resolveActorType($user);
         $actorKey = $user ? 'user:'.$user->id : sha1(($request->ip() ?? 'unknown').'|'.($request->userAgent() ?? 'unknown'));
 
-        $package = $this->settings->packageForUser($user);
-        $dailyLimit = (int) $this->settings->packages()[$package]['daily_requests'];
-
-        $todayCount = AiUsageLog::query()
-            ->whereDate('created_at', now()->toDateString())
-            ->where(function ($query) {
-                $query->where('meta->feature', 'ai_tutor')
-                    ->orWhere(function ($legacy) {
-                        // Older tutor rows retained these fields but had no feature metadata.
-                        $legacy->whereNull('meta->feature')
-                            ->whereNotNull('input_text')->whereNotNull('system_prompt');
-                    });
-            })
-            ->where(function ($query) use ($user, $actorKey) {
-                if ($user) {
-                    $query->where('user_id', $user->id);
-                } else {
-                    $query->where('actor_key', $actorKey);
-                }
-            })
-            ->count();
-
-        if ($todayCount >= $dailyLimit) {
-            return response()->json([
-                'message' => 'Da vuot han muc so luot hoi AI trong ngay.',
-                'meta' => [
-                    'daily_limit' => $dailyLimit,
-                    'used' => $todayCount,
-                ],
-            ], 429);
-        }
-
         if ($this->containsSensitiveContent($userMessage)) {
             AiModerationFlag::create([
                 'user_id' => $user?->id,
@@ -78,6 +50,14 @@ class AiTutorController extends Controller
             return response()->json([
                 'message' => 'Noi dung da bi gan co de admin kiem duyet thu cong.',
             ], 422);
+        }
+
+        $quota = $this->quota->reserve($user, 'ai_tutor');
+        if (! $quota['allowed']) {
+            return response()->json([
+                'message' => 'Da vuot han muc so luot hoi AI trong ngay.',
+                'meta' => $quota,
+            ], 429);
         }
 
         $provider = $this->settings->tutorProvider();
@@ -212,6 +192,9 @@ class AiTutorController extends Controller
             'Cache-Control' => 'no-cache',
             'Connection' => 'keep-alive',
             'X-Accel-Buffering' => 'no',
+            'X-AI-Daily-Limit' => (string) $quota['daily_limit'],
+            'X-AI-Used' => (string) $quota['used'],
+            'X-AI-Remaining' => (string) $quota['remaining'],
         ]);
     }
 

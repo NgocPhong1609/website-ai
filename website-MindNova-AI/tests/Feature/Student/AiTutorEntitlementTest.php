@@ -4,6 +4,7 @@ namespace Tests\Feature\Student;
 
 use App\Models\ActivityLog;
 use App\Models\AdminSetting;
+use App\Models\AiDailyQuotaUsage;
 use App\Models\AiUsageLog;
 use App\Models\Subscription;
 use App\Models\User;
@@ -18,37 +19,139 @@ class AiTutorEntitlementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public static function packages(): array
+    public function test_free_package_uses_one_counter_across_live_and_compatibility_tutor_routes(): void
     {
-        return [['none', 2], ['active', 4], ['expired', 2], ['overlapping', 4]];
-    }
-
-    #[DataProvider('packages')]
-    public function test_package_boundary_blocks_http(string $subscription, int $limit): void
-    {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'student', 'email_verified_at' => now()]);
+        $lesson = CourseAiTutorServiceTest::enrolledLesson($user);
+        config([
+            'services.ai_tutor.provider' => 'groq',
+            'services.groq.key' => 'compatibility-key',
+            'services.gemini.api_key' => 'live-key',
+            'services.gemini.force_failure' => false,
+        ]);
         AdminSetting::create(['key' => 'ai.packages.v1', 'value' => [
             'free' => ['daily_requests' => 2], 'premium' => ['daily_requests' => 4],
         ]]);
-        if ($subscription !== 'none') {
-            Subscription::create(['user_id' => $user->id, 'plan' => 'premium', 'status' => 'active',
-                'expires_at' => $subscription === 'expired' ? now()->subDay() : now()->addDay(),
-                'created_at' => now()->subDays(2)]);
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [['content' => ['parts' => [['text' => 'Live answer']]]]],
+            ]),
+            'api.groq.com/*' => Http::response([
+                'choices' => [['message' => ['content' => 'Compatibility answer']]],
+            ]),
+        ]);
+
+        $this->actingAs($user, 'sanctum')->postJson('/api/student/study-plan/chat', [
+            'message' => 'Explain route binding',
+            'lesson_id' => $lesson->id,
+            'history' => [],
+        ])->assertOk()->assertJsonPath('meta.quota.used', 1);
+        Http::assertSentCount(1);
+
+        $lastAllowed = $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', [
+            'message' => 'Explain addition',
+        ]);
+        $lastAllowed->assertOk()
+            ->assertHeader('Content-Type', 'text/event-stream; charset=UTF-8')
+            ->assertHeader('X-AI-Daily-Limit', '2')
+            ->assertHeader('X-AI-Used', '2')
+            ->assertHeader('X-AI-Remaining', '0');
+        $this->assertSame(2, AiDailyQuotaUsage::sole()->used);
+        Http::assertSentCount(1);
+        $this->assertSame('Compatibility answer', $lastAllowed->streamedContent());
+        Http::assertSentCount(2);
+
+        $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', [
+            'message' => 'One request too many',
+        ])->assertStatus(429)
+            ->assertJsonStructure(['message', 'meta' => ['allowed', 'package', 'daily_limit', 'used', 'remaining', 'resets_at']])
+            ->assertJsonPath('meta.allowed', false)
+            ->assertJsonPath('meta.package', 'free')
+            ->assertJsonPath('meta.daily_limit', 2)
+            ->assertJsonPath('meta.used', 2)
+            ->assertJsonPath('meta.remaining', 0)
+            ->assertJsonPath('meta.resets_at', fn ($value) => is_string($value) && $value !== '');
+        Http::assertSentCount(2);
+    }
+
+    public function test_active_premium_package_uses_its_configured_shared_limit(): void
+    {
+        $user = User::factory()->create(['role' => 'student', 'email_verified_at' => now()]);
+        $lesson = CourseAiTutorServiceTest::enrolledLesson($user);
+        Subscription::create([
+            'user_id' => $user->id,
+            'plan' => 'premium',
+            'status' => 'active',
+            'expires_at' => now()->addDay(),
+        ]);
+        AdminSetting::create(['key' => 'ai.packages.v1', 'value' => [
+            'free' => ['daily_requests' => 1], 'premium' => ['daily_requests' => 3],
+        ]]);
+        config([
+            'services.ai_tutor.provider' => 'groq',
+            'services.groq.key' => 'compatibility-key',
+            'services.gemini.api_key' => 'live-key',
+            'services.gemini.force_failure' => false,
+        ]);
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [['content' => ['parts' => [['text' => 'Live premium answer']]]]],
+            ]),
+            'api.groq.com/*' => Http::response([
+                'choices' => [['message' => ['content' => 'Compatibility premium answer']]],
+            ]),
+        ]);
+
+        $this->actingAs($user, 'sanctum')->postJson('/api/student/study-plan/chat', [
+            'message' => 'Explain route binding',
+            'lesson_id' => $lesson->id,
+            'history' => [],
+        ])->assertOk()->assertJsonPath('meta.quota.daily_limit', 3)
+            ->assertJsonPath('meta.quota.used', 1);
+
+        foreach ([2, 3] as $used) {
+            $response = $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', [
+                'message' => 'Premium question '.$used,
+            ]);
+            $response->assertOk()
+                ->assertHeader('X-AI-Daily-Limit', '3')
+                ->assertHeader('X-AI-Used', (string) $used)
+                ->assertHeader('X-AI-Remaining', (string) (3 - $used));
+            $this->assertSame('Compatibility premium answer', $response->streamedContent());
         }
-        if ($subscription === 'overlapping') {
-            Subscription::create(['user_id' => $user->id, 'plan' => 'premium', 'status' => 'cancelled',
-                'expires_at' => now()->addDays(2)]);
-        }
-        for ($i = 0; $i < $limit; $i++) {
-            AiUsageLog::create(['user_id' => $user->id, 'meta' => ['feature' => 'ai_tutor']]);
-        }
+
+        $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', [
+            'message' => 'Premium request too many',
+        ])->assertStatus(429)
+            ->assertJsonPath('meta.package', 'premium')
+            ->assertJsonPath('meta.daily_limit', 3)
+            ->assertJsonPath('meta.used', 3)
+            ->assertJsonPath('meta.remaining', 0);
+        $this->assertSame(3, AiDailyQuotaUsage::sole()->used);
+        Http::assertSentCount(3);
+    }
+
+    public function test_sensitive_input_is_rejected_before_quota_reservation_or_provider_io(): void
+    {
+        $user = User::factory()->create();
+        config(['services.ai_tutor.provider' => 'groq', 'services.groq.key' => 'secret-key']);
         Http::fake();
-        $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', ['message' => 'Explain addition'])
-            ->assertStatus(429)->assertJsonPath('meta.daily_limit', $limit)->assertJsonPath('meta.used', $limit);
+
+        $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', [
+            'message' => 'This asks about racist content',
+        ])->assertUnprocessable()
+            ->assertJsonPath('message', 'Noi dung da bi gan co de admin kiem duyet thu cong.');
+
+        $this->assertDatabaseHas('ai_moderation_flags', [
+            'user_id' => $user->id,
+            'source' => 'ai_tutor',
+            'reason' => 'toxic_or_policy_sensitive_prompt',
+        ]);
+        $this->assertSame(0, AiDailyQuotaUsage::count());
         Http::assertNothingSent();
     }
 
-    public function test_only_tutor_rows_count_and_stream_records_sanitized_provider_usage(): void
+    public function test_stream_records_sanitized_provider_usage(): void
     {
         $user = User::factory()->create();
         config(['services.ai_tutor.provider' => 'groq', 'services.groq.key' => 'secret-key']);
@@ -56,7 +159,7 @@ class AiTutorEntitlementTest extends TestCase
         AdminSetting::create(['key' => 'ai.prompts', 'value' => ['ai_tro_giang' => 'Stored tutor instruction']]);
         AiUsageLog::create(['user_id' => $user->id, 'meta' => ['feature' => 'quiz']]);
         AiUsageLog::create(['user_id' => $user->id, 'meta' => ['feature' => 'ai_notification']]);
-        // Legacy tutor rows have no feature but retain tutor content; unrelated system rows do not.
+        // Legacy tutor and unrelated observability rows are not quota reservations.
         AiUsageLog::create(['user_id' => $user->id, 'input_text' => 'Legacy question', 'system_prompt' => 'Legacy tutor instruction']);
         Http::fake(['api.groq.com/*' => Http::response([
             'id' => 'chat-request-1', 'choices' => [['message' => ['content' => 'Four']]],
@@ -85,7 +188,7 @@ class AiTutorEntitlementTest extends TestCase
         $this->assertSame(11, $activity->metadata['input_tokens']);
         $this->assertSame(3, $activity->metadata['output_tokens']);
         $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', ['message' => 'Another question'])
-            ->assertStatus(429)->assertJsonPath('meta.used', 2);
+            ->assertOk()->assertHeader('X-AI-Used', '2');
         Http::assertSentCount(1);
     }
 
