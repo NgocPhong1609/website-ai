@@ -1,5 +1,23 @@
 import { axiosClient } from "@/src/shared/lib/axios";
-import type { AiChatApiResponse, AiChatMessage } from "../types";
+import type { AiChatApiResponse, AiChatMessage, AiChatResult, AiQuotaMeta } from "../types";
+
+export class AiQuotaError extends Error {
+ constructor(message: string, public readonly quota?: AiQuotaMeta) {
+  super(message);
+  this.name = "AiQuotaError";
+ }
+}
+
+function parseQuota(quota?: AiQuotaMeta): AiQuotaMeta | undefined {
+ if (!quota) return undefined;
+ return {
+  package: quota.package,
+  daily_limit: quota.daily_limit,
+  used: quota.used,
+  remaining: quota.remaining,
+  resets_at: quota.resets_at,
+ };
+}
 
 /**
  * Sends a user message to the interactive AI Tutor backend service via axiosClient.
@@ -9,7 +27,7 @@ export async function sendAiChatMessage(
  message: string,
  history: AiChatMessage[] = [],
  lessonId?: number
-): Promise<AiChatMessage> {
+): Promise<AiChatResult> {
  try {
  const res = await axiosClient.post("/api/student/study-plan/chat", {
  message,
@@ -19,7 +37,7 @@ export async function sendAiChatMessage(
 
  const result: AiChatApiResponse = res.data;
  if (result && result.success && result.data) {
- return result.data;
+ return { message: result.data, quota: parseQuota(result.meta?.quota) };
  }
 
  throw new Error(
@@ -29,7 +47,9 @@ export async function sendAiChatMessage(
  if (error.response) {
  const status = error.response.status;
  if (status === 429) {
- throw new Error(" **Gia sư Nova hiện đang bận xíu hoặc bạn đã gửi câu hỏi quá nhanh (> 5 câu/phút). Bạn vui lòng chờ khoảng 1 phút rồi thử đặt câu hỏi lại nhé!** ");
+ const message = error.response.data?.message
+  || " **Gia sư Nova hiện đang bận xíu hoặc bạn đã gửi câu hỏi quá nhanh (> 5 câu/phút). Bạn vui lòng chờ khoảng 1 phút rồi thử đặt câu hỏi lại nhé!** ";
+ throw new AiQuotaError(message, parseQuota(error.response.data?.meta?.quota));
  }
  if (status === 401) {
  throw new Error(" **Phiên đăng nhập đã hết hạn. Bạn vui lòng đăng nhập lại để trò chuyện với Gia sư Nova nhé!**");
