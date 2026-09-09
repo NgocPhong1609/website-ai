@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useAdminNavigation } from "./AdminDashboardShell";
 
 const navItems = [
  { label: "Tổng quan", href: "/admin", icon: "⌂" },
@@ -16,50 +16,28 @@ const navItems = [
  { label: "Kiểm duyệt", href: "/admin/moderation-support", icon: "⬟" },
 ];
 
-const systemSlides = [
- {
- tag: "SYSTEM",
- badge: "LIVE",
- badgeColor: "-[#2C3039]/15 -[#FAF7F2] -[#2C3039]/30",
- dotColor: "-[#2C3039]",
- title: "Tất cả dịch vụ đang ổn định",
- subtitle: "Dữ liệu theo thời gian thực đã được đồng bộ.",
- },
- {
- tag: "LATENCY",
- badge: "12ms",
- badgeColor: "-[#C0392B]/15 -[#C0392B] -[#C0392B]/30",
- dotColor: "-[#C0392B] animate-pulse",
- title: "Kết nối DB & R2 siêu tốc",
- subtitle: "Thời gian phản hồi API trung bình < 45ms.",
- },
- {
- tag: "SECURITY",
- badge: "ACTIVE",
- badgeColor: "-[#C0392B]/15 -[#C0392B] -[#C0392B]/30",
- dotColor: "-[#C0392B]",
- title: "Bảo mật SSL & Signed URL",
- subtitle: "Mã hóa tài liệu minh chứng 2 lớp an toàn.",
- },
-];
-
 export function AdminSidebar() {
  const pathname = usePathname();
- const [currentSlide, setCurrentSlide] = useState(0);
- const [isPaused, setIsPaused] = useState(false);
-
- useEffect(() => {
- if (isPaused) return;
- const timer = setInterval(() => {
- setCurrentSlide((prev) => (prev + 1) % systemSlides.length);
- }, 4500);
- return () => clearInterval(timer);
- }, [isPaused]);
-
- const slide = systemSlides[currentSlide];
+ const { closeNavigation, isOpen } = useAdminNavigation();
 
  return (
- <aside className="flex h-full w-[260px] xl:w-[280px] shrink-0 flex-col border-r border-slate-200/80 bg-[linear-gradient(180deg,#0f172a_0%,#101f36_38%,#16284b_100%)] text-slate-100 overflow-hidden">
+ <>
+ {isOpen && (
+ <button
+ type="button"
+ aria-label="Đóng menu quản trị bằng lớp phủ"
+ className="fixed inset-0 z-40 bg-slate-950/55 backdrop-blur-xs lg:hidden"
+ onClick={closeNavigation}
+ />
+ )}
+
+ <aside
+ id="admin-sidebar"
+ aria-label="Điều hướng quản trị"
+ className={`fixed inset-y-0 left-0 z-50 flex h-dvh w-[260px] shrink-0 flex-col overflow-hidden border-r border-slate-200/80 bg-[linear-gradient(180deg,#0f172a_0%,#101f36_38%,#16284b_100%)] text-slate-100 shadow-2xl transition-transform duration-200 ease-out lg:static lg:z-auto lg:h-full lg:translate-x-0 lg:shadow-none xl:w-[280px] ${
+ isOpen ? "translate-x-0" : "-translate-x-full"
+ }`}
+ >
  {/* Brand Header */}
  <div className="px-4 py-4 shrink-0 border-b border-white/5">
  <div className="flex items-center gap-3">
@@ -74,6 +52,16 @@ export function AdminSidebar() {
  Admin
  </h2>
  </div>
+ {isOpen && (
+ <button
+ type="button"
+ aria-label="Đóng menu quản trị"
+ onClick={closeNavigation}
+ className="ml-auto flex h-9 w-9 items-center justify-center rounded-xl border border-white/15 bg-white/10 text-xl text-white transition hover:bg-white/20 lg:hidden"
+ >
+ ×
+ </button>
+ )}
  </div>
  </div>
 
@@ -89,6 +77,7 @@ export function AdminSidebar() {
  <Link
  key={item.label}
  href={item.href}
+ onClick={closeNavigation}
  className={`group flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-semibold transition-all duration-200 ${
  isActive
  ? "bg-[linear-gradient(135deg,rgba(14,165,233,0.28),rgba(96,165,250,0.16))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_12px_24px_-16px_rgba(56,189,248,0.8)] ring-1 ring-white/10"
@@ -110,66 +99,17 @@ export function AdminSidebar() {
  })}
  </nav>
 
- {/* Interactive System Status Slide Carousel */}
- <div className="border-t border-white/10 px-2.5 py-3 shrink-0">
- <div
- onMouseEnter={() => setIsPaused(true)}
- onMouseLeave={() => setIsPaused(false)}
- className="relative rounded-2xl bg-[linear-gradient(135deg,rgba(34,211,238,0.14),rgba(59,130,246,0.08),rgba(15,23,42,0.35))] p-3 ring-1 ring-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] group/slide cursor-default transition-all"
- >
- {/* Header Tag & Live Badge */}
- <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.22em] -[#FAF7F2]/75">
- <span>{slide.tag}</span>
- <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[9px] font-bold ${slide.badgeColor}`}>
- <span className={`h-1.5 w-1.5 rounded-full ${slide.dotColor}`} />
- {slide.badge}
- </span>
- </div>
-
- {/* Dynamic Animated Content */}
- <div key={currentSlide} className="mt-2 animate-in fade-in slide-in-from-right-2 duration-300">
- <p className="text-xs sm:text-[13px] font-bold text-white leading-snug truncate">
- {slide.title}
+ <div className="hidden shrink-0 border-t border-white/10 px-2.5 py-3 lg:block">
+ <div className="rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
+ <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">
+ Trợ giúp quản trị
  </p>
- <p className="mt-0.5 text-[11px] leading-tight text-slate-300/90 line-clamp-2">
- {slide.subtitle}
+ <p className="mt-2 text-xs font-semibold leading-snug text-white">
+ Chọn một mục để quản lý dữ liệu và cấu hình.
  </p>
- </div>
-
- {/* Carousel Slide Indicators (Dots & Arrows) */}
- <div className="mt-2.5 flex items-center justify-between border-t border-white/5 pt-2">
- <div className="flex items-center gap-1.5">
- {systemSlides.map((_, idx) => (
- <button
- key={idx}
- onClick={() => setCurrentSlide(idx)}
- className={`h-1.5 rounded-full transition-all duration-300 ${
- idx === currentSlide ? "w-5 -[#C0392B]" : "w-1.5 bg-slate-600 hover:bg-slate-400"
- }`}
- aria-label={`Go to slide ${idx + 1}`}
- />
- ))}
- </div>
-
- <div className="flex items-center gap-1 opacity-0 group-hover/slide:opacity-100 transition-opacity duration-200">
- <button
- onClick={() => setCurrentSlide((prev) => (prev - 1 + systemSlides.length) % systemSlides.length)}
- className="w-5 h-5 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-[10px] text-white"
- title="Slide trước"
- >
- ‹
- </button>
- <button
- onClick={() => setCurrentSlide((prev) => (prev + 1) % systemSlides.length)}
- className="w-5 h-5 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-[10px] text-white"
- title="Slide tiếp"
- >
- ›
- </button>
- </div>
- </div>
  </div>
  </div>
  </aside>
+ </>
  );
 }

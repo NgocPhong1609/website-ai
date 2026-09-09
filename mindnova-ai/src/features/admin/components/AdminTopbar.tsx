@@ -5,11 +5,13 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { jsPDF } from "jspdf";
 import { adminApi } from "@/src/features/admin/lib/admin-api";
+import { useAdminNavigation } from "./AdminDashboardShell";
 
 type ExportFormat = "json" | "doc" | "pdf";
 
 export function AdminTopbar() {
  const router = useRouter();
+ const { isOpen, menuButtonRef, openNavigation } = useAdminNavigation();
  const [isExporting, setIsExporting] = useState(false);
  const [isRefreshing, setIsRefreshing] = useState(false);
  const [exportFormat, setExportFormat] = useState<ExportFormat>("json");
@@ -199,16 +201,20 @@ export function AdminTopbar() {
  };
 
  return (
- <header className="flex h-14 shrink-0 items-center gap-4 border-b border-slate-200 bg-white/80 px-5 backdrop-blur-xl">
- <div className="flex flex-1 items-center gap-4">
-      <div className="flex items-center gap-2 rounded-full border border-emerald-300/80 bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-800 shadow-xs">
-        <span className="relative flex h-2.5 w-2.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
-        </span>
-        Online sync
-      </div>
+ <header className="flex h-14 shrink-0 items-center gap-2 border-b border-slate-200 bg-white/80 px-3 backdrop-blur-xl sm:gap-4 sm:px-5">
+ <button
+ ref={menuButtonRef}
+ type="button"
+ aria-label="Mở menu quản trị"
+ aria-controls="admin-sidebar"
+ aria-expanded={isOpen}
+ onClick={openNavigation}
+ className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-xl text-slate-700 transition hover:bg-slate-50 lg:hidden"
+ >
+ ☰
+ </button>
 
+ <div className="hidden min-w-0 flex-1 items-center gap-4 lg:flex">
  <div className="relative max-w-xl flex-1">
  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">⌕</span>
  <input
@@ -219,8 +225,8 @@ export function AdminTopbar() {
  </div>
  </div>
 
- <div className="flex items-center gap-3">
- <div className="relative" ref={exportMenuRef}>
+ <div className="ml-auto flex items-center gap-2 sm:gap-3">
+ <div className="relative hidden lg:block" ref={exportMenuRef}>
  <button
  type="button"
  onClick={() => setIsExportMenuOpen((current) => !current)}
@@ -256,23 +262,25 @@ export function AdminTopbar() {
  type="button"
  onClick={() => void handleExportData()}
  disabled={isExporting}
- className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:-[#C0392B] hover:bg-cyan-50 hover:-[#C0392B] disabled:cursor-not-allowed disabled:opacity-60"
+ className="hidden rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:-[#C0392B] hover:bg-cyan-50 hover:-[#C0392B] disabled:cursor-not-allowed disabled:opacity-60 lg:block"
  >
  {isExporting ? "Đang xuất..." : `Xuất ${exportLabel[exportFormat]}`}
  </button>
  <button
  type="button"
+ aria-label="Làm mới dữ liệu"
  onClick={() => void handleRefreshData()}
  disabled={isRefreshing}
- className="rounded-2xl -[#C0392B] -[#C0392B] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_-15px_rgba(79,70,229,0.9)] transition hover:-[#C0392B] hover:-[#C0392B] disabled:cursor-not-allowed disabled:opacity-60"
+ className="rounded-2xl -[#C0392B] -[#C0392B] px-3 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_-15px_rgba(79,70,229,0.9)] transition hover:-[#C0392B] hover:-[#C0392B] disabled:cursor-not-allowed disabled:opacity-60 sm:px-4"
  >
- {isRefreshing ? "Đang làm mới..." : "Làm mới dữ liệu"}
+ <span aria-hidden="true">{isRefreshing ? "↻" : "↻"}</span>
+ <span className="hidden sm:inline">{isRefreshing ? "Đang làm mới..." : "Làm mới dữ liệu"}</span>
  </button>
 
  <button
  type="button"
  aria-label="Notifications"
- className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-lg text-slate-600 transition hover:-[#FAF7F2] hover:-[#C0392B]"
+ className="relative hidden h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-lg text-slate-600 transition hover:-[#FAF7F2] hover:-[#C0392B] sm:flex"
  >
  
  <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
@@ -280,12 +288,14 @@ export function AdminTopbar() {
 
  <button
  type="button"
+ aria-label="Đăng xuất"
  onClick={handleLogout}
- className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
+ className="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 sm:px-4"
  >
- Đăng xuất
+ <span className="hidden sm:inline">Đăng xuất</span>
+ <span className="sm:hidden" aria-hidden="true">Thoát</span>
  </button>
- <Avatar fallback="A" size="md" className="shadow-[0_14px_24px_-14px_rgba(37,99,235,0.9)]" />
+ <Avatar fallback="A" size="md" className="hidden shadow-[0_14px_24px_-14px_rgba(37,99,235,0.9)] sm:flex" />
  </div>
 
  {statusMessage && (
