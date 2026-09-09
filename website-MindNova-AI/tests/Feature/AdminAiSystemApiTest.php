@@ -72,6 +72,36 @@ it('returns the canonical config without secret material', function () {
         ->and($response->json('providers.backup'))->not->toHaveKeys(['api_key', 'apiKeyHint']);
 });
 
+it('reports a Groq-configured backup as ready when it uses the runtime fallback key', function () {
+    config()->set('services.backup_ai.api_key', null);
+    config()->set('services.backup_ai.provider', 'groq');
+    config()->set('services.groq.key', 'groq-fallback-secret');
+
+    $response = $this->actingAs(adminForAiConfig(), 'sanctum')
+        ->getJson('/api/admin/ai-config');
+
+    $response->assertOk()
+        ->assertJsonPath('providers.backup.name', 'groq')
+        ->assertJsonPath('providers.backup.configured', true);
+
+    expect($response->getContent())->not->toContain('groq-fallback-secret');
+});
+
+it('normalizes a blank backup provider to openai and uses its runtime fallback key', function () {
+    config()->set('services.backup_ai.api_key', null);
+    config()->set('services.backup_ai.provider', '');
+    config()->set('services.openai.key', 'openai-fallback-secret');
+
+    $response = $this->actingAs(adminForAiConfig(), 'sanctum')
+        ->getJson('/api/admin/ai-config');
+
+    $response->assertOk()
+        ->assertJsonPath('providers.backup.name', 'openai')
+        ->assertJsonPath('providers.backup.configured', true);
+
+    expect($response->getContent())->not->toContain('openai-fallback-secret');
+});
+
 it('persists exactly the writable free premium packages and prompts', function () {
     $response = $this->actingAs(adminForAiConfig(), 'sanctum')
         ->putJson('/api/admin/ai-config', aiConfigPayload());

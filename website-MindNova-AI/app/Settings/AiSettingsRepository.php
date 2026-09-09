@@ -75,6 +75,14 @@ class AiSettingsRepository
     {
         $primary = config('services.gemini');
         $backup = config('services.backup_ai');
+        $backupProvider = trim((string) ($backup['provider'] ?? '')) ?: 'openai';
+        $backupApiKey = $backup['api_key'] ?? null;
+
+        if (! $this->configured($backupApiKey)) {
+            $backupApiKey = $backupProvider === 'groq'
+                ? config('services.groq.key')
+                : config('services.openai.key');
+        }
 
         return [
             'primary' => [
@@ -83,9 +91,9 @@ class AiSettingsRepository
                 'configured' => $this->configured($primary['api_key'] ?? null),
             ],
             'backup' => [
-                'name' => $backup['provider'] ?? 'openai',
+                'name' => $backupProvider,
                 'model' => $backup['model'] ?? null,
-                'configured' => $this->configured($backup['api_key'] ?? null),
+                'configured' => $this->configured($backupApiKey),
             ],
         ];
     }
