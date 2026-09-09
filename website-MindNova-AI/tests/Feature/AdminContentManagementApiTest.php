@@ -250,3 +250,78 @@ test('admin can permanently delete a course with no order items', function () {
 
     expect(Course::query()->whereKey($course->id)->exists())->toBeFalse();
 });
+
+test('admin can combine instructor search and pagination when listing courses', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $firstTeacher = User::factory()->create(['role' => 'teacher', 'name' => 'Giang vien Alpha']);
+    $secondTeacher = User::factory()->create(['role' => 'teacher', 'name' => 'Giang vien Beta']);
+
+    $firstMatch = Course::create([
+        'teacher_id' => $firstTeacher->id,
+        'title' => 'Laravel Alpha 1',
+        'slug' => 'laravel-alpha-1',
+        'description' => 'Course 1',
+        'price' => 0,
+        'level' => 'beginner',
+        'status' => 'pending_review',
+    ]);
+    $secondMatch = Course::create([
+        'teacher_id' => $firstTeacher->id,
+        'title' => 'Laravel Alpha 2',
+        'slug' => 'laravel-alpha-2',
+        'description' => 'Course 2',
+        'price' => 0,
+        'level' => 'beginner',
+        'status' => 'published',
+    ]);
+    Course::create([
+        'teacher_id' => $secondTeacher->id,
+        'title' => 'Laravel Beta',
+        'slug' => 'laravel-beta',
+        'description' => 'Other teacher',
+        'price' => 0,
+        'level' => 'beginner',
+        'status' => 'pending_review',
+    ]);
+
+    $response = $this->actingAs($admin, 'sanctum')->getJson(
+        "/api/admin/content/courses?teacher_id={$firstTeacher->id}&search=Laravel&per_page=1&page=2"
+    );
+
+    $response->assertOk()
+        ->assertJsonPath('data.0.id', $firstMatch->id)
+        ->assertJsonPath('meta.current_page', 2)
+        ->assertJsonPath('meta.last_page', 2)
+        ->assertJsonPath('meta.per_page', 1)
+        ->assertJsonPath('meta.total', 2)
+        ->assertJsonPath('summary.total', 2)
+        ->assertJsonPath('summary.pending_review', 1)
+        ->assertJsonFragment(['id' => $firstTeacher->id, 'name' => 'Giang vien Alpha'])
+        ->assertJsonFragment(['id' => $secondTeacher->id, 'name' => 'Giang vien Beta']);
+
+    expect($response->json('data.0.id'))->not->toBe($secondMatch->id);
+});
+
+test('admin course filters return an empty paginated result with zero totals', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $teacher = User::factory()->create(['role' => 'teacher']);
+
+    $response = $this->actingAs($admin, 'sanctum')->getJson(
+        "/api/admin/content/courses?teacher_id={$teacher->id}&search=khong-ton-tai"
+    );
+
+    $response->assertOk()
+        ->assertJsonCount(0, 'data')
+        ->assertJsonPath('meta.per_page', 100)
+        ->assertJsonPath('meta.total', 0)
+        ->assertJsonPath('summary.total', 0)
+        ->assertJsonPath('summary.pending_review', 0);
+});
+
+test('non admin cannot use admin course management filters', function () {
+    $teacher = User::factory()->create(['role' => 'teacher']);
+
+    $this->actingAs($teacher, 'sanctum')
+        ->getJson("/api/admin/content/courses?teacher_id={$teacher->id}")
+        ->assertForbidden();
+});

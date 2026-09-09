@@ -75,6 +75,8 @@ describe("responsive admin shell", () => {
     expect(navigation).not.toHaveAttribute("aria-hidden");
     expect(navigation).not.toHaveAttribute("inert");
     expect(screen.getByRole("link", { name: /Tổng quan/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Quản lý khóa học/ })).toHaveAttribute("href", "/admin/content");
+    expect(screen.queryByRole("link", { name: /^Nội dung$/ })).not.toBeInTheDocument();
   });
 
   it("opens and closes the mobile navigation with labeled controls", () => {

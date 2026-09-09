@@ -5,7 +5,12 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Question;
+use App\Models\QuizCourseAttachment;
+use App\Models\ReviewSubmission;
 use App\Models\SharedResource;
+use App\Models\User;
+use App\Services\ContentReviewService;
+use App\Services\Instructor\CourseStructureService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +33,10 @@ class ContentManagementController extends Controller
     {
         $visibility = (string) $request->string('visibility', 'visible');
 
-        $query = Course::query()->with(['teacher:id,name,email', 'category:id,name'])->latest();
+        $query = Course::query()
+            ->with(['teacher:id,name,email', 'category:id,name'])
+            ->orderByDesc('created_at')
+            ->orderByDesc('id');
 
         if ($visibility === 'hidden') {
             $query->whereNotNull('admin_hidden_at');
@@ -36,17 +44,52 @@ class ContentManagementController extends Controller
             $query->visibleInAdmin();
         }
 
+        if ($request->filled('search')) {
+            $keyword = trim((string) $request->string('search'));
+            $query->where('title', 'like', '%'.$keyword.'%');
+        }
+
+        if ($request->filled('teacher_id')) {
+            $query->where('teacher_id', $request->integer('teacher_id'));
+        }
+
+        $summaryQuery = clone $query;
+        $summary = [
+            'total' => (clone $summaryQuery)->count(),
+            'pending_review' => (clone $summaryQuery)->where('status', 'pending_review')->count(),
+        ];
+
         if ($request->filled('status')) {
             $query->where('status', (string) $request->string('status'));
         }
 
-        if ($request->filled('search')) {
-            $keyword = trim((string) $request->string('search'));
-            $query->where('title', 'like', '%' . $keyword . '%');
-        }
+        $perPage = min(max($request->integer('per_page', 100), 1), 100);
+        $courses = $query->paginate($perPage);
+
+        $instructors = User::query()
+            ->select(['id', 'name', 'email'])
+            ->whereHas('courses')
+            ->orderBy('name')
+            ->orderBy('id')
+            ->get()
+            ->map(fn (User $instructor) => [
+                'id' => $instructor->id,
+                'name' => $instructor->name,
+                'email' => $instructor->email,
+            ]);
 
         return response()->json([
-            'data' => $query->take(100)->get(),
+            'data' => $courses->getCollection()->values(),
+            'meta' => [
+                'current_page' => $courses->currentPage(),
+                'last_page' => $courses->lastPage(),
+                'per_page' => $courses->perPage(),
+                'total' => $courses->total(),
+            ],
+            'summary' => $summary,
+            'filters' => [
+                'instructors' => $instructors,
+            ],
         ]);
     }
 
@@ -64,17 +107,20 @@ class ContentManagementController extends Controller
             ->where('orders.status', 'completed')
             ->sum('order_items.price');
 
-        $structureService = app(\App\Services\Instructor\CourseStructureService::class);
+        $structureService = app(CourseStructureService::class);
         $structuredModules = $structureService->getCourseStructure($course);
 
-        $courseLevelAttachments = \App\Models\QuizCourseAttachment::with(['quiz.questions.answers'])
+        $courseLevelAttachments = QuizCourseAttachment::with(['quiz.questions.answers'])
             ->where('course_id', $course->id)
             ->whereIn('position', ['capability_assessment', 'end_of_course'])
             ->get();
 
         $formatQuiz = function ($attachment) {
-            if (!$attachment || !$attachment->quiz) return null;
+            if (! $attachment || ! $attachment->quiz) {
+                return null;
+            }
             $quiz = $attachment->quiz;
+
             return [
                 'attachment_id' => $attachment->id,
                 'quiz_id' => $quiz->id,
@@ -97,7 +143,7 @@ class ContentManagementController extends Controller
                         'points' => (float) ($q->points ?? 1.0),
                         'difficulty' => $q->difficulty ?? 'medium',
                         'options' => $q->answers ? $q->answers->pluck('content')->toArray() : [],
-                        'answers' => $q->answers ? $q->answers->map(fn($a) => [
+                        'answers' => $q->answers ? $q->answers->map(fn ($a) => [
                             'id' => $a->id,
                             'content' => $a->content,
                             'is_correct' => (bool) $a->is_correct,
@@ -154,38 +200,38 @@ class ContentManagementController extends Controller
         ]);
 
         if ($data['status'] === 'published') {
-            $reviewService = app(\App\Services\ContentReviewService::class);
+            $reviewService = app(ContentReviewService::class);
             $admin = $request->user();
-            
+
             // Check if there is an active submission
-            $submission = \App\Models\ReviewSubmission::where('course_id', $course->id)
+            $submission = ReviewSubmission::where('course_id', $course->id)
                 ->whereIn('status', ['pending', 'under_review'])
                 ->latest()
                 ->first();
-                
-            if (!$submission) {
+
+            if (! $submission) {
                 // Self-healing: if no submission exists but we are publishing,
                 // force create one so the course can be published properly with snapshots.
                 $teacher = $course->teacher ?? $admin;
-                
+
                 try {
                     // Update status to draft first so submitForReview allows it
                     $course->update(['status' => 'draft']);
                     $submission = $reviewService->submitForReview($course, $teacher);
                 } catch (\Exception $e) {
-                    return response()->json(['message' => 'Lỗi tạo snapshot: ' . $e->getMessage()], 422);
+                    return response()->json(['message' => 'Lỗi tạo snapshot: '.$e->getMessage()], 422);
                 }
             }
-            
+
             try {
                 if ($submission->status === 'pending') {
                     $submission = $reviewService->startReview($submission, $admin);
                 }
                 $reviewService->approveSubmission($submission, $admin);
             } catch (\Exception $e) {
-                return response()->json(['message' => 'Lỗi duyệt khóa học: ' . $e->getMessage()], 422);
+                return response()->json(['message' => 'Lỗi duyệt khóa học: '.$e->getMessage()], 422);
             }
-            
+
             return response()->json([
                 'message' => 'Duyệt khóa học và tạo phiên bản thành công.',
                 'data' => $course->fresh(),
@@ -316,7 +362,7 @@ class ContentManagementController extends Controller
 
         if ($request->filled('search')) {
             $keyword = trim((string) $request->string('search'));
-            $query->where('content', 'like', '%' . $keyword . '%');
+            $query->where('content', 'like', '%'.$keyword.'%');
         }
 
         $rows = $query->latest()->take(150)->get()->map(function (Question $question) {

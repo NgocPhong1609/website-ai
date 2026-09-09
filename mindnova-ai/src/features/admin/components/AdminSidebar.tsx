@@ -10,7 +10,7 @@ const navItems = [
  { label: "Người dùng", href: "/admin/users", icon: "◌" },
  { label: "Duyệt giáo viên", href: "/admin/teacher-approvals", icon: "❖" },
  { label: "AI & System", href: "/admin/ai-system", icon: "◫" },
- { label: "Nội dung", href: "/admin/content", icon: "◈" },
+ { label: "Quản lý khóa học", href: "/admin/content", icon: "◈" },
  { label: "Mã giảm giá", href: "/admin/coupons", icon: "◌" },
  { label: "Doanh thu", href: "/admin/revenue", icon: "◍" },
  { label: "Báo cáo", href: "/admin/analytics", icon: "▣" },
