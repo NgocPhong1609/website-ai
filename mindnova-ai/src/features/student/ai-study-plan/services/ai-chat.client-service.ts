@@ -1,6 +1,9 @@
 import { axiosClient } from "@/src/shared/lib/axios";
 import type { AiChatApiResponse, AiChatMessage, AiChatResult, AiQuotaMeta } from "../types";
 
+// Match AiChatRequest's max:2000 (Laravel counts Unicode code points).
+const HISTORY_TEXT_LIMIT = 2000;
+
 export class AiQuotaError extends Error {
  constructor(message: string, public readonly quota?: AiQuotaMeta) {
   super(message);
@@ -32,7 +35,10 @@ export async function sendAiChatMessage(
  const res = await axiosClient.post("/api/student/study-plan/chat", {
  message,
  lesson_id: lessonId ?? null,
- history: history.slice(-4).map((m) => ({ sender: m.sender, text: m.text })),
+ history: history.slice(-4).map((m) => ({
+  sender: m.sender,
+  text: Array.from(m.text).slice(0, HISTORY_TEXT_LIMIT).join(""),
+ })),
  });
 
  const result: AiChatApiResponse = res.data;

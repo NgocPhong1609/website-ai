@@ -2,13 +2,13 @@
 
 namespace App\Services\Ai;
 
-use App\Contracts\AiProviderInterface;
+use App\Contracts\ConfiguredAiProviderInterface;
 use App\DTOs\AiMessageDto;
 use App\Models\AiUsageLog;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-abstract class AbstractAiService implements AiProviderInterface
+abstract class AbstractAiService implements ConfiguredAiProviderInterface
 {
     /**
      * Gửi tin nhắn đến AI và nhận phản hồi

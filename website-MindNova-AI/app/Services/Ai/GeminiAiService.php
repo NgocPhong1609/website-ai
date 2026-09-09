@@ -16,11 +16,23 @@ class GeminiAiService extends AbstractAiService
         return 'gemini';
     }
 
-    public function sendMessage(array $messages, array $options = []): string
+    public function isReady(): bool
+    {
+        return $this->resolveApiKey() !== null && ! config('services.gemini.force_failure', false);
+    }
+
+    private function resolveApiKey(): ?string
     {
         $apiKey = config('services.gemini.api_key');
+
+        return is_string($apiKey) && trim($apiKey) !== '' ? $apiKey : null;
+    }
+
+    public function sendMessage(array $messages, array $options = []): string
+    {
+        $apiKey = $this->resolveApiKey();
         $model = config('services.gemini.model', 'gemini-3.6-flash');
-        if (! is_string($apiKey) || trim($apiKey) === '') {
+        if ($apiKey === null) {
             $this->recordAttempt($options, $model, microtime(true), 'failed', 'missing_api_key');
             throw new Exception('Chưa cấu hình API key cho Gemini.');
         }
@@ -109,10 +121,19 @@ class GeminiAiService extends AbstractAiService
 
             if ($response->successful()) {
                 $data = $response->json();
-                $content = $data['candidates'][0]['content']['parts'][0]['text'] ?? 'No response';
+                $content = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
                 $inputTokens = $data['usageMetadata']['promptTokenCount'] ?? null;
                 $outputTokens = $data['usageMetadata']['candidatesTokenCount'] ?? null;
                 $providerRequestId = $data['responseId'] ?? $response->header('x-request-id');
+
+                if (! is_string($content) || trim($content) === '') {
+                    $this->recordAttempt($options, $model, $startedAt, 'failed', 'empty_response',
+                        $inputTokens, $outputTokens, $providerRequestId ?: null);
+                    if ($attempt < $maxRetries) {
+                        continue;
+                    }
+                    throw new AiTransientException('Gemini returned an empty response');
+                }
 
                 $this->recordAttempt($options, $model, $startedAt, 'success', null,
                     $inputTokens, $outputTokens, $providerRequestId ?: null);

@@ -52,14 +52,6 @@ class AiTutorController extends Controller
             ], 422);
         }
 
-        $quota = $this->quota->reserve($user, 'ai_tutor');
-        if (! $quota['allowed']) {
-            return response()->json([
-                'message' => 'Da vuot han muc so luot hoi AI trong ngay.',
-                'meta' => $quota,
-            ], 429);
-        }
-
         $provider = $this->settings->tutorProvider();
         $systemPrompt = $this->settings->prompts()['ai_tro_giang'];
         $model = (string) config('services.ai_tutor.model', 'llama-3.1-8b-instant');
@@ -67,10 +59,19 @@ class AiTutorController extends Controller
         $apiKey = $this->resolveApiKey($provider);
         $baseUri = $this->resolveBaseUri($provider);
 
-        if ($apiKey === '') {
+        if (trim($apiKey) === '' || ! filter_var($baseUri, FILTER_VALIDATE_URL)
+            || ! in_array(parse_url($baseUri, PHP_URL_SCHEME), ['http', 'https'], true)) {
             return response()->json([
                 'message' => 'Chua cau hinh API key cho nha cung cap AI hien tai.',
             ], 422);
+        }
+
+        $quota = $this->quota->reserve($user, 'ai_tutor');
+        if (! $quota['allowed']) {
+            return response()->json([
+                'message' => 'Da vuot han muc so luot hoi AI trong ngay.',
+                'meta' => $quota,
+            ], 429);
         }
 
         return new StreamedResponse(function () use (

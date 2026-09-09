@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class CourseAiContextService
 {
+    // Together these caps keep serialized context below 100 KiB, including worst-case JSON escaping.
+    private const TITLE_LIMIT = 200;
+
     private const COURSE_DESCRIPTION_LIMIT = 2000;
 
     private const LESSON_CONTENT_LIMIT = 12000;
@@ -37,32 +40,30 @@ final class CourseAiContextService
             ? $this->resolveImplicitLesson($user)
             : $this->resolveExplicitLesson($user, $lessonId);
         $courseSnapshot = $lesson->course->publishedVersion?->snapshot ?? [];
+        $lessonSnapshot = $lesson->publishedVersion?->snapshot ?? [];
+        $moduleSnapshot = collect($courseSnapshot['modules'] ?? [])
+            ->first(fn (array $module): bool => ($module['id'] ?? null) === $lesson->module_id);
 
         return [
             'course_id' => $lesson->course->id,
-            'course_title' => (string) ($courseSnapshot['title'] ?? ''),
+            'course_title' => mb_substr((string) ($courseSnapshot['title'] ?? ''), 0, self::TITLE_LIMIT),
             'course_description' => mb_substr(
                 $this->plainText($courseSnapshot['description'] ?? null),
                 0,
                 self::COURSE_DESCRIPTION_LIMIT,
             ),
             'module_id' => $lesson->module?->id,
-            'module_title' => $lesson->module?->title,
+            'module_title' => isset($moduleSnapshot['title'])
+                ? mb_substr($moduleSnapshot['title'], 0, self::TITLE_LIMIT) : null,
             'lesson_id' => $lesson->id,
-            'lesson_title' => $lesson->title,
+            'lesson_title' => mb_substr((string) ($lessonSnapshot['title'] ?? ''), 0, self::TITLE_LIMIT),
             'lesson_content' => mb_substr(
-                $this->plainText($lesson->content),
+                $this->plainText($lessonSnapshot['content'] ?? null),
                 0,
                 self::LESSON_CONTENT_LIMIT,
             ),
-            'attachments' => $lesson->attachments()
-                ->get(['display_name', 'mime_type'])
-                ->map(fn ($attachment): array => [
-                    'display_name' => $attachment->display_name,
-                    'mime_type' => $attachment->mime_type,
-                ])
-                ->values()
-                ->all(),
+            // Lesson attachment rows are mutable and are not part of ContentVersion snapshots.
+            'attachments' => [],
         ];
     }
 
@@ -115,7 +116,9 @@ final class CourseAiContextService
     private function publishedLessons(): Builder
     {
         return Lesson::query()
-            ->where('lessons.status', 'published')
+            ->whereHas('publishedVersion', fn (Builder $versionQuery) => $versionQuery
+                ->where('status', 'published')
+                ->where('is_published', true))
             ->whereHas('course', fn (Builder $query) => $query
                 ->where('status', 'published')
                 ->whereHas('publishedVersion', fn (Builder $versionQuery) => $versionQuery
@@ -129,7 +132,8 @@ final class CourseAiContextService
             ->with([
                 'course:id,published_version_id',
                 'course.publishedVersion:id,snapshot_data',
-                'module:id,course_id,title',
+                'module:id,course_id',
+                'publishedVersion:id,snapshot_data,status,is_published',
             ]);
     }
 

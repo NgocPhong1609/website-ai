@@ -9,8 +9,10 @@ use App\Models\AiUsageLog;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Services\Ai\AiUsageSummaryService;
+use App\Settings\AiSettingsRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -151,6 +153,64 @@ class AiTutorEntitlementTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public static function missingLocalConfiguration(): array
+    {
+        return [
+            'no counter or key' => [null, null, 'https://api.openai.com/v1'],
+            'existing counter without key' => [2, '', 'https://api.openai.com/v1'],
+            'blank key' => [null, '   ', 'https://api.openai.com/v1'],
+            'missing base uri' => [null, 'test-key', ''],
+            'unsupported base uri scheme' => [null, 'test-key', 'ftp://example.invalid'],
+        ];
+    }
+
+    #[DataProvider('missingLocalConfiguration')]
+    public function test_missing_local_configuration_does_not_spend_quota(?int $used, ?string $key, string $baseUri): void
+    {
+        $user = User::factory()->create();
+        config([
+            'services.ai_tutor.provider' => 'openai', 'services.openai.key' => $key,
+            'services.ai_tutor.openai_base_uri' => $baseUri,
+        ]);
+        if ($used !== null) {
+            AiDailyQuotaUsage::create([
+                'user_id' => $user->id, 'feature' => 'ai_tutor',
+                'usage_date' => now()->toDateString(), 'used' => $used,
+            ]);
+        }
+        Http::fake();
+
+        $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', ['message' => 'Explain addition'])
+            ->assertUnprocessable()->assertExactJson(['message' => 'Chua cau hinh API key cho nha cung cap AI hien tai.']);
+
+        $this->assertSame($used === null ? 0 : 1, AiDailyQuotaUsage::count());
+        $this->assertSame($used, AiDailyQuotaUsage::first()?->used);
+        $this->assertSame(0, AiUsageLog::count());
+        Http::assertNothingSent();
+    }
+
+    public function test_stream_finishes_fallible_prompt_preparation_before_reserving_quota(): void
+    {
+        $user = User::factory()->create();
+        config(['services.ai_tutor.provider' => 'groq', 'services.groq.key' => 'test-key']);
+        $this->partialMock(AiSettingsRepository::class, function ($mock) {
+            $mock->shouldReceive('prompts')->once()->andThrow(new \RuntimeException('private-prompt-settings-failure'));
+        });
+        Http::fake();
+        $this->withoutExceptionHandling();
+        $caught = null;
+        try {
+            $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', ['message' => 'Explain addition']);
+        } catch (\RuntimeException $exception) {
+            $caught = $exception;
+        }
+
+        $this->assertNotNull($caught);
+        $this->assertSame(0, AiDailyQuotaUsage::count());
+        $this->assertSame(0, AiUsageLog::count());
+        Http::assertNothingSent();
+    }
+
     public function test_stream_records_sanitized_provider_usage(): void
     {
         $user = User::factory()->create();
@@ -244,13 +304,23 @@ class AiTutorEntitlementTest extends TestCase
     {
         $user = User::factory()->create();
         config(['services.ai_tutor.provider' => 'groq', 'services.groq.key' => 'secret-key']);
-        Http::fake(['api.groq.com/*' => $failure === 'http'
-            ? Http::response(['error' => 'private-provider-body'], 503)
-            : fn () => throw new ConnectionException('private-connection-detail')]);
+        $transactionLevel = DB::transactionLevel();
+        $attempts = 0;
+        Http::fake(['api.groq.com/*' => function () use ($transactionLevel, &$attempts, $failure) {
+            $attempts++;
+            $this->assertSame($transactionLevel, DB::transactionLevel());
+            $this->assertSame(1, AiDailyQuotaUsage::sole()->used);
+
+            return $failure === 'http'
+                ? Http::response(['error' => 'private-provider-body'], 503)
+                : throw new ConnectionException('private-connection-detail');
+        }]);
 
         $response = $this->actingAs($user)->postJson('/api/student/ai-tutor/chat', ['message' => 'Explain addition']);
         $response->assertOk();
         $this->assertSame('He thong AI tam thoi gian doan. Vui long thu lai sau.', $response->streamedContent());
+        $this->assertSame(1, $attempts);
+        $this->assertSame(1, AiDailyQuotaUsage::sole()->used);
         $log = AiUsageLog::sole();
         $this->assertSame('failed', $log->status);
         $this->assertSame($errorCode, $log->error_code);

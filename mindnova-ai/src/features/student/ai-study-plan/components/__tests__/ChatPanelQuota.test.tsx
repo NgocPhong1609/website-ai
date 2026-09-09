@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { axiosClient } from "@/src/shared/lib/axios";
 import { AiQuotaError, sendAiChatMessage } from "../../services/ai-chat.client-service";
 import { ChatPanel } from "../ChatPanel";
 
@@ -55,7 +56,44 @@ describe("ChatPanel quota", () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
     cleanup();
+  });
+
+  it("sends a follow-up after a long Unicode answer and retains the full displayed and saved answer", async () => {
+    vi.useFakeTimers();
+    const client = await vi.importActual<typeof import("../../services/ai-chat.client-service")>("../../services/ai-chat.client-service");
+    vi.mocked(sendAiChatMessage).mockImplementation(client.sendAiChatMessage);
+    const prefix = "ệ".repeat(1999) + "📘";
+    const longAnswer = prefix + "🙂 Kết thúc đầy đủ";
+    const post = vi.spyOn(axiosClient, "post").mockImplementation(async (_url, payload) => {
+      const request = payload as { message: string; history: { text: string }[] };
+      if (request.history.some((entry) => Array.from(entry.text).length > 2000)) {
+        throw { response: { status: 422, data: { message: "History text exceeds 2000 characters." } } };
+      }
+      return {
+        data: {
+          success: true, message: "AI response generated successfully.",
+          data: { id: request.message, sender: "ai", timestamp: "Vừa xong", text: request.message === "Giải thích tiếp" ? "Trả lời tiếp" : longAnswer },
+          meta: { quota },
+        },
+        status: 200, statusText: "OK", headers: {}, config: {},
+      };
+    });
+    renderChatPanel();
+    await submitQuestion();
+    await act(async () => { await vi.advanceTimersByTimeAsync(30_000); });
+    expect(screen.getByText(longAnswer)).toBeVisible();
+
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Giải thích tiếp" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+
+    expect(screen.getByText("Trả lời tiếp")).toBeVisible();
+    expect(post.mock.calls[1][1]).toMatchObject({ history: expect.arrayContaining([{ sender: "ai", text: prefix }]) });
+    expect(screen.getByText(longAnswer)).toBeVisible();
+    const saved = JSON.parse(localStorage.getItem("mindnova_study_plan_chat_v1_42")!);
+    expect(saved.find((entry: { text: string }) => entry.text === longAnswer)).toBeDefined();
   });
 
   it("shows the authoritative remaining quota after a successful reply", async () => {

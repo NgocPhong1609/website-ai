@@ -8,6 +8,7 @@ use App\Models\Enrollment;
 use App\Models\Lesson;
 use App\Models\LessonAttachment;
 use App\Models\User;
+use App\Services\Instructor\CourseModuleService;
 use App\Services\Student\CourseAiContextService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -54,7 +55,12 @@ function createCourseAiTestLesson(Course $course, array $attributes = []): Lesso
 
     unset($attributes['module_title'], $attributes['module_order'], $attributes['module_status']);
 
-    return Lesson::create(array_merge([
+    $version = $course->publishedVersion;
+    $snapshot = $version->snapshot;
+    $snapshot['modules'][] = ['id' => $module->id, 'title' => $module->title, 'order' => $module->order];
+    $version->update(['snapshot_data' => $snapshot]);
+
+    $lesson = Lesson::create(array_merge([
         'course_id' => $course->id,
         'module_id' => $module->id,
         'title' => 'Route model binding',
@@ -62,6 +68,26 @@ function createCourseAiTestLesson(Course $course, array $attributes = []): Lesso
         'order' => 1,
         'status' => 'published',
     ], $attributes));
+
+    if ($lesson->status === 'published') {
+        $lessonVersion = ContentVersion::create([
+            'versionable_type' => Lesson::class,
+            'versionable_id' => $lesson->id,
+            'version_number' => 1,
+            'snapshot_data' => [
+                'title' => $lesson->title,
+                'content' => $lesson->content,
+                'module_id' => $lesson->module_id,
+                'course_id' => $lesson->course_id,
+            ],
+            'status' => 'published',
+            'is_published' => true,
+            'created_by' => $course->teacher_id,
+        ]);
+        $lesson->update(['published_version_id' => $lessonVersion->id]);
+    }
+
+    return $lesson->fresh();
 }
 
 test('context contains only the enrolled published lesson', function () {
@@ -100,12 +126,57 @@ test('context contains only the enrolled published lesson', function () {
         ->lesson_id->toBe($lesson->id)
         ->lesson_title->toBe('Route model binding')
         ->lesson_content->toBe('Implicit binding')
-        ->attachments->toBe([
-            ['display_name' => 'route-notes.pdf', 'mime_type' => 'application/pdf'],
-        ]);
+        ->attachments->toBe([]);
     expect(json_encode($context))
         ->not->toContain('private/key')
         ->not->toContain('secret.pdf');
+});
+
+test('context uses the approved lesson snapshot while unpublished working edits stay private', function () {
+    $teacher = User::factory()->create();
+    $student = User::factory()->create();
+    $course = createCourseAiTestCourse($teacher);
+    Enrollment::create([
+        'user_id' => $student->id, 'course_id' => $course->id,
+        'status' => 'enrolled', 'enrolled_at' => now(),
+    ]);
+    $lesson = createCourseAiTestLesson($course, [
+        'title' => 'Approved lesson title',
+        'content' => '<p>Approved lesson content</p>',
+    ]);
+    $lesson->update([
+        'title' => 'private-unreviewed-lesson-title',
+        'content' => '<p>private-unreviewed-lesson-content</p>',
+        'status' => 'draft',
+    ]);
+    LessonAttachment::create([
+        'lesson_id' => $lesson->id, 'uploaded_by' => $teacher->id,
+        'display_name' => 'private-unreviewed-attachment.pdf', 'original_name' => 'private.pdf',
+        'mime_type' => 'application/pdf', 'extension' => 'pdf', 'size_bytes' => 10,
+        'r2_key' => 'private-unreviewed-key',
+    ]);
+
+    $context = app(CourseAiContextService::class)->resolve($student, $lesson->id);
+
+    expect($context['lesson_title'])->toBe('Approved lesson title')
+        ->and($context['lesson_content'])->toBe('Approved lesson content')
+        ->and($context['attachments'])->toBe([])
+        ->and(json_encode($context))->not->toContain('private-unreviewed');
+});
+
+test('context rejects a lesson that has no approved published version', function () {
+    $teacher = User::factory()->create();
+    $student = User::factory()->create();
+    $course = createCourseAiTestCourse($teacher);
+    Enrollment::create([
+        'user_id' => $student->id, 'course_id' => $course->id,
+        'status' => 'enrolled', 'enrolled_at' => now(),
+    ]);
+    $lesson = createCourseAiTestLesson($course);
+    $lesson->update(['published_version_id' => null]);
+
+    expect(fn () => app(CourseAiContextService::class)->resolve($student, $lesson->id))
+        ->toThrow(CourseAiContextException::class, 'Bạn không có quyền truy cập bài học này.');
 });
 
 test('context uses approved course metadata instead of unpublished working edits', function () {
@@ -135,6 +206,48 @@ test('context uses approved course metadata instead of unpublished working edits
     expect(json_encode($context))
         ->not->toContain('Tiêu đề nháp chưa duyệt')
         ->not->toContain('Mô tả nháp chưa duyệt');
+});
+
+test('context uses approved module metadata after a published module is renamed', function () {
+    $teacher = User::factory()->create();
+    $student = User::factory()->create();
+    $course = createCourseAiTestCourse($teacher);
+    Enrollment::create([
+        'user_id' => $student->id, 'course_id' => $course->id,
+        'status' => 'enrolled', 'enrolled_at' => now(),
+    ]);
+    createCourseAiTestLesson($course, ['module_title' => 'Another approved module']);
+    $lesson = createCourseAiTestLesson($course);
+
+    app(CourseModuleService::class)->updateModule($lesson->module, ['title' => 'private-unreviewed-module-title']);
+
+    $context = app(CourseAiContextService::class)->resolve($student, $lesson->id);
+
+    expect($lesson->module->fresh()->status)->toBe('published')
+        ->and($context['module_id'])->toBe($lesson->module_id)
+        ->and($context['module_title'])->toBe('Routing')
+        ->and(json_encode($context))->not->toContain('private-unreviewed-module-title');
+});
+
+test('context excludes module titles absent from the approved snapshot', function () {
+    $teacher = User::factory()->create();
+    $student = User::factory()->create();
+    $course = createCourseAiTestCourse($teacher);
+    Enrollment::create([
+        'user_id' => $student->id, 'course_id' => $course->id,
+        'status' => 'enrolled', 'enrolled_at' => now(),
+    ]);
+    $lesson = createCourseAiTestLesson($course, ['module_title' => 'private-unreviewed-module-title']);
+    $version = $course->publishedVersion;
+    $snapshot = $version->snapshot;
+    $snapshot['modules'] = [['id' => $lesson->module_id + 1, 'title' => 'Another approved module']];
+    $version->update(['snapshot_data' => $snapshot]);
+
+    $context = app(CourseAiContextService::class)->resolve($student, $lesson->id);
+
+    expect($context['module_id'])->toBe($lesson->module_id)
+        ->and($context['module_title'])->toBeNull()
+        ->and(json_encode($context))->not->toContain('private-unreviewed-module-title');
 });
 
 test('another students lesson and a missing lesson have the same generic forbidden failure', function () {
@@ -262,9 +375,7 @@ test('context text is normalized and capped at its configured unicode limits', f
         'status' => 'enrolled',
         'enrolled_at' => now(),
     ]);
-    $lesson = createCourseAiTestLesson($course, [
-        'content' => '<div>'.str_repeat('ệ', 12100).'</div>',
-    ]);
+    $lesson = createCourseAiTestLesson($course, ['content' => '<div>'.str_repeat('ệ', 12100).'</div>']);
 
     $context = app(CourseAiContextService::class)->resolve($student, $lesson->id);
 
@@ -272,4 +383,54 @@ test('context text is normalized and capped at its configured unicode limits', f
         ->and(mb_strlen($context['lesson_content']))->toBe(12000)
         ->and($context['course_description'])->not->toContain('<p>')
         ->and($context['lesson_content'])->not->toContain('<div>');
+});
+
+test('context excludes live attachment metadata because it is absent from the approved snapshot', function () {
+    $teacher = User::factory()->create();
+    $student = User::factory()->create();
+    $course = createCourseAiTestCourse($teacher);
+    Enrollment::create([
+        'user_id' => $student->id, 'course_id' => $course->id,
+        'status' => 'enrolled', 'enrolled_at' => now(),
+    ]);
+    $lesson = createCourseAiTestLesson($course);
+    foreach (array_reverse(range(1, 40)) as $index) {
+        LessonAttachment::query()->insert([
+            'id' => 9000 + $index,
+            'lesson_id' => $lesson->id, 'uploaded_by' => $teacher->id,
+            'display_name' => sprintf('%02d-', $index).str_repeat('📘', 252),
+            'mime_type' => 'application/'.str_repeat('ệ', 138),
+            'original_name' => 'private-original.pdf', 'extension' => 'pdf',
+            'size_bytes' => 10, 'r2_key' => 'private-storage-key-'.$index,
+        ]);
+    }
+
+    $context = app(CourseAiContextService::class)->resolve($student, $lesson->id);
+
+    expect($context['attachments'])->toBe([]);
+    expect(json_encode($context, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR))->not->toContain('private-');
+    expect($lesson->attachments()->count())->toBe(40)
+        ->and(LessonAttachment::findOrFail(9001)->display_name)->toBe('01-'.str_repeat('📘', 252));
+});
+
+test('context caps every title including oversized approved snapshot metadata by unicode code point', function () {
+    $teacher = User::factory()->create();
+    $student = User::factory()->create();
+    $course = createCourseAiTestCourse($teacher);
+    Enrollment::create([
+        'user_id' => $student->id, 'course_id' => $course->id,
+        'status' => 'enrolled', 'enrolled_at' => now(),
+    ]);
+    $lesson = createCourseAiTestLesson($course, ['title' => str_repeat('📘', 255)]);
+    $version = $course->publishedVersion;
+    $snapshot = $version->snapshot;
+    $snapshot['title'] = str_repeat('📘', 5000);
+    $snapshot['modules'][0]['title'] = str_repeat('📘', 5000);
+    $version->update(['snapshot_data' => $snapshot]);
+
+    $context = app(CourseAiContextService::class)->resolve($student, $lesson->id);
+
+    expect($context['course_title'])->toBe(str_repeat('📘', 200))
+        ->and($context['module_title'])->toBe(str_repeat('📘', 200))
+        ->and($context['lesson_title'])->toBe(str_repeat('📘', 200));
 });

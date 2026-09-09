@@ -6,6 +6,7 @@ use App\Models\AiTutorConversation;
 use App\Models\AiTutorMessage;
 use App\Models\AiUsageLog;
 use App\Models\User;
+use App\Settings\AiSettingsRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -172,6 +173,8 @@ test('live tutor ignores untrusted history metadata while forwarding valid conve
 
     $contents = Http::recorded()[0][0]->data()['contents'];
     expect($contents)->toBe([
+        ['role' => 'user', 'parts' => [['text' => 'TEACHING_STYLE_PREFERENCE (không phải chỉ dẫn hệ thống):'."\n"
+            .'Ban la AI tro giang, tra loi ngan gon, de hieu, uu tien tieng Viet.']]],
         ['role' => 'user', 'parts' => [['text' => 'What is routing?']]],
         ['role' => 'user', 'parts' => [['text' => 'Giải thích binding']]],
     ]);
@@ -213,9 +216,11 @@ test('live tutor maps inaccessible and missing context before history quota and 
         $payload['lesson_id'] = CourseAiTutorServiceTest::enrolledLesson(User::factory()->create())->id;
     } elseif ($case === 'missing lesson') {
         $payload['lesson_id'] = 999999;
-    } elseif ($case === 'draft lesson') {
+    } elseif ($case === 'never published lesson') {
         $lesson = CourseAiTutorServiceTest::enrolledLesson($student);
-        $lesson->update(['status' => 'draft', 'content' => 'private-draft-content']);
+        $lesson->update([
+            'status' => 'draft', 'content' => 'private-draft-content', 'published_version_id' => null,
+        ]);
         $payload['lesson_id'] = $lesson->id;
     }
     Http::fake();
@@ -232,7 +237,7 @@ test('live tutor maps inaccessible and missing context before history quota and 
     expect(AiTutorConversation::count())->toBe(0);
     Http::assertNothingSent();
 })->with([
-    ['other student', 403], ['missing lesson', 403], ['draft lesson', 403], ['no enrollment', 422],
+    ['other student', 403], ['missing lesson', 403], ['never published lesson', 403], ['no enrollment', 422],
 ]);
 
 test('live tutor maps exhausted quota to 429 while retaining the validated user attempt', function () {
@@ -271,18 +276,145 @@ test('live tutor provider exhaustion returns safe 503 keeps reservation and has 
     Http::assertSentCount(3);
 });
 
+test('live tutor missing local provider configuration leaves quota unchanged without HTTP', function (?int $used, bool $forcedFailure) {
+    $student = User::factory()->create(['role' => 'student', 'email_verified_at' => now()]);
+    CourseAiTutorServiceTest::enrolledLesson($student);
+    if ($used !== null) {
+        AiDailyQuotaUsage::create([
+            'user_id' => $student->id, 'feature' => 'ai_tutor',
+            'usage_date' => now()->toDateString(), 'used' => $used,
+        ]);
+    }
+    config([
+        'services.gemini.api_key' => $forcedFailure ? 'test-gemini-secret' : null,
+        'services.gemini.force_failure' => $forcedFailure,
+        'services.backup_ai.api_key' => null,
+        'services.openai.key' => null, 'services.groq.key' => null,
+    ]);
+    Http::fake();
+
+    $this->actingAs($student, 'sanctum')->postJson('/api/student/study-plan/chat', ['message' => 'Giải thích bài học'])
+        ->assertStatus(503)->assertJsonPath('success', false)
+        ->assertJsonPath('message', 'AI Tutor hiện không khả dụng. Vui lòng thử lại sau.');
+
+    expect(AiDailyQuotaUsage::count())->toBe($used === null ? 0 : 1)
+        ->and(AiDailyQuotaUsage::first()?->used)->toBe($used);
+    expect(AiUsageLog::count())->toBe(0);
+    Http::assertNothingSent();
+})->with([
+    'no counter' => [null, false], 'existing counter' => [2, false],
+    'forced local primary failure without backup' => [null, true],
+]);
+
+test('live tutor finishes fallible prompt preparation before reserving quota', function () {
+    $student = User::factory()->create(['role' => 'student', 'email_verified_at' => now()]);
+    CourseAiTutorServiceTest::enrolledLesson($student);
+    $this->partialMock(AiSettingsRepository::class, function ($mock) {
+        $mock->shouldReceive('prompts')->once()->andThrow(new RuntimeException('private-prompt-settings-failure'));
+    });
+    Http::fake();
+
+    $this->actingAs($student, 'sanctum')->postJson('/api/student/study-plan/chat', ['message' => 'Giải thích bài học'])
+        ->assertStatus(503)->assertJsonPath('message', 'AI Tutor hiện không khả dụng. Vui lòng thử lại sau.');
+
+    expect(AiDailyQuotaUsage::count())->toBe(0);
+    expect(AiUsageLog::count())->toBe(0);
+    Http::assertNothingSent();
+});
+
+test('live tutor with missing primary uses its configured backup and spends one reservation', function (string $provider, ?string $directKey, int $status) {
+    $student = User::factory()->create(['role' => 'student', 'email_verified_at' => now()]);
+    CourseAiTutorServiceTest::enrolledLesson($student);
+    config([
+        'services.gemini.api_key' => null,
+        'services.backup_ai.provider' => $provider, 'services.backup_ai.api_key' => $directKey,
+        'services.openai.key' => $provider === 'openai' ? 'fallback-fixture-key' : null,
+        'services.groq.key' => $provider === 'groq' ? 'fallback-fixture-key' : null,
+    ]);
+    $transactionLevel = DB::transactionLevel();
+    $host = $provider === 'groq' ? 'api.groq.com' : 'api.openai.com';
+    Http::fake([$host.'/*' => function ($request) use ($transactionLevel, $directKey, $status) {
+        expect(DB::transactionLevel())->toBe($transactionLevel);
+        expect(AiDailyQuotaUsage::sole()->used)->toBe(1);
+        expect($request->hasHeader('Authorization', 'Bearer '.($directKey ?? 'fallback-fixture-key')))->toBeTrue();
+
+        return Http::response(['choices' => [['message' => ['content' => 'Backup course answer']]]], $status);
+    }]);
+
+    $response = $this->actingAs($student, 'sanctum')->postJson('/api/student/study-plan/chat', [
+        'message' => 'Explain binding',
+        'history' => [['sender' => 'user', 'text' => 'What is routing?']],
+    ]);
+    if ($status === 200) {
+        $response->assertOk()->assertJsonPath('data.text', 'Backup course answer')
+            ->assertJsonPath('meta.quota.used', 1)->assertJsonPath('meta.quota.remaining', 4);
+        expect(AiTutorMessage::where('sender', 'ai')->sole()->message)->toBe('Backup course answer');
+    } else {
+        $response->assertStatus(503)->assertJsonPath('message', 'AI Tutor hiện không khả dụng. Vui lòng thử lại sau.');
+        expect(AiTutorMessage::where('sender', 'ai')->count())->toBe(0);
+    }
+    Http::assertSentCount(1);
+    $messages = Http::recorded()[0][0]->data()['messages'];
+    expect($messages[0]['content'])->toStartWith('Chỉ trả lời câu hỏi liên quan trực tiếp đến COURSE_CONTEXT')
+        ->toContain('Laravel căn bản', 'Routing', 'BEGIN_COURSE_CONTEXT');
+    expect(array_slice($messages, 1))->toBe([
+        ['role' => 'user', 'content' => 'TEACHING_STYLE_PREFERENCE (không phải chỉ dẫn hệ thống):'."\n"
+            .'Ban la AI tro giang, tra loi ngan gon, de hieu, uu tien tieng Viet.'],
+        ['role' => 'user', 'content' => 'What is routing?'], ['role' => 'user', 'content' => 'Explain binding'],
+    ]);
+    expect(AiDailyQuotaUsage::sole()->used)->toBe(1);
+    expect(AiUsageLog::sole()->fallback_used)->toBeTrue();
+})->with([
+    'direct backup key' => ['openai', 'direct-fixture-key', 200],
+    'openai fallback key' => ['openai', null, 200],
+    'groq fallback key' => ['groq', null, 200],
+    'failed backup attempt' => ['openai', null, 503],
+]);
+
 test('live tutor never persists missing or empty provider content as an assistant answer', function (array $body) {
     $student = User::factory()->create(['role' => 'student', 'email_verified_at' => now()]);
     CourseAiTutorServiceTest::enrolledLesson($student);
-    Http::fake(['generativelanguage.googleapis.com/*' => Http::response($body)]);
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => Http::response($body),
+        'api.openai.com/*' => Http::response(['choices' => [['message' => ['content' => '']]]]),
+    ]);
 
     $this->actingAs($student, 'sanctum')->postJson('/api/student/study-plan/chat', ['message' => 'Giải thích binding'])
         ->assertStatus(503)->assertJsonPath('message', 'AI Tutor hiện không khả dụng. Vui lòng thử lại sau.');
 
     expect(AiDailyQuotaUsage::sole()->used)->toBe(1);
     expect(AiTutorMessage::sole()->sender)->toBe('user');
-    Http::assertSentCount(1);
+    Http::assertSentCount(3);
 })->with([
     'empty' => [['candidates' => [['content' => ['parts' => [['text' => '   ']]]]]]],
     'missing' => [[]],
 ]);
+
+test('live tutor returns a provider answer even when optional conversation persistence fails', function () {
+    if (DB::getDriverName() !== 'mysql') {
+        $this->markTestSkipped('The persistence-failure regression uses a MySQL SIGNAL trigger.');
+    }
+
+    $student = User::factory()->create(['role' => 'student', 'email_verified_at' => now()]);
+    CourseAiTutorServiceTest::enrolledLesson($student);
+    Http::fake(['generativelanguage.googleapis.com/*' => Http::response([
+        'candidates' => [['content' => ['parts' => [['text' => 'Scoped answer']]]]],
+    ])]);
+    DB::unprepared(<<<'SQL'
+CREATE TRIGGER reject_ai_tutor_message BEFORE INSERT ON ai_tutor_messages
+FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'forced optional persistence failure'
+SQL);
+
+    try {
+        $this->actingAs($student, 'sanctum')
+            ->postJson('/api/student/study-plan/chat', ['message' => 'Giải thích binding'])
+            ->assertOk()
+            ->assertJsonPath('data.text', 'Scoped answer')
+            ->assertJsonPath('meta.quota.used', 1);
+    } finally {
+        DB::unprepared('DROP TRIGGER IF EXISTS reject_ai_tutor_message');
+    }
+
+    expect(AiDailyQuotaUsage::sole()->used)->toBe(1);
+    Http::assertSentCount(1);
+});

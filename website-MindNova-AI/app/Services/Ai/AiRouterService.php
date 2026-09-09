@@ -2,7 +2,7 @@
 
 namespace App\Services\Ai;
 
-use App\Contracts\AiProviderInterface;
+use App\Contracts\ConfiguredAiProviderInterface;
 use App\Exceptions\AiTransientException;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -13,13 +13,18 @@ class AiRouterService
     private array $providers;
 
     public function __construct(
-        private readonly AiProviderInterface $primaryProvider, // Gemini
-        private readonly AiProviderInterface $backupProvider   // Backup AI
+        private readonly ConfiguredAiProviderInterface $primaryProvider, // Gemini
+        private readonly ConfiguredAiProviderInterface $backupProvider   // Backup AI
     ) {
         $this->providers = [
             'primary' => $primaryProvider,
             'backup' => $backupProvider,
         ];
+    }
+
+    public function isReady(): bool
+    {
+        return $this->primaryProvider->isReady() || $this->backupProvider->isReady();
     }
 
     /**
@@ -35,6 +40,10 @@ class AiRouterService
         $backupOptions = array_merge($options, ['max_retries' => 1, 'request_id' => $requestId, 'fallback_used' => true]); // Total 1 attempt
 
         try {
+            // The metered tutor skips local configuration failures; other callers keep legacy routing.
+            if (($options['skip_unconfigured_providers'] ?? false) && ! $this->primaryProvider->isReady()) {
+                throw new AiTransientException('Primary AI provider is not configured.');
+            }
             Log::info("[AI Router] Primary provider: {$this->primaryProvider->getProviderName()}");
             $response = $this->primaryProvider->sendMessage($messages, $primaryOptions);
 
@@ -54,10 +63,21 @@ class AiRouterService
         } catch (AiTransientException $e) {
             Log::warning("[AI Router] Primary provider unavailable ({$this->primaryProvider->getProviderName()})", ['request_id' => $requestId]);
             Log::warning("[AI Router] Switching to Backup AI provider ({$this->backupProvider->getProviderName()})");
+        } catch (Exception $e) {
+            if (! ($options['skip_unconfigured_providers'] ?? false)) {
+                throw $e;
+            }
+
+            // The live Tutor preserves its legacy behavior: any unusable primary result tries backup.
+            Log::warning("[AI Router] Primary provider failed ({$this->primaryProvider->getProviderName()})", ['request_id' => $requestId]);
+            Log::warning("[AI Router] Switching to Backup AI provider ({$this->backupProvider->getProviderName()})");
         }
 
         // Fallback execution
         try {
+            if (($options['skip_unconfigured_providers'] ?? false) && ! $this->backupProvider->isReady()) {
+                throw new Exception('Backup AI provider is not configured.');
+            }
             $fallbackStartTime = microtime(true);
             Log::info("[AI Router] Backup provider: {$this->backupProvider->getProviderName()}");
             Log::info('[AI Router] Backup request started');
