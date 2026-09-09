@@ -75,7 +75,11 @@ class AiSettingsRepository
     {
         $primary = config('services.gemini');
         $backup = config('services.backup_ai');
-        $backupProvider = trim((string) ($backup['provider'] ?? '')) ?: 'openai';
+        $backupProvider = (string) ($backup['provider'] ?? '');
+
+        if (trim($backupProvider) === '') {
+            $backupProvider = 'openai';
+        }
         $backupApiKey = $backup['api_key'] ?? null;
 
         if (! $this->configured($backupApiKey)) {

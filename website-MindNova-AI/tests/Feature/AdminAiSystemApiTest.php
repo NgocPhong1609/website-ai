@@ -102,6 +102,22 @@ it('normalizes a blank backup provider to openai and uses its runtime fallback k
     expect($response->getContent())->not->toContain('openai-fallback-secret');
 });
 
+it('preserves a whitespace-wrapped provider and follows the runtime openai fallback', function () {
+    config()->set('services.backup_ai.api_key', null);
+    config()->set('services.backup_ai.provider', ' groq ');
+    config()->set('services.groq.key', null);
+    config()->set('services.openai.key', 'openai-whitespace-fallback-secret');
+
+    $response = $this->actingAs(adminForAiConfig(), 'sanctum')
+        ->getJson('/api/admin/ai-config');
+
+    $response->assertOk()
+        ->assertJsonPath('providers.backup.name', ' groq ')
+        ->assertJsonPath('providers.backup.configured', true);
+
+    expect($response->getContent())->not->toContain('openai-whitespace-fallback-secret');
+});
+
 it('persists exactly the writable free premium packages and prompts', function () {
     $response = $this->actingAs(adminForAiConfig(), 'sanctum')
         ->putJson('/api/admin/ai-config', aiConfigPayload());
