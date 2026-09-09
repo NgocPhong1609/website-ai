@@ -60,6 +60,7 @@ return [
     ],
 
     'backup_ai' => [
+        'provider' => env('BACKUP_AI_PROVIDER', 'openai'),
         'api_key' => env('BACKUP_AI_API_KEY'),
         'model' => env('BACKUP_AI_MODEL', 'llama-3.3-70b-versatile'),
     ],
