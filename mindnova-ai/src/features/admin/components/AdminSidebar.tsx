@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { useAdminNavigation } from "./AdminDashboardShell";
 
 const navItems = [
@@ -19,6 +20,59 @@ const navItems = [
 export function AdminSidebar() {
  const pathname = usePathname();
  const { closeNavigation, isOpen } = useAdminNavigation();
+ const [isDesktop, setIsDesktop] = useState(false);
+ const sidebarRef = useRef<HTMLElement>(null);
+ const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+ useEffect(() => {
+ const desktopMedia = window.matchMedia("(min-width: 1024px)");
+ const updateDesktopState = () => setIsDesktop(desktopMedia.matches);
+
+ updateDesktopState();
+ desktopMedia.addEventListener("change", updateDesktopState);
+ return () => desktopMedia.removeEventListener("change", updateDesktopState);
+ }, []);
+
+ useEffect(() => {
+ if (isOpen && !isDesktop) {
+ closeButtonRef.current?.focus();
+ }
+ }, [isDesktop, isOpen]);
+
+ useEffect(() => {
+ if (!isOpen || isDesktop) return;
+
+ const containFocus = (event: KeyboardEvent) => {
+ if (event.key !== "Tab" || !sidebarRef.current) return;
+
+ const focusableElements = Array.from(
+ sidebarRef.current.querySelectorAll<HTMLElement>(
+ "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])",
+ ),
+ );
+ const firstElement = focusableElements[0];
+ const lastElement = focusableElements.at(-1);
+
+ if (!firstElement || !lastElement) return;
+
+ const activeElement = document.activeElement;
+ const focusIsOutside = !sidebarRef.current.contains(activeElement);
+
+ if (event.shiftKey && (activeElement === firstElement || focusIsOutside)) {
+ event.preventDefault();
+ lastElement.focus();
+ return;
+ }
+
+ if (!event.shiftKey && (activeElement === lastElement || focusIsOutside)) {
+ event.preventDefault();
+ firstElement.focus();
+ }
+ };
+
+ document.addEventListener("keydown", containFocus);
+ return () => document.removeEventListener("keydown", containFocus);
+ }, [isDesktop, isOpen]);
 
  return (
  <>
@@ -32,10 +86,13 @@ export function AdminSidebar() {
  )}
 
  <aside
+ ref={sidebarRef}
  id="admin-sidebar"
  aria-label="Điều hướng quản trị"
+ aria-hidden={!isDesktop && !isOpen ? true : undefined}
+ inert={!isDesktop && !isOpen}
  className={`fixed inset-y-0 left-0 z-50 flex h-dvh w-[260px] shrink-0 flex-col overflow-hidden border-r border-slate-200/80 bg-[linear-gradient(180deg,#0f172a_0%,#101f36_38%,#16284b_100%)] text-slate-100 shadow-2xl transition-transform duration-200 ease-out lg:static lg:z-auto lg:h-full lg:translate-x-0 lg:shadow-none xl:w-[280px] ${
- isOpen ? "translate-x-0" : "-translate-x-full"
+ isOpen ? "translate-x-0" : "pointer-events-none -translate-x-full lg:pointer-events-auto"
  }`}
  >
  {/* Brand Header */}
@@ -54,6 +111,7 @@ export function AdminSidebar() {
  </div>
  {isOpen && (
  <button
+ ref={closeButtonRef}
  type="button"
  aria-label="Đóng menu quản trị"
  onClick={closeNavigation}
