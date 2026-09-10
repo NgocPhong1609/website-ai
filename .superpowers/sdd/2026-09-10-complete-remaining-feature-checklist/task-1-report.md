@@ -31,6 +31,12 @@
 - Frontend RED: `1 failed, 2 passed`; the tier percentage input remained enabled during a pending save.
 - Frontend GREEN: combined focused suite `5 passed`.
 
+### Review-fix cycle 2
+
+- Backend RED: replay test `1 failed (5 assertions)` because a payout-only recovery stored the changed current course price (`250000`) instead of the historical payout gross (`100000`); the prior snapshot guard also left the companion revenue transaction missing.
+- Backend GREEN: `CommissionConfigurationTest` — `12 passed (67 assertions)` in `37.40s`.
+- Replay now `firstOrCreate`s the revenue transaction from the resolved historical snapshot, preserves it on subsequent calls, and reconstructs payout-only allocation price fields as historical gross with zero discount.
+
 ## Verification
 
 - Backend: `php artisan test tests/Feature/CommissionConfigurationTest.php tests/Feature/InstructorPayoutTest.php tests/Feature/AdminRevenueApiTest.php` via the local PHP test container and MySQL test database — 14 passed, 82 assertions.

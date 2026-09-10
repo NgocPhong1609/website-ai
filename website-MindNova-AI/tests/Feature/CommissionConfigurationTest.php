@@ -226,7 +226,7 @@ test('admin revenue returns canonical tiers and transaction snapshot fields', fu
         ->assertJsonPath('orderHistory.0.teacherAmount', 70000);
 });
 
-test('replaying payout creation after a configuration change reuses the existing payout snapshot', function () {
+test('replaying payout creation repairs missing companions once from the existing payout snapshot', function () {
     $admin = commissionUser('admin', 'replay-admin@example.com');
     $teacher = commissionUser('teacher', 'replay-teacher@example.com');
     $student = commissionUser('student', 'replay-student@example.com');
@@ -252,13 +252,24 @@ test('replaying payout creation after a configuration change reuses the existing
         ],
     ])->assertOk();
 
+    $course->update(['price' => 250000]);
+
     app(InstructorPayoutService::class)->createForOrder($order);
 
     $allocation = RevenueAllocation::firstOrFail();
     expect((float) $allocation->platform_fee_percent)->toBe(30.0)
         ->and((float) $allocation->instructor_percent)->toBe(70.0)
         ->and((float) $allocation->instructor_amount)->toBe(70000.0)
-        ->and(InstructorTransaction::count())->toBe(0);
+        ->and((float) $allocation->original_price)->toBe(100000.0)
+        ->and((float) $allocation->discount_amount)->toBe(0.0)
+        ->and((float) $allocation->paid_amount)->toBe(100000.0)
+        ->and((float) InstructorTransaction::where('type', 'revenue')->value('amount'))->toBe(70000.0)
+        ->and(InstructorTransaction::where('type', 'revenue')->count())->toBe(1);
+
+    app(InstructorPayoutService::class)->createForOrder($order);
+
+    expect(InstructorTransaction::where('type', 'revenue')->count())->toBe(1)
+        ->and((float) InstructorTransaction::where('type', 'revenue')->value('amount'))->toBe(70000.0);
 });
 
 test('commission percentages are normalized to stored precision before deriving the complement', function () {

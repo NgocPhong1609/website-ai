@@ -40,8 +40,6 @@ class InstructorPayoutService
                     ->where('course_id', $course->id)
                     ->whereNull('order_item_id')
                     ->first();
-            $hadSnapshot = $payout !== null || $allocation !== null;
-
             $quote = $allocation !== null
                 ? $this->quoteFromAllocation($allocation)
                 : ($payout !== null
@@ -71,6 +69,9 @@ class InstructorPayoutService
 
             // Create RevenueAllocation Snapshot per transaction
             if ($allocation === null) {
+                $originalPrice = $payout !== null
+                    ? $quote['gross_amount']
+                    : ($course->price ?? $quote['gross_amount']);
                 $allocation = RevenueAllocation::create([
                     'order_id' => $order->id,
                     'order_item_id' => $item->id,
@@ -78,8 +79,8 @@ class InstructorPayoutService
                     'student_id' => $order->user_id,
                     'instructor_id' => $course->teacher_id,
                     'partnership_tier' => $quote['tier'],
-                    'original_price' => $course->price ?? $quote['gross_amount'],
-                    'discount_amount' => max(0, ($course->price ?? $quote['gross_amount']) - $quote['gross_amount']),
+                    'original_price' => $originalPrice,
+                    'discount_amount' => max(0, $originalPrice - $quote['gross_amount']),
                     'paid_amount' => $quote['gross_amount'],
                     'platform_fee_percent' => $quote['platform_commission_percent'],
                     'platform_fee_amount' => $quote['platform_amount'],
@@ -91,23 +92,21 @@ class InstructorPayoutService
             }
 
             // Create InstructorTransaction for Revenue Dashboard with PENDING/HOLD status initially
-            if (! $hadSnapshot) {
-                InstructorTransaction::firstOrCreate(
-                    [
-                        'reference_type' => 'App\Models\OrderItem',
-                        'reference_id' => $item->id,
-                        'type' => 'revenue',
-                    ],
-                    [
-                        'instructor_id' => $course->teacher_id,
-                        'amount' => $quote['instructor_amount'],
-                        'status' => 'pending', // PENDING/HOLD until refund period expires or progress threshold is crossed
-                        'description' => 'Doanh thu từ khóa học: '.$course->title,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]
-                );
-            }
+            InstructorTransaction::firstOrCreate(
+                [
+                    'reference_type' => 'App\Models\OrderItem',
+                    'reference_id' => $item->id,
+                    'type' => 'revenue',
+                ],
+                [
+                    'instructor_id' => $course->teacher_id,
+                    'amount' => $quote['instructor_amount'],
+                    'status' => 'pending', // PENDING/HOLD until refund period expires or progress threshold is crossed
+                    'description' => 'Doanh thu từ khóa học: '.$course->title,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
     }
 
