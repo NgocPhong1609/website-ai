@@ -32,6 +32,7 @@ class InstructorPayoutService
                 ->where('course_id', $course->id)
                 ->where('teacher_id', $course->teacher_id)
                 ->first();
+            $payoutExisted = $payout !== null;
             $allocation = RevenueAllocation::where('order_id', $order->id)
                 ->where('course_id', $course->id)
                 ->where('order_item_id', $item->id)
@@ -69,7 +70,7 @@ class InstructorPayoutService
 
             // Create RevenueAllocation Snapshot per transaction
             if ($allocation === null) {
-                $originalPrice = $payout !== null
+                $originalPrice = $payoutExisted
                     ? $quote['gross_amount']
                     : ($course->price ?? $quote['gross_amount']);
                 $allocation = RevenueAllocation::create([

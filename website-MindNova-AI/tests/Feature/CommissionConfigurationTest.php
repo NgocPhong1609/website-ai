@@ -226,6 +226,22 @@ test('admin revenue returns canonical tiers and transaction snapshot fields', fu
         ->assertJsonPath('orderHistory.0.teacherAmount', 70000);
 });
 
+test('fresh discounted purchases preserve course price and discount in the allocation snapshot', function () {
+    $teacher = commissionUser('teacher', 'discount-teacher@example.com');
+    $student = commissionUser('student', 'discount-student@example.com');
+    [$course, $order, $item] = commissionOrder($teacher, $student, 'standard', 100000);
+    $order->update(['total_amount' => 80000]);
+    $item->update(['price' => 80000]);
+
+    app(InstructorPayoutService::class)->createForOrder($order);
+
+    $allocation = RevenueAllocation::firstOrFail();
+    expect((float) $allocation->original_price)->toBe(100000.0)
+        ->and((float) $allocation->discount_amount)->toBe(20000.0)
+        ->and((float) $allocation->paid_amount)->toBe(80000.0)
+        ->and((float) $allocation->instructor_amount)->toBe(56000.0);
+});
+
 test('replaying payout creation repairs missing companions once from the existing payout snapshot', function () {
     $admin = commissionUser('admin', 'replay-admin@example.com');
     $teacher = commissionUser('teacher', 'replay-teacher@example.com');

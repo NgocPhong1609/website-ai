@@ -37,6 +37,12 @@
 - Backend GREEN: `CommissionConfigurationTest` — `12 passed (67 assertions)` in `37.40s`.
 - Replay now `firstOrCreate`s the revenue transaction from the resolved historical snapshot, preserves it on subsequent calls, and reconstructs payout-only allocation price fields as historical gross with zero discount.
 
+### Review-fix cycle 3
+
+- Backend RED: discounted-order test `1 failed (1 assertion)` because a fresh purchase stored paid price (`80000`) as `original_price` instead of course price (`100000`).
+- Backend GREEN: `CommissionConfigurationTest` — `13 passed (71 assertions)` in `38.06s`, including both fresh discount preservation and historical payout replay recovery.
+- Payout creation now records whether the payout existed before the call, so only historical payout recovery uses gross/zero-discount fallback; newly created discounted purchases retain course original price and computed discount.
+
 ## Verification
 
 - Backend: `php artisan test tests/Feature/CommissionConfigurationTest.php tests/Feature/InstructorPayoutTest.php tests/Feature/AdminRevenueApiTest.php` via the local PHP test container and MySQL test database — 14 passed, 82 assertions.
