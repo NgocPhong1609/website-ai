@@ -31,6 +31,13 @@ describe('ChatMessageBubble instructor identity', () => {
     expect(screen.getByText('Please review this lesson').parentElement).toHaveClass('bg-indigo-50');
   });
 
+  it('keeps the instructor badge when a message is recalled', () => {
+    render(<ChatMessageBubble message={{ ...message('instructor'), is_recalled: true }} isOwn={false} />);
+
+    expect(screen.getByText('Tin nhắn đã bị thu hồi')).toBeInTheDocument();
+    expect(screen.getByText('Giảng viên')).toHaveAttribute('aria-label', 'Giảng viên');
+  });
+
   it.each([['student'], [null], [undefined]])('does not badge an ordinary or legacy role (%s)', (role) => {
     render(<ChatMessageBubble message={message(role)} isOwn={false} />);
 
