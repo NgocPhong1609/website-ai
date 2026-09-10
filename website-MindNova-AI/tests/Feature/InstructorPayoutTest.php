@@ -55,7 +55,7 @@ class InstructorPayoutTest extends TestCase
             'price' => $course->price,
         ]);
 
-        $service = new InstructorPayoutService();
+        $service = app(InstructorPayoutService::class);
         $service->createForOrder($order);
 
         $this->assertDatabaseCount('teacher_payouts', 1);
@@ -63,8 +63,10 @@ class InstructorPayoutTest extends TestCase
 
         $this->assertSame($teacher->id, $payout->teacher_id);
         $this->assertSame($course->id, $payout->course_id);
-        $this->assertSame(90000.0, (float) $payout->teacher_amount);
-        $this->assertSame(10000.0, (float) $payout->admin_share_amount);
-        $this->assertSame('completed', $payout->status);
+        $this->assertSame(70000.0, (float) $payout->teacher_amount);
+        $this->assertSame(30000.0, (float) $payout->admin_share_amount);
+        $this->assertSame(30.0, (float) $payout->commission_rate);
+        $this->assertSame('standard', $payout->metadata['partnership_tier']);
+        $this->assertSame('pending', $payout->status);
     }
 }

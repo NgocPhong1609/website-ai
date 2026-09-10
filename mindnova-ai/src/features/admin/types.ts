@@ -218,6 +218,8 @@ export type AdminRevenueCourseRow = {
   grossRevenue?: number;
   adminRevenue?: number;
   teacherRevenue?: number;
+  platformCommissionPercent?: number | null;
+  instructorPercent?: number | null;
   revenue: number;
   students: number;
   conversionRate: number;
@@ -231,12 +233,14 @@ export type AdminOrderHistoryRow = {
   studentEmail: string;
   courseTitle: string;
   instructorName: string;
-  partnershipTier: "standard" | "exclusive";
+  partnershipTier: string;
   originalPrice: number;
   discountAmount: number;
   paidAmount: number;
   teacherAmount: number;
   adminAmount: number;
+  platformCommissionPercent: number | null;
+  instructorPercent: number | null;
   allocationStatus: string;
   orderStatus: string;
   refundedAt?: string | null;
@@ -249,6 +253,14 @@ export type AdminRevenueData = {
   courseCount: number;
   courses: AdminRevenueCourseRow[];
   orderHistory?: AdminOrderHistoryRow[];
+  commissionTiers?: CommissionTierDefinition[];
+};
+
+export type CommissionTierDefinition = {
+  tier: string;
+  label: string;
+  platform_commission_percent: number;
+  instructor_percent: number;
 };
 
 export type AdminModerationRow = {

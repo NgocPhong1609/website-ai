@@ -3,15 +3,17 @@
 namespace App\Services\Instructor;
 
 use App\Models\Course;
+use App\Models\InstructorTransaction;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\TeacherPayout;
 use App\Models\RevenueAllocation;
-use App\Models\InstructorTransaction;
-use Illuminate\Support\Facades\DB;
+use App\Models\TeacherPayout;
+use App\Services\CommissionService;
 
 class InstructorPayoutService
 {
+    public function __construct(private readonly CommissionService $commission) {}
+
     public function createForOrder(Order $order): void
     {
         if ($order->status !== 'completed') {
@@ -26,10 +28,7 @@ class InstructorPayoutService
                 continue;
             }
 
-            $grossAmount = (float) $item->price;
-            $commissionRate = ($course->partnership_tier === 'exclusive') ? 0.15 : 0.30;
-            $adminShareAmount = round($grossAmount * $commissionRate, 2);
-            $teacherAmount = round($grossAmount - $adminShareAmount, 2);
+            $quote = $this->commission->quote($course->partnership_tier ?? 'standard', $item->price);
 
             $payout = TeacherPayout::firstOrCreate(
                 [
@@ -39,15 +38,17 @@ class InstructorPayoutService
                 ],
                 [
                     'student_id' => $order->user_id,
-                    'gross_amount' => $grossAmount,
-                    'teacher_amount' => $teacherAmount,
-                    'admin_share_amount' => $adminShareAmount,
-                    'commission_rate' => $commissionRate * 100,
+                    'gross_amount' => $quote['gross_amount'],
+                    'teacher_amount' => $quote['instructor_amount'],
+                    'admin_share_amount' => $quote['platform_amount'],
+                    'commission_rate' => $quote['platform_commission_percent'],
                     'status' => 'pending',
                     'paid_at' => now(),
                     'metadata' => [
                         'source' => 'order_completion',
-                        'partnership_tier' => $course->partnership_tier ?? 'standard',
+                        'partnership_tier' => $quote['tier'],
+                        'platform_commission_percent' => $quote['platform_commission_percent'],
+                        'instructor_percent' => $quote['instructor_percent'],
                     ],
                 ]
             );
@@ -62,13 +63,14 @@ class InstructorPayoutService
                 [
                     'student_id' => $order->user_id,
                     'instructor_id' => $course->teacher_id,
-                    'original_price' => $course->price ?? $grossAmount,
-                    'discount_amount' => max(0, ($course->price ?? $grossAmount) - $grossAmount),
-                    'paid_amount' => $grossAmount,
-                    'platform_fee_percent' => $commissionRate * 100,
-                    'platform_fee_amount' => $adminShareAmount,
-                    'instructor_percent' => (1 - $commissionRate) * 100,
-                    'instructor_amount' => $teacherAmount,
+                    'partnership_tier' => $quote['tier'],
+                    'original_price' => $course->price ?? $quote['gross_amount'],
+                    'discount_amount' => max(0, ($course->price ?? $quote['gross_amount']) - $quote['gross_amount']),
+                    'paid_amount' => $quote['gross_amount'],
+                    'platform_fee_percent' => $quote['platform_commission_percent'],
+                    'platform_fee_amount' => $quote['platform_amount'],
+                    'instructor_percent' => $quote['instructor_percent'],
+                    'instructor_amount' => $quote['instructor_amount'],
                     'status' => 'PENDING',
                     'refund_deadline' => now()->addDays(30),
                 ]
@@ -84,9 +86,9 @@ class InstructorPayoutService
                     ],
                     [
                         'instructor_id' => $course->teacher_id,
-                        'amount' => $teacherAmount,
+                        'amount' => $quote['instructor_amount'],
                         'status' => 'pending', // PENDING/HOLD until refund period expires or progress threshold is crossed
-                        'description' => 'Doanh thu từ khóa học: ' . $course->title,
+                        'description' => 'Doanh thu từ khóa học: '.$course->title,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]

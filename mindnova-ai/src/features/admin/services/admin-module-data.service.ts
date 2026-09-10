@@ -66,6 +66,7 @@ export async function getAdminRevenueData(): Promise<AdminRevenueData> {
       courseCount: raw.courseCount ?? 0,
       courses: raw.courses ?? [],
       orderHistory: raw.orderHistory ?? [],
+      commissionTiers: raw.commissionTiers ?? [],
     };
   } catch (error) {
     console.warn("[AdminService] Failed to fetch admin revenue data:", error);
@@ -76,6 +77,7 @@ export async function getAdminRevenueData(): Promise<AdminRevenueData> {
       courseCount: 0,
       courses: [],
       orderHistory: [],
+      commissionTiers: [],
     };
   }
 }

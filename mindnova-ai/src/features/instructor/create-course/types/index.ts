@@ -84,7 +84,7 @@ export interface Step3Data {
  currency: string;
  basePrice: string;
  salePrice: string;
- partnershipTier?: "standard" | "exclusive";
+ partnershipTier?: string;
  isFlashSale?: boolean;
  saleStartDate?: string;
  saleEndDate?: string;

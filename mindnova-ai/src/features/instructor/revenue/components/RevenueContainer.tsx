@@ -197,14 +197,9 @@ function RevenueChart({ chartData }: { chartData: any[] }) {
  <p className="text-xs text-[#8A8478] mt-0.5">Tỷ lệ phân chia tự động tùy thuộc vào nguồn ghi danh của học viên.</p>
  </div>
  
- <div className="flex items-center gap-2 flex-wrap">
- <span className="px-3 py-1 rounded-xl bg-indigo-50 text-[#C0392B] border -[#FAF7F2] text-xs font-bold">
- Link Giới thiệu Giảng viên: 85% Thực nhận
+ <span className="px-3 py-1 rounded-xl bg-indigo-50 text-[#C0392B] border border-indigo-100 text-xs font-bold">
+ Tỷ lệ thực nhận được lưu theo từng giao dịch
  </span>
- <span className="px-3 py-1 rounded-xl bg-gray-100 text-gray-700 border border-[#E8E2D9] text-xs font-bold">
- Chợ Khóa học Chung: 70% Thực nhận
- </span>
- </div>
  </div>
  
  {/* Visual Bar Chart */}
