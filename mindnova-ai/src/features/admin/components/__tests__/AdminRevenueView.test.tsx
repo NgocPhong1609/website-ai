@@ -28,6 +28,28 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("AdminRevenueView commission tiers", () => {
+  it("labels a weighted course summary as mixed instead of claiming one tier", () => {
+    render(<AdminRevenueView data={{
+      ...data,
+      courses: [{
+        courseId: 1,
+        courseTitle: "Khóa học hỗn hợp",
+        instructorName: "Giảng viên",
+        partnershipTier: "mixed",
+        grossRevenue: 200,
+        adminRevenue: 45,
+        teacherRevenue: 155,
+        instructorPercent: 77.5,
+        revenue: 200,
+        students: 2,
+        conversionRate: 100,
+      }],
+    }} />);
+
+    expect(screen.getByText("Nhiều chế độ (GV bình quân 77.5%)")).toBeVisible();
+    expect(screen.queryByText(/Đối Tác Tiêu Chuẩn \(77\.5%\)/i)).not.toBeInTheDocument();
+  });
+
   it("saves edited platform percentages and derives the instructor share", async () => {
     render(<AdminRevenueView data={data} />);
 

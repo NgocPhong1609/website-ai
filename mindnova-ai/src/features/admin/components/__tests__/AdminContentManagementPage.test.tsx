@@ -42,7 +42,7 @@ describe("AdminContentManagementPage course filters", () => {
   it("uses the course-management wording instead of the legacy approval-tab name", async () => {
     render(<AdminContentManagementPage />);
 
-    expect(await screen.findByText("Quản lý khóa học")).toBeInTheDocument();
+    expect(await screen.findAllByRole("heading", { name: "Quản lý khóa học" })).toHaveLength(2);
     expect(screen.queryByText("Duyệt khóa học")).not.toBeInTheDocument();
     expect(screen.queryByText("Kiểm duyệt khóa học")).not.toBeInTheDocument();
   });

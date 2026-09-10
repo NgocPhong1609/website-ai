@@ -3,10 +3,12 @@
 namespace App\Services\Instructor;
 
 use App\Models\InstructorTransaction;
+use App\Models\OrderItem;
 use App\Models\RevenueAllocation;
 use App\Models\User;
 use App\Models\Withdrawal;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class RevenueService
@@ -28,16 +30,19 @@ class RevenueService
         $pendingBalance = (float) RevenueAllocation::where('instructor_id', $instructor->id)
             ->where('status', 'PENDING')
             ->sum('instructor_amount');
+        $pendingBalance += (float) $this->legacyTransactions($instructor->id)
+            ->where('type', 'revenue')
+            ->where('status', 'escrow')
+            ->sum('amount');
 
         // 2. Available Revenue (Allocations in AVAILABLE status)
         $availableAllocationsRevenue = (float) RevenueAllocation::where('instructor_id', $instructor->id)
             ->where('status', 'AVAILABLE')
             ->sum('instructor_amount');
 
-        $legacyAvailableRevenue = (float) InstructorTransaction::where('instructor_id', $instructor->id)
+        $legacyAvailableRevenue = (float) $this->legacyTransactions($instructor->id)
             ->where('type', 'revenue')
             ->where('status', 'available')
-            ->whereNotIn('reference_id', RevenueAllocation::where('instructor_id', $instructor->id)->pluck('order_item_id'))
             ->sum('amount');
 
         $availableRevenue = $availableAllocationsRevenue + $legacyAvailableRevenue;
@@ -54,18 +59,19 @@ class RevenueService
             ->whereIn('status', ['PENDING', 'AVAILABLE'])
             ->whereBetween('created_at', [$startOfMonth, $now])
             ->sum('instructor_amount');
-
-        if ($currentMonthRevenue == 0) {
-            $currentMonthRevenue = (float) InstructorTransaction::where('instructor_id', $instructor->id)
-                ->where('type', 'revenue')
-                ->whereBetween('created_at', [$startOfMonth, $now])
-                ->sum('amount');
-        }
+        $currentMonthRevenue += (float) $this->legacyTransactions($instructor->id)
+            ->where('type', 'revenue')
+            ->whereBetween('created_at', [$startOfMonth, $now])
+            ->sum('amount');
 
         $lastMonthRevenue = (float) RevenueAllocation::where('instructor_id', $instructor->id)
             ->whereIn('status', ['PENDING', 'AVAILABLE'])
             ->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
             ->sum('instructor_amount');
+        $lastMonthRevenue += (float) $this->legacyTransactions($instructor->id)
+            ->where('type', 'revenue')
+            ->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
+            ->sum('amount');
 
         $revenueGrowth = 0;
         if ($lastMonthRevenue > 0) {
@@ -82,6 +88,15 @@ class RevenueService
             ->whereBetween('created_at', [$startOfMonth, $now])
             ->count();
 
+        $refundCount += $this->legacyTransactions($instructor->id)
+            ->where('type', 'refund')
+            ->whereBetween('created_at', [$startOfMonth, $now])
+            ->count();
+        $totalAllocationsCount += $this->legacyTransactions($instructor->id)
+            ->whereIn('type', ['revenue', 'refund'])
+            ->whereBetween('created_at', [$startOfMonth, $now])
+            ->count();
+
         $refundRate = $totalAllocationsCount > 0 ? ($refundCount / $totalAllocationsCount) * 100 : 0;
 
         // Chart Data (Last 7 days revenue)
@@ -93,17 +108,15 @@ class RevenueService
                 ->whereDate('created_at', $date->toDateString())
                 ->sum('instructor_amount');
 
-            if ($dailyRevenue == 0) {
-                $dailyRevenue = (float) InstructorTransaction::where('instructor_id', $instructor->id)
-                    ->where('type', 'revenue')
-                    ->whereDate('created_at', $date->toDateString())
-                    ->sum('amount');
-            }
+            $dailyRevenue += (float) $this->legacyTransactions($instructor->id)
+                ->where('type', 'revenue')
+                ->whereDate('created_at', $date->toDateString())
+                ->sum('amount');
 
             $chartData[] = [
                 'date' => $date->format('Y-m-d'),
                 'day' => $date->format('d/m/Y'),
-                'revenue' => (float) $dailyRevenue
+                'revenue' => (float) $dailyRevenue,
             ];
         }
 
@@ -115,7 +128,7 @@ class RevenueService
             ->map(function ($tx) {
                 return [
                     'id' => $tx->id,
-                    'transaction_code' => '#TXN-' . str_pad($tx->id, 5, '0', STR_PAD_LEFT),
+                    'transaction_code' => '#TXN-'.str_pad($tx->id, 5, '0', STR_PAD_LEFT),
                     'type' => $tx->type,
                     'amount' => (float) $tx->amount,
                     'status' => $tx->status,
@@ -128,20 +141,40 @@ class RevenueService
         $aiForecast = [
             'expected_end_month' => $currentMonthRevenue * 1.5,
             'growth_prediction' => 43,
-            'top_course' => 'AI Mastery for Business', 
-            'top_course_percentage' => 68
+            'top_course' => 'AI Mastery for Business',
+            'top_course_percentage' => 68,
         ];
 
         return [
-            'total_revenue' => (float) ($currentMonthRevenue + $pendingBalance),
+            'total_revenue' => (float) $currentMonthRevenue,
             'revenue_growth' => round($revenueGrowth, 1),
             'available_balance' => (float) $availableBalance,
             'escrow_balance' => (float) $pendingBalance, // Mapped to Pending/Hold Balance
             'refund_rate' => round($refundRate, 1),
             'chart_data' => $chartData,
             'recent_transactions' => $recentTransactions,
-            'ai_forecast' => $aiForecast
+            'ai_forecast' => $aiForecast,
         ];
+    }
+
+    /**
+     * Legacy rows remain reportable, while OrderItem companion rows are represented
+     * by their immutable RevenueAllocation snapshot and must not be counted twice.
+     */
+    private function legacyTransactions(int $instructorId): Builder
+    {
+        return InstructorTransaction::query()
+            ->where('instructor_id', $instructorId)
+            ->where(function (Builder $query) use ($instructorId): void {
+                $query->whereNull('reference_type')
+                    ->orWhere('reference_type', '!=', OrderItem::class)
+                    ->orWhereNotIn(
+                        'reference_id',
+                        RevenueAllocation::query()
+                            ->select('order_item_id')
+                            ->where('instructor_id', $instructorId),
+                    );
+            });
     }
 
     /**
@@ -180,7 +213,7 @@ class RevenueService
                     ->sum('instructor_amount');
 
                 if ($pendingBalance > 0) {
-                    throw new \Exception("Số dư khả dụng không đủ để rút tiền. Bạn hiện có " . number_format($pendingBalance) . "đ đang ở trạng thái HOLD (chờ hết điều kiện hoàn tiền).");
+                    throw new \Exception('Số dư khả dụng không đủ để rút tiền. Bạn hiện có '.number_format($pendingBalance).'đ đang ở trạng thái HOLD (chờ hết điều kiện hoàn tiền).');
                 }
                 throw new \Exception('Số dư khả dụng không đủ để rút tiền.');
             }
@@ -203,7 +236,7 @@ class RevenueService
                 'status' => 'processing',
                 'reference_type' => Withdrawal::class,
                 'reference_id' => $withdrawal->id,
-                'description' => 'Rút tiền về Ngân hàng (' . ($bankInfo['bank_name'] ?? 'Unknown') . ')',
+                'description' => 'Rút tiền về Ngân hàng ('.($bankInfo['bank_name'] ?? 'Unknown').')',
             ]);
 
             return ['success' => true, 'message' => 'Yêu cầu rút tiền đã được tạo thành công.', 'withdrawal_id' => $withdrawal->id];
@@ -217,11 +250,11 @@ class RevenueService
     {
         $query = InstructorTransaction::where('instructor_id', $instructor->id);
 
-        if (!empty($filters['type']) && $filters['type'] !== 'all') {
+        if (! empty($filters['type']) && $filters['type'] !== 'all') {
             $query->where('type', $filters['type']);
         }
 
-        if (!empty($filters['status']) && $filters['status'] !== 'all') {
+        if (! empty($filters['status']) && $filters['status'] !== 'all') {
             $query->where('status', $filters['status']);
         }
 
@@ -253,7 +286,7 @@ class RevenueService
                 'date' => $date->format('Y-m-d'),
                 'day' => $date->format('d/m'),
                 'revenue' => $dayRevenue,
-                'refund' => $dayRefund
+                'refund' => $dayRefund,
             ];
         }
 

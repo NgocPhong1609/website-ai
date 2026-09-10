@@ -2,13 +2,12 @@
 
 namespace Tests\Feature\Api\Instructor;
 
-use App\Models\User;
-use App\Models\Role;
 use App\Models\InstructorTransaction;
+use App\Models\Role;
+use App\Models\User;
 use App\Models\Withdrawal;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class RevenueTest extends TestCase
@@ -16,12 +15,13 @@ class RevenueTest extends TestCase
     use RefreshDatabase;
 
     protected $teacherRole;
+
     protected $studentRole;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->teacherRole = Role::firstOrCreate(['name' => 'teacher', 'display_name' => 'Teacher']);
         $this->studentRole = Role::firstOrCreate(['name' => 'student', 'display_name' => 'Student']);
     }
@@ -30,6 +30,7 @@ class RevenueTest extends TestCase
     {
         $user = User::factory()->create();
         $user->roles()->attach($this->teacherRole);
+
         return $user;
     }
 
@@ -37,6 +38,7 @@ class RevenueTest extends TestCase
     {
         $user = User::factory()->create();
         $user->roles()->attach($this->studentRole);
+
         return $user;
     }
 
@@ -49,9 +51,9 @@ class RevenueTest extends TestCase
     public function test_unauthorized_access_for_student()
     {
         $student = $this->createStudent();
-        
+
         $response = $this->actingAs($student)->getJson('/api/instructor/revenue/overview');
-        $response->assertStatus(403); 
+        $response->assertStatus(403);
     }
 
     public function test_overview_empty_data()
@@ -69,7 +71,7 @@ class RevenueTest extends TestCase
                 'refund_rate' => 0,
                 'revenue_growth' => 0,
                 'recent_transactions' => [],
-            ]
+            ],
         ]);
     }
 
@@ -105,12 +107,12 @@ class RevenueTest extends TestCase
             'instructor_id' => $teacher->id,
             'amount' => 200000,
             'bank_info' => ['bank_name' => 'MB'],
-            'status' => 'completed'
+            'status' => 'completed',
         ]);
 
         $response = $this->actingAs($teacher)->getJson('/api/instructor/revenue/overview');
         $response->assertStatus(200);
-        
+
         $response->assertJsonPath('data.total_revenue', 1500000);
         $response->assertJsonPath('data.available_balance', 800000);
         $response->assertJsonPath('data.escrow_balance', 500000);
@@ -125,7 +127,7 @@ class RevenueTest extends TestCase
             'instructor_id' => $teacher->id,
             'type' => 'revenue',
             'amount' => 500000,
-            'status' => 'available'
+            'status' => 'available',
         ]);
 
         $payload = [
@@ -133,26 +135,26 @@ class RevenueTest extends TestCase
             'bank_info' => [
                 'bank_name' => 'Vietcombank',
                 'account_number' => '123456789',
-                'account_name' => 'NGUYEN VAN A'
-            ]
+                'account_name' => 'NGUYEN VAN A',
+            ],
         ];
 
         $response = $this->actingAs($teacher)->postJson('/api/instructor/revenue/withdraw', $payload);
-        
+
         $response->assertStatus(200);
         $response->assertJsonPath('success', true);
 
         $this->assertDatabaseHas('withdrawals', [
             'instructor_id' => $teacher->id,
             'amount' => 100000,
-            'status' => 'processing'
+            'status' => 'processing',
         ]);
 
         $this->assertDatabaseHas('instructor_transactions', [
             'instructor_id' => $teacher->id,
             'type' => 'withdrawal',
             'amount' => 100000,
-            'status' => 'processing'
+            'status' => 'processing',
         ]);
     }
 
@@ -165,13 +167,13 @@ class RevenueTest extends TestCase
             'bank_info' => [
                 'bank_name' => 'Vietcombank',
                 'account_number' => '123456789',
-                'account_name' => 'NGUYEN VAN A'
-            ]
+                'account_name' => 'NGUYEN VAN A',
+            ],
         ];
 
         $response = $this->actingAs($teacher)->postJson('/api/instructor/revenue/withdraw', $payload);
-        
-        $response->assertStatus(400); 
+
+        $response->assertStatus(400);
         $response->assertJsonPath('message', 'Số dư khả dụng không đủ để rút tiền.');
     }
 
@@ -180,12 +182,12 @@ class RevenueTest extends TestCase
         $teacher = $this->createTeacher();
 
         $payload = [
-            'amount' => 40000, 
-            'bank_info' => [] 
+            'amount' => 40000,
+            'bank_info' => [],
         ];
 
         $response = $this->actingAs($teacher)->postJson('/api/instructor/revenue/withdraw', $payload);
-        
+
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['amount', 'bank_info.bank_name', 'bank_info.account_number']);
     }

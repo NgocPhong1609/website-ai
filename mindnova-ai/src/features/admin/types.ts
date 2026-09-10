@@ -214,7 +214,7 @@ export type AdminRevenueCourseRow = {
   courseId: number;
   courseTitle: string;
   instructorName: string;
-  partnershipTier?: "standard" | "exclusive";
+  partnershipTier?: string | null;
   grossRevenue?: number;
   adminRevenue?: number;
   teacherRevenue?: number;

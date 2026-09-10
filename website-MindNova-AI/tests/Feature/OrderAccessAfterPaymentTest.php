@@ -5,6 +5,7 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Payment;
 use App\Models\User;
+use App\Services\PaymentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -46,12 +47,17 @@ test('payment success auto grants course access to the student', function () {
         ],
     ]);
 
-    $service = app(\App\Services\PaymentService::class);
-    $service->processCallback('vnpay', [
-        'vnp_TxnRef' => (string) $payment->id,
+    $service = app(PaymentService::class);
+    config(['services.vnpay.hash_secret' => 'test-vnpay-secret']);
+    $callback = [
+        'vnp_TxnRef' => $payment->transaction_id,
+        'vnp_Amount' => 29900000,
         'vnp_ResponseCode' => '00',
         'vnp_TransactionNo' => 'VNP123456',
-    ]);
+    ];
+    ksort($callback);
+    $callback['vnp_SecureHash'] = hash_hmac('sha512', http_build_query($callback), 'test-vnpay-secret');
+    $service->processCallback('vnpay', $callback);
 
     $this->assertDatabaseHas('enrollments', [
         'user_id' => $student->id,

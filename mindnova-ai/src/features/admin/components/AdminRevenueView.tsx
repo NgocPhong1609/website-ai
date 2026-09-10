@@ -707,9 +707,17 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                   const gross = course.grossRevenue ?? course.revenue;
                   const teacherGet = course.teacherRevenue ?? 0;
                   const adminGet = course.adminRevenue ?? 0;
-                  const tierLabel = commissionTiers.find((definition) => definition.tier === course.partnershipTier)?.label
-                    ?? course.partnershipTier
-                    ?? "Ảnh chụp cũ";
+                  const isMixedTier = course.partnershipTier === "mixed";
+                  const tierLabel = isMixedTier
+                    ? "Nhiều chế độ"
+                    : commissionTiers.find((definition) => definition.tier === course.partnershipTier)?.label
+                      ?? course.partnershipTier
+                      ?? "Ảnh chụp cũ";
+                  const tierPercent = course.instructorPercent == null
+                    ? ""
+                    : isMixedTier
+                      ? ` (GV bình quân ${course.instructorPercent}%)`
+                      : ` (${course.instructorPercent}%)`;
 
                   return (
                     <tr key={course.courseId} className="border-t border-slate-100 hover:bg-slate-50/50 transition-colors">
@@ -717,7 +725,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                       <td className="px-5 py-4 text-slate-600">{course.instructorName}</td>
                       <td className="px-5 py-4 text-center">
                         <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-black text-blue-700 ring-1 ring-blue-200">
-                          {tierLabel}{course.instructorPercent == null ? "" : ` (${course.instructorPercent}%)`}
+                          {tierLabel}{tierPercent}
                         </span>
                       </td>
                       <td className="px-5 py-4 text-right font-medium text-slate-600">{course.students}</td>
