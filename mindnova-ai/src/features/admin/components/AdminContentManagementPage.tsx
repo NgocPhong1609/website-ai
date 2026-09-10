@@ -172,14 +172,14 @@ export function AdminContentManagementPage() {
  method: "PATCH",
  body: JSON.stringify({ status }),
  });
- setMessage("Đã cập nhật kiểm duyệt khóa học.");
+ setMessage("Đã cập nhật trạng thái khóa học.");
  await latestLoadCoursesRef.current();
 
  if (detailCourseId === courseId) {
  await fetchCourseDetail(courseId);
  }
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Kiểm duyệt khóa học thất bại.");
+ setMessage(error instanceof Error ? error.message : "Cập nhật trạng thái khóa học thất bại.");
  } finally {
  setPendingAction(null);
  }

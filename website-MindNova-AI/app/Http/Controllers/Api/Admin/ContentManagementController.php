@@ -229,11 +229,11 @@ class ContentManagementController extends Controller
                 }
                 $reviewService->approveSubmission($submission, $admin);
             } catch (\Exception $e) {
-                return response()->json(['message' => 'Lỗi duyệt khóa học: '.$e->getMessage()], 422);
+                return response()->json(['message' => 'Lỗi cập nhật trạng thái khóa học: '.$e->getMessage()], 422);
             }
 
             return response()->json([
-                'message' => 'Duyệt khóa học và tạo phiên bản thành công.',
+                'message' => 'Cập nhật trạng thái khóa học và tạo phiên bản thành công.',
                 'data' => $course->fresh(),
             ]);
         }

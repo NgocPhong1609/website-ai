@@ -17,7 +17,7 @@ export async function AdminCoursesPage({ filters }: AdminCoursesPageProps) {
  <section className="mn-stagger rounded-2xl border -[#FAF7F2]/20 bg-[linear-gradient(125deg,#0f1a3c_0%,#183067_45%,#0284c7_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
  <div>
  <p className="text-[10px] uppercase tracking-[0.35em] -[#FAF7F2]/70">Quản lý khóa học</p>
- <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Kiểm duyệt khóa học</h1>
+ <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý khóa học</h1>
  <p className="mt-1 text-xs text-slate-200/90">
  Theo dõi tình trạng xuất bản và chất lượng nội dung khóa học theo quy trình kiểm duyệt.
  </p>

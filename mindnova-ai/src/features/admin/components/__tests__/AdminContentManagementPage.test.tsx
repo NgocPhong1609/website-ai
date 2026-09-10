@@ -39,6 +39,14 @@ afterEach(() => {
 });
 
 describe("AdminContentManagementPage course filters", () => {
+  it("uses the course-management wording instead of the legacy approval-tab name", async () => {
+    render(<AdminContentManagementPage />);
+
+    expect(await screen.findByText("Quản lý khóa học")).toBeInTheDocument();
+    expect(screen.queryByText("Duyệt khóa học")).not.toBeInTheDocument();
+    expect(screen.queryByText("Kiểm duyệt khóa học")).not.toBeInTheDocument();
+  });
+
   it("combines search and instructor filter with server pagination, then resets to page one when the instructor changes", async () => {
     vi.mocked(adminApi).mockImplementation(async (path) => {
       if (!path.startsWith("/admin/content/courses")) return { data: [] };
