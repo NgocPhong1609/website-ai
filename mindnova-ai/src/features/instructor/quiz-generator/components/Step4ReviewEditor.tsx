@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GeneratedQuestion, QuizConfig } from "../types/quizGenerator.types";
 import { QuestionCardMultipleChoice } from "./QuestionCardMultipleChoice";
 import { QuestionCardEssay } from "./QuestionCardEssay";
@@ -21,6 +21,13 @@ interface Step4ReviewEditorProps {
   onConfirmAll: () => void;
 }
 
+function parsePassingScore(value: string): number | null {
+  if (!/^\d+$/.test(value)) return null;
+
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 0 && parsed <= 100 ? parsed : null;
+}
+
 export function Step4ReviewEditor({
   questions,
   config,
@@ -37,6 +44,11 @@ export function Step4ReviewEditor({
   onConfirmAll,
 }: Step4ReviewEditorProps) {
   const [filterType, setFilterType] = useState<"all" | "multiple_choice" | "essay">("all");
+  const [passingScoreInput, setPassingScoreInput] = useState(String(config.passing_score));
+
+  useEffect(() => {
+    setPassingScoreInput(String(config.passing_score));
+  }, [config.passing_score]);
 
   const mcQuestions = questions.filter((q) => q.type === "multiple_choice");
   const essayQuestions = questions.filter((q) => q.type === "essay");
@@ -51,6 +63,16 @@ export function Step4ReviewEditor({
   const totalPoints = Number(rawTotal.toFixed(2));
   const isValidTotal = Math.abs(totalPoints - 10) < 0.001;
   const isLess = totalPoints < 10;
+  const isPassingScoreValid = parsePassingScore(passingScoreInput) !== null;
+
+  const handlePassingScoreChange = (value: string) => {
+    setPassingScoreInput(value);
+    const parsed = parsePassingScore(value);
+
+    if (parsed !== null) {
+      onChangeConfig({ passing_score: parsed });
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-[#E8E2D9] bg-white p-4 shadow-sm animate-fadeIn sm:gap-6 sm:rounded-3xl sm:p-6 lg:p-8">
@@ -105,10 +127,13 @@ export function Step4ReviewEditor({
                 {config.time_limit_minutes} phút
               </span>
               <span className="rounded-lg border border-indigo-100 bg-white px-2.5 py-1.5">
-                {config.multiple_choice_count} câu trắc nghiệm
+                {questions.length} câu hỏi
               </span>
               <span className="rounded-lg border border-indigo-100 bg-white px-2.5 py-1.5">
-                {config.essay_count} câu tự luận
+                {mcQuestions.length} câu trắc nghiệm
+              </span>
+              <span className="rounded-lg border border-indigo-100 bg-white px-2.5 py-1.5">
+                {essayQuestions.length} câu tự luận
               </span>
               <span className="rounded-lg border border-indigo-100 bg-white px-2.5 py-1.5">
                 Độ khó: {config.difficulty}
@@ -123,10 +148,18 @@ export function Step4ReviewEditor({
               min={0}
               max={100}
               step={1}
-              value={config.passing_score}
-              onChange={(event) => onChangeConfig({ passing_score: Number(event.target.value) })}
+              value={passingScoreInput}
+              onChange={(event) => handlePassingScoreChange(event.target.value)}
+              disabled={isSaving}
+              aria-invalid={!isPassingScoreValid}
+              aria-describedby={!isPassingScoreValid ? "passing-score-error" : undefined}
               className="w-24 rounded-lg border border-[#D9D3C9] bg-[#FEFCF9] px-3 py-2 text-right text-sm font-black text-[#2C3039] outline-none transition focus:border-[#C0392B] focus:ring-2 focus:ring-indigo-100"
             />
+            {!isPassingScoreValid && (
+              <span id="passing-score-error" role="alert" className="max-w-48 text-[11px] font-semibold leading-relaxed text-rose-700">
+                Điểm đạt phải là số nguyên từ 0 đến 100.
+              </span>
+            )}
           </label>
         </div>
       </section>
@@ -259,7 +292,7 @@ export function Step4ReviewEditor({
           <button
             type="button"
             onClick={onConfirmAll}
-            disabled={isSaving || questions.length === 0 || !isValidTotal || isReviewConfirmed}
+            disabled={isSaving || questions.length === 0 || !isValidTotal || !isPassingScoreValid || isReviewConfirmed}
             className="px-5 py-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold text-xs transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isReviewConfirmed ? "✓ Đã xác nhận toàn bộ" : "✓ Xác nhận toàn bộ câu hỏi"}
@@ -274,7 +307,7 @@ export function Step4ReviewEditor({
           <button
             type="button"
             onClick={() => onSave("draft")}
-            disabled={isSaving || !isValidTotal || !isReviewConfirmed}
+            disabled={isSaving || !isValidTotal || !isPassingScoreValid || !isReviewConfirmed}
             className="px-6 py-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-extrabold text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isSaving ? "Đang lưu..." : "💾 Lưu Nháp"}
@@ -283,7 +316,7 @@ export function Step4ReviewEditor({
           <button
             type="button"
             onClick={() => onSave("published")}
-            disabled={isSaving || questions.length === 0 || !isValidTotal || !isReviewConfirmed}
+            disabled={isSaving || questions.length === 0 || !isValidTotal || !isPassingScoreValid || !isReviewConfirmed}
             className="px-8 py-3 bg-[#C0392B] hover:bg-[#a02c20] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
           >
             {isSaving ? (

@@ -1,4 +1,4 @@
-import { act, fireEvent, render, renderHook, screen } from "@testing-library/react";
+import { act, fireEvent, render, renderHook, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Step4ReviewEditor } from "../Step4ReviewEditor";
 import { useAiQuizWizard } from "../../hooks/useAiQuizWizard";
@@ -47,7 +47,10 @@ const config: QuizConfig = {
   passing_score: 70,
 };
 
-const renderEditor = (isReviewConfirmed = false) => {
+const renderEditor = (
+  isReviewConfirmed = false,
+  overrides: Partial<React.ComponentProps<typeof Step4ReviewEditor>> = {},
+) => {
   const props = {
     questions: [question],
     config,
@@ -62,6 +65,7 @@ const renderEditor = (isReviewConfirmed = false) => {
     onSave: vi.fn(),
     onBack: vi.fn(),
     isSaving: false,
+    ...overrides,
   };
 
   const view = render(<Step4ReviewEditor {...props} />);
@@ -103,6 +107,65 @@ describe("Step4ReviewEditor", () => {
     });
 
     expect(props.onChangeConfig).toHaveBeenCalledWith({ passing_score: 85 });
+  });
+
+  it("locks passing-score editing while a save is in flight", () => {
+    renderEditor(true, { isSaving: true });
+
+    expect(screen.getByRole("spinbutton", { name: /điểm đạt/i })).toBeDisabled();
+  });
+
+  it.each([
+    ["an empty value", ""],
+    ["a fractional value", "70.5"],
+    ["a value below zero", "-1"],
+    ["a value above one hundred", "101"],
+  ])("rejects %s and independently blocks confirmation and saving", (_case, value) => {
+    const { props, rerender } = renderEditor(false);
+    const passingScore = screen.getByRole("spinbutton", { name: /điểm đạt/i });
+
+    expect(screen.getByRole("button", { name: /xác nhận toàn bộ câu hỏi/i })).toBeEnabled();
+    fireEvent.change(passingScore, { target: { value } });
+
+    expect(passingScore).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByRole("alert")).toHaveTextContent(/số nguyên từ 0 đến 100/i);
+    expect(props.onChangeConfig).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: /xác nhận toàn bộ câu hỏi/i })).toBeDisabled();
+
+    rerender(<Step4ReviewEditor {...props} isReviewConfirmed />);
+    expect(screen.getByRole("button", { name: /lưu nháp/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /hoàn tất/i })).toBeDisabled();
+  });
+
+  it("derives final question counts from the live review set after deletion", () => {
+    const essayQuestion: GeneratedQuestion = {
+      ...question,
+      id: "q2",
+      type: "essay",
+      options: [],
+      correct_answer_index: null,
+      correct_answer_indices: [],
+    };
+    const staleConfig = {
+      ...config,
+      total_questions: 10,
+      multiple_choice_count: 8,
+      essay_count: 2,
+    };
+    const { props, rerender } = renderEditor(false, {
+      config: staleConfig,
+      questions: [question, essayQuestion],
+    });
+    const getSummary = () => screen.getByRole("region", { name: /cấu hình bài kiểm tra/i });
+
+    expect(within(getSummary()).getByText("2 câu hỏi")).toBeInTheDocument();
+    expect(within(getSummary()).getByText("1 câu trắc nghiệm")).toBeInTheDocument();
+    expect(within(getSummary()).getByText("1 câu tự luận")).toBeInTheDocument();
+
+    rerender(<Step4ReviewEditor {...props} questions={[essayQuestion]} />);
+    expect(within(getSummary()).getByText("1 câu hỏi")).toBeInTheDocument();
+    expect(within(getSummary()).getByText("0 câu trắc nghiệm")).toBeInTheDocument();
+    expect(within(getSummary()).getByText("1 câu tự luận")).toBeInTheDocument();
   });
 });
 
