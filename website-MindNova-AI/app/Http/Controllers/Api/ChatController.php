@@ -68,7 +68,7 @@ class ChatController extends Controller
         $limit = $request->get('limit', 30);
         $cursor = $request->get('cursor');
 
-        $query = ChatMessage::with(['sender:id,name,avatar_url', 'attachments'])
+        $query = ChatMessage::with(['sender:id,name,avatar_url,role', 'attachments'])
             ->where('chat_conversation_id', $conversationId)
             ->orderBy('id', 'desc');
 
@@ -141,7 +141,7 @@ class ChatController extends Controller
             return response()->json(['message' => 'Failed to send message.', 'error' => $e->getMessage()], 500);
         }
 
-        $message->load(['sender:id,name,avatar_url', 'attachments']);
+        $message->load(['sender:id,name,avatar_url,role', 'attachments']);
 
         // Broadcast the event safely so failure to reach Reverb/Pusher does not fail message sending
         try {
@@ -204,7 +204,7 @@ class ChatController extends Controller
 
         $message->update(['is_recalled' => true]);
         
-        $message->load(['sender:id,name,avatar_url', 'attachments']);
+        $message->load(['sender:id,name,avatar_url,role', 'attachments']);
 
         try {
             broadcast(new \App\Events\ChatMessageRecalled($message))->toOthers();

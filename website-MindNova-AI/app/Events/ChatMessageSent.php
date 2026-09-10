@@ -54,6 +54,8 @@ class ChatMessageSent implements ShouldBroadcastNow
      */
     public function broadcastWith(): array
     {
+        $sender = $this->message->sender;
+
         return [
             'id' => $this->message->id,
             'chat_conversation_id' => $this->message->chat_conversation_id,
@@ -61,7 +63,12 @@ class ChatMessageSent implements ShouldBroadcastNow
             'content' => $this->message->content,
             'type' => $this->message->type,
             'created_at' => $this->message->created_at,
-            'sender' => $this->message->sender,
+            'sender' => $sender ? [
+                'id' => (int) $sender->id,
+                'name' => $sender->name,
+                'avatar_url' => $sender->avatar_url,
+                'role' => $sender->role,
+            ] : null,
             'attachments' => $this->message->attachments,
         ];
     }
