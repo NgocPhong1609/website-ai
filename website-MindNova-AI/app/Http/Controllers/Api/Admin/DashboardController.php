@@ -269,7 +269,7 @@ class DashboardController extends Controller
                 'c.id as courseId',
                 'c.title as courseTitle',
                 DB::raw('MAX(COALESCE(ra.partnership_tier, JSON_UNQUOTE(JSON_EXTRACT(tp.metadata, "$.partnership_tier")))) as partnershipTier'),
-                DB::raw('COUNT(DISTINCT COALESCE(ra.partnership_tier, JSON_UNQUOTE(JSON_EXTRACT(tp.metadata, "$.partnership_tier")))) as partnershipTierCount'),
+                DB::raw('COUNT(DISTINCT COALESCE(ra.partnership_tier, JSON_UNQUOTE(JSON_EXTRACT(tp.metadata, "$.partnership_tier")), "__unknown__")) as partnershipTierCount'),
                 DB::raw('COALESCE(teacher.name, "Unassigned") as instructorName'),
                 DB::raw('SUM(oi.price) as grossRevenue'),
                 DB::raw('SUM(COALESCE(ra.platform_fee_amount, tp.admin_share_amount, 0)) as adminRevenue'),

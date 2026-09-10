@@ -111,6 +111,7 @@ test('course revenue marks summaries containing multiple snapshot tiers as mixed
         'status' => 'published',
     ]);
 
+    $allocations = [];
     foreach ([['standard', 30, 70], ['exclusive', 15, 85]] as $index => [$tier, $platformPercent, $instructorPercent]) {
         $order = Order::create([
             'user_id' => $student->id,
@@ -120,7 +121,7 @@ test('course revenue marks summaries containing multiple snapshot tiers as mixed
             'transaction_id' => 'txn-mixed-tier-'.$index,
         ]);
         $item = OrderItem::create(['order_id' => $order->id, 'course_id' => $course->id, 'price' => 100000]);
-        RevenueAllocation::create([
+        $allocations[] = RevenueAllocation::create([
             'order_id' => $order->id,
             'order_item_id' => $item->id,
             'course_id' => $course->id,
@@ -144,4 +145,10 @@ test('course revenue marks summaries containing multiple snapshot tiers as mixed
         ->assertJsonPath('courses.0.partnershipTier', 'mixed')
         ->assertJsonPath('courses.0.platformCommissionPercent', 22.5)
         ->assertJsonPath('courses.0.instructorPercent', 77.5);
+
+    $allocations[1]->update(['partnership_tier' => null]);
+
+    $this->actingAs($admin, 'sanctum')->getJson('/api/admin/revenue')
+        ->assertOk()
+        ->assertJsonPath('courses.0.partnershipTier', 'mixed');
 });

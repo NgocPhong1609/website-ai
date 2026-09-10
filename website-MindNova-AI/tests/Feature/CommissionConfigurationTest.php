@@ -9,6 +9,7 @@ use App\Models\TeacherPayout;
 use App\Models\User;
 use App\Services\CommissionService;
 use App\Services\Instructor\InstructorPayoutService;
+use App\Services\Instructor\RevenueService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -331,6 +332,27 @@ test('legacy nullable allocations remain reportable and refundable', function ()
 
     expect((float) InstructorTransaction::where('reference_id', $item->id)->where('type', 'refund')->value('amount'))->toBe(64000.0)
         ->and(RevenueAllocation::first()->status)->toBe('REFUNDED');
+});
+
+test('nullable allocation snapshots do not hide unrelated legacy order item revenue', function () {
+    $teacher = commissionUser('teacher', 'nullable-report-teacher@example.com');
+    $student = commissionUser('student', 'nullable-report-student@example.com');
+    [$course, $order] = commissionOrder($teacher, $student);
+    legacyAllocation($course, $order, null, 70000);
+
+    InstructorTransaction::create([
+        'instructor_id' => $teacher->id,
+        'type' => 'revenue',
+        'amount' => 50000,
+        'status' => 'available',
+        'reference_type' => OrderItem::class,
+        'reference_id' => 999999,
+    ]);
+
+    $overview = app(RevenueService::class)->getOverview($teacher);
+
+    expect($overview['available_balance'])->toBe(50000.0)
+        ->and($overview['total_revenue'])->toBe(120000.0);
 });
 
 test('normal refunds prefer the exact item allocation over the legacy order and course fallback', function () {

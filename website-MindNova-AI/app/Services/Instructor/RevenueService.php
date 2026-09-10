@@ -172,7 +172,8 @@ class RevenueService
                         'reference_id',
                         RevenueAllocation::query()
                             ->select('order_item_id')
-                            ->where('instructor_id', $instructorId),
+                            ->where('instructor_id', $instructorId)
+                            ->whereNotNull('order_item_id'),
                     );
             });
     }
