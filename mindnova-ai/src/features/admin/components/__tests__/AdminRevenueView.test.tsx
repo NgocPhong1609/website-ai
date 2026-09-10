@@ -64,4 +64,19 @@ describe("AdminRevenueView commission tiers", () => {
     await waitFor(() => expect(screen.queryByRole("alert")).toHaveTextContent("Không thể lưu tỷ lệ"));
     expect(input).toHaveValue(24);
   });
+
+  it("locks tier inputs while a save is in flight", async () => {
+    let resolveSave: ((value: Response) => void) | undefined;
+    fetchMock.mockImplementation(() => new Promise<Response>((resolve) => {
+      resolveSave = resolve;
+    }));
+    render(<AdminRevenueView data={data} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Lưu tỷ lệ hoa hồng" }));
+
+    const input = screen.getByLabelText("Doi tac Tieu chuan · Phí nền tảng");
+    expect(input).toBeDisabled();
+    resolveSave?.({ ok: true, status: 200, json: async () => ({ data: [] }) } as Response);
+    await waitFor(() => expect(input).toBeEnabled());
+  });
 });

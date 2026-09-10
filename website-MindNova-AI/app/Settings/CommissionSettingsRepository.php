@@ -37,13 +37,13 @@ class CommissionSettingsRepository
                     return null;
                 }
 
-                $platformPercent = (float) $percent;
+                $platformPercent = round((float) $percent, 2);
 
                 return [
                     'tier' => $tier,
                     'label' => (string) ($definition['label'] ?? self::DEFAULTS[$tier]['label'] ?? $tier),
                     'platform_commission_percent' => $platformPercent,
-                    'instructor_percent' => 100.0 - $platformPercent,
+                    'instructor_percent' => round(100.0 - $platformPercent, 2),
                 ];
             })
             ->filter()
@@ -82,12 +82,13 @@ class CommissionSettingsRepository
             if (! is_array($definition)
                 || ! isset($definition['tier'], $definition['platform_commission_percent'])
                 || ! is_string($definition['tier'])
+                || strlen($definition['tier']) > 20
                 || ! is_numeric($definition['platform_commission_percent'])) {
                 throw new InvalidArgumentException('Each commission tier must include a tier and numeric platform percentage.');
             }
 
             $tier = $definition['tier'];
-            $percent = (float) $definition['platform_commission_percent'];
+            $percent = round((float) $definition['platform_commission_percent'], 2);
             if (isset($seen[$tier]) || $percent < 0 || $percent > 100) {
                 throw new InvalidArgumentException("Invalid commission tier [{$tier}].");
             }

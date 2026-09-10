@@ -1,67 +1,71 @@
 <?php
 
-use App\Http\Controllers\Api\Admin\AnalyticsController as AdminAnalyticsController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
 // ==========================================
 // IMPORT CÁC CONTROLLER TỪ ĐÚNG THƯ MỤC
 // ==========================================
 
 // Nhóm Auth
-use App\Http\Controllers\Api\Admin\ContentManagementController as AdminContentManagementController;
-// Nhóm Student (Học sinh)
-use App\Http\Controllers\Api\Admin\CouponController as AdminCouponController;
-use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Api\Admin\ModerationSupportController as AdminModerationSupportController;
-use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
-use App\Http\Controllers\Api\Admin\SystemConfigController as AdminSystemConfigController;
-use App\Http\Controllers\Api\Admin\UserManagementController as AdminUserManagementController;
 use App\Http\Controllers\Api\Auth\AuthController;
-use App\Http\Controllers\Api\ChatController;
-use App\Http\Controllers\Api\Instructor\ContentReviewController as InstructorContentReviewController;
-use App\Http\Controllers\Api\Instructor\CouponController as InstructorCouponController;
-use App\Http\Controllers\Api\Instructor\CourseController;
-use App\Http\Controllers\Api\Instructor\CourseModuleController;
-use App\Http\Controllers\Api\Instructor\CourseOutlineController;
-use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscussionController;
-use App\Http\Controllers\Api\Instructor\DraftRevisionController;
-use App\Http\Controllers\Api\Instructor\LessonController;
-use App\Http\Controllers\Api\Instructor\MediaController;
-use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNotificationController;
-use App\Http\Controllers\Api\Instructor\OrderController as InstructorOrderController;
-use App\Http\Controllers\Api\Instructor\QuizController;
-// Nhóm Dùng chung
-use App\Http\Controllers\Api\Instructor\QuizGeneratorController;
-use App\Http\Controllers\Api\Instructor\QuizMediaController;
-// Nhóm Admin
-use App\Http\Controllers\Api\Instructor\RevenueController;
-use App\Http\Controllers\Api\Instructor\ReviewController as InstructorReviewController;
-use App\Http\Controllers\Api\Instructor\StudentAnalyticsController;
-use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentController;
-use App\Http\Controllers\Api\Instructor\TeacherProfileController;
-use App\Http\Controllers\Api\RealtimeController;
-use App\Http\Controllers\Api\Student\AiQuizGeneratorController;
-use App\Http\Controllers\Api\Student\AiTutorController;
-// Nhóm Instructor (Giáo viên)
-use App\Http\Controllers\Api\Student\AnalyzeLessonController;
-use App\Http\Controllers\Api\Student\CouponController;
-use App\Http\Controllers\Api\Student\CourseController as StudentCourseController;
-use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardController;
-use App\Http\Controllers\Api\Student\DiscussionController as StudentDiscussionController;
-use App\Http\Controllers\Api\Student\HistoryController as StudentHistoryController;
-use App\Http\Controllers\Api\Student\LessonController as StudentLessonController;
-use App\Http\Controllers\Api\Student\NotificationController as StudentNotificationController;
-use App\Http\Controllers\Api\Student\OnboardingController;
+
+// Nhóm Student (Học sinh)
+use App\Http\Controllers\Api\Student\UserController;
 use App\Http\Controllers\Api\Student\OrderController;
-use App\Http\Controllers\Api\Student\PaymentController as StudentPaymentController;
+use App\Http\Controllers\Api\Student\AiTutorController;
+use App\Http\Controllers\Api\Student\CourseController as StudentCourseController;
+use App\Http\Controllers\Api\StudentQuizController;
+use App\Http\Controllers\Api\Student\OnboardingController;
+use App\Http\Controllers\Api\Student\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Api\Student\StudyPlanController as StudentStudyPlanController;
 use App\Http\Controllers\Api\Student\PracticeController as StudentPracticeController;
 use App\Http\Controllers\Api\Student\ProgressController as StudentProgressController;
-use App\Http\Controllers\Api\Student\ReviewController as StudentReviewController;
-use App\Http\Controllers\Api\Student\SelfAssessmentController;
+use App\Http\Controllers\Api\Student\HistoryController as StudentHistoryController;
+use App\Http\Controllers\Api\Student\NotificationController as StudentNotificationController;
 use App\Http\Controllers\Api\Student\StreakController;
-use App\Http\Controllers\Api\Student\StudyPlanController as StudentStudyPlanController;
-use App\Http\Controllers\Api\Student\UserController;
-use App\Http\Controllers\Api\StudentQuizController;
-use Illuminate\Support\Facades\Broadcast;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Student\AiQuizGeneratorController;
+use App\Http\Controllers\Api\Student\AnalyzeLessonController;
+use App\Http\Controllers\Api\Student\SelfAssessmentController;
+use App\Http\Controllers\Api\Student\PaymentController as StudentPaymentController;
+use App\Http\Controllers\Api\Student\ReviewController as StudentReviewController;
+use App\Http\Controllers\Api\Student\LessonController as StudentLessonController;
+use App\Http\Controllers\Api\Student\DiscussionController as StudentDiscussionController;
+
+// Nhóm Dùng chung
+use App\Http\Controllers\Api\RealtimeController;
+use App\Http\Controllers\Api\ChatController;
+
+// Nhóm Admin
+use App\Http\Controllers\Api\Admin\AnalyticsController as AdminAnalyticsController;
+use App\Http\Controllers\Api\Admin\ContentManagementController as AdminContentManagementController;
+use App\Http\Controllers\Api\Admin\ModerationSupportController as AdminModerationSupportController;
+use App\Http\Controllers\Api\Admin\SystemConfigController as AdminSystemConfigController;
+use App\Http\Controllers\Api\Admin\UserManagementController as AdminUserManagementController;
+use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Api\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
+
+// Nhóm Instructor (Giáo viên)
+use App\Http\Controllers\Api\Instructor\CourseController;
+use App\Http\Controllers\Api\Instructor\CourseModuleController;
+use App\Http\Controllers\Api\Instructor\LessonController;
+use App\Http\Controllers\Api\Instructor\MediaController;
+use App\Http\Controllers\Api\Instructor\QuizMediaController;
+use App\Http\Controllers\Api\Instructor\QuizController;
+use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentController;
+use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscussionController;
+use App\Http\Controllers\Api\Instructor\NotificationController as InstructorNotificationController;
+use App\Http\Controllers\Api\Instructor\RevenueController;
+use App\Http\Controllers\Api\Instructor\CourseOutlineController;
+use App\Http\Controllers\Api\Instructor\ContentReviewController as InstructorContentReviewController;
+use App\Http\Controllers\Api\Instructor\TeacherProfileController;
+use App\Http\Controllers\Api\Instructor\DraftRevisionController;
+use App\Http\Controllers\Api\Instructor\QuizGeneratorController;
+use App\Http\Controllers\Api\Instructor\StudentAnalyticsController;
+use App\Http\Controllers\Api\Instructor\OrderController as InstructorOrderController;
+use App\Http\Controllers\Api\Instructor\ReviewController as InstructorReviewController;
+use App\Http\Controllers\Api\Instructor\CouponController as InstructorCouponController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -111,7 +115,7 @@ Route::prefix('student')->group(function () {
 // 2. NHÓM API PRIVATE (Bắt buộc phải có Bearer Token)
 // ==========================================
 Route::middleware('auth:sanctum')->group(function () {
-    Broadcast::routes(['middleware' => ['auth:sanctum']]);
+    \Illuminate\Support\Facades\Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
     // -- Đăng xuất --
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -147,7 +151,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // -- Nhóm API Đơn hàng (Orders) & Mã giảm giá (Coupons) --
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
-    Route::post('/coupons/apply', [CouponController::class, 'apply']);
+    Route::post('/coupons/apply', [\App\Http\Controllers\Api\Student\CouponController::class, 'apply']);
 
     // ==========================================
     // 3. NHÓM API HỌC SINH (Student Authenticated Actions)

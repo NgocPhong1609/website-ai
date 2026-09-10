@@ -3,23 +3,13 @@
 namespace App\Http\Controllers\Api\Student;
 
 use App\Http\Controllers\Controller;
-use App\Models\ChatConversation;
-use App\Models\ChatConversationMember;
-use App\Models\Coupon;
-use App\Models\Course;
-use App\Models\InstructorTransaction;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\RevenueAllocation;
-use App\Models\TeacherPayout;
-use App\Models\User;
-use App\Notifications\StudentEnrolled;
-use App\Services\Student\CourseService;
+use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class OrderController extends Controller
@@ -30,10 +20,10 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'course_ids' => 'required|array|min:1',
-            'course_ids.*' => 'required|integer|exists:courses,id',
+            'course_ids'     => 'required|array|min:1',
+            'course_ids.*'   => 'required|integer|exists:courses,id',
             'payment_method' => 'required|string|in:vnpay,momo,banking,free',
-            'coupon_code' => 'nullable|string',
+            'coupon_code'    => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -55,13 +45,13 @@ class OrderController extends Controller
 
             if ($request->filled('coupon_code')) {
                 $code = strtoupper(trim($request->coupon_code));
-                $coupon = Coupon::where('code', $code)->first();
+                $coupon = \App\Models\Coupon::where('code', $code)->first();
 
                 if ($coupon && $coupon->status === 'active') {
                     $isExpired = $coupon->expires_at && now()->greaterThan($coupon->expires_at);
-                    $limitReached = $coupon->max_uses !== null && (int) $coupon->used_count >= (int) $coupon->max_uses;
-                    $courseMismatch = $coupon->course_id && ! in_array((int) $coupon->course_id, array_map('intval', $request->course_ids));
-
+                    $limitReached = $coupon->max_uses !== null && (int)$coupon->used_count >= (int)$coupon->max_uses;
+                    $courseMismatch = $coupon->course_id && !in_array((int)$coupon->course_id, array_map('intval', $request->course_ids));
+                    
                     $instructorMismatch = false;
                     if ($coupon->instructor_id) {
                         foreach ($courses as $c) {
@@ -73,11 +63,11 @@ class OrderController extends Controller
                         }
                     }
 
-                    if (! $isExpired && ! $limitReached && ! $courseMismatch && ! $instructorMismatch) {
+                    if (!$isExpired && !$limitReached && !$courseMismatch && !$instructorMismatch) {
                         if ($coupon->type === 'percent') {
-                            $discountAmount = round($originalTotal * ((float) $coupon->value / 100));
+                            $discountAmount = round($originalTotal * ((float)$coupon->value / 100));
                         } else {
-                            $discountAmount = min($originalTotal, (float) $coupon->value);
+                            $discountAmount = min($originalTotal, (float)$coupon->value);
                         }
                         $coupon->increment('used_count');
                     }
@@ -85,14 +75,14 @@ class OrderController extends Controller
             }
 
             $totalAmount = max(0, $originalTotal - $discountAmount);
-            $transactionId = 'ORD-'.strtoupper(Str::random(6));
+            $transactionId = 'ORD-' . strtoupper(Str::random(6));
 
             $order = Order::create([
                 'user_id' => $user->id,
                 'total_amount' => $totalAmount,
                 'payment_method' => $request->payment_method,
                 'status' => 'pending',
-                'transaction_id' => $transactionId,
+                'transaction_id' => $transactionId
             ]);
 
             $discountFactor = $originalTotal > 0 ? max(0, ($originalTotal - $discountAmount) / $originalTotal) : 1;
@@ -104,34 +94,34 @@ class OrderController extends Controller
 
             if ($totalAmount <= 0) {
                 $order->update(['status' => 'completed']);
-                $student = User::find($order->user_id);
+                $student = \App\Models\User::find($order->user_id);
                 foreach ($courses as $course) {
                     $inserted = DB::table('enrollments')->insertOrIgnore([
                         'user_id' => $user->id, 'course_id' => $course->id,
-                        'status' => 'enrolled', 'enrolled_at' => now(),
+                        'status' => 'enrolled', 'enrolled_at' => now()
                     ]);
-
+                    
                     if ($inserted) {
                         if ($course && $course->teacher && $student) {
-                            $course->teacher->notify(new StudentEnrolled($course, $student));
+                            $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
                         }
 
                         // Add student to chat conversation
-                        $conversation = ChatConversation::firstOrCreate(
+                        $conversation = \App\Models\ChatConversation::firstOrCreate(
                             ['course_id' => $course->id],
                             ['title' => $course->title, 'type' => 'course']
                         );
 
                         if ($course->teacher_id) {
-                            ChatConversationMember::firstOrCreate([
+                            \App\Models\ChatConversationMember::firstOrCreate([
                                 'chat_conversation_id' => $conversation->id,
-                                'user_id' => $course->teacher_id,
+                                'user_id' => $course->teacher_id
                             ]);
                         }
 
-                        ChatConversationMember::firstOrCreate([
+                        \App\Models\ChatConversationMember::firstOrCreate([
                             'chat_conversation_id' => $conversation->id,
-                            'user_id' => $student->id,
+                            'user_id' => $student->id
                         ]);
                     }
                 }
@@ -141,7 +131,7 @@ class OrderController extends Controller
                     'success' => true,
                     'message' => 'Đăng ký khóa học miễn phí thành công!',
                     'data' => $order->load('orderItems'),
-                    'payment_url' => null,
+                    'payment_url' => null
                 ], 201);
             }
 
@@ -154,13 +144,12 @@ class OrderController extends Controller
                 'success' => true,
                 'message' => 'Tạo đơn hàng thành công!',
                 'data' => $order->load('orderItems'),
-                'payment_url' => $paymentUrl,
+                'payment_url' => $paymentUrl
             ], 201);
 
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return response()->json(['success' => false, 'message' => 'Lỗi hệ thống: '.$e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => 'Lỗi hệ thống: ' . $e->getMessage()], 500);
         }
     }
 
@@ -171,24 +160,23 @@ class OrderController extends Controller
     {
         $transactionId = $order->transaction_id;
         $courseId = $courses ? $courses->first()->id : '';
-        $returnUrl = 'http://localhost:3000/payment/callback'.($courseId ? '?course_id='.$courseId : '');
+        $returnUrl = "http://localhost:3000/payment/callback" . ($courseId ? "?course_id=" . $courseId : "");
 
         if ($order->payment_method === 'vnpay') {
             $inputData = [
-                'vnp_Version' => '2.1.0', 'vnp_TmnCode' => env('VNPAY_TMN_CODE'),
-                'vnp_Amount' => $totalAmount * 100, 'vnp_Command' => 'pay',
-                'vnp_CreateDate' => date('YmdHis'), 'vnp_CurrCode' => 'VND',
-                'vnp_IpAddr' => $request->ip(), 'vnp_Locale' => 'vn',
-                'vnp_OrderInfo' => 'Thanh toan '.$transactionId,
-                'vnp_OrderType' => 'billpayment',
-                'vnp_ReturnUrl' => $returnUrl,
-                'vnp_TxnRef' => $transactionId,
+                "vnp_Version" => "2.1.0", "vnp_TmnCode" => env('VNPAY_TMN_CODE'),
+                "vnp_Amount" => $totalAmount * 100, "vnp_Command" => "pay",
+                "vnp_CreateDate" => date('YmdHis'), "vnp_CurrCode" => "VND",
+                "vnp_IpAddr" => $request->ip(), "vnp_Locale" => "vn",
+                "vnp_OrderInfo" => "Thanh toan " . $transactionId,
+                "vnp_OrderType" => "billpayment",
+                "vnp_ReturnUrl" => $returnUrl,
+                "vnp_TxnRef" => $transactionId,
             ];
             ksort($inputData);
             $query = http_build_query($inputData);
             $hash = hash_hmac('sha512', $query, env('VNPAY_HASH_SECRET'));
-
-            return 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?'.$query.'&vnp_SecureHash='.$hash;
+            return "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?" . $query . "&vnp_SecureHash=" . $hash;
         }
 
         if ($order->payment_method === 'momo') {
@@ -197,12 +185,12 @@ class OrderController extends Controller
             $secretKey = env('MOMO_SECRET_KEY', 'secret_key');
             $endpoint = env('MOMO_ENDPOINT', 'https://test-payment.momo.vn/v2/gateway/api/create');
             $redirectUrl = $returnUrl;
-            $ipnUrl = env('APP_URL', 'http://localhost:8000').'/api/student/payment/momo-ipn';
-            $amount = (string) $totalAmount;
-            $orderInfo = 'Thanh toan don hang '.$transactionId;
-            $requestId = time().'';
-            $extraData = '';
-            $requestType = 'captureWallet';
+            $ipnUrl = env('APP_URL', 'http://localhost:8000') . "/api/student/payment/momo-ipn";
+            $amount = (string)$totalAmount;
+            $orderInfo = "Thanh toan don hang " . $transactionId;
+            $requestId = time() . "";
+            $extraData = "";
+            $requestType = "captureWallet";
 
             $rawHash = "accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$transactionId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType";
             $signature = hash_hmac('sha256', $rawHash, $secretKey);
@@ -220,24 +208,22 @@ class OrderController extends Controller
                 'lang' => 'vi',
                 'extraData' => $extraData,
                 'requestType' => $requestType,
-                'signature' => $signature,
+                'signature' => $signature
             ];
 
             try {
-                $response = Http::post($endpoint, $data);
+                $response = \Illuminate\Support\Facades\Http::post($endpoint, $data);
                 if ($response->successful()) {
                     $json = $response->json();
-
                     return $json['payUrl'] ?? null;
                 }
             } catch (\Exception $e) {
                 // Return null if Momo fails
             }
-
             return null;
         }
 
-        return 'https://your-website.com/banking-instruction'; // Link trang hướng dẫn banking
+        return "https://your-website.com/banking-instruction"; // Link trang hướng dẫn banking
     }
 
     /**
@@ -247,7 +233,7 @@ class OrderController extends Controller
     {
         // Giữ nguyên logic IPN của bạn vì nó đang hoạt động tốt
         $vnp_HashSecret = env('VNPAY_HASH_SECRET');
-        $inputData = array_filter($request->all(), fn ($k) => str_starts_with($k, 'vnp_'), ARRAY_FILTER_USE_KEY);
+        $inputData = array_filter($request->all(), fn($k) => str_starts_with($k, 'vnp_'), ARRAY_FILTER_USE_KEY);
         $vnp_SecureHash = $inputData['vnp_SecureHash'];
         unset($inputData['vnp_SecureHash'], $inputData['vnp_SecureHashType']);
         ksort($inputData);
@@ -260,49 +246,47 @@ class OrderController extends Controller
                     $order->update(['status' => 'completed']);
                     // Tự động cấp quyền
                     $items = OrderItem::with('course.teacher')->where('order_id', $order->id)->get();
-                    $student = User::find($order->user_id);
+                    $student = \App\Models\User::find($order->user_id);
                     foreach ($items as $item) {
                         $inserted = DB::table('enrollments')->insertOrIgnore([
                             'user_id' => $order->user_id, 'course_id' => $item->course_id,
-                            'status' => 'enrolled', 'enrolled_at' => now(),
+                            'status' => 'enrolled', 'enrolled_at' => now()
                         ]);
-
+                        
                         if ($inserted) {
                             $course = $item->course;
                             if ($course && $course->teacher && $student) {
-                                $course->teacher->notify(new StudentEnrolled($course, $student));
+                                $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
                             }
 
                             // Add student to chat conversation
                             if ($course) {
-                                $conversation = ChatConversation::firstOrCreate(
+                                $conversation = \App\Models\ChatConversation::firstOrCreate(
                                     ['course_id' => $course->id],
                                     ['title' => $course->title, 'type' => 'course']
                                 );
 
                                 if ($course->teacher_id) {
-                                    ChatConversationMember::firstOrCreate([
+                                    \App\Models\ChatConversationMember::firstOrCreate([
                                         'chat_conversation_id' => $conversation->id,
-                                        'user_id' => $course->teacher_id,
+                                        'user_id' => $course->teacher_id
                                     ]);
                                 }
 
-                                ChatConversationMember::firstOrCreate([
+                                \App\Models\ChatConversationMember::firstOrCreate([
                                     'chat_conversation_id' => $conversation->id,
-                                    'user_id' => $order->user_id,
+                                    'user_id' => $order->user_id
                                 ]);
                             }
                         }
                     }
-
+                    
                     app(InstructorPayoutService::class)->createForOrder($order);
                 }
             }
-
             return response()->json(['RspCode' => '00', 'Message' => 'Confirm Success']);
         }
     }
-
     /**
      * API nhận IPN Momo
      */
@@ -327,7 +311,7 @@ class OrderController extends Controller
         $signature = $request->signature;
 
         $rawHash = "accessKey=$accessKey&amount=$amount&extraData=$extraData&message=$message&orderId=$orderId&orderInfo=$orderInfo&orderType=$orderType&partnerCode=$partnerCodeParam&payType=$payType&requestId=$requestId&responseTime=$responseTime&resultCode=$resultCode&transId=$transId";
-
+        
         $mySignature = hash_hmac('sha256', $rawHash, $secretKey);
 
         if ($mySignature === $signature) {
@@ -338,47 +322,45 @@ class OrderController extends Controller
                     $order->update(['status' => 'completed']);
                     // Tự động cấp quyền
                     $items = OrderItem::with('course.teacher')->where('order_id', $order->id)->get();
-                    $student = User::find($order->user_id);
+                    $student = \App\Models\User::find($order->user_id);
                     foreach ($items as $item) {
                         $inserted = DB::table('enrollments')->insertOrIgnore([
                             'user_id' => $order->user_id, 'course_id' => $item->course_id,
-                            'status' => 'enrolled', 'enrolled_at' => now(),
+                            'status' => 'enrolled', 'enrolled_at' => now()
                         ]);
-
+                        
                         if ($inserted) {
                             $course = $item->course;
                             if ($course && $course->teacher && $student) {
-                                $course->teacher->notify(new StudentEnrolled($course, $student));
+                                $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
                             }
 
                             // Add student to chat conversation
                             if ($course) {
-                                $conversation = ChatConversation::firstOrCreate(
+                                $conversation = \App\Models\ChatConversation::firstOrCreate(
                                     ['course_id' => $course->id],
                                     ['title' => $course->title, 'type' => 'course']
                                 );
 
                                 if ($course->teacher_id) {
-                                    ChatConversationMember::firstOrCreate([
+                                    \App\Models\ChatConversationMember::firstOrCreate([
                                         'chat_conversation_id' => $conversation->id,
-                                        'user_id' => $course->teacher_id,
+                                        'user_id' => $course->teacher_id
                                     ]);
                                 }
 
-                                ChatConversationMember::firstOrCreate([
+                                \App\Models\ChatConversationMember::firstOrCreate([
                                     'chat_conversation_id' => $conversation->id,
-                                    'user_id' => $order->user_id,
+                                    'user_id' => $order->user_id
                                 ]);
                             }
                         }
                     }
-
+                    
                     app(InstructorPayoutService::class)->createForOrder($order);
                 }
-
                 return response()->json(['message' => 'Success']);
             }
-
             return response()->json(['message' => 'Payment failed']);
         }
 
@@ -391,10 +373,10 @@ class OrderController extends Controller
     public function showByTransaction(Request $request, $transactionId)
     {
         $order = Order::with('orderItems.course')->where('transaction_id', $transactionId)->first();
-        if (! $order) {
+        if (!$order) {
             return response()->json(['success' => false, 'message' => 'Order not found'], 404);
         }
-
+        
         // Ensure user can only check their own order
         if ($order->user_id !== $request->user()->id) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
@@ -402,7 +384,7 @@ class OrderController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $order,
+            'data' => $order
         ]);
     }
 
@@ -411,12 +393,12 @@ class OrderController extends Controller
      */
     public function devCompleteOrder(Request $request, $orderId)
     {
-        if (! app()->environment('local', 'testing')) {
+        if (!app()->environment('local', 'testing')) {
             return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
         }
 
         $order = Order::find($orderId);
-        if (! $order) {
+        if (!$order) {
             return response()->json(['success' => false, 'message' => 'Order not found'], 404);
         }
 
@@ -428,72 +410,69 @@ class OrderController extends Controller
         try {
             $order->update(['status' => 'completed']);
             $items = OrderItem::with('course.teacher')->where('order_id', $order->id)->get();
-            $student = User::find($order->user_id);
-
+            $student = \App\Models\User::find($order->user_id);
+            
             foreach ($items as $item) {
                 $inserted = DB::table('enrollments')->insertOrIgnore([
                     'user_id' => $order->user_id, 'course_id' => $item->course_id,
-                    'status' => 'enrolled', 'enrolled_at' => now(),
+                    'status' => 'enrolled', 'enrolled_at' => now()
                 ]);
-
+                
                 if ($inserted) {
                     $course = $item->course;
                     if ($course && $course->teacher && $student) {
-                        $course->teacher->notify(new StudentEnrolled($course, $student));
+                        $course->teacher->notify(new \App\Notifications\StudentEnrolled($course, $student));
                     }
 
                     // Add student to chat conversation
                     if ($course) {
-                        $conversation = ChatConversation::firstOrCreate(
+                        $conversation = \App\Models\ChatConversation::firstOrCreate(
                             ['course_id' => $course->id],
                             ['title' => $course->title, 'type' => 'course']
                         );
 
                         if ($course->teacher_id) {
-                            ChatConversationMember::firstOrCreate([
+                            \App\Models\ChatConversationMember::firstOrCreate([
                                 'chat_conversation_id' => $conversation->id,
-                                'user_id' => $course->teacher_id,
+                                'user_id' => $course->teacher_id
                             ]);
                         }
 
-                        ChatConversationMember::firstOrCreate([
+                        \App\Models\ChatConversationMember::firstOrCreate([
                             'chat_conversation_id' => $conversation->id,
-                            'user_id' => $order->user_id,
+                            'user_id' => $order->user_id
                         ]);
                     }
                 }
             }
-
+            
             if (class_exists(\App\Services\Instructor\InstructorPayoutService::class)) {
                 app(\App\Services\Instructor\InstructorPayoutService::class)->createForOrder($order);
             }
-
+            
             DB::commit();
-
             return response()->json([
                 'success' => true,
                 'message' => 'Order forcefully completed for testing',
-                'data' => $order->load('orderItems'),
+                'data' => $order->load('orderItems')
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('devCompleteOrder failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-
+            \Illuminate\Support\Facades\Log::error('devCompleteOrder failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
-
     /**
      * Dev Endpoint to force refund an order for testing
      */
     public function devRefundOrder(Request $request, $orderId)
     {
-        if (! app()->environment('local', 'testing')) {
+        if (!app()->environment('local', 'testing')) {
             return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
         }
 
         $order = Order::find($orderId);
-        if (! $order) {
+        if (!$order) {
             return response()->json(['success' => false, 'message' => 'Order not found'], 404);
         }
 
@@ -505,22 +484,20 @@ class OrderController extends Controller
         try {
             $order->update(['status' => 'refunded']);
             $items = OrderItem::with('course.teacher')->where('order_id', $order->id)->get();
-
+            
             foreach ($items as $item) {
                 DB::table('enrollments')->where('user_id', $order->user_id)->where('course_id', $item->course_id)->delete();
-
-                $conversation = ChatConversation::where('course_id', $item->course_id)->first();
+                
+                $conversation = \App\Models\ChatConversation::where('course_id', $item->course_id)->first();
                 if ($conversation) {
-                    ChatConversationMember::where('chat_conversation_id', $conversation->id)
+                    \App\Models\ChatConversationMember::where('chat_conversation_id', $conversation->id)
                         ->where('user_id', $order->user_id)
                         ->delete();
                 }
-
+                
                 $course = $item->course;
                 if ($course && $course->teacher_id) {
-                    $allocation = RevenueAllocation::where('order_id', $order->id)
-                        ->where('order_item_id', $item->id)
-                        ->first();
+                    $allocation = $this->allocationSnapshot($order->id, $course->id, $item->id);
                     $teacherAmount = $allocation?->instructor_amount;
 
                     if ($allocation) {
@@ -528,38 +505,36 @@ class OrderController extends Controller
                     }
 
                     if ($teacherAmount === null) {
-                        $teacherAmount = TeacherPayout::where('order_id', $order->id)
+                        $teacherAmount = \App\Models\TeacherPayout::where('order_id', $order->id)
                             ->where('course_id', $course->id)
                             ->value('teacher_amount');
                     }
 
                     if ($teacherAmount !== null) {
-                        InstructorTransaction::create([
+                        \App\Models\InstructorTransaction::create([
                             'instructor_id' => $course->teacher_id,
                             'type' => 'refund',
                             'amount' => (float) $teacherAmount,
                             'status' => 'completed',
                             'reference_type' => 'App\Models\OrderItem',
                             'reference_id' => $item->id,
-                            'description' => 'Hoàn tiền cho khóa học: '.$course->title,
+                            'description' => 'Hoàn tiền cho khóa học: ' . $course->title,
                             'created_at' => now(),
                             'updated_at' => now(),
                         ]);
                     }
-
-                    TeacherPayout::where('order_id', $order->id)->where('course_id', $course->id)->update(['status' => 'refunded']);
+                    
+                    \App\Models\TeacherPayout::where('order_id', $order->id)->where('course_id', $course->id)->update(['status' => 'refunded']);
                 }
             }
-
+            
             DB::commit();
-
             return response()->json([
                 'success' => true,
-                'message' => 'Order forcefully refunded for testing',
+                'message' => 'Order forcefully refunded for testing'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -570,7 +545,7 @@ class OrderController extends Controller
     public function checkRefundEligibility(Request $request, $courseId)
     {
         $user = $request->user('sanctum') ?? $request->user();
-        if (! $user) {
+        if (!$user) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
         }
 
@@ -582,13 +557,13 @@ class OrderController extends Controller
             ->latest()
             ->first();
 
-        if (! $order) {
+        if (!$order) {
             return response()->json([
                 'success' => true,
                 'data' => [
                     'is_eligible' => false,
                     'reason' => 'Bạn chưa mua hoặc khóa học này đã được hoàn tiền trước đó.',
-                ],
+                ]
             ]);
         }
 
@@ -596,11 +571,11 @@ class OrderController extends Controller
         $within30Days = $daysDiff <= 30;
 
         $course = Course::find($courseId);
-        if (! $course) {
+        if (!$course) {
             return response()->json(['success' => false, 'message' => 'Không tìm thấy khóa học.'], 404);
         }
 
-        $courseService = app(CourseService::class);
+        $courseService = app(\App\Services\Student\CourseService::class);
         $progressData = $courseService->calculateStudentProgress($course, $user->id);
 
         $progressPercentage = $progressData['progress_percentage'] ?? 0;
@@ -610,10 +585,10 @@ class OrderController extends Controller
         $isEligible = $within30Days && $progressEligible;
 
         $reasons = [];
-        if (! $within30Days) {
+        if (!$within30Days) {
             $reasons[] = "Đã quá 30 ngày kể từ khi mua khóa học (Đã mua {$daysDiff} ngày).";
         }
-        if (! $progressEligible) {
+        if (!$progressEligible) {
             $reasons[] = "Tiến độ học vượt quá điều kiện quy định (Yêu cầu tiến độ ≤10% và ≤5 bài. Tiến độ hiện tại của bạn: {$progressPercentage}%, bài đã học: {$completedLessonsCount}).";
         }
 
@@ -632,7 +607,7 @@ class OrderController extends Controller
                 'progress_eligible' => $progressEligible,
                 'reasons' => $reasons,
                 'amount' => (float) $order->total_amount,
-            ],
+            ]
         ]);
     }
 
@@ -642,14 +617,14 @@ class OrderController extends Controller
     public function requestRefund(Request $request)
     {
         $user = $request->user('sanctum') ?? $request->user();
-        if (! $user) {
+        if (!$user) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
         }
 
         $courseId = $request->input('course_id');
         $orderId = $request->input('order_id');
 
-        if (! $courseId && ! $orderId) {
+        if (!$courseId && !$orderId) {
             return response()->json(['success' => false, 'message' => 'Vui lòng chọn khóa học hoặc đơn hàng để hoàn tiền.'], 422);
         }
 
@@ -665,10 +640,10 @@ class OrderController extends Controller
 
         $order = $orderQuery->latest()->first();
 
-        if (! $order) {
+        if (!$order) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy đơn hàng đủ điều kiện hoặc đơn hàng đã được hoàn tiền trước đó.',
+                'message' => 'Không tìm thấy đơn hàng đủ điều kiện hoặc đơn hàng đã được hoàn tiền trước đó.'
             ], 404);
         }
 
@@ -676,22 +651,22 @@ class OrderController extends Controller
         if ($daysDiff > 30) {
             return response()->json([
                 'success' => false,
-                'message' => "Khóa học đã mua quá 30 ngày (Đã mua {$daysDiff} ngày), không đủ điều kiện hoàn tiền theo chính sách.",
+                'message' => "Khóa học đã mua quá 30 ngày (Đã mua {$daysDiff} ngày), không đủ điều kiện hoàn tiền theo chính sách."
             ], 422);
         }
 
         $targetCourseId = $courseId;
-        if (! $targetCourseId) {
+        if (!$targetCourseId) {
             $firstItem = $order->orderItems->first();
             $targetCourseId = $firstItem ? $firstItem->course_id : null;
         }
 
         $course = Course::find($targetCourseId);
-        if (! $course) {
+        if (!$course) {
             return response()->json(['success' => false, 'message' => 'Không tìm thấy khóa học.'], 404);
         }
 
-        $courseService = app(CourseService::class);
+        $courseService = app(\App\Services\Student\CourseService::class);
         $progressData = $courseService->calculateStudentProgress($course, $user->id);
 
         $progressPercentage = $progressData['progress_percentage'] ?? 0;
@@ -699,10 +674,10 @@ class OrderController extends Controller
 
         $isEligible = ($progressPercentage <= 10) && ($completedLessonsCount <= 5);
 
-        if (! $isEligible) {
+        if (!$isEligible) {
             return response()->json([
                 'success' => false,
-                'message' => "Không đủ điều kiện hoàn tiền. Khóa học chỉ được hoàn tiền khi tiến độ ≤10% và chưa học quá 5 bài. Tiến độ hiện tại của bạn là {$progressPercentage}% ({$completedLessonsCount} bài đã học).",
+                'message' => "Không đủ điều kiện hoàn tiền. Khóa học chỉ được hoàn tiền khi tiến độ ≤10% và chưa học quá 5 bài. Tiến độ hiện tại của bạn là {$progressPercentage}% ({$completedLessonsCount} bài đã học)."
             ], 422);
         }
 
@@ -712,9 +687,9 @@ class OrderController extends Controller
             DB::table('enrollments')->where('user_id', $user->id)->where('course_id', $course->id)->delete();
 
             // Remove from chat group
-            $conversation = ChatConversation::where('course_id', $course->id)->first();
+            $conversation = \App\Models\ChatConversation::where('course_id', $course->id)->first();
             if ($conversation) {
-                ChatConversationMember::where('chat_conversation_id', $conversation->id)
+                \App\Models\ChatConversationMember::where('chat_conversation_id', $conversation->id)
                     ->where('user_id', $user->id)
                     ->delete();
             }
@@ -723,9 +698,7 @@ class OrderController extends Controller
             if ($course->teacher_id) {
                 $orderItem = OrderItem::where('order_id', $order->id)->where('course_id', $course->id)->first();
                 // Update RevenueAllocation to REFUNDED
-                $allocation = RevenueAllocation::where('order_id', $order->id)
-                    ->where('course_id', $course->id)
-                    ->first();
+                $allocation = $this->allocationSnapshot($order->id, $course->id, $orderItem?->id);
 
                 $teacherAmount = $allocation?->instructor_amount;
 
@@ -737,26 +710,26 @@ class OrderController extends Controller
                 }
 
                 if ($teacherAmount === null) {
-                    $teacherAmount = TeacherPayout::where('order_id', $order->id)
+                    $teacherAmount = \App\Models\TeacherPayout::where('order_id', $order->id)
                         ->where('course_id', $course->id)
                         ->value('teacher_amount');
                 }
 
                 if ($teacherAmount !== null) {
-                    InstructorTransaction::create([
+                    \App\Models\InstructorTransaction::create([
                         'instructor_id' => $course->teacher_id,
                         'type' => 'refund',
                         'amount' => (float) $teacherAmount,
                         'status' => 'completed',
                         'reference_type' => 'App\Models\OrderItem',
                         'reference_id' => $orderItem ? $orderItem->id : $course->id,
-                        'description' => 'Hoàn tiền cho khóa học: '.$course->title,
+                        'description' => 'Hoàn tiền cho khóa học: ' . $course->title,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
                 }
 
-                TeacherPayout::where('order_id', $order->id)->where('course_id', $course->id)->update(['status' => 'refunded']);
+                \App\Models\TeacherPayout::where('order_id', $order->id)->where('course_id', $course->id)->update(['status' => 'refunded']);
             }
 
             $order->update(['status' => 'refunded']);
@@ -765,17 +738,35 @@ class OrderController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => "Hoàn tiền khóa học '{$course->title}' thành công! Số tiền ".number_format($order->total_amount).' VNĐ đã được hoàn trả.',
+                'message' => "Hoàn tiền khóa học '{$course->title}' thành công! Số tiền " . number_format($order->total_amount) . " VNĐ đã được hoàn trả.",
                 'data' => [
                     'order_id' => $order->id,
                     'course_id' => $course->id,
                     'refunded_amount' => $order->total_amount,
-                ],
+                ]
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return response()->json(['success' => false, 'message' => 'Lỗi khi xử lý hoàn tiền: '.$e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => 'Lỗi khi xử lý hoàn tiền: ' . $e->getMessage()], 500);
         }
+    }
+
+    private function allocationSnapshot(int $orderId, int $courseId, ?int $orderItemId): ?\App\Models\RevenueAllocation
+    {
+        if ($orderItemId !== null) {
+            $exact = \App\Models\RevenueAllocation::where('order_id', $orderId)
+                ->where('course_id', $courseId)
+                ->where('order_item_id', $orderItemId)
+                ->first();
+
+            if ($exact !== null) {
+                return $exact;
+            }
+        }
+
+        return \App\Models\RevenueAllocation::where('order_id', $orderId)
+            ->where('course_id', $courseId)
+            ->whereNull('order_item_id')
+            ->first();
     }
 }

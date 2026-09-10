@@ -15,7 +15,7 @@ class UpdateCommissionSettingsRequest extends FormRequest
     {
         return [
             'tiers' => ['required', 'array', 'min:1'],
-            'tiers.*.tier' => ['required', 'string', 'alpha_dash', 'max:50', 'distinct'],
+            'tiers.*.tier' => ['required', 'string', 'alpha_dash', 'max:20', 'distinct'],
             'tiers.*.label' => ['sometimes', 'string', 'max:100'],
             'tiers.*.platform_commission_percent' => ['required', 'numeric', 'min:0', 'max:100'],
         ];

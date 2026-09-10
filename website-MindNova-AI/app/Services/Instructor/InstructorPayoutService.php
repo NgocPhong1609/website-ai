@@ -28,15 +28,31 @@ class InstructorPayoutService
                 continue;
             }
 
-            $quote = $this->commission->quote($course->partnership_tier ?? 'standard', $item->price);
+            $payout = TeacherPayout::where('order_id', $order->id)
+                ->where('course_id', $course->id)
+                ->where('teacher_id', $course->teacher_id)
+                ->first();
+            $allocation = RevenueAllocation::where('order_id', $order->id)
+                ->where('course_id', $course->id)
+                ->where('order_item_id', $item->id)
+                ->first()
+                ?? RevenueAllocation::where('order_id', $order->id)
+                    ->where('course_id', $course->id)
+                    ->whereNull('order_item_id')
+                    ->first();
+            $hadSnapshot = $payout !== null || $allocation !== null;
 
-            $payout = TeacherPayout::firstOrCreate(
-                [
+            $quote = $allocation !== null
+                ? $this->quoteFromAllocation($allocation)
+                : ($payout !== null
+                    ? $this->quoteFromPayout($payout, $course)
+                    : $this->commission->quote($course->partnership_tier ?? 'standard', $item->price));
+
+            if ($payout === null) {
+                $payout = TeacherPayout::create([
                     'order_id' => $order->id,
                     'course_id' => $course->id,
                     'teacher_id' => $course->teacher_id,
-                ],
-                [
                     'student_id' => $order->user_id,
                     'gross_amount' => $quote['gross_amount'],
                     'teacher_amount' => $quote['instructor_amount'],
@@ -50,17 +66,15 @@ class InstructorPayoutService
                         'platform_commission_percent' => $quote['platform_commission_percent'],
                         'instructor_percent' => $quote['instructor_percent'],
                     ],
-                ]
-            );
+                ]);
+            }
 
             // Create RevenueAllocation Snapshot per transaction
-            $allocation = RevenueAllocation::firstOrCreate(
-                [
+            if ($allocation === null) {
+                $allocation = RevenueAllocation::create([
                     'order_id' => $order->id,
                     'order_item_id' => $item->id,
                     'course_id' => $course->id,
-                ],
-                [
                     'student_id' => $order->user_id,
                     'instructor_id' => $course->teacher_id,
                     'partnership_tier' => $quote['tier'],
@@ -73,11 +87,11 @@ class InstructorPayoutService
                     'instructor_amount' => $quote['instructor_amount'],
                     'status' => 'PENDING',
                     'refund_deadline' => now()->addDays(30),
-                ]
-            );
+                ]);
+            }
 
             // Create InstructorTransaction for Revenue Dashboard with PENDING/HOLD status initially
-            if ($payout->wasRecentlyCreated || $allocation->wasRecentlyCreated) {
+            if (! $hadSnapshot) {
                 InstructorTransaction::firstOrCreate(
                     [
                         'reference_type' => 'App\Models\OrderItem',
@@ -95,5 +109,32 @@ class InstructorPayoutService
                 );
             }
         }
+    }
+
+    private function quoteFromAllocation(RevenueAllocation $allocation): array
+    {
+        return [
+            'tier' => $allocation->partnership_tier,
+            'gross_amount' => (float) $allocation->paid_amount,
+            'platform_commission_percent' => (float) $allocation->platform_fee_percent,
+            'platform_amount' => (float) $allocation->platform_fee_amount,
+            'instructor_percent' => (float) $allocation->instructor_percent,
+            'instructor_amount' => (float) $allocation->instructor_amount,
+        ];
+    }
+
+    private function quoteFromPayout(TeacherPayout $payout, Course $course): array
+    {
+        $metadata = $payout->metadata ?? [];
+        $platformPercent = (float) $payout->commission_rate;
+
+        return [
+            'tier' => $metadata['partnership_tier'] ?? $course->partnership_tier ?? 'standard',
+            'gross_amount' => (float) $payout->gross_amount,
+            'platform_commission_percent' => $platformPercent,
+            'platform_amount' => (float) $payout->admin_share_amount,
+            'instructor_percent' => (float) ($metadata['instructor_percent'] ?? round(100 - $platformPercent, 2)),
+            'instructor_amount' => (float) $payout->teacher_amount,
+        ];
     }
 }

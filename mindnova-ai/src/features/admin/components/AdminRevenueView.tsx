@@ -221,6 +221,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                   max={100}
                   step="0.01"
                   value={definition.platform_commission_percent}
+                  disabled={isSavingTiers}
                   onChange={(event) => updateTierPercent(definition.tier, Number(event.target.value))}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
                 />

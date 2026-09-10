@@ -52,6 +52,30 @@ function commissionOrder(User $teacher, User $student, string $tier = 'standard'
     return [$course, $order, $item];
 }
 
+function legacyAllocation(Course $course, Order $order, ?OrderItem $item, float $instructorAmount, string $tier = 'standard'): RevenueAllocation
+{
+    $paidAmount = (float) ($item?->price ?? $order->total_amount);
+    $platformAmount = $paidAmount - $instructorAmount;
+
+    return RevenueAllocation::create([
+        'order_id' => $order->id,
+        'order_item_id' => $item?->id,
+        'course_id' => $course->id,
+        'student_id' => $order->user_id,
+        'instructor_id' => $course->teacher_id,
+        'partnership_tier' => $tier,
+        'original_price' => $paidAmount,
+        'discount_amount' => 0,
+        'paid_amount' => $paidAmount,
+        'platform_fee_percent' => $platformAmount / $paidAmount * 100,
+        'platform_fee_amount' => $platformAmount,
+        'instructor_percent' => $instructorAmount / $paidAmount * 100,
+        'instructor_amount' => $instructorAmount,
+        'status' => 'PENDING',
+        'refund_deadline' => now()->addDays(30),
+    ]);
+}
+
 test('authenticated instructors receive the canonical default commission tiers', function () {
     $teacher = commissionUser('teacher', 'tier-reader@example.com');
 
@@ -200,4 +224,126 @@ test('admin revenue returns canonical tiers and transaction snapshot fields', fu
         ->assertJsonPath('orderHistory.0.instructorPercent', 70)
         ->assertJsonPath('orderHistory.0.adminAmount', 30000)
         ->assertJsonPath('orderHistory.0.teacherAmount', 70000);
+});
+
+test('replaying payout creation after a configuration change reuses the existing payout snapshot', function () {
+    $admin = commissionUser('admin', 'replay-admin@example.com');
+    $teacher = commissionUser('teacher', 'replay-teacher@example.com');
+    $student = commissionUser('student', 'replay-student@example.com');
+    [$course, $order] = commissionOrder($teacher, $student);
+
+    TeacherPayout::create([
+        'order_id' => $order->id,
+        'course_id' => $course->id,
+        'teacher_id' => $teacher->id,
+        'student_id' => $student->id,
+        'gross_amount' => 100000,
+        'teacher_amount' => 70000,
+        'admin_share_amount' => 30000,
+        'commission_rate' => 30,
+        'status' => 'pending',
+        'metadata' => ['partnership_tier' => 'standard', 'instructor_percent' => 70],
+    ]);
+
+    $this->actingAs($admin, 'sanctum')->putJson('/api/admin/revenue/commission-tiers', [
+        'tiers' => [
+            ['tier' => 'standard', 'platform_commission_percent' => 5],
+            ['tier' => 'exclusive', 'platform_commission_percent' => 10],
+        ],
+    ])->assertOk();
+
+    app(InstructorPayoutService::class)->createForOrder($order);
+
+    $allocation = RevenueAllocation::firstOrFail();
+    expect((float) $allocation->platform_fee_percent)->toBe(30.0)
+        ->and((float) $allocation->instructor_percent)->toBe(70.0)
+        ->and((float) $allocation->instructor_amount)->toBe(70000.0)
+        ->and(InstructorTransaction::count())->toBe(0);
+});
+
+test('commission percentages are normalized to stored precision before deriving the complement', function () {
+    $admin = commissionUser('admin', 'precision-admin@example.com');
+
+    $this->actingAs($admin, 'sanctum')->putJson('/api/admin/revenue/commission-tiers', [
+        'tiers' => [
+            ['tier' => 'standard', 'platform_commission_percent' => 12.345],
+            ['tier' => 'exclusive', 'platform_commission_percent' => 15],
+        ],
+    ])->assertOk()
+        ->assertJsonPath('data.0.platform_commission_percent', 12.35)
+        ->assertJsonPath('data.0.instructor_percent', 87.65);
+
+    $quote = app(CommissionService::class)->quote('standard', 100000);
+    expect($quote['platform_commission_percent'] + $quote['instructor_percent'])->toBe(100.0);
+});
+
+test('tier identifiers longer than the snapshot column are rejected', function () {
+    $admin = commissionUser('admin', 'tier-length-admin@example.com');
+
+    $this->actingAs($admin, 'sanctum')->putJson('/api/admin/revenue/commission-tiers', [
+        'tiers' => [
+            ['tier' => str_repeat('x', 21), 'platform_commission_percent' => 20],
+        ],
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors('tiers.0.tier');
+});
+
+test('legacy nullable allocations remain reportable and refundable', function () {
+    $admin = commissionUser('admin', 'legacy-admin@example.com');
+    $teacher = commissionUser('teacher', 'legacy-teacher@example.com');
+    $student = commissionUser('student', 'legacy-student@example.com');
+    [$course, $order, $item] = commissionOrder($teacher, $student);
+    legacyAllocation($course, $order, null, 64000);
+
+    $this->actingAs($admin, 'sanctum')->getJson('/api/admin/revenue')
+        ->assertOk()
+        ->assertJsonPath('orderHistory.0.teacherAmount', 64000)
+        ->assertJsonPath('orderHistory.0.platformCommissionPercent', 36);
+
+    $this->actingAs($student, 'sanctum')->postJson("/api/dev/orders/{$order->id}/refund")->assertOk();
+
+    expect((float) InstructorTransaction::where('reference_id', $item->id)->where('type', 'refund')->value('amount'))->toBe(64000.0)
+        ->and(RevenueAllocation::first()->status)->toBe('REFUNDED');
+});
+
+test('normal refunds prefer the exact item allocation over the legacy order and course fallback', function () {
+    $teacher = commissionUser('teacher', 'precedence-teacher@example.com');
+    $student = commissionUser('student', 'precedence-student@example.com');
+    [$course, $order, $item] = commissionOrder($teacher, $student);
+    $legacy = legacyAllocation($course, $order, null, 64000);
+    $exact = legacyAllocation($course, $order, $item, 71000);
+
+    $this->actingAs($student, 'sanctum')->postJson('/api/student/orders/refund', [
+        'order_id' => $order->id,
+        'course_id' => $course->id,
+    ])->assertOk();
+
+    expect((float) InstructorTransaction::where('reference_id', $item->id)->where('type', 'refund')->value('amount'))->toBe(71000.0)
+        ->and($exact->refresh()->status)->toBe('REFUNDED')
+        ->and($legacy->refresh()->status)->toBe('PENDING');
+});
+
+test('allocation tier backfill prefers payout metadata before the current course tier', function () {
+    $teacher = commissionUser('teacher', 'backfill-teacher@example.com');
+    $student = commissionUser('student', 'backfill-student@example.com');
+    [$course, $order, $item] = commissionOrder($teacher, $student, 'exclusive');
+    $allocation = legacyAllocation($course, $order, $item, 70000, 'standard');
+    $allocation->update(['partnership_tier' => null]);
+    TeacherPayout::create([
+        'order_id' => $order->id,
+        'course_id' => $course->id,
+        'teacher_id' => $teacher->id,
+        'student_id' => $student->id,
+        'gross_amount' => 100000,
+        'teacher_amount' => 70000,
+        'admin_share_amount' => 30000,
+        'commission_rate' => 30,
+        'status' => 'pending',
+        'metadata' => ['partnership_tier' => 'standard'],
+    ]);
+
+    $migration = require database_path('migrations/2026_09_10_000001_add_partnership_tier_to_revenue_allocations_table.php');
+    $migration->up();
+
+    expect($allocation->refresh()->partnership_tier)->toBe('standard');
 });

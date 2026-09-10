@@ -17,7 +17,7 @@ class CommissionService
     {
         $definition = $this->settings->tier($tier);
         $gross = round((float) $grossAmount, 2);
-        $platformPercent = (float) $definition['platform_commission_percent'];
+        $platformPercent = round((float) $definition['platform_commission_percent'], 2);
         $platformAmount = round($gross * $platformPercent / 100, 2);
 
         return [
@@ -25,7 +25,7 @@ class CommissionService
             'gross_amount' => $gross,
             'platform_commission_percent' => $platformPercent,
             'platform_amount' => $platformAmount,
-            'instructor_percent' => 100.0 - $platformPercent,
+            'instructor_percent' => round(100.0 - $platformPercent, 2),
             'instructor_amount' => round($gross - $platformAmount, 2),
         ];
     }

@@ -262,8 +262,7 @@ class DashboardController extends Controller
                     ->on('tp.course_id', '=', 'oi.course_id');
             })
             ->leftJoin('revenue_allocations as ra', function ($join) {
-                $join->on('ra.order_id', '=', 'oi.order_id')
-                    ->on('ra.order_item_id', '=', 'oi.id');
+                $join->on('ra.id', '=', DB::raw('(SELECT ra_pick.id FROM revenue_allocations ra_pick WHERE ra_pick.order_id = oi.order_id AND ra_pick.course_id = oi.course_id AND (ra_pick.order_item_id = oi.id OR ra_pick.order_item_id IS NULL) ORDER BY CASE WHEN ra_pick.order_item_id = oi.id THEN 0 ELSE 1 END, ra_pick.id DESC LIMIT 1)'));
             })
             ->where('o.status', 'completed')
             ->select([
@@ -313,8 +312,7 @@ class DashboardController extends Controller
             ->join('users as student', 'student.id', '=', 'o.user_id')
             ->leftJoin('users as teacher', 'teacher.id', '=', 'c.teacher_id')
             ->leftJoin('revenue_allocations as ra', function ($join) {
-                $join->on('ra.order_id', '=', 'o.id')
-                    ->on('ra.order_item_id', '=', 'oi.id');
+                $join->on('ra.id', '=', DB::raw('(SELECT ra_pick.id FROM revenue_allocations ra_pick WHERE ra_pick.order_id = o.id AND ra_pick.course_id = c.id AND (ra_pick.order_item_id = oi.id OR ra_pick.order_item_id IS NULL) ORDER BY CASE WHEN ra_pick.order_item_id = oi.id THEN 0 ELSE 1 END, ra_pick.id DESC LIMIT 1)'));
             })
             ->leftJoin('teacher_payouts as tp', function ($join) {
                 $join->on('tp.order_id', '=', 'o.id')
