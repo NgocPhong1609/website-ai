@@ -50,13 +50,13 @@ export async function getStudyPlanOverview(): Promise<StudyPlanOverview> {
  activeSyllabus: normalizeSyllabus(response.data.active_syllabus),
  coreConcepts: (response.data.core_concepts || []).map(normalizeConcept),
  lessonResources: response.data.lesson_resources || [],
- aiInsight: response.data.ai_insight || "Ask Nova to illustrate the Bloch Sphere if you need a tangible 3D mental model for multi-dimensional qubit states.",
+ aiInsight: response.data.ai_insight || "Hãy hỏi Nova để được giải đáp những khái niệm khó và nhận lộ trình tối ưu cho riêng bạn.",
  initialMessages: response.data.initial_messages || [
  {
  id: "msg-init",
  sender: "ai",
- timestamp: "Just now",
- text: "Greetings! I am **Nova**, your personal AI Study Co-Pilot. We are currently focusing on **Module 4: Quantum Computing Fundamentals**.\n\nYou've already mastered Superposition! Do you want to dive deeper into **Entanglement mathematics**, or should we run a simulation on **Qubit Gate architectures** today?",
+ timestamp: "Vừa xong",
+ text: "Chào bạn! Mình là **Nova**, trợ lý AI Co-Pilot đồng hành cùng bạn tại MindNova AI. Bạn đã sẵn sàng để tiếp tục lộ trình học tập hôm nay chưa?",
  },
  ],
  };

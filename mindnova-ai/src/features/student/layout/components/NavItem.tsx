@@ -32,14 +32,14 @@ export function NavItem({ label, iconKey, href, isCollapsed }: NavItemProps) {
  "transition-all duration-150",
  isCollapsed ? "w-10 h-10 justify-center mx-auto" : "px-3 py-2.5 gap-3",
  isActive
- ? "bg-[#C0392B]/8 text-[#C0392B]"
- : "text-[#8A8478] hover:bg-[#F5F0E8] hover:text-[#2C3039]",
+ ? "bg-blue-50 text-blue-600"
+ : "text-slate-500 hover:bg-slate-50 hover:text-slate-900",
  )}
  >
  {/* Active indicator bar */}
  <span
  className={twMerge(
- "absolute left-0 w-[3px] h-5 rounded-r-full bg-[#C0392B] transition-all duration-200",
+ "absolute left-0 w-[3px] h-5 rounded-r-full bg-blue-600 transition-all duration-200",
  isActive ? "opacity-100 scale-y-100" : "opacity-0 scale-y-0",
  )}
  />
@@ -49,8 +49,8 @@ export function NavItem({ label, iconKey, href, isCollapsed }: NavItemProps) {
  className={twMerge(
  "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-150 shrink-0",
  isActive
- ? "bg-[#C0392B]/10 text-[#C0392B]"
- : "text-[#B8B0A3] group-hover:text-[#C0392B] group-hover:bg-[#C0392B]/5",
+ ? "bg-blue-100/50 text-blue-600"
+ : "text-slate-400 group-hover:text-blue-600 group-hover:bg-blue-50",
  )}
  >
  <Icon />

@@ -118,12 +118,12 @@ export function DashboardTopbar() {
  <>
  <header className="sticky top-0 z-50 h-18 shrink-0 flex items-center justify-end gap-4 px-6 lg:px-8 bg-[#FEFCF9]/95 backdrop-blur-sm border-b border-[#E8E2D9] transition-all duration-200">
  <div className="flex items-center gap-3">
- <div className="flex items-center gap-1 bg-[#F5F0E8] p-1 rounded-lg border border-[#E8E2D9]">
+ <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-[#e2e8f0] shadow-sm">
  {/* Chat Button */}
  <a
  href="/messages"
  aria-label="Messages"
- className="group/chat relative w-9 h-9 rounded-md flex items-center justify-center text-[#8A8478] hover:text-[#C0392B] hover:bg-white transition-all duration-200 focus:outline-none"
+ className="group/chat relative w-9 h-9 rounded-md flex items-center justify-center text-[#64748b] hover:text-[#2563eb] hover:bg-[#f8fafc] transition-all duration-200 focus:outline-none"
  >
  <div className="group-hover/chat:scale-105 transition-transform duration-200">
  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -131,7 +131,7 @@ export function DashboardTopbar() {
  </svg>
  </div>
  {chatUnreadCount > 0 && (
- <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#C0392B] animate-pulse ring-2 ring-white" />
+ <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#ef4444] animate-pulse ring-2 ring-white" />
  )}
  </a>
 
@@ -141,25 +141,25 @@ export function DashboardTopbar() {
  type="button"
  onClick={() => setShowNotif(!showNotif)}
  aria-label="Notifications"
- className="group/bell relative w-9 h-9 rounded-md flex items-center justify-center text-[#8A8478] hover:text-[#C0392B] hover:bg-white transition-all duration-200 focus:outline-none"
+ className="group/bell relative w-9 h-9 rounded-md flex items-center justify-center text-[#64748b] hover:text-[#2563eb] hover:bg-[#f8fafc] transition-all duration-200 focus:outline-none"
  >
  <div className="group-hover/bell:rotate-6 transition-transform duration-200">
  <BellIcon />
  </div>
  {unreadCount > 0 && (
- <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#C0392B] animate-pulse ring-2 ring-white" />
+ <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#ef4444] animate-pulse ring-2 ring-white" />
  )}
  </button>
 
  {/* Notification Dropdown */}
  {showNotif && (
- <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-[#E8E2D9] overflow-hidden z-50">
- <div className="px-4 py-3 border-b border-[#F5F0E8] flex items-center justify-between bg-[#FAF7F2]">
- <h3 className="text-sm font-semibold text-[#2C3039]">
+ <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-[#e2e8f0] overflow-hidden z-50">
+ <div className="px-4 py-3 border-b border-[#f1f5f9] flex items-center justify-between bg-[#f8fafc]">
+ <h3 className="text-sm font-semibold text-[#0f172a]">
  Thông báo ({notifications.length}/50)
  </h3>
  {unreadCount > 0 && (
- <span className="text-[10px] font-semibold bg-[#FADBD8] text-[#C0392B] px-2 py-0.5 rounded-full">
+ <span className="text-[10px] font-semibold bg-[#fee2e2] text-[#ef4444] px-2 py-0.5 rounded-full">
  {unreadCount} mới
  </span>
  )}
@@ -176,7 +176,7 @@ export function DashboardTopbar() {
  />
  </div>
  ) : (
- <div className="flex flex-col divide-y divide-[#F5F0E8]">
+ <div className="flex flex-col divide-y divide-[#f1f5f9]">
  {notifications.map((notif) => {
  const senderAvatar = notif.sender?.avatar || "";
 
@@ -195,20 +195,20 @@ export function DashboardTopbar() {
  className={twMerge(
  "px-5 py-4 transition-colors duration-200 cursor-pointer flex gap-4 items-start",
  !notif.is_read
- ? "bg-[#FDF6E3]/60 hover:bg-[#FDF6E3]"
- : "bg-white hover:bg-[#FAF7F2]"
+ ? "bg-[#eff6ff]/60 hover:bg-[#eff6ff]"
+ : "bg-white hover:bg-[#f8fafc]"
  )}
  >
  <div className="relative shrink-0 mt-0.5">
  <Avatar
  fallback="NV"
  src={senderAvatar}
- className="w-[46px] h-[46px] rounded-full text-[#C0392B] bg-[#FADBD8]"
+ className="w-[46px] h-[46px] rounded-full text-[#2563eb] bg-[#dbeafe]"
  />
  <span
  className={twMerge(
  "absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[2.5px] border-white shadow-sm",
- !notif.is_read ? "bg-[#C0392B]" : "bg-[#27AE60]"
+ !notif.is_read ? "bg-[#2563eb]" : "bg-[#10b981]"
  )}
  />
  </div>
@@ -216,16 +216,16 @@ export function DashboardTopbar() {
  <div className="flex-1 min-w-0">
  <p
  className={twMerge(
- "text-[14px] text-[#2C3039] leading-tight mb-1",
+ "text-[14px] text-[#0f172a] leading-tight mb-1",
  !notif.is_read ? "font-bold" : "font-semibold"
  )}
  >
  {notif.title || "Thông báo mới"}
  </p>
- <p className="text-[13px] text-[#8A8478] line-clamp-2 leading-relaxed mb-1.5">
+ <p className="text-[13px] text-[#64748b] line-clamp-2 leading-relaxed mb-1.5">
  {notif.content}
  </p>
- <p className="text-[11px] text-[#B8B0A3] font-medium">
+ <p className="text-[11px] text-[#94a3b8] font-medium">
  {new Date(notif.created_at).toLocaleString("vi-VN")}
  </p>
  </div>
@@ -237,11 +237,11 @@ export function DashboardTopbar() {
  </div>
 
  {/* Footer action */}
- <div className="px-4 py-3 border-t border-[#F5F0E8] flex items-center justify-center bg-[#FAF7F2]">
+ <div className="px-4 py-3 border-t border-[#f1f5f9] flex items-center justify-center bg-[#f8fafc]">
  <button
  onClick={handleDeleteRead}
  disabled={notifications.filter((n) => n.is_read).length === 0}
- className="text-xs font-semibold text-[#C0392B] hover:text-[#A93226] disabled:text-[#B8B0A3] transition-colors"
+ className="text-xs font-semibold text-[#2563eb] hover:text-[#1d4ed8] disabled:text-[#94a3b8] transition-colors"
  >
  Xóa thông báo đã đọc
  </button>
@@ -254,7 +254,7 @@ export function DashboardTopbar() {
  <button
  type="button"
  aria-label="Settings"
- className="group/settings w-9 h-9 rounded-md flex items-center justify-center text-[#8A8478] hover:text-[#C0392B] hover:bg-white transition-all duration-200 focus:outline-none"
+ className="group/settings w-9 h-9 rounded-md flex items-center justify-center text-[#64748b] hover:text-[#2563eb] hover:bg-[#f8fafc] transition-all duration-200 focus:outline-none"
  >
  <div className="group-hover/settings:rotate-30 transition-transform duration-300">
  <SettingsIcon />
@@ -262,7 +262,7 @@ export function DashboardTopbar() {
  </button>
  </div>
 
- <span className="w-px h-6 bg-[#E8E2D9] hidden sm:block" />
+ <span className="w-px h-6 bg-[#e2e8f0] hidden sm:block" />
 
  {/* Profile Avatar or Login/Register Links */}
  {isMounted && isLoggedIn ? (

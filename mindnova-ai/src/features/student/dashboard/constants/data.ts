@@ -38,11 +38,13 @@ export const AI_SUGGESTION = {
 export const OVERALL_PROGRESS = {
  percent: 68,
  delta: "+2.4% vs last week",
+ level: 4,
+ description: "Tối ưu hóa đều đặn qua từng học phần của khoá học.",
 } as const;
 
 export const STUDY_STREAK = {
  days: 7,
- message: "Keep it up! 3 days to gold.",
+ message: "Duy trì thói quen cực tốt!",
 } as const;
 
 export const ADVANCED_RECOMMENDATIONS = [

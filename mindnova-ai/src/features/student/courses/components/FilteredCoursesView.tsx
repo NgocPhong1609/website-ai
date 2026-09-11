@@ -69,7 +69,7 @@ export function FilteredCoursesView() {
  return (
  <div className="flex flex-col items-center justify-center py-20 min-h-[400px]">
  
- <p className="mt-4 text-[#8A8478] font-medium">Đang tải khoá học...</p>
+ <p className="mt-4 text-slate-500 font-medium">Đang tải khoá học...</p>
  </div>
  );
  }
@@ -77,7 +77,7 @@ export function FilteredCoursesView() {
  if (isError) {
  return (
  <div className="flex flex-col items-center justify-center py-20 min-h-[400px]">
- <p className="text-[#C0392B] font-medium">Đã xảy ra lỗi khi tải khoá học. Vui lòng thử lại sau.</p>
+ <p className="text-red-500 font-medium">Đã xảy ra lỗi khi tải khoá học. Vui lòng thử lại sau.</p>
  </div>
  );
  }
@@ -99,26 +99,17 @@ export function FilteredCoursesView() {
  <MyCourseCard key={`${course.id}-${idx}`} course={course} />
  ))
  ) : (
- <div className="col-span-full py-12 px-6 text-center bg-white rounded-xl border border-[#E8E2D9] flex flex-col items-center justify-center shadow-sm">
- <h3 className="text-base sm:text-lg font-bold text-[#2C3039] mb-1.5 font-serif">Không tìm thấy khoá học phù hợp</h3>
- <p className="text-xs sm:text-sm font-normal text-[#8A8478] max-w-md mb-5 leading-relaxed">
+ <div className="col-span-full py-12 px-6 text-center bg-white rounded-2xl border border-slate-100 flex flex-col items-center justify-center shadow-sm">
+ <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1.5">Không tìm thấy khoá học phù hợp</h3>
+ <p className="text-xs sm:text-sm font-normal text-slate-500 max-w-md mb-5 leading-relaxed">
  Hệ thống không tìm thấy khoá học nào trong mục "{TAB_LABELS[activeTab]}"{searchQuery ? ` với từ khoá "${searchQuery}"` : ""}. Bạn hãy thử thay đổi tiêu chí bộ lọc hoặc tìm kiếm từ khoá khác.
  </p>
  <div className="flex gap-3">
- <button
- type="button"
- onClick={() => {
- setActiveTab("All");
- setSearchQuery("");
- }}
- className="px-5 py-2.5 rounded-lg bg-white border border-[#E8E2D9] text-[#2C3039] text-xs sm:text-sm font-semibold hover:bg-[#F5F0E8] transition-all"
- >
- Đặt lại bộ lọc
- </button>
+
  {activeTab === "All" && !searchQuery && (
  <Link
  href="/explore"
- className="px-5 py-2.5 rounded-lg bg-[#2C3039] text-white text-xs sm:text-sm font-semibold hover:bg-[#1C1D23] transition-all text-decoration-none"
+ className="px-5 py-2.5 rounded-lg bg-blue-600 text-white text-xs sm:text-sm font-semibold hover:bg-blue-700 transition-all text-decoration-none shadow-sm"
  >
  Khám phá Khóa học
  </Link>

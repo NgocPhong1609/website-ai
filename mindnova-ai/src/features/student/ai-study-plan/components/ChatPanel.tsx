@@ -32,7 +32,7 @@ function renderFormattedText(text: string) {
       const token = match[0];
       if (token.startsWith("**") && token.endsWith("**")) {
         parts.push(
-          <strong key={`bold-${idx++}`} className="font-semibold text-red-700 bg-primary-muted px-1.5 py-0.5 rounded-md border border-red-100">
+          <strong key={`bold-${idx++}`} className="font-semibold text-blue-800 bg-blue-50 px-1.5 py-0.5 rounded-md border border-blue-100">
             {token.slice(2, -2)}
           </strong>
         );
@@ -138,15 +138,8 @@ function TypewriterText({
 }
 
 export function ChatPanel({
-  initialMessages = [
-    {
-      id: "msg-init",
-      sender: "ai",
-      timestamp: "Vừa xong",
-      text: "Chào bạn! Mình là **Nova**, trợ lý AI Co-Pilot đồng hành cùng bạn tại MindNova AI. Hiện tại chúng ta đang học **Module 4: Quantum Computing Fundamentals**.\n\nBạn đã thành thạo khái niệm *Superposition* (Chồng chập lượng tử)! Hôm nay bạn muốn tìm hiểu sâu hơn về toán học của **Quantum Entanglement** (Vướng víu lượng tử) hay muốn chạy thử nghiệm mô phỏng mạch **Qubit Gates**?",
-    },
-  ],
-  syllabusTitle = "Quantum Computing Fundamentals",
+  initialMessages = [],
+  syllabusTitle = "Chủ đề học",
   lessonId,
   externalPrompt,
   onClearExternalPrompt,
@@ -191,9 +184,9 @@ export function ChatPanel({
   }, [messages, storageKey, isLoaded]);
 
   const quickPrompts = [
-    { id: 1, text: "Giải thích khái niệm quan trọng bằng ví dụ thực tế trong cuộc sống", query: "Hãy giải thích cho tôi các khái niệm quan trọng bằng một ví dụ thực tế trong cuộc sống cho dễ hiểu nhé", tag: "Ví dụ trực quan", color: "bg-primary-muted text-red-700 border-red-200" },
-    { id: 2, text: "Tạo 3 câu hỏi trắc nghiệm ôn tập kiến thức kèm giải thích chi tiết", query: "Hãy giúp tôi tạo 3 câu hỏi ôn tập kèm theo giải thích đáp án chi tiết nhé", tag: "Ôn tập nhanh", color: "bg-muted text-stone-700 border-border" },
-    { id: 3, text: "Tóm tắt ngắn gọn những ý cốt lõi quan trọng nhất của bài học này", query: "Hãy tóm tắt ngắn gọn những ý quan trọng nhất của bài học này giúp mình với", tag: "Tóm tắt bài", color: "bg-success-bg text-success border-emerald-200" },
+    { id: 1, text: "Giải thích khái niệm quan trọng bằng ví dụ thực tế trong cuộc sống", query: "Hãy giải thích cho tôi các khái niệm quan trọng bằng một ví dụ thực tế trong cuộc sống cho dễ hiểu nhé", tag: "Ví dụ trực quan", color: "bg-blue-50 text-blue-700 border-blue-200" },
+    { id: 2, text: "Tạo 3 câu hỏi trắc nghiệm ôn tập kiến thức kèm giải thích chi tiết", query: "Hãy giúp tôi tạo 3 câu hỏi ôn tập kèm theo giải thích đáp án chi tiết nhé", tag: "Ôn tập nhanh", color: "bg-slate-100 text-slate-700 border-slate-200" },
+    { id: 3, text: "Tóm tắt ngắn gọn những ý cốt lõi quan trọng nhất của bài học này", query: "Hãy tóm tắt ngắn gọn những ý quan trọng nhất của bài học này giúp mình với", tag: "Tóm tắt bài", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
   ];
 
   const scrollToBottom = (smooth: boolean = false) => {
@@ -305,11 +298,11 @@ export function ChatPanel({
       {/* ─── Synchronized Chat Header ─── */}
       <header className="shrink-0 bg-white border-b border-border flex flex-wrap items-center justify-between px-6 py-4 gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="relative w-10 h-10 rounded-xl bg-primary-muted text-primary border border-red-100 flex items-center justify-center shadow-sm shrink-0">
+          <div className="relative w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shadow-sm shrink-0">
             <Sparkles className="w-5 h-5" />
             <span className="absolute -top-1 -right-1 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-bg0 opacity-75" />
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-success-bg0 border-2 border-white" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white" />
             </span>
           </div>
           <div>
@@ -349,7 +342,7 @@ export function ChatPanel({
                       setShowConfirmDelete(false);
                       toast.success("Đã xóa lịch sử trò chuyện");
                     }}
-                    className="px-3 py-1.5 bg-primary text-white hover:bg-primary-hover rounded-md text-xs font-semibold transition-colors cursor-pointer"
+                    className="px-3 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-md text-xs font-semibold transition-colors cursor-pointer"
                   >
                     Xóa
                   </button>
@@ -357,7 +350,7 @@ export function ChatPanel({
               </div>
             )}
           </div>
-          <div className="flex items-center gap-2 bg-primary-muted px-3.5 py-1.5 rounded-lg border border-red-100 text-xs font-semibold text-red-700 shadow-sm">
+          <div className="flex items-center gap-2 bg-blue-50 px-3.5 py-1.5 rounded-lg border border-blue-200 text-xs font-semibold text-blue-700 shadow-sm">
             <Sparkles className="w-3.5 h-3.5" /><span>AI Ready</span>
           </div>
         </div>
@@ -373,7 +366,7 @@ export function ChatPanel({
           return isAi ? (
             /* Nova AI Message */
             <div key={msg.id} className="flex items-start gap-4 max-w-[92%] sm:max-w-[85%] group">
-              <div className="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
                 <Bot className="w-5 h-5 text-white" />
               </div>
               <div className="flex flex-col gap-2 flex-1 min-w-0">
@@ -404,7 +397,7 @@ export function ChatPanel({
                   <button
                     type="button"
                     onClick={() => handleCopy(msg.id, msg.text)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium text-muted-foreground hover:text-primary bg-white border border-border transition-all cursor-pointer shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium text-muted-foreground hover:text-blue-600 bg-white border border-border transition-all cursor-pointer shadow-sm"
                   >
                     <span>{isCopied ? <Check size={12} /> : <Clipboard size={12} />}</span>
                     <span>{isCopied ? "Đã chép!" : "Sao chép"}</span>
@@ -415,8 +408,8 @@ export function ChatPanel({
                     onClick={() => togglePin(msg.id)}
                     className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer shadow-sm border ${
                       isPinned
-                        ? "bg-primary-muted text-primary border-red-200"
-                        : "text-muted-foreground hover:text-primary bg-white border-border"
+                        ? "bg-blue-50 text-blue-700 border-blue-200"
+                        : "text-slate-500 hover:text-blue-600 bg-white border-slate-200"
                     }`}
                   >
                     <span><Star size={12} fill={isPinned ? "currentColor" : "none"} /></span>
@@ -427,7 +420,7 @@ export function ChatPanel({
                     type="button"
                     onClick={() => handleSend("Hãy giải thích lại ý trên một cách đơn giản, dễ hiểu hơn kèm ví dụ thực tế nhé!")}
                     disabled={chatMutation.isPending}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium text-muted-foreground hover:text-primary bg-white border border-border transition-all cursor-pointer shadow-sm disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium text-muted-foreground hover:text-blue-600 bg-white border border-border transition-all cursor-pointer shadow-sm disabled:opacity-50"
                   >
                     <span>Giải thích dễ hiểu hơn</span>
                   </button>
@@ -452,7 +445,7 @@ export function ChatPanel({
                   <span className="text-[11px] font-normal text-stone-400">{msg.timestamp}</span>
                   <span className="text-xs font-semibold text-stone-700">Bạn</span>
                 </div>
-                <div className="bg-primary text-white px-5 py-3.5 rounded-2xl rounded-tr-sm text-sm leading-relaxed shadow-sm font-normal whitespace-pre-line border border-red-500">
+                <div className="bg-blue-600 text-white px-5 py-3.5 rounded-2xl rounded-tr-sm text-sm leading-relaxed shadow-sm font-normal whitespace-pre-line border border-blue-700">
                   {msg.text}
                 </div>
               </div>
@@ -463,7 +456,7 @@ export function ChatPanel({
         {/* Nova Live Neural Synthesizer Typing Indicator */}
         {chatMutation.isPending && (
           <div className="flex items-start gap-3.5 max-w-[80%]">
-            <div className="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm animate-pulse">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm animate-pulse">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div className="bg-white border border-border px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm flex flex-col gap-2 w-fit">
@@ -472,9 +465,9 @@ export function ChatPanel({
                 <span className="text-xs font-semibold text-muted-foreground">Nova đang tổng hợp câu trả lời...</span>
               </div>
               <div className="flex items-center gap-1.5 pl-1">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
               </div>
             </div>
           </div>
@@ -486,7 +479,7 @@ export function ChatPanel({
         <div className="mt-6 pt-5 border-t border-border flex flex-col gap-3.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-muted-foreground flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-primary-muted0" />
+              <span className="w-2 h-2 rounded-full bg-slate-300" />
               <span>Gợi ý câu hỏi</span>
             </span>
             <span className="text-[11px] font-medium text-muted-foreground bg-secondary px-2.5 py-0.5 rounded-full border border-border flex items-center">
@@ -500,17 +493,17 @@ export function ChatPanel({
                 type="button"
                 onClick={() => handleSend(prompt.query)}
                 disabled={isGenerating}
-                className="group relative text-left p-3.5 rounded-xl bg-white hover:bg-muted disabled:opacity-50 border border-border hover:border-red-300 shadow-sm transition-all duration-200 focus:outline-none cursor-pointer flex flex-col justify-between gap-2.5"
+                className="group relative text-left p-3.5 rounded-xl bg-white hover:bg-muted disabled:opacity-50 border border-border hover:border-blue-300 shadow-sm transition-all duration-200 focus:outline-none cursor-pointer flex flex-col justify-between gap-2.5"
               >
                 <div className="flex items-center justify-between">
                   <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-md border ${prompt.color}`}>
                     {prompt.tag}
                   </span>
-                  <span className="w-5 h-5 rounded-md bg-secondary group-hover:bg-primary group-hover:text-white text-stone-400 flex items-center justify-center transition-all">
+                  <span className="w-5 h-5 rounded-md bg-secondary group-hover:bg-blue-600 group-hover:text-white text-stone-400 flex items-center justify-center transition-all">
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
-                <p className="text-xs font-normal text-stone-700 group-hover:text-primary-hover leading-relaxed transition-colors">
+                <p className="text-xs font-normal text-stone-700 group-hover:text-blue-700 leading-relaxed transition-colors">
                   {prompt.text}
                 </p>
               </button>
@@ -531,7 +524,7 @@ export function ChatPanel({
                 onKeyDown={handleKeyDown}
                 disabled={isGenerating}
                 placeholder={isGenerating ? "Nova đang tổng hợp câu trả lời cho bạn..." : "Hỏi Nova bất cứ điều gì về bài tập hay lộ trình học..."}
-                className="w-full bg-muted focus:bg-white disabled:bg-secondary border border-border focus:border-red-500 rounded-xl pl-4 pr-12 py-3 text-sm text-foreground placeholder:text-stone-400 shadow-sm focus:outline-none focus:ring-4 focus:ring-red-500/10 transition-all duration-200 font-medium"
+                className="w-full bg-muted focus:bg-white disabled:bg-secondary border border-border focus:border-blue-500 rounded-xl pl-4 pr-12 py-3 text-sm text-foreground placeholder:text-stone-400 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 font-medium"
               />
               <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-bold text-stone-400 hidden sm:flex items-center gap-1">
                 <CornerDownLeft className="w-3.5 h-3.5" />
@@ -552,7 +545,7 @@ export function ChatPanel({
                 onClick={() => handleSend()}
                 disabled={!inputText.trim()}
                 aria-label="Send message"
-                className="shrink-0 w-11 h-11 flex items-center justify-center bg-primary hover:bg-primary-hover disabled:bg-stone-200 disabled:text-stone-400 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-sm cursor-pointer"
+                className="shrink-0 w-11 h-11 flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:bg-stone-200 disabled:text-stone-400 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-sm cursor-pointer"
               >
                 <Send className="w-5 h-5 ml-0.5" />
               </button>

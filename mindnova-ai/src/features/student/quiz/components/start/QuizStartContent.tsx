@@ -190,7 +190,7 @@ export function QuizStartContent() {
             onClick={() => setActiveTab("ai_generator")}
             className={`pb-3 text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
               activeTab === "ai_generator"
-                ? "text-primary border-b-2 border-primary"
+                ? "text-blue-600 border-b-2 border-blue-600"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -201,7 +201,7 @@ export function QuizStartContent() {
             onClick={() => setActiveTab("default_modules")}
             className={`pb-3 text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
               activeTab === "default_modules"
-                ? "text-primary border-b-2 border-primary"
+                ? "text-blue-600 border-b-2 border-blue-600"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -212,7 +212,7 @@ export function QuizStartContent() {
             onClick={() => setActiveTab("history")}
             className={`pb-3 text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer ${
               activeTab === "history"
-                ? "text-primary border-b-2 border-primary"
+                ? "text-blue-600 border-b-2 border-blue-600"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -229,7 +229,7 @@ export function QuizStartContent() {
             <div className="space-y-8">
               <div>
                 <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-                  <Settings className="w-5 h-5 text-primary" />
+                  <Settings className="w-5 h-5 text-blue-600" />
                   Cấu hình Đề thi AI
                 </h2>
                 <div className="space-y-5">
@@ -240,7 +240,7 @@ export function QuizStartContent() {
                       placeholder="Ví dụ: React Hooks, Toán 12, Lịch sử thế giới..."
                       value={topic}
                       onChange={(e) => setTopic(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-muted border border-border text-sm focus:outline-none focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-red-500 transition-all font-medium text-foreground placeholder:text-stone-400"
+                      className="w-full px-4 py-3 rounded-xl bg-muted border border-border text-sm focus:outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-foreground placeholder:text-stone-400"
                     />
                   </div>
                   <div>
@@ -250,7 +250,7 @@ export function QuizStartContent() {
                       placeholder="Ví dụ: Khảo sát kiến thức chuyên sâu"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-muted border border-border text-sm focus:outline-none focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-red-500 transition-all font-medium text-foreground placeholder:text-stone-400"
+                      className="w-full px-4 py-3 rounded-xl bg-muted border border-border text-sm focus:outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-foreground placeholder:text-stone-400"
                     />
                   </div>
                 </div>
@@ -266,7 +266,7 @@ export function QuizStartContent() {
                         type="button"
                         onClick={() => setQuestionCount(num)}
                         className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all cursor-pointer ${
-                          questionCount === num ? "bg-primary-muted text-primary border-red-200 shadow-sm" : "bg-white text-muted-foreground border-border hover:border-red-300 hover:bg-primary-muted/50"
+                          questionCount === num ? "bg-blue-600-muted text-blue-600 border-blue-200 shadow-sm" : "bg-white text-muted-foreground border-border hover:border-blue-300 hover:bg-blue-600-muted/50"
                         }`}
                       >
                         {num}
@@ -284,7 +284,7 @@ export function QuizStartContent() {
                         type="button"
                         onClick={() => setDifficulty(d)}
                         className={`py-2.5 rounded-xl text-sm font-semibold border transition-all cursor-pointer ${
-                          difficulty === d ? "bg-primary-muted text-primary border-red-200 shadow-sm" : "bg-white text-muted-foreground border-border hover:border-red-300 hover:bg-primary-muted/50"
+                          difficulty === d ? "bg-blue-600-muted text-blue-600 border-blue-200 shadow-sm" : "bg-white text-muted-foreground border-border hover:border-blue-300 hover:bg-blue-600-muted/50"
                         }`}
                       >
                         {d}
@@ -305,7 +305,7 @@ export function QuizStartContent() {
                         type="button"
                         onClick={() => handleToggleType(type)}
                         className={`px-4 py-2.5 rounded-xl text-sm font-semibold border transition-all cursor-pointer flex items-center gap-2 ${
-                          isChecked ? "bg-primary-muted border-red-200 text-primary shadow-sm" : "bg-white border-border text-muted-foreground hover:border-red-300 hover:bg-primary-muted/50"
+                          isChecked ? "bg-blue-600-muted border-blue-200 text-blue-600 shadow-sm" : "bg-white border-border text-muted-foreground hover:border-blue-300 hover:bg-blue-600-muted/50"
                         }`}
                       >
                         {isChecked ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-stone-300" />}
@@ -331,7 +331,7 @@ export function QuizStartContent() {
                       type="button"
                       onClick={() => setTimeLimit(t.value)}
                       className={`px-4 py-2.5 rounded-xl text-sm font-semibold border transition-all cursor-pointer ${
-                        timeLimit === t.value ? "bg-primary-muted text-primary border-red-200 shadow-sm" : "bg-white text-muted-foreground border-border hover:border-red-300 hover:bg-primary-muted/50"
+                        timeLimit === t.value ? "bg-blue-600-muted text-blue-600 border-blue-200 shadow-sm" : "bg-white text-muted-foreground border-border hover:border-blue-300 hover:bg-blue-600-muted/50"
                       }`}
                     >
                       {t.label}
@@ -347,7 +347,7 @@ export function QuizStartContent() {
                   placeholder="Ví dụ: Ưu tiên các bài toán thực tế, giải thích chi tiết..."
                   value={customPrompt}
                   onChange={(e) => setCustomPrompt(e.target.value)}
-                  className="w-full p-4 rounded-xl bg-muted border border-border text-sm focus:outline-none focus:bg-white focus:ring-4 focus:ring-red-500/10 focus:border-red-500 transition-all font-medium text-foreground placeholder:text-stone-400"
+                  className="w-full p-4 rounded-xl bg-muted border border-border text-sm focus:outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-foreground placeholder:text-stone-400"
                 />
               </div>
 
@@ -356,7 +356,7 @@ export function QuizStartContent() {
                   type="button"
                   disabled={isGenerating}
                   onClick={handleGenerateAiQuiz}
-                  className="w-full py-3 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl text-sm shadow-sm transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+                  className="w-full py-3 bg-blue-600 hover:bg-blue-600-hover text-white font-semibold rounded-xl text-sm shadow-sm transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
                 >
                   {isGenerating ? (
                     <>
@@ -399,7 +399,7 @@ export function QuizStartContent() {
                   </div>
                   <div>
                     <span className="text-xs text-muted-foreground block mb-1">Cơ chế</span>
-                    <span className="text-sm font-semibold text-primary flex items-center gap-1"><Brain className="w-4 h-4" /> AI Chấm</span>
+                    <span className="text-sm font-semibold text-blue-600 flex items-center gap-1"><Brain className="w-4 h-4" /> AI Chấm</span>
                   </div>
                 </div>
 
@@ -407,7 +407,7 @@ export function QuizStartContent() {
                 
                 <div className="flex items-center gap-3 pt-4">
                   <Link href={`/practice/quiz/question?aiQuizId=${generatedQuiz.id}`} className="flex-1">
-                    <button type="button" className="w-full py-3 bg-primary hover:bg-primary-hover text-white font-semibold rounded-xl text-sm shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2">
+                    <button type="button" className="w-full py-3 bg-blue-600 hover:bg-blue-600-hover text-white font-semibold rounded-xl text-sm shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2">
                       Bắt Đầu Làm Bài Ngay
                       <ArrowRight className="w-4 h-4" />
                     </button>
@@ -448,7 +448,7 @@ export function QuizStartContent() {
                   
                   <div className="flex gap-3">
                     <Link href={`/practice/quiz/question?lessonId=${mod.id}`} className="flex-1">
-                      <button type="button" className="w-full py-3.5 bg-primary text-white font-semibold rounded-xl text-sm hover:bg-primary-hover shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2">
+                      <button type="button" className="w-full py-3.5 bg-blue-600 text-white font-semibold rounded-xl text-sm hover:bg-blue-600-hover shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2">
                         Bắt đầu thi
                       </button>
                     </Link>
@@ -480,7 +480,7 @@ export function QuizStartContent() {
               <p className="text-muted-foreground font-medium">Bạn chưa có bài thi nào trong lịch sử.</p>
               <button 
                 onClick={() => setActiveTab("ai_generator")} 
-                className="text-primary font-bold hover:underline mt-2 flex items-center gap-1.5"
+                className="text-blue-600 font-bold hover:underline mt-2 flex items-center gap-1.5"
               >
                 <Wand2 className="w-4 h-4" /> Khởi tạo đề ngay
               </button>
@@ -501,7 +501,7 @@ export function QuizStartContent() {
                     {myHistoryQuizzes.map((quiz) => (
                       <tr key={quiz.id} className="hover:bg-muted transition-colors group">
                         <td className="px-6 py-4 font-bold text-foreground flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-primary-muted text-primary flex items-center justify-center shrink-0">
+                          <div className="w-8 h-8 rounded-lg bg-blue-600-muted text-blue-600 flex items-center justify-center shrink-0">
                             <FileText className="w-4 h-4" />
                           </div>
                           {quiz.title}
@@ -509,7 +509,7 @@ export function QuizStartContent() {
                         <td className="px-6 py-4 text-muted-foreground font-medium">{quiz.difficulty} <span className="mx-1 text-stone-300">•</span> {quiz.questions_count} câu</td>
                         <td className="px-6 py-4">
                           {quiz.is_completed ? (
-                            <span className={`inline-flex items-center gap-1.5 font-bold px-2.5 py-1 rounded-full text-xs ${quiz.score >= 70 ? "bg-success-bg text-success" : "bg-primary-muted text-red-700"}`}>
+                            <span className={`inline-flex items-center gap-1.5 font-bold px-2.5 py-1 rounded-full text-xs ${quiz.score >= 70 ? "bg-success-bg text-success" : "bg-blue-600-muted text-red-700"}`}>
                               {quiz.score >= 70 ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                               {quiz.score}%
                             </span>
@@ -529,18 +529,18 @@ export function QuizStartContent() {
                                 >
                                   <Eye className="w-3.5 h-3.5" /> Xem lại
                                 </button>
-                                <Link href={`/practice/quiz/question?aiQuizId=${quiz.id}`} className="text-xs font-semibold text-primary hover:text-primary-hover transition-colors flex items-center gap-1">
+                                <Link href={`/practice/quiz/question?aiQuizId=${quiz.id}`} className="text-xs font-semibold text-blue-600 hover:text-blue-600-hover transition-colors flex items-center gap-1">
                                   <PlayCircle className="w-3.5 h-3.5" /> Làm lại
                                 </Link>
                               </>
                             ) : (
-                              <Link href={`/practice/quiz/question?aiQuizId=${quiz.id}`} className="text-xs font-semibold text-primary hover:text-primary-hover transition-colors flex items-center gap-1">
+                              <Link href={`/practice/quiz/question?aiQuizId=${quiz.id}`} className="text-xs font-semibold text-blue-600 hover:text-blue-600-hover transition-colors flex items-center gap-1">
                                 <PlayCircle className="w-3.5 h-3.5" /> Làm bài ngay
                               </Link>
                             )}
                             <button
                               onClick={(e) => handleDeleteQuiz(quiz.id, e)}
-                              className="text-stone-400 hover:text-primary transition-colors ml-2 cursor-pointer p-1.5 hover:bg-primary-muted rounded-md"
+                              className="text-stone-400 hover:text-blue-600 transition-colors ml-2 cursor-pointer p-1.5 hover:bg-blue-600-muted rounded-md"
                               title="Xóa đề"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -609,7 +609,7 @@ export function QuizStartContent() {
                       <h4 className="text-base font-bold text-foreground leading-relaxed">
                         <span className="text-stone-400 font-medium">Câu {idx + 1}.</span> {q.question}
                       </h4>
-                      <span className={`text-xs font-bold px-3 py-1 rounded-full shrink-0 flex items-center gap-1.5 ${isCorrect ? "bg-success-bg text-success border border-emerald-100" : "bg-primary-muted text-red-700 border border-red-100"}`}>
+                      <span className={`text-xs font-bold px-3 py-1 rounded-full shrink-0 flex items-center gap-1.5 ${isCorrect ? "bg-success-bg text-success border border-emerald-100" : "bg-blue-600-muted text-red-700 border border-red-100"}`}>
                         {isCorrect ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                         {isCorrect ? "Đúng" : "Sai"}
                       </span>
@@ -637,14 +637,14 @@ export function QuizStartContent() {
                           if (isRightKey) {
                             optStyle = "bg-success-bg border-emerald-200 text-emerald-800 font-semibold";
                           } else if (isChosen && !isRightKey) {
-                            optStyle = "bg-primary-muted border-red-200 text-red-700 font-semibold";
+                            optStyle = "bg-blue-600-muted border-blue-200 text-red-700 font-semibold";
                           }
 
                           return (
                             <div key={optIdx} className={`px-4 py-3 rounded-xl border text-sm flex items-center justify-between transition-all ${optStyle}`}>
                               <span>{opt}</span>
                               {isChosen && (
-                                <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${isRightKey ? "bg-emerald-600 text-white" : "bg-primary text-white"}`}>
+                                <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${isRightKey ? "bg-emerald-600 text-white" : "bg-blue-600 text-white"}`}>
                                   {isRightKey ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                                   Bạn chọn
                                 </span>
@@ -656,9 +656,9 @@ export function QuizStartContent() {
                     )}
 
                     {q.explanation && (
-                      <div className="p-4 rounded-xl border border-red-100 bg-primary-muted/50 text-sm">
-                        <span className="font-bold text-red-800 block mb-1 flex items-center gap-1.5"><Brain className="w-4 h-4" /> Gia sư Nova giải thích:</span>
-                        <p className="leading-relaxed text-red-900/80">{q.explanation}</p>
+                      <div className="p-4 rounded-xl border border-red-100 bg-blue-600-muted/50 text-sm">
+                        <span className="font-bold text-blue-800 block mb-1 flex items-center gap-1.5"><Brain className="w-4 h-4" /> Gia sư Nova giải thích:</span>
+                        <p className="leading-relaxed text-blue-900/80">{q.explanation}</p>
                       </div>
                     )}
                   </div>

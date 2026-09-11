@@ -27,16 +27,16 @@ export function PromoCodeCard() {
  }
 
  return (
- <div className="rounded-2xl bg-white border border-[#E8E2D9] shadow-2xs p-6 flex flex-col gap-5 transition-all duration-300 hover:shadow-sm">
+ <div className="rounded-2xl bg-white border border-[#e2e8f0] shadow-2xs p-6 flex flex-col gap-5 transition-all duration-300 hover:shadow-sm">
  {/* Header */}
  <div className="border-b border-[#F0F2FA] pb-4">
  <div className="flex items-center gap-2.5">
- <span className="flex items-center justify-center w-7 h-7 rounded-xl bg-[#FAF7F2] text-[#C0392B] border border-[#C0392B]/15 shadow-2xs">
+ <span className="flex items-center justify-center w-7 h-7 rounded-xl bg-[#f8fafc] text-[#2563eb] border border-[#2563eb]/15 shadow-2xs">
  <SparkleIcon size={14} />
  </span>
- <h2 className="text-base font-semibold text-[#2C3039]">Mã Ưu Đãi &amp; Khuyến Mãi</h2>
+ <h2 className="text-base font-semibold text-[#0f172a]">Mã Ưu Đãi &amp; Khuyến Mãi</h2>
  </div>
- <p className="text-xs font-normal text-[#8A8478] mt-1 leading-relaxed">
+ <p className="text-xs font-normal text-[#64748b] mt-1 leading-relaxed">
  Sử dụng voucher khuyến mãi hoặc mã chiết khấu từ sự kiện MindNova để áp dụng vào học phí kỳ tới.
  </p>
  </div>
@@ -54,12 +54,12 @@ export function PromoCodeCard() {
  setApplied(false);
  }}
  placeholder="Nhập mã ưu đãi..."
- className="flex-1 min-w-0 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-normal text-[#2C3039] bg-[#F8FAFC] focus:bg-white border border-[#E4E6F0] focus:border-[#C0392B] shadow-2xs placeholder-[#989AAB] focus:outline-none focus:ring-2 focus:ring-[#C0392B]/15 transition-all duration-200 uppercase tracking-wider"
+ className="flex-1 min-w-0 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-normal text-[#0f172a] bg-[#F8FAFC] focus:bg-white border border-[#E4E6F0] focus:border-[#2563eb] shadow-2xs placeholder-[#989AAB] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/15 transition-all duration-200 uppercase tracking-wider"
  />
  <button
  type="button"
  onClick={handleApply}
- className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#C0392B] shadow-2xs hover:opacity-95 active:scale-98 transition-all duration-200 shrink-0 cursor-pointer flex items-center justify-center"
+ className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#2563eb] shadow-2xs hover:opacity-95 active:scale-98 transition-all duration-200 shrink-0 cursor-pointer flex items-center justify-center"
  >
  {applied ? "Đã áp dụng " : "Áp dụng ngay"}
  </button>
@@ -67,7 +67,7 @@ export function PromoCodeCard() {
 
  {/* Quick Selection Pills (Prevents overlap with floating AI widget) */}
  <div className="flex flex-wrap items-center gap-2 pt-1">
- <span className="text-xs text-[#8A8478] font-normal mr-1">Gợi ý khả dụng:</span>
+ <span className="text-xs text-[#64748b] font-normal mr-1">Gợi ý khả dụng:</span>
  {[
  { tag: "NOVA2026-AI", label: "Giảm 20% Học kỳ Pro" },
  { tag: "AIMASTER10", label: "Voucher 100K" },
@@ -76,23 +76,23 @@ export function PromoCodeCard() {
  key={tag}
  type="button"
  onClick={() => handleQuickSelect(tag)}
- className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F4F5FD] hover:bg-[#FAF7F2] border border-[#E8E2D9] hover:border-[#E8E2D9] text-xs font-medium text-[#C0392B] transition-all duration-150 cursor-pointer shadow-2xs"
+ className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F4F5FD] hover:bg-[#f8fafc] border border-[#e2e8f0] hover:border-[#e2e8f0] text-xs font-medium text-[#2563eb] transition-all duration-150 cursor-pointer shadow-2xs"
  >
  <span className="font-semibold">{tag}</span>
- <span className="text-[11px] text-[#8A8478] font-normal">• {label}</span>
+ <span className="text-[11px] text-[#64748b] font-normal">• {label}</span>
  </button>
  ))}
  </div>
 
  {/* Feedback Messages */}
  {applied && (
- <p className="text-xs font-medium text-[#2C3039] bg-[#EAF8F5] p-3 rounded-xl border border-[#2C3039] flex items-center gap-2 mt-1 animate-fadeIn">
+ <p className="text-xs font-medium text-[#0f172a] bg-[#EAF8F5] p-3 rounded-xl border border-[#0f172a] flex items-center gap-2 mt-1 animate-fadeIn">
  <span></span>
  <span><strong>{code}</strong> đã được áp dụng thành công cho lượt thanh toán tiếp theo!</span>
  </p>
  )}
  {error && (
- <p className="text-xs font-medium text-[#C0392B] bg-[#FAF7F2] p-3 rounded-xl border border-[#EF4444]/20 flex items-center gap-1.5 mt-1">
+ <p className="text-xs font-medium text-[#2563eb] bg-[#f8fafc] p-3 rounded-xl border border-[#EF4444]/20 flex items-center gap-1.5 mt-1">
  <span>️</span>
  <span>Vui lòng nhập mã voucher hợp lệ để kích hoạt ưu đãi.</span>
  </p>

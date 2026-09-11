@@ -18,68 +18,62 @@ export default async function DashboardPage() {
  return (
  <div className="flex flex-col gap-8 p-6 md:p-8 max-w-[1400px] w-full mx-auto min-h-[calc(100vh-4rem)]">
  
- {/* ─── Synchronized Universal Welcome Hero Banner matching /study-plan ─── */}
- <section className="relative overflow-hidden rounded-2xl bg-[#FEFCF9] border border-[#E8E2D9] p-6 sm:p-7 shadow-[0_8px_30px_rgba(107,107,255,0.07)] transition-all duration-300 hover:shadow-[0_12px_36px_rgba(107,107,255,0.12)] w-full">
- <div className="absolute -top-16 -right-16 w-60 h-60 rounded-full bg-[#FAF7F2] blur-3xl pointer-events-none animate-pulse" />
- <div className="absolute -bottom-16 -left-16 w-60 h-60 rounded-full bg-[#C0392B]/15 blur-3xl pointer-events-none" />
-
- <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 w-full">
- <div className="space-y-3 max-w-xl">
- <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-[#E8E2D9] text-xs font-semibold text-[#C0392B] shadow-sm">
- <span className="w-2 h-2 rounded-full bg-[#2C3039] animate-ping" />
- <span className="w-2 h-2 rounded-full bg-[#2C3039] absolute" />
- MindNova AI Co-Pilot • Hoạt động 24/7
+ {/* ─── Synchronized Universal Welcome Hero Banner ─── */}
+ <section className="relative overflow-hidden rounded-2xl bg-white border border-slate-100 p-6 sm:p-7 shadow-sm transition-all w-full">
+ <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 w-full">
+ <div className="space-y-4 max-w-xl">
+ <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-blue-50 border border-blue-100 text-xs font-medium text-blue-600">
+ {dashboardData.ai_badge_text || "MindNova AI • Hoạt động 24/7"}
  </div>
  
- <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3039] leading-tight">
- Chào mừng trở lại, <span className="text-[#C0392B] font-bold drop-shadow-2xs">{userName}! </span>
+ <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 leading-tight">
+ Chào mừng trở lại, <span className="text-blue-600">{userName}!</span>
  </h1>
  
- <p className="text-xs sm:text-sm text-[#8A8478] leading-relaxed font-normal">
+ <p className="text-sm text-slate-500 leading-relaxed">
  {dashboardData.user 
- ? "Chuỗi chuyên cần của bạn đang được duy trì vô cùng tích cực! Hiện tại bạn đạt hiệu suất rèn luyện vượt trội hơn 88% học viên cùng chuyên ngành trong tuần này."
+ ? (dashboardData.welcome_message || "Chuỗi chuyên cần của bạn đang được duy trì vô cùng tích cực! Hiện tại bạn đạt hiệu suất rèn luyện vượt trội hơn 88% học viên cùng chuyên ngành trong tuần này.")
  : "Vui lòng đăng nhập để theo dõi tiến độ học tập và nhận các gợi ý thông minh từ AI."}
  </p>
  </div>
 
  {/* Universal Wide Mastery Card */}
  {dashboardData.user ? (
- <Link href="/study-plan" className="group block shrink-0 bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-[#E8E2D9] flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm hover:border-[#E8E2D9] hover:-translate-y-0.5 transition-all duration-300 text-decoration-none focus:outline-none">
- <div className="w-full flex items-center justify-between gap-4 mb-2">
- <span className="text-xs font-semibold text-[#8A8478] group-hover:text-[#C0392B] transition-colors">Mục tiêu trong ngày ↗</span>
- <span className="text-[11px] font-bold text-[#2C3039] bg-[#FAF7F2] px-2.5 py-0.5 rounded-full border border-[#2C3039]">
+ <Link href="/study-plan" className="group block shrink-0 bg-slate-50 rounded-xl p-5 border border-slate-100 flex flex-col justify-center min-w-[320px] sm:min-w-[380px] hover:border-slate-200 hover:shadow-sm transition-all text-decoration-none focus:outline-none">
+ <div className="w-full flex items-center justify-between gap-4 mb-3">
+ <span className="text-xs font-semibold text-slate-500 group-hover:text-blue-600 transition-colors">Mục tiêu trong ngày ↗</span>
+ <span className="text-[11px] font-medium text-slate-700 bg-white px-2.5 py-0.5 rounded-full border border-slate-200 shadow-sm">
  {dashboardData.daily_goal?.percentage === 100 ? "Hoàn thành" : "Đang tiến hành"}
  </span>
  </div>
  
- <div className="text-3xl font-bold text-[#2C3039] my-1 flex items-baseline justify-between gap-6">
+ <div className="text-3xl font-bold text-slate-900 my-1 flex items-baseline justify-between gap-6">
  <div>
- <span className="text-[#C0392B]">{dashboardData.daily_goal?.percentage || 0}%</span>
- <span className="text-xs font-medium text-[#8A8478] ml-1.5">hoàn thành</span>
+ <span className="text-blue-600">{dashboardData.daily_goal?.percentage || 0}%</span>
+ <span className="text-xs font-medium text-slate-500 ml-1.5">hoàn thành</span>
  </div>
- <span className="text-xs font-semibold text-[#8A8478]">
- {dashboardData.daily_goal?.completed || 0} / {dashboardData.daily_goal?.target || 3} bài học
+ <span className="text-xs font-medium text-slate-500">
+ {dashboardData.daily_goal?.completed || 0} / {dashboardData.daily_goal?.target || 0} bài học
  </span>
  </div>
 
- <div className="w-full h-2 bg-[#F5F0E8] rounded-full mt-2 overflow-hidden p-0.5 border border-[#E8E2D9]">
+ <div className="w-full h-1.5 bg-slate-200 rounded-full mt-3 overflow-hidden">
  <div 
- className="h-full bg-[#C0392B] rounded-full shadow-[0_0_8px_rgba(107,107,255,0.4)] transition-all duration-1000 group-hover:brightness-110" 
+ className="h-full bg-blue-500 rounded-full transition-all duration-1000" 
  style={{ width: `${dashboardData.daily_goal?.percentage || 0}%` }}
  />
  </div>
  
- <p className="text-xs font-semibold text-[#C0392B] mt-3 flex items-center justify-between gap-4">
- <span> {dashboardData.daily_goal?.percentage === 100 ? "Bạn đã đạt mục tiêu hôm nay!" : "Tiếp tục cố gắng nhé!"}</span>
- <span className="text-[#C0392B] font-bold group-hover:underline">Vào học tiếp </span>
+ <p className="text-xs font-medium text-slate-500 mt-4 flex items-center justify-between gap-4">
+ <span>{dashboardData.daily_goal?.percentage === 100 ? "Bạn đã đạt mục tiêu hôm nay!" : "Tiếp tục cố gắng nhé!"}</span>
+ <span className="text-blue-600 font-semibold group-hover:underline">Vào học tiếp</span>
  </p>
  </Link>
  ) : (
- <div className="group block shrink-0 bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-[#E8E2D9] flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm text-center">
- <span className="text-2xl mb-2"></span>
- <h3 className="text-sm font-bold text-[#2C3039] mb-1">Dữ liệu được bảo mật</h3>
- <p className="text-xs text-[#8A8478] mb-3">Đăng nhập để xem thông tin học tập của bạn.</p>
- <Link href="/login" className="inline-block py-2 px-4 rounded-xl text-xs font-semibold text-white bg-[#C0392B] hover:bg-[#C0392B] transition-colors">
+ <div className="group block shrink-0 bg-slate-50 rounded-xl p-6 border border-slate-100 flex flex-col justify-center min-w-[320px] sm:min-w-[380px] text-center">
+ <h3 className="text-sm font-semibold text-slate-900 mb-1">Dữ liệu được bảo mật</h3>
+ <p className="text-xs text-slate-500 mb-4">Đăng nhập để xem thông tin học tập của bạn.</p>
+ <Link href="/login" className="inline-flex justify-center items-center py-2 px-4 rounded-lg text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">
  Đăng nhập ngay
  </Link>
  </div>
@@ -106,20 +100,19 @@ export default async function DashboardPage() {
  <ContinueLearning courses={dashboardData.courses} />
 
  {/* ─── Advanced Recommendations Section ─── */}
- <div className="w-full flex flex-col gap-8 border-t border-[#E6E6F0] pt-6">
+ <div className="w-full flex flex-col gap-8 border-t border-slate-100 pt-8">
  <AdvancedRecommendationsSection recommendations={dashboardData.advanced_recommendations} />
  </div>
  </>
  ) : (
- <div className="flex flex-col items-center justify-center py-20 px-4 text-center border border-dashed border-[#E8E2D9] rounded-2xl bg-[#FEFCF9]">
- 
- <h2 className="text-xl font-bold text-[#2C3039] mb-2">Bạn chưa bắt đầu khóa học nào</h2>
- <p className="text-sm text-[#8A8478] max-w-md mb-6">
+ <div className="flex flex-col items-center justify-center py-20 px-4 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
+ <h2 className="text-xl font-semibold text-slate-900 mb-2">Bạn chưa bắt đầu khóa học nào</h2>
+ <p className="text-sm text-slate-500 max-w-md mb-6">
  Khám phá hàng trăm khóa học chất lượng từ chuyên gia và xây dựng lộ trình học tập của riêng bạn ngay hôm nay.
  </p>
  <Link 
  href="/explore" 
- className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-[#2C3039] shadow-md hover:shadow-lg transition-all"
+ className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium text-white bg-slate-900 hover:bg-slate-800 transition-all shadow-sm"
  >
  Tìm khóa học ngay 
  </Link>

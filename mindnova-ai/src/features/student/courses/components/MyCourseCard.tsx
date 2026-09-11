@@ -8,25 +8,25 @@ export function MyCourseCard({ course }: { course: MyCourse }) {
  const isNotStarted = course.status === "not-started";
 
  const statusBadgeStyle = isCompleted
- ? "bg-[#27AE60] text-white border-transparent"
+ ? "bg-emerald-50 text-emerald-600 border-emerald-100"
  : isNotStarted
- ? "bg-[#8A8478] text-white border-transparent"
- : "bg-[#2C3039] text-white border-transparent";
+ ? "bg-slate-50 text-slate-500 border-slate-200"
+ : "bg-blue-50 text-blue-600 border-blue-200";
 
  const buttonStyle = isCompleted
- ? "bg-[#F5F0E8] text-[#2C3039] hover:bg-[#E8E2D9] border border-[#E8E2D9]"
+ ? "bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200"
  : isNotStarted
- ? "bg-[#2C3039] text-white hover:bg-[#1C1D23] border border-[#2C3039]"
- : "bg-[#C0392B] text-white hover:bg-[#A93226] border border-[#C0392B]";
+ ? "bg-slate-900 text-white hover:bg-slate-800 border border-slate-900 shadow-sm"
+ : "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-transparent hover:-translate-y-0.5 shadow-sm";
 
  const buttonText = isCompleted ? "Ôn tập khoá học" : isNotStarted ? "Bắt đầu học ngay" : "Vào học tiếp";
  
  const labelText = isCompleted ? "Trạng thái" : isNotStarted ? "Bài học mở đầu" : "Bài học tiếp theo";
 
  return (
- <div className="group/card bg-white border border-[#E8E2D9] rounded-xl flex flex-col justify-between h-full hover:border-[#B8B0A3] transition-all duration-300 overflow-hidden">
+ <div className="group/card bg-white border border-slate-100 rounded-2xl flex flex-col justify-between h-full hover:border-slate-200 hover:shadow-md transition-all duration-300 overflow-hidden">
  {/* Thumbnail Header */}
- <div className="relative h-44 w-full bg-[#2C3039] overflow-hidden shrink-0">
+ <div className="relative h-44 w-full bg-slate-900 overflow-hidden shrink-0">
  {course.thumbnailUrl ? (
  <Image
  src={course.thumbnailUrl}
@@ -42,13 +42,13 @@ export function MyCourseCard({ course }: { course: MyCourse }) {
 
  {/* Top Badges */}
  <div className="absolute top-3.5 left-3.5 flex items-center gap-2 z-10">
- <div className={twMerge("px-2.5 py-1 rounded-full text-xs font-semibold tracking-normal border flex items-center gap-1.5", statusBadgeStyle)}>
+ <div className={twMerge("px-2.5 py-1 rounded-full text-xs font-semibold tracking-normal border flex items-center gap-1.5 shadow-sm", statusBadgeStyle)}>
  {isCompleted ? "Đã hoàn tất" : isNotStarted ? "Chưa bắt đầu" : "Đang học"}
  </div>
  </div>
 
  {course.isAiRecommended && (
- <div className="absolute top-3.5 right-3.5 flex items-center gap-1 px-2.5 py-1 rounded-full bg-white text-[#C0392B] text-[10px] font-bold border border-[#E8E2D9] z-10 uppercase tracking-wider">
+ <div className="absolute top-3.5 right-3.5 flex items-center gap-1 px-2.5 py-1 rounded-full bg-white text-amber-500 text-[10px] font-bold border border-amber-100 shadow-sm z-10 uppercase tracking-wider">
  <span>AI Đề xuất</span>
  </div>
  )}
@@ -65,9 +65,9 @@ export function MyCourseCard({ course }: { course: MyCourse }) {
  </div>
 
  {/* Progress Bar */}
- <div className="w-full bg-[#F5F0E8] h-1.5 overflow-hidden border-b border-[#E8E2D9]">
+ <div className="w-full bg-slate-100 h-1.5 overflow-hidden border-b border-slate-100">
  <div
- className="h-full transition-all duration-700 bg-[#2C3039]"
+ className="h-full transition-all duration-700 bg-blue-500"
  style={{ width: `${course.progress}%` }}
  role="progressbar"
  aria-valuenow={course.progress}
@@ -80,21 +80,21 @@ export function MyCourseCard({ course }: { course: MyCourse }) {
  <div className="p-5 flex flex-col flex-1 bg-white justify-between gap-4">
  <div>
  <Link href={`/courses/detail?courseId=${course.id}`} className="block text-decoration-none focus:outline-none min-w-0 group/title">
- <h3 className="text-base sm:text-lg font-bold text-[#2C3039] leading-snug line-clamp-1 group-hover/card:text-[#C0392B] group-hover/title:text-[#C0392B] transition-colors font-serif">
+ <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug line-clamp-1 group-hover/card:text-blue-600 group-hover/title:text-blue-600 transition-colors">
  {course.title}
  </h3>
  </Link>
 
  {/* Next Lesson Tile */}
- <div className="mt-3 bg-[#FAF7F2] rounded-lg p-3 flex items-center gap-3 border border-[#E8E2D9] group-hover/card:border-[#B8B0A3] transition-all duration-200">
- <div className="w-8 h-8 rounded-lg bg-[#F5F0E8] text-[#C0392B] flex items-center justify-center shrink-0 group-hover/card:bg-[#C0392B] group-hover/card:text-white transition-all duration-300 text-xs font-bold">
+ <div className="mt-3 bg-slate-50 rounded-xl p-3 flex items-center gap-3 border border-slate-100 group-hover/card:border-slate-200 transition-all duration-200">
+ <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 shadow-sm text-slate-500 flex items-center justify-center shrink-0 group-hover/card:bg-blue-50 group-hover/card:text-blue-600 group-hover/card:border-blue-100 transition-all duration-300 text-xs font-bold">
  {isCompleted ? "C" : "N"}
  </div>
  <div className="min-w-0 flex-1">
- <span className="text-xs font-medium block mb-0.5 text-[#8A8478]">
+ <span className="text-xs font-medium block mb-0.5 text-slate-500">
  {labelText}
  </span>
- <p className="text-xs sm:text-sm font-semibold text-[#2C3039] truncate">
+ <p className="text-xs sm:text-sm font-semibold text-slate-900 truncate">
  {course.nextLesson === "Course Completed " ? "Đã hoàn thành khóa học" : course.nextLesson}
  </p>
  </div>

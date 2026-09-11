@@ -39,23 +39,23 @@ interface CardRowProps {
 
 function CardRow({ card, onRemove }: CardRowProps) {
   return (
-    <div className="flex items-center justify-between py-3 px-3.5 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC]/60 hover:bg-white hover:border-[#8A8478]/30 transition-all duration-200 shadow-2xs group">
+    <div className="flex items-center justify-between py-3 px-3.5 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC]/60 hover:bg-white hover:border-[#64748b]/30 transition-all duration-200 shadow-2xs group">
       <div className="flex items-center gap-3.5 min-w-0">
         {card.brand === "visa" ? <VisaLogo /> : <MastercardLogo />}
 
         <div className="space-y-0.5">
           <div className="flex items-center gap-2.5">
-            <span className="text-xs sm:text-sm font-semibold text-[#2C3039] tracking-normal">
+            <span className="text-xs sm:text-sm font-semibold text-[#0f172a] tracking-normal">
               Thẻ {card.brand === "visa" ? "Visa" : "Mastercard"} •••• {card.last4}
             </span>
             {card.isDefault && (
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold text-[#A93226] bg-[#EEF2FF] border border-[#A93226]/25 shrink-0">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold text-[#1d4ed8] bg-[#eff6ff] border border-[#1d4ed8]/25 shrink-0">
                 Mặc định
               </span>
             )}
           </div>
-          <p className="text-xs font-normal text-[#8A8478]">
-            Hết hạn: <span className="font-medium text-[#8A8478]">{card.expiry}</span>
+          <p className="text-xs font-normal text-[#64748b]">
+            Hết hạn: <span className="font-medium text-[#64748b]">{card.expiry}</span>
           </p>
         </div>
       </div>
@@ -64,7 +64,7 @@ function CardRow({ card, onRemove }: CardRowProps) {
         type="button"
         aria-label={`Xóa thẻ kết thúc bằng số ${card.last4}`}
         onClick={() => onRemove(card.id)}
-        className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8A8478] hover:text-[#C0392B] hover:bg-[#FEE2E2]/70 transition-all duration-150 cursor-pointer opacity-75 group-hover:opacity-100"
+        className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] hover:text-[#2563eb] hover:bg-[#dbeafe]/70 transition-all duration-150 cursor-pointer opacity-75 group-hover:opacity-100"
         title="Xóa thẻ liên kết"
       >
         <TrashIcon size={15} />
@@ -91,13 +91,13 @@ export function PaymentMethodsCard() {
       {/* Header with integrated trust badge */}
       <div className="flex items-center justify-between gap-4 border-b border-[#F0F2FA] pb-4">
         <div>
-          <h2 className="text-base font-semibold text-[#2C3039] flex items-center gap-2">
+          <h2 className="text-base font-semibold text-[#0f172a] flex items-center gap-2">
             <span>Phương thức Thanh toán</span>
             <span className="text-[11px] font-medium text-[#27AE60] bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#27AE60]/20 flex items-center">
               <ShieldCheck size={12} className="mr-1" /> PCI-DSS
             </span>
           </h2>
-          <p className="text-xs font-normal text-[#8A8478] mt-1">
+          <p className="text-xs font-normal text-[#64748b] mt-1">
             Quản lý các thẻ tín dụng &amp; ghi nợ liên kết tự động thanh toán học phí.
           </p>
         </div>
@@ -105,7 +105,7 @@ export function PaymentMethodsCard() {
         <button
           type="button"
           onClick={handleAddNew}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#A93226] bg-[#EEF2FF] hover:bg-[#E2E6FF] border border-[#A93226]/20 transition-all duration-150 cursor-pointer shrink-0"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#1d4ed8] bg-[#eff6ff] hover:bg-[#E2E6FF] border border-[#1d4ed8]/20 transition-all duration-150 cursor-pointer shrink-0"
         >
           <PlusIcon size={13} />
           <span>Thêm thẻ mới</span>

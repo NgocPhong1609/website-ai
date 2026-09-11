@@ -20,7 +20,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
           action={
             <Link
               href="/courses"
-              className="px-6 py-3 bg-[#C0392B] text-white rounded-xl font-medium text-sm transition-colors hover:bg-[#3234a8] shadow-md"
+              className="px-6 py-3 bg-[#2563eb] text-white rounded-xl font-medium text-sm transition-colors hover:bg-[#1d4ed8] shadow-sm"
             >
               Quay lại khóa học của tôi
             </Link>
@@ -42,15 +42,15 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
  {/* Catalog Header */}
  <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
  <div className="space-y-2">
- <h1 className="text-2xl sm:text-3xl font-bold text-[#2C3039] tracking-tight">
- Khám phá <span className=" bg-[#C0392B] bg-clip-text text-transparent">Khóa học mới</span>
+ <h1 className="text-2xl sm:text-3xl font-bold text-[#0f172a] tracking-tight">
+ Khám phá <span className=" bg-[#2563eb] bg-clip-text text-transparent">Khóa học mới</span>
  </h1>
- <p className="text-sm text-[#8A8478] max-w-2xl leading-relaxed">
+ <p className="text-sm text-[#64748b] max-w-2xl leading-relaxed">
  Nâng tầm kỹ năng với các lộ trình đào tạo chuyên sâu được giảng dạy bởi các chuyên gia hàng đầu. Đăng ký ngay hôm nay để mở khóa Lộ trình AI cá nhân hóa.
  </p>
  </div>
  <div className="shrink-0 flex items-center gap-2">
- <span className="px-3 py-1.5 rounded-full bg-[#FAF7F2] text-[#C0392B] text-xs font-semibold border border-[#C0392B]/20 shadow-sm">
+ <span className="px-3 py-1.5 rounded-full bg-[#f8fafc] text-[#2563eb] text-xs font-semibold border border-[#2563eb]/20 shadow-sm">
  {courses.length} Khóa học khả dụng
  </span>
  </div>
@@ -65,7 +65,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
  return (
  <div
  key={course.id}
- className="group flex flex-col bg-white rounded-2xl border border-[#E8E2D9] overflow-hidden shadow-sm hover:shadow-xl hover:border-[#C0392B]/40 transition-all duration-300 transform hover:-translate-y-1 justify-between h-full"
+ className="group flex flex-col bg-white rounded-2xl border border-[#e2e8f0] overflow-hidden shadow-sm hover:shadow-xl hover:border-[#2563eb]/40 transition-all duration-300 transform hover:-translate-y-1 justify-between h-full"
  >
  {/* Thumbnail */}
  <div className="relative h-44 w-full bg-[#1A1A2E] overflow-hidden shrink-0">
@@ -93,26 +93,26 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
  <div className="p-5 flex flex-col flex-1 gap-4">
  <div>
  <Link href={`/courses/detail?courseId=${course.id}`} className="block focus:outline-none">
- <h3 className="text-lg font-bold text-[#2C3039] line-clamp-2 leading-snug group-hover:text-[#C0392B] transition-colors">
+ <h3 className="text-lg font-bold text-[#0f172a] line-clamp-2 leading-snug group-hover:text-[#2563eb] transition-colors">
  {course.title}
  </h3>
  </Link>
- <p className="text-sm text-[#8A8478] line-clamp-2 mt-2 leading-relaxed">
+ <p className="text-sm text-[#64748b] line-clamp-2 mt-2 leading-relaxed">
  {course.description || "Chưa có mô tả chi tiết cho khóa học này."}
  </p>
  </div>
  
  {/* Logic giá & thời gian đã được gộp mượt mà */}
- <div className="flex items-center justify-between text-xs font-semibold text-[#8A8478] border-t border-[#F0F0F8] pt-4 mt-auto">
+ <div className="flex items-center justify-between text-xs font-semibold text-[#64748b] border-t border-[#F0F0F8] pt-4 mt-auto">
  <span className="flex items-center gap-1.5">
  {course.duration_hours !== undefined ? `${course.duration_hours} giờ` : 'Đang cập nhật'}
  </span>
  <div className="flex flex-col items-end">
  {Number(course.price) === 0 ? (
- <span className="text-[#2C3039] font-bold">Miễn phí</span>
+ <span className="text-[#0f172a] font-bold">Miễn phí</span>
  ) : (course.current_price !== undefined && course.price !== undefined && course.current_price < course.price) ? (
  <>
- <span className="text-[#2C3039] font-bold">
+ <span className="text-[#0f172a] font-bold">
  {Number(course.current_price).toLocaleString('vi-VN')} VND
  </span>
  <span className="text-[10px] text-gray-400 line-through">
@@ -120,7 +120,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
  </span>
  </>
  ) : (
- <span className="text-[#2C3039] font-bold">
+ <span className="text-[#0f172a] font-bold">
  {Number(course.price ? course.price : 0).toLocaleString('vi-VN')} VND
  </span>
  )}
@@ -133,7 +133,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
  {course.is_enrolled ? (
  <Link
  href={`/courses/lesson?courseId=${course.id}`}
- className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-[#2C3039] bg-[#FAF7F2] border border-[#2C3039] hover:bg-[#A7F3D0] transition-all"
+ className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-[#0f172a] bg-[#f8fafc] border border-[#0f172a] hover:bg-[#A7F3D0] transition-all"
  >
  <span>Đã đăng ký - Vào học</span>
  <span></span>
@@ -141,7 +141,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
  ) : (
  <Link
  href={`/courses/detail?courseId=${course.id}`}
- className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-[#C0392B] shadow-md hover:shadow-lg transition-all hover:opacity-95"
+ className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-[#2563eb] shadow-sm hover:shadow-md transition-all hover:opacity-95"
  >
  <span>Xem chi tiết & Đăng ký</span>
  <span className="group-hover:translate-x-1 transition-transform"></span>

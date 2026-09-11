@@ -30,6 +30,8 @@ export interface AiSuggestion {
 export interface OverallProgress {
  percent: number;
  delta: string;
+ level?: number;
+ description?: string;
 }
 
 export interface StudyStreak {
@@ -68,6 +70,8 @@ export interface DailyGoal {
 
 export interface DashboardOverview {
  user: UserProfileSummary | null;
+ welcome_message?: string;
+ ai_badge_text?: string;
  courses: DashboardCourse[];
  focus_areas: FocusArea[];
  ai_suggestion: AiSuggestion;

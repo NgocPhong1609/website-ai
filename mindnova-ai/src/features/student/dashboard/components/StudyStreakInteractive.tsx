@@ -138,24 +138,24 @@ export function StudyStreakInteractive({
     <>
       <div 
         onClick={() => setShowModal(true)}
-        className="group cursor-pointer bg-white rounded-2xl p-5 border border-[#EAEAF4] shadow-sm hover:shadow-md hover:border-[#F59E0B]/40 transition-all duration-300 flex flex-col justify-between gap-4"
+        className="group cursor-pointer bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-500/40 transition-all duration-300 flex flex-col justify-between gap-4 h-full"
       >
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[#8A8478] group-hover:text-[#D97706] transition-colors">Chuỗi chuyên cần ↗</span>
-            <div className="w-9 h-9 rounded-xl bg-[#FFF9ED] text-[#D97706] flex items-center justify-center shadow-sm border border-[#F59E0B]/20">
+            <span className="text-xs font-medium text-slate-500 group-hover:text-blue-600 transition-colors uppercase tracking-wider">Chuỗi chuyên cần ↗</span>
+            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shadow-sm border border-amber-500/20">
               <Flame size={16} fill="currentColor" />
             </div>
           </div>
           
           <div className="flex items-baseline justify-between">
-             <span className="text-3xl font-black text-[#2C3039]">{streakDays} <span className="text-sm font-bold text-[#8A8478]">Ngày</span></span>
+             <span className="text-3xl font-bold text-slate-900">{streakDays} <span className="text-sm font-medium text-slate-500">Ngày</span></span>
             <button
               onClick={(e) => { e.stopPropagation(); handleCheckIn(); }}
               disabled={isCheckedIn || isLoading}
               className={twMerge(
-                "text-xs font-bold px-3 py-1.5 rounded-lg transition-all shadow-sm z-10 border",
-                isCheckedIn ? "bg-[#F0FDF4] text-[#16A34A] border-[#16A34A]/20 cursor-default" : "bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white hover:scale-105"
+                "text-xs font-medium px-3 py-1.5 rounded-lg transition-all shadow-sm z-10 border",
+                isCheckedIn ? "bg-emerald-50 text-emerald-600 border-emerald-600/20 cursor-default" : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:scale-105"
               )}
             >
               {isLoading ? "Đang xử lý..." : (isCheckedIn ? "Đã điểm danh ✓" : "Điểm danh ngay")}
@@ -163,14 +163,14 @@ export function StudyStreakInteractive({
           </div>
         </div>
         
-        <div className="grid grid-cols-7 gap-1.5 pt-4 border-t border-[#F0F0F8] mt-auto">
+        <div className="grid grid-cols-7 gap-1.5 pt-4 border-t border-slate-100 mt-auto">
           {weekDays.map((d) => (
              <div key={d} className="flex flex-col items-center gap-1.5">
-               <span className="text-[10px] font-bold text-[#8A8478] uppercase">{d}</span>
+               <span className="text-[10px] font-medium text-slate-500 uppercase">{d}</span>
                <div className={twMerge(
                  "w-full h-1.5 rounded-full transition-all duration-300",
-                 activeDays[d] || (d === todayKey && isCheckedIn) ? "bg-gradient-to-r from-[#F59E0B] to-[#D97706]" : "bg-[#F4F4FA]",
-                 d === todayKey && !isCheckedIn && "bg-[#EAEAF4] relative overflow-hidden after:absolute after:inset-0 after:bg-[#F59E0B]/50 after:animate-pulse"
+                 activeDays[d] || (d === todayKey && isCheckedIn) ? "bg-gradient-to-r from-blue-500 to-blue-600" : "bg-slate-100",
+                 d === todayKey && !isCheckedIn && "bg-slate-200 relative overflow-hidden after:absolute after:inset-0 after:bg-blue-500/50 after:animate-pulse"
                )}/>
              </div>
           ))}
@@ -178,32 +178,32 @@ export function StudyStreakInteractive({
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#0B0B19]/80 backdrop-blur-md" onClick={() => setShowModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-md" onClick={() => setShowModal(false)}>
           <div 
-            className="bg-white w-full max-w-5xl rounded-3xl overflow-hidden shadow-2xl relative flex flex-col lg:flex-row border border-[#EAEAF4]" 
+            className="bg-white w-full max-w-5xl rounded-3xl overflow-hidden shadow-2xl relative flex flex-col lg:flex-row border border-slate-200" 
             onClick={(e) => e.stopPropagation()}
           >
-            <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 z-20 text-[#8A8478] hover:bg-[#F4F4FA] p-2.5 rounded-full transition-colors bg-white shadow-sm">
+            <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 z-20 text-slate-500 hover:bg-slate-100 p-2.5 rounded-full transition-colors bg-white shadow-sm">
               <X size={18} />
             </button>
 
-            <div className="w-full lg:w-7/12 p-6 sm:p-8 bg-[#FAFAFC] border-r border-[#EAEAF4]">
+            <div className="w-full lg:w-7/12 p-6 sm:p-8 bg-slate-50/50 border-r border-slate-100">
               <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
-                <div className="flex items-center gap-4 bg-white px-2 py-1 rounded-xl shadow-sm border border-[#EAEAF4]">
-                  <button onClick={handlePrevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F4F4FA] text-[#8A8478] font-bold transition-colors">&lt;</button>
-                  <h3 className="text-lg font-black text-[#2C3039] min-w-[140px] text-center">Tháng {viewMonth + 1}, {viewYear}</h3>
-                  <button onClick={handleNextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F4F4FA] text-[#8A8478] font-bold transition-colors">&gt;</button>
+                <div className="flex items-center gap-4 bg-white px-2 py-1 rounded-xl shadow-sm border border-slate-200">
+                  <button onClick={handlePrevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 font-medium transition-colors">&lt;</button>
+                  <h3 className="text-lg font-bold text-slate-900 min-w-[140px] text-center">Tháng {viewMonth + 1}, {viewYear}</h3>
+                  <button onClick={handleNextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 font-medium transition-colors">&gt;</button>
                 </div>
                 
                 <div className="flex gap-2">
-                  <span className="text-xs font-bold text-[#0284C7] bg-[#E0F2FE] px-3 py-2 rounded-lg flex items-center gap-1.5 border border-[#0284C7]/20 shadow-sm">
-                    <Snowflake size={14} fill="currentColor" /> Băng bảo vệ: {streakFreezeCount}
+                  <span className="text-xs font-medium text-amber-600 bg-amber-50 px-3 py-2 rounded-xl flex items-center gap-1.5 border border-amber-100 shadow-sm">
+                    <Snowflake size={14} fill="currentColor" className="text-amber-500" /> Băng bảo vệ: {streakFreezeCount}
                   </span>
                 </div>
               </div>
               
               <div className="grid grid-cols-7 gap-2 text-center mb-3">
-                {weekDays.map(d => <div key={d} className="text-[11px] font-black text-[#8A8478] uppercase tracking-wider">{d}</div>)}
+                {weekDays.map(d => <div key={d} className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">{d}</div>)}
               </div>
               
               <div className="grid grid-cols-7 gap-2 sm:gap-3">
@@ -212,11 +212,11 @@ export function StudyStreakInteractive({
                 ))}
                 
                 {calendarDays.map((date) => {
-                  let bgClass = "bg-white border border-[#EAEAF4] text-[#8A8478] hover:border-[#8A8478]/30 cursor-default"; 
+                  let bgClass = "bg-white border border-slate-100 text-slate-500 hover:border-slate-200 cursor-default"; 
                   if (date.isCheckedIn) {
-                    bgClass = "bg-gradient-to-tr from-[#27AE60] to-[#34D399] text-white shadow-md border-transparent font-bold";
+                    bgClass = "bg-blue-100 text-blue-700 shadow-sm font-semibold border border-blue-200";
                   } else if (date.isPast) {
-                    bgClass = "bg-[#FEE2E2] text-[#C0392B] border-transparent font-bold opacity-70"; 
+                    bgClass = "bg-slate-50 text-slate-300 border-transparent font-normal"; 
                   }
                   
                   return (
@@ -225,7 +225,7 @@ export function StudyStreakInteractive({
                       className={twMerge(
                         "aspect-square rounded-xl flex items-center justify-center text-sm sm:text-base transition-all duration-300 relative group/date",
                         bgClass,
-                        date.isToday && !date.isCheckedIn && "border-2 border-[#F59E0B] text-[#D97706] bg-[#FFF9ED] shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+                        date.isToday && !date.isCheckedIn && "border-2 border-dashed border-amber-300 text-amber-600 bg-amber-50"
                       )}
                     >
                       {date.day}
@@ -237,33 +237,33 @@ export function StudyStreakInteractive({
 
             <div className="w-full lg:w-5/12 p-6 sm:p-8 flex flex-col bg-white">
               <div className="text-center mb-8 pt-4">
-                <div className="mb-4 drop-shadow-xl inline-flex text-[#F59E0B]">
+                <div className="mb-4 drop-shadow-xl inline-flex text-amber-500">
                   <Flame size={72} fill="currentColor" strokeWidth={1} />
                 </div>
-                <h2 className="text-4xl font-black text-[#2C3039] tracking-tight">{streakDays} <span className="text-xl font-bold text-[#8A8478]">Ngày</span></h2>
-                <p className="text-sm font-semibold text-[#D97706] mt-2">Duy trì thói quen cực tốt!</p>
+                <h2 className="text-4xl font-semibold text-slate-900 tracking-tight">{streakDays} <span className="text-xl font-medium text-slate-500">Ngày</span></h2>
+                <p className="text-sm font-medium text-slate-500 mt-2">{data.message || "Duy trì thói quen cực tốt!"}</p>
               </div>
 
               {(!isCheckedIn && viewMonth === today.getMonth() && viewYear === today.getFullYear()) && (
                 <button 
                   onClick={handleCheckIn}
-                  className="w-full py-4 mb-6 bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white rounded-2xl font-bold text-sm shadow-[0_8px_20px_rgba(245,158,11,0.3)] hover:-translate-y-1 transition-all active:scale-95"
+                  className="w-full py-4 mb-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl font-medium text-sm shadow-sm hover:-translate-y-1 transition-all active:scale-95"
                 >
                   {isLoading ? "Đang xử lý..." : "Xác nhận điểm danh hôm nay"}
                 </button>
               )}
 
-              <div className="mt-auto bg-[#F8FAFC] rounded-2xl p-5 border border-[#EAEAF4] relative">
-                 <div className="absolute -top-3 left-4 bg-gradient-to-r from-[#C0392B] to-[#C0392B] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> AI Lịch trình
+              <div className="mt-auto bg-white rounded-2xl p-5 border border-slate-100 relative shadow-sm">
+                 <div className="absolute -top-3 left-4 bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-semibold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" /> AI LỊCH TRÌNH
                  </div>
                  
-                 <div className="mt-3">
-                   <p className="text-sm text-[#2C3039] font-medium leading-relaxed">
+                 <div className="mt-2">
+                   <p className="text-sm text-slate-600 font-normal leading-relaxed">
                      {aiInsight.message}
                    </p>
                    {aiInsight.actionLabel && (
-                     <button className="mt-4 w-full py-2.5 bg-white border border-[#C0392B] text-[#C0392B] font-bold text-xs rounded-xl hover:bg-[#EEF2FF] transition-colors">
+                     <button className="mt-4 w-full py-2 bg-slate-50 border border-slate-200 text-slate-700 font-medium text-xs rounded-xl hover:bg-slate-100 transition-colors">
                        {aiInsight.actionLabel}
                      </button>
                    )}

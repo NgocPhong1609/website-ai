@@ -54,7 +54,7 @@ function ProfileAvatar({ name, avatarUrl, onClick, isLoading }: ProfileAvatarPro
  }}
  />
  ) : (
- <span className="text-2xl sm:text-3xl font-bold text-primary select-none relative z-10">
+ <span className="text-2xl sm:text-3xl font-bold text-blue-600 select-none relative z-10">
  {initials || "NP"}
  </span>
  )}
@@ -107,20 +107,20 @@ function TabButton({ id, label, isActive, onClick }: TabButtonProps) {
  className={twMerge(
  "group relative w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-normal transition-all duration-200 cursor-pointer overflow-hidden outline-none",
  isActive
- ? "bg-primary/5 text-primary font-medium"
+ ? "bg-blue-600/5 text-blue-600 font-medium"
  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
  )}
  >
  {/* Minimalist Active Left Indicator */}
  {isActive && (
- <span className="absolute left-0 top-2.5 bottom-2.5 w-[3px] rounded-r-md bg-primary" />
+ <span className="absolute left-0 top-2.5 bottom-2.5 w-[3px] rounded-r-md bg-blue-600" />
  )}
 
  <span
  className={twMerge(
  "flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-200 shrink-0",
  isActive
- ? "text-primary"
+ ? "text-blue-600"
  : "text-muted-foreground group-hover:text-foreground"
  )}
  >

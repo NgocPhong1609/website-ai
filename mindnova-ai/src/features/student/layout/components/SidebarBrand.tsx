@@ -1,21 +1,15 @@
 import Link from "next/link";
 
+import { Sparkles } from "lucide-react";
+
 // ─── Logo mark ────────────────────────────────────────────────────────────────
 
 function LogoMark() {
- return (
- <div className="w-9 h-9 rounded-lg bg-[#2C3039] flex items-center justify-center shadow-sm shrink-0">
- <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
- <circle cx="12" cy="12" r="2.5" fill="white" />
- <path
- d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"
- stroke="white"
- strokeWidth="2"
- strokeLinecap="round"
- />
- </svg>
- </div>
- );
+  return (
+    <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-blue-500 to-blue-600 flex items-center justify-center shadow-sm shrink-0">
+      <Sparkles className="w-5 h-5 text-white" />
+    </div>
+  );
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -26,10 +20,10 @@ export function SidebarBrand({ isCollapsed }: { isCollapsed?: boolean }) {
  <LogoMark />
  {!isCollapsed && (
  <div className="flex flex-col leading-tight overflow-hidden whitespace-nowrap">
- <span className="text-[14px] font-bold text-[#2C3039] tracking-tight group-hover:text-[#C0392B] transition-colors duration-150 font-serif">
+ <span className="text-[14px] font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors duration-150">
  MindNova AI
  </span>
- <span className="text-[10px] text-[#B8B0A3] font-medium tracking-wide">
+ <span className="text-[10px] text-slate-400 font-medium tracking-wide">
  AI-Powered Learning
  </span>
  </div>

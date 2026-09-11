@@ -82,18 +82,18 @@ export default function Sidebar() {
 
  return (
  <aside className={twMerge(
- "shrink-0 h-screen flex flex-col bg-[#FEFCF9] border-r border-[#E8E2D9] transition-all duration-300 relative group/sidebar",
- isCollapsed ? "w-[72px]" : "w-60"
+ "shrink-0 h-screen flex flex-col bg-white border-r border-slate-200 transition-all duration-300 relative group/sidebar",
+ isCollapsed ? "w-[72px]" : "w-56"
  )}>
  {/* Brand & Toggle */}
  <div className={twMerge(
- "py-[18px] border-b border-[#F5F0E8] flex items-center transition-all",
+ "py-[18px] border-b border-slate-100 flex items-center transition-all",
  isCollapsed ? "px-2 flex-col justify-center gap-4" : "px-4 justify-between"
  )}>
  <SidebarBrand isCollapsed={isCollapsed} />
  <button
  onClick={() => setIsCollapsed(!isCollapsed)}
- className="w-10 h-10 rounded-lg flex items-center justify-center text-[#8A8478] hover:bg-[#F5F0E8] hover:text-[#C0392B] transition-all cursor-pointer shrink-0"
+ className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all cursor-pointer shrink-0"
  aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
  >
  <MenuIcon />
@@ -104,26 +104,9 @@ export default function Sidebar() {
  <SidebarNav isCollapsed={isCollapsed} />
 
  {/* Bottom section */}
- <div className={twMerge("py-5 border-t border-[#F5F0E8] flex flex-col gap-3", isCollapsed ? "px-2 items-center" : "px-4")}>
+ <div className={twMerge("py-5 border-t border-slate-100 flex flex-col gap-3", isCollapsed ? "px-2 items-center" : "px-4")}>
  
- {/* Nút Test Onboarding */}
- <Link
- href="/onboarding"
- title={isCollapsed ? "Test Onboarding" : undefined}
- className={twMerge(
- "flex items-center justify-center transition-all duration-200 text-[#D4A574] bg-[#FDF6E3] border border-[#D4A574]/30 hover:bg-[#F5ECD4]",
- isCollapsed 
- ? "w-10 h-10 rounded-lg" 
- : "w-full gap-2 py-3 px-4 rounded-lg text-sm font-semibold"
- )}
- >
- <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
- <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
- <path d="M9 18h6"/>
- <path d="M10 22h4"/>
- </svg>
- {!isCollapsed && <span>Test Onboarding</span>}
- </Link>
+ 
 
  {/* Help + Auth */}
  <div className="flex flex-col gap-0.5 w-full">
@@ -131,7 +114,7 @@ export default function Sidebar() {
  href="/help"
  title={isCollapsed ? "Help" : undefined}
  className={twMerge(
- "flex items-center rounded-lg text-[#8A8478] hover:bg-[#F5F0E8] hover:text-[#2C3039] transition-all duration-150 shrink-0",
+ "flex items-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all duration-150 shrink-0",
  isCollapsed ? "justify-center w-10 h-10 mx-auto" : "gap-2.5 px-3 py-2 text-sm w-full text-left"
  )}
  >
@@ -145,7 +128,7 @@ export default function Sidebar() {
  onClick={handleLogout}
  title={isCollapsed ? "Logout" : undefined}
  className={twMerge(
- "flex items-center rounded-lg text-[#8A8478] hover:bg-[#FADBD8] hover:text-[#C0392B] transition-all duration-150 shrink-0 cursor-pointer",
+ "flex items-center rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all duration-150 shrink-0 cursor-pointer",
  isCollapsed ? "justify-center w-10 h-10 mx-auto" : "gap-2.5 px-3 py-2 text-sm w-full text-left"
  )}
  >
@@ -157,7 +140,7 @@ export default function Sidebar() {
  href="/login"
  title={isCollapsed ? "Login" : undefined}
  className={twMerge(
- "flex items-center rounded-lg text-[#8A8478] hover:bg-[#F5F0E8] hover:text-[#C0392B] transition-all duration-150 shrink-0 text-decoration-none",
+ "flex items-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all duration-150 shrink-0 text-decoration-none",
  isCollapsed ? "justify-center w-10 h-10 mx-auto" : "gap-2.5 px-3 py-2 text-sm w-full text-left"
  )}
  >

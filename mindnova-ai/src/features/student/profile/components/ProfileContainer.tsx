@@ -26,7 +26,7 @@ export default function ProfileContainer() {
  const { data: profile, isLoading, isError, error } = useGetProfile();
 
  if (isLoading) {
- return <div className="p-8 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
+ return <div className="p-8 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full" /></div>;
  }
 
  if (isError || !profile) {
@@ -61,7 +61,7 @@ export default function ProfileContainer() {
  <div className="group shrink-0 flex flex-col justify-center min-w-[320px] sm:min-w-[340px]">
  <div className="w-full flex items-center justify-between gap-4 mb-2">
  <span className="text-sm font-medium text-muted-foreground">Độ hoàn thiện hồ sơ</span>
- <span className="text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+ <span className="text-xs font-semibold text-blue-600 bg-blue-600/10 px-2.5 py-1 rounded-full">
  Cấp độ Bảo mật A+
  </span>
  </div>
@@ -73,7 +73,7 @@ export default function ProfileContainer() {
 
  <div className="w-full h-1.5 bg-muted rounded-full mt-3 overflow-hidden">
  <div
- className="h-full bg-primary rounded-full transition-all duration-1000"
+ className="h-full bg-blue-600 rounded-full transition-all duration-1000"
  style={{ width: `${profile.completionPercent}%` }}
  />
  </div>
