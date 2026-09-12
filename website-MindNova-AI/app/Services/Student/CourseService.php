@@ -106,14 +106,14 @@ class CourseService
         try {
             if (class_exists(Course::class)) {
                 // ── SECURITY: Only fetch published courses ──
-                $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])
+                $dbCourse = Course::with(['modules.lessons.attachments', 'teacher', 'category'])
                     ->where('status', 'published')
                     ->whereNotNull('published_version_id')
                     ->find($courseId);
                 
                 if (!$dbCourse) {
                     // Fallback to first published course
-                    $dbCourse = Course::with(['modules.lessons', 'teacher', 'category'])
+                    $dbCourse = Course::with(['modules.lessons.attachments', 'teacher', 'category'])
                         ->where('status', 'published')
                         ->whereNotNull('published_version_id')
                         ->first();
@@ -153,6 +153,7 @@ class CourseService
                                 'id' => (string) $quizObj->id,
                                 'quiz_id' => $quizObj->id,
                                 'title' => $quizObj->title,
+                                'thumbnail_url' => $quizObj->thumbnail_url,
                                 'time_limit_minutes' => $quizObj->time_limit_minutes ?? 15,
                                 'passing_score' => $quizObj->passing_score ?? 70,
                                 'questions_count' => count($quizObj->questions),
@@ -163,21 +164,13 @@ class CourseService
                                             'content' => $a->content,
                                             'text' => $a->content,
                                             'option' => $a->content,
-                                            'is_correct' => (bool) $a->is_correct,
+                                            'image_url' => $a->image_url,
                                         ];
                                     })->values()->toArray() : [];
 
                                     $optionsArr = !empty($answersArr)
                                         ? array_column($answersArr, 'content')
                                         : (is_string($q->options) ? json_decode($q->options, true) : ($q->options ?? []));
-
-                                    $correctAnswer = null;
-                                    foreach ($answersArr as $a) {
-                                        if (!empty($a['is_correct'])) {
-                                            $correctAnswer = $a['content'];
-                                            break;
-                                        }
-                                    }
 
                                     $text = $q->content ?? $q->question ?? $q->question_text ?? '';
                                     return [
@@ -186,13 +179,13 @@ class CourseService
                                         'question_text' => $text,
                                         'content' => $text,
                                         'title' => $text,
+                                        'image_url' => $q->image_url,
                                         'answers' => $answersArr,
                                         'options' => $optionsArr,
                                         'choices' => $optionsArr,
-                                        'correct_answer' => $correctAnswer,
-                                        'answer' => $correctAnswer,
                                         'explanation' => $q->explanation,
                                         'type' => $q->type ?? 'multiple_choice',
+                                        'selection_type' => $q->selection_type ?? 'single_choice',
                                     ];
                                 })->values()->toArray(),
                             ];
@@ -262,6 +255,7 @@ class CourseService
                                             'id' => (string) $quizObj->id,
                                             'quiz_id' => $quizObj->id,
                                             'title' => $quizObj->title ?: $les->title,
+                                            'thumbnail_url' => $quizObj->thumbnail_url,
                                             'time_limit_minutes' => $quizObj->time_limit_minutes ?? 15,
                                             'passing_score' => $quizObj->passing_score ?? 70,
                                             'questions_count' => count($quizObj->questions),
@@ -272,21 +266,13 @@ class CourseService
                                                         'content' => $a->content,
                                                         'text' => $a->content,
                                                         'option' => $a->content,
-                                                        'is_correct' => (bool) $a->is_correct,
+                                                        'image_url' => $a->image_url,
                                                     ];
                                                 })->values()->toArray() : [];
 
                                                 $optionsArr = !empty($answersArr)
                                                     ? array_column($answersArr, 'content')
                                                     : (is_string($q->options) ? json_decode($q->options, true) : ($q->options ?? []));
-
-                                                $correctAnswer = null;
-                                                foreach ($answersArr as $a) {
-                                                    if (!empty($a['is_correct'])) {
-                                                        $correctAnswer = $a['content'];
-                                                        break;
-                                                    }
-                                                }
 
                                                 $text = $q->content ?? $q->question ?? $q->question_text ?? '';
                                                 return [
@@ -295,13 +281,13 @@ class CourseService
                                                     'question_text' => $text,
                                                     'content' => $text,
                                                     'title' => $text,
+                                                    'image_url' => $q->image_url,
                                                     'answers' => $answersArr,
                                                     'options' => $optionsArr,
                                                     'choices' => $optionsArr,
-                                                    'correct_answer' => $correctAnswer,
-                                                    'answer' => $correctAnswer,
                                                     'explanation' => $q->explanation,
                                                     'type' => $q->type ?? 'multiple_choice',
+                                                    'selection_type' => $q->selection_type ?? 'single_choice',
                                                 ];
                                             })->values()->toArray(),
                                         ];
@@ -318,6 +304,14 @@ class CourseService
                                         'video_url' => $les->video_url,
                                         'has_uploaded_video' => $les->media()->where('media_type', 'video')->where('status', 'ready')->exists(),
                                         'content' => $lessonType === 'article' ? $les->content : null,
+                                        'attachments' => $les->attachments->map(fn ($attachment) => [
+                                            'id' => $attachment->id,
+                                            'display_name' => $attachment->display_name,
+                                            'original_name' => $attachment->original_name,
+                                            'mime_type' => $attachment->mime_type,
+                                            'extension' => $attachment->extension,
+                                            'size_bytes' => $attachment->size_bytes,
+                                        ])->values()->toArray(),
                                         'quiz_id' => $quizId,
                                         'quizData' => $quizDataPayload,
                                         'quiz' => $quizDataPayload,
@@ -707,4 +701,3 @@ class CourseService
         ];
     }
 }
-

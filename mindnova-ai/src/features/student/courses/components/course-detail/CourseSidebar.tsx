@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
+import { Download, FileArchive, FileText, Link2, MessageCircle, Video } from "lucide-react";
 import type { 
  CourseDetailProgressCard, 
  CourseDetailAIInsight, 
@@ -104,6 +105,15 @@ function AiInsightCard({ aiInsight }: { aiInsight?: CourseDetailAIInsight }) {
  );
 }
 
+function ResourceTypeIcon({ type, title }: { type?: string; title?: string }) {
+ const value = `${type || ""} ${title || ""}`.toLowerCase();
+ if (value.includes("pdf") || value.includes("doc")) return <FileText size={14} aria-label="Tài liệu" />;
+ if (value.includes("zip")) return <FileArchive size={14} aria-label="Tệp nén" />;
+ if (value.includes("chat") || value.includes("discord")) return <MessageCircle size={14} aria-label="Thảo luận" />;
+ if (value.includes("video")) return <Video size={14} aria-label="Video" />;
+ return <Link2 size={14} aria-label="Liên kết" />;
+}
+
 function ResourcesCard({ resources = [] }: { resources?: CourseDetailResourceItem[] }) {
  const defaultResources: CourseDetailResourceItem[] = [
  { id: "1", title: "Source Code & Notebooks (PyTorch 2.0)", type: "zip", size: "45.8 MB", url: "#" },
@@ -135,8 +145,8 @@ function ResourcesCard({ resources = [] }: { resources?: CourseDetailResourceIte
  className="w-full text-left p-3 rounded-lg border border-[#E2E8F0] hover:border-[#0F172A] hover:bg-[#F1F5F9] transition-all duration-150 flex items-center justify-between gap-3 group cursor-pointer"
  >
  <div className="flex items-center gap-3 min-w-0">
- <span className="text-xs font-bold text-[#0F172A] bg-white px-2 py-1 rounded border border-[#E2E8F0] uppercase w-10 text-center">
- {res.type || "DOC"}
+ <span className="w-8 h-8 rounded border border-[#E2E8F0] bg-white text-[#0F172A] flex items-center justify-center shrink-0">
+ <ResourceTypeIcon type={res.type} title={res.title} />
  </span>
  <div className="min-w-0">
  <span className="text-xs font-bold text-[#0F172A] truncate block transition-colors">
@@ -149,7 +159,8 @@ function ResourcesCard({ resources = [] }: { resources?: CourseDetailResourceIte
  )}
  </div>
  </div>
- <span className="text-xs font-bold text-[#64748B] group-hover:text-[#0F172A]">
+ <span className="text-xs font-bold text-[#64748B] group-hover:text-[#0F172A] inline-flex items-center gap-1 shrink-0">
+ <Download size={14} aria-hidden />
  Tải về
  </span>
  </button>

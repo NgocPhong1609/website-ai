@@ -1,15 +1,26 @@
 export type SourceType = "content" | "topic" | "course";
 export type DifficultyType = "easy" | "medium" | "hard" | "mixed";
 export type QuestionType = "multiple_choice" | "essay";
+export type SelectionType = "single_choice" | "multiple_choice";
 export type ReviewStatus = "pending" | "approved" | "edited" | "discarded";
+
+export interface QuizImageValue {
+ url: string | null;
+ r2_key: string | null;
+}
 
 export interface GeneratedQuestion {
  id: string;
  type: QuestionType;
+ selection_type?: SelectionType;
  difficulty: DifficultyType | "easy" | "medium" | "hard";
  question: string;
+ image_url?: string | null;
+ image_r2_key?: string | null;
  options: string[];
  correct_answer_index: number | null;
+ correct_answer_indices?: number[];
+ answer_images?: QuizImageValue[];
  explanation: string;
  sample_answer?: string;
  rubric?: string;
@@ -20,6 +31,8 @@ export interface GeneratedQuestion {
 export interface QuizConfig {
  title: string;
  description: string;
+ thumbnail_url?: string | null;
+ thumbnail_r2_key?: string | null;
  source_type: SourceType;
  source_content: string;
  topic: string;
@@ -45,6 +58,8 @@ export interface QuizSummary {
   id: number;
   title: string;
   description: string | null;
+  thumbnail_url?: string | null;
+  thumbnail_r2_key?: string | null;
   source_type: SourceType | string;
   type?: string;
   position?: string;

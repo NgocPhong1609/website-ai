@@ -88,7 +88,7 @@ function AIAnnouncementPanel({ onOpenModal }: { onOpenModal: (topic?: string) =>
 
  return (
  <div className="rounded-2xl border-[#E2E8F0] bg-blue-50/20 shadow-2xs overflow-hidden">
- <div className="p-4 border-b text-[#F8FAFC] flex items-center gap-2 bg-blue-50/50">
+ <div className="p-4 border-b border-[#E2E8F0] text-[#0F172A] flex items-center gap-2 bg-blue-50/50">
  <span className="text-[#3B82F6]"><SparklesIcon size={16} /></span>
  <span className="text-xs font-black text-[#3B82F6] tracking-wide uppercase">Trợ lý Thông báo AI</span>
  </div>

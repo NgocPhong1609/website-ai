@@ -21,10 +21,10 @@ class AiChatRequest extends FormRequest
     {
         return [
             'message' => 'required|string|max:2000',
-            'lesson_id' => 'nullable|integer',
-            'history' => 'nullable|array',
-            'history.*.sender' => 'nullable|in:user,ai',
-            'history.*.text' => 'nullable|string',
+            'lesson_id' => 'nullable|integer|min:1',
+            'history' => 'nullable|array|max:4',
+            'history.*.sender' => 'required|in:user,ai',
+            'history.*.text' => 'required|string|max:2000',
         ];
     }
 }

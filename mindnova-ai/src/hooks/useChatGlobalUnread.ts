@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { axiosClient } from '@/src/shared/lib/axios';
+import { getEchoInstance } from '@/src/hooks/useRealtimeChat';
 
 export const useChatGlobalUnread = (token: string | null, userId: number | null) => {
     const [unreadCount, setUnreadCount] = useState<number>(0);
@@ -35,7 +36,6 @@ export const useChatGlobalUnread = (token: string | null, userId: number | null)
     useEffect(() => {
         if (!token || !userId) return;
 
-        const { getEchoInstance } = require('@/src/hooks/useRealtimeChat');
         const echo = getEchoInstance(token);
         const channelName = `App.Models.User.${userId}`;
         

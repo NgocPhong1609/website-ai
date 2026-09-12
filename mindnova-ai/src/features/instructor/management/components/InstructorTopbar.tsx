@@ -366,7 +366,7 @@ export function InstructorTopbar() {
  onClick={() => setIsAlertOpen(false)}
  className={twMerge(
  "group p-3.5 rounded-xl border transition-all flex flex-col gap-1.5 relative block",
- !item.read ? "bg-[#F8FAFC] text-[#F8FAFC] shadow-2xs hover:bg-[#F1F5F9]" : "bg-white border-gray-100 opacity-70 hover:opacity-100"
+ !item.read ? "bg-[#EFF6FF] text-[#0F172A] shadow-2xs hover:bg-[#DBEAFE]" : "bg-white border-gray-100 opacity-70 hover:opacity-100"
  )}
  >
  {content}
@@ -376,7 +376,7 @@ export function InstructorTopbar() {
  key={item.id}
  className={twMerge(
  "p-3.5 rounded-xl border transition-all flex flex-col gap-1.5 relative",
- !item.read ? "bg-[#F8FAFC] text-[#F8FAFC] shadow-2xs" : "bg-white border-gray-100 opacity-70"
+ !item.read ? "bg-[#EFF6FF] text-[#0F172A] shadow-2xs" : "bg-white border-gray-100 opacity-70"
  )}
  >
  {content}

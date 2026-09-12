@@ -2,7 +2,14 @@
 
 import { useState, useCallback, useMemo } from "react";
 
-export type PricingTier = "standard" | "exclusive";
+export type PricingTier = string;
+
+export interface PricingTierDefinition {
+  tier: string;
+  label: string;
+  platform_commission_percent: number;
+  instructor_percent: number;
+}
 
 export interface DiscountConfig {
   isEnabled: boolean;
@@ -13,7 +20,8 @@ export interface DiscountConfig {
 
 export interface RevenueBreakdown {
   listPrice: number;
-  commissionRate: number; // e.g. 30 or 15
+  commissionRate: number | null;
+  instructorPercent: number | null;
   platformFee: number;
   instructorEarnings: number;
   earningsText: string;
@@ -42,7 +50,8 @@ export function useInstructorPricing(
   initialSalePrice?: number,
   initialStartDate?: string,
   initialEndDate?: string,
-  initialTier: PricingTier = "standard"
+  initialTier: PricingTier = "standard",
+  tierDefinitions: PricingTierDefinition[] = [],
 ): UseInstructorPricingReturn {
   const isInitiallyFree = initialPrice === 0;
   const [isFree, setIsFreeState] = useState(isInitiallyFree);
@@ -110,6 +119,7 @@ export function useInstructorPricing(
       return {
         listPrice: 0,
         commissionRate: 0,
+        instructorPercent: 0,
         platformFee: 0,
         instructorEarnings: 0,
         earningsText: "Khóa học miễn phí — (0 VNĐ phí nền tảng). Rất tốt để xây dựng cộng đồng!",
@@ -117,18 +127,31 @@ export function useInstructorPricing(
     }
 
     const activePrice = discount.isEnabled ? discount.discountPrice : basePrice;
-    const rate = tier === "exclusive" ? 15 : 30; // 15% for exclusive instructors, 30% standard
+    const definition = tierDefinitions.find((candidate) => candidate.tier === tier);
+    if (!definition) {
+      return {
+        listPrice: activePrice,
+        commissionRate: null,
+        instructorPercent: null,
+        platformFee: 0,
+        instructorEarnings: 0,
+        earningsText: "Chưa thể dự toán cho đến khi tải được cấu hình hoa hồng.",
+      };
+    }
+
+    const rate = definition.platform_commission_percent;
     const platformFee = Number(((activePrice * rate) / 100).toFixed(2));
     const instructorEarnings = activePrice - platformFee;
 
     return {
       listPrice: activePrice,
       commissionRate: rate,
+      instructorPercent: definition.instructor_percent,
       platformFee,
       instructorEarnings,
       earningsText: `Nếu bạn đặt giá ${activePrice.toLocaleString('vi-VN')} VNĐ, bạn sẽ nhận được ${instructorEarnings.toLocaleString('vi-VN')} VNĐ sau khi trừ ${rate}% phí nền tảng.`,
     };
-  }, [isFree, basePrice, discount.isEnabled, discount.discountPrice, tier]);
+  }, [isFree, basePrice, discount.isEnabled, discount.discountPrice, tier, tierDefinitions]);
 
   return {
     isFree,

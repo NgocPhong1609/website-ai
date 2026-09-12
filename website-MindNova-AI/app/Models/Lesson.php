@@ -47,6 +47,11 @@ class Lesson extends Model
         return $this->hasMany(LessonMedia::class);
     }
 
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(LessonAttachment::class);
+    }
+
     public function quiz()
     {
         return $this->hasOne(Quiz::class);

@@ -24,6 +24,8 @@ export function useManualQuizWizard(options?: {
   const [config, setConfig] = useState<QuizConfig>({
     title: "Bài kiểm tra mới",
     description: "Đề kiểm tra trắc nghiệm & tự luận",
+    thumbnail_url: null,
+    thumbnail_r2_key: null,
     source_type: "manual" as any,
     course_id: courseIdParam || undefined,
     source_content: "",
@@ -62,10 +64,15 @@ export function useManualQuizWizard(options?: {
       {
         id: `manual_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         type,
+        selection_type: "single_choice",
         difficulty: "medium",
         question: "",
+        image_url: null,
+        image_r2_key: null,
         options: type === "multiple_choice" ? ["", "", "", ""] : [],
         correct_answer_index: type === "multiple_choice" ? 0 : null,
+        correct_answer_indices: type === "multiple_choice" ? [0] : [],
+        answer_images: type === "multiple_choice" ? Array.from({ length: 4 }, () => ({ url: null, r2_key: null })) : [],
         explanation: "",
         sample_answer: "",
         rubric: "",
@@ -103,6 +110,8 @@ export function useManualQuizWizard(options?: {
       const response = await quizGeneratorApi.saveQuiz({
         title: config.title,
         description: config.description,
+        thumbnail_url: config.thumbnail_url,
+        thumbnail_r2_key: config.thumbnail_r2_key,
         source_type: "manual",
         source_content: config.title,
         course_id: config.course_id,

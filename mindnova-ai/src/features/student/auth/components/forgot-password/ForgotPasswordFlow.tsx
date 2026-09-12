@@ -126,7 +126,7 @@ export function ForgotPasswordFlow() {
  <button
  type="submit"
  disabled={isLoading || !email}
- className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#F8FAFC] hover:bg-[#2563EB] transition-colors disabled:opacity-50"
+ className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-colors disabled:opacity-50"
  >
  {isLoading ? "Đang xử lý..." : "Gửi mã xác nhận"}
  </button>
@@ -151,7 +151,7 @@ export function ForgotPasswordFlow() {
  <button
  type="submit"
  disabled={isLoading || otp.length < 6}
- className="mt-2 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#F8FAFC] hover:bg-[#2563EB] transition-colors disabled:opacity-50"
+ className="mt-2 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-colors disabled:opacity-50"
  >
  {isLoading ? "Đang xử lý..." : "Xác nhận OTP"}
  </button>
@@ -199,7 +199,7 @@ export function ForgotPasswordFlow() {
  <button
  type="submit"
  disabled={isLoading || newPassword.length < 6}
- className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#F8FAFC] hover:bg-[#2563EB] transition-colors disabled:opacity-50"
+ className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-colors disabled:opacity-50"
  >
  {isLoading ? "Đang xử lý..." : "Đổi mật khẩu"}
  </button>

@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Instructor;
 
+use App\Settings\CommissionSettingsRepository;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateCoursePriceRequest extends FormRequest
 {
@@ -15,7 +17,7 @@ class UpdateCoursePriceRequest extends FormRequest
     {
         $rules = [
             'price' => 'required|numeric|min:0|max:100000000',
-            'partnership_tier' => 'nullable|string|in:standard,exclusive',
+            'partnership_tier' => ['nullable', 'string', Rule::in(app(CommissionSettingsRepository::class)->tierKeys())],
             'is_flash_sale' => 'sometimes|boolean',
             'sale_start_date' => 'nullable|date',
             'sale_end_date' => 'nullable|date|after:sale_start_date',

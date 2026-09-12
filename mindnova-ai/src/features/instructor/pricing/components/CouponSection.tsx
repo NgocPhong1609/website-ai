@@ -299,7 +299,7 @@ export function CouponSection({ courseId }: { courseId?: string } = {}) {
               <p className="text-[11px] text-[#64748B]">Tạo mã ưu đãi để thúc đẩy doanh số bán hàng trong các dịp đặc biệt.</p>
             </div>
           </div>
-          <button type="button" onClick={() => setShowDialog(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl text-[12px] font-semibold text-[#3B82F6] bg-[#EFF6FF] border border-[#DBEAFE] hover:bg-[#F8FAFC] hover:text-white transition-all duration-200 cursor-pointer">
+          <button type="button" onClick={() => setShowDialog(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl text-[12px] font-semibold text-[#3B82F6] bg-[#EFF6FF] border border-[#DBEAFE] hover:bg-[#DBEAFE] hover:text-[#1D4ED8] transition-all duration-200 cursor-pointer">
             <PlusCircleIcon size={13} /> Tạo mã mới
           </button>
         </div>

@@ -1,6 +1,5 @@
 import { apiClient } from "@/src/shared/lib";
 import type {
- AdminAiConfigData,
  AdminAnalyticsData,
  AdminContentData,
  AdminModerationData,
@@ -28,17 +27,6 @@ export async function getTeacherApprovalsData(): Promise<AdminTeacherApprovalDat
   } catch (error) {
     console.warn("[AdminService] Failed to fetch teacher approvals data:", error);
     return { rows: [] };
-  }
-}
-
-export async function getAdminAiSystemData(): Promise<AdminAiConfigData> {
-  try {
-    const payload = await apiClient<ApiEnvelope<AdminAiConfigData>>("/admin/ai-system");
-
-    return payload.data ?? { providers: [], quotas: [], systemPrompts: [] };
-  } catch (error) {
-    console.warn("[AdminService] Failed to fetch AI system data:", error);
-    return { providers: [], quotas: [], systemPrompts: [] };
   }
 }
 
@@ -78,6 +66,7 @@ export async function getAdminRevenueData(): Promise<AdminRevenueData> {
       courseCount: raw.courseCount ?? 0,
       courses: raw.courses ?? [],
       orderHistory: raw.orderHistory ?? [],
+      commissionTiers: raw.commissionTiers ?? [],
     };
   } catch (error) {
     console.warn("[AdminService] Failed to fetch admin revenue data:", error);
@@ -88,6 +77,7 @@ export async function getAdminRevenueData(): Promise<AdminRevenueData> {
       courseCount: 0,
       courses: [],
       orderHistory: [],
+      commissionTiers: [],
     };
   }
 }

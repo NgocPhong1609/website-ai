@@ -129,7 +129,7 @@ export function AIInsightsTab() {
  "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border",
  item.type === "warning" && "bg-amber-50 text-amber-800 border-amber-200",
  item.type === "suggestion" && "bg-emerald-50 text-emerald-700",
- item.type === "trend" && "bg-purple-50 text-[#3B82F6] text-[#F8FAFC]"
+ item.type === "trend" && "bg-purple-50 text-[#3B82F6]"
  )}
  >
  {item.type.toUpperCase()}

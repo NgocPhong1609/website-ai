@@ -1,7 +1,18 @@
-import { axiosClient } from "@/src/shared/lib/axios";
+import { axiosClient } from "../../../../shared/lib/axios";
 import { QuizConfig, GeneratedQuestion, QuizSummary, QuizAttachmentPayload } from "../types/quizGenerator.types";
+import { serializeQuizQuestion } from "./serializeQuizQuestion";
 
 export const quizGeneratorApi = {
+ uploadMedia: async (file: File, purpose: "thumbnail" | "question" | "answer") => {
+ const formData = new FormData();
+ formData.append("file", file);
+ formData.append("purpose", purpose);
+ const res = await axiosClient.post("/api/instructor/quiz-media", formData, {
+ headers: { "Content-Type": "multipart/form-data" },
+ });
+ return res.data.data;
+ },
+
  // Generate quiz questions via AI
  generateQuiz: async (config: QuizConfig) => {
  const payload = {
@@ -41,6 +52,8 @@ export const quizGeneratorApi = {
  quizData: {
  title: string;
  description?: string;
+ thumbnail_url?: string | null;
+ thumbnail_r2_key?: string | null;
  source_type?: string;
  source_content?: string;
  course_id?: number | null;
@@ -55,21 +68,30 @@ export const quizGeneratorApi = {
  ...quizData,
  questions: quizData.questions.map((q: any) => ({
  type: q.type === "trac_nghiem" ? "multiple_choice" : (q.type === "tu_luan" ? "essay" : q.type),
+ selection_type: q.selection_type || "single_choice",
  difficulty: q.difficulty || "medium",
  content: q.content || q.question || "",
+ image_url: q.image_url || null,
+ image_r2_key: q.image_r2_key || null,
  explanation: q.explanation || "",
  sample_answer: q.type === "essay" || q.type === "tu_luan" ? (q.sample_answer || "") : undefined,
  rubric: q.type === "essay" || q.type === "tu_luan" ? (q.rubric || "") : undefined,
  points: parseFloat(q.points) || 0,
  answers: (q.type === "multiple_choice" || q.type === "trac_nghiem") && Array.isArray(q.answers)
- ? q.answers.map((a: any) => ({
+ ? q.answers.map((a: any, idx: number) => ({
  content: a.content || a.text || "",
  is_correct: Boolean(a.is_correct),
+ image_url: a.image_url || q.answer_images?.[idx]?.url || null,
+ image_r2_key: a.image_r2_key || q.answer_images?.[idx]?.r2_key || null,
  }))
  : (q.type === "multiple_choice" || q.type === "trac_nghiem") && Array.isArray(q.options)
  ? q.options.map((opt: string, idx: number) => ({
  content: opt,
- is_correct: idx === q.correct_answer_index,
+ is_correct: q.selection_type === "multiple_choice"
+ ? (q.correct_answer_indices || []).includes(idx)
+ : idx === q.correct_answer_index,
+ image_url: q.answer_images?.[idx]?.url || null,
+ image_r2_key: q.answer_images?.[idx]?.r2_key || null,
  }))
  : undefined,
  })),
@@ -83,6 +105,8 @@ export const quizGeneratorApi = {
  saveQuiz: async (quizData: {
  title: string;
  description: string;
+ thumbnail_url?: string | null;
+ thumbnail_r2_key?: string | null;
  source_type: string;
  source_content: string;
  course_id?: number | null;
@@ -94,31 +118,7 @@ export const quizGeneratorApi = {
  }) => {
  const payload = {
  ...quizData,
- questions: quizData.questions.map((q: any) => {
- const isEssay = q.type === "essay" || q.type === "tu_luan";
- return {
- type: isEssay ? "essay" : "multiple_choice",
- difficulty: q.difficulty || "medium",
- content: q.question || q.content || "",
- explanation: q.explanation || "",
- sample_answer: isEssay ? (q.sample_answer || "") : undefined,
- rubric: isEssay ? (q.rubric || "") : undefined,
- points: parseFloat(q.points) || (isEssay ? 2.5 : 0.5),
- answers: !isEssay
- ? (Array.isArray(q.answers)
- ? q.answers.map((a: any) => ({
- content: a.content || a.text || "",
- is_correct: Boolean(a.is_correct),
- }))
- : (Array.isArray(q.options)
- ? q.options.map((opt: string, idx: number) => ({
- content: opt,
- is_correct: idx === q.correct_answer_index,
- }))
- : []))
- : undefined,
- };
- }),
+ questions: quizData.questions.map(serializeQuizQuestion),
  };
 
  const res = await axiosClient.post("/api/instructor/ai-quiz/store", payload);

@@ -19,7 +19,7 @@ export default function InstructorLayout({
  <InstructorSidebar />
  <div className="flex flex-col flex-1 overflow-hidden">
  <InstructorTopbar />
- <main className="flex-1 overflow-y-auto">{children}</main>
+ <main className="flex-1 overflow-y-auto pb-24">{children}</main>
  </div>
  <FloatingAiChat />
  </div>

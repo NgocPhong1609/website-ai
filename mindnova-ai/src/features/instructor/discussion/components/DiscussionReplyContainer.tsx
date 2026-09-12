@@ -185,7 +185,7 @@ export function DiscussionReplyContainer() {
  className={twMerge(
  "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer",
  filter === tab.id
- ? "bg-[#F8FAFC] text-white shadow-sm"
+ ? "bg-[#3B82F6] text-white shadow-sm"
  : "bg-white text-[#64748B] border border-[#E2E8F0] hover:bg-[#F8FAFC]"
  )}
  >
@@ -273,7 +273,7 @@ export function DiscussionReplyContainer() {
  onClick={() => toggleResolvedStatus(thread.id, thread.isResolved)}
  className={twMerge(
  "px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
- thread.isResolved ? "text-[#0F172A] text-white shadow-sm" : "bg-emerald-50 hover:bg-[#F8FAFC] text-[#0F172A] border-[#E2E8F0]"
+ thread.isResolved ? "bg-[#3B82F6] text-white shadow-sm" : "bg-emerald-50 hover:bg-[#EFF6FF] text-[#0F172A] border border-[#E2E8F0]"
  )}
  >
  {thread.isResolved ? " Đã phản hồi" : "️ Xác nhận đã phản hồi"}

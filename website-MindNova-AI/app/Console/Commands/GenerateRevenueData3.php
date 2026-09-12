@@ -2,41 +2,46 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\InstructorTransaction;
 use App\Models\ActivityLog;
-use App\Models\User;
 use App\Models\Course;
+use App\Models\Enrollment;
+use App\Models\InstructorTransaction;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Enrollment;
+use App\Models\User;
+use App\Services\CommissionService;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class GenerateRevenueData3 extends Command
 {
     protected $signature = 'demo:revenue3';
+
     protected $description = 'Generate complete revenue data for admin';
 
     public function handle()
     {
-        $this->info("Clearing old transactions and orders...");
-        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        $this->info('Clearing old transactions and orders...');
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         InstructorTransaction::truncate();
         ActivityLog::truncate();
         OrderItem::truncate();
         Order::truncate();
         Enrollment::truncate();
-        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $instructor = User::find(1);
-        if (!$instructor) {
-            $this->error("Instructor 1 not found.");
+        if (! $instructor) {
+            $this->error('Instructor 1 not found.');
+
             return;
         }
 
         $students = User::where('role', 'user')->get();
         if ($students->isEmpty()) {
-            $this->error("No students found.");
+            $this->error('No students found.');
+
             return;
         }
 
@@ -45,14 +50,15 @@ class GenerateRevenueData3 extends Command
         $courses = Course::where('teacher_id', $instructor->id)->get();
 
         if ($courses->isEmpty()) {
-            $this->error("No courses found.");
+            $this->error('No courses found.');
+
             return;
         }
 
         $startDate = Carbon::create(2026, 7, 21);
         $endDate = Carbon::create(2026, 8, 28);
 
-        $this->info("Generating correct data from " . $startDate->format('Y-m-d') . " to " . $endDate->format('Y-m-d') . "...");
+        $this->info('Generating correct data from '.$startDate->format('Y-m-d').' to '.$endDate->format('Y-m-d').'...');
 
         $currentDate = $startDate->copy();
 
@@ -63,7 +69,7 @@ class GenerateRevenueData3 extends Command
                 $student = $students->random();
                 $course = $courses->random();
                 $amount = $course->price > 0 ? $course->price : rand(5, 50) * 10000;
-                
+
                 $orderDate = $currentDate->copy()->addHours(rand(8, 22))->addMinutes(rand(0, 59));
 
                 $order = Order::create([
@@ -92,8 +98,9 @@ class GenerateRevenueData3 extends Command
                     'created_at' => $orderDate,
                     'updated_at' => $orderDate,
                 ]);
-                
-                $instructorAmount = $amount * 0.7; // 70% share
+
+                $instructorAmount = app(CommissionService::class)
+                    ->quote($course->partnership_tier ?? 'standard', $amount)['instructor_amount'];
 
                 InstructorTransaction::create([
                     'instructor_id' => $instructor->id,
@@ -112,7 +119,8 @@ class GenerateRevenueData3 extends Command
                 $student = $students->random();
                 $course = $courses->random();
                 $amount = $course->price > 0 ? $course->price : rand(5, 50) * 10000;
-                $refundAmount = $amount * 0.7;
+                $refundAmount = app(CommissionService::class)
+                    ->quote($course->partnership_tier ?? 'standard', $amount)['instructor_amount'];
                 $refundDate = $currentDate->copy()->addHours(rand(8, 22))->addMinutes(rand(0, 59));
 
                 // We need an order item to link to
@@ -159,7 +167,7 @@ class GenerateRevenueData3 extends Command
                     'updated_at' => $currentDate->copy()->addHours(rand(7, 23))->addMinutes(rand(0, 59)),
                 ]);
             }
-            
+
             // Add some views to the courses
             $course = $courses->random();
             $course->views_count = $course->views_count + rand(10, 50);
@@ -168,6 +176,6 @@ class GenerateRevenueData3 extends Command
             $currentDate->addDay();
         }
 
-        $this->info("Fake revenue and engagement data generated successfully!");
+        $this->info('Fake revenue and engagement data generated successfully!');
     }
 }

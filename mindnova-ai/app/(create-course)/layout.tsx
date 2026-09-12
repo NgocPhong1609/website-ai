@@ -14,7 +14,7 @@ export default function CreateCourseLayout({
  return (
  <div className="min-h-screen bg-[#F8F8FD] flex flex-col">
  <CreateCourseTopbar />
- <main className="flex-1">{children}</main>
+ <main className="flex-1 pb-24">{children}</main>
  <FloatingAiChat />
  </div>
  );

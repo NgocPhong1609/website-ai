@@ -497,21 +497,32 @@ class OrderController extends Controller
                 
                 $course = $item->course;
                 if ($course && $course->teacher_id) {
-                    $grossAmount = (float) $item->price;
-                    $commissionRate = 0.10;
-                    $teacherAmount = round($grossAmount - ($grossAmount * $commissionRate), 2);
-                    
-                    \App\Models\InstructorTransaction::create([
-                        'instructor_id' => $course->teacher_id,
-                        'type' => 'refund',
-                        'amount' => $teacherAmount,
-                        'status' => 'completed',
-                        'reference_type' => 'App\Models\OrderItem',
-                        'reference_id' => $item->id,
-                        'description' => 'Hoàn tiền cho khóa học: ' . $course->title,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
+                    $allocation = $this->allocationSnapshot($order->id, $course->id, $item->id);
+                    $teacherAmount = $allocation?->instructor_amount;
+
+                    if ($allocation) {
+                        $allocation->update(['status' => 'REFUNDED', 'refunded_at' => now()]);
+                    }
+
+                    if ($teacherAmount === null) {
+                        $teacherAmount = \App\Models\TeacherPayout::where('order_id', $order->id)
+                            ->where('course_id', $course->id)
+                            ->value('teacher_amount');
+                    }
+
+                    if ($teacherAmount !== null) {
+                        \App\Models\InstructorTransaction::create([
+                            'instructor_id' => $course->teacher_id,
+                            'type' => 'refund',
+                            'amount' => (float) $teacherAmount,
+                            'status' => 'completed',
+                            'reference_type' => 'App\Models\OrderItem',
+                            'reference_id' => $item->id,
+                            'description' => 'Hoàn tiền cho khóa học: ' . $course->title,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
                     
                     \App\Models\TeacherPayout::where('order_id', $order->id)->where('course_id', $course->id)->update(['status' => 'refunded']);
                 }
@@ -686,34 +697,37 @@ class OrderController extends Controller
             // Record instructor refund transaction
             if ($course->teacher_id) {
                 $orderItem = OrderItem::where('order_id', $order->id)->where('course_id', $course->id)->first();
-                $itemPrice = $orderItem ? (float)$orderItem->price : (float)$course->price;
-                $commissionRate = ($course->partnership_tier === 'exclusive') ? 0.15 : 0.30;
-                $teacherAmount = round($itemPrice * (1 - $commissionRate), 2);
-
                 // Update RevenueAllocation to REFUNDED
-                $allocation = \App\Models\RevenueAllocation::where('order_id', $order->id)
-                    ->where('course_id', $course->id)
-                    ->first();
+                $allocation = $this->allocationSnapshot($order->id, $course->id, $orderItem?->id);
+
+                $teacherAmount = $allocation?->instructor_amount;
 
                 if ($allocation) {
                     $allocation->update([
                         'status' => 'REFUNDED',
                         'refunded_at' => now(),
                     ]);
-                    $teacherAmount = (float) $allocation->instructor_amount;
                 }
 
-                \App\Models\InstructorTransaction::create([
-                    'instructor_id' => $course->teacher_id,
-                    'type' => 'refund',
-                    'amount' => $teacherAmount,
-                    'status' => 'completed',
-                    'reference_type' => 'App\Models\OrderItem',
-                    'reference_id' => $orderItem ? $orderItem->id : $course->id,
-                    'description' => 'Hoàn tiền cho khóa học: ' . $course->title,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                if ($teacherAmount === null) {
+                    $teacherAmount = \App\Models\TeacherPayout::where('order_id', $order->id)
+                        ->where('course_id', $course->id)
+                        ->value('teacher_amount');
+                }
+
+                if ($teacherAmount !== null) {
+                    \App\Models\InstructorTransaction::create([
+                        'instructor_id' => $course->teacher_id,
+                        'type' => 'refund',
+                        'amount' => (float) $teacherAmount,
+                        'status' => 'completed',
+                        'reference_type' => 'App\Models\OrderItem',
+                        'reference_id' => $orderItem ? $orderItem->id : $course->id,
+                        'description' => 'Hoàn tiền cho khóa học: ' . $course->title,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
 
                 \App\Models\TeacherPayout::where('order_id', $order->id)->where('course_id', $course->id)->update(['status' => 'refunded']);
             }
@@ -735,5 +749,24 @@ class OrderController extends Controller
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Lỗi khi xử lý hoàn tiền: ' . $e->getMessage()], 500);
         }
+    }
+
+    private function allocationSnapshot(int $orderId, int $courseId, ?int $orderItemId): ?\App\Models\RevenueAllocation
+    {
+        if ($orderItemId !== null) {
+            $exact = \App\Models\RevenueAllocation::where('order_id', $orderId)
+                ->where('course_id', $courseId)
+                ->where('order_item_id', $orderItemId)
+                ->first();
+
+            if ($exact !== null) {
+                return $exact;
+            }
+        }
+
+        return \App\Models\RevenueAllocation::where('order_id', $orderId)
+            ->where('course_id', $courseId)
+            ->whereNull('order_item_id')
+            ->first();
     }
 }

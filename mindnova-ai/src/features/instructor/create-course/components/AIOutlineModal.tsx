@@ -62,7 +62,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  <div className="bg-white rounded-3xl border border-[#E2E8F0] shadow-[0_25px_80px_rgba(0,0,0,0.25)] max-w-3xl w-full overflow-hidden flex flex-col max-h-[90vh]">
  
  {/* Header */}
- <div className="p-6 from-[#0F172A] to-[#2B2D62] text-white flex items-center justify-between">
+ <div className="p-6 bg-gradient-to-r from-[#0F172A] to-[#1D4ED8] text-white flex items-center justify-between">
  <div className="flex items-center gap-3">
  <span className="w-10 h-10 rounded-2xl bg-[#F8FAFC] text-[#3B82F6] flex items-center justify-center shadow-md">
  <SparklesIcon size={20} />
@@ -234,7 +234,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  "text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0",
  lesson.type === "quiz"
  ? "bg-amber-100 text-amber-700"
- : "text-[#F8FAFC] text-[#3B82F6]"
+ : "bg-[#EFF6FF] text-[#3B82F6]"
  )}>
  {lesson.type === "quiz" ? "Trắc nghiệm" : "Tài liệu"}
  </span>

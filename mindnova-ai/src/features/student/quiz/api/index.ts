@@ -10,6 +10,7 @@ export interface StudentAnswer {
 export interface StudentQuestion {
  id: string | number;
  type?: 'multiple_choice' | 'essay';
+ selection_type?: 'single_choice' | 'multiple_choice';
  content: string;
  points?: number;
  rubric?: string;
@@ -84,7 +85,7 @@ export function useSubmitQuiz() {
  lessonId?: string | number;
  courseId?: string | number;
  quizType?: string;
- answers: Record<string, number | string>;
+ answers: Record<string, number | string | number[]>;
  time_taken_seconds: number;
  }): Promise<QuizGradingResult> => {
  const endpoint = (courseId && quizType)
@@ -104,4 +105,3 @@ export function useSubmitQuiz() {
 }
 
 export * from "../types";
-

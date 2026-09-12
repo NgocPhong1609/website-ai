@@ -383,7 +383,7 @@ export function QuizResultContent() {
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 sm:p-6 animate-fadeIn">
  <div className="bg-white w-full max-w-4xl rounded-3xl border border-[#e2e8f0] shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-scaleUp">
  
- <div className="p-6 from-[#eff6ff] via-[#F3F4FC] to-[#EAF8F5] border-b border-[#e2e8f0] flex items-center justify-between shrink-0">
+ <div className="p-6 bg-gradient-to-r from-[#eff6ff] via-[#F3F4FC] to-[#EAF8F5] border-b border-[#e2e8f0] flex items-center justify-between shrink-0">
  <div className="space-y-1">
  <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-white text-xs font-semibold text-[#2563eb] border border-[#2563eb]/20">
  <span> Soát Lỗi Chi Tiết từ Gia Sư AI Nova</span>
@@ -447,6 +447,13 @@ export function QuizResultContent() {
  <h4 className="text-sm sm:text-base font-semibold text-[#0f172a] leading-relaxed">
  {item.content}
  </h4>
+ {item.image_url && (
+ <img
+ src={item.image_url}
+ alt={`Hình minh họa câu hỏi: ${item.content}`}
+ className="max-h-72 w-full rounded-xl border border-[#E2E8F0] bg-white object-contain"
+ />
+ )}
 
  {item.type === 'essay' ? (
  <div className="space-y-3 pt-1">
@@ -469,7 +476,7 @@ export function QuizResultContent() {
  </div>
  )}
 
- <div className="p-4 rounded-xl from-[#eff6ff]/80 via-[#F3F4FC] to-[#EAF8F5]/80 border border-[#2563eb]/20 space-y-2">
+ <div className="p-4 rounded-xl bg-gradient-to-r from-[#eff6ff]/80 via-[#F3F4FC] to-[#EAF8F5]/80 border border-[#2563eb]/20 space-y-2">
  <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563eb] flex items-center gap-1.5">
  <span> Nhận xét đánh giá từ Gia sư AI MindNova:</span>
  </span>
@@ -502,6 +509,52 @@ export function QuizResultContent() {
  </div>
  ) : (
  <div className="space-y-3 pt-1">
+ {item.selection_type === 'multiple_choice' && item.answer_options ? (
+ <div className="space-y-2">
+ {item.answer_options.map((answer) => {
+ const isSelected = item.selected_answer_ids?.includes(answer.id) ?? false;
+ const isCorrectAnswer = item.correct_answer_ids?.includes(answer.id) ?? false;
+ const state = isSelected && isCorrectAnswer
+ ? 'selected-correct'
+ : isSelected
+ ? 'selected-incorrect'
+ : isCorrectAnswer
+ ? 'missed-correct'
+ : 'neutral';
+ const style = state === 'selected-correct'
+ ? 'bg-[#ECFDF5] border-[#10B981]/30 text-[#0F172A]'
+ : state === 'selected-incorrect'
+ ? 'bg-rose-50 border-rose-200 text-rose-700'
+ : state === 'missed-correct'
+ ? 'bg-[#FFFBEB] border-[#F59E0B]/30 text-[#92400E]'
+ : 'bg-[#F8FAFC] border-[#E2E8F0] text-[#94A3B8]';
+ const label = state === 'selected-correct'
+ ? 'Đã chọn · đúng'
+ : state === 'selected-incorrect'
+ ? 'Đã chọn · chưa đúng'
+ : state === 'missed-correct'
+ ? 'Đáp án đúng bị bỏ lỡ'
+ : '';
+
+ return (
+ <div key={answer.id} data-answer-state={state} className={`p-3.5 rounded-xl border text-xs sm:text-sm flex items-center justify-between ${style}`}>
+ <span className="flex-1">
+ {answer.content}
+ {answer.image_url && (
+ <img
+ src={answer.image_url}
+ alt={`Hình minh họa đáp án: ${answer.content}`}
+ className="mt-2 max-h-40 w-full rounded-lg border border-current/15 bg-white object-contain"
+ />
+ )}
+ </span>
+ {label && <span className="text-[11px] font-semibold">{label}</span>}
+ </div>
+ );
+ })}
+ </div>
+ ) : (
+ <>
  <div className={`p-3.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center gap-2 ${
  item.is_correct 
  ? "bg-[#EAF8F5] border-[#0f172a]/20 text-[#0f172a]" 
@@ -517,6 +570,20 @@ export function QuizResultContent() {
  <div className="p-3.5 rounded-xl bg-[#EAF8F5] border border-[#0f172a]/20 text-xs sm:text-sm font-semibold text-[#0f172a]">
  <span>Đáp án chuẩn xác từ CSDL: {item.correct_answer}</span>
  </div>
+ )}
+ {item.answer_options
+ ?.filter((answer) => answer.image_url && (
+ answer.content === item.user_answer_text || answer.content === item.correct_answer
+ ))
+ .map((answer) => (
+ <img
+ key={answer.id}
+ src={answer.image_url || undefined}
+ alt={`Hình minh họa đáp án: ${answer.content}`}
+ className="max-h-40 w-full rounded-lg border border-[#E2E8F0] bg-white object-contain"
+ />
+ ))}
+ </>
  )}
 
  <div className="bg-[#F8FAFC] p-4 rounded-xl border border-[#e2e8f0] space-y-1.5">

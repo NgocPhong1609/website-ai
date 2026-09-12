@@ -13,6 +13,8 @@ class Quiz extends Model
         'lesson_id',
         'title',
         'description',
+        'thumbnail_url',
+        'thumbnail_r2_key',
         'source_type',
         'source_content',
         'type', // normal, capability_assessment

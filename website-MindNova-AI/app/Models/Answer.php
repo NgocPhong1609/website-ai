@@ -10,6 +10,8 @@ class Answer extends Model
     protected $fillable = [
         'question_id',
         'content',
+        'image_url',
+        'image_r2_key',
         'is_correct',
     ];
 

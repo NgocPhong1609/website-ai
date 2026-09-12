@@ -247,7 +247,7 @@ export function AdminUsersManagementPage() {
 
  <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Theo dõi hoạt động người dùng</h3>
- {!activity && <p className="mt-3 text-sm text-slate-500">Chọn "Lịch sử" ở bảng bên trái để xem chi tiết.</p>}
+ {!activity && <p className="mt-3 text-sm text-slate-500">Chọn &quot;Lịch sử&quot; ở bảng bên trái để xem chi tiết.</p>}
 
  {activity && (
  <div className="mt-3 space-y-3 text-sm text-slate-700">

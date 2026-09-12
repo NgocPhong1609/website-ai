@@ -23,6 +23,24 @@ export interface CourseHealthReport {
  issues: CourseHealthIssue[];
 }
 
+export interface CommissionTierDefinition {
+ tier: string;
+ label: string;
+ platform_commission_percent: number;
+ instructor_percent: number;
+}
+
+export function useCommissionTiers() {
+ return useQuery({
+ queryKey: ["instructor", "commission-tiers"],
+ queryFn: async () => {
+ const { data } = await axiosClient.get("/api/instructor/commission-tiers");
+ return data.data as CommissionTierDefinition[];
+ },
+ staleTime: 60_000,
+ });
+}
+
 export function useCourseHealth(courseId: string, enabled = true) {
  return useQuery({
  queryKey: ["instructor", "course", courseId, "health"],
@@ -93,7 +111,7 @@ export function useUpdateCoursePrice() {
     }: { 
       courseId: string; 
       price: number;
-      partnership_tier?: "standard" | "exclusive";
+      partnership_tier?: string;
       is_flash_sale?: boolean;
       sale_price?: number;
       sale_start_date?: string;

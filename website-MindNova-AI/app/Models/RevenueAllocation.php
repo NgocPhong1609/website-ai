@@ -16,6 +16,7 @@ class RevenueAllocation extends Model
         'course_id',
         'student_id',
         'instructor_id',
+        'partnership_tier',
         'original_price',
         'discount_amount',
         'paid_amount',

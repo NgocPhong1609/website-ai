@@ -132,7 +132,7 @@ function StatCards({ data }: { data: any }) {
 function AIForecastSection({ onClose, forecast }: { onClose: () => void; forecast: any }) {
  return (
  <div className="p-6 rounded-2xl bg-white border-[#E2E8F0] shadow-sm flex flex-col gap-5 animate-fadeIn">
- <div className="flex items-center justify-between border-b text-[#F8FAFC] pb-4">
+ <div className="flex items-center justify-between border-b border-[#E2E8F0] text-[#0F172A] pb-4">
  <div className="flex items-center gap-3">
  
  <div>
@@ -248,10 +248,10 @@ function RevenueChart({ chartData }: { chartData: any[] }) {
 
 function RecentTransactions({ transactions }: { transactions: any[] }) {
  const getStatusStyle = (status: string, type: string) => {
- if (type === "withdrawal") return "text-[#3B82F6] bg-blue-50 text-[#F8FAFC]";
+ if (type === "withdrawal") return "text-[#3B82F6] bg-blue-50";
  if (type === "refund") return "text-rose-700 bg-rose-50 border-rose-200";
  if (status === "escrow") return "text-amber-700 bg-amber-50 border-amber-200";
- if (status === "available" || status === "completed") return "text-[#0F172A] bg-emerald-50 text-[#F8FAFC]";
+ if (status === "available" || status === "completed") return "text-[#047857] bg-emerald-50";
  return "text-gray-700 bg-[#F8FAFC] border-[#E2E8F0]";
  };
 

@@ -15,6 +15,7 @@ class GeminiAiServiceTest extends TestCase
 
     public function test_gemini_service_sends_correct_payload_and_logs_usage()
     {
+        config(['services.gemini.api_key' => 'fake-gemini-key']);
         $user = User::factory()->create();
 
         // Fake Http response
@@ -24,27 +25,27 @@ class GeminiAiServiceTest extends TestCase
                     [
                         'content' => [
                             'parts' => [
-                                ['text' => 'This is a mocked Gemini response']
-                            ]
-                        ]
-                    ]
+                                ['text' => 'This is a mocked Gemini response'],
+                            ],
+                        ],
+                    ],
                 ],
                 'usageMetadata' => [
                     'promptTokenCount' => 15,
-                    'candidatesTokenCount' => 25
-                ]
-            ], 200)
+                    'candidatesTokenCount' => 25,
+                ],
+            ], 200),
         ]);
 
-        $service = new GeminiAiService();
+        $service = new GeminiAiService;
         $messages = [
             new AiMessageDto('system', 'You are a helpful tutor.'),
-            new AiMessageDto('user', 'Hello Gemini!')
+            new AiMessageDto('user', 'Hello Gemini!'),
         ];
 
         $response = $service->sendMessage($messages, [
             'user_id' => $user->id,
-            'feature' => 'tutor_test'
+            'feature' => 'tutor_test',
         ]);
 
         $this->assertEquals('This is a mocked Gemini response', $response);
@@ -52,6 +53,7 @@ class GeminiAiServiceTest extends TestCase
         // Assert request payload
         Http::assertSent(function ($request) {
             $payload = $request->data();
+
             return isset($payload['systemInstruction']) &&
                    $payload['systemInstruction']['parts'][0]['text'] === 'You are a helpful tutor.' &&
                    $payload['contents'][0]['role'] === 'user' &&
@@ -62,10 +64,10 @@ class GeminiAiServiceTest extends TestCase
         $this->assertDatabaseHas('ai_usage_logs', [
             'user_id' => $user->id,
             'provider' => 'gemini',
-            'feature' => 'tutor_test',
-            'prompt_tokens' => 15,
-            'completion_tokens' => 25,
-            'total_tokens' => 40
+            'meta->feature' => 'tutor_test',
+            'input_tokens' => 15,
+            'output_tokens' => 25,
+            'token_source' => 'provider',
         ]);
     }
 }

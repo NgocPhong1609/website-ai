@@ -8,6 +8,8 @@ import { twMerge } from "tailwind-merge";
 import { useUploadTempMedia, useDeleteTempMedia } from "../api";
 import { getEmbedUrl } from "../../shared/utils/videoHelpers";
 import type { DraftQuizData } from "../../create-course/types";
+import { LessonAttachments } from "./LessonAttachments";
+import type { LessonAttachment } from "../api";
 
 interface LessonEditModalProps {
  lesson: {
@@ -18,6 +20,7 @@ interface LessonEditModalProps {
  content?: string;
  video_url?: string;
  quizData?: DraftQuizData;
+ attachments?: LessonAttachment[];
  };
  onSave: (id: string, updates: any) => Promise<void> | void;
  onClose: () => void;
@@ -394,6 +397,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  onVideoUpload={handleVideoUpload}
  onImageUpload={handleImageUpload}
  />
+ <LessonAttachments lessonId={lesson.id} initialAttachments={lesson.attachments ?? []} />
  </>
  )}
  </div>

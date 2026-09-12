@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { GeneratedQuestion } from "../types/quizGenerator.types";
+import { GeneratedQuestion, SelectionType } from "../types/quizGenerator.types";
+import { QuizImageField } from "./QuizImageField";
 
 interface QuestionCardMultipleChoiceProps {
  question: GeneratedQuestion;
@@ -22,22 +23,67 @@ export function QuestionCardMultipleChoice({
 }: QuestionCardMultipleChoiceProps) {
  const [isEditing, setIsEditing] = useState(false);
  const [draftQ, setDraftQ] = useState(question.question);
+ const [draftQuestionImage, setDraftQuestionImage] = useState({ url: question.image_url || null, r2_key: question.image_r2_key || null });
  const [draftOptions, setDraftOptions] = useState<string[]>([...question.options]);
- const [draftCorrectIndex, setDraftCorrectIndex] = useState<number>(question.correct_answer_index ?? 0);
+ const [draftSelectionType, setDraftSelectionType] = useState<SelectionType>(question.selection_type ?? "single_choice");
+ const [draftCorrectIndices, setDraftCorrectIndices] = useState<number[]>(
+ question.correct_answer_indices?.length
+ ? [...question.correct_answer_indices]
+ : [question.correct_answer_index ?? 0],
+ );
  const [draftExplanation, setDraftExplanation] = useState(question.explanation);
+ const [draftAnswerImages, setDraftAnswerImages] = useState(
+ question.options.map((_, index) => question.answer_images?.[index] || { url: null, r2_key: null }),
+ );
  const [draftPoints, setDraftPoints] = useState(question.points);
+ const [validationError, setValidationError] = useState<string | null>(null);
 
  const isApproved = question.reviewStatus === "approved" || question.reviewStatus === "edited";
 
  const handleSaveEdit = () => {
+ const requiredCorrectCount = draftSelectionType === "multiple_choice" ? 2 : 1;
+ if (draftCorrectIndices.length < requiredCorrectCount) {
+ setValidationError(
+ draftSelectionType === "multiple_choice"
+ ? "Câu hỏi nhiều đáp án cần ít nhất 2 đáp án đúng."
+ : "Câu hỏi một đáp án cần đúng 1 đáp án đúng.",
+ );
+ return;
+ }
  onUpdate(question.id, {
  question: draftQ,
+ image_url: draftQuestionImage.url,
+ image_r2_key: draftQuestionImage.r2_key,
  options: draftOptions,
- correct_answer_index: draftCorrectIndex,
+ selection_type: draftSelectionType,
+ correct_answer_index: draftCorrectIndices[0] ?? 0,
+ correct_answer_indices: draftCorrectIndices,
+ answer_images: draftAnswerImages,
  explanation: draftExplanation,
  points: draftPoints,
  });
+ setValidationError(null);
  setIsEditing(false);
+ };
+
+ const handleSelectionTypeChange = (selectionType: SelectionType) => {
+ if (selectionType === "single_choice" && draftCorrectIndices.length > 1) {
+ setValidationError("Hãy chỉ giữ lại một đáp án đúng trước khi chuyển sang chế độ một đáp án.");
+ return;
+ }
+ setDraftSelectionType(selectionType);
+ setValidationError(null);
+ };
+
+ const toggleCorrectAnswer = (optionIndex: number) => {
+ if (draftSelectionType === "single_choice") {
+ setDraftCorrectIndices([optionIndex]);
+ return;
+ }
+
+ setDraftCorrectIndices((current) => current.includes(optionIndex)
+ ? current.filter((index) => index !== optionIndex)
+ : [...current, optionIndex].sort((a, b) => a - b));
  };
 
  return (
@@ -107,6 +153,30 @@ export function QuestionCardMultipleChoice({
  {/* Question Body */}
  {isEditing ? (
  <div className="flex flex-col gap-4 pt-2">
+ <fieldset className="flex flex-wrap items-center gap-4 rounded-xl border border-[#E2E8F0] p-3">
+ <legend className="px-1 text-xs font-bold text-gray-700">Số đáp án đúng</legend>
+ <label className="flex items-center gap-2 text-xs font-semibold">
+ <input
+ type="radio"
+ aria-label="Chế độ một đáp án đúng"
+ checked={draftSelectionType === "single_choice"}
+ onChange={() => handleSelectionTypeChange("single_choice")}
+ />
+ Một đáp án đúng
+ </label>
+ <label className="flex items-center gap-2 text-xs font-semibold">
+ <input
+ type="radio"
+ aria-label="Chế độ nhiều đáp án đúng"
+ checked={draftSelectionType === "multiple_choice"}
+ onChange={() => handleSelectionTypeChange("multiple_choice")}
+ />
+ Nhiều đáp án đúng
+ </label>
+ </fieldset>
+
+ {validationError && <p className="text-xs font-semibold text-red-600">{validationError}</p>}
+
  <div>
  <label className="block text-xs font-bold text-gray-700 mb-1">Nội dung câu hỏi</label>
  <textarea
@@ -117,15 +187,25 @@ export function QuestionCardMultipleChoice({
  />
  </div>
 
+ <QuizImageField
+ label="Ảnh câu hỏi"
+ purpose="question"
+ value={draftQuestionImage}
+ onChange={setDraftQuestionImage}
+ />
+
  <div className="flex flex-col gap-2">
- <label className="block text-xs font-bold text-gray-700">Các đáp án (Chọn radio để đánh dấu đáp án ĐÚNG)</label>
+ <label className="block text-xs font-bold text-gray-700">
+ Các đáp án ({draftSelectionType === "multiple_choice" ? "chọn ít nhất 2 đáp án đúng" : "chọn 1 đáp án đúng"})
+ </label>
  {draftOptions.map((opt, oIdx) => (
  <div key={oIdx} className="flex items-center gap-2">
  <input
- type="radio"
+ type={draftSelectionType === "multiple_choice" ? "checkbox" : "radio"}
+ aria-label={`Đáp án đúng ${String.fromCharCode(65 + oIdx)}`}
  name={`correct_${question.id}`}
- checked={draftCorrectIndex === oIdx}
- onChange={() => setDraftCorrectIndex(oIdx)}
+ checked={draftCorrectIndices.includes(oIdx)}
+ onChange={() => toggleCorrectAnswer(oIdx)}
  className="w-4 h-4 text-[#0F172A] cursor-pointer"
  />
  <span className="font-bold text-xs w-6">{String.fromCharCode(65 + oIdx)}.</span>
@@ -138,9 +218,17 @@ export function QuestionCardMultipleChoice({
  setDraftOptions(newOpts);
  }}
  className={`w-full p-2.5 rounded-xl border text-xs font-medium ${
- draftCorrectIndex === oIdx ? "text-[#0F172A] bg-emerald-50/50 font-bold text-[#0F172A]" : "border-[#E2E8F0]"
+ draftCorrectIndices.includes(oIdx) ? "text-[#0F172A] bg-emerald-50/50 font-bold border-[#3B82F6]" : "border-[#E2E8F0]"
  }`}
  />
+ <div className="w-full">
+ <QuizImageField
+ label={`Ảnh đáp án ${String.fromCharCode(65 + oIdx)}`}
+ purpose="answer"
+ value={draftAnswerImages[oIdx] || { url: null, r2_key: null }}
+ onChange={(image) => setDraftAnswerImages((current) => current.map((value, index) => index === oIdx ? image : value))}
+ />
+ </div>
  </div>
  ))}
  </div>
@@ -176,10 +264,14 @@ export function QuestionCardMultipleChoice({
  <h4 className="text-base font-extrabold text-[#0F172A] leading-snug">
  {question.question}
  </h4>
+ {question.image_url && <img src={question.image_url} alt={`Ảnh câu hỏi ${index + 1}`} className="max-h-64 rounded-xl border object-contain" />}
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
  {question.options.map((opt, oIdx) => {
- const isCorrect = oIdx === question.correct_answer_index;
+ const correctIndices = question.correct_answer_indices?.length
+ ? question.correct_answer_indices
+ : [question.correct_answer_index ?? 0];
+ const isCorrect = correctIndices.includes(oIdx);
  return (
  <div
  key={oIdx}
@@ -197,6 +289,7 @@ export function QuestionCardMultipleChoice({
  {String.fromCharCode(65 + oIdx)}
  </span>
  <span>{opt}</span>
+ {question.answer_images?.[oIdx]?.url && <img src={question.answer_images[oIdx].url!} alt={`Ảnh đáp án ${String.fromCharCode(65 + oIdx)}`} className="h-16 w-20 rounded-lg object-contain" />}
  {isCorrect && <span className="ml-auto text-[#0F172A] font-extrabold text-xs"> Đáp án đúng</span>}
  </div>
  );

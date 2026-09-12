@@ -73,3 +73,36 @@ describe("admin lucide migration", () => {
     expect(sidebar).not.toMatch(/icon: ["'][⌂◌❖◫◈◍▣⬟✦⚑]/);
   });
 });
+
+describe("light-theme contrast", () => {
+  it("does not remap --foreground to a light color when the OS prefers dark", () => {
+    const css = readFileSync(join(APP_ROOT, "src/shared/styles/globals.css"), "utf8");
+    expect(css).not.toMatch(
+      /prefers-color-scheme:\s*dark[\s\S]{0,240}--foreground:\s*#f8fafc/i,
+    );
+  });
+
+  it("does not pair white labels with the page-background slate", () => {
+    const files = walkSourceFiles(join(APP_ROOT, "src")).concat(
+      walkSourceFiles(join(APP_ROOT, "app")),
+    );
+    const hits: string[] = [];
+    const quoted = /"[^"\n]*"/g;
+
+    for (const file of files) {
+      const text = readFileSync(file, "utf8");
+      const classStrings = text.match(quoted) ?? [];
+      const broken = classStrings.some((value) => {
+        const rest = value
+          .replaceAll("group-hover:text-white", "")
+          .replaceAll("hover:text-white", "")
+          .replaceAll("group-hover:bg-[#F8FAFC]", "")
+          .replaceAll("hover:bg-[#F8FAFC]", "");
+        return rest.includes("bg-[#F8FAFC]") && /(?<![\w-])text-white/.test(rest);
+      });
+      if (broken) hits.push(relative(APP_ROOT, file));
+    }
+
+    expect(hits).toEqual([]);
+  });
+});

@@ -51,6 +51,7 @@ use App\Http\Controllers\Api\Instructor\CourseController;
 use App\Http\Controllers\Api\Instructor\CourseModuleController;
 use App\Http\Controllers\Api\Instructor\LessonController;
 use App\Http\Controllers\Api\Instructor\MediaController;
+use App\Http\Controllers\Api\Instructor\QuizMediaController;
 use App\Http\Controllers\Api\Instructor\QuizController;
 use App\Http\Controllers\Api\Instructor\StudentController as InstructorStudentController;
 use App\Http\Controllers\Api\Instructor\DiscussionController as InstructorDiscussionController;
@@ -103,7 +104,6 @@ Route::prefix('student')->group(function () {
     Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
     Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
     Route::get('/courses/{course}/reviews', [StudentReviewController::class, 'index']);
-    Route::post('/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:10,1');
     Route::post('/onboarding', [OnboardingController::class, 'store']);
     Route::get('/available-topics', [OnboardingController::class, 'getAvailableTopics']);
     Route::post('/analyze-lesson', [AnalyzeLessonController::class, 'analyze']);
@@ -157,6 +157,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // 3. NHÓM API HỌC SINH (Student Authenticated Actions)
     // ==========================================
     Route::prefix('student')->group(function () {
+        Route::post('/study-plan/chat', [StudentStudyPlanController::class, 'chat'])
+            ->middleware('throttle:10,1');
+
         // Dashboard
         Route::get('/dashboard', [StudentDashboardController::class, 'overview']);
 
@@ -187,6 +190,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Lesson — Video URL, Hoàn thành, Kiểm tra đáp án Quiz
         Route::get('lessons/{lesson}/video-url', [StudentLessonController::class, 'videoUrl']);
+        Route::get('lessons/{lesson}/attachments/{attachment}/download', [StudentLessonController::class, 'attachmentDownloadUrl']);
         Route::post('lessons/{lesson}/complete', [StudentLessonController::class, 'complete']);
         Route::post('lessons/{lesson}/quiz/check-answer', [StudentLessonController::class, 'checkAnswer']);
 
@@ -207,6 +211,7 @@ Route::middleware('auth:sanctum')->group(function () {
 // 4. NHÓM API GIÁO VIÊN (Dành cho Teacher)
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group(function () {
+    Route::get('commission-tiers', [CourseController::class, 'commissionTiers']);
 
     // Khóa học
     Route::apiResource('courses', CourseController::class);
@@ -236,9 +241,14 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::post('lessons/{lesson}/video', [LessonController::class, 'uploadVideo']);
     Route::get('lessons/{lesson}/video-url', [LessonController::class, 'getVideoUrl']);
     Route::post('lessons/{lesson}/content-media', [LessonController::class, 'uploadContentMedia']);
+    Route::post('lessons/{lesson}/attachments', [LessonController::class, 'uploadAttachments']);
+    Route::patch('lessons/{lesson}/attachments/{attachment}', [LessonController::class, 'renameAttachment']);
+    Route::delete('lessons/{lesson}/attachments/{attachment}', [LessonController::class, 'deleteAttachment']);
+    Route::get('lessons/{lesson}/attachments/{attachment}/download', [LessonController::class, 'attachmentDownloadUrl']);
 
     // Temporary Media
     Route::post('media/temp', [MediaController::class, 'uploadTemp']);
+    Route::post('quiz-media', [QuizMediaController::class, 'store']);
     Route::delete('media/temp/{media}', [MediaController::class, 'deleteTemp']);
 
     // Quiz (Instructor CRUD)
@@ -327,6 +337,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
 // 5. NHÓM API QUẢN TRỊ (Dành riêng cho Admin)
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/overview', [AdminDashboardController::class, 'overview']);
 
     // 1) User management & Teacher Verification Review
     Route::get('/users', [AdminUserManagementController::class, 'index']);
@@ -366,6 +377,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     // 4) Analytics and reports
     Route::get('/analytics/dashboard', [AdminAnalyticsController::class, 'dashboard']);
     Route::get('/revenue', [AdminDashboardController::class, 'revenue']);
+    Route::put('/revenue/commission-tiers', [AdminDashboardController::class, 'updateCommissionTiers']);
 
     // 4.5) Coupons
     Route::apiResource('/coupons', AdminCouponController::class);

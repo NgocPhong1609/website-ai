@@ -12,6 +12,12 @@ interface QuizQuestionScreenProps {
   courseTitle?: string;
 }
 
+type AnswerValue = string | number[];
+
+const hasAnswer = (answer: AnswerValue | undefined) => Array.isArray(answer)
+  ? answer.length > 0
+  : answer != null && answer.trim() !== "";
+
 export function QuizQuestionScreen({
   lessonId: propLessonId,
   courseTitle = "Chuyên đề Kỹ thuật AI & Fullstack",
@@ -44,13 +50,13 @@ export function QuizQuestionScreen({
   const [isSubmittingAi, setIsSubmittingAi] = useState<boolean>(false);
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answers, setAnswers] = useState<Record<string, AnswerValue>>({});
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [errorNotice, setErrorNotice] = useState<string | null>(null);
 
   const isFinishedRef = useRef(false);
-  const answersRef = useRef<Record<string, string>>({});
+  const answersRef = useRef<Record<string, AnswerValue>>({});
   answersRef.current = answers;
 
   const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/api\/?$/, "");
@@ -78,6 +84,7 @@ export function QuizQuestionScreen({
           return {
             id: String(q.id || idx + 1),
             type,
+            selection_type: q.selection_type || "single_choice",
             content: q.question,
             rubric: q.rubric || null,
             answers: (q.options || []).map((opt: string) => {
@@ -144,7 +151,7 @@ export function QuizQuestionScreen({
   }, [quiz, isFinished, quizStorageId]);
 
   // 3. Hàm nộp bài tập trung
-  const handleSubmit = useCallback(async (finalAnswers: Record<string, string> = answersRef.current) => {
+  const handleSubmit = useCallback(async (finalAnswers: Record<string, AnswerValue> = answersRef.current) => {
     if (isFinishedRef.current) return;
     isFinishedRef.current = true;
     setIsFinished(true);
@@ -281,6 +288,20 @@ export function QuizQuestionScreen({
     });
   };
 
+  const handleToggleMultipleAnswer = (questionId: string | number, answerId: string | number) => {
+    setAnswers((previous) => {
+      const key = String(questionId);
+      const numericAnswerId = Number(answerId);
+      const current = Array.isArray(previous[key]) ? previous[key] as number[] : [];
+      const selected = current.includes(numericAnswerId)
+        ? current.filter((id) => id !== numericAnswerId)
+        : [...current, numericAnswerId];
+      const updated = { ...previous, [key]: selected };
+      localStorage.setItem(`mindnova_draft_answers_${quizStorageId}`, JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const handleExitQuiz = async () => {
     if (!quiz) return;
     const confirmExit = confirm(
@@ -296,7 +317,7 @@ export function QuizQuestionScreen({
 
   const handleUserInitiatedSubmit = () => {
     if (!quiz) return;
-    const currentAnswered = Object.keys(answers).filter((k) => answers[k] != null && answers[k].trim() !== "").length;
+    const currentAnswered = Object.keys(answers).filter((key) => hasAnswer(answers[key])).length;
 
     if (currentAnswered === 0) {
       if (!confirm("⚠️ Bạn chưa nhập câu trả lời nào! Bạn có chắc muốn nộp bài sớm không?")) return;
@@ -357,8 +378,9 @@ export function QuizQuestionScreen({
 
   const question = quiz.questions[currentIndex];
   const progress = Math.round(((currentIndex + 1) / quiz.questions.length) * 100);
-  const currentAnswerVal = answers[String(question?.id)] || "";
-  const answeredCount = Object.keys(answers).filter((k) => answers[k] != null && answers[k].trim() !== "").length;
+  const isMultipleSelection = question?.selection_type === "multiple_choice";
+  const currentAnswerVal = answers[String(question?.id)] ?? (isMultipleSelection ? [] : "");
+  const answeredCount = Object.keys(answers).filter((key) => hasAnswer(answers[key])).length;
   const isEssayType = question?.type === "essay" || (!question?.answers || question?.answers.length === 0);
 
   return (
@@ -411,7 +433,7 @@ export function QuizQuestionScreen({
             </div>
             <div className="flex flex-wrap gap-2">
               {quiz.questions.map((q: any, idx: number) => {
-                const isAnswered = answers[String(q.id)] != null && answers[String(q.id)].trim() !== "";
+                const isAnswered = hasAnswer(answers[String(q.id)]);
                 const isCurrent = currentIndex === idx;
                 return (
                   <button
@@ -452,6 +474,13 @@ export function QuizQuestionScreen({
               </h1>
               <span className="text-xs font-medium text-[#64748b] mb-1 shrink-0 ml-4">Tiến độ: {progress}%</span>
             </div>
+            {question?.image_url && (
+              <img
+                src={question.image_url}
+                alt={`Hình minh họa câu hỏi: ${question.content}`}
+                className="mt-4 max-h-80 w-full rounded-2xl border border-[#EAEAF4] bg-white object-contain"
+              />
+            )}
             
             <div className="w-full h-1.5 bg-[#EAEAF4] rounded-full mt-4 overflow-hidden p-0.5">
               <div className="h-full bg-gradient-to-r from-[#2563eb] via-[#1d4ed8] to-[#2563eb] rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
@@ -478,14 +507,14 @@ export function QuizQuestionScreen({
 
               <textarea
                 rows={6}
-                value={currentAnswerVal}
+                value={typeof currentAnswerVal === "string" ? currentAnswerVal : ""}
                 onChange={(e) => handleSelectAnswer(question.id, e.target.value)}
                 placeholder="Nhập câu trả lời hoặc các bước giải chi tiết của bạn tại đây..."
                 className="w-full p-4 rounded-xl border-2 border-[#EAEAF4] focus:border-[#1d4ed8] focus:ring-4 focus:ring-[#1d4ed8]/10 text-sm leading-relaxed bg-white shadow-xs focus:outline-none transition-all"
               />
               <div className="flex justify-between items-center text-xs text-[#64748b]">
-                <span>Ký tự: {currentAnswerVal.length}</span>
-                {currentAnswerVal.trim().length > 0 ? (
+                <span>Ký tự: {typeof currentAnswerVal === "string" ? currentAnswerVal.length : 0}</span>
+                {typeof currentAnswerVal === "string" && currentAnswerVal.trim().length > 0 ? (
                   <span className="text-[#27AE60] font-semibold flex items-center gap-1"><Check size={12} /> Đã lưu nháp</span>
                 ) : (
                   <span className="text-[#F59E0B] flex items-center gap-1"><AlertTriangle size={12} /> Chưa nhập câu trả lời</span>
@@ -497,21 +526,32 @@ export function QuizQuestionScreen({
               {question?.answers?.map((answer: any, i: number) => {
                 const ansIdStr = String(answer.id || i);
                 const letter = String.fromCharCode(65 + i);
-                const isSelected = currentAnswerVal != null && currentAnswerVal !== "" && (
-                  String(currentAnswerVal).toUpperCase() === ansIdStr.toUpperCase() ||
-                  String(currentAnswerVal).toUpperCase() === letter.toUpperCase()
-                );
+                const isSelected = Array.isArray(currentAnswerVal)
+                  ? currentAnswerVal.includes(Number(answer.id))
+                  : currentAnswerVal !== "" && (
+                    String(currentAnswerVal).toUpperCase() === ansIdStr.toUpperCase() ||
+                    String(currentAnswerVal).toUpperCase() === letter.toUpperCase()
+                  );
 
                 return (
                   <div 
                     key={ansIdStr}
-                    onClick={() => handleSelectAnswer(question.id, answer.id ? String(answer.id) : letter)}
+                    onClick={() => isMultipleSelection
+                      ? handleToggleMultipleAnswer(question.id, answer.id)
+                      : handleSelectAnswer(question.id, answer.id ? String(answer.id) : letter)}
                     className={`group flex items-start sm:items-center p-4 sm:p-4.5 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                       isSelected 
                         ? "border-[#1d4ed8] bg-[#eff6ff] shadow-[0_4px_18px_rgba(59, 130, 246,0.14)] -translate-y-0.5 z-10" 
                         : "border-[#EAEAF4] bg-white hover:border-[#1d4ed8]/40 hover:bg-[#F8FAFC]"
                     }`}
                   >
+                    <input
+                      type={isMultipleSelection ? "checkbox" : "radio"}
+                      aria-label={`Chọn đáp án ${letter}`}
+                      checked={isSelected}
+                      readOnly
+                      className="sr-only"
+                    />
                     <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 transition-all ${
                       isSelected 
                         ? "bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] text-white shadow-sm scale-105" 
@@ -524,6 +564,13 @@ export function QuizQuestionScreen({
                       isSelected ? "font-bold text-[#0f172a]" : "font-normal text-[#0f172a]"
                     }`}>
                       {answer.content}
+                      {answer.image_url && (
+                        <img
+                          src={answer.image_url}
+                          alt={`Hình minh họa đáp án ${letter}: ${answer.content}`}
+                          className="mt-2 max-h-48 w-full rounded-xl border border-[#EAEAF4] bg-white object-contain"
+                        />
+                      )}
                     </span>
 
                     {isSelected && (
@@ -535,6 +582,10 @@ export function QuizQuestionScreen({
                 );
               })}
             </div>
+          )}
+
+          {!isEssayType && isMultipleSelection && (
+            <p className="mt-3 text-xs font-semibold text-[#2563EB]">Có thể chọn nhiều đáp án.</p>
           )}
 
           

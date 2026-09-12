@@ -73,7 +73,7 @@ function AIInsightPanel({ onApply }: { onApply: (price: string) => void }) {
  <button
  type="button"
  onClick={() => onApply("990.000")}
- className="w-full py-2 rounded-lg border border-[#E2E8F0] text-[12px] font-semibold text-[#3B82F6] hover:bg-[#F8FAFC] hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30"
+ className="w-full py-2 rounded-lg border border-[#E2E8F0] text-[12px] font-semibold text-[#3B82F6] hover:bg-[#EFF6FF] hover:text-[#1D4ED8] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30"
  >
  Áp dụng giá gợi ý
  </button>

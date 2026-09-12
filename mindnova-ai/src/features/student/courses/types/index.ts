@@ -108,6 +108,16 @@ export interface CourseDetailLessonItem {
  video_url?: string;
  has_uploaded_video?: boolean;
  content?: string; // HTML content for article type
+ attachments?: CourseLessonAttachment[];
+}
+
+export interface CourseLessonAttachment {
+ id: number;
+ display_name: string;
+ original_name: string;
+ mime_type: string;
+ extension: string;
+ size_bytes: number;
 }
 
 export interface CourseDetailModuleItem {

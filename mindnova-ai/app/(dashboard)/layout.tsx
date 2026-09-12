@@ -21,7 +21,7 @@ export default function DashboardLayout({
  {/* Right: topbar + scrollable content */}
  <div className="flex flex-col flex-1 overflow-hidden min-w-0">
  <DashboardTopbar />
- <main className="flex-1 overflow-y-auto overflow-x-hidden">{children}</main>
+ <main className="flex-1 overflow-y-auto overflow-x-hidden pb-24">{children}</main>
  </div>
  </div>
 

@@ -38,6 +38,9 @@ export interface DraftQuestion {
 
 export interface DraftQuizData {
  title: string;
+ description?: string;
+ thumbnail_url?: string | null;
+ thumbnail_r2_key?: string | null;
  time_limit_minutes: number;
  passing_score: number;
  questions: DraftQuestion[];
@@ -81,7 +84,7 @@ export interface Step3Data {
  currency: string;
  basePrice: string;
  salePrice: string;
- partnershipTier?: "standard" | "exclusive";
+ partnershipTier?: string;
  isFlashSale?: boolean;
  saleStartDate?: string;
  saleEndDate?: string;

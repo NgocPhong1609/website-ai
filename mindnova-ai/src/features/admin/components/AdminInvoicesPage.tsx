@@ -31,7 +31,7 @@ function toStatusTone(status: string) {
  const value = status.toLowerCase();
  if (value.includes("completed")) return "bg-emerald-50 text-[#0F172A]";
  if (value.includes("failed")) return "bg-rose-100 text-rose-700";
- if (value.includes("refund")) return "text-[#F8FAFC] text-[#3B82F6]";
+ if (value.includes("refund")) return "bg-blue-50 text-[#3B82F6]";
  return "bg-amber-50 text-amber-700";
 }
 

@@ -3,16 +3,18 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateCommissionSettingsRequest;
 use App\Models\Category;
 use App\Models\Course;
 use App\Models\Discussion;
 use App\Models\Enrollment;
 use App\Models\Order;
-use App\Models\Subscription;
 use App\Models\User;
+use App\Services\Ai\AiUsageSummaryService;
+use App\Settings\AiSettingsRepository;
+use App\Settings\CommissionSettingsRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -26,20 +28,19 @@ class DashboardController extends Controller
         $previous = (clone $query)->whereBetween($column, [now()->subDays(60), now()->subDays(30)])->count();
 
         if ($previous === 0) {
-            return $current > 0 ? '+100%' : '0%';
+            return $current > 0 ? '' : '0%';
         }
 
         $change = (($current - $previous) / $previous) * 100;
 
-        return ($change >= 0 ? '+' : '') . number_format($change, 1) . '%';
+        return ($change >= 0 ? '+' : '').number_format($change, 1).'%';
     }
 
-    public function overview(Request $request): JsonResponse
+    public function overview(AiSettingsRepository $settings, AiUsageSummaryService $usage): JsonResponse
     {
         $totalUsers = User::count();
         $totalCourses = Course::count();
         $totalRevenue = (float) Order::where('status', 'completed')->sum('total_amount');
-        $activeSubscriptions = Subscription::where('status', 'active')->count();
         $completedEnrollments = Enrollment::where('status', 'completed')->count();
         $totalEnrollments = Enrollment::count();
         $completionRate = $totalEnrollments > 0 ? round(($completedEnrollments / $totalEnrollments) * 100, 1) : 0;
@@ -60,6 +61,7 @@ class DashboardController extends Controller
                 }
 
                 return [
+                    'id' => $user->id,
                     'name' => $user->name,
                     'role' => $roleLabel,
                     'status' => $user->status === 'active' ? 'Đang hoạt động' : 'Ngưng hoạt động',
@@ -81,33 +83,28 @@ class DashboardController extends Controller
         $failedJobs = DB::table('failed_jobs')->count();
         $freeBytes = @disk_free_space(storage_path());
         $totalBytes = @disk_total_space(storage_path());
-        $freePercent = ($freeBytes && $totalBytes) ? ($freeBytes / $totalBytes) * 100 : 100;
+        $freePercent = ($freeBytes !== false && $totalBytes !== false && $totalBytes > 0)
+            ? ($freeBytes / $totalBytes) * 100 : null;
 
         $health = [
-            ['title' => 'API Laravel', 'status' => 'Ổn định', 'color' => 'bg-emerald-500'],
             [
                 'title' => 'Hàng đợi tác vụ',
-                'status' => $failedJobs > 0 ? 'Cảnh báo' : 'Ổn định',
+                'status' => $failedJobs.' tác vụ thất bại được ghi nhận',
                 'color' => $failedJobs > 0 ? 'bg-amber-500' : 'bg-cyan-500',
             ],
             [
                 'title' => 'Lưu trữ',
-                'status' => $freePercent < 15 ? 'Cảnh báo' : 'Ổn định',
-                'color' => $freePercent < 15 ? 'bg-amber-500' : 'bg-emerald-500',
-            ],
-            [
-                'title' => 'Dịch vụ AI',
-                'status' => filled(config('services.groq.key')) ? 'Ổn định' : 'Cảnh báo',
-                'color' => filled(config('services.groq.key')) ? 'bg-violet-500' : 'bg-amber-500',
+                'status' => $freePercent === null ? 'Chưa có dữ liệu' : round($freePercent, 1).'% dung lượng trống',
+                'color' => $freePercent === null || $freePercent < 15 ? 'bg-amber-500' : 'bg-emerald-500',
             ],
         ];
 
         return response()->json([
             'hero' => [
                 'title' => 'Xin chào, Quản trị viên',
-                'description' => 'Trang quản trị để bạn theo dõi người dùng, khóa học, doanh thu và trạng thái hệ thống theo thời gian thực.',
-                'primaryAction' => 'Thêm mới',
-                'secondaryAction' => 'Xuất báo cáo',
+                'description' => 'Tổng quan người dùng, khóa học, doanh thu và dữ liệu AI đã ghi nhận.',
+                'primaryAction' => 'Quản lý nội dung',
+                'secondaryAction' => 'Xem báo cáo',
             ],
             'stats' => [
                 [
@@ -117,21 +114,21 @@ class DashboardController extends Controller
                     'note' => 'so với 30 ngày trước',
                 ],
                 [
-                    'label' => 'Khóa học đang hoạt động',
+                    'label' => 'Tổng khóa học',
                     'value' => number_format($totalCourses),
                     'trend' => $this->percentChange(Course::query()),
                     'note' => 'so với 30 ngày trước',
                 ],
                 [
                     'label' => 'Doanh thu',
-                    'value' => '$' . number_format($totalRevenue, 1),
-                    'trend' => $this->percentChange(Order::where('status', 'completed')),
+                    'value' => number_format($totalRevenue, 0, ',', '.').' VNĐ',
+                    'trend' => '',
                     'note' => 'tổng doanh số đã thanh toán',
                 ],
                 [
                     'label' => 'Tỉ lệ hoàn thành',
-                    'value' => $completionRate . '%',
-                    'trend' => $this->percentChange(Enrollment::where('status', 'completed'), 'enrolled_at'),
+                    'value' => $completionRate.'%',
+                    'trend' => '',
                     'note' => 'trên tổng số lượt ghi danh',
                 ],
             ],
@@ -144,6 +141,11 @@ class DashboardController extends Controller
                 'Lọc và tìm kiếm khóa học',
                 'Kiểm duyệt và khóa người dùng',
                 'Gửi email thông báo',
+            ],
+            'ai_summary' => [
+                'providers' => $settings->providerReadiness(),
+                'usage' => $usage->summarize('7d'),
+                'packages' => $settings->packages(),
             ],
         ]);
     }
@@ -171,7 +173,7 @@ class DashboardController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'avatarUrl' => $user->avatar_url,
-                'cvUrl' => $user->profile?->cv_path ? asset('storage/' . $user->profile->cv_path) : null,
+                'cvUrl' => $user->profile?->cv_path ? asset('storage/'.$user->profile->cv_path) : null,
                 'expertise' => $user->profile?->skill_level ?? 'General instruction',
                 'status' => $status,
                 'submittedAt' => $user->created_at?->toDateString() ?? now()->toDateString(),
@@ -180,7 +182,7 @@ class DashboardController extends Controller
                 'credentials' => $user->credentials->map(fn ($credential) => [
                     'id' => $credential->id,
                     'title' => $credential->title,
-                    'fileUrl' => asset('storage/' . $credential->file_path),
+                    'fileUrl' => asset('storage/'.$credential->file_path),
                 ])->values(),
                 'rating' => $user->courses()->count() > 0
                     ? round((float) $user->courses()->avg('price'), 1)
@@ -249,7 +251,7 @@ class DashboardController extends Controller
         return response()->json(['data' => $rows]);
     }
 
-    public function revenue(): JsonResponse
+    public function revenue(CommissionSettingsRepository $commissionSettings): JsonResponse
     {
         $courseSummary = DB::table('order_items as oi')
             ->join('orders as o', 'o.id', '=', 'oi.order_id')
@@ -257,20 +259,24 @@ class DashboardController extends Controller
             ->leftJoin('users as teacher', 'teacher.id', '=', 'c.teacher_id')
             ->leftJoin('teacher_payouts as tp', function ($join) {
                 $join->on('tp.order_id', '=', 'oi.order_id')
-                     ->on('tp.course_id', '=', 'oi.course_id');
+                    ->on('tp.course_id', '=', 'oi.course_id');
+            })
+            ->leftJoin('revenue_allocations as ra', function ($join) {
+                $join->on('ra.id', '=', DB::raw('(SELECT ra_pick.id FROM revenue_allocations ra_pick WHERE ra_pick.order_id = oi.order_id AND ra_pick.course_id = oi.course_id AND (ra_pick.order_item_id = oi.id OR ra_pick.order_item_id IS NULL) ORDER BY CASE WHEN ra_pick.order_item_id = oi.id THEN 0 ELSE 1 END, ra_pick.id DESC LIMIT 1)'));
             })
             ->where('o.status', 'completed')
             ->select([
                 'c.id as courseId',
                 'c.title as courseTitle',
-                'c.partnership_tier as partnershipTier',
+                DB::raw('MAX(COALESCE(ra.partnership_tier, JSON_UNQUOTE(JSON_EXTRACT(tp.metadata, "$.partnership_tier")))) as partnershipTier'),
+                DB::raw('COUNT(DISTINCT COALESCE(ra.partnership_tier, JSON_UNQUOTE(JSON_EXTRACT(tp.metadata, "$.partnership_tier")), "__unknown__")) as partnershipTierCount'),
                 DB::raw('COALESCE(teacher.name, "Unassigned") as instructorName'),
                 DB::raw('SUM(oi.price) as grossRevenue'),
-                DB::raw('COALESCE(SUM(tp.admin_share_amount), SUM(oi.price * IF(c.partnership_tier = "exclusive", 0.15, 0.30))) as adminRevenue'),
-                DB::raw('COALESCE(SUM(tp.teacher_amount), SUM(oi.price * IF(c.partnership_tier = "exclusive", 0.85, 0.70))) as teacherRevenue'),
+                DB::raw('SUM(COALESCE(ra.platform_fee_amount, tp.admin_share_amount, 0)) as adminRevenue'),
+                DB::raw('SUM(COALESCE(ra.instructor_amount, tp.teacher_amount, 0)) as teacherRevenue'),
                 DB::raw('COUNT(DISTINCT o.user_id) as students'),
             ])
-            ->groupBy('c.id', 'c.title', 'c.partnership_tier', 'teacher.name')
+            ->groupBy('c.id', 'c.title', 'teacher.name')
             ->orderByDesc('grossRevenue')
             ->get();
 
@@ -285,10 +291,18 @@ class DashboardController extends Controller
                 'courseId' => (int) $row->courseId,
                 'courseTitle' => $row->courseTitle,
                 'instructorName' => $row->instructorName ?? 'Unassigned',
-                'partnershipTier' => $row->partnershipTier ?? 'standard',
+                'partnershipTier' => (int) $row->partnershipTierCount > 1
+                    ? 'mixed'
+                    : $row->partnershipTier,
                 'grossRevenue' => (float) $row->grossRevenue,
                 'adminRevenue' => (float) $row->adminRevenue,
                 'teacherRevenue' => (float) $row->teacherRevenue,
+                'platformCommissionPercent' => (float) $row->grossRevenue > 0
+                    ? round((float) $row->adminRevenue / (float) $row->grossRevenue * 100, 2)
+                    : null,
+                'instructorPercent' => (float) $row->grossRevenue > 0
+                    ? round((float) $row->teacherRevenue / (float) $row->grossRevenue * 100, 2)
+                    : null,
                 'revenue' => (float) $row->grossRevenue,
                 'students' => $students,
                 'conversionRate' => $students > 0 ? 100.0 : 0.0,
@@ -301,8 +315,11 @@ class DashboardController extends Controller
             ->join('users as student', 'student.id', '=', 'o.user_id')
             ->leftJoin('users as teacher', 'teacher.id', '=', 'c.teacher_id')
             ->leftJoin('revenue_allocations as ra', function ($join) {
-                $join->on('ra.order_id', '=', 'o.id')
-                     ->on('ra.course_id', '=', 'c.id');
+                $join->on('ra.id', '=', DB::raw('(SELECT ra_pick.id FROM revenue_allocations ra_pick WHERE ra_pick.order_id = o.id AND ra_pick.course_id = c.id AND (ra_pick.order_item_id = oi.id OR ra_pick.order_item_id IS NULL) ORDER BY CASE WHEN ra_pick.order_item_id = oi.id THEN 0 ELSE 1 END, ra_pick.id DESC LIMIT 1)'));
+            })
+            ->leftJoin('teacher_payouts as tp', function ($join) {
+                $join->on('tp.order_id', '=', 'o.id')
+                    ->on('tp.course_id', '=', 'c.id');
             })
             ->select([
                 'o.id as orderId',
@@ -312,13 +329,15 @@ class DashboardController extends Controller
                 'student.name as studentName',
                 'student.email as studentEmail',
                 'c.title as courseTitle',
-                'c.partnership_tier as partnershipTier',
+                DB::raw('COALESCE(ra.partnership_tier, JSON_UNQUOTE(JSON_EXTRACT(tp.metadata, "$.partnership_tier")), "legacy") as partnershipTier'),
                 DB::raw('COALESCE(teacher.name, "Unassigned") as instructorName'),
-                DB::raw('COALESCE(ra.original_price, c.price, oi.price) as originalPrice'),
-                DB::raw('COALESCE(ra.discount_amount, GREATEST(0, COALESCE(c.price, oi.price) - oi.price)) as discountAmount'),
-                DB::raw('oi.price as paidAmount'),
-                DB::raw('COALESCE(ra.instructor_amount, oi.price * IF(c.partnership_tier = "exclusive", 0.85, 0.70)) as teacherAmount'),
-                DB::raw('COALESCE(ra.platform_fee_amount, oi.price * IF(c.partnership_tier = "exclusive", 0.15, 0.30)) as adminAmount'),
+                DB::raw('COALESCE(ra.original_price, tp.gross_amount, oi.price) as originalPrice'),
+                DB::raw('COALESCE(ra.discount_amount, 0) as discountAmount'),
+                DB::raw('COALESCE(ra.paid_amount, tp.gross_amount, oi.price) as paidAmount'),
+                DB::raw('COALESCE(ra.instructor_percent, 100 - tp.commission_rate) as instructorPercent'),
+                DB::raw('COALESCE(ra.platform_fee_percent, tp.commission_rate) as platformCommissionPercent'),
+                DB::raw('COALESCE(ra.instructor_amount, tp.teacher_amount, 0) as teacherAmount'),
+                DB::raw('COALESCE(ra.platform_fee_amount, tp.admin_share_amount, 0) as adminAmount'),
                 DB::raw('COALESCE(ra.status, IF(o.status = "refunded", "REFUNDED", "AVAILABLE")) as allocationStatus'),
                 'ra.refunded_at as refundedAt',
                 'o.updated_at as orderUpdatedAt',
@@ -330,13 +349,13 @@ class DashboardController extends Controller
                 $refundedAtFormatted = null;
                 if ($row->allocationStatus === 'REFUNDED' || $row->orderStatus === 'refunded') {
                     $dt = $row->refundedAt ? $row->refundedAt : $row->orderUpdatedAt;
-                    $refundedAtFormatted = $dt ? \Carbon\Carbon::parse($dt)->format('d/m/Y H:i') : null;
+                    $refundedAtFormatted = $dt ? Carbon::parse($dt)->format('d/m/Y H:i') : null;
                 }
 
                 return [
                     'orderId' => (int) $row->orderId,
-                    'transactionCode' => $row->transactionCode ? '#ORD-' . str_pad($row->orderId, 5, '0', STR_PAD_LEFT) : '#ORD-' . str_pad($row->orderId, 5, '0', STR_PAD_LEFT),
-                    'purchasedAt' => \Carbon\Carbon::parse($row->purchasedAt)->format('d/m/Y H:i'),
+                    'transactionCode' => $row->transactionCode ? '#ORD-'.str_pad($row->orderId, 5, '0', STR_PAD_LEFT) : '#ORD-'.str_pad($row->orderId, 5, '0', STR_PAD_LEFT),
+                    'purchasedAt' => Carbon::parse($row->purchasedAt)->format('d/m/Y H:i'),
                     'studentName' => $row->studentName,
                     'studentEmail' => $row->studentEmail,
                     'courseTitle' => $row->courseTitle,
@@ -345,6 +364,8 @@ class DashboardController extends Controller
                     'originalPrice' => (float) $row->originalPrice,
                     'discountAmount' => (float) $row->discountAmount,
                     'paidAmount' => (float) $row->paidAmount,
+                    'instructorPercent' => $row->instructorPercent === null ? null : (float) $row->instructorPercent,
+                    'platformCommissionPercent' => $row->platformCommissionPercent === null ? null : (float) $row->platformCommissionPercent,
                     'teacherAmount' => (float) $row->teacherAmount,
                     'adminAmount' => (float) $row->adminAmount,
                     'allocationStatus' => $row->allocationStatus,
@@ -359,6 +380,7 @@ class DashboardController extends Controller
             'totalAdminRevenue' => $totalAdminRevenue,
             'totalTeacherRevenue' => $totalTeacherRevenue,
             'courseCount' => $courses->count(),
+            'commissionTiers' => $commissionSettings->tiers(),
             'courses' => $courses,
             'orderHistory' => $orderHistory,
         ];
@@ -367,6 +389,16 @@ class DashboardController extends Controller
             ['data' => $responseData],
             $responseData
         ));
+    }
+
+    public function updateCommissionTiers(
+        UpdateCommissionSettingsRequest $request,
+        CommissionSettingsRepository $commissionSettings,
+    ): JsonResponse {
+        return response()->json([
+            'message' => 'Commission tiers updated.',
+            'data' => $commissionSettings->save($request->validated('tiers')),
+        ]);
     }
 
     public function analytics(): JsonResponse
@@ -418,7 +450,7 @@ class DashboardController extends Controller
             $weekCompleted = Enrollment::whereBetween('enrolled_at', [$weekStart, $weekEnd])->where('status', 'completed')->count();
 
             return [
-                'label' => 'W' . (6 - $weeksAgo),
+                'label' => 'W'.(6 - $weeksAgo),
                 'value' => $weekTotal > 0 ? (int) round(($weekCompleted / $weekTotal) * 100) : 0,
             ];
         })->values()->all();
@@ -427,9 +459,9 @@ class DashboardController extends Controller
             'data' => [
                 'metrics' => [
                     ['label' => 'Total learners', 'value' => number_format($totalLearners), 'change' => $this->percentChange(User::query())],
-                    ['label' => 'Completion rate', 'value' => $completionRate . '%', 'change' => $this->percentChange(Enrollment::where('status', 'completed'), 'enrolled_at')],
-                    ['label' => 'Avg. progress', 'value' => $avgProgress . '%', 'change' => $this->percentChange(Enrollment::query(), 'enrolled_at')],
-                    ['label' => 'Teacher retention', 'value' => $teacherRetention . '%', 'change' => $this->percentChange(User::whereIn('role', ['teacher', 'instructor']))],
+                    ['label' => 'Completion rate', 'value' => $completionRate.'%', 'change' => $this->percentChange(Enrollment::where('status', 'completed'), 'enrolled_at')],
+                    ['label' => 'Avg. progress', 'value' => $avgProgress.'%', 'change' => $this->percentChange(Enrollment::query(), 'enrolled_at')],
+                    ['label' => 'Teacher retention', 'value' => $teacherRetention.'%', 'change' => $this->percentChange(User::whereIn('role', ['teacher', 'instructor']))],
                 ],
                 'traffic' => $traffic,
                 'subjects' => $subjects,

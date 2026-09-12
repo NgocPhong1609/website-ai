@@ -9,7 +9,7 @@ export default defineConfig({
     setupFiles: ['./setupTests.ts'],
     globals: true,
     alias: {
-      '@': path.resolve(__dirname, './src')
+      '@': path.resolve(__dirname, '.')
     },
     coverage: {
       provider: 'v8',

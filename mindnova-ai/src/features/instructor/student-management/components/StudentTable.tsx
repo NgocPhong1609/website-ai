@@ -17,9 +17,9 @@ function ProgressBadge({ progress, status }: { progress: number; status: Progres
  let bg = "bg-[#F8FAFC] border-[#E2E8F0]";
 
  if (status === "Hoàn tất" || status === "completed") {
- bar = "text-[#0F172A]"; text = "text-[#0F172A]"; bg = "bg-emerald-50 text-[#F8FAFC]"; label = "Hoàn tất";
+ bar = "bg-[#10B981]"; text = "text-[#047857]"; bg = "bg-emerald-50 border-emerald-200"; label = "Hoàn tất";
  } else if (status === "Đang học" || status === "in-progress") {
- bar = "bg-[#3B82F6]"; text = "text-[#3B82F6]"; bg = "bg-blue-50 text-[#F8FAFC]"; label = "Đang học";
+ bar = "bg-[#3B82F6]"; text = "text-[#2563EB]"; bg = "bg-blue-50 border-[#DBEAFE]"; label = "Đang học";
  } else if (status === "Nguy cơ trễ" || status === "at-risk") {
  bar = "bg-rose-500"; text = "text-rose-600"; bg = "bg-rose-50 border-rose-200"; label = "Nguy cơ trễ";
  } else if (status === "Chưa bắt đầu") {
@@ -47,7 +47,7 @@ function Avatar({ name, avatarUrl }: { name: string; avatarUrl?: string }) {
  }
  const initials = name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
  return (
- <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[#3B82F6] text-white text-xs font-black shrink-0 shadow-2xs">
+ <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#EFF6FF] text-[#2563EB] text-xs font-black shrink-0 shadow-2xs">
  {initials}
  </div>
  );
@@ -87,7 +87,7 @@ function CustomSelect({
  onClick={() => setIsOpen(!isOpen)}
  className={twMerge(
  "w-full flex items-center justify-between px-3.5 py-2 rounded-xl border bg-white text-xs font-bold text-[#0F172A] cursor-pointer shadow-2xs transition-all",
- isOpen ? "border-[#3B82F6] ring-2 ring-[#3B82F6]/15" : "border-[#E2E8F0] hover:bg-[#2563EB]"
+ isOpen ? "border-[#3B82F6] ring-2 ring-[#3B82F6]/15" : "border-[#E2E8F0] hover:bg-[#F8FAFC]"
  )}
  >
  <span className="truncate">{selectedOption.name}</span>
@@ -200,11 +200,11 @@ export function StudentTable({
  {/* Main Table Grid */}
  <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-2xs overflow-hidden">
  <div className="overflow-x-auto">
- <table className="w-full text-left border-collapse min-w-[800px]">
+ <table className="w-full text-left border-collapse min-w-[640px]">
  <thead>
  <tr className="border-b border-[#E2E8F0] bg-[#F8FAFC]/70 text-[11px] font-black text-[#64748B] uppercase tracking-wider">
  {COLS.map((col) => (
- <th key={col} className="px-6 py-3.5 whitespace-nowrap">
+ <th key={col} className="px-4 py-3.5 whitespace-normal break-words">
  {col}
  </th>
  ))}
@@ -253,7 +253,7 @@ export function StudentTable({
  <td className="px-6 py-4">
  <div className="flex flex-col gap-1.5 items-start">
  <div className="flex items-center gap-2 whitespace-nowrap">
- <span className={twMerge("font-mono text-xs font-black px-2.5 py-1 rounded-lg border shadow-2xs whitespace-nowrap shrink-0", st.average_score >= 80 ? "text-[#0F172A] bg-emerald-50 text-[#F8FAFC]" : (st.average_score !== null ? "text-amber-700 bg-amber-50 border-amber-200" : "text-[#64748B] bg-[#F8FAFC] border-[#E2E8F0]"))}>
+ <span className={twMerge("font-mono text-xs font-black px-2.5 py-1 rounded-lg border shadow-2xs whitespace-nowrap shrink-0", st.average_score >= 80 ? "text-[#047857] bg-emerald-50 border-emerald-200" : (st.average_score !== null ? "text-amber-700 bg-amber-50 border-amber-200" : "text-[#64748B] bg-[#F8FAFC] border-[#E2E8F0]"))}>
  {st.average_score !== null ? `${st.average_score}/100` : "Chưa có"}
  </span>
  <span className="px-2 py-0.5 rounded-md bg-purple-50 text-[#3B82F6] border-[#E2E8F0] text-[10px] font-black font-mono whitespace-nowrap shrink-0">
@@ -277,7 +277,7 @@ export function StudentTable({
  )}
  </div>
  </td>
- <td className="px-6 py-4 text-xs font-bold text-[#64748B]">
+ <td className="px-4 py-4 text-xs font-bold text-[#64748B] whitespace-nowrap">
  {st.enrolled_at ? new Date(st.enrolled_at).toLocaleDateString("vi-VN") : "N/A"}
  </td>
  </tr>
