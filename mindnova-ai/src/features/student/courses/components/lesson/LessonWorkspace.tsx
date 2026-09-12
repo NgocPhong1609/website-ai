@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
-import { CheckCircle2, AlertTriangle, Lightbulb, Bot, Target, MessageSquare, ClipboardList, Eye, GraduationCap, X, FileEdit, Check, Lock, Flag, Trophy, PartyPopper } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Lightbulb, Bot, Target, MessageSquare, ClipboardList, Eye, GraduationCap, X, FileEdit, Check, Lock, Flag, Trophy, PartyPopper, ChevronsUpDown } from "lucide-react";
+import { LessonStatusIcon, lessonDisplayTitle } from "../LessonStatusIcon";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -1527,8 +1528,8 @@ function LessonWorkspaceContent() {
  </div>
  </div>
  </div>
- <button className="text-[#64748B] group-hover:text-[#0F172A] transition-colors p-1 shrink-0">
- ↕
+ <button className="text-[#64748B] group-hover:text-[#0F172A] transition-colors p-1 shrink-0" type="button" aria-label="Thu gọn hoặc mở rộng học phần">
+ <ChevronsUpDown size={16} strokeWidth={2} />
  </button>
  </div>
 
@@ -1557,7 +1558,14 @@ function LessonWorkspaceContent() {
  isCurrent ? "bg-white border-2 border-[#3B82F6] text-[#0F172A]" :
  "border-2 border-gray-300 text-transparent bg-[#F8FAFC]"
  )}>
- {isCompleted ? "" : isCurrent ? "▶" : <span className="w-1.5 h-1.5 rounded-full bg-gray-300" />}
+ <LessonStatusIcon
+ lesson={{
+ type: lesson.type,
+ title: lesson.title,
+ status: isCompleted ? "completed" : isCurrent ? "current" : undefined,
+ completed: isCompleted,
+ }}
+ />
  </div>
 
  <div className="min-w-0 flex-1">
@@ -1565,7 +1573,7 @@ function LessonWorkspaceContent() {
  "text-[13.5px] sm:text-[14px] leading-snug truncate",
  isCurrent ? "text-[#0F172A] font-extrabold" : "text-[#0F172A] font-bold"
  )}>
- {lesson.title}
+ {lessonDisplayTitle(lesson.title)}
  </h4>
  <div className="flex items-center gap-2 mt-1 flex-wrap">
  {/* Lesson Type Label */}

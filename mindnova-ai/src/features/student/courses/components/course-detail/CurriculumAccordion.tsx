@@ -4,9 +4,10 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { NoDataAvailable } from "@/src/shared/components/ui";
-import { BookX } from "lucide-react";
+import { BookX, ChevronDown, ChevronUp } from "lucide-react";
 import type { CourseDetailModuleItem, CourseDetailLessonItem } from "../../types";
 import toast from "react-hot-toast";
+import { LessonStatusIcon, lessonDisplayTitle } from "../LessonStatusIcon";
 
 // ─── Lesson Item Row ──────────────────────────────────────────────────────────
 function LessonItemRow({ lesson, courseId }: { lesson: CourseDetailLessonItem; courseId: string | number }) {
@@ -30,9 +31,7 @@ function LessonItemRow({ lesson, courseId }: { lesson: CourseDetailLessonItem; c
  isCurrent ? "bg-[#0F172A] border-[#0F172A] text-white" :
  "bg-white border-[#E2E8F0] text-[#64748B]"
  )}>
- {isCompleted && ""}
- {isCurrent && "▶"}
- {isLocked && ""}
+ <LessonStatusIcon lesson={lesson} />
  </div>
 
  <div className="min-w-0">
@@ -40,7 +39,7 @@ function LessonItemRow({ lesson, courseId }: { lesson: CourseDetailLessonItem; c
  "text-xs sm:text-sm font-bold truncate block transition-colors",
  isLocked ? "text-[#64748B]" : (isCurrent ? "text-[#0F172A]" : "text-[#64748B] group-hover/lesson:text-[#0F172A]")
  )}>
- {lesson.title}
+ {lessonDisplayTitle(lesson.title)}
  </span>
  {isCurrent && (
  <span className="text-[10px] font-bold text-[#3B82F6] uppercase tracking-wider block mt-1">
@@ -198,8 +197,8 @@ export function CurriculumAccordion({ modules = [], courseId = 1 }: { modules?: 
  }`}>
  {completedInMod}/{totalInMod} Đã học
  </span>
- <div className="w-8 h-8 rounded border border-[#E2E8F0] bg-white text-[#0F172A] flex items-center justify-center shrink-0 font-bold">
- {isExpanded ? "-" : "+"}
+ <div className="w-8 h-8 rounded border border-[#E2E8F0] bg-white text-[#0F172A] flex items-center justify-center shrink-0">
+ {isExpanded ? <ChevronUp size={16} strokeWidth={2} aria-hidden /> : <ChevronDown size={16} strokeWidth={2} aria-hidden />}
  </div>
  </div>
  </button>

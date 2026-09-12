@@ -1,3 +1,5 @@
+import { BookOpen, Check, Video } from "lucide-react";
+
 export function LessonCurriculumSidebar() {
  return (
  <aside className="w-[300px] shrink-0 border-r border-[#E2E8F0] bg-white h-full overflow-y-auto hidden lg:block">
@@ -18,7 +20,9 @@ export function LessonCurriculumSidebar() {
  <div className="flex flex-col space-y-2">
  {/* Item 1 - Completed */}
  <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-[#F8FAFC] cursor-pointer transition-colors border border-transparent hover:border-[#E2E8F0]">
- 
+ <div className="w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 text-white bg-[#0F172A] border border-[#0F172A] rounded">
+ <Check size={12} strokeWidth={2.5} aria-label="Đã hoàn thành" />
+ </div>
  <div>
  <p className="text-sm font-semibold text-[#0F172A]">Introduction to Next.js</p>
  <p className="text-xs text-[#64748B] mt-0.5">12m</p>
@@ -28,7 +32,7 @@ export function LessonCurriculumSidebar() {
  {/* Item 2 - Active */}
  <div className="flex items-start gap-3 p-3 rounded-xl bg-[#F8FAFC] border border-[#0F172A] cursor-pointer">
  <div className="w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 text-white font-bold text-[10px] bg-[#0F172A] border border-[#0F172A] rounded">
- ▶
+ <Video size={11} aria-label="Bài video" />
  </div>
  <div>
  <p className="text-sm font-semibold text-[#0F172A]">Route Handlers in Next.js</p>
@@ -38,7 +42,9 @@ export function LessonCurriculumSidebar() {
 
  {/* Item 3 - Locked */}
  <div className="flex items-start gap-3 p-3 rounded-xl cursor-not-allowed opacity-60">
- 
+ <div className="w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 text-[#64748B] bg-white border border-[#E2E8F0] rounded">
+ <BookOpen size={11} aria-label="Bài đọc" />
+ </div>
  <div>
  <p className="text-sm font-semibold text-[#64748B]">Server Components</p>
  <p className="text-xs text-[#64748B] mt-0.5">30m</p>
@@ -47,7 +53,9 @@ export function LessonCurriculumSidebar() {
 
  {/* Item 4 - Locked */}
  <div className="flex items-start gap-3 p-3 rounded-xl cursor-not-allowed opacity-60">
- 
+ <div className="w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 text-[#64748B] bg-white border border-[#E2E8F0] rounded">
+ <BookOpen size={11} aria-label="Bài đọc" />
+ </div>
  <div>
  <p className="text-sm font-semibold text-[#64748B]">Data Fetching Patterns</p>
  <p className="text-xs text-[#64748B] mt-0.5">45m</p>
