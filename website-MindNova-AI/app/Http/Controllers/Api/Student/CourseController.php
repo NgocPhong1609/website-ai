@@ -54,7 +54,7 @@ class CourseController extends Controller
      * SECURITY: Only returns published lessons from approved versions.
      * Draft/pending/rejected lessons are completely invisible.
      */
-    public function detail(Request $request, $id = 1): JsonResponse
+    public function detail(Request $request, $id): JsonResponse
     {
         // Verify the course is published
         $course = Course::where('status', 'published')

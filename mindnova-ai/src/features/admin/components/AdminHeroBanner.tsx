@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 
 interface AdminHeroBannerProps {
  hero: AdminOverviewData["hero"];
+ stats?: AdminOverviewData["stats"];
 }
 
-export function AdminHeroBanner({ hero }: AdminHeroBannerProps) {
+export function AdminHeroBanner({ hero, stats = [] }: AdminHeroBannerProps) {
  const router = useRouter();
  const title = hero?.title ?? "Bảng điều khiển MindNova";
  const description = hero?.description ?? "Theo dõi người dùng, nội dung và hệ thống trên cùng một palette xanh với student.";
@@ -54,12 +55,17 @@ export function AdminHeroBanner({ hero }: AdminHeroBannerProps) {
  </div>
  </div>
 
+ {(() => {
+ const metrics = [
+ stats.find((item) => item.label.toLowerCase().includes("doanh thu")),
+ stats.find((item) => item.label.toLowerCase().includes("khóa học")),
+ stats.find((item) => item.label.toLowerCase().includes("hoàn thành")),
+ ].filter((item): item is NonNullable<typeof item> => Boolean(item));
+ const display = metrics.length ? metrics : stats.slice(0, 3);
+ if (!display.length) return null;
+ return (
  <div className="relative mt-7 grid gap-4 sm:grid-cols-3">
- {[
- { label: "Tổng doanh thu", value: "$128.4K", trend: "+18.2%" },
- { label: "Khóa học mới", value: "246", trend: "+9.6%" },
- { label: "Tỷ lệ hoàn thành", value: "84.7%", trend: "+2.8%" },
- ].map((metric) => (
+ {display.map((metric) => (
  <div key={metric.label} className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
  <p className="text-[11px] uppercase tracking-[0.2em] text-[#F8FAFC]/60">{metric.label}</p>
  <div className="mt-3 flex items-end justify-between gap-3">
@@ -71,6 +77,8 @@ export function AdminHeroBanner({ hero }: AdminHeroBannerProps) {
  </div>
  ))}
  </div>
+ );
+ })()}
  </section>
  );
 }

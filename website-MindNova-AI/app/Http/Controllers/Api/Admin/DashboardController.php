@@ -193,31 +193,23 @@ class DashboardController extends Controller
         return response()->json(['data' => $rows]);
     }
 
-    public function aiSystem(): JsonResponse
+    public function aiSystem(AiSettingsRepository $settings, AiUsageSummaryService $usage): JsonResponse
     {
-        $totalUsers = User::count();
-        $totalCourses = Course::count();
-        $totalEnrollments = Enrollment::count();
-
-        $groqConnected = filled(config('services.groq.key'));
-        $geminiConnected = filled(config('services.gemini.key'));
+        $packages = $settings->packages();
+        $usageSummary = $usage->summarize('7d');
+        $prompts = $settings->prompts();
 
         return response()->json([
             'data' => [
-                'providers' => [
-                    ['provider' => 'Groq (Học sinh hỏi đáp)', 'model' => config('services.groq.model'), 'status' => $groqConnected ? 'connected' : 'offline', 'apiKeyHint' => $groqConnected ? '••••••••••••••••' : 'Chưa cấu hình'],
-                    ['provider' => 'Gemini (Tạo nội dung)', 'model' => config('services.gemini.model'), 'status' => $geminiConnected ? 'connected' : 'offline', 'apiKeyHint' => $geminiConnected ? '••••••••••••••••' : 'Chưa cấu hình'],
-                ],
-                'quotas' => [
-                    ['label' => 'Daily generation quota', 'limit' => 3000, 'used' => min(3000, (int) round($totalEnrollments * 12))],
-                    ['label' => 'Course evaluation calls', 'limit' => 1200, 'used' => min(1200, (int) round($totalCourses * 14))],
-                    ['label' => 'Teacher assistant usage', 'limit' => 900, 'used' => min(900, (int) round($totalUsers * 3))],
-                ],
-                // No system-prompt table exists yet; this remains a fixed placeholder until one is added.
-                'systemPrompts' => [
-                    ['id' => 1, 'name' => 'Learning Coach', 'purpose' => 'Guide personal study paths', 'status' => 'active', 'updatedAt' => now()->subDay()->toDateString()],
-                    ['id' => 2, 'name' => 'Course Reviewer', 'purpose' => 'Check quality and structure', 'status' => 'draft', 'updatedAt' => now()->subDays(3)->toDateString()],
-                ],
+                'providers' => $settings->providerReadiness(),
+                'usage' => $usageSummary,
+                'packages' => $packages,
+                'prompts' => collect($prompts)->map(fn ($content, $name) => [
+                    'id' => $name,
+                    'name' => $name,
+                    'purpose' => $content,
+                    'status' => 'active',
+                ])->values(),
             ],
         ]);
     }

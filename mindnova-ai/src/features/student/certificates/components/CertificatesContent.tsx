@@ -1,20 +1,43 @@
+"use client";
+
 import React from "react";
 import {
-  UploadIcon,
   ShareIcon,
   PartyPopperIcon,
   ArrowRightIcon,
   VerifiedBadgeIcon,
   GraduationCapIcon,
-  StopwatchIcon,
   MedalIcon
 } from "./icons";
+import { useClaimCertificate, useGetCertificates } from "../api";
+import toast from "react-hot-toast";
 
 export function CertificatesContent() {
+  const { data, isLoading, isError, refetch } = useGetCertificates();
+  const claimMutation = useClaimCertificate();
+  const issued = data?.issued ?? [];
+  const claimable = data?.claimable ?? [];
+  const firstClaimable = claimable[0];
+
+  const handleClaim = async (courseId: number) => {
+    try {
+      await claimMutation.mutateAsync(courseId);
+      toast.success("Đã nhận chứng chỉ.");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Không thể nhận chứng chỉ.");
+    }
+  };
+
+  const handleShare = (url: string | null) => {
+    if (url) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+    toast("Chứng chỉ chưa có tệp để chia sẻ.");
+  };
+
   return (
     <div className="max-w-6xl mx-auto w-full p-8 lg:p-10 space-y-10">
-      
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
         <div className="flex-1">
           <h3 className="text-[11px] font-bold tracking-widest text-[#64748B] uppercase mb-2">
@@ -24,173 +47,94 @@ export function CertificatesContent() {
             Certificates &amp; Credentials
           </h1>
           <p className="text-[14px] text-[#64748B] max-w-2xl leading-relaxed">
-            Celebrate your hard work. Here you can find all your verified AI-powered certifications, ready to be shared with the world.
+            Chứng chỉ khóa học bạn đã hoàn thành trên MindNova.
           </p>
         </div>
-        <div className="flex items-center gap-3 shrink-0 flex-wrap">
-          <button className="flex items-center gap-2 px-5 py-3 bg-[#F0F0FF] text-[#64748B] rounded-xl text-[14px] font-bold hover:bg-[#EAEAF4] transition-colors shadow-sm">
-            <UploadIcon className="w-4 h-4" />
-            Export All
-          </button>
-          <button className="flex items-center gap-2 px-6 py-3 bg-[#3B82F6] text-white rounded-xl text-[14px] font-bold hover:bg-[#2563EB] transition-colors shadow-md">
-            <ShareIcon className="w-4 h-4" />
-            Share Portfolio
-          </button>
-        </div>
       </div>
 
-      {/* Claim Banner */}
-      <div className="bg-white border border-[#64748B]/20 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm relative overflow-hidden">
-        {/* Subtle background glow */}
-        <div className="absolute top-0 left-0 w-64 h-full bg-gradient-to-r from-[#F0F0FF] to-transparent pointer-events-none" />
-        
-        <div className="flex items-center gap-5 relative z-10 w-full md:w-auto">
-          <div className="w-16 h-16 rounded-full bg-[#EAEAF4] flex items-center justify-center shrink-0">
-            <PartyPopperIcon className="w-8 h-8 text-[#3B82F6]" />
-          </div>
-          <div>
-            <h2 className="text-[18px] font-bold text-[#0F172A] mb-1">Ready to claim!</h2>
-            <p className="text-[14px] text-[#64748B]">
-              You&apos;ve completed 100% of <span className="font-bold text-[#0F172A]">Neural Networks 101</span>.
-            </p>
-          </div>
-        </div>
-        <button className="w-full md:w-auto px-8 py-3.5 bg-[#3B82F6] text-white rounded-xl text-[15px] font-bold flex items-center justify-center gap-2 hover:bg-[#2563EB] transition-colors shadow-[0_4px_14px_rgba(59, 130, 246,0.35)] relative z-10 shrink-0">
-          Claim Your Certificate
-          <ArrowRightIcon className="w-4 h-4" />
-        </button>
-      </div>
+      {isLoading && <p className="text-sm text-[#64748B]">Đang tải chứng chỉ...</p>}
+      {isError && (
+        <p className="text-sm text-rose-600">
+          Không thể tải chứng chỉ.{" "}
+          <button type="button" className="underline" onClick={() => refetch()}>Thử lại</button>
+        </p>
+      )}
 
-      {/* Certificates Grid */}
+      {firstClaimable && (
+        <div className="bg-white border border-[#64748B]/20 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+          <div className="flex items-center gap-5 w-full md:w-auto">
+            <div className="w-16 h-16 rounded-full bg-[#EAEAF4] flex items-center justify-center shrink-0">
+              <PartyPopperIcon className="w-8 h-8 text-[#3B82F6]" />
+            </div>
+            <div>
+              <h2 className="text-[18px] font-bold text-[#0F172A] mb-1">Sẵn sàng nhận chứng chỉ</h2>
+              <p className="text-[14px] text-[#64748B]">
+                Bạn đã hoàn thành <span className="font-bold text-[#0F172A]">{firstClaimable.course_title}</span>.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleClaim(firstClaimable.course_id)}
+            className="w-full md:w-auto px-8 py-3.5 bg-[#3B82F6] text-white rounded-xl text-[15px] font-bold flex items-center justify-center gap-2 hover:bg-[#2563EB] shrink-0"
+          >
+            Claim Your Certificate
+            <ArrowRightIcon className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        {/* Card 1 */}
-        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
-          {/* Certificate Preview Graphic */}
-          <div className="w-full h-[180px] rounded-xl mb-5 relative bg-gradient-to-br from-[#1A1C23] to-[#0A0B0E] p-2 flex flex-col items-center justify-center shadow-inner overflow-hidden border border-[#2A2C33]">
-            <div className="absolute inset-1.5 border border-[#D4AF37]/40 rounded-lg pointer-events-none" />
-            <div className="absolute inset-2 border border-[#D4AF37]/20 rounded-lg pointer-events-none" />
-            <div className="w-8 h-8 rounded-full border border-[#D4AF37] flex items-center justify-center mb-3">
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#AA8A2A]" />
+        {issued.map((certificate) => (
+          <div key={certificate.id} className="bg-white border border-[#EAEAF4] rounded-2xl p-5 shadow-sm flex flex-col">
+            <div className="w-full h-[180px] rounded-xl mb-5 bg-[#F8F9FB] border border-[#EAEAF4] flex flex-col items-center justify-center p-4 text-center">
+              <div className="text-[10px] font-bold tracking-[0.2em] text-[#3B82F6] uppercase mb-2">MindNova</div>
+              <div className="text-[14px] font-serif text-[#0F172A]">{certificate.student_name}</div>
+              <div className="text-[12px] text-[#64748B] mt-2">{certificate.course_title}</div>
             </div>
-            <div className="text-[10px] font-bold tracking-[0.2em] text-[#D4AF37] uppercase mb-1">Mindnova</div>
-            <div className="text-[6px] text-gray-400 uppercase tracking-widest mb-3">Certificate of Achievement</div>
-            <div className="w-1/2 h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mb-2" />
-            <div className="text-[12px] text-white font-serif">Alex Chen</div>
-          </div>
-          
-          <div className="flex-1 flex flex-col">
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="text-[17px] font-bold text-[#0F172A] leading-tight">Next.js Fullstack</h3>
-              <VerifiedBadgeIcon className="w-5 h-5 text-[#3B82F6] shrink-0 mt-0.5" />
-            </div>
-            <p className="text-[13px] text-[#64748B] mb-5">Completed on Oct 12, 2023</p>
-            
-            <div className="flex items-center gap-2 flex-wrap mt-auto">
-              <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">React</span>
-              <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Node.js</span>
-              <span className="px-2.5 py-1 bg-[#F0F0FF] text-[#64748B] border border-[#64748B]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Expert</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 2 */}
-        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
-          {/* Certificate Preview Graphic */}
-          <div className="w-full h-[180px] rounded-xl mb-5 relative bg-gradient-to-br from-[#0F3A44] to-[#0A262D] p-4 flex flex-col items-center justify-center shadow-inner overflow-hidden border border-[#164D59]">
-            <div className="w-[80%] h-full flex flex-col items-start justify-center">
-              <div className="text-[12px] font-bold text-white mb-2">Mindnova AI Academy</div>
-              <div className="w-full h-px bg-white/20 mb-3" />
-              <div className="text-[14px] text-white/90 font-serif mb-1">Machine Learning Foundations</div>
-              <div className="text-[8px] text-white/50 mb-3">Awarded to Alex Chen</div>
-              <div className="absolute bottom-4 right-4 w-10 h-10 bg-[#20B2AA] transform rotate-45 opacity-80" />
-            </div>
-          </div>
-          
-          <div className="flex-1 flex flex-col">
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="text-[17px] font-bold text-[#0F172A] leading-tight">Machine Learning Foundations</h3>
-              <VerifiedBadgeIcon className="w-5 h-5 text-[#3B82F6] shrink-0 mt-0.5" />
-            </div>
-            <p className="text-[13px] text-[#64748B] mb-5">Completed on Aug 05, 2023</p>
-            
-            <div className="flex items-center gap-2 flex-wrap mt-auto">
-              <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Python</span>
-              <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Scikit-Learn</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3 */}
-        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
-          {/* Certificate Preview Graphic */}
-          <div className="w-full h-[180px] rounded-xl mb-5 relative bg-[#F8F9FB] p-4 flex flex-col items-center justify-center shadow-inner border border-[#EAEAF4]">
-            <div className="w-[85%] h-[85%] bg-white shadow-sm border border-[#EAEAF4] flex flex-col items-center justify-center relative p-3">
-              <div className="text-[14px] font-serif text-[#0F172A] mb-2 border-b border-[#EAEAF4] pb-1">Alex Chen</div>
-              <div className="text-[8px] text-[#64748B] text-center px-4">Has successfully completed the Advanced UI Design course on MindNova AI.</div>
-              {/* Ribbon */}
-              <div className="absolute bottom-3 right-3 flex flex-col items-center">
-                <div className="w-6 h-6 rounded-full bg-[#3B82F6] border-2 border-white shadow-sm relative z-10" />
-                <div className="w-2 h-4 bg-[#64748B] transform -rotate-12 translate-x-1 -translate-y-2 absolute bottom-[-8px] right-2" />
-                <div className="w-2 h-4 bg-[#64748B] transform rotate-12 -translate-x-1 -translate-y-2 absolute bottom-[-8px] left-2" />
+            <div className="flex-1 flex flex-col">
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <h3 className="text-[17px] font-bold text-[#0F172A] leading-tight">{certificate.course_title}</h3>
+                <VerifiedBadgeIcon className="w-5 h-5 text-[#3B82F6] shrink-0 mt-0.5" />
               </div>
+              <p className="text-[13px] text-[#64748B] mb-5">
+                {certificate.issued_at ? `Completed on ${certificate.issued_at}` : "Đã cấp"}
+              </p>
+              <button
+                type="button"
+                onClick={() => handleShare(certificate.certificate_url)}
+                className="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-[#3B82F6]"
+              >
+                <ShareIcon className="w-4 h-4" /> Share
+              </button>
             </div>
           </div>
-          
-          <div className="flex-1 flex flex-col">
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="text-[17px] font-bold text-[#0F172A] leading-tight">Advanced UI Design</h3>
-              <VerifiedBadgeIcon className="w-5 h-5 text-[#3B82F6] shrink-0 mt-0.5" />
-            </div>
-            <p className="text-[13px] text-[#64748B] mb-5">Completed on June 20, 2023</p>
-            
-            <div className="flex items-center gap-2 flex-wrap mt-auto">
-              <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Design Systems</span>
-              <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Figma</span>
-            </div>
-          </div>
-        </div>
-
+        ))}
+        {!isLoading && issued.length === 0 && (
+          <p className="text-sm text-[#64748B] col-span-full">Bạn chưa có chứng chỉ nào.</p>
+        )}
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
-        
-        {/* Total Certificates */}
-        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 flex items-center gap-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 flex items-center gap-5">
           <div className="w-14 h-14 rounded-2xl bg-[#F0F0FF] text-[#64748B] flex items-center justify-center shrink-0">
             <GraduationCapIcon className="w-6 h-6" />
           </div>
           <div>
             <p className="text-[13px] font-semibold text-[#64748B] mb-0.5">Total Certificates</p>
-            <p className="text-2xl font-bold text-[#0F172A]">08</p>
+            <p className="text-2xl font-bold text-[#0F172A]">{data?.stats.total_certificates ?? 0}</p>
           </div>
         </div>
-
-        {/* Learning Hours */}
-        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 flex items-center gap-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
-          <div className="w-14 h-14 rounded-2xl bg-[#F4FAFA] text-[#20B2AA] flex items-center justify-center shrink-0">
-            <StopwatchIcon className="w-6 h-6" />
-          </div>
-          <div>
-            <p className="text-[13px] font-semibold text-[#64748B] mb-0.5">Learning Hours</p>
-            <p className="text-2xl font-bold text-[#0F172A]">240h</p>
-          </div>
-        </div>
-
-        {/* Skill Points */}
-        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 flex items-center gap-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 flex items-center gap-5">
           <div className="w-14 h-14 rounded-2xl bg-[#F0F0FF] text-[#64748B] flex items-center justify-center shrink-0">
             <MedalIcon className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[13px] font-semibold text-[#64748B] mb-0.5">Skill Points</p>
-            <p className="text-2xl font-bold text-[#0F172A]">1,250</p>
+            <p className="text-[13px] font-semibold text-[#64748B] mb-0.5">Completed courses</p>
+            <p className="text-2xl font-bold text-[#0F172A]">{data?.stats.completed_courses ?? 0}</p>
           </div>
         </div>
-
       </div>
-
     </div>
   );
 }

@@ -13,6 +13,6 @@ type Props = {
 export default async function CourseDetailPage({ searchParams }: Props) {
  const resolvedParams = await searchParams;
  const courseIdStr = resolvedParams.courseId;
- const courseId = courseIdStr ? parseInt(courseIdStr as string, 10) : 1;
+ const courseId = courseIdStr ? parseInt(courseIdStr as string, 10) : 0;
  return <CourseDetailWorkspace courseId={courseId} />;
 }

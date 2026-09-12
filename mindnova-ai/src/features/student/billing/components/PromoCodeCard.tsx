@@ -2,28 +2,35 @@
 
 import { useState } from "react";
 import { SparkleIcon } from "./icons";
+import { axiosClient } from "@/src/shared/lib/axios";
 
-export function PromoCodeCard() {
- const [code, setCode] = useState("NOVA2026-AI");
+export function PromoCodeCard({ courseId }: { courseId?: number | null }) {
+ const [code, setCode] = useState("");
  const [applied, setApplied] = useState(false);
  const [error, setError] = useState(false);
+ const [message, setMessage] = useState("");
 
- function handleApply() {
+ async function handleApply() {
  if (code.trim().length === 0) {
  setError(true);
  setApplied(false);
  return;
  }
- setError(false);
- setApplied(true);
- setTimeout(() => setApplied(false), 3500);
+ if (!courseId) {
+ setError(true);
+ setMessage("Mã sẽ được áp dụng khi thanh toán khóa học.");
+ return;
  }
-
- function handleQuickSelect(sample: string) {
- setCode(sample);
+ try {
+ const { data } = await axiosClient.post("/api/coupons/apply", { code: code.trim(), course_id: courseId });
  setError(false);
  setApplied(true);
- setTimeout(() => setApplied(false), 3500);
+ setMessage(data.message || "Áp dụng mã thành công.");
+ } catch (err: any) {
+ setError(true);
+ setApplied(false);
+ setMessage(err?.response?.data?.message || "Mã không hợp lệ.");
+ }
  }
 
  return (
@@ -65,30 +72,9 @@ export function PromoCodeCard() {
  </button>
  </div>
 
- {/* Quick Selection Pills (Prevents overlap with floating AI widget) */}
- <div className="flex flex-wrap items-center gap-2 pt-1">
- <span className="text-xs text-[#64748b] font-normal mr-1">Gợi ý khả dụng:</span>
- {[
- { tag: "NOVA2026-AI", label: "Giảm 20% Học kỳ Pro" },
- { tag: "AIMASTER10", label: "Voucher 100K" },
- ].map(({ tag, label }) => (
- <button
- key={tag}
- type="button"
- onClick={() => handleQuickSelect(tag)}
- className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F4F5FD] hover:bg-[#f8fafc] border border-[#e2e8f0] hover:border-[#e2e8f0] text-xs font-medium text-[#2563eb] transition-all duration-150 cursor-pointer shadow-2xs"
- >
- <span className="font-semibold">{tag}</span>
- <span className="text-[11px] text-[#64748b] font-normal">• {label}</span>
- </button>
- ))}
- </div>
-
- {/* Feedback Messages */}
- {applied && (
- <p className="text-xs font-medium text-[#0f172a] bg-[#EAF8F5] p-3 rounded-xl border border-[#0f172a] flex items-center gap-2 mt-1 animate-fadeIn">
- <span></span>
- <span><strong>{code}</strong> đã được áp dụng thành công cho lượt thanh toán tiếp theo!</span>
+ {applied && message && (
+ <p className="text-xs font-medium text-[#0f172a] bg-[#EAF8F5] p-3 rounded-xl border border-[#0f172a] mt-1">
+ {message}
  </p>
  )}
  {error && (

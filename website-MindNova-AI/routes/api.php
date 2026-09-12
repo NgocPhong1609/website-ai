@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\Student\HistoryController as StudentHistoryControll
 use App\Http\Controllers\Api\Student\NotificationController as StudentNotificationController;
 use App\Http\Controllers\Api\Student\StreakController;
 use App\Http\Controllers\Api\Student\AiQuizGeneratorController;
+use App\Http\Controllers\Api\Student\CertificateController as StudentCertificateController;
 use App\Http\Controllers\Api\Student\AnalyzeLessonController;
 use App\Http\Controllers\Api\Student\SelfAssessmentController;
 use App\Http\Controllers\Api\Student\PaymentController as StudentPaymentController;
@@ -87,14 +88,6 @@ Route::get('/student/payment/vnpay-ipn', [OrderController::class, 'vnpayIpn']);
 Route::post('/student/payment/momo-ipn', [OrderController::class, 'momoIpn']);
 
 // -- Nhóm AI Quiz Generator & Review --
-Route::prefix('student/practice')->group(function () {
-    Route::post('/generate-ai-quiz', [AiQuizGeneratorController::class, 'generate']);
-    Route::get('/ai-quizzes/history', [AiQuizGeneratorController::class, 'history']);
-    Route::get('/ai-quizzes/{id}', [AiQuizGeneratorController::class, 'show']);
-    Route::post('/ai-quizzes/{id}/submit', [AiQuizGeneratorController::class, 'submit']);
-    Route::delete('/ai-quizzes/{id}', [AiQuizGeneratorController::class, 'destroy']);
-});
-
 // -- API Student Public Routes --
 Route::prefix('student')->group(function () {
     Route::get('/study-plan', [StudentStudyPlanController::class, 'overview']);
@@ -165,6 +158,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Enrolled Courses
         Route::get('/courses/enrolled', [StudentCourseController::class, 'enrolledCourses']);
+
+        Route::prefix('practice')->group(function () {
+            Route::post('/generate-ai-quiz', [AiQuizGeneratorController::class, 'generate']);
+            Route::get('/ai-quizzes/history', [AiQuizGeneratorController::class, 'history']);
+            Route::get('/ai-quizzes/{id}', [AiQuizGeneratorController::class, 'show']);
+            Route::post('/ai-quizzes/{id}/submit', [AiQuizGeneratorController::class, 'submit']);
+            Route::delete('/ai-quizzes/{id}', [AiQuizGeneratorController::class, 'destroy']);
+        });
+
+        Route::get('/certificates', [StudentCertificateController::class, 'index']);
+        Route::post('/certificates/claim', [StudentCertificateController::class, 'claim']);
 
         // Check Order Status by Transaction ID
         Route::get('/orders/transaction/{transactionId}', [OrderController::class, 'showByTransaction']);

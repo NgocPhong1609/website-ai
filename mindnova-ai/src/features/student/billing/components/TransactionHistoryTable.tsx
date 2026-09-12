@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { TRANSACTIONS, FILTER_PERIODS } from "../constants";
+import { FILTER_PERIODS } from "../constants";
+import type { BillingOrder } from "../api";
 import type { Transaction, TransactionStatus, FilterPeriod } from "../types";
 import { FilterIcon, ChevronDownSmall } from "./icons";
 import { StudentRefundModal } from "../../courses/components/StudentRefundModal";
@@ -179,12 +180,30 @@ function TransactionRow({ tx, onRefundClick }: { tx: Transaction; onRefundClick?
 
 // ─── Transaction History Table ────────────────────────────────────────────────
 
-export function TransactionHistoryTable() {
+function mapStatus(status: string): TransactionStatus {
+  if (status === "completed") return "Paid";
+  if (status === "refunded") return "Refunded";
+  if (status === "failed") return "Failed";
+  return "Pending";
+}
+
+export function TransactionHistoryTable({ orders = [], isLoading = false }: { orders?: BillingOrder[]; isLoading?: boolean }) {
   const [filter, setFilter] = useState<FilterPeriod>("6 Tháng qua");
   const [showAll, setShowAll] = useState(false);
   const [refundTx, setRefundTx] = useState<Transaction | null>(null);
 
-  const displayed = showAll ? TRANSACTIONS : TRANSACTIONS.slice(0, 4);
+  const transactions: Transaction[] = orders.map((order) => ({
+    id: String(order.id),
+    invoiceId: order.transaction_id || `#${order.id}`,
+    date: order.created_at || "",
+    service: order.service,
+    serviceIcon: "course",
+    amount: `${Number(order.total_amount).toLocaleString("vi-VN")} VNĐ`,
+    status: mapStatus(order.status),
+    canRefund: order.status === "completed",
+  }));
+
+  const displayed = showAll ? transactions : transactions.slice(0, 4);
 
   return (
     <div className="rounded-2xl bg-white border border-[#e2e8f0] shadow-2xs overflow-hidden transition-all duration-300 hover:shadow-sm">
@@ -194,7 +213,7 @@ export function TransactionHistoryTable() {
           <h2 className="text-base font-semibold text-[#0f172a] flex items-center gap-2">
             <span>Lịch Sử Giao Dịch &amp; Học Phí</span>
             <span className="text-[11px] font-medium text-[#2563eb] bg-[#f8fafc] px-2.5 py-0.5 rounded-full border border-[#2563eb]/20">
-              {TRANSACTIONS.length} Giao dịch
+              {isLoading ? "..." : `${transactions.length} Giao dịch`}
             </span>
           </h2>
           <p className="text-xs font-normal text-[#64748b] mt-1">
@@ -241,12 +260,17 @@ export function TransactionHistoryTable() {
             {displayed.map((tx) => (
               <TransactionRow key={tx.id} tx={tx} onRefundClick={(t) => setRefundTx(t)} />
             ))}
+            {!isLoading && displayed.length === 0 && (
+              <tr>
+                <td colSpan={6} className="px-6 py-10 text-center text-sm text-[#64748b]">Chưa có giao dịch.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Footer view controls */}
-      {!showAll && TRANSACTIONS.length > 4 && (
+      {!showAll && transactions.length > 4 && (
         <div className="border-t border-[#F0F2FA] p-4 flex justify-center bg-[#F8FAFC]/40">
           <button
             type="button"

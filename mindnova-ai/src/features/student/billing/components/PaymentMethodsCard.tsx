@@ -1,89 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { NoDataAvailable } from "@/src/shared/components/ui";
-import { PAYMENT_CARDS } from "../constants";
-import type { PaymentCard } from "../types";
-import { PlusIcon, TrashIcon } from "./icons";
+import { PlusIcon } from "./icons";
 import { ShieldCheck, CreditCard } from "lucide-react";
 import toast from "react-hot-toast";
 
-// ─── Card Brand Logos ─────────────────────────────────────────────────────────
-
-function VisaLogo() {
-  return (
-    <div className="flex items-center justify-center w-11 h-7 bg-[#1A1F71] rounded-lg shrink-0 shadow-2xs">
-      <span className="text-white text-[10px] font-extrabold tracking-widest italic select-none">VISA</span>
-    </div>
-  );
-}
-
-function MastercardLogo() {
-  return (
-    <div className="flex items-center justify-center w-11 h-7 rounded-lg shrink-0 overflow-hidden bg-gray-800 shadow-2xs">
-      <div className="relative w-6 h-4">
-        <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-[#EB001B] opacity-90" />
-        <div className="absolute right-0 top-0 w-4 h-4 rounded-full bg-[#F79E1B] opacity-90" />
-        <div className="absolute left-1/2 -translate-x-1/2 top-0 w-2 h-4 bg-[#FF5F00] opacity-80 rounded-sm" />
-      </div>
-    </div>
-  );
-}
-
-// ─── Single Card Row ──────────────────────────────────────────────────────────
-
-interface CardRowProps {
-  card: PaymentCard;
-  onRemove: (id: string) => void;
-}
-
-function CardRow({ card, onRemove }: CardRowProps) {
-  return (
-    <div className="flex items-center justify-between py-3 px-3.5 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC]/60 hover:bg-white hover:border-[#64748b]/30 transition-all duration-200 shadow-2xs group">
-      <div className="flex items-center gap-3.5 min-w-0">
-        {card.brand === "visa" ? <VisaLogo /> : <MastercardLogo />}
-
-        <div className="space-y-0.5">
-          <div className="flex items-center gap-2.5">
-            <span className="text-xs sm:text-sm font-semibold text-[#0f172a] tracking-normal">
-              Thẻ {card.brand === "visa" ? "Visa" : "Mastercard"} •••• {card.last4}
-            </span>
-            {card.isDefault && (
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold text-[#1d4ed8] bg-[#eff6ff] border border-[#1d4ed8]/25 shrink-0">
-                Mặc định
-              </span>
-            )}
-          </div>
-          <p className="text-xs font-normal text-[#64748b]">
-            Hết hạn: <span className="font-medium text-[#64748b]">{card.expiry}</span>
-          </p>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        aria-label={`Xóa thẻ kết thúc bằng số ${card.last4}`}
-        onClick={() => onRemove(card.id)}
-        className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748b] hover:text-[#2563eb] hover:bg-[#dbeafe]/70 transition-all duration-150 cursor-pointer opacity-75 group-hover:opacity-100"
-        title="Xóa thẻ liên kết"
-      >
-        <TrashIcon size={15} />
-      </button>
-    </div>
-  );
-}
-
-// ─── Payment Methods Card ─────────────────────────────────────────────────────
-
-export function PaymentMethodsCard() {
-  const [cards, setCards] = useState<PaymentCard[]>(PAYMENT_CARDS);
-
-  function handleRemove(id: string) {
-    setCards((prev) => prev.filter((c) => c.id !== id));
-  }
+export function PaymentMethodsCard({ methods = [], isLoading = false }: { methods?: string[]; isLoading?: boolean }) {
+  const labels: Record<string, string> = {
+    vnpay: "VNPay",
+    momo: "MoMo",
+    banking: "Chuyển khoản",
+    free: "Miễn phí",
+  };
 
   function handleAddNew() {
-    toast("Hệ thống kết nối luồng thêm thẻ an toàn SSL 256-bit qua cổng Napas & Quốc tế.");
+    toast("Thanh toán khóa học được thực hiện qua VNPay hoặc MoMo khi checkout.");
   }
 
   return (
@@ -114,12 +46,16 @@ export function PaymentMethodsCard() {
 
       {/* Compact, well-spaced card list without vertical void gap */}
       <div className="flex flex-col gap-3">
-        {cards.map((card) => (
-          <CardRow key={card.id} card={card} onRemove={handleRemove} />
+        {isLoading && <p className="text-xs text-[#64748b]">Đang tải phương thức thanh toán...</p>}
+        {!isLoading && methods.map((method) => (
+          <div key={method} className="flex items-center justify-between py-3 px-3.5 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC]/60">
+            <span className="text-sm font-semibold text-[#0f172a]">{labels[method] || method}</span>
+            <span className="text-xs text-[#64748b]">Đã sử dụng</span>
+          </div>
         ))}
-        {cards.length === 0 && (
+        {!isLoading && methods.length === 0 && (
           <div className="py-2">
-            <NoDataAvailable icon={CreditCard} title="Chưa có thẻ" description="Chưa có thẻ nào được liên kết trong hệ thống của bạn." variant="compact" />
+            <NoDataAvailable icon={CreditCard} title="Chưa có phương thức" description="Bạn chưa thanh toán khóa học nào. VNPay và MoMo sẽ hiện khi có giao dịch." variant="compact" />
           </div>
         )}
       </div>

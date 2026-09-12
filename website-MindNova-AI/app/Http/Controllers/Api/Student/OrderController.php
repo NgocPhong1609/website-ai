@@ -14,6 +14,40 @@ use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
+    public function index(Request $request)
+    {
+        $user = $request->user();
+
+        $orders = Order::with('orderItems.course')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'orders' => $orders->map(function (Order $order) {
+                    $titles = $order->orderItems
+                        ->map(fn ($item) => $item->course?->title)
+                        ->filter()
+                        ->values();
+
+                    return [
+                        'id' => $order->id,
+                        'transaction_id' => $order->transaction_id,
+                        'total_amount' => (float) $order->total_amount,
+                        'payment_method' => $order->payment_method,
+                        'status' => $order->status,
+                        'created_at' => optional($order->created_at)->timezone('Asia/Ho_Chi_Minh')?->format('d/m/Y'),
+                        'course_id' => $order->orderItems->first()?->course_id,
+                        'service' => $titles->implode(', ') ?: 'Thanh toán khóa học',
+                    ];
+                })->values(),
+                'payment_methods' => $orders->pluck('payment_method')->unique()->values(),
+            ],
+        ]);
+    }
+
     /**
      * Tạo đơn hàng mới
      */
