@@ -8,17 +8,7 @@ export const STEPS: Step[] = [
  { id: 3, label: "Cài đặt & Giá" },
 ];
 
-export const COURSE_FIELDS = [
- "Lập trình & Công nghệ",
- "Trí tuệ nhân tạo",
- "Khoa học dữ liệu",
- "Thiết kế UI/UX",
- "Marketing số",
- "Kinh doanh",
- "Ngoại ngữ",
- "Toán học",
- "Khác",
-] as const;
+export const OTHER_CATEGORY_VALUE = "__other__";
 
 export const MAX_TITLE_LENGTH = 100;
 export const MAX_DESCRIPTION_LENGTH = 500;

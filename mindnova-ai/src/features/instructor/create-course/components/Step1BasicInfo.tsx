@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { ThumbnailUploader } from "./ThumbnailUploader";
 import { ChevronDownIcon } from "./icons";
 import {
- COURSE_FIELDS,
+ OTHER_CATEGORY_VALUE,
  MAX_TITLE_LENGTH,
  MAX_DESCRIPTION_LENGTH,
 } from "../constants";
+import { useInstructorCategories } from "../api";
 import type { CourseBasicInfo, DifficultyLevel } from "../types";
 
 interface CharCountProps {
@@ -71,6 +72,20 @@ interface Step1BasicInfoProps {
 }
 
 export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
+ const { data: categories = [], isLoading: categoriesLoading } = useInstructorCategories();
+ const [search, setSearch] = useState("");
+ const [open, setOpen] = useState(false);
+
+ const filtered = useMemo(() => {
+ const q = search.trim().toLowerCase();
+ if (!q) return categories;
+ return categories.filter((c) => c.name.toLowerCase().includes(q));
+ }, [categories, search]);
+
+ const selectedName =
+ data.field === OTHER_CATEGORY_VALUE
+ ? "Khác"
+ : categories.find((c) => c.id === data.categoryId)?.name ?? "";
 
  const handleThumbnail = useCallback(
  (file: File, preview: string) => {
@@ -161,27 +176,75 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  Lĩnh vực Chuyên môn
  </label>
  <div className="relative">
- <select
+ <button
  id="course-field"
- value={data.field}
- onChange={(e) => onChange("field", e.target.value)}
- className={`w-full appearance-none px-4 py-2.5 pr-10 rounded-xl text-xs bg-[#F8FAFC]/50 border border-[#E2E8F0] focus:outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 focus:bg-white transition-all cursor-pointer shadow-2xs ${
- !data.field ? "text-gray-400 font-normal" : "text-[#0F172A] font-bold"
+ type="button"
+ onClick={() => setOpen((v) => !v)}
+ className={`w-full appearance-none px-4 py-2.5 pr-10 rounded-xl text-xs bg-[#F8FAFC]/50 border border-[#E2E8F0] focus:outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 focus:bg-white transition-all cursor-pointer shadow-2xs text-left ${
+ !selectedName ? "text-gray-400 font-normal" : "text-[#0F172A] font-bold"
  }`}
  >
- <option value="" disabled className="text-gray-400 font-normal">
- -- Chọn lĩnh vực --
- </option>
- {COURSE_FIELDS.map((f) => (
- <option key={f} value={f} className="text-[#0F172A] font-bold">
- {f}
- </option>
- ))}
- </select>
+ {categoriesLoading ? "Đang tải danh mục..." : selectedName || "-- Chọn lĩnh vực --"}
+ </button>
  <div className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-[#64748B]">
  <ChevronDownIcon size={14} />
  </div>
+ {open && (
+ <div className="absolute z-20 mt-1 w-full rounded-xl border border-[#E2E8F0] bg-white shadow-lg">
+ <input
+ autoFocus
+ value={search}
+ onChange={(e) => setSearch(e.target.value)}
+ placeholder="Tìm danh mục..."
+ className="w-full border-b border-[#E2E8F0] px-3 py-2 text-xs text-[#0F172A] outline-none"
+ />
+ <ul className="max-h-48 overflow-y-auto py-1">
+ {filtered.map((c) => (
+ <li key={c.id}>
+ <button
+ type="button"
+ className="w-full px-3 py-2 text-left text-xs font-semibold text-[#0F172A] hover:bg-[#EFF6FF]"
+ onClick={() => {
+ onChange("categoryId", c.id);
+ onChange("field", String(c.id));
+ onChange("otherName", "");
+ setOpen(false);
+ setSearch("");
+ }}
+ >
+ {c.name}
+ </button>
+ </li>
+ ))}
+ {filtered.length === 0 && (
+ <li className="px-3 py-2 text-xs text-[#64748B]">Không tìm thấy danh mục</li>
+ )}
+ <li className="border-t border-[#E2E8F0]">
+ <button
+ type="button"
+ className="w-full px-3 py-2 text-left text-xs font-bold text-[#3B82F6] hover:bg-[#EFF6FF]"
+ onClick={() => {
+ onChange("categoryId", null);
+ onChange("field", OTHER_CATEGORY_VALUE);
+ setOpen(false);
+ setSearch("");
+ }}
+ >
+ Khác
+ </button>
+ </li>
+ </ul>
  </div>
+ )}
+ </div>
+ {data.field === OTHER_CATEGORY_VALUE && (
+ <input
+ value={data.otherName}
+ onChange={(e) => onChange("otherName", e.target.value)}
+ placeholder="Nhập lĩnh vực khác..."
+ className="mt-2 w-full px-4 py-2.5 rounded-xl text-xs font-medium text-[#0F172A] placeholder:text-gray-400 bg-[#F8FAFC]/50 border border-[#E2E8F0] focus:outline-none focus:border-[#3B82F6] focus:bg-white"
+ />
+ )}
  </div>
 
  {/* Difficulty */}
