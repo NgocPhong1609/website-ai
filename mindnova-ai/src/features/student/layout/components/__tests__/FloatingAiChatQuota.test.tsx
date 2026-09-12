@@ -164,6 +164,14 @@ describe("FloatingAiChat quota", () => {
     expect(screen.getByLabelText("Hạn mức AI hôm nay")).toHaveTextContent("Còn 4/5 lượt hôm nay");
   });
 
+  it("keeps the collapsed launcher at the bottom-right until the user drags it", () => {
+    renderFloatingChat();
+    const launcher = screen.getByRole("button", { name: "Hỏi Gia sư AI" }).closest(".fixed");
+    expect(launcher).toHaveStyle({ bottom: "20px", right: "20px" });
+    expect((launcher as HTMLElement).style.left).toBe("");
+    expect((launcher as HTMLElement).style.top).toBe("");
+  });
+
   it("places the quota in a shrinkable input region at a 390px viewport", async () => {
     vi.mocked(sendAiChatMessage).mockResolvedValue({
       message: { id: "ai-2", sender: "ai", timestamp: "Vừa xong", text: "Câu trả lời" },

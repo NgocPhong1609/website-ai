@@ -262,7 +262,7 @@ function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLes
  <button
  type="button"
  onClick={onAddLesson}
- className="w-full flex items-center gap-2 px-4 py-3 text-[12px] font-semibold text-[#3B82F6] hover:bg-blue-50/50 transition-colors duration-150 border-t border-dashed text-[#F8FAFC] group"
+ className="w-full flex items-center gap-2 px-4 py-3 text-[12px] font-semibold text-[#3B82F6] hover:bg-blue-50/50 transition-colors duration-150 border-t border-dashed border-[#E2E8F0] group"
  >
  <PlusIcon size={13} />
  Thêm bài học mới vào chương {chapter.index}

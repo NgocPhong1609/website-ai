@@ -194,7 +194,7 @@ function GeneratingShimmer() {
  {[80, 100, 65, 90, 75, 55].map((w, i) => (
  <div
  key={i}
- className="h-3 rounded-full from-[#EFF6FF] via-[#DBEAFE] to-[#EFF6FF] animate-pulse"
+ className="h-3 rounded-full bg-gradient-to-r from-[#EFF6FF] via-[#DBEAFE] to-[#EFF6FF] animate-pulse"
  style={{ width: `${w}%`, animationDelay: `${i * 100}ms` }}
  />
  ))}

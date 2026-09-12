@@ -314,7 +314,7 @@ export default function QuizDetailPage() {
  onChange={(image) => setQuiz((current: any) => ({ ...current, thumbnail_url: image.url, thumbnail_r2_key: image.r2_key }))}
  />
  )}
- <div className="p-8 rounded-3xl from-[#1E233E] via-[#2B2D62] to-[#121626] text-white flex flex-col gap-5 shadow-xl border border-white/10 relative overflow-hidden">
+ <div className="p-8 rounded-3xl bg-gradient-to-r from-[#1E233E] via-[#2B2D62] to-[#121626] text-white flex flex-col gap-5 shadow-xl border border-white/10 relative overflow-hidden">
  {quiz.thumbnail_url && <img src={quiz.thumbnail_url} alt={`Ảnh đại diện ${quiz.title}`} className="h-44 w-full rounded-2xl bg-white/10 object-cover" />}
  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
  <div className="flex items-center gap-2 flex-wrap">
@@ -487,8 +487,8 @@ export default function QuizDetailPage() {
  <span
  className={`px-2.5 py-0.5 text-[11px] font-black rounded-lg border uppercase ${
  isMcq
- ? "bg-blue-50 text-[#3B82F6] text-[#F8FAFC]"
- : "bg-purple-50 text-[#3B82F6] text-[#F8FAFC]"
+ ? "bg-blue-50 text-[#3B82F6]"
+ : "bg-purple-50 text-[#3B82F6]"
  }`}
  >
  {isMcq ? "Trắc nghiệm" : "Tự luận"}

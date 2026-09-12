@@ -19,6 +19,7 @@ const sourceSans3 = Source_Sans_3({
 export const viewport: Viewport = {
  width: "device-width",
  initialScale: 1,
+ colorScheme: "light",
 };
 
 export const metadata: Metadata = {

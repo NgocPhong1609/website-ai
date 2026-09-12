@@ -530,7 +530,7 @@ function statusLabel(status: string): string {
 }
 
 function statusClassName(status: string): string {
- if (status === "published") return "text-[#F8FAFC] text-[#0F172A]";
+ if (status === "published") return "bg-emerald-50 text-[#047857]";
  if (status === "archived") return "bg-amber-100 text-amber-800";
  if (status === "pending_review") return "bg-blue-100 text-blue-800";
  if (status === "draft") return "bg-slate-100 text-slate-700";

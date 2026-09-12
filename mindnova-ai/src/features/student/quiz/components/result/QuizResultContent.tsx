@@ -383,7 +383,7 @@ export function QuizResultContent() {
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 sm:p-6 animate-fadeIn">
  <div className="bg-white w-full max-w-4xl rounded-3xl border border-[#e2e8f0] shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-scaleUp">
  
- <div className="p-6 from-[#eff6ff] via-[#F3F4FC] to-[#EAF8F5] border-b border-[#e2e8f0] flex items-center justify-between shrink-0">
+ <div className="p-6 bg-gradient-to-r from-[#eff6ff] via-[#F3F4FC] to-[#EAF8F5] border-b border-[#e2e8f0] flex items-center justify-between shrink-0">
  <div className="space-y-1">
  <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-white text-xs font-semibold text-[#2563eb] border border-[#2563eb]/20">
  <span> Soát Lỗi Chi Tiết từ Gia Sư AI Nova</span>
@@ -476,7 +476,7 @@ export function QuizResultContent() {
  </div>
  )}
 
- <div className="p-4 rounded-xl from-[#eff6ff]/80 via-[#F3F4FC] to-[#EAF8F5]/80 border border-[#2563eb]/20 space-y-2">
+ <div className="p-4 rounded-xl bg-gradient-to-r from-[#eff6ff]/80 via-[#F3F4FC] to-[#EAF8F5]/80 border border-[#2563eb]/20 space-y-2">
  <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563eb] flex items-center gap-1.5">
  <span> Nhận xét đánh giá từ Gia sư AI MindNova:</span>
  </span>

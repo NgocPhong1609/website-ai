@@ -56,7 +56,7 @@ export default function SkillContainer() {
  onClick={() => router.push("/onboarding/topics")}
  className={`py-[21.6px] px-[57.6px] rounded-lg transition-colors text-[14.4px] mt-8 ${
  selectedId !== null
- ? "bg-[#F8FAFC] text-white shadow-md hover:bg-[#5757EE]"
+ ? "bg-[#3B82F6] text-white shadow-md hover:bg-[#2563EB]"
  : "bg-[#E2E8F0] text-[#0F172A]/40 cursor-not-allowed"
  }`}
  rightIcon={<ArrowRightIcon />}

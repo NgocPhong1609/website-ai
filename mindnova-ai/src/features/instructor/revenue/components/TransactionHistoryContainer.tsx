@@ -211,14 +211,14 @@ function TransactionTable({
  };
 
  const getIconColor = (type: string) => {
- if (type === 'revenue') return "text-[#0F172A] bg-emerald-50 text-[#F8FAFC]";
- if (type === 'withdrawal') return "text-[#3B82F6] bg-purple-50 text-[#F8FAFC]";
+ if (type === 'revenue') return "text-[#047857] bg-emerald-50";
+ if (type === 'withdrawal') return "text-[#3B82F6] bg-purple-50";
  return "text-amber-600 bg-amber-50 border-amber-100";
  };
 
  const getStatusStyle = (status: string) => {
- if (status === 'available' || status === 'completed') return "text-[#0F172A] bg-emerald-50 text-[#F8FAFC]";
- if (status === 'processing') return "text-[#3B82F6] bg-blue-50 text-[#F8FAFC]";
+ if (status === 'available' || status === 'completed') return "text-[#047857] bg-emerald-50";
+ if (status === 'processing') return "text-[#3B82F6] bg-blue-50";
  if (status === 'escrow') return "text-amber-700 bg-amber-50 border-amber-200";
  return "text-gray-700 bg-[#F8FAFC] border-[#E2E8F0]";
  };

@@ -179,7 +179,7 @@ export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSumm
  icon={<BookIcon />}
  label="Topics"
  value={
- <span className="bg-[#F8FAFC] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+ <span className="bg-[#3B82F6] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
  {topics.length} selected
  </span>
  }

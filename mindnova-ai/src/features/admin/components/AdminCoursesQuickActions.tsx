@@ -69,7 +69,7 @@ function toStatusLabel(status: string): string {
 
 function statusPillClass(status: string): string {
  const value = status.toLowerCase();
- if (value.includes("publish")) return "text-[#F8FAFC] text-[#0F172A]";
+ if (value.includes("publish")) return "bg-emerald-50 text-[#047857]";
  if (value.includes("draft")) return "bg-amber-100 text-amber-700";
  if (value.includes("archive")) return "bg-rose-100 text-rose-700";
  return "bg-slate-100 text-slate-700";

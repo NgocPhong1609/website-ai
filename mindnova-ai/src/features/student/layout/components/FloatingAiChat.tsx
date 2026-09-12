@@ -243,17 +243,27 @@ export function FloatingAiChat() {
     }
   };
 
-  // Initialize initial coordinate position on client mount
-  useEffect(() => {
-    if (typeof window !== "undefined" && !position) {
-      // Default to bottom-right corner with safe padding
-      const defaultWidth = 340; // Updated 5% larger width
-      const defaultHeight = 445; // Updated 5% larger height
-      const initX = Math.max(16, window.innerWidth - defaultWidth - 24);
-      const initY = Math.max(16, window.innerHeight - defaultHeight - 24);
-      setPosition({ x: initX, y: initY });
+  const clampPosition = useCallback(() => {
+    if (!position || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const maxRight = window.innerWidth - rect.width - 8;
+    const maxBottom = window.innerHeight - rect.height - 8;
+    const nextX = Math.max(8, Math.min(position.x, maxRight));
+    const nextY = Math.max(8, Math.min(position.y, maxBottom));
+    if (nextX !== position.x || nextY !== position.y) {
+      setPosition({ x: nextX, y: nextY });
     }
-  }, []);
+  }, [position]);
+
+  useEffect(() => {
+    if (!isOpen && !position) return;
+    clampPosition();
+  }, [isOpen, clampPosition, position]);
+
+  useEffect(() => {
+    window.addEventListener("resize", clampPosition);
+    return () => window.removeEventListener("resize", clampPosition);
+  }, [clampPosition]);
 
   // Handle Mouse Drag events
   const handleMouseDown = (e: React.MouseEvent) => {

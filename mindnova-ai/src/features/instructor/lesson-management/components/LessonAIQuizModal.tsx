@@ -54,7 +54,7 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  <div className="bg-white rounded-3xl border border-[#E2E8F0] shadow-[0_30px_90px_rgba(0,0,0,0.3)] max-w-4xl w-full overflow-hidden flex flex-col max-h-[90vh]">
  
  {/* Top Header */}
- <div className="p-6 from-[#1E233E] via-[#2B2D62] to-[#121626] text-white flex items-center justify-between">
+ <div className="p-6 bg-gradient-to-r from-[#1E233E] via-[#1D4ED8] to-[#121626] text-white flex items-center justify-between">
  <div className="flex items-center gap-3">
  <div className="w-11 h-11 rounded-2xl bg-[#3B82F6] to-[#F368E0] flex items-center justify-center text-2xl font-black shadow-md">
  🪄
@@ -281,7 +281,7 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  <button
  type="button"
  onClick={() => generateFromTranscript(lessonTitle)}
- className="mt-2 px-6 py-2.5 bg-[#F8FAFC] text-white text-xs font-extrabold rounded-2xl shadow-md"
+ className="mt-2 px-6 py-2.5 bg-[#3B82F6] hover:bg-[#2563EB] text-white text-xs font-extrabold rounded-2xl shadow-md"
  >
  Generate New Questions
  </button>
