@@ -10,7 +10,7 @@ export async function getAdminOverviewData(): Promise<AdminOverviewData> {
       error: "Không thể tải tổng quan. Vui lòng tải lại trang để thử lại.",
       hero: {
         title: "Tổng quan quản trị",
-        description: "Theo dõi người dùng, khóa học, doanh thu và dữ liệu AI đã ghi nhận.",
+        description: "Theo dõi người dùng, khóa học và doanh thu.",
         primaryAction: "Quản lý nội dung",
         secondaryAction: "Xem báo cáo",
       },
@@ -19,7 +19,6 @@ export async function getAdminOverviewData(): Promise<AdminOverviewData> {
       health: [],
       users: [],
       quickActions: [],
-      ai_summary: null,
     };
   }
 }

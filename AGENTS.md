@@ -30,7 +30,7 @@ Ba vai trò:
 
 - **student**: khám phá khóa học, mua, học bài, quiz, thảo luận, chat khóa học, streak, onboarding, AI hỗ trợ.
 - **teacher** (FE thường gọi **instructor**): tạo/sửa khóa học, media, quiz, review workflow, học viên, doanh thu, xác minh giảng viên.
-- **admin**: user, teacher verification, content moderation, coupon, analytics/revenue, AI config, support.
+- **admin**: user, teacher verification, content moderation, coupon, analytics/revenue, support.
 
 ### Công nghệ chính
 
@@ -192,7 +192,7 @@ Instructor **không tự publish**. Publish qua admin content-review. Policy: x�
 
 ### 3.4 Admin
 
-FE pages: `/admin` (analytics), users, teacher-approvals, content, coupons, revenue, ai-system, moderation-support.
+FE pages: `/admin` (analytics), users, teacher-approvals, content, coupons, revenue, moderation-support.
 
 BE: `app/Http/Controllers/Api/Admin/*`.
 
@@ -326,7 +326,6 @@ Prefix `/api/admin`.
 
 - users: list/store, patch role, lock/unlock, destroy, activity
 - teacher-approvals / teachers verify/revoke, certificates approve/reject, evidence signed URL
-- ai-config GET/PUT
 - content overview/courses moderate/restore/delete, resources, question-bank
 - analytics/dashboard, revenue
 - `apiResource coupons`

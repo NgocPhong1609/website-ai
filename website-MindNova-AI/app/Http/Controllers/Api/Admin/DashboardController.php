@@ -10,8 +10,6 @@ use App\Models\Discussion;
 use App\Models\Enrollment;
 use App\Models\Order;
 use App\Models\User;
-use App\Services\Ai\AiUsageSummaryService;
-use App\Settings\AiSettingsRepository;
 use App\Settings\CommissionSettingsRepository;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -36,7 +34,7 @@ class DashboardController extends Controller
         return ($change >= 0 ? '+' : '').number_format($change, 1).'%';
     }
 
-    public function overview(AiSettingsRepository $settings, AiUsageSummaryService $usage): JsonResponse
+    public function overview(): JsonResponse
     {
         $totalUsers = User::count();
         $totalCourses = Course::count();
@@ -102,7 +100,7 @@ class DashboardController extends Controller
         return response()->json([
             'hero' => [
                 'title' => 'Xin chào, Quản trị viên',
-                'description' => 'Tổng quan người dùng, khóa học, doanh thu và dữ liệu AI đã ghi nhận.',
+                'description' => 'Tổng quan người dùng, khóa học và doanh thu.',
                 'primaryAction' => 'Quản lý nội dung',
                 'secondaryAction' => 'Xem báo cáo',
             ],
@@ -141,11 +139,6 @@ class DashboardController extends Controller
                 'Lọc và tìm kiếm khóa học',
                 'Kiểm duyệt và khóa người dùng',
                 'Gửi email thông báo',
-            ],
-            'ai_summary' => [
-                'providers' => $settings->providerReadiness(),
-                'usage' => $usage->summarize('7d'),
-                'packages' => $settings->packages(),
             ],
         ]);
     }
@@ -191,27 +184,6 @@ class DashboardController extends Controller
         })->values();
 
         return response()->json(['data' => $rows]);
-    }
-
-    public function aiSystem(AiSettingsRepository $settings, AiUsageSummaryService $usage): JsonResponse
-    {
-        $packages = $settings->packages();
-        $usageSummary = $usage->summarize('7d');
-        $prompts = $settings->prompts();
-
-        return response()->json([
-            'data' => [
-                'providers' => $settings->providerReadiness(),
-                'usage' => $usageSummary,
-                'packages' => $packages,
-                'prompts' => collect($prompts)->map(fn ($content, $name) => [
-                    'id' => $name,
-                    'name' => $name,
-                    'purpose' => $content,
-                    'status' => 'active',
-                ])->values(),
-            ],
-        ]);
     }
 
     public function content(): JsonResponse

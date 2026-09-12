@@ -1,5 +1,3 @@
-import type { AdminAiSystemData } from "./ai-system/types";
-
 export type AdminStatItem = {
  label: string;
  value: string;
@@ -96,7 +94,6 @@ export type AdminInvoicesPageData = {
 
 export type AdminOverviewData = {
  error?: string;
- ai_summary: Pick<AdminAiSystemData, "providers" | "usage" | "packages"> | null;
  hero: {
  title: string;
  description: string;

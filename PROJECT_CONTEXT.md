@@ -301,7 +301,7 @@ Không token → `/login` nếu path:
 
 #### Admin
 
-`/admin`, `/admin/users`, `/admin/teacher-approvals`, `/admin/ai-system`, `/admin/content`, `/admin/coupons`, `/admin/revenue`, `/admin/analytics`, `/admin/moderation-support`.
+`/admin`, `/admin/users`, `/admin/teacher-approvals`, `/admin/content`, `/admin/coupons`, `/admin/revenue`, `/admin/analytics`, `/admin/moderation-support`.
 
 #### Auth / stub
 
@@ -484,7 +484,7 @@ Prefix `/api/instructor`: courses CRUD + thumbnail/status/price/health/draft; mo
 
 ### Admin (`role:admin`)
 
-Prefix `/api/admin`: `GET /overview` (có trong `api.php` hiện tại), users, teacher-approvals, ai-config, content, analytics, revenue + commission-tiers, coupons, flags, tickets, review queue.
+Prefix `/api/admin`: `GET /overview` (có trong `api.php` hiện tại), users, teacher-approvals, content, analytics, revenue + commission-tiers, coupons, flags, tickets, review queue.
 
 Docs `admin-email-queue.md` nhắc `POST /admin/notifications/test-email` — **không có** trong `api.php`.
 

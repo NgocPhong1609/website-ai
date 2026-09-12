@@ -13,7 +13,6 @@ export * from "./AdminNotificationsPage";
 export * from "./AdminSidebar";
 export * from "./AdminTopbar";
 export * from "./AdminTeacherApprovalsPage";
-export * from "./AdminAiSystemPage";
 export * from "./AdminContentPage";
 export * from "./AdminCouponsPage";
 export * from "./AdminAnalyticsPage";

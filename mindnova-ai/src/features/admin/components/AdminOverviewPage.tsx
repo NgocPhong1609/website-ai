@@ -1,7 +1,6 @@
 import { AdminActivityChart } from "@/src/features/admin/components/AdminActivityChart";
 import { AdminHeroBanner } from "@/src/features/admin/components/AdminHeroBanner";
 import { AdminStatsGrid } from "@/src/features/admin/components/AdminStatsGrid";
-import { AdminAiOverviewSummary } from "./ai-system/AdminAiOverviewSummary";
 import { getAdminOverviewData } from "@/src/features/admin/services/admin-overview.service";
 
 export async function AdminOverviewPage() {
@@ -17,7 +16,6 @@ export async function AdminOverviewPage() {
  ) : (
   <p className="text-sm text-slate-600">Chưa có dữ liệu hoạt động.</p>
  )}
- <AdminAiOverviewSummary summary={data.ai_summary} />
  </div>
  );
 }

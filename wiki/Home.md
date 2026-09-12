@@ -14,6 +14,7 @@ Xong:
 - Admin sidebar/topbar/revenue/duyệt khóa: Lucide, bỏ emoji/dingbat.
 - Wizard tạo khóa instructor: Lucide thay emoji/SVG hardcode.
 - Logout admin/student dùng Blue, không còn `red-*`.
+- Gỡ trang admin **AI & System** (`/admin/ai-system`) và API `GET/PUT /api/admin/ai-config`. AI học viên/giáo viên giữ nguyên.
 
 Sắp làm:
 

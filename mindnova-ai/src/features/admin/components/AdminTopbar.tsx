@@ -111,7 +111,6 @@ export function AdminTopbar({ onOpenNav }: { onOpenNav?: () => void }) {
  const endpoints = {
  users: "/admin/users",
  analytics: "/admin/analytics/dashboard?period=monthly",
- ai_config: "/admin/ai-config",
  content_courses: "/admin/content/courses",
  content_resources: "/admin/content/resources",
  content_question_bank: "/admin/content/question-bank",

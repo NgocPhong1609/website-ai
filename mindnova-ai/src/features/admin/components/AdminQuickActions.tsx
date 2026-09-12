@@ -25,10 +25,6 @@ export function AdminQuickActions({ quickActions }: AdminQuickActionsProps) {
  return "/admin/analytics";
  }
 
- if (keyword.includes("ai") || keyword.includes("he thong") || keyword.includes("hệ thống")) {
- return "/admin/ai-system";
- }
-
  if (keyword.includes("moderation") || keyword.includes("support") || keyword.includes("ticket")) {
  return "/admin/moderation-support";
  }

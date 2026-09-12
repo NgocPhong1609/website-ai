@@ -915,7 +915,7 @@ RENDER UI
 ### ⚠️ 3. Phụ thuộc API Key cho các Tính năng AI
 - **Vị trí**: [website-MindNova-AI/config/services.php](file:///h:/du_an/website/website-MindNova-AI/config/services.php) & `.env` (`OPENAI_API_KEY`, `GEMINI_API_KEY`).
 - **Chi tiết**: Các chức năng AI (Outline Generator, Quiz Generator, Notification Generator) cần API Key hợp lệ.
-- **Rủi ro**: Nếu chưa cấu hình Key trong Admin AI System Page (`/admin/ai-config`), các nút AI trên giao diện Instructor sẽ xoay Loading liên tục hoặc bắn lỗi HTTP 500.
+- **Rủi ro**: Nếu chưa cấu hình Key trong `.env` (`GEMINI_API_KEY`, `GROQ_API_KEY`, `OPENAI_API_KEY`), các nút AI trên giao diện Instructor sẽ xoay Loading liên tục hoặc bắn lỗi HTTP 500.
 - **Đề xuất khi test**: Kiểm tra trường hợp chưa nhập API Key xem giao diện có hiển thị thông báo lỗi rõ ràng hay không.
 
 ---

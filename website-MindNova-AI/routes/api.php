@@ -42,7 +42,6 @@ use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\Admin\AnalyticsController as AdminAnalyticsController;
 use App\Http\Controllers\Api\Admin\ContentManagementController as AdminContentManagementController;
 use App\Http\Controllers\Api\Admin\ModerationSupportController as AdminModerationSupportController;
-use App\Http\Controllers\Api\Admin\SystemConfigController as AdminSystemConfigController;
 use App\Http\Controllers\Api\Admin\UserManagementController as AdminUserManagementController;
 use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Api\Admin\CouponController as AdminCouponController;
@@ -370,11 +369,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/certificates/{certId}/reject', [AdminUserManagementController::class, 'rejectCertificate']);
     Route::get('/certificates/evidence/{evidenceId}', [AdminUserManagementController::class, 'getEvidenceSignedUrl']);
 
-    // 2) AI and system configuration
-    Route::get('/ai-config', [AdminSystemConfigController::class, 'show']);
-    Route::put('/ai-config', [AdminSystemConfigController::class, 'update']);
-
-    // 3) Content management
+    // 2) Content management
     Route::get('/content/overview', [AdminContentManagementController::class, 'overview']);
     Route::get('/content/courses', [AdminContentManagementController::class, 'courses']);
     Route::get('/content/courses/{course}', [AdminContentManagementController::class, 'showCourse']);
