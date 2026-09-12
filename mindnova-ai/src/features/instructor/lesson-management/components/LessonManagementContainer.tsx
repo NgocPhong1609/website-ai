@@ -275,46 +275,111 @@ function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLes
 
 // ─── AI Assist Card ───────────────────────────────────────────────────────────
 
-function AIAssistCard({ courseId, onSuggestChapter }: {
-    courseId?: string;
-    onSuggestChapter: () => void;
+export function AIAssistCard({ courseId, onSuggestChapter }: {
+ courseId?: string;
+ onSuggestChapter: () => void | Promise<void>;
 }) {
-    return (
-        <div className="rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50/80 via-purple-50/50 to-blue-50/80 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
-            <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-                <div className="flex items-center gap-2 text-[#C0392B]">
-                    <span className="animate-pulse"><SparklesIcon size={13} /></span>
-                    <span className="text-[10px] font-black tracking-widest uppercase">
-                        MindNova AI Assist
-                    </span>
-                </div>
-                <p className="text-[14px] font-black text-[#2C3039]">
-                    Studio Tạo &amp; Tự Động Sinh Đề Kiểm Tra Bằng AI
-                </p>
-                <p className="text-[12px] text-[#8A8478] font-medium leading-relaxed max-w-[420px]">
-                    Trí tuệ nhân tạo MindNova phân tích toàn bộ bài học thuộc khóa học này để tự động tạo bộ câu hỏi trắc nghiệm &amp; tự luận bám sát giáo trình.
-                </p>
-            </div>
+ const [isSuggesting, setIsSuggesting] = useState(false);
+ const [suggestionError, setSuggestionError] = useState<string | null>(null);
 
-            <div className="flex items-center gap-2 shrink-0">
-                <Link
-                    href={`/instructor/quiz-generator?course_id=${courseId || ""}`}
-                    className="px-4 py-2.5 rounded-xl text-[13px] font-extrabold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-md transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                    <SparklesIcon size={13} />
-                    <span>🤖 Tạo Quiz bằng AI</span>
-                </Link>
-                <button
-                    type="button"
-                    onClick={onSuggestChapter}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-[#2C3039] bg-white border border-[#FAF7F2] hover:bg-gray-50 transition-all duration-200 focus:outline-none"
-                >
-                    <PlusIcon size={13} />
-                    Gợi ý Chương mới
-                </button>
-            </div>
-        </div>
-    );
+ const handleSuggestChapter = async () => {
+  setIsSuggesting(true);
+  setSuggestionError(null);
+
+  try {
+   await onSuggestChapter();
+  } catch (error) {
+   setSuggestionError(
+    error instanceof Error && error.message
+     ? error.message
+     : "Không thể mở trình soạn thảo chương. Vui lòng thử lại.",
+   );
+  } finally {
+   setIsSuggesting(false);
+  }
+ };
+
+ return (
+ <section
+  aria-label="MindNova AI Assist"
+  className="overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-purple-50 shadow-sm"
+ >
+  <div className="flex flex-col gap-5 p-4 sm:p-6">
+   <div className="flex items-start gap-3">
+    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[#C0392B] text-white shadow-sm">
+     <SparklesIcon size={17} aria-hidden="true" />
+    </span>
+    <div className="min-w-0">
+     <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#C0392B]">
+      MindNova AI Assist
+     </p>
+     <h2 className="mt-1 text-base font-black text-[#2C3039] sm:text-lg">
+      Xây dựng nội dung khóa học cùng AI
+     </h2>
+     <p className="mt-1 max-w-2xl text-xs font-medium leading-relaxed text-[#8A8478] sm:text-[13px]">
+      Chọn công cụ phù hợp để tạo đề kiểm tra hoặc tiếp tục phát triển cấu trúc khóa học.
+     </p>
+    </div>
+   </div>
+
+   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <Link
+     href={`/instructor/quiz-generator?course_id=${courseId || ""}`}
+     aria-describedby="ai-assist-quiz-description"
+     className="group flex min-h-24 items-start gap-3 rounded-2xl border border-indigo-200 bg-white p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C0392B] focus-visible:ring-offset-2"
+    >
+     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-[#C0392B] transition-colors group-hover:bg-[#C0392B] group-hover:text-white">
+      <SparklesIcon size={18} aria-hidden="true" />
+     </span>
+     <span className="min-w-0">
+      <span className="block text-sm font-extrabold text-[#2C3039]">Tạo Quiz bằng AI</span>
+      <span id="ai-assist-quiz-description" className="mt-1 block text-xs font-medium leading-relaxed text-[#8A8478]">
+       Tạo bộ câu hỏi bám sát nội dung khóa học để bạn xem lại và hiệu chỉnh.
+      </span>
+     </span>
+    </Link>
+
+    <button
+     type="button"
+     onClick={handleSuggestChapter}
+     disabled={isSuggesting}
+     aria-describedby="ai-assist-chapter-description"
+     className="group flex min-h-24 items-start gap-3 rounded-2xl border border-[#E8E2D9] bg-white p-4 text-left shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-purple-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C0392B] focus-visible:ring-offset-2 disabled:cursor-wait disabled:transform-none disabled:opacity-70"
+    >
+     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-700 transition-colors group-hover:bg-purple-700 group-hover:text-white">
+      {isSuggesting ? (
+       <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" />
+      ) : (
+       <PlusIcon size={18} aria-hidden="true" />
+      )}
+     </span>
+     <span className="min-w-0">
+      <span className="block text-sm font-extrabold text-[#2C3039]">
+       {isSuggesting ? "Đang mở trình soạn thảo" : "Gợi ý Chương mới"}
+      </span>
+      <span id="ai-assist-chapter-description" className="mt-1 block text-xs font-medium leading-relaxed text-[#8A8478]">
+       Mở trình soạn thảo chương để bổ sung phần tiếp theo cho giáo trình.
+      </span>
+     </span>
+    </button>
+   </div>
+
+   {suggestionError && (
+    <div role="alert" className="flex flex-col gap-2 rounded-2xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800 sm:flex-row sm:items-center sm:justify-between">
+     <span className="font-semibold">{suggestionError}</span>
+     <button
+      type="button"
+      onClick={handleSuggestChapter}
+      disabled={isSuggesting}
+      className="self-start rounded-xl border border-rose-200 bg-white px-3 py-2 font-extrabold text-rose-700 transition-colors hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60 sm:self-auto"
+     >
+      Thử lại
+     </button>
+    </div>
+   )}
+  </div>
+ </section>
+ );
 }
 
 // ─── Filter Tabs + Stats ──────────────────────────────────────────────────────

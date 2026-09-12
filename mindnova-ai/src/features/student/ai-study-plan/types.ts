@@ -43,6 +43,19 @@ export interface AiChatMessage {
  animate?: boolean;
 }
 
+export interface AiQuotaMeta {
+ package: "free" | "premium";
+ daily_limit: number;
+ used: number;
+ remaining: number;
+ resets_at: string;
+}
+
+export interface AiChatResult {
+ message: AiChatMessage;
+ quota?: AiQuotaMeta;
+}
+
 export interface StudyPlanOverview {
  activeSyllabus: ActiveSyllabus | null;
  coreConcepts: CoreConcept[];
@@ -67,4 +80,7 @@ export interface AiChatApiResponse {
  success: boolean;
  message: string;
  data: AiChatMessage;
+ meta?: {
+  quota?: AiQuotaMeta;
+ };
 }

@@ -46,7 +46,7 @@ export default async function AIStudyPlanPage() {
                         </div>
 
                         {/* Synchronized Universal Wide Mastery Card */}
-                        <div className="group shrink-0 bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-[#980811] flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm hover:border-[#980811] hover:-translate-y-0.5 transition-all duration-300">
+                        <div className="group w-full min-w-0 shrink-0 bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-[#E8E2D9] flex flex-col justify-center sm:min-w-[380px] lg:w-auto shadow-sm hover:border-[#E8E2D9] hover:-translate-y-0.5 transition-all duration-300">
                             <div className="w-full flex items-center justify-between gap-4 mb-2">
                                 <span className="text-xs font-semibold text-[#8A8478] group-hover:text-[#C0392B] transition-colors">Tiến độ lộ trình ↗</span>
                                 <span className="text-[11px] font-bold text-[#2C3039] bg-[#FAF7F2] px-2.5 py-0.5 rounded-full border border-[#2C3039]">

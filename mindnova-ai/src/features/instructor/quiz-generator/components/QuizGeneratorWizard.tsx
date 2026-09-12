@@ -176,6 +176,8 @@ export function QuizGeneratorWizard({
       {step === 4 && (
         <Step4ReviewEditor
           questions={questions}
+          config={config}
+          onChangeConfig={updateConfig}
           onUpdateQuestion={updateQuestion}
           onApproveQuestion={approveQuestion}
           onDeleteQuestion={deleteQuestion}

@@ -5,8 +5,8 @@ import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
 import { UploadIcon, MoreVerticalIcon, RobotIcon, SendIcon } from "./icons";
 import { Sparkles, Star, Check, Clipboard, Zap } from "lucide-react";
-import type { AiChatMessage } from "../types";
-import { sendAiChatMessage } from "../services/ai-chat.client-service";
+import type { AiChatMessage, AiQuotaMeta } from "../types";
+import { AiQuotaError, sendAiChatMessage } from "../services/ai-chat.client-service";
 
 interface ChatPanelProps {
   initialMessages?: AiChatMessage[];
@@ -160,8 +160,32 @@ export function ChatPanel({
   const [stoppedMsgIds, setStoppedMsgIds] = useState<string[]>([]);
   const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
   const [pinnedIds, setPinnedIds] = useState<string[]>([]);
+  const [quota, setQuota] = useState<AiQuotaMeta | null>(null);
+  const [quotaResetReached, setQuotaResetReached] = useState(false);
   const chatBoxRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (quota?.remaining !== 0) return;
+    const resetAt = Date.parse(quota.resets_at);
+    if (!Number.isFinite(resetAt) || resetAt <= Date.now()) return;
+
+    const timer = window.setTimeout(
+      () => setQuotaResetReached(true),
+      Math.min(resetAt - Date.now(), 2_147_483_647)
+    );
+    return () => window.clearTimeout(timer);
+  }, [quota]);
+
+  const resetAt = quota ? Date.parse(quota.resets_at) : Number.NaN;
+  const isQuotaBlocked = quota?.remaining === 0
+    && !quotaResetReached
+    && (!Number.isFinite(resetAt) || resetAt > Date.now());
+
+  const updateQuota = (nextQuota: AiQuotaMeta) => {
+    setQuota(nextQuota);
+    setQuotaResetReached(false);
+  };
 
   // Load chat history after hydration completes to guarantee 100% SSR matching
   useEffect(() => {
@@ -216,11 +240,13 @@ export function ChatPanel({
 
   const chatMutation = useMutation({
     mutationFn: (messageText: string) => sendAiChatMessage(messageText, messages, lessonId),
-    onSuccess: (newAiMessage) => {
-      setMessages((prev) => [...prev, { ...newAiMessage, animate: true }]);
+    onSuccess: (result) => {
+      if (result.quota) updateQuota(result.quota);
+      setMessages((prev) => [...prev, { ...result.message, animate: true }]);
     },
     onError: (error) => {
       console.error("[ChatPanel] AI Tutor response failed:", error);
+      if (error instanceof AiQuotaError && error.quota) updateQuota(error.quota);
       const friendlyText = error instanceof Error && (error.message.includes("Gia sư") || error.message.includes(""))
         ? error.message
         : " **Gia sư Nova hiện đang bận xíu hoặc hệ thống đang chịu tải cao, bạn vui lòng chờ khoảng 1 phút rồi quay lại trò chuyện với mình nhé!** ";
@@ -260,7 +286,7 @@ export function ChatPanel({
 
   const handleSend = (textToSend?: string) => {
     const text = textToSend || inputText.trim();
-    if (!text || isGenerating) return;
+    if (!text || isGenerating || isQuotaBlocked) return;
 
     const newUserMsg: AiChatMessage = {
       id: `msg-${Date.now()}`,
@@ -278,16 +304,16 @@ export function ChatPanel({
   };
 
   useEffect(() => {
-    if (externalPrompt && !isGenerating) {
+    if (externalPrompt && !isGenerating && !isQuotaBlocked) {
       handleSend(externalPrompt);
       onClearExternalPrompt?.();
     }
-  }, [externalPrompt, isGenerating]);
+  }, [externalPrompt, isGenerating, isQuotaBlocked]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      if (!isGenerating) handleSend();
+      if (!isGenerating && !isQuotaBlocked) handleSend();
     }
   };
 
@@ -411,7 +437,7 @@ export function ChatPanel({
                   <button
                     type="button"
                     onClick={() => handleSend("Hãy giải thích lại ý trên một cách đơn giản, dễ hiểu hơn kèm ví dụ thực tế nhé!")}
-                    disabled={chatMutation.isPending}
+                    disabled={chatMutation.isPending || isQuotaBlocked}
                     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium text-[#2C3039] hover:text-[#097268] bg-[#F5F0E8] hover:bg-[#D3F3EC] border border-[#2C3039]/25 transition-all cursor-pointer shadow-2xs disabled:opacity-50"
                   >
                     <span></span>
@@ -484,8 +510,8 @@ export function ChatPanel({
                 key={prompt.id}
                 type="button"
                 onClick={() => handleSend(prompt.query)}
-                disabled={isGenerating}
-                className="group relative text-left p-3.5 rounded-xl bg-white hover:bg-[#FAF7F2] disabled:opacity-50 border border-[#FAF7F2] hover:border-[#C0392B]/50 shadow-2xs hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 focus:outline-none cursor-pointer flex flex-col justify-between gap-2.5"
+                disabled={isGenerating || isQuotaBlocked}
+                className="group relative text-left p-3.5 rounded-xl bg-white hover:bg-[#FAF7F2] disabled:opacity-50 border border-[#E8E2D9] hover:border-[#C0392B]/50 shadow-2xs hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 focus:outline-none cursor-pointer flex flex-col justify-between gap-2.5"
               >
                 <div className="flex items-center justify-between">
                   <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-lg border ${prompt.color}`}>
@@ -506,15 +532,15 @@ export function ChatPanel({
 
       {/* ─── Elevated Compact Input Bar ─── */}
       <div className="px-5 py-3 bg-white border-t border-[#F5F0E8] shrink-0">
-        <div className="max-w-5xl mx-auto space-y-1.5">
+        <div role="group" aria-label="Khung nhập tin nhắn AI" className="w-full min-w-0 max-w-5xl mx-auto space-y-1.5">
           <div className="flex items-center gap-2.5">
-            <div className="relative flex-1">
+            <div className="relative flex-1 min-w-0">
               <input
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={handleKeyDown}
-                disabled={isGenerating}
+                disabled={isGenerating || isQuotaBlocked}
                 placeholder={isGenerating ? "Nova đang tổng hợp câu trả lời cho bạn..." : "Hỏi Nova bất cứ điều gì về bài tập hay lộ trình học bối rối nhé..."}
                 className="w-full bg-[#FAF7F2] focus:bg-white disabled:bg-gray-100 border border-[#FAF7F2] focus:border-[#C0392B] rounded-xl pl-4 pr-24 py-2.5 text-xs sm:text-sm text-[#2C3039] placeholder:text-[#9092A8] shadow-inner focus:outline-none focus:ring-2 focus:ring-[#C0392B]/15 transition-all duration-200 font-medium"
               />
@@ -536,7 +562,7 @@ export function ChatPanel({
               <button
                 type="button"
                 onClick={() => handleSend()}
-                disabled={!inputText.trim()}
+                disabled={!inputText.trim() || isQuotaBlocked}
                 aria-label="Send message"
                 className="shrink-0 px-5 py-2.5 flex items-center justify-center bg-gradient-to-r from-[#C0392B] via-[#6669F6] to-[#C0392B] hover:brightness-110 disabled:opacity-50 disabled:pointer-events-none text-white rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 focus:outline-none shadow-2xs hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
               >
@@ -545,8 +571,13 @@ export function ChatPanel({
               </button>
             )}
           </div>
-
-          <div className="flex items-center justify-center text-xs font-normal text-[#8A8478] pt-1">
+          
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs font-normal text-[#8A8478] pt-1 text-center">
+            {quota && (
+              <span aria-label="Hạn mức AI hôm nay" className="shrink-0 text-[11px] text-[#8A8478]">
+                Còn {quota.remaining}/{quota.daily_limit} lượt hôm nay
+              </span>
+            )}
             <span> <strong>Mẹo nhỏ:</strong> Bạn có thể dán công thức toán học, bài toán khó hoặc xin code ví dụ bằng Python/JavaScript trực tiếp.</span>
           </div>
         </div>

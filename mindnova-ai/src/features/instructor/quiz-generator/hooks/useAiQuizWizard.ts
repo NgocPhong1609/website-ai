@@ -78,6 +78,7 @@ export function useAiQuizWizard(options?: {
 
  // Update Config
  const updateConfig = useCallback((fields: Partial<QuizConfig>) => {
+ setIsReviewConfirmed(false);
  setConfig((prev) => {
  const next = { ...prev, ...fields };
  return next;

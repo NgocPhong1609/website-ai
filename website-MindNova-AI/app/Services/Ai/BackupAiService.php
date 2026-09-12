@@ -16,7 +16,12 @@ class BackupAiService extends AbstractAiService
         return 'backup';
     }
 
-    public function sendMessage(array $messages, array $options = []): string
+    public function isReady(): bool
+    {
+        return ! empty($this->resolveApiKey());
+    }
+
+    private function resolveApiKey(): mixed
     {
         $provider = config('services.backup_ai.provider', 'openai');
         $apiKey = config('services.backup_ai.api_key');
@@ -28,6 +33,14 @@ class BackupAiService extends AbstractAiService
                 $apiKey = config('services.openai.key');
             }
         }
+
+        return $apiKey;
+    }
+
+    public function sendMessage(array $messages, array $options = []): string
+    {
+        $provider = config('services.backup_ai.provider', 'openai');
+        $apiKey = $this->resolveApiKey();
 
         if (empty($apiKey)) {
             $this->recordAttempt($options, config('services.backup_ai.model', 'gpt-4o-mini'), microtime(true), 'failed', 'missing_api_key');
@@ -89,10 +102,19 @@ class BackupAiService extends AbstractAiService
             }
 
             if ($response->successful()) {
-                $content = $response->json('choices.0.message.content') ?? '';
+                $content = $response->json('choices.0.message.content');
                 $inputTokens = $response->json('usage.prompt_tokens');
                 $outputTokens = $response->json('usage.completion_tokens');
                 $providerRequestId = $response->json('id') ?? $response->header('x-request-id');
+
+                if (! is_string($content) || trim($content) === '') {
+                    $this->recordAttempt($options, $model, $startedAt, 'failed', 'empty_response',
+                        $inputTokens, $outputTokens, $providerRequestId ?: null);
+                    if ($attempt < $maxRetries) {
+                        continue;
+                    }
+                    throw new AiTransientException('Backup returned an empty response');
+                }
 
                 $this->recordAttempt($options, $model, $startedAt, 'success', null,
                     $inputTokens, $outputTokens, $providerRequestId ?: null);

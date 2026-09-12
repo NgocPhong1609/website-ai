@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import type { AdminRevenueData } from "@/src/features/admin/types";
+import { adminApi } from "@/src/features/admin/lib/admin-api";
 
 const formatMoney = (value: number) => {
   const rounded = Math.round(value || 0);
@@ -18,11 +19,17 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [commissionTiers, setCommissionTiers] = useState(() =>
+    (data.commissionTiers ?? []).map((definition) => ({ ...definition })),
+  );
+  const [isSavingTiers, setIsSavingTiers] = useState(false);
+  const [tierSaveError, setTierSaveError] = useState<string | null>(null);
+  const [tierSaveMessage, setTierSaveMessage] = useState<string | null>(null);
 
   const teacherDropdownRef = useRef<HTMLDivElement>(null);
 
-  const totalAdmin = data.totalAdminRevenue ?? (data.totalRevenue * 0.30);
-  const totalTeacher = data.totalTeacherRevenue ?? (data.totalRevenue * 0.70);
+  const totalAdmin = data.totalAdminRevenue ?? 0;
+  const totalTeacher = data.totalTeacherRevenue ?? 0;
   const orderHistory = data.orderHistory ?? [];
 
   // Get unique list of instructor names
@@ -139,6 +146,43 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
     setCurrentPage(1);
   };
 
+  const updateTierPercent = (tier: string, value: number) => {
+    setCommissionTiers((current) => current.map((definition) =>
+      definition.tier === tier
+        ? {
+            ...definition,
+            platform_commission_percent: value,
+            instructor_percent: 100 - value,
+          }
+        : definition,
+    ));
+    setTierSaveError(null);
+    setTierSaveMessage(null);
+  };
+
+  const saveCommissionTiers = async () => {
+    setIsSavingTiers(true);
+    setTierSaveError(null);
+    setTierSaveMessage(null);
+
+    try {
+      await adminApi("/admin/revenue/commission-tiers", {
+        method: "PUT",
+        body: JSON.stringify({
+          tiers: commissionTiers.map(({ tier, platform_commission_percent }) => ({
+            tier,
+            platform_commission_percent,
+          })),
+        }),
+      });
+      setTierSaveMessage("Đã lưu tỷ lệ hoa hồng.");
+    } catch (error) {
+      setTierSaveError(error instanceof Error ? error.message : "Không thể lưu tỷ lệ hoa hồng.");
+    } finally {
+      setIsSavingTiers(false);
+    }
+  };
+
   return (
     <div className="space-y-6 px-5 lg:px-6 pt-2.5 pb-8 [font-family:var(--font-admin-body)]">
       {/* Header Banner */}
@@ -150,6 +194,46 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
         </p>
       </section>
 
+      <section className="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]" aria-labelledby="commission-tier-heading">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 id="commission-tier-heading" className="text-base font-bold text-slate-900">Cấu hình hoa hồng theo cấp hợp tác</h2>
+            <p className="mt-1 text-xs text-slate-500">Tỷ lệ của giao dịch đã xác nhận luôn giữ nguyên theo ảnh chụp tại thời điểm mua.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => void saveCommissionTiers()}
+            disabled={isSavingTiers || commissionTiers.length === 0}
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
+          >
+            {isSavingTiers ? "Đang lưu..." : "Lưu tỷ lệ hoa hồng"}
+          </button>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {commissionTiers.map((definition) => (
+            <div key={definition.tier} className="rounded-xl border border-slate-200 p-4">
+              <p className="text-sm font-bold text-slate-900">{definition.label}</p>
+              <label className="mt-3 block text-xs font-semibold text-slate-600">
+                <span className="block mb-1">{definition.label} · Phí nền tảng</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step="0.01"
+                  value={definition.platform_commission_percent}
+                  disabled={isSavingTiers}
+                  onChange={(event) => updateTierPercent(definition.tier, Number(event.target.value))}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                />
+              </label>
+              <p className="mt-2 text-xs font-bold text-emerald-700">Giảng viên nhận {definition.instructor_percent}%</p>
+            </div>
+          ))}
+        </div>
+        {tierSaveError && <p role="alert" className="mt-3 text-xs font-semibold text-rose-700">{tierSaveError} Thay đổi của bạn vẫn được giữ.</p>}
+        {tierSaveMessage && <p role="status" className="mt-3 text-xs font-semibold text-emerald-700">{tierSaveMessage}</p>}
+      </section>
+
       {/* Overview Metric Cards */}
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
@@ -157,7 +241,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
           <p className="mt-2 text-2xl font-black text-indigo-700 [font-family:var(--font-admin-head)]">
             {formatMoney(totalAdmin)}
           </p>
-          <p className="mt-1 text-[11px] text-slate-400 font-medium">Phí hệ thống 15% - 30%</p>
+          <p className="mt-1 text-[11px] text-slate-400 font-medium">Theo ảnh chụp phân bổ của từng giao dịch</p>
         </div>
 
         <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
@@ -165,7 +249,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
           <p className="mt-2 text-2xl font-black text-emerald-600 [font-family:var(--font-admin-head)]">
             {formatMoney(totalTeacher)}
           </p>
-          <p className="mt-1 text-[11px] text-slate-400 font-medium">Tỷ lệ chi trả 70% - 85%</p>
+          <p className="mt-1 text-[11px] text-slate-400 font-medium">Theo ảnh chụp phân bổ của từng giao dịch</p>
         </div>
 
         <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
@@ -193,7 +277,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
         <div className="leading-relaxed">
           <strong className="font-extrabold text-amber-900">Quy tắc Cấn trừ Tiền khi Học sinh Hoàn tiền:</strong>
           <p className="mt-0.5 text-amber-800">
-            Khi học sinh yêu cầu hoàn tiền thành công (trong vòng 30 ngày &amp; tiến độ ≤ 10% / ≤ 5 bài), học sinh nhận lại 100% số tiền đã trả. Hệ thống tự động **cấn trừ đúng số tiền đã giữ của Giảng viên (70%/85%)** và **Admin (30%/15%)** thuộc chính đơn hàng đó về 0.
+            Khi học sinh yêu cầu hoàn tiền thành công (trong vòng 30 ngày &amp; tiến độ ≤ 10% / ≤ 5 bài), học sinh nhận lại 100% số tiền đã trả. Hệ thống cấn trừ đúng số tiền của Giảng viên và Admin đã được lưu trong ảnh chụp phân bổ của chính đơn hàng đó.
           </p>
         </div>
       </div>
@@ -422,7 +506,6 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                 </tr>
               ) : (
                 paginatedOrders.map((ord) => {
-                  const isExclusive = ord.partnershipTier === "exclusive";
                   const isRefunded = ord.allocationStatus === "REFUNDED" || ord.orderStatus === "refunded";
                   const isPending = ord.allocationStatus === "PENDING";
 
@@ -489,15 +572,9 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
 
                       {/* Tier Badge */}
                       <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                        {isExclusive ? (
-                          <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-black text-emerald-800 ring-1 ring-emerald-200">
-                            85 / 15
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-black text-blue-800 ring-1 ring-blue-200">
-                            70 / 30
-                          </span>
-                        )}
+                        <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-black text-blue-800 ring-1 ring-blue-200">
+                          {ord.instructorPercent ?? "—"} / {ord.platformCommissionPercent ?? "—"}
+                        </span>
                       </td>
 
                       {/* Teacher Amount / Deduction */}
@@ -627,25 +704,29 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                 </tr>
               ) : (
                 data.courses.map((course) => {
-                  const isExclusive = course.partnershipTier === "exclusive";
                   const gross = course.grossRevenue ?? course.revenue;
-                  const teacherGet = course.teacherRevenue ?? (gross * (isExclusive ? 0.85 : 0.70));
-                  const adminGet = course.adminRevenue ?? (gross * (isExclusive ? 0.15 : 0.30));
+                  const teacherGet = course.teacherRevenue ?? 0;
+                  const adminGet = course.adminRevenue ?? 0;
+                  const isMixedTier = course.partnershipTier === "mixed";
+                  const tierLabel = isMixedTier
+                    ? "Nhiều chế độ"
+                    : commissionTiers.find((definition) => definition.tier === course.partnershipTier)?.label
+                      ?? course.partnershipTier
+                      ?? "Ảnh chụp cũ";
+                  const tierPercent = course.instructorPercent == null
+                    ? ""
+                    : isMixedTier
+                      ? ` (GV bình quân ${course.instructorPercent}%)`
+                      : ` (${course.instructorPercent}%)`;
 
                   return (
                     <tr key={course.courseId} className="border-t border-slate-100 hover:bg-slate-50/50 transition-colors">
                       <td className="px-5 py-4 font-semibold text-slate-900">{course.courseTitle}</td>
                       <td className="px-5 py-4 text-slate-600">{course.instructorName}</td>
                       <td className="px-5 py-4 text-center">
-                        {isExclusive ? (
-                          <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-black text-emerald-700 ring-1 ring-emerald-200">
-                            Độc quyền (85%)
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-black text-blue-700 ring-1 ring-blue-200">
-                            Tiêu chuẩn (70%)
-                          </span>
-                        )}
+                        <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-black text-blue-700 ring-1 ring-blue-200">
+                          {tierLabel}{tierPercent}
+                        </span>
                       </td>
                       <td className="px-5 py-4 text-right font-medium text-slate-600">{course.students}</td>
                       <td className="px-5 py-4 text-right font-bold text-slate-900">{formatMoney(gross)}</td>

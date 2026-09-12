@@ -51,7 +51,7 @@ test('admin can fetch dashboard overview data through the api', function () {
         ->assertJsonPath('ai_summary.usage.tokens.output', 8)
         ->assertJsonPath('ai_summary.usage.cost.available', false)
         ->assertJsonPath('ai_summary.usage.cost.amount', null)
-        ->assertJsonPath('ai_summary.packages.free.daily_requests', 30)
+        ->assertJsonPath('ai_summary.packages.free.daily_requests', 5)
         ->assertJsonPath('ai_summary.packages.premium.daily_requests', 200);
 
     foreach (['overview-primary-secret', 'overview-backup-secret', 'private-question', 'private-response', 'private-prompt', 'latency', 'apiKeyHint', 'Ổn định'] as $forbidden) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { adminApi } from "@/src/features/admin/lib/admin-api";
 import { AdminCourseDetailModal, type FullAdminCourseDetail } from "./AdminCourseDetailModal";
 
@@ -13,6 +13,29 @@ type CourseRow = {
 };
 
 type CourseDetail = FullAdminCourseDetail;
+
+type InstructorOption = {
+ id: number;
+ name: string;
+ email?: string | null;
+};
+
+type CourseListResponse = {
+ data: CourseRow[];
+ meta: {
+ current_page: number;
+ last_page: number;
+ per_page: number;
+ total: number;
+ };
+ summary: {
+ total: number;
+ pending_review: number;
+ };
+ filters: {
+ instructors: InstructorOption[];
+ };
+};
 
 type ResourceRow = {
  id: number;
@@ -34,46 +57,93 @@ export function AdminContentManagementPage() {
  const [resources, setResources] = useState<ResourceRow[]>([]);
  const [questions, setQuestions] = useState<QuestionRow[]>([]);
  const [message, setMessage] = useState<string | null>(null);
+ const [isLoadingCourses, setIsLoadingCourses] = useState(true);
  const [pendingAction, setPendingAction] = useState<string | null>(null);
  const [courseDetail, setCourseDetail] = useState<CourseDetail | null>(null);
  const [detailCourseId, setDetailCourseId] = useState<number | null>(null);
  const [activeTab, setActiveTab] = useState<"pending" | "all">("pending");
+ const [instructors, setInstructors] = useState<InstructorOption[]>([]);
+ const [searchInput, setSearchInput] = useState("");
+ const [appliedSearch, setAppliedSearch] = useState("");
+ const [teacherId, setTeacherId] = useState("");
+ const [page, setPage] = useState(1);
+ const [courseMeta, setCourseMeta] = useState({ current_page: 1, last_page: 1, per_page: 20, total: 0 });
+ const [courseSummary, setCourseSummary] = useState({ total: 0, pending_review: 0 });
  const [resourceForm, setResourceForm] = useState({ title: "", type: "ebook", url: "", description: "" });
+ const courseRequestIdRef = useRef(0);
 
- const loadData = async () => {
+ const loadCourses = useCallback(async () => {
+ const requestId = ++courseRequestIdRef.current;
  setMessage(null);
+ setIsLoadingCourses(true);
+
+ const query = new URLSearchParams({ visibility: "all" });
+ if (activeTab === "pending") query.set("status", "pending_review");
+ if (appliedSearch) query.set("search", appliedSearch);
+ if (teacherId) query.set("teacher_id", teacherId);
+ query.set("page", String(page));
+ query.set("per_page", "20");
 
  try {
- const [coursesRes, resourcesRes, questionsRes] = await Promise.all([
- adminApi<{ data: CourseRow[] }>("/admin/content/courses?visibility=all"),
+ const coursesRes = await adminApi<CourseListResponse>(`/admin/content/courses?${query.toString()}`);
+
+ if (requestId !== courseRequestIdRef.current) return;
+ if (coursesRes.meta.current_page > coursesRes.meta.last_page) {
+ setPage(Math.max(1, coursesRes.meta.last_page));
+ return;
+ }
+
+ setCourses(coursesRes.data);
+ setCourseMeta(coursesRes.meta);
+ setCourseSummary(coursesRes.summary);
+ setInstructors(coursesRes.filters.instructors);
+ } catch (error) {
+ if (requestId !== courseRequestIdRef.current) return;
+ setMessage(error instanceof Error ? error.message : "Không thể tải dữ liệu nội dung.");
+ } finally {
+ if (requestId !== courseRequestIdRef.current) return;
+ setIsLoadingCourses(false);
+ }
+ }, [activeTab, appliedSearch, page, teacherId]);
+ const latestLoadCoursesRef = useRef(loadCourses);
+ latestLoadCoursesRef.current = loadCourses;
+
+ const loadAncillaryData = useCallback(async () => {
+ try {
+ const [resourcesRes, questionsRes] = await Promise.all([
  adminApi<{ data: ResourceRow[] }>("/admin/content/resources"),
  adminApi<{ data: QuestionRow[] }>("/admin/content/question-bank"),
  ]);
-
- setCourses(coursesRes.data);
  setResources(resourcesRes.data);
  setQuestions(questionsRes.data);
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Không thể tải dữ liệu nội dung.");
+ setMessage(error instanceof Error ? error.message : "Không thể tải kho tài liệu hoặc ngân hàng câu hỏi.");
  }
- };
-
- useEffect(() => {
- void loadData();
  }, []);
 
  useEffect(() => {
+ void loadCourses();
+ }, [loadCourses]);
+
+ useEffect(() => {
+ void loadAncillaryData();
+ }, [loadAncillaryData]);
+
+ useEffect(() => {
  const handleRefresh = () => {
- void loadData();
+ void loadCourses();
+ void loadAncillaryData();
  };
 
  window.addEventListener("admin:refresh-data", handleRefresh);
  return () => window.removeEventListener("admin:refresh-data", handleRefresh);
- }, []);
+ }, [loadAncillaryData, loadCourses]);
 
- const pendingCourses = useMemo(() => courses.filter((course) => course.status === "pending_review").length, [courses]);
-
- const allCoursesCount = courses.length;
+ const applySearch = (event: FormEvent<HTMLFormElement>) => {
+ event.preventDefault();
+ setPage(1);
+ setAppliedSearch(searchInput.trim());
+ };
 
  const fetchCourseDetail = async (courseId: number) => {
  const payload = await adminApi<{ data: CourseDetail }>(`/admin/content/courses/${courseId}`);
@@ -102,14 +172,14 @@ export function AdminContentManagementPage() {
  method: "PATCH",
  body: JSON.stringify({ status }),
  });
- setMessage("Đã cập nhật kiểm duyệt khóa học.");
- await loadData();
+ setMessage("Đã cập nhật trạng thái khóa học.");
+ await latestLoadCoursesRef.current();
 
  if (detailCourseId === courseId) {
  await fetchCourseDetail(courseId);
  }
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Kiểm duyệt khóa học thất bại.");
+ setMessage(error instanceof Error ? error.message : "Cập nhật trạng thái khóa học thất bại.");
  } finally {
  setPendingAction(null);
  }
@@ -131,7 +201,7 @@ export function AdminContentManagementPage() {
  setCourseDetail(null);
  setDetailCourseId(null);
  }
- await loadData();
+ await latestLoadCoursesRef.current();
  } catch (error) {
  setMessage(error instanceof Error ? error.message : "Gỡ bỏ khóa học thất bại.");
  } finally {
@@ -154,7 +224,7 @@ export function AdminContentManagementPage() {
  await fetchCourseDetail(courseId);
  }
 
- await loadData();
+ await latestLoadCoursesRef.current();
  } catch (error) {
  setMessage(error instanceof Error ? error.message : "Khôi phục khóa học thất bại.");
  } finally {
@@ -170,7 +240,7 @@ export function AdminContentManagementPage() {
  });
  setResourceForm({ title: "", type: "ebook", url: "", description: "" });
  setMessage("Đã thêm tài liệu mẫu.");
- await loadData();
+ await loadAncillaryData();
  } catch (error) {
  setMessage(error instanceof Error ? error.message : "Thêm tài liệu thất bại.");
  }
@@ -182,7 +252,7 @@ export function AdminContentManagementPage() {
  method: "PATCH",
  body: JSON.stringify({ question_category: questionCategory }),
  });
- await loadData();
+ await loadAncillaryData();
  } catch (error) {
  setMessage(error instanceof Error ? error.message : "Phân loại câu hỏi thất bại.");
  }
@@ -197,31 +267,68 @@ export function AdminContentManagementPage() {
  </section>
 
  <section className="grid gap-4 md:grid-cols-3">
- <SmallCard label="Tổng khóa học" value={allCoursesCount} />
- <SmallCard label="Chờ duyệt" value={pendingCourses} />
+ <SmallCard label="Tổng khóa học" value={courseSummary.total} />
+ <SmallCard label="Chờ duyệt" value={courseSummary.pending_review} />
  <SmallCard label="Kho tài liệu mẫu" value={resources.length} />
  </section>
 
  <section className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
  <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
- <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Kiểm duyệt khóa học</h2>
+ <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Quản lý khóa học</h2>
  <div className="inline-flex rounded-xl bg-slate-100 p-1 text-sm">
  <button
  type="button"
- onClick={() => setActiveTab("pending")}
+ onClick={() => {
+ setPage(1);
+ setActiveTab("pending");
+ }}
  className={`rounded-lg px-3 py-2 font-medium transition ${activeTab === "pending" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"}`}
  >
  Khóa học chờ duyệt
  </button>
  <button
  type="button"
- onClick={() => setActiveTab("all")}
+ onClick={() => {
+ setPage(1);
+ setActiveTab("all");
+ }}
  className={`rounded-lg px-3 py-2 font-medium transition ${activeTab === "all" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"}`}
  >
  Tất cả khóa học
  </button>
  </div>
  </div>
+ <form onSubmit={applySearch} className="mb-4 grid gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto] md:items-end">
+ <label className="space-y-1 text-sm text-slate-700">
+ <span className="font-medium">Tìm khóa học</span>
+ <input
+ type="search"
+ value={searchInput}
+ onChange={(event) => setSearchInput(event.target.value)}
+ placeholder="Nhập tên khóa học"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ />
+ </label>
+ <label className="space-y-1 text-sm text-slate-700">
+ <span className="font-medium">Lọc theo giảng viên</span>
+ <select
+ value={teacherId}
+ onChange={(event) => {
+ setPage(1);
+ setTeacherId(event.target.value);
+ }}
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ >
+ <option value="">Tất cả giảng viên</option>
+ {instructors.map((instructor) => (
+ <option key={instructor.id} value={instructor.id}>{instructor.name}</option>
+ ))}
+ </select>
+ </label>
+ <button type="submit" className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">
+ Tìm kiếm
+ </button>
+ </form>
  <div className="overflow-x-auto">
  <table className="min-w-full text-sm">
  <thead className="bg-slate-50 text-slate-600">
@@ -233,22 +340,22 @@ export function AdminContentManagementPage() {
  </tr>
  </thead>
  <tbody>
- {(() => {
- const displayedCourses = activeTab === "pending"
- ? courses.filter((c) => c.status === "pending_review")
- : courses;
-
- if (displayedCourses.length === 0) {
- return (
+ {isLoadingCourses ? (
+ <tr>
+ <td colSpan={4} className="px-3 py-6 text-center text-sm text-slate-500">Đang tải khóa học...</td>
+ </tr>
+ ) : courses.length === 0 ? (
  <tr>
  <td colSpan={4} className="px-3 py-6 text-center text-sm text-slate-500">
- {activeTab === "pending" ? "Không có khóa học nào đang chờ duyệt." : "Chưa có khóa học nào trong hệ thống."}
+ {appliedSearch || teacherId
+ ? "Không tìm thấy khóa học phù hợp."
+ : activeTab === "pending"
+ ? "Không có khóa học nào đang chờ duyệt."
+ : "Chưa có khóa học nào trong hệ thống."}
  </td>
  </tr>
- );
- }
-
- return displayedCourses.map((course) => (
+ ) : (
+ courses.map((course) => (
  <tr key={course.id} className="border-t border-slate-200">
  <td className="px-3 py-2">{course.title}</td>
  <td className="px-3 py-2">{course.teacher?.name || "-"}</td>
@@ -312,10 +419,34 @@ export function AdminContentManagementPage() {
  </div>
  </td>
  </tr>
- ));
- })()}
+ ))
+ )}
  </tbody>
  </table>
+ </div>
+ <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
+ <span>{courseMeta.total} kết quả</span>
+ <div className="flex items-center gap-2">
+ <button
+ type="button"
+ aria-label="Trang trước"
+ disabled={isLoadingCourses || courseMeta.current_page <= 1}
+ onClick={() => setPage((current) => Math.max(1, current - 1))}
+ className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-50"
+ >
+ Trước
+ </button>
+ <span>Trang {courseMeta.current_page} / {courseMeta.last_page}</span>
+ <button
+ type="button"
+ aria-label="Trang sau"
+ disabled={isLoadingCourses || courseMeta.current_page >= courseMeta.last_page}
+ onClick={() => setPage((current) => current + 1)}
+ className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-50"
+ >
+ Sau
+ </button>
+ </div>
  </div>
  </section>
 

@@ -3,6 +3,7 @@ import { Conversation } from '../types';
 import { ChatSidebar } from './ChatSidebar';
 import { ChatArea } from './ChatArea';
 import { axiosClient } from '@/src/shared/lib/axios';
+import { getEchoInstance } from '@/src/hooks/useRealtimeChat';
 
 interface ChatLayoutProps {
  token: string;
@@ -67,8 +68,6 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
  useEffect(() => {
  if (!token || conversations.length === 0) return;
  
- // Use a dynamic import or require if getEchoInstance is exported
- const { getEchoInstance } = require('@/src/hooks/useRealtimeChat');
  const echo = getEchoInstance(token);
  const listeners: { channel: any, callback: any }[] = [];
 

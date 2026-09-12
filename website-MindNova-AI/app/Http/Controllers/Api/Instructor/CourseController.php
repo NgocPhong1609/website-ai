@@ -11,11 +11,14 @@ use App\Http\Requests\Instructor\UploadThumbnailRequest;
 use App\Http\Resources\CourseCollection;
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
-use App\Services\Instructor\CourseService;
 use App\Services\Instructor\CourseHealthService;
+use App\Services\Instructor\CourseService;
+use App\Settings\CommissionSettingsRepository;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class CourseController extends Controller
 {
@@ -24,9 +27,7 @@ class CourseController extends Controller
     public function __construct(
         private readonly CourseService $courseService,
         private readonly CourseHealthService $courseHealthService,
-    )
-    {
-    }
+    ) {}
 
     public function index(Request $request)
     {
@@ -35,9 +36,9 @@ class CourseController extends Controller
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
-        
+
         if ($request->has('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
+            $query->where('title', 'like', '%'.$request->search.'%');
         }
 
         $sortBy = $request->get('sort_by', 'created_at');
@@ -64,7 +65,7 @@ class CourseController extends Controller
         Gate::authorize('view', $course);
 
         $course->load(['modules.lessons']);
-        if (\Illuminate\Support\Facades\Schema::hasColumn('lessons', 'course_id')) {
+        if (Schema::hasColumn('lessons', 'course_id')) {
             $course->load('lessons');
         }
 
@@ -104,6 +105,7 @@ class CourseController extends Controller
 
         try {
             $course = $this->courseService->updateStatus($course, $request->status, $request->user());
+
             return $this->successResponse(new CourseResource($course), 'Course status updated.');
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 422);
@@ -114,7 +116,7 @@ class CourseController extends Controller
     {
         Gate::authorize('update', $course);
 
-        \Illuminate\Support\Facades\Log::info('updatePrice payload', $request->all());
+        Log::info('updatePrice payload', $request->all());
 
         $price = (float) $request->price;
 
@@ -142,6 +144,11 @@ class CourseController extends Controller
         }
 
         return $this->successResponse(new CourseResource($course), 'Price updated.');
+    }
+
+    public function commissionTiers(CommissionSettingsRepository $settings)
+    {
+        return $this->successResponse($settings->tiers());
     }
 
     public function health(Course $course)

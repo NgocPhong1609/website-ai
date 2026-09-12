@@ -16,7 +16,7 @@ import { WithdrawalModal } from "./WithdrawalModal";
 
 function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
     return (
-        <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-[#FAF7F2] shadow-2xs w-fit">
+        <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-[#E8E2D9] shadow-2xs w-fit">
             <Link
                 href="/instructor/revenue"
                 className={twMerge(
@@ -69,7 +69,7 @@ function PageHeader({ onOpenWithdrawal, onToggleForecast }: { onOpenWithdrawal: 
                 <button
                     type="button"
                     onClick={onToggleForecast}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#FAF7F2] text-xs font-extrabold text-[#C0392B] bg-indigo-50/80 hover:border-[#FAF7F2] transition-all cursor-pointer shadow-2xs"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#E8E2D9] text-xs font-extrabold text-[#C0392B] bg-indigo-50/80 hover:border-[#E8E2D9] transition-all cursor-pointer shadow-2xs"
                 >
                     <SparklesIcon size={15} />
                     <span>Dự báo Thu nhập AI</span>
@@ -90,7 +90,7 @@ function PageHeader({ onOpenWithdrawal, onToggleForecast }: { onOpenWithdrawal: 
 function StatCards({ data }: { data: any }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-2xl p-5 border border-[#FAF7F2] shadow-2xs flex flex-col justify-between">
+            <div className="bg-white rounded-2xl p-5 border border-[#E8E2D9] shadow-2xs flex flex-col justify-between">
                 <span className="text-xs font-black text-[#8A8478] uppercase tracking-wide">Tổng Doanh Thu (Tháng này)</span>
                 <span className="text-2xl font-black text-[#2C3039] mt-2">{data.total_revenue.toLocaleString('vi-VN')}đ</span>
                 <div className={twMerge("flex items-center gap-1.5 mt-3 text-xs font-extrabold", data.revenue_growth >= 0 ? "text-[#2C3039]" : "text-rose-600")}>
@@ -99,7 +99,7 @@ function StatCards({ data }: { data: any }) {
                 </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-5 border border-[#FAF7F2] shadow-2xs flex flex-col justify-between">
+            <div className="bg-white rounded-2xl p-5 border border-[#E8E2D9] shadow-2xs flex flex-col justify-between">
                 <span className="text-xs font-black text-[#8A8478] uppercase tracking-wide">Số Dư Khả Dụng Ngay</span>
                 <span className="text-2xl font-black text-[#C0392B] mt-2">{data.available_balance.toLocaleString('vi-VN')}đ</span>
                 <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-gray-400">
@@ -108,7 +108,7 @@ function StatCards({ data }: { data: any }) {
                 </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-5 border border-[#FAF7F2] shadow-2xs flex flex-col justify-between">
+            <div className="bg-white rounded-2xl p-5 border border-[#E8E2D9] shadow-2xs flex flex-col justify-between">
                 <span className="text-xs font-black text-[#8A8478] uppercase tracking-wide">Quỹ Bảo Lãnh (Escrow)</span>
                 <span className="text-2xl font-black text-amber-600 mt-2">{data.escrow_balance.toLocaleString('vi-VN')}đ</span>
                 <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-amber-700">
@@ -117,7 +117,7 @@ function StatCards({ data }: { data: any }) {
                 </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-5 border border-[#FAF7F2] shadow-2xs flex flex-col justify-between">
+            <div className="bg-white rounded-2xl p-5 border border-[#E8E2D9] shadow-2xs flex flex-col justify-between">
                 <span className="text-xs font-black text-[#8A8478] uppercase tracking-wide">Tỷ Lệ Hoàn Tiền (Refund)</span>
                 <span className="text-2xl font-black text-[#2C3039] mt-2">{data.refund_rate}%</span>
                 <div className="flex items-center gap-1.5 mt-3 text-xs font-extrabold text-[#2C3039]">
@@ -131,14 +131,13 @@ function StatCards({ data }: { data: any }) {
 
 function AIForecastSection({ onClose, forecast }: { onClose: () => void; forecast: any }) {
     return (
-        <div className="p-6 rounded-2xl bg-white border border-[#FAF7F2] shadow-sm flex flex-col gap-5 animate-fadeIn">
-            <div className="flex items-center justify-between border-b border-[#FAF7F2] pb-4">
+        <div className="p-6 rounded-2xl bg-white border border-[#E8E2D9] shadow-sm flex flex-col gap-5 animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-[#E8E2D9] pb-4">
                 <div className="flex items-center gap-3">
-
                     <div>
                         <div className="flex items-center gap-2">
                             <h3 className="text-sm font-black text-[#2C3039]">Dự Báo &amp; Tối Ưu Hóa Thu Nhập AI</h3>
-                            <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-[#FAF7F2] text-[#C0392B] border border-[#FAF7F2]">
+                            <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-[#FAF7F2] text-[#C0392B] border border-[#E8E2D9]">
                                 AI Predictive Engine
                             </span>
                         </div>
@@ -148,24 +147,24 @@ function AIForecastSection({ onClose, forecast }: { onClose: () => void; forecas
                     </div>
                 </div>
                 <button type="button" onClick={onClose} aria-label="Đóng bảng dự báo" className="text-gray-400 hover:text-gray-700 font-black text-base p-1 cursor-pointer">
-
+                    ✕
                 </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 rounded-xl bg-[#FEFCF9] border border-[#FAF7F2] flex flex-col justify-between">
+                <div className="p-4 rounded-xl bg-[#FEFCF9] border border-[#E8E2D9] flex flex-col justify-between">
                     <span className="text-xs font-bold text-[#8A8478] uppercase">Thu Nhập Cuối Tháng Dự Kiến</span>
                     <span className="text-xl font-black text-[#C0392B] mt-1.5">{forecast?.expected_end_month?.toLocaleString('vi-VN')}đ</span>
                     <span className="text-xs font-semibold text-[#2C3039] mt-1">▲ Dự kiến tăng trưởng +{forecast?.growth_prediction}% so với kỳ trước</span>
                 </div>
 
-                <div className="p-4 rounded-xl bg-[#FEFCF9] border border-[#FAF7F2] flex flex-col justify-between">
+                <div className="p-4 rounded-xl bg-[#FEFCF9] border border-[#E8E2D9] flex flex-col justify-between">
                     <span className="text-xs font-bold text-[#8A8478] uppercase">Khóa Học Đứng Đầu Chuyển Đổi</span>
                     <span className="text-base font-black text-[#2C3039] truncate mt-1.5">{forecast?.top_course}</span>
                     <span className="text-xs font-semibold text-[#8A8478] mt-1">Chiếm {forecast?.top_course_percentage}% doanh số từ nguồn liên kết chia sẻ</span>
                 </div>
 
-                <div className="p-4 rounded-xl bg-indigo-50/60 border border-[#FAF7F2] flex flex-col justify-between gap-3">
+                <div className="p-4 rounded-xl bg-indigo-50/60 border border-[#E8E2D9] flex flex-col justify-between gap-3">
                     <div>
                         <span className="text-xs font-black text-[#C0392B] uppercase flex items-center gap-1.5">
                             <span> Đề xuất nhanh từ AI</span>
@@ -190,21 +189,16 @@ function RevenueChart({ chartData }: { chartData: any[] }) {
     const maxVal = Math.max(...chartData.map(d => d.revenue), 1000); // minimum scale
 
     return (
-        <div className="bg-white rounded-2xl border border-[#FAF7F2] p-6 flex flex-col shadow-2xs">
+        <div className="bg-white rounded-2xl border border-[#E8E2D9] p-6 flex flex-col shadow-2xs">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
                     <h3 className="text-base font-black text-[#2C3039]">Biểu Đồ Nguồn Thu &amp; Tỷ Lệ Chiết Khấu</h3>
                     <p className="text-xs text-[#8A8478] mt-0.5">Tỷ lệ phân chia tự động tùy thuộc vào nguồn ghi danh của học viên.</p>
                 </div>
 
-                <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-3 py-1 rounded-xl bg-indigo-50 text-[#C0392B] border border-[#FAF7F2] text-xs font-bold">
-                        Link Giới thiệu Giảng viên: 85% Thực nhận
-                    </span>
-                    <span className="px-3 py-1 rounded-xl bg-gray-100 text-gray-700 border border-[#FAF7F2] text-xs font-bold">
-                        Chợ Khóa học Chung: 70% Thực nhận
-                    </span>
-                </div>
+                <span className="px-3 py-1 rounded-xl bg-indigo-50 text-[#C0392B] border border-indigo-100 text-xs font-bold">
+                    Tỷ lệ thực nhận được lưu theo từng giao dịch
+                </span>
             </div>
 
             {/* Visual Bar Chart */}
@@ -248,11 +242,11 @@ function RevenueChart({ chartData }: { chartData: any[] }) {
 
 function RecentTransactions({ transactions }: { transactions: any[] }) {
     const getStatusStyle = (status: string, type: string) => {
-        if (type === "withdrawal") return "text-[#C0392B] bg-indigo-50 border-[#FAF7F2]";
+        if (type === "withdrawal") return "text-[#C0392B] bg-indigo-50 border-[#E8E2D9]";
         if (type === "refund") return "text-rose-700 bg-rose-50 border-rose-200";
         if (status === "escrow") return "text-amber-700 bg-amber-50 border-amber-200";
-        if (status === "available" || status === "completed") return "text-[#2C3039] bg-emerald-50 border-[#FAF7F2]";
-        return "text-gray-700 bg-[#FEFCF9] border-[#FAF7F2]";
+        if (status === "available" || status === "completed") return "text-[#2C3039] bg-emerald-50 border-[#E8E2D9]";
+        return "text-gray-700 bg-[#FEFCF9] border-[#E8E2D9]";
     };
 
     const getStatusText = (status: string, type: string) => {
@@ -268,7 +262,7 @@ function RecentTransactions({ transactions }: { transactions: any[] }) {
     };
 
     return (
-        <div className="bg-white rounded-2xl border border-[#FAF7F2] flex flex-col shadow-2xs overflow-hidden">
+        <div className="bg-white rounded-2xl border border-[#E8E2D9] flex flex-col shadow-2xs overflow-hidden">
             <div className="flex items-center justify-between p-5 border-b border-gray-100">
                 <h3 className="text-sm font-black text-[#2C3039]">Giao dịch mới cập nhật</h3>
                 <Link href="/instructor/revenue/history" className="text-xs font-extrabold text-[#C0392B] hover:underline">
@@ -284,7 +278,7 @@ function RecentTransactions({ transactions }: { transactions: any[] }) {
                     </div>
                 ) : (
                     transactions.map((item) => (
-                        <div key={item.id} className="flex items-center justify-between p-3.5 rounded-xl bg-[#FEFCF9]/70 border border-gray-100 hover:border-[#FAF7F2] transition-all">
+                        <div key={item.id} className="flex items-center justify-between p-3.5 rounded-xl bg-[#FEFCF9]/70 border border-gray-100 hover:border-[#E8E2D9] transition-all">
                             <div>
                                 <div className="flex items-center gap-1.5">
                                     <span className="text-xs font-extrabold text-[#2C3039]">{item.transaction_code}</span>
@@ -341,7 +335,7 @@ export function RevenueContainer() {
                         <div className="flex flex-col items-center justify-center py-20">
                             <span className="text-4xl mb-3">️</span>
                             <p className="text-sm font-semibold text-[#8A8478] mb-4">Lỗi khi tải dữ liệu. Vui lòng thử lại.</p>
-                            <button onClick={() => refetch()} className="px-4 py-2 bg-white border border-[#FAF7F2] rounded-lg text-sm font-bold shadow-sm">
+                            <button onClick={() => refetch()} className="px-4 py-2 bg-white border border-[#E8E2D9] rounded-lg text-sm font-bold shadow-sm">
                                 Tải lại trang
                             </button>
                         </div>

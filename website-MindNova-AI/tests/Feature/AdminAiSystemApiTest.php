@@ -249,6 +249,13 @@ it('uses the legacy student quota as the free package fallback', function () {
         ->assertJsonPath('packages.premium.daily_tokens', null);
 });
 
+it('reports five free daily requests and 200 premium requests by default', function () {
+    $this->actingAs(adminForAiConfig(), 'sanctum')->getJson('/api/admin/ai-config')
+        ->assertOk()
+        ->assertJsonPath('packages.free.daily_requests', 5)
+        ->assertJsonPath('packages.premium.daily_requests', 200);
+});
+
 it('rejects package values outside the configured numeric bounds', function () {
     $response = $this->actingAs(adminForAiConfig(), 'sanctum')
         ->putJson('/api/admin/ai-config', aiConfigPayload([

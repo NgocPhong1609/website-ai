@@ -104,7 +104,6 @@ Route::prefix('student')->group(function () {
     Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
     Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
     Route::get('/courses/{course}/reviews', [StudentReviewController::class, 'index']);
-    Route::post('/study-plan/chat', [StudentStudyPlanController::class, 'chat'])->middleware('throttle:10,1');
     Route::post('/onboarding', [OnboardingController::class, 'store']);
     Route::get('/available-topics', [OnboardingController::class, 'getAvailableTopics']);
     Route::post('/analyze-lesson', [AnalyzeLessonController::class, 'analyze']);
@@ -158,6 +157,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // 3. NHÓM API HỌC SINH (Student Authenticated Actions)
     // ==========================================
     Route::prefix('student')->group(function () {
+        Route::post('/study-plan/chat', [StudentStudyPlanController::class, 'chat'])
+            ->middleware('throttle:10,1');
+
         // Dashboard
         Route::get('/dashboard', [StudentDashboardController::class, 'overview']);
 
@@ -209,6 +211,7 @@ Route::middleware('auth:sanctum')->group(function () {
 // 4. NHÓM API GIÁO VIÊN (Dành cho Teacher)
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group(function () {
+    Route::get('commission-tiers', [CourseController::class, 'commissionTiers']);
 
     // Khóa học
     Route::apiResource('courses', CourseController::class);
@@ -374,6 +377,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     // 4) Analytics and reports
     Route::get('/analytics/dashboard', [AdminAnalyticsController::class, 'dashboard']);
     Route::get('/revenue', [AdminDashboardController::class, 'revenue']);
+    Route::put('/revenue/commission-tiers', [AdminDashboardController::class, 'updateCommissionTiers']);
 
     // 4.5) Coupons
     Route::apiResource('/coupons', AdminCouponController::class);
