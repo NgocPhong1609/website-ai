@@ -55,8 +55,7 @@ test('payment success auto grants course access to the student', function () {
         'vnp_ResponseCode' => '00',
         'vnp_TransactionNo' => 'VNP123456',
     ];
-    ksort($callback);
-    $callback['vnp_SecureHash'] = hash_hmac('sha512', http_build_query($callback), 'test-vnpay-secret');
+    $callback['vnp_SecureHash'] = app(\App\Services\VNPayService::class)->secureHash($callback);
     $service->processCallback('vnpay', $callback);
 
     $this->assertDatabaseHas('enrollments', [

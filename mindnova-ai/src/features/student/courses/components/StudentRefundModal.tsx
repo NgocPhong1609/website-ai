@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Banknote, X, Check, PartyPopper, AlertTriangle } from "lucide-react";
 import { axiosClient } from "@/src/shared/lib/axios";
-import { useGetPaymentMethods } from "../../billing/api";
 
 interface StudentRefundModalProps {
   isOpen: boolean;
@@ -26,16 +25,6 @@ export function StudentRefundModal({
   const [reason, setReason] = useState("Nội dung không phù hợp với nhu cầu");
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
-  const [savedMethodId, setSavedMethodId] = useState<number | null>(null);
-  const [confirmAccount, setConfirmAccount] = useState(false);
-  const { data: savedMethods = [] } = useGetPaymentMethods();
-
-  useEffect(() => {
-    const preferred = savedMethods.find((method) => method.is_default) ?? savedMethods[0];
-    if (preferred && savedMethodId === null) {
-      setSavedMethodId(preferred.id);
-    }
-  }, [savedMethods, savedMethodId]);
 
   // Fetch refund eligibility from backend
   const { data: eligibility, isLoading } = useQuery({
@@ -50,18 +39,9 @@ export function StudentRefundModal({
   // Refund mutation
   const refundMutation = useMutation({
     mutationFn: async () => {
-      if (savedMethods.length > 0) {
-        if (!savedMethodId) {
-          throw new Error("Vui lòng chọn tài khoản nhận hoàn tiền.");
-        }
-        if (!confirmAccount) {
-          throw new Error("Hãy xác nhận tài khoản nhận hoàn tiền.");
-        }
-      }
       const res = await axiosClient.post("/api/student/orders/refund", {
         course_id: courseId,
         reason,
-        payment_method_id: savedMethodId || undefined,
       });
       return res.data;
     },
@@ -189,28 +169,10 @@ export function StudentRefundModal({
             </div>
           )}
 
-          {/* Reason Select */}
-          {isEligible && savedMethods.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-black text-gray-800 uppercase">Tài khoản nhận hoàn tiền</label>
-              {savedMethods.map((method) => (
-                <label key={method.id} className="flex items-center gap-2 text-xs font-semibold text-[#0F172A]">
-                  <input
-                    type="radio"
-                    checked={savedMethodId === method.id}
-                    onChange={() => { setSavedMethodId(method.id); setConfirmAccount(false); }}
-                  />
-                  {method.label}
-                </label>
-              ))}
-              <label className="flex items-center gap-2 text-xs font-semibold text-[#0F172A]">
-                <input type="checkbox" checked={confirmAccount} onChange={(e) => setConfirmAccount(e.target.checked)} />
-                Xác nhận hoàn về tài khoản đã chọn
-              </label>
-            </div>
-          )}
-          {isEligible && savedMethods.length === 0 && (
-            <p className="text-xs text-[#3B82F6] font-semibold">Hãy thêm tài khoản thanh toán trong Billing trước khi hoàn tiền.</p>
+          {isEligible && (
+            <p className="text-xs text-[#64748B] leading-relaxed">
+              Số tiền hoàn sẽ được xử lý theo phương thức thanh toán ban đầu (VNPAY hoặc MoMo). Website không lưu số tài khoản ngân hàng để hoàn tiền.
+            </p>
           )}
 
           {isEligible && (
@@ -249,7 +211,7 @@ export function StudentRefundModal({
               <button
                 type="button"
                 onClick={() => refundMutation.mutate()}
-                disabled={refundMutation.isPending || (savedMethods.length === 0)}
+                disabled={refundMutation.isPending}
                 className="px-5 py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white text-xs font-extrabold shadow-md transition-all disabled:opacity-50 cursor-pointer"
               >
                 {refundMutation.isPending ? "Đang xử lý..." : "Xác Nhận & Hoàn Tiền Ngay"}

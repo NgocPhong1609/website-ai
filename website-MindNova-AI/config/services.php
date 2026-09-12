@@ -78,6 +78,8 @@ return [
         'model' => env('BACKUP_AI_MODEL', 'llama-3.3-70b-versatile'),
     ],
 
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
+
     'momo' => [
         'partner_code' => env('MOMO_PARTNER_CODE'),
         'access_key' => env('MOMO_ACCESS_KEY'),
