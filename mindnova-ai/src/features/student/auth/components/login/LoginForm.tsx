@@ -122,18 +122,18 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  {/* Header — bám sát phía trên */}
  <div className="flex items-center gap-2.5 mb-auto">
  <LogoMark />
- <span className="text-[14px] font-bold tracking-tight text-[#2C3039]">MindNova AI</span>
+ <span className="text-[14px] font-bold tracking-tight text-[#0F172A]">MindNova AI</span>
  </div>
 
  {/* Content — căn giữa dọc */}
  <div className="flex flex-col justify-center w-full max-w-[380px] mx-auto py-6">
  <div className="mb-5">
- <h1 className="text-[26px] font-bold text-[#2C3039] leading-tight tracking-tight">
+ <h1 className="text-[26px] font-bold text-[#0F172A] leading-tight tracking-tight">
  Welcome back
  </h1>
- <p className="mt-1.5 text-[13px] text-[#8A8478] leading-relaxed">
+ <p className="mt-1.5 text-[13px] text-[#64748B] leading-relaxed">
  Continue your personalized learning journey with{" "}
- <span className="text-[#C0392B] font-medium">AI-driven</span> insights.
+ <span className="text-[#3B82F6] font-medium">AI-driven</span> insights.
  </p>
  </div>
 
@@ -142,7 +142,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  className={`mb-3 p-3 rounded-xl text-xs font-medium border ${
  statusMessage.includes("thành công")
  ? "bg-[#E8F8F0] text-[#27AE60] border-[#27AE60]/20"
- : "bg-[#FADBD8] text-[#C0392B] border-[#C0392B]/30"
+ : "bg-[#EFF6FF] text-[#3B82F6] border-[#3B82F6]/30"
  }`}
  >
  {statusMessage}
@@ -172,7 +172,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  labelRight={
  <Link
  href="/forgot-password"
- className="text-xs font-semibold text-[#C0392B] hover:text-[#C0392B] transition-colors"
+ className="text-xs font-semibold text-[#3B82F6] hover:text-[#2563EB] transition-colors"
  >
  Forgot password?
  </Link>
@@ -181,7 +181,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  <button
  type="button"
  onClick={togglePassword}
- className="text-[#B8B0A3] hover:text-[#C0392B] transition-colors focus:outline-none"
+ className="text-[#94A3B8] hover:text-[#2563EB] transition-colors focus:outline-none"
  >
  {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
  </button>
@@ -199,31 +199,31 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  onChange={handleChange("rememberMe")}
  className="sr-only peer"
  />
- <div className="w-[18px] h-[18px] rounded-[5px] border-2 border-[#D0D0E8] bg-white peer-checked:bg-[#FAF7F2] peer-checked:border-[#E8E2D9] transition-all duration-200 flex items-center justify-center shadow-sm group-hover:border-[#E8E2D9]">
+ <div className="w-[18px] h-[18px] rounded-[5px] border-2 border-[#D0D0E8] bg-white peer-checked:bg-[#F8FAFC] peer-checked:border-[#E2E8F0] transition-all duration-200 flex items-center justify-center shadow-sm group-hover:border-[#E2E8F0]">
  {values.rememberMe && (
  <></>
  )}
  </div>
  </div>
- <span className="text-[13px] text-[#8A8478] group-hover:text-[#2C3039] transition-colors">
+ <span className="text-[13px] text-[#64748B] group-hover:text-[#0F172A] transition-colors">
  Remember me for 30 days
  </span>
  </label>
  <button
  type="submit"
  disabled={isLoading || !canSubmit}
- className="mt-1 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#C0392B] shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#C0392B]/30"
+ className="mt-1 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#3B82F6]/30"
  >
  {isLoading ? "Signing in..." : <>Login <ArrowRightIcon /></>}
  </button>
  </form>
 
- <p className="mt-5 text-center text-[13px] text-[#8A8478]">
+ <p className="mt-5 text-center text-[13px] text-[#64748B]">
  Don&apos;t have an account?{" "}
  <button
  type="button"
  onClick={onFlipToRegister}
- className="font-semibold text-[#C0392B] hover:text-[#C0392B] transition-colors hover:underline underline-offset-2 focus:outline-none"
+ className="font-semibold text-[#3B82F6] hover:text-[#2563EB] transition-colors hover:underline underline-offset-2 focus:outline-none"
  >
  Sign up
  </button>
@@ -232,7 +232,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
 
  {/* Footer — bám sát phía dưới */}
  <div className="mt-auto text-center">
- <p className="text-[11px] text-[#B8B0A3] leading-relaxed">
+ <p className="text-[11px] text-[#94A3B8] leading-relaxed">
  © 2024 MindNova AI. Empowering global learners through intelligence.
  </p>
  </div>

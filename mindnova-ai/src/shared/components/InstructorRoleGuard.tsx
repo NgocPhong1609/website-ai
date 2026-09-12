@@ -47,7 +47,7 @@ export function InstructorRoleGuard({ children }: { children: React.ReactNode })
     return (
       <div className="flex h-screen w-full items-center justify-center bg-[#F4F4F8]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-[#4648D4] border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
           <p className="text-sm font-semibold text-[#64647A]">Đang chuyển hướng...</p>
         </div>
       </div>

@@ -244,7 +244,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  <tr key={row.id} className="hover:bg-slate-50/80 transition-colors">
  <td className="px-6 py-4 min-w-[240px]">
  <div className="flex items-center gap-3">
- <div className="w-10 h-10 rounded-full bg-amber-50 text-[#C0392B] flex items-center justify-center font-black overflow-hidden border border-amber-100 shrink-0">
+ <div className="w-10 h-10 rounded-full bg-amber-50 text-[#3B82F6] flex items-center justify-center font-black overflow-hidden border border-amber-100 shrink-0">
  {avatar ? (
  <img src={avatar} alt={row.name} className="w-full h-full object-cover" />
  ) : (
@@ -297,7 +297,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  <button
  type="button"
  onClick={() => setSelectedRow(row)}
- className="px-4 py-2 rounded-xl border border-rose-200 bg-rose-50/50 text-[#C0392B] text-xs font-black hover:bg-rose-100 transition-all shadow-xs whitespace-nowrap"
+ className="px-4 py-2 rounded-xl border border-rose-200 bg-rose-50/50 text-[#3B82F6] text-xs font-black hover:bg-rose-100 transition-all shadow-xs whitespace-nowrap"
  >
  Xem hồ sơ & Thẩm định
  </button>
@@ -324,7 +324,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  {/* Modal Header */}
  <div className="flex items-center justify-between border-b border-slate-200 px-8 py-5 bg-slate-50">
  <div className="flex items-center gap-3">
- <div className="w-12 h-12 rounded-full -[#FAF7F2] text-[#C0392B] font-black text-lg flex items-center justify-center overflow-hidden border -[#FAF7F2]">
+ <div className="w-12 h-12 rounded-full bg-[#F8FAFC] text-[#3B82F6] font-black text-lg flex items-center justify-center overflow-hidden border-[#E2E8F0]">
  {selectedRow.avatar_url || selectedRow.avatarUrl ? (
  <img
  src={selectedRow.avatar_url || selectedRow.avatarUrl!}
@@ -365,7 +365,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  <span
  className={`px-3 py-1 rounded-full text-xs font-black border ${
  selectedRow.is_verified
- ? "bg-emerald-50 -[#2C3039] -[#FAF7F2]"
+ ? "bg-emerald-50 text-emerald-700"
  : selectedRow.teacher_verification_status === "rejected"
  ? "bg-rose-50 text-rose-700 border-rose-200"
  : selectedRow.teacher_verification_status === "revoked"
@@ -434,7 +434,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  setActionError("");
  setShowApproveConfirmModal(true);
  }}
- className="w-full py-3 rounded-xl -[#2C3039] hover:-[#2C3039] text-white text-xs font-black shadow-md transition-all flex items-center justify-center gap-1.5"
+ className="w-full py-3 rounded-xl bg-[#0F172A] hover:bg-[#0F172A] text-white text-xs font-black shadow-md transition-all flex items-center justify-center gap-1.5"
  >
  CẤP TÍCH XANH SỐ XÁC MINH
  </button>
@@ -498,7 +498,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  <span
  className={`px-3 py-1 rounded-full text-xs font-black border ${
  cert.verification_status === "approved"
- ? "bg-emerald-50 -[#2C3039] -[#FAF7F2]"
+ ? "bg-emerald-50 text-emerald-700"
  : cert.verification_status === "rejected"
  ? "bg-rose-50 text-rose-700 border-rose-200"
  : "bg-amber-50 text-amber-700 border-amber-200"
@@ -543,7 +543,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  href={cert.verification_url}
  target="_blank"
  rel="noreferrer"
- className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 text-[#C0392B] border -[#FAF7F2] text-xs font-bold hover:underline"
+ className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-[#3B82F6] border-[#E2E8F0] text-xs font-bold hover:underline"
  >
  Mở trang xác minh chính thức ↗
  </a>
@@ -584,7 +584,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  type="button"
  disabled={isPendingAction}
  onClick={() => handleCertDecision(cert.id, "approved")}
- className="px-4 py-2 rounded-xl -[#2C3039] hover:-[#2C3039] text-white text-xs font-black shadow-xs transition-all"
+ className="px-4 py-2 rounded-xl bg-[#0F172A] hover:bg-[#0F172A] text-white text-xs font-black shadow-xs transition-all"
  >
  Duyệt chứng chỉ này
  </button>
@@ -624,14 +624,14 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  <p className="text-xs font-semibold text-slate-600 mt-1 leading-relaxed">
  Bạn có chắc chắn muốn cấp tích xanh xác minh cho giáo viên <strong className="text-slate-900">{selectedRow.name}</strong>?
  </p>
- <p className="text-[11px] font-medium text-slate-500 mt-2 bg-emerald-50 p-2.5 rounded-xl border -[#FAF7F2] leading-relaxed">
+ <p className="text-[11px] font-medium text-slate-500 mt-2 bg-emerald-50 p-2.5 rounded-xl border-[#E2E8F0] leading-relaxed">
  Sau khi xác nhận, giáo viên sẽ được hiển thị trạng thái đã xác minh trên toàn hệ thống MindNova AI.
  </p>
  </div>
 
  {actionError && (
- <div className="p-2.5 rounded-xl bg-red-50 text-xs font-bold text-red-700">
- ️ {actionError}
+ <div className="p-2.5 rounded-xl bg-[#EFF6FF] text-xs font-bold text-[#1D4ED8]">
+ {actionError}
  </div>
  )}
 
@@ -651,7 +651,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  type="button"
  disabled={isPendingAction}
  onClick={() => handleTeacherDecision("approved")}
- className="px-5 py-2 rounded-xl text-xs font-black text-white -[#2C3039] hover:-[#2C3039] shadow-md shadow-emerald-600/30 transition-all disabled:opacity-50 flex items-center gap-1.5"
+ className="px-5 py-2 rounded-xl text-xs font-black text-white bg-[#0F172A] hover:bg-[#0F172A] shadow-md shadow-emerald-600/30 transition-all disabled:opacity-50 flex items-center gap-1.5"
  >
  {isPendingAction ? (
  <>
@@ -684,8 +684,8 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  </p>
 
  {actionError && (
- <div className="p-2.5 rounded-xl bg-red-50 text-xs font-bold text-red-700">
- ️ {actionError}
+ <div className="p-2.5 rounded-xl bg-[#EFF6FF] text-xs font-bold text-[#1D4ED8]">
+ {actionError}
  </div>
  )}
 

@@ -23,7 +23,7 @@ export function ProgressContent() {
   if (isError || !data) {
     return (
       <div className="p-6 md:p-12 max-w-[1400px] mx-auto min-h-[60vh] flex flex-col items-center justify-center text-center gap-3">
-        <div className="w-16 h-16 rounded-2xl bg-[#FEF2F2] text-[#2563eb] flex items-center justify-center text-2xl mb-1 shadow-sm border border-[#FCA5A5]/40">
+        <div className="w-16 h-16 rounded-2xl bg-[#EFF6FF] text-[#2563eb] flex items-center justify-center text-2xl mb-1 shadow-sm border border-[#DBEAFE]/40">
           
         </div>
         <h3 className="text-lg font-bold text-[#0f172a]">Không thể tải dữ liệu tiến trình học tập</h3>
@@ -95,7 +95,7 @@ export function ProgressContent() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     viewMode === "linear"
                       ? "bg-[#2563eb] text-white"
-                      : "text-[#64748b] hover:bg-[#F5F0E8] hover:text-[#0f172a]"
+                      : "text-[#64748b] hover:bg-[#F1F5F9] hover:text-[#0f172a]"
                   }`}
                 >
                   Tuyến tính
@@ -106,7 +106,7 @@ export function ProgressContent() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     viewMode === "module"
                       ? "bg-[#2563eb] text-white"
-                      : "text-[#64748b] hover:bg-[#F5F0E8] hover:text-[#0f172a]"
+                      : "text-[#64748b] hover:bg-[#F1F5F9] hover:text-[#0f172a]"
                   }`}
                 >
                   Dạng Thẻ
@@ -134,7 +134,7 @@ export function ProgressContent() {
                       
                       {/* Timeline Dot */}
                       <div className={`absolute -left-[35px] top-1 w-5 h-5 rounded-full ring-4 ring-white shrink-0 ${
-                        isCompleted ? "bg-[#27AE60]" : isActive ? "bg-[#2563eb] shadow-[0_0_12px_rgba(192,57,43,0.4)]" : "bg-[#e2e8f0]"
+                        isCompleted ? "bg-[#27AE60]" : isActive ? "bg-[#2563eb] shadow-[0_0_12px_rgba(59, 130, 246,0.4)]" : "bg-[#e2e8f0]"
                       }`} />
 
                       <div className={`p-6 rounded-2xl bg-white border transition-colors ${
@@ -144,7 +144,7 @@ export function ProgressContent() {
                           <div className="space-y-2">
                             <div className="flex items-center gap-3">
                               <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md border ${
-                                isActive ? "bg-[#eff6ff] text-[#2563eb] border-[#2563eb]/20" : isCompleted ? "bg-[#E8F8F0] text-[#27AE60] border-[#27AE60]/20" : "bg-[#F5F0E8] text-[#64748b] border-[#e2e8f0]"
+                                isActive ? "bg-[#eff6ff] text-[#2563eb] border-[#2563eb]/20" : isCompleted ? "bg-[#E8F8F0] text-[#27AE60] border-[#27AE60]/20" : "bg-[#F1F5F9] text-[#64748b] border-[#e2e8f0]"
                               }`}>
                                 {mod.module_number}
                               </span>
@@ -172,7 +172,7 @@ export function ProgressContent() {
                                 </button>
                               </Link>
                             ) : (
-                              <span className="flex items-center gap-1.5 text-xs font-semibold text-[#64748b] bg-[#F5F0E8] px-3 py-1.5 rounded-lg border border-[#e2e8f0]">
+                              <span className="flex items-center gap-1.5 text-xs font-semibold text-[#64748b] bg-[#F1F5F9] px-3 py-1.5 rounded-lg border border-[#e2e8f0]">
                                 <Lock size={12} /> Chưa mở
                               </span>
                             )}
@@ -185,7 +185,7 @@ export function ProgressContent() {
                               <span className="text-[#64748b]">Tiến độ Module</span>
                               <span className="text-[#2563eb]">{mod.progress_text || `${mod.progress_percentage || 0}%`}</span>
                             </div>
-                            <div className="w-full h-1.5 bg-[#F5F0E8] rounded-full overflow-hidden">
+                            <div className="w-full h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden">
                               <div className="h-full bg-[#2563eb] rounded-full" style={{ width: `${mod.progress_percentage || 0}%` }} />
                             </div>
                           </div>
@@ -210,7 +210,7 @@ export function ProgressContent() {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md border ${
-                          isActive ? "bg-[#eff6ff] text-[#2563eb] border-[#2563eb]/20" : isCompleted ? "bg-[#E8F8F0] text-[#27AE60] border-[#27AE60]/20" : "bg-[#F5F0E8] text-[#64748b] border-[#e2e8f0]"
+                          isActive ? "bg-[#eff6ff] text-[#2563eb] border-[#2563eb]/20" : isCompleted ? "bg-[#E8F8F0] text-[#27AE60] border-[#27AE60]/20" : "bg-[#F1F5F9] text-[#64748b] border-[#e2e8f0]"
                         }`}>
                           {mod.module_number}
                         </span>
@@ -227,7 +227,7 @@ export function ProgressContent() {
                           <span>Tiến độ</span>
                           <span className="text-[#2563eb]">{mod.progress_percentage || 0}%</span>
                         </div>
-                        <div className="w-full h-1 bg-[#F5F0E8] rounded-full overflow-hidden">
+                        <div className="w-full h-1 bg-[#F1F5F9] rounded-full overflow-hidden">
                           <div className="h-full bg-[#2563eb] rounded-full" style={{ width: `${mod.progress_percentage || 0}%` }} />
                         </div>
                       </div>
@@ -247,7 +247,7 @@ export function ProgressContent() {
                           </button>
                         </Link>
                       ) : (
-                        <button disabled className="w-full py-2.5 bg-[#F5F0E8] border border-[#e2e8f0] text-[#64748b] rounded-lg font-bold text-sm cursor-not-allowed">
+                        <button disabled className="w-full py-2.5 bg-[#F1F5F9] border border-[#e2e8f0] text-[#64748b] rounded-lg font-bold text-sm cursor-not-allowed">
                           Chưa mở khóa
                         </button>
                       )}

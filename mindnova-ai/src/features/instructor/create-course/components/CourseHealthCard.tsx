@@ -23,10 +23,10 @@ export function CourseHealthCard({ courseId }: { courseId: string }) {
  const title = hasErrors ? "Cần hoàn thiện trước khi gửi duyệt" : report.status === "ready" ? "Khóa học sẵn sàng gửi duyệt" : "Khóa học sẵn sàng, nhưng còn lưu ý";
 
  return (
- <section className={`mb-5 rounded-2xl border p-4 ${tone === "rose" ? "border-rose-200 bg-rose-50" : tone === "emerald" ? "-[#FAF7F2] bg-emerald-50" : "border-amber-200 bg-amber-50"}`}>
+ <section className={`mb-5 rounded-2xl border p-4 ${tone === "rose" ? "border-rose-200 bg-rose-50" : tone === "emerald" ? "text-[#F8FAFC] bg-emerald-50" : "border-amber-200 bg-amber-50"}`}>
  <div className="flex flex-wrap items-center justify-between gap-3">
  <div>
- <p className="text-sm font-black text-[#2C3039]">Course Health · {report.score}/100</p>
+ <p className="text-sm font-black text-[#0F172A]">Course Health · {report.score}/100</p>
  <p className="mt-0.5 text-xs font-medium text-gray-700">{title}</p>
  </div>
  <button type="button" onClick={() => refetch()} className="rounded-lg border border-current/20 bg-white/70 px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-white">

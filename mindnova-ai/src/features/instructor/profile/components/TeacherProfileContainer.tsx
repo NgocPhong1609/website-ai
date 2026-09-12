@@ -124,7 +124,7 @@ export function TeacherProfileContainer() {
 
  if (isLoading) {
  return (
- <div className="flex items-center justify-center min-h-[400px] text-[#8A8478] font-semibold">
+ <div className="flex items-center justify-center min-h-[400px] text-[#64748B] font-semibold">
  Đang tải thông tin hồ sơ giáo viên...
  </div>
  );
@@ -137,13 +137,13 @@ export function TeacherProfileContainer() {
  return (
  <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
  {/* Header Profile Banner */}
- <div className="relative rounded-3xl border border-[#E8E2D9]/80 bg-white p-6 md:p-8 shadow-sm overflow-hidden">
- <div className="absolute top-0 right-0 w-64 h-64 bg-[#C0392B] -[#C0392B]/5 rounded-full blur-3xl -z-0 pointer-events-none" />
+ <div className="relative rounded-3xl border border-[#E2E8F0]/80 bg-white p-6 md:p-8 shadow-sm overflow-hidden">
+ <div className="absolute top-0 right-0 w-64 h-64 bg-[#3B82F6] text-[#3B82F6]/5 rounded-full blur-3xl -z-0 pointer-events-none" />
 
  <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
  {/* Avatar Upload */}
  <div className="relative group">
- <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100 flex items-center justify-center text-3xl font-black text-[#C0392B]">
+ <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100 flex items-center justify-center text-3xl font-black text-[#3B82F6]">
  {profileData?.avatar_url ? (
  <img
  src={profileData.avatar_url}
@@ -170,27 +170,27 @@ export function TeacherProfileContainer() {
  {/* Teacher Basic Details */}
  <div className="flex-1 text-center md:text-left space-y-2">
  <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
- <h1 className="text-2xl md:text-3xl font-black text-[#2C3039]">
+ <h1 className="text-2xl md:text-3xl font-black text-[#0F172A]">
  {profileData?.name}
  </h1>
  <VerifiedTeacherBadge isVerified={isVerified} size="md" />
  </div>
 
- <p className="text-sm font-semibold text-[#8A8478]">{profileData?.email}</p>
+ <p className="text-sm font-semibold text-[#64748B]">{profileData?.email}</p>
 
  <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-1">
- <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-[#C0392B] border -[#FAF7F2] uppercase tracking-wide">
+ <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#3B82F6] border-[#E2E8F0] uppercase tracking-wide">
  ‍ Giảng viên
  </span>
  <span
  className={`px-3 py-1 rounded-full text-xs font-bold border uppercase tracking-wide ${
  isVerified
- ? "bg-emerald-50 -[#2C3039] -[#FAF7F2]"
+ ? "bg-emerald-50 text-emerald-700"
  : status === "pending"
  ? "bg-amber-50 text-amber-700 border-amber-200"
  : status === "rejected"
  ? "bg-rose-50 text-rose-700 border-rose-200"
- : "bg-gray-100 text-[#8A8478] border-[#E8E2D9]"
+ : "bg-gray-100 text-[#64748B] border-[#E2E8F0]"
  }`}
  >
  {isVerified
@@ -211,7 +211,7 @@ export function TeacherProfileContainer() {
  <div
  className={`p-4 rounded-2xl border text-sm font-bold ${
  msg.type === "success"
- ? "bg-emerald-50 -[#2C3039] -[#FAF7F2]"
+ ? "bg-emerald-50 text-emerald-700"
  : "bg-rose-50 text-rose-800 border-rose-200"
  }`}
  >
@@ -224,23 +224,23 @@ export function TeacherProfileContainer() {
  {/* Left Column: Verification Card & Certificates */}
  <div className="lg:col-span-1 space-y-6">
  {/* Card: Verification Status */}
- <div className="rounded-3xl border border-[#E8E2D9] bg-white p-6 shadow-sm space-y-4">
+ <div className="rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm space-y-4">
  <div className="flex items-center gap-2">
  
- <h2 className="text-base font-black text-[#2C3039]">Xác minh chuyên môn</h2>
+ <h2 className="text-base font-black text-[#0F172A]">Xác minh chuyên môn</h2>
  </div>
 
  {isVerified ? (
- <div className="p-4 rounded-2xl bg-emerald-50/70 border -[#FAF7F2] space-y-2">
- <div className="flex items-center gap-2 -[#2C3039] font-black text-sm">
+ <div className="p-4 rounded-2xl bg-emerald-50/70 border-[#E2E8F0] space-y-2">
+ <div className="flex items-center gap-2 text-[#0F172A] font-black text-sm">
  <VerifiedTeacherBadge isVerified={true} size="sm" showTooltip={false} />
  <span>Đã được MindNova xác minh</span>
  </div>
- <p className="text-xs -[#2C3039] font-semibold leading-relaxed">
+ <p className="text-xs text-[#0F172A] font-semibold leading-relaxed">
  Tài khoản của bạn đã được xác minh bằng cấp và chuyên môn chính thức bởi Ban quản trị. Tích xanh được hiển thị công khai trên toàn hệ thống.
  </p>
  {profileData?.teacher_verified_at && (
- <p className="text-[11px] -[#2C3039] font-bold pt-1">
+ <p className="text-[11px] text-[#0F172A] font-bold pt-1">
  Cấp ngày: {new Date(profileData.teacher_verified_at).toLocaleDateString("vi-VN")}
  </p>
  )}
@@ -276,13 +276,13 @@ export function TeacherProfileContainer() {
  </button>
  </div>
  ) : (
- <div className="p-4 rounded-2xl bg-indigo-50/50 border -[#FAF7F2] space-y-3">
- <p className="text-xs text-[#8A8478] font-semibold leading-relaxed">
+ <div className="p-4 rounded-2xl bg-blue-50/50 border-[#E2E8F0] space-y-3">
+ <p className="text-xs text-[#64748B] font-semibold leading-relaxed">
  Tài khoản của bạn chưa được xác minh. Nộp bằng cấp/chứng chỉ để Admin kiểm tra và cấp tích xanh xác minh uy tín.
  </p>
  <button
  onClick={() => setIsModalOpen(true)}
- className="w-full py-2.5 rounded-xl bg-[#C0392B] hover:bg-[#383AB8] text-white font-black text-xs shadow-md shadow-[#C0392B]/20 transition-all"
+ className="w-full py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-black text-xs shadow-md shadow-[#3B82F6]/20 transition-all"
  >
  Yêu cầu cấp tích xanh 
  </button>
@@ -291,12 +291,12 @@ export function TeacherProfileContainer() {
  </div>
 
  {/* Card: Certificate List */}
- <div className="rounded-3xl border border-[#E8E2D9] bg-white p-6 shadow-sm space-y-4">
+ <div className="rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm space-y-4">
  <div className="flex items-center justify-between">
- <h2 className="text-base font-black text-[#2C3039]">Bằng cấp & Chứng chỉ</h2>
+ <h2 className="text-base font-black text-[#0F172A]">Bằng cấp & Chứng chỉ</h2>
  <button
  onClick={() => setIsModalOpen(true)}
- className="text-xs font-black text-[#C0392B] hover:underline"
+ className="text-xs font-black text-[#3B82F6] hover:underline"
  >
  + Thêm bằng cấp
  </button>
@@ -307,19 +307,19 @@ export function TeacherProfileContainer() {
  {profileData.certificates.map((cert: any) => (
  <div
  key={cert.id}
- className="p-3.5 rounded-2xl border border-gray-100 bg-[#FEFCF9]/60 space-y-2 relative group"
+ className="p-3.5 rounded-2xl border border-gray-100 bg-[#F8FAFC]/60 space-y-2 relative group"
  >
  <div className="flex items-start justify-between gap-2">
  <div>
- <h4 className="text-sm font-extrabold text-[#2C3039]">{cert.certificate_name}</h4>
- <p className="text-xs font-semibold text-[#8A8478]">
+ <h4 className="text-sm font-extrabold text-[#0F172A]">{cert.certificate_name}</h4>
+ <p className="text-xs font-semibold text-[#64748B]">
  {cert.issuing_organization || "Đơn vị chưa cập nhật"}
  </p>
  </div>
  <span
  className={`text-[10px] font-black px-2 py-0.5 rounded-full border ${
  cert.verification_status === "approved"
- ? "bg-emerald-50 -[#2C3039] -[#FAF7F2]"
+ ? "bg-emerald-50 text-emerald-700"
  : cert.verification_status === "rejected"
  ? "bg-rose-50 text-rose-700 border-rose-200"
  : "bg-amber-50 text-amber-700 border-amber-200"
@@ -338,7 +338,7 @@ export function TeacherProfileContainer() {
  href={cert.certificate_image}
  target="_blank"
  rel="noreferrer"
- className="block mt-2 rounded-xl overflow-hidden border border-[#E8E2D9] h-24 bg-gray-100"
+ className="block mt-2 rounded-xl overflow-hidden border border-[#E2E8F0] h-24 bg-gray-100"
  >
  <img
  src={cert.certificate_image}
@@ -353,13 +353,13 @@ export function TeacherProfileContainer() {
  href={cert.verification_url}
  target="_blank"
  rel="noreferrer"
- className="inline-block text-[11px] font-bold text-[#C0392B] hover:underline"
+ className="inline-block text-[11px] font-bold text-[#3B82F6] hover:underline"
  >
  Link xác minh chính thức 
  </a>
  )}
 
- <div className="flex items-center justify-between pt-1 border-t border-[#E8E2D9]/50 text-[11px] text-gray-400">
+ <div className="flex items-center justify-between pt-1 border-t border-[#E2E8F0]/50 text-[11px] text-gray-400">
  <span>{cert.is_public ? " Hiển thị Public" : " Riêng tư"}</span>
   <div className="flex items-center gap-3">
   {cert.verification_status === "approved" ? (
@@ -373,7 +373,7 @@ export function TeacherProfileContainer() {
     <button
       type="button"
       onClick={() => setEditingCert(cert)}
-      className="text-[#C0392B] hover:underline font-bold cursor-pointer"
+      className="text-[#3B82F6] hover:underline font-bold cursor-pointer"
     >
       Sửa
     </button>
@@ -399,10 +399,10 @@ export function TeacherProfileContainer() {
  {/* Right Column: Edit Profile Form & Courses */}
  <div className="lg:col-span-2 space-y-6">
  {/* Edit Profile Form */}
- <div className="rounded-3xl border border-[#E8E2D9] bg-white p-6 md:p-8 shadow-sm space-y-6">
+ <div className="rounded-3xl border border-[#E2E8F0] bg-white p-6 md:p-8 shadow-sm space-y-6">
  <div className="border-b border-gray-100 pb-4">
- <h2 className="text-lg font-black text-[#2C3039]">Chỉnh sửa thông tin cá nhân</h2>
- <p className="text-xs font-semibold text-[#8A8478]">
+ <h2 className="text-lg font-black text-[#0F172A]">Chỉnh sửa thông tin cá nhân</h2>
+ <p className="text-xs font-semibold text-[#64748B]">
  Thông tin được hiển thị cho học viên trên trang cá nhân của bạn.
  </p>
  </div>
@@ -418,7 +418,7 @@ export function TeacherProfileContainer() {
  required
  value={form.name}
  onChange={(e) => setForm({ ...form, name: e.target.value })}
- className="w-full px-3.5 py-2.5 rounded-xl border border-[#E8E2D9] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#C0392B]"
+ className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
  />
  </div>
 
@@ -430,7 +430,7 @@ export function TeacherProfileContainer() {
  type="text"
  value={form.phone}
  onChange={(e) => setForm({ ...form, phone: e.target.value })}
- className="w-full px-3.5 py-2.5 rounded-xl border border-[#E8E2D9] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#C0392B]"
+ className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
  />
  </div>
  </div>
@@ -445,7 +445,7 @@ export function TeacherProfileContainer() {
  placeholder="VD: Lập trình Fullstack, AI, IELTS..."
  value={form.expertise}
  onChange={(e) => setForm({ ...form, expertise: e.target.value })}
- className="w-full px-3.5 py-2.5 rounded-xl border border-[#E8E2D9] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#C0392B]"
+ className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
  />
  </div>
 
@@ -458,7 +458,7 @@ export function TeacherProfileContainer() {
  placeholder="VD: 5+ năm giảng dạy tại ĐH Bách Khoa"
  value={form.experience}
  onChange={(e) => setForm({ ...form, experience: e.target.value })}
- className="w-full px-3.5 py-2.5 rounded-xl border border-[#E8E2D9] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#C0392B]"
+ className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
  />
  </div>
  </div>
@@ -471,7 +471,7 @@ export function TeacherProfileContainer() {
  type="text"
  value={form.address}
  onChange={(e) => setForm({ ...form, address: e.target.value })}
- className="w-full px-3.5 py-2.5 rounded-xl border border-[#E8E2D9] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#C0392B]"
+ className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
  />
  </div>
 
@@ -484,7 +484,7 @@ export function TeacherProfileContainer() {
  placeholder="Giới thiệu bản thân, phong cách giảng dạy và định hướng học tập cho học viên..."
  value={form.bio}
  onChange={(e) => setForm({ ...form, bio: e.target.value })}
- className="w-full px-3.5 py-2.5 rounded-xl border border-[#E8E2D9] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#C0392B]"
+ className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
  />
  </div>
 
@@ -492,7 +492,7 @@ export function TeacherProfileContainer() {
  <button
  type="submit"
  disabled={isSaving}
- className="px-6 py-2.5 rounded-xl text-xs font-black text-white bg-[#C0392B] hover:bg-[#383AB8] shadow-md shadow-[#C0392B]/30 transition-all disabled:opacity-50"
+ className="px-6 py-2.5 rounded-xl text-xs font-black text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-md shadow-[#3B82F6]/30 transition-all disabled:opacity-50"
  >
  {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
  </button>
@@ -501,14 +501,14 @@ export function TeacherProfileContainer() {
  </div>
 
  {/* Teacher's Courses */}
- <div className="rounded-3xl border border-[#E8E2D9] bg-white p-6 md:p-8 shadow-sm space-y-4">
- <h2 className="text-lg font-black text-[#2C3039]">Danh sách Khóa học giảng dạy</h2>
+ <div className="rounded-3xl border border-[#E2E8F0] bg-white p-6 md:p-8 shadow-sm space-y-4">
+ <h2 className="text-lg font-black text-[#0F172A]">Danh sách Khóa học giảng dạy</h2>
  {profileData?.courses?.length > 0 ? (
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
  {profileData.courses.map((course: any) => (
  <div
  key={course.id}
- className="p-4 rounded-2xl border border-gray-100 bg-[#FEFCF9] flex items-center gap-3"
+ className="p-4 rounded-2xl border border-gray-100 bg-[#F8FAFC] flex items-center gap-3"
  >
  <div className="w-14 h-14 rounded-xl bg-gray-200 shrink-0 overflow-hidden">
  {course.thumbnail && (
@@ -520,10 +520,10 @@ export function TeacherProfileContainer() {
  )}
  </div>
  <div className="min-w-0 flex-1">
- <h4 className="text-sm font-extrabold text-[#2C3039] truncate">
+ <h4 className="text-sm font-extrabold text-[#0F172A] truncate">
  {course.title}
  </h4>
- <span className="text-[10px] font-bold uppercase text-[#C0392B]">
+ <span className="text-[10px] font-bold uppercase text-[#3B82F6]">
  {course.status}
  </span>
  </div>

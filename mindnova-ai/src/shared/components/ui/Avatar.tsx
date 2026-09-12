@@ -34,7 +34,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   }, [src]);
 
   const baseClasses =
-    "relative inline-flex items-center justify-center overflow-hidden rounded-full bg-indigo-50 border border-indigo-100 flex-shrink-0";
+    "relative inline-flex items-center justify-center overflow-hidden rounded-full bg-blue-50 border border-blue-100 flex-shrink-0";
   const mergedClasses = twMerge(baseClasses, sizeClasses[size], className);
 
   if (src && !error) {
@@ -53,7 +53,7 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   return (
     <div className={mergedClasses}>
-      <span className="font-semibold text-indigo-600 uppercase">
+      <span className="font-semibold text-blue-600 uppercase">
         {fallback.slice(0, 2)}
       </span>
     </div>

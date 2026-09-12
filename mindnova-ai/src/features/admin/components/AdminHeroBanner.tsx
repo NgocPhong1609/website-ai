@@ -9,6 +9,10 @@ interface AdminHeroBannerProps {
 
 export function AdminHeroBanner({ hero }: AdminHeroBannerProps) {
  const router = useRouter();
+ const title = hero?.title ?? "Bảng điều khiển MindNova";
+ const description = hero?.description ?? "Theo dõi người dùng, nội dung và hệ thống trên cùng một palette xanh với student.";
+ const primaryAction = hero?.primaryAction ?? "Quản lý nội dung";
+ const secondaryAction = hero?.secondaryAction ?? "Xem báo cáo";
 
  const handleSecondaryAction = () => {
  router.push("/admin/analytics");
@@ -20,16 +24,16 @@ export function AdminHeroBanner({ hero }: AdminHeroBannerProps) {
 
  return (
  <section className="relative overflow-hidden rounded-[24px] border border-slate-200 bg-[linear-gradient(120deg,#08162d_0%,#122a49_35%,#1b3f6b_70%,#244f84_100%)] py-4 px-5 lg:py-5 lg:px-6 text-white shadow-[0_20px_50px_-30px_rgba(15,23,42,0.8)]">
- <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.26),transparent_20%),radial-gradient(circle_at_bottom_left,rgba(99,102,241,0.28),transparent_30%)]" />
+ <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(96, 165, 250,0.26),transparent_20%),radial-gradient(circle_at_bottom_left,rgba(37, 99, 235,0.28),transparent_30%)]" />
  <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
  <div className="max-w-2xl">
- <p className="text-[11px] uppercase tracking-[0.28em] -[#FAF7F2]/85">
+ <p className="text-[11px] uppercase tracking-[0.28em] text-[#F8FAFC]/85">
  Bảng điều khiển quản trị
  </p>
  <h1 className="mt-3 text-3xl font-semibold leading-tight text-white md:text-4xl [font-family:var(--font-admin-head)]">
- {hero.title}
+ {title}
  </h1>
- <p className="mt-3 max-w-xl text-sm text-slate-200/90">{hero.description}</p>
+ <p className="mt-3 max-w-xl text-sm text-slate-200/90">{description}</p>
  </div>
 
  <div className="flex flex-wrap gap-3">
@@ -38,14 +42,14 @@ export function AdminHeroBanner({ hero }: AdminHeroBannerProps) {
  onClick={handleSecondaryAction}
  className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20"
  >
- {hero.secondaryAction}
+ {secondaryAction}
  </button>
  <button
  type="button"
  onClick={handlePrimaryAction}
- className="rounded-full -[#C0392B] px-4 py-2 text-sm font-semibold text-[#0a1d3d] shadow-[0_10px_24px_-12px_rgba(34,211,238,0.85)] transition hover:-[#FAF7F2]"
+ className="rounded-full bg-[#3B82F6] px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_-12px_rgba(37,99,235,0.85)] transition hover:bg-[#2563EB]"
  >
- {hero.primaryAction}
+ {primaryAction}
  </button>
  </div>
  </div>
@@ -57,10 +61,10 @@ export function AdminHeroBanner({ hero }: AdminHeroBannerProps) {
  { label: "Tỷ lệ hoàn thành", value: "84.7%", trend: "+2.8%" },
  ].map((metric) => (
  <div key={metric.label} className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
- <p className="text-[11px] uppercase tracking-[0.2em] -[#FAF7F2]/60">{metric.label}</p>
+ <p className="text-[11px] uppercase tracking-[0.2em] text-[#F8FAFC]/60">{metric.label}</p>
  <div className="mt-3 flex items-end justify-between gap-3">
  <span className="text-2xl font-semibold text-white">{metric.value}</span>
- <span className="rounded-full -[#2C3039]/15 px-2 py-1 text-[10px] font-semibold -[#FAF7F2]">
+ <span className="rounded-full bg-[#0F172A]/15 px-2 py-1 text-[10px] font-semibold text-[#F8FAFC]">
  {metric.trend}
  </span>
  </div>

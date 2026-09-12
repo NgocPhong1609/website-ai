@@ -388,7 +388,7 @@ export function QuizQuestionScreen({
             <span>Đã làm: {answeredCount}/{quiz.questions.length} câu</span>
           </div>
 
-          <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full shadow-2xs border transition-all ${timeRemaining < 60 ? "bg-[#eff6ff] text-[#2563eb] border-[#E11D48]/30 animate-pulse" : "bg-[#eff6ff] text-[#1d4ed8] border-[#1d4ed8]/20"}`}>
+          <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full shadow-2xs border transition-all ${timeRemaining < 60 ? "bg-[#eff6ff] text-[#2563eb] border-[#2563EB]/30 animate-pulse" : "bg-[#eff6ff] text-[#1d4ed8] border-[#1d4ed8]/20"}`}>
             <Clock size={16} />
             <span className="text-xs sm:text-sm font-semibold tracking-wide">{formatTime(timeRemaining)}</span>
           </div>
@@ -398,9 +398,9 @@ export function QuizQuestionScreen({
       <main className="flex-1 overflow-y-auto pb-36">
         <div className="max-w-[820px] mx-auto px-6 pt-7 sm:pt-8">
           {errorNotice && (
-            <div className="mb-6 p-4 rounded-xl bg-[#eff6ff] border border-[#E11D48]/30 text-[#2563eb] text-xs flex items-center justify-between">
+            <div className="mb-6 p-4 rounded-xl bg-[#eff6ff] border border-[#2563EB]/30 text-[#2563eb] text-xs flex items-center justify-between">
               <span className="flex items-center gap-2"><AlertTriangle size={14} /> {errorNotice}</span>
-              <button onClick={() => setErrorNotice(null)} className="font-semibold p-1 hover:bg-[#E11D48]/10 rounded-full transition-colors"><X size={14} /></button>
+              <button onClick={() => setErrorNotice(null)} className="font-semibold p-1 hover:bg-[#2563EB]/10 rounded-full transition-colors"><X size={14} /></button>
             </div>
           )}
 
@@ -508,7 +508,7 @@ export function QuizQuestionScreen({
                     onClick={() => handleSelectAnswer(question.id, answer.id ? String(answer.id) : letter)}
                     className={`group flex items-start sm:items-center p-4 sm:p-4.5 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                       isSelected 
-                        ? "border-[#1d4ed8] bg-[#eff6ff] shadow-[0_4px_18px_rgba(192,57,43,0.14)] -translate-y-0.5 z-10" 
+                        ? "border-[#1d4ed8] bg-[#eff6ff] shadow-[0_4px_18px_rgba(59, 130, 246,0.14)] -translate-y-0.5 z-10" 
                         : "border-[#EAEAF4] bg-white hover:border-[#1d4ed8]/40 hover:bg-[#F8FAFC]"
                     }`}
                   >

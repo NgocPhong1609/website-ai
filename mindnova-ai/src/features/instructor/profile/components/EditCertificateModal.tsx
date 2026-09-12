@@ -122,17 +122,17 @@ export function EditCertificateModal({
       <div className="relative w-full max-w-xl max-h-[88vh] rounded-3xl bg-white shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 bg-[#FEFCF9]/50 shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 bg-[#F8FAFC]/50 shrink-0">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-wider text-[#C0392B]">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#3B82F6]">
               MindNova Certificate Manager
             </span>
-            <h2 className="text-base sm:text-lg font-black text-[#2C3039] mt-0.5">Chỉnh sửa Bằng cấp / Chứng chỉ</h2>
+            <h2 className="text-base sm:text-lg font-black text-[#0F172A] mt-0.5">Chỉnh sửa Bằng cấp / Chứng chỉ</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white border border-[#E8E2D9] text-[#8A8478] hover:bg-gray-100 flex items-center justify-center transition-colors shadow-2xs font-bold"
+            className="w-8 h-8 rounded-full bg-white border border-[#E2E8F0] text-[#64748B] hover:bg-gray-100 flex items-center justify-center transition-colors shadow-2xs font-bold"
           >
             ✕
           </button>
@@ -148,7 +148,7 @@ export function EditCertificateModal({
             )}
 
             {errorMsg && (
-              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs font-bold text-red-700">
+              <div className="p-3 rounded-xl bg-[#EFF6FF] border border-[#DBEAFE] text-xs font-bold text-[#1D4ED8]">
                 ⚠️ {errorMsg}
               </div>
             )}
@@ -156,7 +156,7 @@ export function EditCertificateModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-[11px] font-extrabold uppercase text-gray-700 mb-1">
-                  Tên chứng chỉ / Bằng cấp <span className="text-red-500">*</span>
+                  Tên chứng chỉ / Bằng cấp <span className="text-[#3B82F6]">*</span>
                 </label>
                 <input
                   type="text"
@@ -165,7 +165,7 @@ export function EditCertificateModal({
                   placeholder="VD: Bằng Thạc sĩ CNTT, IELTS 8.0..."
                   value={formData.certificate_name}
                   onChange={(e) => setFormData({ ...formData, certificate_name: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-[#E8E2D9] text-xs sm:text-sm font-semibold text-[#2C3039] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C0392B] disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-semibold text-[#0F172A] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3B82F6] disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -179,7 +179,7 @@ export function EditCertificateModal({
                   placeholder="VD: Đại học Bách Khoa, British Council..."
                   value={formData.issuing_organization}
                   onChange={(e) => setFormData({ ...formData, issuing_organization: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-[#E8E2D9] text-xs sm:text-sm font-semibold text-[#2C3039] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C0392B] disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-semibold text-[#0F172A] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3B82F6] disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -195,7 +195,7 @@ export function EditCertificateModal({
                   placeholder="VD: REG-2024-88921"
                   value={formData.certificate_number}
                   onChange={(e) => setFormData({ ...formData, certificate_number: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-[#E8E2D9] text-xs sm:text-sm font-semibold text-[#2C3039] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C0392B] disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-semibold text-[#0F172A] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3B82F6] disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -209,7 +209,7 @@ export function EditCertificateModal({
                   placeholder="VD: Lập trình Web, AI, Tiếng Anh..."
                   value={formData.specialization}
                   onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-[#E8E2D9] text-xs sm:text-sm font-semibold text-[#2C3039] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C0392B] disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-semibold text-[#0F172A] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3B82F6] disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -222,7 +222,7 @@ export function EditCertificateModal({
                   disabled={isApproved}
                   value={formData.issue_date}
                   onChange={(e) => setFormData({ ...formData, issue_date: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-[#E8E2D9] text-xs sm:text-sm font-semibold text-[#2C3039] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C0392B] disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-semibold text-[#0F172A] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3B82F6] disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -235,7 +235,7 @@ export function EditCertificateModal({
                   disabled={isApproved}
                   value={formData.expiry_date}
                   onChange={(e) => setFormData({ ...formData, expiry_date: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-[#E8E2D9] text-xs sm:text-sm font-semibold text-[#2C3039] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C0392B] disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-semibold text-[#0F172A] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3B82F6] disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -250,22 +250,22 @@ export function EditCertificateModal({
                 placeholder="https://verify.organization.com/check/..."
                 value={formData.verification_url}
                 onChange={(e) => setFormData({ ...formData, verification_url: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-[#E8E2D9] text-xs sm:text-sm font-semibold text-[#2C3039] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C0392B] disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-semibold text-[#0F172A] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3B82F6] disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-3 rounded-xl bg-indigo-50/50 border border-indigo-100">
-                <label className="block text-[11px] font-extrabold uppercase text-[#C0392B] mb-0.5">
+              <div className="p-3 rounded-xl bg-blue-50/50 border border-blue-100">
+                <label className="block text-[11px] font-extrabold uppercase text-[#3B82F6] mb-0.5">
                   Cập nhật Ảnh Bằng cấp (Public)
                 </label>
-                <p className="text-[10px] text-[#8A8478] mb-1.5">Để trống nếu muốn giữ ảnh hiện tại.</p>
+                <p className="text-[10px] text-[#64748B] mb-1.5">Để trống nếu muốn giữ ảnh hiện tại.</p>
                 <input
                   type="file"
                   disabled={isApproved}
                   accept="image/jpeg,image/png,image/webp"
                   onChange={(e) => handleFileChange(e, false)}
-                  className="text-[11px] font-semibold text-gray-700 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-[#C0392B] file:text-white hover:file:bg-[#383AB8] disabled:opacity-50"
+                  className="text-[11px] font-semibold text-gray-700 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-[#3B82F6] file:text-white hover:file:bg-[#2563EB] disabled:opacity-50"
                 />
               </div>
 
@@ -295,7 +295,7 @@ export function EditCertificateModal({
                 placeholder="Mô tả nội dung chương trình đào tạo..."
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl border border-[#E8E2D9] text-xs sm:text-sm font-semibold text-[#2C3039] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C0392B] disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs sm:text-sm font-semibold text-[#0F172A] bg-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3B82F6] disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -306,7 +306,7 @@ export function EditCertificateModal({
                 disabled={isApproved}
                 checked={formData.is_public}
                 onChange={(e) => setFormData({ ...formData, is_public: e.target.checked })}
-                className="w-4 h-4 rounded text-[#C0392B] focus:ring-[#C0392B] disabled:opacity-50"
+                className="w-4 h-4 rounded text-[#3B82F6] focus:ring-[#3B82F6] disabled:opacity-50"
               />
               <label htmlFor="edit_is_public" className="text-xs font-bold text-gray-700 cursor-pointer">
                 Cho phép hiển thị thông tin bằng cấp này trên Profile công khai
@@ -315,11 +315,11 @@ export function EditCertificateModal({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-2.5 px-5 py-3 border-t border-gray-100 bg-[#FEFCF9]/50 shrink-0">
+          <div className="flex items-center justify-end gap-2.5 px-5 py-3 border-t border-gray-100 bg-[#F8FAFC]/50 shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-extrabold text-[#8A8478] hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 rounded-xl text-xs font-extrabold text-[#64748B] hover:bg-gray-200 transition-colors"
             >
               Hủy bỏ
             </button>
@@ -327,7 +327,7 @@ export function EditCertificateModal({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-5 py-2 rounded-xl text-xs font-black text-white bg-[#C0392B] hover:bg-[#383AB8] shadow-md shadow-[#C0392B]/30 transition-all disabled:opacity-50 flex items-center gap-1.5"
+                className="px-5 py-2 rounded-xl text-xs font-black text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-md shadow-[#3B82F6]/30 transition-all disabled:opacity-50 flex items-center gap-1.5"
               >
                 {isSubmitting ? (
                   <>

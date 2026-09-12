@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { Check } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 
 interface Option {
@@ -73,7 +74,7 @@ export function MultiSelect({
       <div
         className={twMerge(
           "min-h-10 w-full rounded-xl border border-[#DDDDF0] bg-[#FAFAFE] transition-all duration-150 cursor-pointer flex items-center justify-between px-2",
-          isOpen ? "ring-2 ring-[#6B6BFF]/15 border-[#6B6BFF]" : "hover:border-[#C5C6FF]"
+          isOpen ? "ring-2 ring-[#3B82F6]/15 border-[#3B82F6]" : "hover:border-[#DBEAFE]"
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -84,7 +85,7 @@ export function MultiSelect({
             selectedOptions.map((opt) => (
               <span
                 key={opt.value}
-                className="flex items-center gap-1 bg-[#EEF0FF] text-[#4648D4] text-[12px] font-semibold px-2 py-1 rounded-md"
+                className="flex items-center gap-1 bg-[#EFF6FF] text-[#2563EB] text-[12px] font-semibold px-2 py-1 rounded-md"
               >
                 <span className="truncate max-w-[140px] block" title={opt.label}>
                   {opt.label}
@@ -92,7 +93,7 @@ export function MultiSelect({
                 <button
                   type="button"
                   onClick={(e) => removeOption(e, opt.value)}
-                  className="w-3.5 h-3.5 flex items-center justify-center rounded-full hover:bg-[#D5D5FF] text-[#4648D4] transition-colors"
+                  className="w-3.5 h-3.5 flex items-center justify-center rounded-full hover:bg-[#DBEAFE] text-[#2563EB] transition-colors"
                 >
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -128,7 +129,7 @@ export function MultiSelect({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-2 bg-white rounded-xl border border-[#EAEAF4] shadow-lg shadow-[#4648D4]/5 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+        <div className="absolute z-50 w-full mt-2 bg-white rounded-xl border border-[#EAEAF4] shadow-lg shadow-[#2563EB]/5 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
           {/* Search Input */}
           <div className="p-2 border-b border-[#F0F0F8]">
             <input
@@ -137,7 +138,7 @@ export function MultiSelect({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onClick={(e) => e.stopPropagation()}
-              className="w-full bg-[#FAFAFE] border border-[#DDDDF0] rounded-lg px-3 py-1.5 text-[13px] text-[#1A1A2E] placeholder-[#C4C4D8] focus:outline-none focus:border-[#6B6BFF] transition-colors"
+              className="w-full bg-[#FAFAFE] border border-[#DDDDF0] rounded-lg px-3 py-1.5 text-[13px] text-[#0F172A] placeholder-[#C4C4D8] focus:outline-none focus:border-[#3B82F6] transition-colors"
             />
           </div>
 
@@ -145,7 +146,7 @@ export function MultiSelect({
           <div className="max-h-52 overflow-y-auto p-1">
             {loading ? (
               <div className="flex items-center justify-center py-4 text-[13px] text-[#9090B0]">
-                <span className="w-4 h-4 rounded-full border-2 border-[#EAEAF4] border-t-[#6B6BFF] animate-spin mr-2" />
+                <span className="w-4 h-4 rounded-full border-2 border-[#EAEAF4] border-t-[#3B82F6] animate-spin mr-2" />
                 Đang tải...
               </div>
             ) : filteredOptions.length === 0 ? (
@@ -165,15 +166,13 @@ export function MultiSelect({
                     className={twMerge(
                       "flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer text-[13px] transition-colors",
                       isSelected
-                        ? "bg-[#EEF0FF] text-[#4648D4] font-semibold"
-                        : "text-[#464554] hover:bg-[#F4F4FA]"
+                        ? "bg-[#EFF6FF] text-[#2563EB] font-semibold"
+                        : "text-[#475569] hover:bg-[#F4F4FA]"
                     )}
                   >
                     <span>{opt.label}</span>
                     {isSelected && (
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#6B6BFF]">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
+                      <Check className="h-3.5 w-3.5 text-[#3B82F6]" strokeWidth={2.5} aria-hidden />
                     )}
                   </div>
                 );

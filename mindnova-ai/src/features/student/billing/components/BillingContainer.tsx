@@ -61,7 +61,7 @@ export default function BillingContainer() {
 
  <div className="w-full h-2 bg-[#e2e8f0] rounded-full mt-2.5 overflow-hidden p-0.5 border border-[#e2e8f0]">
  <div
- className="h-full bg-[#2563eb] rounded-full shadow-[0_0_8px_rgba(192,57,43,0.4)] transition-all duration-1000 group-hover:brightness-110"
+ className="h-full bg-[#2563eb] rounded-full shadow-[0_0_8px_rgba(59, 130, 246,0.4)] transition-all duration-1000 group-hover:brightness-110"
  style={{ width: "100%" }}
  />
  </div>

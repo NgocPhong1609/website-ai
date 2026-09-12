@@ -80,16 +80,16 @@ export default async function PaymentCallbackPage({ searchParams }: Props) {
 
  return (
  <div className="flex items-center justify-center min-h-[80vh] p-6">
- <div className="bg-white rounded-3xl border border-[#E8E2D9] shadow-sm max-w-md w-full p-8 text-center flex flex-col items-center">
- <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 text-4xl shadow-sm ${isSuccess ? "bg-[#D1FAE5] text-[#2C3039]" : "bg-[#FEE2E2] text-[#EF4444]"}`}>
+ <div className="bg-white rounded-3xl border border-[#E2E8F0] shadow-sm max-w-md w-full p-8 text-center flex flex-col items-center">
+ <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 text-4xl shadow-sm ${isSuccess ? "bg-[#D1FAE5] text-[#0F172A]" : "bg-[#EFF6FF] text-[#3B82F6]"}`}>
  {isSuccess ? "" : ""}
  </div>
 
- <h1 className="text-2xl font-bold text-[#2C3039] mb-3">
+ <h1 className="text-2xl font-bold text-[#0F172A] mb-3">
  {isSuccess ? "Thanh toán Thành công!" : "Thanh toán đang xử lý hoặc thất bại"}
  </h1>
 
- <p className="text-sm text-[#8A8478] mb-8 leading-relaxed">
+ <p className="text-sm text-[#64748B] mb-8 leading-relaxed">
  {isSuccess
  ? "Cảm ơn bạn đã đăng ký khóa học. Hóa đơn của bạn đã được ghi nhận và khóa học đã được thêm vào lộ trình học tập."
  : "Giao dịch của bạn chưa được hoàn tất hoặc đang chờ xử lý từ ngân hàng. Nếu bạn đã bị trừ tiền, vui lòng chờ trong ít phút."}
@@ -97,7 +97,7 @@ export default async function PaymentCallbackPage({ searchParams }: Props) {
 
  <Link
  href={isSuccess ? (courseId ? `/courses/lesson?courseId=${courseId}` : "/study-plan") : "/explore"}
- className="w-full py-3.5 rounded-xl text-sm font-bold text-white bg-[#2C3039] shadow-md hover:shadow-lg transition-all"
+ className="w-full py-3.5 rounded-xl text-sm font-bold text-white bg-[#0F172A] shadow-md hover:shadow-lg transition-all"
  >
  {isSuccess ? "Vào học ngay" : "Quay lại khám phá"}
  </Link>

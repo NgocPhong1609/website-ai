@@ -21,12 +21,12 @@ const renderVideoPreview = (url: string) => {
  const displaySize = meta?.size ? ` • ${meta.size}` : '';
 
  return `
- <div style="width: 100%; max-width: 100%; padding: 24px; border-radius: 12px; background-color: #E8E2D9; border: 2px dashed #D5D5F0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; cursor: default;">
- <div style="width: 48px; height: 48px; border-radius: 50%; background-color: #EEF0FF; color: #C0392B; display: flex; align-items: center; justify-content: center;">
+ <div style="width: 100%; max-width: 100%; padding: 24px; border-radius: 12px; background-color: #E2E8F0; border: 2px dashed #D5D5F0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; cursor: default;">
+ <div style="width: 48px; height: 48px; border-radius: 50%; background-color: #EFF6FF; color: #3B82F6; display: flex; align-items: center; justify-content: center;">
  <></>
  </div>
  <div style="text-align: center;">
- <div style="font-family: sans-serif; font-size: 14px; font-weight: 600; color: #1A1A2E;">${displayName}</div>
+ <div style="font-family: sans-serif; font-size: 14px; font-weight: 600; color: #0F172A;">${displayName}</div>
  <div style="font-family: sans-serif; font-size: 12px; color: #64647A; margin-top: 4px;">Click để xem/đổi video (Preview tạm thời tắt)${displaySize}</div>
  </div>
  </div>
@@ -371,7 +371,7 @@ export function RichTextEditor({
  {showMenu && (
  <>
  <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
- <div className="absolute top-12 left-1/2 -translate-x-1/2 z-50 w-56 bg-white rounded-xl shadow-lg border border-[#E8E2D9] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+ <div className="absolute top-12 left-1/2 -translate-x-1/2 z-50 w-56 bg-white rounded-xl shadow-lg border border-[#E2E8F0] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
  <div className="p-1.5 flex flex-col">
  <button
  type="button"
@@ -380,7 +380,7 @@ export function RichTextEditor({
  setShowMenu(false);
  fileInputRef.current?.click();
  }}
- className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-[#2C3039] hover:bg-[#E8E2D9] hover:text-[#C0392B] rounded-lg transition-colors w-full text-left disabled:opacity-50"
+ className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-[#0F172A] hover:bg-[#E2E8F0] hover:text-[#2563EB] rounded-lg transition-colors w-full text-left disabled:opacity-50"
  >
  <></>
  Tải video từ máy
@@ -391,7 +391,7 @@ export function RichTextEditor({
  setShowMenu(false);
  setShowLinkDialog(true);
  }}
- className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-[#2C3039] hover:bg-[#E8E2D9] hover:text-[#C0392B] rounded-lg transition-colors w-full text-left"
+ className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-[#0F172A] hover:bg-[#E2E8F0] hover:text-[#2563EB] rounded-lg transition-colors w-full text-left"
  >
  <></>
  Gắn liên kết video
@@ -406,18 +406,18 @@ export function RichTextEditor({
  <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowLinkDialog(false)} />
  <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
  <div className="px-6 py-5 border-b border-[#F0F0F8]">
- <h2 className="text-lg font-bold text-[#2C3039]">Gắn liên kết Video</h2>
+ <h2 className="text-lg font-bold text-[#0F172A]">Gắn liên kết Video</h2>
  </div>
  <form onSubmit={handleLinkSubmit}>
  <div className="p-6">
- <label className="block text-sm font-semibold text-[#2C3039] mb-2">Đường dẫn Video (URL)</label>
+ <label className="block text-sm font-semibold text-[#0F172A] mb-2">Đường dẫn Video (URL)</label>
  <input
  autoFocus
  type="url"
  placeholder="https://..."
  value={linkInput}
  onChange={(e) => setLinkInput(e.target.value)}
- className="w-full px-4 py-2.5 rounded-xl text-sm border border-[#E8E2D9] focus:border-[#E8E2D9] focus:ring-2 focus:ring-[#C0392B]/20 outline-none transition-all"
+ className="w-full px-4 py-2.5 rounded-xl text-sm border border-[#E2E8F0] focus:border-[#E2E8F0] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none transition-all"
  required
  />
  </div>
@@ -425,13 +425,13 @@ export function RichTextEditor({
  <button
  type="button"
  onClick={() => setShowLinkDialog(false)}
- className="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#8A8478] hover:bg-[#EAEAF4] transition-colors"
+ className="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#64748B] hover:bg-[#EAEAF4] transition-colors"
  >
  Hủy
  </button>
  <button
  type="submit"
- className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#C0392B] shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+ className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#3B82F6] shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
  >
  Thêm
  </button>
@@ -450,13 +450,13 @@ export function RichTextEditor({
  />
 
  {isUploading && (
- <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg border border-[#E8E2D9]">
+ <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg border border-[#E2E8F0]">
  <Loader size="lg" className="mb-4" />
- <div className="text-[#2C3039] font-medium mb-1">Đang tải video lên...</div>
- <div className="text-[#8A8478] text-sm">{Math.round(uploadProgress)}%</div>
- <div className="w-48 h-1.5 bg-[#E8E2D9] rounded-full mt-3 overflow-hidden">
+ <div className="text-[#0F172A] font-medium mb-1">Đang tải video lên...</div>
+ <div className="text-[#64748B] text-sm">{Math.round(uploadProgress)}%</div>
+ <div className="w-48 h-1.5 bg-[#E2E8F0] rounded-full mt-3 overflow-hidden">
  <div
- className="h-full bg-[#C0392B] transition-all duration-300"
+ className="h-full bg-[#3B82F6] transition-all duration-300"
  style={{ width: `${uploadProgress}%` }}
  ></div>
  </div>

@@ -51,9 +51,9 @@ function formatRateTick(value: number): string {
 function DragHint({ range }: { range: DragRange | null }) {
  if (!range) return null;
  return (
- <div className="flex items-center gap-2 px-3 py-1.5 bg-[#EEF0FF] rounded-lg">
+ <div className="flex items-center gap-2 px-3 py-1.5 bg-[#EFF6FF] rounded-lg">
  <></>
- <span className="text-[11.5px] font-semibold text-[#C0392B]">
+ <span className="text-[11.5px] font-semibold text-[#3B82F6]">
  Selected{" "}
  <strong>
  {String(range.startHour).padStart(2, "0")}:00 –{" "}
@@ -133,9 +133,9 @@ export function HourlyChart({
  return (
  <div className={twMerge("bg-white rounded-2xl border border-[#EAEAF4] shadow-sm", className)}>
  {/* ── Card Header ── */}
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 pt-5 pb-4 border-b border-[#E8E2D9]">
+ <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 pt-5 pb-4 border-b border-[#E2E8F0]">
  <div className="flex flex-col gap-1">
- <h3 className="text-[13.5px] font-extrabold text-[#1A1A2E] tracking-tight">
+ <h3 className="text-[13.5px] font-extrabold text-[#0F172A] tracking-tight">
  {chartTitle}
  </h3>
  {selectedMetrics.length === 0 && (
@@ -152,7 +152,7 @@ export function HourlyChart({
  {selectedRange && (
  <button
  onClick={clearSelection}
- className="text-[11px] font-semibold text-[#8A8478] hover:text-[#464554] underline transition-colors"
+ className="text-[11px] font-semibold text-[#64748B] hover:text-[#475569] underline transition-colors"
  >
  Clear
  </button>
@@ -264,9 +264,9 @@ export function HourlyChart({
  yAxisId={hasVolumeAxis ? "left" : "right"}
  x1={refX1}
  x2={refX2}
- fill="#6366F1"
+ fill="#3B82F6"
  fillOpacity={0.12}
- stroke="#6366F1"
+ stroke="#3B82F6"
  strokeOpacity={0.4}
  strokeWidth={1}
  />
@@ -278,9 +278,9 @@ export function HourlyChart({
  yAxisId={hasVolumeAxis ? "left" : "right"}
  x1={selectedRange.startHour}
  x2={selectedRange.endHour}
- fill="#6366F1"
+ fill="#3B82F6"
  fillOpacity={0.07}
- stroke="#6366F1"
+ stroke="#3B82F6"
  strokeOpacity={0.3}
  strokeWidth={1}
  strokeDasharray="4 4"

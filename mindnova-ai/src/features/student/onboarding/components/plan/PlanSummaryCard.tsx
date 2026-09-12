@@ -12,20 +12,20 @@ export interface PlanSummaryCardProps {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const NEURAL_NODES = [
- { top: "22%", left: "48%", size: 9, glow: "#C0392B" },
- { top: "52%", left: "22%", size: 6, glow: "#C0392B" },
- { top: "40%", left: "74%", size: 7, glow: "#C0392B" },
- { top: "72%", left: "56%", size: 5, glow: "#C0392B" },
- { top: "18%", left: "30%", size: 4, glow: "#C0392B" },
- { top: "66%", left: "18%", size: 3, glow: "#C0392B" },
- { top: "20%", left: "78%", size: 3, glow: "#C0392B" },
- { top: "80%", left: "36%", size: 3, glow: "#C0392B" },
- { top: "48%", left: "10%", size: 2, glow: "#C0392B" },
+ { top: "22%", left: "48%", size: 9, glow: "#3B82F6" },
+ { top: "52%", left: "22%", size: 6, glow: "#3B82F6" },
+ { top: "40%", left: "74%", size: 7, glow: "#3B82F6" },
+ { top: "72%", left: "56%", size: 5, glow: "#3B82F6" },
+ { top: "18%", left: "30%", size: 4, glow: "#3B82F6" },
+ { top: "66%", left: "18%", size: 3, glow: "#3B82F6" },
+ { top: "20%", left: "78%", size: 3, glow: "#3B82F6" },
+ { top: "80%", left: "36%", size: 3, glow: "#3B82F6" },
+ { top: "48%", left: "10%", size: 2, glow: "#3B82F6" },
 ] as const;
 
 const LEVEL_BADGE_CLASS: Record<string, string> = {
  Beginner: "bg-[#06B6D4]/10 text-[#06B6D4] border-[#06B6D4]/20",
- Intermediate: "bg-[#FAF7F2] text-[#C0392B] border-[#E8E2D9]",
+ Intermediate: "bg-[#F8FAFC] text-[#3B82F6] border-[#E2E8F0]",
  Advanced: "bg-[#8B5CF6]/10 text-[#8B5CF6] border-[#8B5CF6]/20",
 };
 
@@ -47,7 +47,7 @@ function NeuralMap() {
  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(76,215,246,0.18)_0%,transparent_50%)]" />
 
  {/* Pulsing active overlay */}
- <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(192,57,43,0.20)_0%,transparent_70%)] animate-pulse" />
+ <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(59, 130, 246,0.20)_0%,transparent_70%)] animate-pulse" />
 
  {/* Neural nodes */}
  {NEURAL_NODES.map((node, i) => (
@@ -68,14 +68,14 @@ function NeuralMap() {
 
  {/* Bottom label row */}
  <div className="absolute inset-0 flex flex-col justify-end p-3 gap-1">
- <span className="text-[9px] font-mono tracking-[0.18em] text-[#C0392B]/50 uppercase">
+ <span className="text-[9px] font-mono tracking-[0.18em] text-[#3B82F6]/50 uppercase">
  AI Neural Map — Active
  </span>
  <div className="flex gap-1">
  {[3, 2, 1].map((flex, i) => (
  <div
  key={i}
- className="h-0.5 rounded-full bg-[#C0392B] "
+ className="h-0.5 rounded-full bg-[#3B82F6] "
  style={{ flex, opacity: 0.65 }}
  />
  ))}
@@ -94,11 +94,11 @@ interface SummaryRowProps {
 function SummaryRow({ icon, label, value }: SummaryRowProps) {
  return (
  <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0F7] last:border-0">
- <div className="flex items-center gap-2 text-[11px] text-[#8A8478]">
+ <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
  {icon}
  <span>{label}</span>
  </div>
- <div className="text-[11px] font-semibold text-[#2C3039]">{value}</div>
+ <div className="text-[11px] font-semibold text-[#0F172A]">{value}</div>
  </div>
  );
 }
@@ -138,20 +138,20 @@ function BoltIcon() {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSummaryCardProps) {
- const levelClass = LEVEL_BADGE_CLASS[level] ?? "bg-[#F0F0F7] text-[#8A8478] border-[#E2E2EA]";
+ const levelClass = LEVEL_BADGE_CLASS[level] ?? "bg-[#F0F0F7] text-[#64748B] border-[#E2E2EA]";
 
  return (
  <div className="w-[240px] shrink-0 flex flex-col gap-3">
  {/* Header label */}
  <div className="flex items-center gap-2">
- <div className="w-6 h-6 rounded-lg bg-[#C0392B] flex items-center justify-center shadow-[0_2px_8px_rgba(192,57,43,0.4)]">
+ <div className="w-6 h-6 rounded-lg bg-[#3B82F6] flex items-center justify-center shadow-[0_2px_8px_rgba(59, 130, 246,0.4)]">
  <BoltIcon />
  </div>
- <h2 className="text-sm font-bold text-[#2C3039]">Your Profile</h2>
+ <h2 className="text-sm font-bold text-[#0F172A]">Your Profile</h2>
  </div>
 
  {/* Main card */}
- <div className="bg-white border border-[#E8E8F0] rounded-2xl p-4 shadow-[0_2px_12px_rgba(192,57,43,0.06)]">
+ <div className="bg-white border border-[#E8E8F0] rounded-2xl p-4 shadow-[0_2px_12px_rgba(59, 130, 246,0.06)]">
  {/* Goal */}
  <SummaryRow
  icon={<TargetIcon />}
@@ -179,7 +179,7 @@ export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSumm
  icon={<BookIcon />}
  label="Topics"
  value={
- <span className="bg-[#FAF7F2] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+ <span className="bg-[#F8FAFC] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
  {topics.length} selected
  </span>
  }
@@ -190,7 +190,7 @@ export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSumm
  icon={<ClockIcon />}
  label="Est. time"
  value={
- <span className="text-[#C0392B] bg-[#FAF7F2] px-2 py-0.5 rounded-full">
+ <span className="text-[#3B82F6] bg-[#F8FAFC] px-2 py-0.5 rounded-full">
  {estimatedTime}
  </span>
  }
@@ -206,13 +206,13 @@ export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSumm
  {topics.slice(0, 4).map((t, i) => (
  <span
  key={i}
- className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-[#FAF7F2] text-[#C0392B] border border-[#E8E2D9]"
+ className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-[#F8FAFC] text-[#3B82F6] border border-[#E2E8F0]"
  >
  {t}
  </span>
  ))}
  {topics.length > 4 && (
- <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-[#F0F0F7] text-[#8A8478]">
+ <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-[#F0F0F7] text-[#64748B]">
  +{topics.length - 4} more
  </span>
  )}

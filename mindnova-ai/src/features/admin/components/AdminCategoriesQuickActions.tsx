@@ -58,7 +58,7 @@ function toStatusLabel(status: string): string {
 function statusPillClass(status: string): string {
  const value = status.toLowerCase();
  if (value.includes("pending")) return "bg-amber-100 text-amber-700";
- if (value.includes("active")) return "-[#FAF7F2] -[#2C3039]";
+ if (value.includes("active")) return "text-[#F8FAFC] text-[#0F172A]";
  if (value.includes("inactive")) return "bg-rose-100 text-rose-700";
  return "bg-slate-100 text-slate-700";
 }
@@ -225,7 +225,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  <button
  type="button"
  onClick={() => setIsOpen((current) => !current)}
- className="rounded-2xl -[#C0392B] px-4 py-2 text-sm font-semibold text-white transition hover:-[#C0392B]"
+ className="rounded-2xl bg-[#3B82F6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563EB]"
  >
  + Thêm danh mục
  </button>
@@ -243,7 +243,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  value={form.name}
  onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
  required
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
 
@@ -252,7 +252,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  <select
  value={form.status}
  onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as CategoryStatus }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  >
  {statusOptions.map((option) => (
  <option key={option.value} value={option.value}>
@@ -268,7 +268,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  value={form.description}
  onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
  rows={3}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
  </div>
@@ -293,7 +293,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  )}
 
  {editingCategory && (
- <form onSubmit={handleUpdate} className="rounded-2xl border -[#FAF7F2] bg-cyan-50/60 p-4 shadow-sm">
+ <form onSubmit={handleUpdate} className="rounded-2xl border-[#E2E8F0] bg-blue-50/60 p-4 shadow-sm">
  <div className="mb-3 text-sm font-semibold text-slate-900">Chỉnh sửa danh mục: {editingCategory.name}</div>
  <div className="grid gap-3 md:grid-cols-3">
  <label className="space-y-1 text-sm text-slate-700 md:col-span-2">
@@ -302,7 +302,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  value={editForm.name}
  onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))}
  required
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
 
@@ -311,7 +311,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  <select
  value={editForm.status}
  onChange={(event) => setEditForm((current) => ({ ...current, status: event.target.value as CategoryStatus }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  >
  {statusOptions.map((option) => (
  <option key={option.value} value={option.value}>
@@ -327,7 +327,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  value={editForm.description}
  onChange={(event) => setEditForm((current) => ({ ...current, description: event.target.value }))}
  rows={3}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
  </div>
@@ -336,7 +336,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  <button
  type="submit"
  disabled={isUpdating === editingCategory.id}
- className="rounded-xl -[#C0392B] px-4 py-2 text-sm font-semibold text-white transition hover:-[#C0392B] disabled:cursor-not-allowed disabled:opacity-60"
+ className="rounded-xl bg-[#3B82F6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563EB] disabled:cursor-not-allowed disabled:opacity-60"
  >
  {isUpdating === editingCategory.id ? "Đang lưu..." : "Lưu thay đổi"}
  </button>
@@ -364,7 +364,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  </thead>
  <tbody>
  {rows.map((row) => (
- <tr key={row.id} className="border-t border-slate-200 bg-white hover:bg-cyan-50/35">
+ <tr key={row.id} className="border-t border-slate-200 bg-white hover:bg-blue-50/35">
  <td className="px-4 py-3 font-medium text-slate-900">{row.name}</td>
  <td className="px-4 py-3 text-slate-600">{row.slug}</td>
  <td className="px-4 py-3">
@@ -378,7 +378,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  type="button"
  disabled={isUpdating === row.id}
  onClick={() => handleModerate(row.id, "active", "Đã duyệt danh mục thành công.")}
- className="rounded-lg -[#2C3039] px-2.5 py-1 text-xs font-semibold text-white hover:-[#2C3039] disabled:cursor-not-allowed disabled:opacity-60"
+ className="rounded-lg bg-[#0F172A] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[#0F172A] disabled:cursor-not-allowed disabled:opacity-60"
  >
  Duyệt
  </button>
@@ -405,7 +405,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  <button
  type="button"
  onClick={() => handleOpenEdit(row)}
- className="rounded-lg border -[#FAF7F2] bg-cyan-50 px-2.5 py-1 text-xs font-semibold -[#C0392B] hover:-[#FAF7F2]"
+ className="rounded-lg border-[#E2E8F0] bg-blue-50 px-2.5 py-1 text-xs font-semibold text-[#3B82F6] hover:bg-[#F8FAFC]"
  >
  Sửa
  </button>
@@ -433,7 +433,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  </table>
  </div>
 
- {status && <p className="w-full rounded-xl bg-teal-50 px-3 py-2 text-sm -[#C0392B]">{status}</p>}
+ {status && <p className="w-full rounded-xl bg-teal-50 px-3 py-2 text-sm bg-[#3B82F6]">{status}</p>}
  </div>
  );
 }

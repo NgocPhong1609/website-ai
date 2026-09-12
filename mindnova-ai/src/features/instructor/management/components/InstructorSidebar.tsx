@@ -16,24 +16,15 @@ import {
  QuizNavIcon,
 } from "./icons";
 
+import { Plus, Sparkles } from "lucide-react";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
 function LogoMark() {
- return (
- <div className="w-9 h-9 rounded-xl bg-[#C0392B] to-[#383AB8] text-white flex items-center justify-center font-black text-lg shadow-md shrink-0 border -[#FAF7F2]">
- <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
- <circle cx="12" cy="12" r="2.5" fill="white" />
- <path
- d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"
- stroke="white"
- strokeWidth="2.5"
- strokeLinecap="round"
- />
- </svg>
- </div>
- );
+  return (
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] text-white shadow-md">
+      <Sparkles className="h-[18px] w-[18px]" aria-hidden />
+    </div>
+  );
 }
 
 function CreateCourseCTA() {
@@ -42,12 +33,9 @@ function CreateCourseCTA() {
  <Link
  href="/instructor/create-course"
  title="Create New Course"
- className="flex items-center justify-center gap-2 px-4 py-3 w-full rounded-xl text-xs font-black text-white bg-[#C0392B] hover:bg-[#383AB8] shadow-md transition-all duration-200"
+ className="flex items-center justify-center gap-2 px-4 py-3 w-full rounded-xl text-xs font-black text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-md transition-all duration-200"
  >
- <svg aria-hidden viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" className="shrink-0">
- <line x1="12" y1="5" x2="12" y2="19" />
- <line x1="5" y1="12" x2="19" y2="12" />
- </svg>
+ <Plus className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden />
  <span className="truncate tracking-wide uppercase font-black">TẠO KHÓA HỌC MỚI</span>
  </Link>
  </div>
@@ -117,7 +105,7 @@ function SidebarUserProfile({ isCollapsed }: { isCollapsed: boolean }) {
  <div className={twMerge("relative flex py-2", isCollapsed ? "flex-col gap-3 items-center" : "items-center gap-3 px-2")} ref={dropdownRef}>
  <button 
  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
- className="w-9 h-9 rounded-full bg-[#C0392B]/15 text-[#C0392B] flex items-center justify-center text-sm font-black shadow-2xs shrink-0 border border-[#C0392B]/20 overflow-hidden hover:ring-2 hover:ring-[#C0392B]/50 transition-all focus:outline-none"
+ className="w-9 h-9 rounded-full bg-[#3B82F6]/15 text-[#3B82F6] flex items-center justify-center text-sm font-black shadow-2xs shrink-0 border border-[#3B82F6]/20 overflow-hidden hover:ring-2 hover:ring-[#3B82F6]/50 transition-all focus:outline-none"
  >
  {avatarUrl ? (
  <img src={avatarUrl} alt={name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerText = initial; }} />
@@ -128,19 +116,19 @@ function SidebarUserProfile({ isCollapsed }: { isCollapsed: boolean }) {
 
  {isDropdownOpen && (
  <div className={twMerge(
- "absolute z-50 bg-white border border-[#E8E2D9] rounded-xl shadow-lg py-1 min-w-[160px] overflow-hidden",
+ "absolute z-50 bg-white border border-[#E2E8F0] rounded-xl shadow-lg py-1 min-w-[160px] overflow-hidden",
  isCollapsed ? "left-full ml-2 bottom-0" : "bottom-full mb-2 left-2"
  )}>
  <Link
  href="/instructor/profile"
  onClick={() => setIsDropdownOpen(false)}
- className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-[#FEFCF9] hover:text-[#C0392B] transition-colors"
+ className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-[#F8FAFC] hover:text-[#2563EB] transition-colors"
  >
  Thông tin tài khoản
  </Link>
  <button
  onClick={handleLogout}
- className="w-full text-left px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
+ className="w-full text-left px-4 py-2 text-sm font-semibold text-[#2563EB] hover:bg-[#EFF6FF] transition-colors"
  >
  Đăng xuất
  </button>
@@ -149,7 +137,7 @@ function SidebarUserProfile({ isCollapsed }: { isCollapsed: boolean }) {
 
  {!isCollapsed && (
  <Link href="/instructor/profile" className="flex items-center gap-1 min-w-0 leading-tight group cursor-pointer">
- <span className="text-sm font-black text-[#2C3039] truncate group-hover:text-[#C0392B] transition-colors">{name}</span>
+ <span className="text-sm font-black text-[#0F172A] truncate group-hover:text-[#2563EB] transition-colors">{name}</span>
  {user?.is_verified && <VerifiedTeacherBadge isVerified={true} size="xs" />}
  </Link>
  )}
@@ -180,8 +168,8 @@ function SidebarNavItem({ label, href, activePatterns, Icon, isCollapsed }: NavI
  "group relative flex items-center gap-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150",
  isCollapsed ? "justify-center px-0" : "px-3",
  isActive
- ? "bg-[#C0392B] text-white shadow-md shadow-[#C0392B]/30"
- : "text-[#8A8478] hover:bg-[#E8E2D9] hover:text-[#2C3039]",
+ ? "bg-[#3B82F6] text-white shadow-md shadow-[#3B82F6]/30"
+ : "text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#0F172A]",
  )}
  >
  <span
@@ -189,7 +177,7 @@ function SidebarNavItem({ label, href, activePatterns, Icon, isCollapsed }: NavI
  "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-150",
  isActive
  ? "text-white"
- : "text-[#8A8478] group-hover:text-[#C0392B] group-hover:bg-[#FAF7F2]",
+ : "text-[#64748B] group-hover:text-[#2563EB] group-hover:bg-[#F8FAFC]",
  )}
  >
  <Icon />
@@ -234,17 +222,17 @@ export function InstructorSidebar() {
  ];
 
  return (
- <aside className={twMerge("shrink-0 h-full flex flex-col bg-white border-r border-[#E8E2D9] shadow-sm z-50 transition-all duration-300", isCollapsed ? "w-[80px]" : "w-[234px]")}>
+ <aside className={twMerge("shrink-0 h-full flex flex-col bg-white border-r border-[#E2E8F0] shadow-sm z-50 transition-all duration-300", isCollapsed ? "w-[80px]" : "w-[234px]")}>
  {/* Brand */}
- <div className={twMerge("h-16 shrink-0 border-b border-[#E8E2D9] flex items-center justify-center", isCollapsed ? "px-2" : "px-4")}>
+ <div className={twMerge("h-16 shrink-0 border-b border-[#E2E8F0] flex items-center justify-center", isCollapsed ? "px-2" : "px-4")}>
  <Link href="/instructor/courses" className="flex items-center gap-3 group" aria-label="MindNova AI — Instructor">
  <LogoMark />
  {!isCollapsed && (
  <div className="flex flex-col leading-tight">
- <span className="text-sm font-black text-[#2C3039] tracking-tight group-hover:text-[#C0392B] transition-colors duration-150">
+ <span className="text-sm font-black text-[#0F172A] tracking-tight group-hover:text-[#2563EB] transition-colors duration-150">
  Instructor Portal
  </span>
- <span className="text-[10px] text-[#8A8478] font-extrabold tracking-wide uppercase">
+ <span className="text-[10px] text-[#64748B] font-extrabold tracking-wide uppercase">
  Professional Suite
  </span>
  </div>
@@ -271,12 +259,9 @@ export function InstructorSidebar() {
  <Link
  href="/instructor/create-course"
  title="Create New Course"
- className="flex items-center justify-center w-full h-10 rounded-xl text-xs font-black text-white bg-[#C0392B] hover:bg-[#383AB8] shadow-md transition-all duration-200"
+ className="flex items-center justify-center w-full h-10 rounded-xl text-xs font-black text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-md transition-all duration-200"
  >
- <svg aria-hidden viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" className="shrink-0">
- <line x1="12" y1="5" x2="12" y2="19" />
- <line x1="5" y1="12" x2="19" y2="12" />
- </svg>
+ <Plus className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden />
  </Link>
  ) : (
  <CreateCourseCTA />
@@ -287,10 +272,10 @@ export function InstructorSidebar() {
  <SidebarUserProfile isCollapsed={isCollapsed} />
  <button
  onClick={() => setIsCollapsed(!isCollapsed)}
- className={twMerge("flex items-center gap-2 px-3 py-2 text-xs font-bold text-[#8A8478] hover:text-[#2C3039] transition-colors border border-[#E8E2D9] rounded-xl hover:bg-[#FEFCF9] group", isCollapsed ? "justify-center" : "justify-between w-full")}
+ className={twMerge("flex items-center gap-2 px-3 py-2 text-xs font-bold text-[#64748B] hover:text-[#0F172A] transition-colors border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC] group", isCollapsed ? "justify-center" : "justify-between w-full")}
  >
  {isCollapsed ? (
- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 group-hover:text-[#2C3039] transition-colors">
+ <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 group-hover:text-[#0F172A] transition-colors">
  <line x1="4" x2="20" y1="12" y2="12" />
  <line x1="4" x2="20" y1="6" y2="6" />
  <line x1="4" x2="20" y1="18" y2="18" />
@@ -298,14 +283,14 @@ export function InstructorSidebar() {
  ) : (
  <>
  <div className="flex items-center gap-2.5">
- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 group-hover:text-[#2C3039] transition-colors">
+ <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 group-hover:text-[#0F172A] transition-colors">
  <line x1="4" x2="20" y1="12" y2="12" />
  <line x1="4" x2="20" y1="6" y2="6" />
  <line x1="4" x2="20" y1="18" y2="18" />
  </svg>
  <span>Thu gọn</span>
  </div>
- <span className="px-1.5 py-0.5 rounded bg-gray-100 border border-[#E8E2D9] text-[10px] font-black tracking-widest text-gray-400 group-hover:text-[#8A8478] group-hover:border-gray-300 transition-colors">Ctrl+B</span>
+ <span className="px-1.5 py-0.5 rounded bg-gray-100 border border-[#E2E8F0] text-[10px] font-black tracking-widest text-gray-400 group-hover:text-[#64748B] group-hover:border-gray-300 transition-colors">Ctrl+B</span>
  </>
  )}
  </button>

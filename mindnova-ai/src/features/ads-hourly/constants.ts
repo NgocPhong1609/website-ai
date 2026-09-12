@@ -28,14 +28,14 @@ export const METRIC_CONFIGS: Record<MetricKey, MetricConfig> = {
  roas: {
  key: "roas",
  label: "ROAS",
- color: "#6366F1",
+ color: "#3B82F6",
  type: "rate",
  format: (v) => `${v.toFixed(1)}%`,
  },
  clicks: {
  key: "clicks",
  label: "Clicks",
- color: "#C0392B",
+ color: "#3B82F6",
  type: "volume",
  format: (v) => fmt(v),
  },
@@ -56,14 +56,14 @@ export const METRIC_CONFIGS: Record<MetricKey, MetricConfig> = {
  acos: {
  key: "acos",
  label: "ACOS",
- color: "#EF4444",
+ color: "#3B82F6",
  type: "rate",
  format: (v) => `${v.toFixed(1)}%`,
  },
  cvr: {
  key: "cvr",
  label: "CVR",
- color: "#2C3039",
+ color: "#0F172A",
  type: "rate",
  format: (v) => `${v.toFixed(2)}%`,
  },

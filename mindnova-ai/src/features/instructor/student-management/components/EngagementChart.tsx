@@ -15,17 +15,17 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
  };
 
  return (
- <div className="bg-white p-6 rounded-2xl border border-[#E8E2D9] shadow-2xs flex flex-col gap-6 w-full h-full">
+ <div className="bg-white p-6 rounded-2xl border border-[#E2E8F0] shadow-2xs flex flex-col gap-6 w-full h-full">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
  <div>
- <h3 className="text-base font-black text-[#2C3039]">Biểu Đồ Tương Tác Học Tập</h3>
- <p className="text-xs text-[#8A8478] mt-1">Tối ưu hóa tần suất hoạt động theo từng ngày trong tuần.</p>
+ <h3 className="text-base font-black text-[#0F172A]">Biểu Đồ Tương Tác Học Tập</h3>
+ <p className="text-xs text-[#64748B] mt-1">Tối ưu hóa tần suất hoạt động theo từng ngày trong tuần.</p>
  </div>
  
  <div className="relative">
  <button 
  onClick={() => setIsOpen(!isOpen)}
- className="flex items-center justify-between w-[130px] bg-white border border-[#E8E2D9] text-gray-700 text-xs font-bold rounded-xl px-4 py-2 hover:bg-[#FEFCF9] focus:outline-none focus:-[#C0392B] cursor-pointer shadow-sm transition-colors"
+ className="flex items-center justify-between w-[130px] bg-white border border-[#E2E8F0] text-gray-700 text-xs font-bold rounded-xl px-4 py-2 hover:bg-[#F8FAFC] focus:outline-none focus:border-[#3B82F6] cursor-pointer shadow-sm transition-colors"
  >
  <span>{getRangeText(timeRange)}</span>
  <></>
@@ -44,7 +44,7 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
  }}
  className={twMerge(
  "w-full text-left px-4 py-2 text-xs font-bold cursor-pointer transition-colors",
- timeRange === val ? "bg-indigo-50 -[#C0392B]" : "text-gray-700 hover:bg-[#FEFCF9]"
+ timeRange === val ? "bg-blue-50 text-[#3B82F6]" : "text-gray-700 hover:bg-[#F8FAFC]"
  )}
  >
  {getRangeText(val)}
@@ -62,8 +62,8 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
  <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
  <defs>
  <linearGradient id="colorInteractions" x1="0" y1="0" x2="0" y2="1">
- <stop offset="5%" stopColor="#C0392B" stopOpacity={0.3}/>
- <stop offset="95%" stopColor="#C0392B" stopOpacity={0}/>
+ <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
+ <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
  </linearGradient>
  </defs>
  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -81,18 +81,18 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
  />
  <Tooltip 
  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
- itemStyle={{ color: '#C0392B', fontWeight: 'bold' }}
+ itemStyle={{ color: '#3B82F6', fontWeight: 'bold' }}
  labelStyle={{ color: '#6b7280', marginBottom: '4px', fontSize: '12px' }}
  />
  <Area 
  type="monotone" 
  dataKey="interactions" 
  name="Tương tác"
- stroke="#C0392B" 
+ stroke="#3B82F6" 
  strokeWidth={3}
  fillOpacity={1} 
  fill="url(#colorInteractions)" 
- activeDot={{ r: 6, fill: "#C0392B", stroke: "#fff", strokeWidth: 2 }}
+ activeDot={{ r: 6, fill: "#3B82F6", stroke: "#fff", strokeWidth: 2 }}
  />
  </AreaChart>
  </ResponsiveContainer>

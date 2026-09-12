@@ -11,7 +11,7 @@ function CompletedIcon() {
 
 function InProgressIcon() {
   return (
-    <div className="w-7 h-7 rounded-full border-2 border-[#C0392B] border-t-transparent flex items-center justify-center shrink-0 animate-spin" />
+    <div className="w-7 h-7 rounded-full border-2 border-[#3B82F6] border-t-transparent flex items-center justify-center shrink-0 animate-spin" />
   );
 }
 
@@ -38,9 +38,9 @@ const STATUS_LABEL: Record<GeneratingStepStatus, string> = {
 };
 
 const STATUS_LABEL_CLASS: Record<GeneratingStepStatus, string> = {
-  completed: "text-[#C0392B] font-semibold",
+  completed: "text-[#3B82F6] font-semibold",
   "in-progress": "text-[#00A896] font-semibold",
-  pending: "text-[#8A8478]",
+  pending: "text-[#64748B]",
 };
 
 // ─── Progress Bar (only for in-progress) ─────────────────────────────────────
@@ -51,7 +51,7 @@ function ProgressBar() {
       <div
         className="h-full rounded-full animate-progress-fill"
         style={{
-          background: "linear-gradient(to right, #C0392B, #27AE60)",
+          background: "linear-gradient(to right, #3B82F6, #27AE60)",
         }}
       />
     </div>
@@ -85,7 +85,7 @@ export function StepItem({ label, status }: StepItemProps) {
           <span
             className={twMerge(
               "text-sm font-medium",
-              isPending ? "text-[#8A8478]" : "text-[#2C3039]",
+              isPending ? "text-[#64748B]" : "text-[#0F172A]",
             )}
           >
             {label}

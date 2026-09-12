@@ -99,7 +99,7 @@ function LessonStatusBadge({ status }: { status: LessonStatus }) {
  className={twMerge(
  "text-[10px] font-semibold px-2 py-0.5 rounded-full",
  status === "published"
- ? "bg-[#EEF0FF] text-[#C0392B]"
+ ? "bg-[#EFF6FF] text-[#3B82F6]"
  : "bg-amber-100 text-amber-700",
  )}
  >
@@ -118,7 +118,7 @@ function XCloseIcon({ size = 16 }: { size?: number }) {
 
 function LessonTypeIcon({ type }: { type: LessonType }) {
  return (
- <span className="w-6 h-6 rounded-md bg-[#E8E2D9] text-[#8A8478] flex items-center justify-center shrink-0">
+ <span className="w-6 h-6 rounded-md bg-[#E2E8F0] text-[#64748B] flex items-center justify-center shrink-0">
  {type === "video" && <VideoIcon size={12} />}
  {type === "article" && <DocumentIcon size={12} />}
  {type === "quiz_module" && <VideoIcon size={12} />}
@@ -147,12 +147,12 @@ function LessonRow({ lesson, onEdit, onDelete, onGenerateQuiz }: LessonRowProps)
  <LessonTypeIcon type={lesson.type} />
 
  {/* Title */}
- <p className="flex-1 text-[13px] text-[#2C3039] font-medium truncate min-w-0">
+ <p className="flex-1 text-[13px] text-[#0F172A] font-medium truncate min-w-0">
  {lesson.title}
  </p>
 
  {/* Duration */}
- <span className="flex items-center gap-1 text-[11px] text-[#8A8478] shrink-0 font-mono">
+ <span className="flex items-center gap-1 text-[11px] text-[#64748B] shrink-0 font-mono">
  <ClockIcon size={11} />
  {formatDurationSeconds(lesson.duration_seconds || 0)}
  </span>
@@ -166,7 +166,7 @@ function LessonRow({ lesson, onEdit, onDelete, onGenerateQuiz }: LessonRowProps)
  type="button"
  aria-label="Chỉnh sửa bài học"
  onClick={onEdit}
- className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-indigo-50 transition-all duration-150"
+ className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#2563EB] hover:bg-blue-50 transition-all duration-150"
  >
  <PencilIcon size={12} />
  </button>
@@ -174,7 +174,7 @@ function LessonRow({ lesson, onEdit, onDelete, onGenerateQuiz }: LessonRowProps)
  type="button"
  aria-label="Xóa bài học"
  onClick={onDelete}
- className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-150"
+ className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#2563EB] hover:bg-[#EFF6FF] transition-all duration-150"
  >
  <TrashIcon size={12} />
  </button>
@@ -198,21 +198,21 @@ interface ChapterCardProps {
 
 function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLesson, onEdit, onDelete, onGenerateQuiz }: ChapterCardProps) {
  return (
- <div className="rounded-2xl border border-[#E8E2D9] bg-white shadow-2xs overflow-hidden">
+ <div className="rounded-2xl border border-[#E2E8F0] bg-white shadow-2xs overflow-hidden">
  {/* Chapter header */}
- <div className="flex items-center gap-3 px-4 py-3 bg-white hover:bg-[#FEFCF9]/50 transition-colors">
+ <div className="flex items-center gap-3 px-4 py-3 bg-white hover:bg-[#F8FAFC]/50 transition-colors">
  {/* Drag handle */}
  <span className="text-gray-300 cursor-grab shrink-0">
  <GripIcon size={16} />
  </span>
 
  {/* Chapter badge */}
- <span className="px-2.5 py-1 rounded-lg bg-[#C0392B] text-white text-[11px] font-bold tracking-wide shrink-0">
+ <span className="px-2.5 py-1 rounded-lg bg-[#3B82F6] text-white text-[11px] font-bold tracking-wide shrink-0">
  Chương {chapter.index}
  </span>
 
  {/* Title */}
- <span className="flex-1 text-[13px] font-semibold text-[#2C3039] truncate min-w-0" onClick={onToggle} style={{cursor: "pointer"}}>
+ <span className="flex-1 text-[13px] font-semibold text-[#0F172A] truncate min-w-0" onClick={onToggle} style={{cursor: "pointer"}}>
  {chapter.title}
  </span>
 
@@ -222,7 +222,7 @@ function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLes
  type="button"
  aria-label="Chỉnh sửa chương"
  onClick={onEdit}
- className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-indigo-50 transition-all duration-150"
+ className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#2563EB] hover:bg-blue-50 transition-all duration-150"
  >
  <PencilIcon size={13} />
  </button>
@@ -230,7 +230,7 @@ function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLes
  type="button"
  aria-label="Xóa chương"
  onClick={onDelete}
- className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-150"
+ className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#2563EB] hover:bg-[#EFF6FF] transition-all duration-150"
  >
  <TrashIcon size={13} />
  </button>
@@ -238,7 +238,7 @@ function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLes
  type="button"
  aria-label={chapter.collapsed ? "Mở rộng chương" : "Thu gọn chương"}
  onClick={onToggle}
- className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-indigo-50 transition-all duration-150"
+ className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#2563EB] hover:bg-blue-50 transition-all duration-150"
  >
  {chapter.collapsed ? <ChevronDownIcon size={14} /> : <ChevronUpIcon size={14} />}
  </button>
@@ -262,7 +262,7 @@ function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLes
  <button
  type="button"
  onClick={onAddLesson}
- className="w-full flex items-center gap-2 px-4 py-3 text-[12px] font-semibold text-[#C0392B] hover:bg-indigo-50/50 transition-colors duration-150 border-t border-dashed -[#FAF7F2] group"
+ className="w-full flex items-center gap-2 px-4 py-3 text-[12px] font-semibold text-[#3B82F6] hover:bg-blue-50/50 transition-colors duration-150 border-t border-dashed text-[#F8FAFC] group"
  >
  <PlusIcon size={13} />
  Thêm bài học mới vào chương {chapter.index}
@@ -280,18 +280,18 @@ function AIAssistCard({ courseId, onSuggestChapter }: {
  onSuggestChapter: () => void;
 }) {
  return (
- <div className="rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50/80 via-purple-50/50 to-blue-50/80 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+ <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50/80 via-purple-50/50 to-blue-50/80 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
  <div className="flex flex-col gap-1.5 flex-1 min-w-0">
- <div className="flex items-center gap-2 text-[#C0392B]">
+ <div className="flex items-center gap-2 text-[#3B82F6]">
  <span className="animate-pulse"><SparklesIcon size={13} /></span>
  <span className="text-[10px] font-black tracking-widest uppercase">
  MindNova AI Assist
  </span>
  </div>
- <p className="text-[14px] font-black text-[#2C3039]">
+ <p className="text-[14px] font-black text-[#0F172A]">
  Studio Tạo &amp; Tự Động Sinh Đề Kiểm Tra Bằng AI
  </p>
- <p className="text-[12px] text-[#8A8478] font-medium leading-relaxed max-w-[420px]">
+ <p className="text-[12px] text-[#64748B] font-medium leading-relaxed max-w-[420px]">
  Trí tuệ nhân tạo MindNova phân tích toàn bộ bài học thuộc khóa học này để tự động tạo bộ câu hỏi trắc nghiệm &amp; tự luận bám sát giáo trình.
  </p>
  </div>
@@ -299,7 +299,7 @@ function AIAssistCard({ courseId, onSuggestChapter }: {
  <div className="flex items-center gap-2 shrink-0">
  <Link
  href={`/instructor/quiz-generator?course_id=${courseId || ""}`}
- className="px-4 py-2.5 rounded-xl text-[13px] font-extrabold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+ className="px-4 py-2.5 rounded-xl text-[13px] font-extrabold text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-md transition-all cursor-pointer flex items-center gap-1.5"
  >
  <SparklesIcon size={13} />
  <span>🤖 Tạo Quiz bằng AI</span>
@@ -307,7 +307,7 @@ function AIAssistCard({ courseId, onSuggestChapter }: {
  <button
  type="button"
  onClick={onSuggestChapter}
- className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-[#2C3039] bg-white border border-[#E8E2D9] hover:bg-gray-50 transition-all duration-200 focus:outline-none"
+ className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-[#0F172A] bg-white border border-[#E2E8F0] hover:bg-gray-50 transition-all duration-200 focus:outline-none"
  >
  <PlusIcon size={13} />
  Gợi ý Chương mới
@@ -348,8 +348,8 @@ function FilterBar({ active, onChange, total, published, draft, totalHours, tota
  className={twMerge(
  "px-3.5 py-1.5 rounded-xl text-[12px] font-semibold transition-all duration-150 focus:outline-none",
  active === tab.id
- ? "bg-[#C0392B] text-white shadow-sm"
- : "bg-gray-100 text-[#8A8478] hover:bg-gray-200 hover:text-[#2C3039]",
+ ? "bg-[#3B82F6] text-white shadow-sm"
+ : "bg-gray-100 text-[#64748B] hover:bg-gray-200 hover:text-[#0F172A]",
  )}
  >
  {tab.label} ({tab.count})
@@ -362,25 +362,25 @@ function FilterBar({ active, onChange, total, published, draft, totalHours, tota
 
  {/* Stats */}
  <div className="flex items-center gap-4">
- <div className="flex items-center gap-1.5 text-[12px] text-[#8A8478]">
+ <div className="flex items-center gap-1.5 text-[12px] text-[#64748B]">
  <ClockIcon size={13} />
  <span className="text-[11px] font-semibold text-gray-400">Tổng thời lượng</span>
- <span className="font-bold text-[#2C3039]">{totalHours}</span>
+ <span className="font-bold text-[#0F172A]">{totalHours}</span>
  </div>
- <div className="flex items-center gap-1.5 text-[12px] text-[#8A8478]">
+ <div className="flex items-center gap-1.5 text-[12px] text-[#64748B]">
  <LayersIcon size={13} />
  <span className="text-[11px] font-semibold text-gray-400">Tổng chương</span>
- <span className="font-bold text-[#2C3039]">
+ <span className="font-bold text-[#0F172A]">
  {String(totalChapters).padStart(2, "0")} Chương
  </span>
  </div>
 
  {/* Sort icons */}
  <div className="flex items-center gap-1">
- <button type="button" aria-label="Lọc" className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-indigo-50 transition-all">
+ <button type="button" aria-label="Lọc" className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#2563EB] hover:bg-blue-50 transition-all">
  <FilterIcon size={14} />
  </button>
- <button type="button" aria-label="Sắp xếp" className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-indigo-50 transition-all">
+ <button type="button" aria-label="Sắp xếp" className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#2563EB] hover:bg-blue-50 transition-all">
  <SortIcon size={14} />
  </button>
  </div>
@@ -395,12 +395,12 @@ function AddChapterButton({ onClick }: { onClick: () => void }) {
  type="button"
  id="btn-add-chapter"
  onClick={onClick}
- className="w-full flex flex-col items-center justify-center gap-2 py-7 rounded-2xl border-2 border-dashed border-gray-300 bg-white hover:border-[#C0392B] hover:bg-indigo-50/30 transition-all duration-200 group cursor-pointer shadow-2xs"
+ className="w-full flex flex-col items-center justify-center gap-2 py-7 rounded-2xl border-2 border-dashed border-gray-300 bg-white hover:border-[#2563EB] hover:bg-blue-50/30 transition-all duration-200 group cursor-pointer shadow-2xs"
  >
- <span className="w-10 h-10 rounded-xl border-2 border-dashed border-gray-300 group-hover:border-[#C0392B] group-hover:bg-indigo-50 flex items-center justify-center text-gray-400 group-hover:text-[#C0392B] transition-all">
+ <span className="w-10 h-10 rounded-xl border-2 border-dashed border-gray-300 group-hover:border-[#2563EB] group-hover:bg-blue-50 flex items-center justify-center text-gray-400 group-hover:text-[#2563EB] transition-all">
  <PlusCircleIcon size={20} />
  </span>
- <span className="text-xs font-black text-[#8A8478] group-hover:text-[#C0392B] transition-colors duration-200 uppercase tracking-wider">
+ <span className="text-xs font-black text-[#64748B] group-hover:text-[#2563EB] transition-colors duration-200 uppercase tracking-wider">
  Thêm Chuyên Đề / Chương Mới
  </span>
  </button>
@@ -457,7 +457,7 @@ function ChapterModal({ isOpen, editingChapter, onSave, onClose }: ChapterModalP
  <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-fadeIn">
  {/* Header */}
  <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
- <h2 className="text-[16px] font-bold text-[#2C3039]">
+ <h2 className="text-[16px] font-bold text-[#0F172A]">
  {editingChapter ? "Chỉnh sửa Module" : "Thêm Module mới"}
  </h2>
  <button
@@ -473,8 +473,8 @@ function ChapterModal({ isOpen, editingChapter, onSave, onClose }: ChapterModalP
  <div className="px-6 py-6 flex flex-col gap-5">
  {/* Title */}
  <div className="flex flex-col gap-1.5">
- <label htmlFor="chapter-title" className="text-sm font-semibold text-[#2C3039]">
- Tên Module <span className="text-red-500">*</span>
+ <label htmlFor="chapter-title" className="text-sm font-semibold text-[#0F172A]">
+ Tên Module <span className="text-[#3B82F6]">*</span>
  </label>
  <input
  id="chapter-title"
@@ -490,20 +490,20 @@ function ChapterModal({ isOpen, editingChapter, onSave, onClose }: ChapterModalP
  }}
  placeholder="Ví dụ: Giới thiệu về Machine Learning"
  className={twMerge(
- "w-full px-4 py-3 rounded-xl text-sm text-[#2C3039] placeholder-gray-400 bg-white border transition-all duration-200 focus:outline-none",
+ "w-full px-4 py-3 rounded-xl text-sm text-[#0F172A] placeholder-gray-400 bg-white border transition-all duration-200 focus:outline-none",
  titleError
- ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100"
- : "border-[#E8E2D9] focus:border-[#C0392B] focus:ring-2 focus:ring-[#C0392B]/20",
+ ? "border-[#60A5FA] focus:border-[#3B82F6] focus:ring-2 focus:ring-[#DBEAFE]"
+ : "border-[#E2E8F0] focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20",
  )}
  />
  {titleError && (
- <p className="text-[12px] text-red-500 font-medium">{titleError}</p>
+ <p className="text-[12px] text-[#3B82F6] font-medium">{titleError}</p>
  )}
  </div>
 
  {/* Description */}
  <div className="flex flex-col gap-1.5">
- <label htmlFor="chapter-desc" className="text-sm font-semibold text-[#2C3039]">
+ <label htmlFor="chapter-desc" className="text-sm font-semibold text-[#0F172A]">
  Mô tả
  </label>
  <textarea
@@ -512,24 +512,24 @@ function ChapterModal({ isOpen, editingChapter, onSave, onClose }: ChapterModalP
  onChange={(e) => setDescription(e.target.value)}
  rows={3}
  placeholder="Mô tả ngắn gọn nội dung module này..."
- className="w-full px-4 py-3 rounded-xl text-sm text-[#2C3039] placeholder-gray-400 bg-white border border-[#E8E2D9] focus:outline-none focus:border-[#C0392B] focus:ring-2 focus:ring-[#C0392B]/20 transition-all duration-200 resize-none leading-relaxed"
+ className="w-full px-4 py-3 rounded-xl text-sm text-[#0F172A] placeholder-gray-400 bg-white border border-[#E2E8F0] focus:outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 transition-all duration-200 resize-none leading-relaxed"
  />
  </div>
  </div>
 
  {/* Footer */}
- <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-[#FEFCF9]/50">
+ <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-[#F8FAFC]/50">
  <button
  type="button"
  onClick={handleClose}
- className="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#8A8478] hover:bg-gray-100 transition-colors"
+ className="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#64748B] hover:bg-gray-100 transition-colors"
  >
  Hủy
  </button>
  <button
  type="button"
  onClick={handleSave}
- className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-2xs hover:shadow-sm transition-all"
+ className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-2xs hover:shadow-sm transition-all"
  >
  {editingChapter ? "Lưu thay đổi" : "Thêm Module"}
  </button>
@@ -659,7 +659,7 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
  <div className="max-w-[900px] mx-auto px-6 py-6 flex flex-col gap-6">
  <Link
  href="/instructor/courses"
- className="flex items-center gap-1.5 text-xs text-[#C0392B] font-bold hover:underline transition-colors w-fit"
+ className="flex items-center gap-1.5 text-xs text-[#3B82F6] font-bold hover:underline transition-colors w-fit"
  >
  <ChevronLeftIcon size={14} />
  <span>Quay lại danh sách khóa học</span>
@@ -667,10 +667,10 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
 
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
  <div>
- <h1 className="text-xl font-black text-[#2C3039] tracking-tight leading-tight">
+ <h1 className="text-xl font-black text-[#0F172A] tracking-tight leading-tight">
  {course?.title || "Khóa học"}
  </h1>
- <p className="text-xs text-[#8A8478] mt-1">
+ <p className="text-xs text-[#64748B] mt-1">
  Trung tâm quản lý nội dung học liệu và cấu trúc bài giảng AI
  </p>
  </div>
@@ -678,7 +678,7 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
  <Link
  href={`/courses/lesson?course_id=${courseId}&preview=true`}
  target="_blank"
- className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#E8E2D9] text-xs font-bold text-gray-700 bg-white hover:bg-[#FEFCF9] transition-all cursor-pointer shadow-2xs"
+ className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-gray-700 bg-white hover:bg-[#F8FAFC] transition-all cursor-pointer shadow-2xs"
  >
  <EyeIcon size={14} />
  <span>Xem trước</span>
@@ -687,7 +687,7 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
  type="button"
  id="btn-add-lesson"
  onClick={() => addLesson(chapters[0]?.id?.toString() || "ch1")}
- className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-2xs transition-all cursor-pointer"
+ className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-2xs transition-all cursor-pointer"
  >
  <PlusIcon size={14} />
  <span>Thêm bài giảng</span>
@@ -721,7 +721,7 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
  ))}
 
  {filteredChapters.length === 0 && (
- <div className="flex items-center justify-center py-20 text-xs font-bold text-gray-400 bg-white rounded-2xl border border-[#E8E2D9] shadow-2xs">
+ <div className="flex items-center justify-center py-20 text-xs font-bold text-gray-400 bg-white rounded-2xl border border-[#E2E8F0] shadow-2xs">
  Không có bài giảng nào phù hợp với bộ lọc này.
  </div>
  )}

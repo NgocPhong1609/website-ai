@@ -17,7 +17,7 @@ export default memo(function HeroSectionLeft({
 }: HeroSectionLeftProps) {
  return (
  <div className="w-145 flex flex-col items-start gap-4.5">
- <div className="min-w-45.25 flex items-center justify-center gap-2 p-2 rounded-full bg-[#C0392B]/10">
+ <div className="min-w-45.25 flex items-center justify-center gap-2 p-2 rounded-full bg-[#3B82F6]/10">
  <Image
  src="/icons/gemini.svg"
  alt=""
@@ -30,7 +30,7 @@ export default memo(function HeroSectionLeft({
  <h1 className="text-[48px] font-bold min-w-127.5">
  Welcome to <span className="text-linear-brand-bright">MindNova AI</span>
  </h1>
- <p className="text-lg max-w-120 text-[#2C3039]">
+ <p className="text-lg max-w-120 text-[#0F172A]">
  Harness the power of generative intelligence to architect your
  personalized learning journey. Skills mastery, reimagined for the modern
  age.
@@ -47,7 +47,7 @@ export default memo(function HeroSectionLeft({
  className="max-w-47.75 w-full rounded-xl bg-white"
  >
  <div className="flex items-center gap-2">
- <span className="text-[14px] text-[#2C3039]">Explore Platform</span>
+ <span className="text-[14px] text-[#0F172A]">Explore Platform</span>
  <Image
  src="/icons/arrow.svg"
  alt=""

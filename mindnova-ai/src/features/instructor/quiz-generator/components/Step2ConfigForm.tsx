@@ -30,20 +30,20 @@ export function Step2ConfigForm({
   const essayPercent = total > 0 ? Math.round((essay / total) * 100) : 0;
 
   return (
-    <div className="p-8 bg-white rounded-3xl border border-[#E8E2D9] shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-3xl border border-[#E2E8F0] shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
           {!embeddedMode && (
-            <span className="px-3 py-1 bg-indigo-50 text-[#C0392B] text-xs font-black rounded-lg border border-indigo-100 uppercase tracking-wider">
+            <span className="px-3 py-1 bg-blue-50 text-[#3B82F6] text-xs font-black rounded-lg border border-blue-100 uppercase tracking-wider">
               Bước 2 / 5
             </span>
           )}
-          <h2 className="text-xl font-black text-[#2C3039]">
+          <h2 className="text-xl font-black text-[#0F172A]">
             {embeddedMode ? "Cấu Hình Bài Kiểm Tra AI Cho Chuyên Đề" : "Cấu Hình Thông Số Đề Kiểm Tra"}
           </h2>
         </div>
-        <p className="text-xs text-[#8A8478] font-medium mt-1">
+        <p className="text-xs text-[#64748B] font-medium mt-1">
           Thiết lập tên bài kiểm tra, độ khó, chủ đề AI và số lượng câu hỏi.
         </p>
       </div>
@@ -52,15 +52,15 @@ export function Step2ConfigForm({
         {/* Left Column: Metadata */}
         <div className="flex flex-col gap-4">
           {!embeddedMode && config.source_type === "course" && config.course_title && (
-            <div className="p-3.5 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-between">
+            <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-base">🎓</span>
                 <div>
-                  <span className="text-[10px] font-black text-[#C0392B] uppercase tracking-wider block">Khóa học được chọn</span>
-                  <span className="text-xs font-black text-[#2C3039]">{config.course_title}</span>
+                  <span className="text-[10px] font-black text-[#3B82F6] uppercase tracking-wider block">Khóa học được chọn</span>
+                  <span className="text-xs font-black text-[#0F172A]">{config.course_title}</span>
                 </div>
               </div>
-              <span className="px-2.5 py-1 bg-white text-[#C0392B] text-[11px] font-extrabold rounded-lg border border-indigo-100 shadow-2xs">
+              <span className="px-2.5 py-1 bg-white text-[#3B82F6] text-[11px] font-extrabold rounded-lg border border-blue-100 shadow-2xs">
                 Tự động từ Bước 1
               </span>
             </div>
@@ -72,7 +72,7 @@ export function Step2ConfigForm({
               type="text"
               value={config.title}
               onChange={(e) => onChangeConfig({ title: e.target.value })}
-              className="w-full p-3.5 rounded-xl border border-[#E8E2D9] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
+              className="w-full p-3.5 rounded-xl border border-[#E2E8F0] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
               placeholder="VD: Kiểm tra Hệ nhị phân & Máy tính"
             />
           </div>
@@ -84,7 +84,7 @@ export function Step2ConfigForm({
                 type="text"
                 value={config.topic || ""}
                 onChange={(e) => onChangeConfig({ topic: e.target.value })}
-                className="w-full p-3.5 rounded-xl border border-[#E8E2D9] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
+                className="w-full p-3.5 rounded-xl border border-[#E2E8F0] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
                 placeholder="VD: Kiến thức bài học, HTML/CSS căn bản, React Hooks..."
               />
             </div>
@@ -96,7 +96,7 @@ export function Step2ConfigForm({
               value={config.description}
               onChange={(e) => onChangeConfig({ description: e.target.value })}
               rows={3}
-              className="w-full p-3.5 rounded-xl border border-[#E8E2D9] bg-[#FAF8FF] text-xs font-medium text-gray-800 focus:outline-none focus:border-[#C0392B]"
+              className="w-full p-3.5 rounded-xl border border-[#E2E8F0] bg-[#FAF8FF] text-xs font-medium text-gray-800 focus:outline-none focus:border-[#3B82F6]"
               placeholder="Mô tả mục tiêu của bài kiểm tra..."
             />
           </div>
@@ -117,8 +117,8 @@ export function Step2ConfigForm({
                   onClick={() => onChangeConfig({ difficulty: diff.key as DifficultyType })}
                   className={`p-2.5 rounded-xl border text-xs font-extrabold flex flex-col items-center gap-1 transition-all ${
                     config.difficulty === diff.key
-                      ? "border-[#C0392B] bg-indigo-50 text-[#C0392B] shadow-xs"
-                      : "border-[#E8E2D9] text-[#8A8478] hover:border-gray-300"
+                      ? "border-[#3B82F6] bg-blue-50 text-[#3B82F6] shadow-xs"
+                      : "border-[#E2E8F0] text-[#64748B] hover:border-gray-300"
                   }`}
                 >
                   <span className="text-sm">{diff.icon}</span>
@@ -137,7 +137,7 @@ export function Step2ConfigForm({
                 max={180}
                 value={config.time_limit_minutes}
                 onChange={(e) => onChangeConfig({ time_limit_minutes: parseInt(e.target.value) || 0 })}
-                className="w-full p-3 rounded-xl border border-[#E8E2D9] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
+                className="w-full p-3 rounded-xl border border-[#E2E8F0] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
               />
             </div>
             <div>
@@ -148,20 +148,20 @@ export function Step2ConfigForm({
                 max={100}
                 value={config.passing_score}
                 onChange={(e) => onChangeConfig({ passing_score: parseInt(e.target.value) || 70 })}
-                className="w-full p-3 rounded-xl border border-[#E8E2D9] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
+                className="w-full p-3 rounded-xl border border-[#E2E8F0] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
               />
             </div>
           </div>
         </div>
 
         {/* Right Column: Question Counts Breakdown Widget */}
-        <div className="p-6 rounded-3xl bg-[#F5F4FE] border border-indigo-100 text-[#2C3039] flex flex-col justify-between shadow-xs">
+        <div className="p-6 rounded-3xl bg-[#F5F4FE] border border-blue-100 text-[#0F172A] flex flex-col justify-between shadow-xs">
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-black text-[#2C3039] uppercase tracking-wider flex items-center gap-2">
+              <h3 className="text-xs font-black text-[#0F172A] uppercase tracking-wider flex items-center gap-2">
                 <span>⚡ Cân Bằng Cấu Trúc Đề</span>
               </h3>
-              <span className="px-3 py-1 rounded-xl bg-white text-[#C0392B] text-xs font-mono font-black border border-indigo-100 shadow-2xs">
+              <span className="px-3 py-1 rounded-xl bg-white text-[#3B82F6] text-xs font-mono font-black border border-blue-100 shadow-2xs">
                 Tổng: {total} câu
               </span>
             </div>
@@ -170,7 +170,7 @@ export function Step2ConfigForm({
             <div>
               <div className="flex justify-between text-xs font-bold mb-1">
                 <span className="text-gray-700">Tổng số câu hỏi mong muốn</span>
-                <span className="text-[#C0392B] font-black">{total} câu</span>
+                <span className="text-[#3B82F6] font-black">{total} câu</span>
               </div>
               <input
                 type="range"
@@ -183,25 +183,25 @@ export function Step2ConfigForm({
                   const newEssay = newTotal - newMc;
                   onChangeConfig({ total_questions: newTotal, multiple_choice_count: newMc, essay_count: newEssay });
                 }}
-                className="w-full accent-[#C0392B] cursor-pointer h-2 bg-indigo-100 rounded-lg"
+                className="w-full accent-[#3B82F6] cursor-pointer h-2 bg-blue-100 rounded-lg"
               />
             </div>
 
             {/* MCQ & Essay Inputs */}
             <div className="grid grid-cols-2 gap-3 pt-2">
-              <div className="p-3.5 rounded-2xl bg-white border border-indigo-100 shadow-2xs flex flex-col gap-1.5">
-                <label className="text-[11px] font-black text-[#C0392B] uppercase tracking-wider">Số câu trắc nghiệm</label>
+              <div className="p-3.5 rounded-2xl bg-white border border-blue-100 shadow-2xs flex flex-col gap-1.5">
+                <label className="text-[11px] font-black text-[#3B82F6] uppercase tracking-wider">Số câu trắc nghiệm</label>
                 <input
                   type="number"
                   min={0}
                   max={total}
                   value={mc}
                   onChange={(e) => onChangeConfig({ multiple_choice_count: parseInt(e.target.value) || 0 })}
-                  className="w-full p-2.5 rounded-xl bg-[#FAF9FF] border border-indigo-100 text-[#2C3039] font-black text-sm focus:outline-none focus:border-[#C0392B] focus:bg-white"
+                  className="w-full p-2.5 rounded-xl bg-[#FAF9FF] border border-blue-100 text-[#0F172A] font-black text-sm focus:outline-none focus:border-[#3B82F6] focus:bg-white"
                 />
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-white border border-indigo-100 shadow-2xs flex flex-col gap-1.5">
+              <div className="p-3.5 rounded-2xl bg-white border border-blue-100 shadow-2xs flex flex-col gap-1.5">
                 <label className="text-[11px] font-black text-purple-700 uppercase tracking-wider">Số câu tự luận</label>
                 <input
                   type="number"
@@ -209,7 +209,7 @@ export function Step2ConfigForm({
                   max={total}
                   value={essay}
                   onChange={(e) => onChangeConfig({ essay_count: parseInt(e.target.value) || 0 })}
-                  className="w-full p-2.5 rounded-xl bg-[#FAF9FF] border border-indigo-100 text-[#2C3039] font-black text-sm focus:outline-none focus:border-[#C0392B] focus:bg-white"
+                  className="w-full p-2.5 rounded-xl bg-[#FAF9FF] border border-blue-100 text-[#0F172A] font-black text-sm focus:outline-none focus:border-[#3B82F6] focus:bg-white"
                 />
               </div>
             </div>
@@ -217,13 +217,13 @@ export function Step2ConfigForm({
             {/* Realtime Balance Progress Bar */}
             <div className="mt-2 flex flex-col gap-2">
               <div className="flex justify-between text-[11px] font-black">
-                <span className="text-indigo-700">Trắc nghiệm: {mc} ({mcPercent}%)</span>
+                <span className="text-blue-700">Trắc nghiệm: {mc} ({mcPercent}%)</span>
                 <span className="text-purple-700">Tự luận: {essay} ({essayPercent}%)</span>
               </div>
-              <div className="w-full h-3 rounded-full bg-indigo-100 overflow-hidden flex border border-indigo-200">
+              <div className="w-full h-3 rounded-full bg-blue-100 overflow-hidden flex border border-blue-200">
                 <div
                   style={{ width: `${mcPercent}%` }}
-                  className="h-full bg-indigo-600 transition-all duration-300"
+                  className="h-full bg-blue-600 transition-all duration-300"
                 />
                 <div
                   style={{ width: `${essayPercent}%` }}
@@ -267,7 +267,7 @@ export function Step2ConfigForm({
           type="button"
           onClick={onGenerate}
           disabled={!isValidBalance || !config.title.trim() || isGenerating}
-          className="px-8 py-3 bg-[#C0392B] hover:bg-[#a02c20] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 cursor-pointer flex items-center gap-2"
+          className="px-8 py-3 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 cursor-pointer flex items-center gap-2"
         >
           {isGenerating ? (
             <span>⏳ Đang tạo câu hỏi bằng AI...</span>

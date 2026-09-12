@@ -23,17 +23,17 @@ export function TopicsGrid({ selectedIds, onToggle }: TopicsGridProps) {
  const selectedCount = selectedIds.size;
 
  return (
- <div className="flex-1 bg-white border border-[#E8E8F0] rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_16px_rgba(192,57,43,0.04)]">
+ <div className="flex-1 bg-white border border-[#E8E8F0] rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_16px_rgba(59, 130, 246,0.04)]">
  {/* Header */}
  <div className="flex items-center justify-between px-5 py-4 border-b border-[#F0F0F7]">
  <div className="flex items-center gap-2">
- <div className="w-2 h-2 rounded-full bg-[#FAF7F2] animate-pulse" />
- <span className="text-xs font-semibold text-[#8A8478] uppercase tracking-wider">
+ <div className="w-2 h-2 rounded-full bg-[#F8FAFC] animate-pulse" />
+ <span className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">
  Available Topics
  </span>
  </div>
  {selectedCount > 0 && (
- <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FAF7F2] text-[#C0392B] text-xs font-semibold">
+ <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F8FAFC] text-[#3B82F6] text-xs font-semibold">
  <></>
  {selectedCount} selected
  </span>
@@ -55,7 +55,7 @@ export function TopicsGrid({ selectedIds, onToggle }: TopicsGridProps) {
  </div>
 
  {/* Footer hint */}
- <p className="mt-4 text-[11px] text-[#B8B0A3] leading-relaxed">
+ <p className="mt-4 text-[11px] text-[#94A3B8] leading-relaxed">
  Select all that apply — more selections create richer AI pathways.
  </p>
  </div>

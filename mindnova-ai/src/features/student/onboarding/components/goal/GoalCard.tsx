@@ -25,7 +25,7 @@ export default function GoalCard({
  "w-full p-6 bg-white border rounded-xl cursor-pointer transition-all duration-200",
  "hover:-translate-y-0.5 hover:shadow-md",
  isActive
- ? "border-[#E8E2D9] ring-1 ring-[#C0392B] bg-[#F8F9FE]"
+ ? "border-[#E2E8F0] ring-1 ring-[#3B82F6] bg-[#F8F9FE]"
  : "border-[#C7C4D7]",
  )}
  >
@@ -33,10 +33,10 @@ export default function GoalCard({
  <div className="w-12 h-12 bg-[#EAEDFF] rounded-lg flex justify-center items-center">
  <Image src={icon} width={24} height={24} alt="" aria-hidden="true" />
  </div>
- <h3 className="max-w-[275.33px] w-full text-[20px] font-semibold text-[#2C3039]">
+ <h3 className="max-w-[275.33px] w-full text-[20px] font-semibold text-[#0F172A]">
  {title}
  </h3>
- <p className="max-w-[275.33px] w-full text-[14px] text-[#2C3039]">
+ <p className="max-w-[275.33px] w-full text-[14px] text-[#0F172A]">
  {description}
  </p>
  </div>

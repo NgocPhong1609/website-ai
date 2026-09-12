@@ -46,7 +46,7 @@ export function StudentRoleGuard({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-[#F7F7FB]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-[#6B6BFF] border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-[#3B82F6] border-t-transparent rounded-full animate-spin" />
           <p className="text-sm font-semibold text-[#64647A]">Đang chuyển hướng đến Portal...</p>
         </div>
       </div>

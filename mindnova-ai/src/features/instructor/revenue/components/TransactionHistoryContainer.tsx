@@ -19,14 +19,14 @@ import {
 
 function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
  return (
- <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-[#E8E2D9] shadow-2xs w-fit">
+ <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-[#E2E8F0] shadow-2xs w-fit">
  <Link
  href="/instructor/revenue"
  className={twMerge(
  "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
  active === "overview"
- ? "bg-[#C0392B] text-white shadow-sm"
- : "text-[#8A8478] hover:bg-gray-100 hover:text-[#2C3039]"
+ ? "bg-[#3B82F6] text-white shadow-sm"
+ : "text-[#64748B] hover:bg-gray-100 hover:text-[#0F172A]"
  )}
  >
  <span> Tổng quan Doanh thu</span>
@@ -37,8 +37,8 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  className={twMerge(
  "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
  active === "report"
- ? "bg-[#C0392B] text-white shadow-sm"
- : "text-[#8A8478] hover:bg-gray-100 hover:text-[#2C3039]"
+ ? "bg-[#3B82F6] text-white shadow-sm"
+ : "text-[#64748B] hover:bg-gray-100 hover:text-[#0F172A]"
  )}
  >
  <span> Báo cáo Bán hàng</span>
@@ -49,8 +49,8 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  className={twMerge(
  "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
  active === "history"
- ? "bg-[#C0392B] text-white shadow-sm"
- : "text-[#8A8478] hover:bg-gray-100 hover:text-[#2C3039]"
+ ? "bg-[#3B82F6] text-white shadow-sm"
+ : "text-[#64748B] hover:bg-gray-100 hover:text-[#0F172A]"
  )}
  >
  <span> Lịch sử Giao dịch</span>
@@ -62,8 +62,8 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
 function PageHeader() {
  return (
  <div className="flex flex-col">
- <h1 className="text-xl font-black text-[#2C3039] tracking-tight">Lịch Sử Giao Dịch &amp; Đối Soát</h1>
- <p className="text-xs text-[#8A8478] mt-1">
+ <h1 className="text-xl font-black text-[#0F172A] tracking-tight">Lịch Sử Giao Dịch &amp; Đối Soát</h1>
+ <p className="text-xs text-[#64748B] mt-1">
  Kiểm soát dòng tiền chi tiết, các lệnh rút tiền hoa hồng và lịch sử bán khóa học theo thời gian thực.
  </p>
  </div>
@@ -100,7 +100,7 @@ function Filters({
 
  return (
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
- <div className="flex items-center gap-1 bg-white border border-[#E8E2D9] rounded-xl p-1 shadow-2xs overflow-x-auto">
+ <div className="flex items-center gap-1 bg-white border border-[#E2E8F0] rounded-xl p-1 shadow-2xs overflow-x-auto">
  {tabs.map((tab) => (
  <button
  key={tab.id}
@@ -109,8 +109,8 @@ function Filters({
  className={twMerge(
  "px-4 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer whitespace-nowrap",
  activeFilter === tab.id
- ? "bg-[#C0392B] text-white shadow-2xs"
- : "text-[#8A8478] hover:text-[#2C3039] hover:bg-[#FEFCF9]"
+ ? "bg-[#3B82F6] text-white shadow-2xs"
+ : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]"
  )}
  >
  {tab.label}
@@ -125,14 +125,14 @@ function Filters({
  type="date" 
  value={startDate}
  onChange={(e) => setStartDate(e.target.value)}
- className="px-3 py-2 rounded-xl border border-[#E8E2D9] text-xs font-bold text-gray-700 bg-white shadow-2xs outline-none focus:border-[#C0392B] transition-colors"
+ className="px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-gray-700 bg-white shadow-2xs outline-none focus:border-[#3B82F6] transition-colors"
  />
  <span className="text-gray-400 font-bold text-xs">-</span>
  <input 
  type="date" 
  value={endDate}
  onChange={(e) => setEndDate(e.target.value)}
- className="px-3 py-2 rounded-xl border border-[#E8E2D9] text-xs font-bold text-gray-700 bg-white shadow-2xs outline-none focus:border-[#C0392B] transition-colors"
+ className="px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-gray-700 bg-white shadow-2xs outline-none focus:border-[#3B82F6] transition-colors"
  />
  </div>
  )}
@@ -140,7 +140,7 @@ function Filters({
  <div className="relative">
  <button 
  onClick={() => setIsOpen(!isOpen)}
- className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E8E2D9] text-xs font-bold text-gray-700 bg-white shadow-2xs hover:border-[#C0392B] transition-colors cursor-pointer min-w-[170px] justify-between"
+ className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-gray-700 bg-white shadow-2xs hover:border-[#2563EB] transition-colors cursor-pointer min-w-[170px] justify-between"
  >
  <div className="flex items-center gap-2">
  <CalendarIcon />
@@ -150,7 +150,7 @@ function Filters({
  </button>
  
  {isOpen && (
- <div className="absolute right-0 top-full mt-1.5 w-44 bg-white border border-[#E8E2D9] rounded-xl shadow-lg z-20 py-1 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+ <div className="absolute right-0 top-full mt-1.5 w-44 bg-white border border-[#E2E8F0] rounded-xl shadow-lg z-20 py-1 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
  {dateOptions.map((opt) => (
  <button
  key={opt.id}
@@ -165,8 +165,8 @@ function Filters({
  className={twMerge(
  "w-full text-left px-4 py-2.5 text-xs font-bold transition-colors cursor-pointer",
  activeDateRange === opt.id 
- ? "bg-indigo-50 text-[#C0392B]" 
- : "text-[#8A8478] hover:bg-[#FEFCF9] hover:text-[#2C3039]"
+ ? "bg-blue-50 text-[#3B82F6]" 
+ : "text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
  )}
  >
  {opt.label}
@@ -211,16 +211,16 @@ function TransactionTable({
  };
 
  const getIconColor = (type: string) => {
- if (type === 'revenue') return "-[#2C3039] bg-emerald-50 -[#FAF7F2]";
- if (type === 'withdrawal') return "-[#C0392B] bg-purple-50 -[#FAF7F2]";
+ if (type === 'revenue') return "text-[#0F172A] bg-emerald-50 text-[#F8FAFC]";
+ if (type === 'withdrawal') return "text-[#3B82F6] bg-purple-50 text-[#F8FAFC]";
  return "text-amber-600 bg-amber-50 border-amber-100";
  };
 
  const getStatusStyle = (status: string) => {
- if (status === 'available' || status === 'completed') return "-[#2C3039] bg-emerald-50 -[#FAF7F2]";
- if (status === 'processing') return "-[#C0392B] bg-indigo-50 -[#FAF7F2]";
+ if (status === 'available' || status === 'completed') return "text-[#0F172A] bg-emerald-50 text-[#F8FAFC]";
+ if (status === 'processing') return "text-[#3B82F6] bg-blue-50 text-[#F8FAFC]";
  if (status === 'escrow') return "text-amber-700 bg-amber-50 border-amber-200";
- return "text-gray-700 bg-[#FEFCF9] border-[#E8E2D9]";
+ return "text-gray-700 bg-[#F8FAFC] border-[#E2E8F0]";
  };
 
  const getStatusText = (status: string) => {
@@ -233,7 +233,7 @@ function TransactionTable({
 
  const formatAmount = (amount: number, type: string) => {
  const sign = type === 'withdrawal' || type === 'refund' ? '-' : '+';
- const color = type === 'withdrawal' || type === 'refund' ? 'text-[#2C3039] font-bold' : '-[#2C3039] font-black';
+ const color = type === 'withdrawal' || type === 'refund' ? 'text-[#0F172A] font-bold' : 'text-[#0F172A] font-black';
  return {
  text: `${sign}${amount.toLocaleString('vi-VN')}đ`,
  color
@@ -250,16 +250,16 @@ function TransactionTable({
 
  if (isLoading) {
  return (
- <div className="bg-white rounded-2xl border border-[#E8E2D9] shadow-2xs p-12 flex flex-col items-center justify-center">
+ <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-2xs p-12 flex flex-col items-center justify-center">
  
- <p className="text-[#8A8478] font-bold text-sm">Đang tải lịch sử giao dịch...</p>
+ <p className="text-[#64748B] font-bold text-sm">Đang tải lịch sử giao dịch...</p>
  </div>
  );
  }
 
  if (isError || !data) {
  return (
- <div className="bg-white rounded-2xl border border-[#E8E2D9] shadow-2xs p-12 flex flex-col items-center justify-center text-rose-500">
+ <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-2xs p-12 flex flex-col items-center justify-center text-rose-500">
  <p className="font-bold">Đã có lỗi xảy ra khi tải dữ liệu giao dịch.</p>
  </div>
  );
@@ -269,11 +269,11 @@ function TransactionTable({
  const meta = data;
 
  return (
- <div className="bg-white rounded-2xl border border-[#E8E2D9] shadow-2xs flex flex-col overflow-hidden">
+ <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-2xs flex flex-col overflow-hidden">
  <div className="overflow-x-auto">
  <table className="w-full text-left border-collapse min-w-[750px]">
  <thead>
- <tr className="bg-[#FEFCF9]/70 border-b border-[#E8E2D9] text-[11px] font-black text-[#8A8478] uppercase tracking-wider">
+ <tr className="bg-[#F8FAFC]/70 border-b border-[#E2E8F0] text-[11px] font-black text-[#64748B] uppercase tracking-wider">
  <th className="px-6 py-3.5 w-[170px]">Thời Gian</th>
  <th className="px-6 py-3.5 w-[140px]">Mã Giao Dịch</th>
  <th className="px-6 py-3.5">Nội Dung Đối Soát</th>
@@ -287,15 +287,15 @@ function TransactionTable({
  const dt = formatDate(t.created_at);
  const am = formatAmount(t.amount, t.type);
  return (
- <tr key={t.id} className="hover:bg-[#FEFCF9]/80 transition-colors">
+ <tr key={t.id} className="hover:bg-[#F8FAFC]/80 transition-colors">
  <td className="px-6 py-4">
  <div className="flex flex-col">
- <span className="font-extrabold text-[#2C3039]">{dt.date}</span>
+ <span className="font-extrabold text-[#0F172A]">{dt.date}</span>
  <span className="text-[11px] text-gray-400 mt-0.5">{dt.time}</span>
  </div>
  </td>
  <td className="px-6 py-4">
- <span className="font-bold font-mono text-[#8A8478]">{t.transaction_code}</span>
+ <span className="font-bold font-mono text-[#64748B]">{t.transaction_code}</span>
  </td>
  <td className="px-6 py-4">
  <div className="flex items-center gap-3">
@@ -303,8 +303,8 @@ function TransactionTable({
  {getIcon(t.type)}
  </div>
  <div>
- <div className="font-extrabold text-[#2C3039]">{t.description}</div>
- <div className="text-[11px] font-semibold text-[#8A8478] mt-0.5">Phân loại: {t.type.toUpperCase()}</div>
+ <div className="font-extrabold text-[#0F172A]">{t.description}</div>
+ <div className="text-[11px] font-semibold text-[#64748B] mt-0.5">Phân loại: {t.type.toUpperCase()}</div>
  </div>
  </div>
  </td>
@@ -330,22 +330,22 @@ function TransactionTable({
  </table>
  </div>
 
- <div className="px-6 py-4 flex items-center justify-between border-t border-gray-100 bg-[#FEFCF9]/50">
- <span className="text-xs font-semibold text-[#8A8478]">Hiển thị {transactions.length} trên tổng số {meta.total} giao dịch</span>
+ <div className="px-6 py-4 flex items-center justify-between border-t border-gray-100 bg-[#F8FAFC]/50">
+ <span className="text-xs font-semibold text-[#64748B]">Hiển thị {transactions.length} trên tổng số {meta.total} giao dịch</span>
  <div className="flex items-center gap-1">
  <button 
  onClick={() => setPage(page - 1)}
  disabled={page === 1}
  aria-label="Trang trước" 
- className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E8E2D9] bg-white text-gray-400 disabled:opacity-50 hover:bg-[#FEFCF9] transition-colors cursor-pointer disabled:cursor-not-allowed">
+ className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E2E8F0] bg-white text-gray-400 disabled:opacity-50 hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:cursor-not-allowed">
  <ChevronLeftIcon />
  </button>
- <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#C0392B] text-white font-extrabold text-xs shadow-2xs">{page}</button>
+ <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#3B82F6] text-white font-extrabold text-xs shadow-2xs">{page}</button>
  <button 
  onClick={() => setPage(page + 1)}
  disabled={page === meta.last_page || meta.last_page === 0}
  aria-label="Trang sau" 
- className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E8E2D9] bg-white text-gray-400 disabled:opacity-50 hover:bg-[#FEFCF9] transition-colors cursor-pointer disabled:cursor-not-allowed">
+ className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E2E8F0] bg-white text-gray-400 disabled:opacity-50 hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:cursor-not-allowed">
  <ChevronRightIcon />
  </button>
  </div>
@@ -363,34 +363,34 @@ function BottomCards() {
 
  return (
  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
- <div className="bg-white rounded-2xl border border-[#E8E2D9] p-5 shadow-2xs flex items-center gap-4">
- <div className="w-12 h-12 rounded-xl bg-indigo-50 text-[#C0392B] flex items-center justify-center shrink-0 border -[#FAF7F2]">
+ <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 shadow-2xs flex items-center gap-4">
+ <div className="w-12 h-12 rounded-xl bg-blue-50 text-[#3B82F6] flex items-center justify-center shrink-0 border-[#E2E8F0]">
  <BuildingBankIcon size={22} />
  </div>
  <div>
- <span className="text-xs font-bold text-[#8A8478] block uppercase">Số dư khả dụng</span>
- <span className="text-xl font-black text-[#2C3039] mt-0.5 block">{overview ? overview.available_balance.toLocaleString('vi-VN') : '...'}đ</span>
+ <span className="text-xs font-bold text-[#64748B] block uppercase">Số dư khả dụng</span>
+ <span className="text-xl font-black text-[#0F172A] mt-0.5 block">{overview ? overview.available_balance.toLocaleString('vi-VN') : '...'}đ</span>
  </div>
  </div>
 
- <div className="bg-white rounded-2xl border border-[#E8E2D9] p-5 shadow-2xs flex items-center gap-4">
- <div className="w-12 h-12 rounded-xl bg-emerald-50 -[#2C3039] flex items-center justify-center shrink-0 border -[#FAF7F2]">
+ <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 shadow-2xs flex items-center gap-4">
+ <div className="w-12 h-12 rounded-xl bg-emerald-50 text-[#0F172A] flex items-center justify-center shrink-0 border-[#E2E8F0]">
  <TrendUpIcon size={22} />
  </div>
  <div>
- <span className="text-xs font-bold text-[#8A8478] block uppercase">Thu nhập Tích lũy Tháng</span>
- <span className="text-xl font-black -[#2C3039] mt-0.5 block">{overview ? overview.total_revenue.toLocaleString('vi-VN') : '...'}đ</span>
+ <span className="text-xs font-bold text-[#64748B] block uppercase">Thu nhập Tích lũy Tháng</span>
+ <span className="text-xl font-black text-[#0F172A] mt-0.5 block">{overview ? overview.total_revenue.toLocaleString('vi-VN') : '...'}đ</span>
  </div>
  </div>
 
- <div className="bg-indigo-50/50 rounded-2xl border -[#FAF7F2] p-5 flex items-center justify-between gap-3 shadow-2xs">
+ <div className="bg-blue-50/50 rounded-2xl border-[#E2E8F0] p-5 flex items-center justify-between gap-3 shadow-2xs">
  <div>
- <span className="text-sm font-black text-[#C0392B] block">Yêu Cầu Rút Tiền Hoa Hồng</span>
- <span className="text-xs -[#C0392B]/80 font-medium mt-0.5 block">Hệ thống thanh toán nhanh 24/7</span>
+ <span className="text-sm font-black text-[#3B82F6] block">Yêu Cầu Rút Tiền Hoa Hồng</span>
+ <span className="text-xs text-[#3B82F6]/80 font-medium mt-0.5 block">Hệ thống thanh toán nhanh 24/7</span>
  </div>
  <Link
  href="/instructor/revenue"
- className="px-5 py-2.5 rounded-xl bg-[#C0392B] hover:bg-[#4338CA] text-white text-xs font-extrabold shadow-sm transition-all shrink-0"
+ className="px-5 py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white text-xs font-extrabold shadow-sm transition-all shrink-0"
  >
  Rút Ngay 
  </Link>

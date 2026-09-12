@@ -68,7 +68,7 @@ export function AdminUserModerationButton({ userId, initialStatus }: AdminUserMo
  disabled={isLoading || userId === 0}
  className={`rounded-lg px-3 py-1 text-xs font-semibold transition ${
  isBanned
- ? "bg-emerald-50 -[#2C3039] hover:-[#FAF7F2]"
+ ? "bg-emerald-50 text-[#0F172A] hover:bg-[#F8FAFC]"
  : "bg-rose-50 text-rose-700 hover:bg-rose-100"
  }`}
  >

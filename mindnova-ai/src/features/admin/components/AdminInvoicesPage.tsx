@@ -29,9 +29,9 @@ function toMethodLabel(method: string) {
 
 function toStatusTone(status: string) {
  const value = status.toLowerCase();
- if (value.includes("completed")) return "bg-emerald-50 -[#2C3039]";
+ if (value.includes("completed")) return "bg-emerald-50 text-[#0F172A]";
  if (value.includes("failed")) return "bg-rose-100 text-rose-700";
- if (value.includes("refund")) return "-[#FAF7F2] -[#C0392B]";
+ if (value.includes("refund")) return "text-[#F8FAFC] text-[#3B82F6]";
  return "bg-amber-50 text-amber-700";
 }
 
@@ -40,13 +40,13 @@ export async function AdminInvoicesPage({ filters }: AdminInvoicesPageProps) {
 
  return (
  <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
- <section className="mn-stagger rounded-2xl border -[#FAF7F2]/20 bg-[linear-gradient(125deg,#0d1d3f_0%,#17386d_48%,#0f766e_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
- <p className="text-[10px] uppercase tracking-[0.35em] -[#FAF7F2]/70">Hóa đơn</p>
+ <section className="mn-stagger rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(125deg,#0d1d3f_0%,#17386d_48%,#2563EB_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
+ <p className="text-[10px] uppercase tracking-[0.35em] text-[#F8FAFC]/70">Hóa đơn</p>
  <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Danh sách hóa đơn</h1>
  <p className="mt-1 text-xs text-slate-200/90">Theo dõi tình trạng hóa đơn, phương thức thanh toán và tổng tiền đơn hàng.</p>
  </section>
 
- <section className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
+ <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
  <form method="GET" className="grid gap-3 md:grid-cols-4">
  <label className="space-y-1 text-sm text-slate-700 md:col-span-2">
  <span className="font-medium">Tìm kiếm</span>
@@ -54,7 +54,7 @@ export async function AdminInvoicesPage({ filters }: AdminInvoicesPageProps) {
  name="search"
  defaultValue={filters?.search}
  placeholder="Tên học viên, email, mã hóa đơn, tên khóa học"
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
 
@@ -63,7 +63,7 @@ export async function AdminInvoicesPage({ filters }: AdminInvoicesPageProps) {
  <select
  name="status"
  defaultValue={filters?.status}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  >
  <option value="">Tất cả</option>
  <option value="pending">Chờ thanh toán</option>
@@ -78,7 +78,7 @@ export async function AdminInvoicesPage({ filters }: AdminInvoicesPageProps) {
  <select
  name="paymentMethod"
  defaultValue={filters?.paymentMethod}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  >
  <option value="">Tất cả</option>
  <option value="vnpay">VNPay</option>
@@ -89,17 +89,17 @@ export async function AdminInvoicesPage({ filters }: AdminInvoicesPageProps) {
  </label>
 
  <div className="md:col-span-4">
- <button className="rounded-xl -[#C0392B] -[#C0392B] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_-16px_rgba(79,70,229,0.9)] transition hover:-[#C0392B] hover:-[#C0392B]">
+ <button className="rounded-xl bg-gradient-to-r from-[#3B82F6] to-[#3B82F6] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_-16px_rgba(37, 99, 235,0.9)] transition hover:bg-[#2563EB] hover:bg-[#2563EB]">
  Áp dụng bộ lọc
  </button>
  </div>
  </form>
  </section>
 
- <section className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
+ <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
  <div className="mb-4 flex items-center justify-between">
  <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Hóa đơn gần đây</h2>
- <span className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold -[#C0392B] ring-1 ring-cyan-100">
+ <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#3B82F6] ring-1 ring-blue-100">
  {data.rows.length} hóa đơn
  </span>
  </div>
@@ -119,7 +119,7 @@ export async function AdminInvoicesPage({ filters }: AdminInvoicesPageProps) {
  </thead>
  <tbody>
  {data.rows.map((row) => (
- <tr key={row.id} className="border-t border-slate-200 bg-white hover:bg-cyan-50/35">
+ <tr key={row.id} className="border-t border-slate-200 bg-white hover:bg-blue-50/35">
  <td className="px-4 py-3 font-medium text-slate-900">{row.transactionId || "-"}</td>
  <td className="px-4 py-3 text-slate-700">
  <p className="max-w-[260px] truncate" title={row.courseTitle || "-"}>

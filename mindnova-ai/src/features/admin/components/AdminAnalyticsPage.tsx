@@ -71,10 +71,10 @@ export function AdminAnalyticsPage() {
 
  return (
  <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
- <section className="rounded-2xl border -[#FAF7F2]/20 bg-[linear-gradient(120deg,#0c1f36_0%,#1d4ed8_46%,#0f766e_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.8)]">
+ <section className="rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(120deg,#0c1f36_0%,#1d4ed8_46%,#2563EB_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.8)]">
  <div className="flex flex-wrap items-center justify-between gap-3">
  <div>
- <p className="text-[10px] uppercase tracking-[0.34em] -[#FAF7F2]/70">Analytics & Dashboard</p>
+ <p className="text-[10px] uppercase tracking-[0.34em] text-[#F8FAFC]/70">Analytics & Dashboard</p>
  <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Báo cáo tài chính, học tập và hệ thống</h1>
  </div>
 
@@ -99,13 +99,13 @@ export function AdminAnalyticsPage() {
  </section>
 
  <section className="grid gap-4 xl:grid-cols-2">
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <div className="mb-3 flex items-center justify-between gap-3">
  <div>
  <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Lưu lượng truy cập</h2>
  <p className="text-sm text-slate-500">Dữ liệu {labelForPeriod(period).toLowerCase()} với đường xu hướng truy cập.</p>
  </div>
- <span className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold -[#C0392B] ring-1 ring-cyan-100">
+ <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#3B82F6] ring-1 ring-blue-100">
  {labelForPeriod(period)}
  </span>
  </div>
@@ -119,9 +119,9 @@ export function AdminAnalyticsPage() {
  <Line
  type="monotone"
  dataKey="total"
- stroke="#0891b2"
+ stroke="#2563eb"
  strokeWidth={3}
- dot={{ r: 4, fill: "#0891b2", stroke: "#ffffff", strokeWidth: 2 }}
+ dot={{ r: 4, fill: "#2563eb", stroke: "#ffffff", strokeWidth: 2 }}
  activeDot={{ r: 6 }}
  />
  </LineChart>
@@ -129,7 +129,7 @@ export function AdminAnalyticsPage() {
  </div>
  </div>
 
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <h2 className="mb-3 text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Hiệu suất học tập tổng quan</h2>
  <ul className="space-y-2 text-sm text-slate-700">
  <li>Bài học hoàn thành: {data.learning.completed_lessons}</li>
@@ -142,7 +142,7 @@ export function AdminAnalyticsPage() {
  {data.learning.trending_subjects.map((item) => (
  <li key={item.course} className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2">
  <span>{item.course}</span>
- <span className="text-xs -[#C0392B]">{item.enrollments} enrollments</span>
+ <span className="text-xs text-[#3B82F6]">{item.enrollments} enrollments</span>
  </li>
  ))}
  </ul>
@@ -155,13 +155,13 @@ export function AdminAnalyticsPage() {
  <Box title="Tỷ lệ chuyển đổi Guest" value={`${data.system.guest_conversion_rate}%`} />
  </section>
 
- <section className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 shadow-[0_14px_32px_-25px_rgba(10,18,40,0.4)]">
+ <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_14px_32px_-25px_rgba(10,18,40,0.4)]">
  <div className="flex flex-wrap items-center justify-between gap-3">
  <div>
  <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Doanh thu theo khóa học</h2>
  <p className="text-sm text-slate-500">So sánh doanh thu của từng khóa học theo {labelForPeriod(period).toLowerCase()}.</p>
  </div>
- <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold -[#2C3039] ring-1 ring-emerald-100">
+ <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-[#0F172A] ring-1 ring-emerald-100">
  {data.course_revenue.length} khóa học có doanh thu
  </span>
  </div>
@@ -191,7 +191,7 @@ export function AdminAnalyticsPage() {
  </td>
  <td className="px-3 py-3 text-slate-600">{item.instructor}</td>
  <td className="px-3 py-3 text-right text-slate-600">{item.total_orders}</td>
- <td className="px-3 py-3 text-right font-semibold -[#2C3039]">{formatCurrency(item.revenue)}</td>
+ <td className="px-3 py-3 text-right font-semibold text-[#0F172A]">{formatCurrency(item.revenue)}</td>
  </tr>
  ))
  )}
@@ -209,7 +209,7 @@ export function AdminAnalyticsPage() {
 
 function Box({ title, value }: { title: string; value: string }) {
  return (
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 shadow-[0_14px_32px_-25px_rgba(10,18,40,0.4)]">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_14px_32px_-25px_rgba(10,18,40,0.4)]">
  <p className="text-sm text-slate-500">{title}</p>
  <p className="mt-2 text-2xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{value}</p>
  </div>

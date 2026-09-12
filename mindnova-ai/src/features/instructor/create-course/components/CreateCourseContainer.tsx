@@ -284,7 +284,7 @@ export function CreateCourseContainer() {
  return (
  <div className="min-h-screen bg-[#F4F4F8] flex flex-col font-sans pb-16">
  {/* ── Header Bar ──────────────────────────────────────────────────────── */}
- <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#E8E2D9] px-6 py-4 shadow-2xs">
+ <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#E2E8F0] px-6 py-4 shadow-2xs">
  <div className="max-w-6xl mx-auto flex flex-col gap-4">
  <div className="flex flex-wrap items-center justify-between gap-4">
  <div className="flex items-center gap-3">
@@ -296,17 +296,17 @@ export function CreateCourseContainer() {
  <ArrowLeftIcon size={18} />
  </Link>
  <div>
- <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-[#8A8478] mb-0.5 font-semibold">
- <Link href="/instructor/courses" className="hover:text-[#C0392B] transition-colors">
+ <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-[#64748B] mb-0.5 font-semibold">
+ <Link href="/instructor/courses" className="hover:text-[#2563EB] transition-colors">
  Khóa học của tôi
  </Link>
  <span>/</span>
- <span className="text-[#C0392B] font-extrabold">
+ <span className="text-[#3B82F6] font-extrabold">
  Studio Tạo Khóa Học AI
  </span>
  </nav>
  <div className="flex items-center gap-2.5">
- <h1 className="text-lg font-black text-[#2C3039] tracking-tight truncate max-w-md md:max-w-xl">
+ <h1 className="text-lg font-black text-[#0F172A] tracking-tight truncate max-w-md md:max-w-xl">
  {createStepLabels[step as 1 | 2 | 3] || "Studio Khóa học"}
  </h1>
  </div>
@@ -319,7 +319,7 @@ export function CreateCourseContainer() {
  type="button"
  id="btn-finish-publish"
  onClick={() => setIsOutlineOpen(true)}
- className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-2xs transition-all cursor-pointer"
+ className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-2xs transition-all cursor-pointer"
  >
  <SparklesIcon size={13} />
  <span>Sinh đề cương AI</span>
@@ -335,9 +335,9 @@ export function CreateCourseContainer() {
  <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-8 flex flex-col gap-6">
  
  {publishError && (
- <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-center justify-between">
+ <div className="p-4 rounded-xl bg-[#EFF6FF] border border-[#DBEAFE] text-[#1D4ED8] text-sm font-medium flex items-center justify-between">
  <span>{publishError}</span>
- <button type="button" onClick={() => setPublishError(null)} className="text-red-500 hover:text-red-700 ml-3"></button>
+ <button type="button" onClick={() => setPublishError(null)} className="text-[#3B82F6] hover:text-[#1D4ED8] ml-3"></button>
  </div>
  )}
 
@@ -363,12 +363,12 @@ export function CreateCourseContainer() {
  )}
 
  {/* Wizard Navigation Footer */}
- <div className="mt-4 pt-4 border-t border-[#E8E2D9] flex items-center justify-between bg-white p-5 rounded-2xl shadow-2xs">
+ <div className="mt-4 pt-4 border-t border-[#E2E8F0] flex items-center justify-between bg-white p-5 rounded-2xl shadow-2xs">
  <button
  type="button"
  onClick={handleBack}
  disabled={step === 1}
- className="flex items-center gap-2 px-4.5 py-2.5 rounded-xl text-xs font-bold text-gray-700 border border-[#E8E2D9] bg-white hover:bg-[#FEFCF9] disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shadow-2xs"
+ className="flex items-center gap-2 px-4.5 py-2.5 rounded-xl text-xs font-bold text-gray-700 border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shadow-2xs"
  >
  <span>← Quay lại</span>
  </button>
@@ -377,7 +377,7 @@ export function CreateCourseContainer() {
  type="button"
  onClick={step === 3 ? handlePublish : handleNext}
  disabled={isPublishing}
- className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-2xs transition-all cursor-pointer disabled:opacity-70"
+ className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-2xs transition-all cursor-pointer disabled:opacity-70"
  >
  {step === 3 ? (
  <>

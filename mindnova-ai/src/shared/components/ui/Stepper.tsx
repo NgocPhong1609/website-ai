@@ -22,7 +22,7 @@ export default function Stepper({
       {/* HÀNG TRÊN: Khối chứa 2 dòng chữ */}
       <div className="w-full flex justify-between items-center text-sm font-semibold">
         <span
-          className="text-[#6B6BFF] uppercase tracking-wide"
+          className="text-[#3B82F6] uppercase tracking-wide"
           aria-live="polite"
         >
           STEP {currentStep} OF {totalSteps}
@@ -46,7 +46,7 @@ export default function Stepper({
               key={index}
               className={twMerge(
                 "h-2 flex-1 rounded-full transition-colors duration-300",
-                isActive ? "bg-[#6B6BFF]" : "bg-[#E2E2EA]",
+                isActive ? "bg-[#3B82F6]" : "bg-[#E2E2EA]",
               )}
             />
           );

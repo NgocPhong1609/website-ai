@@ -55,7 +55,7 @@ export function LearningHistory() {
  if (isError || !data) {
  return (
  <div className="p-6 md:p-12 max-w-[1400px] mx-auto min-h-[60vh] flex flex-col items-center justify-center text-center gap-3">
- <div className="w-16 h-16 rounded-2xl bg-[#FEF2F2] text-[#2563eb] flex items-center justify-center text-2xl mb-1 shadow-sm border border-[#FCA5A5]/40">
+ <div className="w-16 h-16 rounded-2xl bg-[#EFF6FF] text-[#2563eb] flex items-center justify-center text-2xl mb-1 shadow-sm border border-[#DBEAFE]/40">
  ️
  </div>
  <h3 className="text-lg font-bold text-[#0f172a]">Không thể tải dữ liệu lịch sử học tập</h3>

@@ -59,17 +59,17 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
 
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
- <div className="bg-white rounded-3xl border border-[#E8E2D9] shadow-[0_25px_80px_rgba(0,0,0,0.25)] max-w-3xl w-full overflow-hidden flex flex-col max-h-[90vh]">
+ <div className="bg-white rounded-3xl border border-[#E2E8F0] shadow-[0_25px_80px_rgba(0,0,0,0.25)] max-w-3xl w-full overflow-hidden flex flex-col max-h-[90vh]">
  
  {/* Header */}
- <div className="p-6 from-[#1A1A2E] to-[#2B2D62] text-white flex items-center justify-between">
+ <div className="p-6 from-[#0F172A] to-[#2B2D62] text-white flex items-center justify-between">
  <div className="flex items-center gap-3">
- <span className="w-10 h-10 rounded-2xl bg-[#FAF7F2] flex items-center justify-center text-xl font-bold shadow-md">
- 🪄
+ <span className="w-10 h-10 rounded-2xl bg-[#F8FAFC] text-[#3B82F6] flex items-center justify-center shadow-md">
+ <SparklesIcon size={20} />
  </span>
  <div>
  <h3 className="text-base font-black text-white">Trợ lý AI tạo Đề cương (Mục 2.1)</h3>
- <p className="text-xs -[#FAF7F2]">Xây dựng cấu trúc chương trình học chuẩn mực dựa trên thực tiễn tốt nhất.</p>
+ <p className="text-xs text-[#F8FAFC]">Xây dựng cấu trúc chương trình học chuẩn mực dựa trên thực tiễn tốt nhất.</p>
  </div>
  </div>
  <button
@@ -86,37 +86,37 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  {step === "params" ? (
  <div className="flex flex-col gap-5 animate-fadeIn">
  <div>
- <label className="block text-xs font-black text-[#2C3039] uppercase tracking-wide mb-1.5">
+ <label className="block text-xs font-black text-[#0F172A] uppercase tracking-wide mb-1.5">
  Chủ đề Khóa học &amp; Lĩnh vực
  </label>
  <input
  type="text"
  value={topic}
  onChange={(e) => setTopic(e.target.value)}
- className="w-full px-4 py-3 rounded-2xl border-2 border-[#D5D5FF] text-[#2C3039] font-bold text-sm focus:outline-none focus:border-[#E8E2D9] transition-all"
+ className="w-full px-4 py-3 rounded-2xl border-2 border-[#DBEAFE] text-[#0F172A] font-bold text-sm focus:outline-none focus:border-[#E2E8F0] transition-all"
  />
  </div>
 
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
  <div>
- <label className="block text-xs font-black text-[#2C3039] uppercase tracking-wide mb-1.5">
+ <label className="block text-xs font-black text-[#0F172A] uppercase tracking-wide mb-1.5">
  Đối tượng Mục tiêu
  </label>
  <input
  type="text"
  value={targetAudience}
  onChange={(e) => setTargetAudience(e.target.value)}
- className="w-full px-4 py-2.5 rounded-2xl border border-gray-300 text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#E8E2D9]"
+ className="w-full px-4 py-2.5 rounded-2xl border border-gray-300 text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#E2E8F0]"
  />
  </div>
  <div>
- <label className="block text-xs font-black text-[#2C3039] uppercase tracking-wide mb-1.5">
+ <label className="block text-xs font-black text-[#0F172A] uppercase tracking-wide mb-1.5">
  Trình độ Mục tiêu
  </label>
  <select
  value={skillLevel}
  onChange={(e) => setSkillLevel(e.target.value)}
- className="w-full px-4 py-2.5 rounded-2xl border border-gray-300 text-xs font-bold text-[#2C3039] bg-white focus:outline-none focus:border-[#E8E2D9]"
+ className="w-full px-4 py-2.5 rounded-2xl border border-gray-300 text-xs font-bold text-[#0F172A] bg-white focus:outline-none focus:border-[#E2E8F0]"
  >
  <option value="Beginner">Người mới bắt đầu (Cơ bản)</option>
  <option value="Intermediate to Advanced">Trung bình đến Cao cấp</option>
@@ -127,7 +127,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
 
  {/* Teaching Methodology Selection */}
  <div>
- <label className="block text-xs font-black text-[#2C3039] uppercase tracking-wide mb-2">
+ <label className="block text-xs font-black text-[#0F172A] uppercase tracking-wide mb-2">
  Phương pháp Giảng dạy (Chiến lược Cấu trúc)
  </label>
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -137,12 +137,12 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  className={twMerge(
  "p-4 rounded-2xl border-2 text-left transition-all",
  methodology.includes("80/20")
- ? "border-[#E8E2D9] bg-[#F0F0FF] text-[#C0392B] shadow-xs font-bold"
- : "border-[#E8E2D9] text-[#8A8478] hover:border-gray-300"
+ ? "border-[#E2E8F0] bg-[#F0F0FF] text-[#3B82F6] shadow-xs font-bold"
+ : "border-[#E2E8F0] text-[#64748B] hover:border-gray-300"
  )}
  >
  <p className="text-xs font-extrabold"> 80/20 Thực hành vs Lý thuyết (Khuyên dùng)</p>
- <p className="text-[11px] font-semibold text-[#8A8478] mt-1">
+ <p className="text-[11px] font-semibold text-[#64748B] mt-1">
  Chương trình chú trọng dự án; 80% thời gian thực hành &amp; làm bài tập, 20% lý thuyết nền tảng.
  </p>
  </button>
@@ -153,12 +153,12 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  className={twMerge(
  "p-4 rounded-2xl border-2 text-left transition-all",
  !methodology.includes("80/20")
- ? "border-[#E8E2D9] bg-[#F0F0FF] text-[#C0392B] shadow-xs font-bold"
- : "border-[#E8E2D9] text-[#8A8478] hover:border-gray-300"
+ ? "border-[#E2E8F0] bg-[#F0F0FF] text-[#3B82F6] shadow-xs font-bold"
+ : "border-[#E2E8F0] text-[#64748B] hover:border-gray-300"
  )}
  >
  <p className="text-xs font-extrabold"> Nắm vững Học thuật Toàn diện</p>
- <p className="text-[11px] font-semibold text-[#8A8478] mt-1">
+ <p className="text-[11px] font-semibold text-[#64748B] mt-1">
  Đi sâu vào lý thuyết, nghiên cứu các tình huống thực tế và phân tích kiến thức chuyên sâu.
  </p>
  </button>
@@ -171,42 +171,42 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  {isGenerating ? (
  <div className="py-20 flex flex-col items-center justify-center gap-4 text-center">
  <Loader size="md" />
- <h4 className="text-sm font-extrabold text-[#2C3039]">Đang tạo đề cương khóa học bằng AI...</h4>
- <p className="text-xs text-[#8A8478] max-w-sm">
+ <h4 className="text-sm font-extrabold text-[#0F172A]">Đang tạo đề cương khóa học bằng AI...</h4>
+ <p className="text-xs text-[#64748B] max-w-sm">
  Đang cấu trúc các chương dựa trên phương pháp bạn đã chọn.
  </p>
  </div>
  ) : error ? (
- <div className="py-20 flex flex-col items-center justify-center gap-4 text-center text-red-500">
+ <div className="py-20 flex flex-col items-center justify-center gap-4 text-center text-[#3B82F6]">
  <h4 className="text-sm font-extrabold">{error}</h4>
- <button disabled={isGenerating} onClick={handleGenerate} className="px-4 py-2 bg-red-100 text-red-600 rounded-xl font-bold hover:bg-red-200 disabled:opacity-50">
+ <button disabled={isGenerating} onClick={handleGenerate} className="px-4 py-2 bg-[#EFF6FF] text-[#2563EB] rounded-xl font-bold hover:bg-[#DBEAFE] disabled:opacity-50">
  Thử lại
  </button>
  </div>
  ) : (
  <div className="flex flex-col gap-4">
  <div className="flex items-center justify-between">
- <span className="text-xs font-extrabold -[#2C3039] px-3 py-1 bg-emerald-50 rounded-xl border -[#FAF7F2]">
+ <span className="text-xs font-extrabold text-[#0F172A] px-3 py-1 bg-emerald-50 rounded-xl border-[#E2E8F0]">
  Đã tạo Đề cương bằng AI
  </span>
  <button
  type="button"
  onClick={() => setStep("params")}
- className="text-xs font-bold -[#C0392B] hover:underline"
+ className="text-xs font-bold text-[#3B82F6] hover:underline"
  >
  ← Thay đổi thông số
  </button>
  </div>
 
- <p className="text-xs text-[#8A8478] font-semibold">
+ <p className="text-xs text-[#64748B] font-semibold">
  Xem lại và chỉnh sửa tiêu đề các chương, bài học đã tạo trước khi áp dụng vào chương trình chính.
  </p>
 
  <div className="flex flex-col gap-4 max-h-[360px] overflow-y-auto pr-2">
  {outline.chapters.map((ch, cIdx) => (
- <div key={cIdx} className="p-4 rounded-2xl bg-[#F8F9FF] border border-[#E8E2D9] flex flex-col gap-3">
+ <div key={cIdx} className="p-4 rounded-2xl bg-[#F8F9FF] border border-[#E2E8F0] flex flex-col gap-3">
  <div className="flex items-center justify-between">
- <h5 className="text-sm font-black text-[#2C3039]">
+ <h5 className="text-sm font-black text-[#0F172A]">
  {cIdx + 1}. {ch.title}
  </h5>
  <span className="text-[10px] font-bold text-gray-400 uppercase">{ch.lessons.length} Bài học</span>
@@ -218,7 +218,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  "flex flex-col gap-1.5 p-2.5 rounded-xl border shadow-2xs",
  lesson.type === "quiz"
  ? "bg-amber-50 border-amber-200"
- : "bg-white border-[#E8E2D9]"
+ : "bg-white border-[#E2E8F0]"
  )}>
  <div className="flex items-center gap-2">
  <span className="text-xs font-extrabold">
@@ -228,13 +228,13 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  type="text"
  value={lesson.title}
  onChange={(e) => updateLessonTitle(cIdx, lIdx, e.target.value)}
- className="flex-1 text-xs font-bold text-gray-800 bg-transparent focus:outline-none focus:text-[#C0392B]"
+ className="flex-1 text-xs font-bold text-gray-800 bg-transparent focus:outline-none focus:text-[#3B82F6]"
  />
  <span className={twMerge(
  "text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0",
  lesson.type === "quiz"
  ? "bg-amber-100 text-amber-700"
- : "-[#FAF7F2] -[#C0392B]"
+ : "text-[#F8FAFC] text-[#3B82F6]"
  )}>
  {lesson.type === "quiz" ? "Trắc nghiệm" : "Tài liệu"}
  </span>
@@ -263,11 +263,11 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  </div>
 
  {/* Footer */}
- <div className="p-4 px-6 bg-[#F8F9FF] border-t border-[#E8E2D9] flex items-center justify-between">
+ <div className="p-4 px-6 bg-[#F8F9FF] border-t border-[#E2E8F0] flex items-center justify-between">
  <button
  type="button"
  onClick={onClose}
- className="px-5 py-2 rounded-xl text-xs font-extrabold text-[#8A8478] hover:bg-gray-200 transition-colors"
+ className="px-5 py-2 rounded-xl text-xs font-extrabold text-[#64748B] hover:bg-gray-200 transition-colors"
  >
  Hủy bỏ
  </button>
@@ -276,7 +276,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  <button
  type="button"
  onClick={handleGenerate}
- className="px-6 py-2.5 bg-[#C0392B] text-white text-xs font-extrabold rounded-xl shadow-md hover:opacity-95 transition-all flex items-center gap-2"
+ className="px-6 py-2.5 bg-[#3B82F6] text-white text-xs font-extrabold rounded-xl shadow-md hover:opacity-95 transition-all flex items-center gap-2"
  >
  <span> Tạo Đề cương</span>
  </button>
@@ -286,7 +286,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  type="button"
  onClick={handleGenerate}
  disabled={isGenerating}
- className="px-4 py-2 bg-white border border-[#D5D5FF] text-[#C0392B] text-xs font-extrabold rounded-xl hover:bg-[#FAF8FF] transition-all disabled:opacity-50"
+ className="px-4 py-2 bg-white border border-[#DBEAFE] text-[#3B82F6] text-xs font-extrabold rounded-xl hover:bg-[#FAF8FF] transition-all disabled:opacity-50"
  >
  Tạo lại
  </button>
@@ -294,7 +294,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  type="button"
  onClick={handleApply}
  disabled={isGenerating || outline.chapters.length === 0}
- className="px-6 py-2.5 bg-[#1A1A2E] text-white text-xs font-black rounded-xl shadow-md hover:bg-[#C0392B] transition-all disabled:opacity-50"
+ className="px-6 py-2.5 bg-[#0F172A] text-white text-xs font-black rounded-xl shadow-md hover:bg-[#2563EB] transition-all disabled:opacity-50"
  >
  Áp dụng vào Khóa học
  </button>

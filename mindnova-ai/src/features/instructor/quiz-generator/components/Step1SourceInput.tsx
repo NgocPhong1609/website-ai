@@ -111,16 +111,16 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
   }
 
   return (
-    <div className="p-8 bg-white rounded-3xl border border-[#E8E2D9] shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-3xl border border-[#E2E8F0] shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 bg-indigo-50 text-[#C0392B] text-xs font-black rounded-lg border border-indigo-100 uppercase tracking-wider">
+          <span className="px-3 py-1 bg-blue-50 text-[#3B82F6] text-xs font-black rounded-lg border border-blue-100 uppercase tracking-wider">
             Bước 1 / 5
           </span>
-          <h2 className="text-xl font-black text-[#2C3039]">Chọn Khóa Học</h2>
+          <h2 className="text-xl font-black text-[#0F172A]">Chọn Khóa Học</h2>
         </div>
-        <p className="text-xs text-[#8A8478] font-medium mt-1">
+        <p className="text-xs text-[#64748B] font-medium mt-1">
           Chọn khóa học bạn muốn sử dụng để AI tạo đề bài kiểm tra.
         </p>
       </div>
@@ -136,13 +136,13 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Tìm kiếm khóa học của bạn..."
-              className="w-full pl-11 pr-4 py-3.5 rounded-2xl border-2 border-gray-200 bg-[#FAF8FF] text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] focus:bg-white transition-all shadow-xs"
+              className="w-full pl-11 pr-4 py-3.5 rounded-2xl border-2 border-gray-200 bg-[#FAF8FF] text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6] focus:bg-white transition-all shadow-xs"
             />
           </div>
 
           {/* Course Selection List */}
           {isLoadingCourses ? (
-            <div className="p-8 bg-[#FAF8FF] rounded-2xl border border-gray-100 text-center text-xs font-bold text-[#8A8478] animate-pulse">
+            <div className="p-8 bg-[#FAF8FF] rounded-2xl border border-gray-100 text-center text-xs font-bold text-[#64748B] animate-pulse">
               Đang tải danh sách khóa học của bạn...
             </div>
           ) : courses.length === 0 ? (
@@ -162,22 +162,22 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
               {filteredCourses.map((course) => (
                 <div
                   key={course.id}
-                  className="p-5 rounded-2xl border-2 border-[#E8E2D9] hover:border-[#C0392B]/50 bg-white transition-all duration-200 flex flex-col justify-between gap-4 shadow-2xs hover:shadow-md group"
+                  className="p-5 rounded-2xl border-2 border-[#E2E8F0] hover:border-[#2563EB]/50 bg-white transition-all duration-200 flex flex-col justify-between gap-4 shadow-2xs hover:shadow-md group"
                 >
                   <div className="flex items-start gap-3.5">
-                    <div className="w-11 h-11 rounded-2xl bg-indigo-50 text-[#C0392B] border border-indigo-100 flex items-center justify-center text-xl shrink-0 font-bold group-hover:scale-105 transition-transform">
+                    <div className="w-11 h-11 rounded-2xl bg-blue-50 text-[#3B82F6] border border-blue-100 flex items-center justify-center text-xl shrink-0 font-bold group-hover:scale-105 transition-transform">
                       📚
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-black uppercase text-[#C0392B] bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-md">
+                        <span className="text-[10px] font-black uppercase text-[#3B82F6] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-md">
                           {course.status === "published" ? "Đã xuất bản" : "Bản nháp"}
                         </span>
                       </div>
-                      <h4 className="text-sm font-black text-[#2C3039] truncate" title={course.title}>
+                      <h4 className="text-sm font-black text-[#0F172A] truncate" title={course.title}>
                         {course.title}
                       </h4>
-                      <div className="flex items-center gap-3 text-xs font-bold text-[#8A8478] mt-1.5">
+                      <div className="flex items-center gap-3 text-xs font-bold text-[#64748B] mt-1.5">
                         <span>{course.modules_count ?? course.modules?.length ?? 0} Modules</span>
                         <span>•</span>
                         <span>{course.lessons_count ?? 0} Lessons</span>
@@ -188,7 +188,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
                   <button
                     type="button"
                     onClick={() => handleSelectCourse(course)}
-                    className="w-full py-2.5 px-4 bg-[#C0392B] hover:bg-[#4338CA] text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer shadow-2xs flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 px-4 bg-[#3B82F6] hover:bg-[#2563EB] text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer shadow-2xs flex items-center justify-center gap-1.5"
                   >
                     <span>🎯 Chọn khóa học này</span>
                   </button>
@@ -228,19 +228,19 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
           </div>
 
           {/* Selected Course Modules & Lessons Preview Card */}
-          <div className="p-5 rounded-2xl bg-white border border-[#E8E2D9] shadow-sm flex flex-col gap-3">
+          <div className="p-5 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="text-xs font-black text-[#2C3039]">
+                <h4 className="text-xs font-black text-[#0F172A]">
                   Chi tiết nội dung khóa học được trích xuất
                 </h4>
-                <p className="text-[11px] font-bold text-[#8A8478] mt-0.5">
+                <p className="text-[11px] font-bold text-[#64748B] mt-0.5">
                   AI sẽ sử dụng dữ liệu thực tế từ bài học trong khóa này để sinh bộ câu hỏi.
                 </p>
               </div>
 
               <div className="flex items-center gap-2 text-xs font-bold shrink-0">
-                <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-[#C0392B] border border-indigo-100">
+                <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-[#3B82F6] border border-blue-100">
                   {modulesList.length} Modules
                 </span>
                 <span className="px-2.5 py-1 rounded-lg bg-purple-50 text-purple-800 border border-purple-100">
@@ -255,14 +255,14 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
               </div>
             ) : lessonsList.length > 0 ? (
               <div className="flex flex-col gap-1.5 pt-2 border-t border-gray-100">
-                <span className="text-[11px] font-bold text-[#8A8478] uppercase tracking-wider">
+                <span className="text-[11px] font-bold text-[#64748B] uppercase tracking-wider">
                   Các bài học được trích xuất:
                 </span>
                 <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1">
                   {lessonsList.map((les, idx) => (
                     <span
                       key={les.id || idx}
-                      className="px-2.5 py-1 rounded-lg bg-[#FEFCF9] border border-[#E8E2D9] text-gray-700 text-[11px] font-bold truncate max-w-xs"
+                      className="px-2.5 py-1 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-gray-700 text-[11px] font-bold truncate max-w-xs"
                       title={les.title}
                     >
                       Bài {idx + 1}: {les.title}
@@ -299,7 +299,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
             onNext();
           }}
           disabled={!config.course_id}
-          className="px-8 py-3 bg-[#C0392B] hover:bg-[#4338CA] text-white font-black text-xs rounded-2xl shadow-lg hover:scale-[1.02] transition-all disabled:opacity-40 disabled:hover:scale-100 cursor-pointer disabled:cursor-not-allowed"
+          className="px-8 py-3 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-black text-xs rounded-2xl shadow-lg hover:scale-[1.02] transition-all disabled:opacity-40 disabled:hover:scale-100 cursor-pointer disabled:cursor-not-allowed"
         >
           Tiếp theo: Cấu hình Quiz ➡️
         </button>

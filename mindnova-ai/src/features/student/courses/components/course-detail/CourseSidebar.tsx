@@ -18,30 +18,30 @@ function ProgressCard({ progress }: { progress?: CourseDetailProgressCard }) {
  const statusTag = progress?.status_tag ?? "Vượt chỉ tiêu +15%";
 
  return (
- <div className="bg-white rounded-xl border border-[#E8E2D9] p-5 shadow-sm hover:border-[#B8B0A3] transition-all duration-300">
+ <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 shadow-sm hover:border-[#94A3B8] transition-all duration-300">
  <div className="flex items-center justify-between gap-2 mb-3">
  <div>
- <span className="text-xs font-bold text-[#8A8478] uppercase tracking-wider block">Tiến độ khóa học</span>
- <h3 className="text-2xl font-bold text-[#2C3039] mt-1 font-serif">{percentage}% Hoàn thành</h3>
+ <span className="text-xs font-bold text-[#64748B] uppercase tracking-wider block">Tiến độ khóa học</span>
+ <h3 className="text-2xl font-bold text-[#0F172A] mt-1 font-serif">{percentage}% Hoàn thành</h3>
  </div>
- <span className="text-[11px] font-bold text-[#2C3039] bg-[#E8F6F3] px-2.5 py-1 rounded-md border border-[#2C3039]/20">
+ <span className="text-[11px] font-bold text-[#0F172A] bg-[#E8F6F3] px-2.5 py-1 rounded-md border border-[#0F172A]/20">
  {statusTag}
  </span>
  </div>
 
- <div className="w-full h-1.5 bg-[#F5F0E8] rounded-full overflow-hidden p-0 border border-[#E8E2D9] mt-4">
+ <div className="w-full h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden p-0 border border-[#E2E8F0] mt-4">
  <div 
- className="h-full bg-[#2C3039] rounded-full transition-all duration-1000" 
+ className="h-full bg-[#0F172A] rounded-full transition-all duration-1000" 
  style={{ width: `${percentage}%` }} 
  />
  </div>
 
- <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#E8E2D9] text-xs font-medium text-[#8A8478]">
- <span className="flex items-center gap-1.5 text-[#2C3039]">
- <span className="font-semibold text-[#8A8478]">Thời gian:</span>
+ <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#E2E8F0] text-xs font-medium text-[#64748B]">
+ <span className="flex items-center gap-1.5 text-[#0F172A]">
+ <span className="font-semibold text-[#64748B]">Thời gian:</span>
  <span>{timeLeft.replace(" thời lượng còn lại", "")}</span>
  </span>
- <span className="font-bold text-[#2C3039] bg-[#F5F0E8] px-2.5 py-1 rounded-md border border-[#E8E2D9]">
+ <span className="font-bold text-[#0F172A] bg-[#F1F5F9] px-2.5 py-1 rounded-md border border-[#E2E8F0]">
  {completed}/{total} Bài
  </span>
  </div>
@@ -57,29 +57,29 @@ function AiInsightCard({ aiInsight }: { aiInsight?: CourseDetailAIInsight }) {
  const actionLabel = aiInsight?.action_label || "Mở khung chat Gia sư Nova";
 
  return (
- <div className="bg-[#FEFCF9] rounded-xl border border-[#E8E2D9] p-5 relative overflow-hidden transition-all duration-300 hover:border-[#B8B0A3]">
+ <div className="bg-[#F8FAFC] rounded-xl border border-[#E2E8F0] p-5 relative overflow-hidden transition-all duration-300 hover:border-[#94A3B8]">
 
  <div className="flex items-center justify-between mb-4">
  <div className="flex items-center gap-2">
- <div className="w-8 h-8 rounded-lg bg-[#2C3039] text-white flex items-center justify-center font-bold text-xs font-serif">
+ <div className="w-8 h-8 rounded-lg bg-[#0F172A] text-white flex items-center justify-center font-bold text-xs font-serif">
  AI
  </div>
- <span className="text-xs sm:text-sm font-bold text-[#2C3039]">{title}</span>
+ <span className="text-xs sm:text-sm font-bold text-[#0F172A]">{title}</span>
  </div>
- <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white text-[11px] font-bold text-[#2C3039] border border-[#E8E2D9]">
+ <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white text-[11px] font-bold text-[#0F172A] border border-[#E2E8F0]">
  <span>{statusTag}</span>
  </div>
  </div>
 
- <p className="text-xs sm:text-[13px] text-[#8A8478] leading-relaxed font-normal">
+ <p className="text-xs sm:text-[13px] text-[#64748B] leading-relaxed font-normal">
  {summaryText}
  </p>
 
  {suggestionText && (
- <div className="mt-3 p-3 rounded-lg bg-white border border-[#E8E2D9] text-xs text-[#2C3039] flex items-start gap-2.5">
+ <div className="mt-3 p-3 rounded-lg bg-white border border-[#E2E8F0] text-xs text-[#0F172A] flex items-start gap-2.5">
  <div>
- <span className="font-bold text-[#C0392B] block mb-0.5">Gợi ý ôn luyện từ AI:</span>
- <span className="text-[#8A8478] leading-relaxed">{suggestionText}</span>
+ <span className="font-bold text-[#3B82F6] block mb-0.5">Gợi ý ôn luyện từ AI:</span>
+ <span className="text-[#64748B] leading-relaxed">{suggestionText}</span>
  </div>
  </div>
  )}
@@ -96,7 +96,7 @@ function AiInsightCard({ aiInsight }: { aiInsight?: CourseDetailAIInsight }) {
  })
  );
  }}
- className="w-full mt-4 py-2.5 rounded-lg text-xs font-bold text-white bg-[#C0392B] hover:bg-[#A93226] transition-all cursor-pointer text-center block"
+ className="w-full mt-4 py-2.5 rounded-lg text-xs font-bold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-all cursor-pointer text-center block"
  >
  {actionLabel}
  </button>
@@ -118,12 +118,12 @@ function ResourcesCard({ resources = [] }: { resources?: CourseDetailResourceIte
  };
 
  return (
- <div className="bg-white rounded-xl border border-[#E8E2D9] p-5 hover:border-[#B8B0A3] transition-all">
- <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#E8E2D9]">
- <h3 className="text-xs font-bold text-[#8A8478] uppercase tracking-wider">
+ <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 hover:border-[#94A3B8] transition-all">
+ <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#E2E8F0]">
+ <h3 className="text-xs font-bold text-[#64748B] uppercase tracking-wider">
  Tài Liệu & Học Liệu Hỗ Trợ
  </h3>
- <span className="text-[11px] text-[#B8B0A3] font-bold">{displayList.length} files</span>
+ <span className="text-[11px] text-[#94A3B8] font-bold">{displayList.length} files</span>
  </div>
 
  <div className="space-y-2.5">
@@ -132,24 +132,24 @@ function ResourcesCard({ resources = [] }: { resources?: CourseDetailResourceIte
  key={res.id || idx}
  type="button"
  onClick={() => handleResourceClick(res)}
- className="w-full text-left p-3 rounded-lg border border-[#E8E2D9] hover:border-[#2C3039] hover:bg-[#F5F0E8] transition-all duration-150 flex items-center justify-between gap-3 group cursor-pointer"
+ className="w-full text-left p-3 rounded-lg border border-[#E2E8F0] hover:border-[#0F172A] hover:bg-[#F1F5F9] transition-all duration-150 flex items-center justify-between gap-3 group cursor-pointer"
  >
  <div className="flex items-center gap-3 min-w-0">
- <span className="text-xs font-bold text-[#2C3039] bg-white px-2 py-1 rounded border border-[#E8E2D9] uppercase w-10 text-center">
+ <span className="text-xs font-bold text-[#0F172A] bg-white px-2 py-1 rounded border border-[#E2E8F0] uppercase w-10 text-center">
  {res.type || "DOC"}
  </span>
  <div className="min-w-0">
- <span className="text-xs font-bold text-[#2C3039] truncate block transition-colors">
+ <span className="text-xs font-bold text-[#0F172A] truncate block transition-colors">
  {res.title}
  </span>
  {res.size && (
- <span className="text-[11px] text-[#8A8478] font-normal">
+ <span className="text-[11px] text-[#64748B] font-normal">
  {res.size}
  </span>
  )}
  </div>
  </div>
- <span className="text-xs font-bold text-[#8A8478] group-hover:text-[#2C3039]">
+ <span className="text-xs font-bold text-[#64748B] group-hover:text-[#0F172A]">
  Tải về
  </span>
  </button>
@@ -171,33 +171,33 @@ function InstructorCard({ instructor }: { instructor?: CourseDetailInstructor & 
  const avatarSrc = instructor?.avatar_url || (instructor as any)?.avatar || null;
 
  return (
- <div className="bg-white rounded-xl border border-[#E8E2D9] p-5 flex flex-col items-center text-center relative overflow-hidden group hover:border-[#B8B0A3] transition-all">
+ <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col items-center text-center relative overflow-hidden group hover:border-[#94A3B8] transition-all">
  <div className="relative z-10 mb-3 mt-3">
  <Avatar
  src={avatarSrc}
  fallback={name}
  size="xl"
- className="w-20 h-20 text-xl font-bold border border-[#E8E2D9] bg-[#F5F0E8] text-[#2C3039]"
+ className="w-20 h-20 text-xl font-bold border border-[#E2E8F0] bg-[#F1F5F9] text-[#0F172A]"
  />
  </div>
 
- <span className="text-[11px] font-bold text-[#2C3039] bg-[#F5F0E8] px-2.5 py-0.5 rounded-full border border-[#E8E2D9] mb-2">
+ <span className="text-[11px] font-bold text-[#0F172A] bg-[#F1F5F9] px-2.5 py-0.5 rounded-full border border-[#E2E8F0] mb-2">
  Giảng viên Chủ trì
  </span>
 
  <div className="flex items-center gap-1 mb-1">
- <h3 className="text-base font-bold text-[#2C3039] font-serif">{name}</h3>
+ <h3 className="text-base font-bold text-[#0F172A] font-serif">{name}</h3>
  <VerifiedTeacherBadge isVerified={isVerified} size="sm" />
  </div>
- <p className="text-xs text-[#8A8478] font-bold mb-3">{role}</p>
- <p className="text-xs text-[#8A8478] leading-relaxed max-w-xs font-normal mb-5 border-t border-[#E8E2D9] pt-4">
+ <p className="text-xs text-[#64748B] font-bold mb-3">{role}</p>
+ <p className="text-xs text-[#64748B] leading-relaxed max-w-xs font-normal mb-5 border-t border-[#E2E8F0] pt-4">
  {bio}
  </p>
 
  <button
  type="button"
  onClick={() => toast(`Đang kết nối tới trang hồ sơ cá nhân và lịch trực giảng chi tiết của ${name}...`)}
- className="w-full py-2.5 rounded-lg text-xs font-bold text-[#2C3039] bg-white hover:bg-[#F5F0E8] border border-[#E8E2D9] hover:border-[#B8B0A3] transition-all cursor-pointer"
+ className="w-full py-2.5 rounded-lg text-xs font-bold text-[#0F172A] bg-white hover:bg-[#F1F5F9] border border-[#E2E8F0] hover:border-[#94A3B8] transition-all cursor-pointer"
  >
  Xem hồ sơ giảng viên
  </button>
@@ -209,22 +209,22 @@ function EnrollCard({ price, courseId }: { price?: number, courseId?: string | n
  const router = useRouter();
  
  return (
- <div className="bg-white rounded-xl border border-[#E8E2D9] p-5 hover:border-[#B8B0A3] transition-all duration-300">
- <div className="flex items-center justify-between gap-2 mb-3 pb-3 border-b border-[#E8E2D9]">
+ <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 hover:border-[#94A3B8] transition-all duration-300">
+ <div className="flex items-center justify-between gap-2 mb-3 pb-3 border-b border-[#E2E8F0]">
  <div>
- <span className="text-xs font-bold text-[#C0392B] uppercase tracking-wider block">Phí Đăng Ký</span>
- <h3 className="text-2xl font-bold text-[#2C3039] mt-1 font-serif">
+ <span className="text-xs font-bold text-[#3B82F6] uppercase tracking-wider block">Phí Đăng Ký</span>
+ <h3 className="text-2xl font-bold text-[#0F172A] mt-1 font-serif">
  {Number(price) === 0 ? 'Miễn phí' : `${Number(price).toLocaleString()} VND`}
  </h3>
  </div>
  </div>
- <p className="text-xs text-[#8A8478] mb-5 leading-relaxed">
+ <p className="text-xs text-[#64748B] mb-5 leading-relaxed">
  Đăng ký khóa học để kích hoạt Trợ lý Trí tuệ AI Nova và theo dõi lộ trình học tập cá nhân hóa.
  </p>
  <button 
  type="button"
  onClick={() => router.push(`/checkout?courseId=${courseId}`)}
- className="w-full py-3 rounded-lg text-sm font-bold text-white bg-[#C0392B] hover:bg-[#A93226] transition-all flex justify-center items-center gap-2 cursor-pointer"
+ className="w-full py-3 rounded-lg text-sm font-bold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-all flex justify-center items-center gap-2 cursor-pointer"
  >
  <span>Đăng ký ngay</span>
  </button>

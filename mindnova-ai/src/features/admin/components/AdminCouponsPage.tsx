@@ -31,7 +31,7 @@ export async function AdminCouponsPage() {
 
   return (
     <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
-      <section className="mn-stagger rounded-2xl border border-white/20 bg-[linear-gradient(125deg,#0f1a3c_0%,#183067_45%,#0f766e_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
+      <section className="mn-stagger rounded-2xl border border-white/20 bg-[linear-gradient(125deg,#0f1a3c_0%,#183067_45%,#2563EB_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
         <div>
           <p className="text-[10px] uppercase tracking-[0.35em] text-white/70">Mã giảm giá</p>
           <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý mã giảm giá khóa học</h1>
@@ -65,12 +65,12 @@ export async function AdminCouponsPage() {
             <tbody className="divide-y divide-slate-200">
               {data.rows.map((row) => (
                 <tr key={row.id} className="bg-white hover:bg-emerald-50/35">
-                  <td className="px-4 py-3 font-mono font-bold text-sky-700">{row.code}</td>
+                  <td className="px-4 py-3 font-mono font-bold text-blue-700">{row.code}</td>
                   <td className="px-4 py-3 font-medium text-slate-900">{row.teacherName}</td>
                   <td className="px-4 py-3 font-extrabold text-emerald-700">{toDiscountText(row.discountType, row.value)}</td>
                   <td className="px-4 py-3 text-slate-600">
                     {row.courseTitle ? (
-                      <span className="inline-block px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 text-xs font-semibold">
+                      <span className="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200 text-xs font-semibold">
                         {row.courseTitle}
                       </span>
                     ) : (

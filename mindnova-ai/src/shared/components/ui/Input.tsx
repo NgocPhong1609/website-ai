@@ -38,7 +38,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       "w-full rounded-md border text-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500";
 
     const stateClasses = error
-      ? "border-red-500 focus:border-red-500 focus:ring-red-500/20 text-red-900 placeholder-red-300"
+      ? "border-[#3B82F6] focus:border-[#3B82F6] focus:ring-[#3B82F6]/20 text-[#1D4ED8] placeholder-[#93C5FD]"
       : "border-gray-300 focus:border-blue-500 focus:ring-blue-500/20 text-gray-900 placeholder-gray-400";
 
     const paddingClasses = `py-2 ${leftIcon ? "pl-10" : "pl-3"} ${rightIcon ? "pr-10" : "pr-3"}`;
@@ -52,7 +52,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             className="text-sm font-medium text-gray-700"
           >
             {label}
-            {props.required && <span className="ml-1 text-red-500">*</span>}
+            {props.required && <span className="ml-1 text-[#3B82F6]">*</span>}
           </label>
         )}
 
@@ -92,7 +92,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
         {/* Error & Helper Messages */}
         {error ? (
-          <p id={`${inputId}-error`} className="text-sm text-red-500 mt-0.5">
+          <p id={`${inputId}-error`} className="text-sm text-[#3B82F6] mt-0.5">
             {error}
           </p>
         ) : helperText ? (

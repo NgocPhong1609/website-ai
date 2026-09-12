@@ -74,9 +74,9 @@ function usePlan() {
 
 function StepBadge() {
  return (
- <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#C0392B] border border-[#E8E2D9] backdrop-blur-sm">
- <span className="text-[#C0392B]"><SparkleIcon /></span>
- <span className="text-xs font-bold text-[#C0392B] tracking-wider uppercase">
+ <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#3B82F6] border border-[#E2E8F0] backdrop-blur-sm">
+ <span className="text-[#3B82F6]"><SparkleIcon /></span>
+ <span className="text-xs font-bold text-[#3B82F6] tracking-wider uppercase">
  Step 4 of 4 — Your Plan
  </span>
  </div>
@@ -85,18 +85,18 @@ function StepBadge() {
 
 function CelebrationBanner({ goal }: { goal: string }) {
  return (
- <div className="relative w-full max-w-4xl bg-[#C0392B] via-[#818cf8]/6 border border-[#E8E2D9] rounded-2xl px-6 py-4 overflow-hidden">
- <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_50%,rgba(192,57,43,0.12)_0%,transparent_60%)]" aria-hidden="true" />
+ <div className="relative w-full max-w-4xl bg-[#3B82F6] via-[#818cf8]/6 border border-[#E2E8F0] rounded-2xl px-6 py-4 overflow-hidden">
+ <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_50%,rgba(59, 130, 246,0.12)_0%,transparent_60%)]" aria-hidden="true" />
  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_100%_50%,rgba(76,215,246,0.10)_0%,transparent_60%)]" aria-hidden="true" />
 
  <div className="relative flex items-center gap-4">
  
 
  <div className="flex flex-col gap-0.5">
- <span className="text-sm font-bold text-[#2C3039]">
+ <span className="text-sm font-bold text-[#0F172A]">
  Your personalized learning path is ready! 
  </span>
- <span className="text-xs text-[#8A8478]">
+ <span className="text-xs text-[#64748B]">
  Crafted dynamically by AI based on your goal{goal ? ` — ${goal}` : ""}, skill level & selected topics.
  </span>
  </div>
@@ -119,13 +119,13 @@ export default function PlanContainer() {
  <StepBadge />
 
  <div className="flex flex-col items-center gap-3 text-center max-w-2xl">
- <h1 className="text-[44px] font-bold text-[#2C3039] leading-tight tracking-tight">
+ <h1 className="text-[44px] font-bold text-[#0F172A] leading-tight tracking-tight">
  Here&apos;s your{" "}
- <span className="text-transparent bg-clip-text bg-[#C0392B] via-[#818cf8] ">
+ <span className="text-transparent bg-clip-text bg-[#3B82F6] via-[#818cf8] ">
  AI-crafted path
  </span>
  </h1>
- <p className="text-base text-[#8A8478] leading-relaxed max-w-lg">
+ <p className="text-base text-[#64748B] leading-relaxed max-w-lg">
  Every phase is dynamically tailored to your unique goal and expertise — start when you&apos;re ready.
  </p>
  </div>
@@ -148,7 +148,7 @@ export default function PlanContainer() {
  onClick={handleBack}
  size="unstyled"
  variant="unstyled"
- className="px-6 py-4 rounded-2xl text-sm font-semibold text-[#8A8478] border border-[#E2E2EA] bg-white hover:border-[#E8E2D9] hover:text-[#C0392B] transition-all duration-200 cursor-pointer"
+ className="px-6 py-4 rounded-2xl text-sm font-semibold text-[#64748B] border border-[#E2E2EA] bg-white hover:border-[#E2E8F0] hover:text-[#2563EB] transition-all duration-200 cursor-pointer"
  >
  ← Back
  </Button>
@@ -160,10 +160,10 @@ export default function PlanContainer() {
  className={[
  "relative px-14 py-4 rounded-2xl text-sm font-bold tracking-wide",
  "text-white cursor-pointer",
- " bg-[#C0392B] ",
- "shadow-[0_6px_24px_rgba(192,57,43,0.45)]",
- "hover:shadow-[0_8px_32px_rgba(192,57,43,0.6)] hover:-translate-y-0.5",
- "active:translate-y-0 active:shadow-[0_3px_14px_rgba(192,57,43,0.35)]",
+ " bg-[#3B82F6] ",
+ "shadow-[0_6px_24px_rgba(59, 130, 246,0.45)]",
+ "hover:shadow-[0_8px_32px_rgba(59, 130, 246,0.6)] hover:-translate-y-0.5",
+ "active:translate-y-0 active:shadow-[0_3px_14px_rgba(59, 130, 246,0.35)]",
  "transition-all duration-200 ease-out",
  ].join(" ")}
  rightIcon={<RocketIcon />}
@@ -172,7 +172,7 @@ export default function PlanContainer() {
  </Button>
  </div>
 
- <p className="flex items-center gap-1.5 text-[11px] text-[#B8B0A3]">
+ <p className="flex items-center gap-1.5 text-[11px] text-[#94A3B8]">
  <ShieldCheckIcon />
  <span>
  AI-powered intelligent curriculum generation engine

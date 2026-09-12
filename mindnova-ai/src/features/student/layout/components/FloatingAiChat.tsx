@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, Sparkles, Trash2, Lightbulb, Target, BookOpen } from "lucide-react";
+import { MessageCircle, Sparkles, Trash2, Lightbulb, Target, BookOpen, Square } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
@@ -32,7 +32,7 @@ function renderFormattedText(text: string) {
       const token = match[0];
       if (token.startsWith("**") && token.endsWith("**")) {
         parts.push(
-          <strong key={`bold-${idx++}`} className="font-semibold text-blue-600 bg-[#EEF2FF]/70 px-1.5 py-0.5 rounded-md border border-blue-600/15">
+          <strong key={`bold-${idx++}`} className="font-semibold text-blue-600 bg-[#EFF6FF]/70 px-1.5 py-0.5 rounded-md border border-blue-600/15">
             {token.slice(2, -2)}
           </strong>
         );
@@ -500,12 +500,12 @@ export function FloatingAiChat() {
           <header
             onMouseDown={handleMouseDown}
             onTouchStart={handleTouchStart}
-            className="px-4 py-3 border-b border-[#E8E9F2] bg-gradient-to-r from-[#F8F9FD] via-[#F5F7FD] to-[#EEF2FF] flex items-center justify-between shrink-0 cursor-move select-none group/header hover:bg-[#EEF2FF]/60 transition-colors"
+            className="px-4 py-3 border-b border-[#E8E9F2] bg-gradient-to-r from-[#F8F9FD] via-[#F5F7FD] to-[#EFF6FF] flex items-center justify-between shrink-0 cursor-move select-none group/header hover:bg-[#EFF6FF]/60 transition-colors"
             title="Nhấn và kéo thanh tiêu đề để chuyển vị trí cửa sổ trên màn hình"
           >
             <div className="flex items-center gap-2.5">
               {/* Grip icon indicating dragging capability */}
-              <span className="text-[#8A8478] group-hover/header:text-blue-600 text-xs font-bold tracking-tighter transition-colors">
+              <span className="text-[#64748B] group-hover/header:text-blue-600 text-xs font-bold tracking-tighter transition-colors">
                 ⋮⋮
               </span>
               <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-blue-600 via-blue-500 to-blue-600 text-white flex items-center justify-center shadow-2xs text-xs font-bold">
@@ -513,12 +513,12 @@ export function FloatingAiChat() {
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="text-xs font-bold text-[#2C3039] tracking-tight">
+                  <h3 className="text-xs font-bold text-[#0F172A] tracking-tight">
                     Nova AI Co-Pilot
                   </h3>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#27AE60]" title="Online" />
                 </div>
-                <p className="text-[10px] font-medium text-[#8A8478]">Trợ lý học tập 24/7 • <span className="italic text-blue-600/80">Kéo để di chuyển</span></p>
+                <p className="text-[10px] font-medium text-[#64748B]">Trợ lý học tập 24/7 • <span className="italic text-blue-600/80">Kéo để di chuyển</span></p>
               </div>
             </div>
 
@@ -528,7 +528,7 @@ export function FloatingAiChat() {
                 onClick={() => setShowConfirmDelete(true)}
                 aria-label="Xóa lịch sử chat"
                 title="Xóa và làm mới cuộc trò chuyện"
-                className="w-7 h-7 rounded-lg hover:bg-red-50 text-[#8A8478] hover:text-red-600 flex items-center justify-center transition-colors focus:outline-none cursor-pointer text-xs font-normal"
+                className="w-7 h-7 rounded-lg hover:bg-[#EFF6FF] text-[#64748B] hover:text-[#2563EB] flex items-center justify-center transition-colors focus:outline-none cursor-pointer text-xs font-normal"
               >
                 <Trash2 size={14} />
               </button>
@@ -537,7 +537,7 @@ export function FloatingAiChat() {
                 onClick={() => setIsOpen(false)}
                 aria-label="Thu nhỏ"
                 title="Thu nhỏ cửa sổ"
-                className="w-7 h-7 rounded-lg hover:bg-[#E0E5FF] text-[#8A8478] hover:text-blue-600 flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
+                className="w-7 h-7 rounded-lg hover:bg-[#E0E5FF] text-[#64748B] hover:text-blue-600 flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -556,7 +556,7 @@ export function FloatingAiChat() {
                 }`}
               >
                 {msg.sender === "ai" ? (
-                  <div className="w-6.5 h-6.5 rounded-lg bg-[#EEF2FF] text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 shadow-2xs border border-blue-600/20">
+                  <div className="w-6.5 h-6.5 rounded-lg bg-[#EFF6FF] text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 shadow-2xs border border-blue-600/20">
                     N
                   </div>
                 ) : (
@@ -576,8 +576,8 @@ export function FloatingAiChat() {
                   <div
                     className={`p-3 rounded-xl text-[12.5px] leading-relaxed whitespace-pre-line ${
                       msg.sender === "user"
-                        ? "bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 text-white rounded-tr-none shadow-2xs font-medium"
-                        : "bg-[#F4F6FC] text-[#2C3039] border border-[#E4E6F0] rounded-tl-none font-normal"
+                        ? "bg-gradient-to-r from-blue-600 via-blue-500 to-blue-500 text-white rounded-tr-none shadow-2xs font-medium"
+                        : "bg-[#F4F6FC] text-[#0F172A] border border-[#E4E6F0] rounded-tl-none font-normal"
                     }`}
                   >
                     {msg.sender === "ai" ? (
@@ -597,7 +597,7 @@ export function FloatingAiChat() {
                       msg.text
                     )}
                   </div>
-                  <span className="text-[10px] font-normal text-[#8A8478] px-1">{msg.time}</span>
+                  <span className="text-[10px] font-normal text-[#64748B] px-1">{msg.time}</span>
                 </div>
               </div>
             ))}
@@ -605,7 +605,7 @@ export function FloatingAiChat() {
             {/* Live Typing Indicator */}
             {chatMutation.isPending && (
               <div className="flex items-start gap-2.5 max-w-[80%]">
-                <div className="w-6.5 h-6.5 rounded-lg bg-[#EEF2FF] text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 shadow-2xs border border-blue-600/20 animate-pulse">
+                <div className="w-6.5 h-6.5 rounded-lg bg-[#EFF6FF] text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 shadow-2xs border border-blue-600/20 animate-pulse">
                   N
                 </div>
                 <div className="bg-[#F4F6FC] border border-[#E4E6F0] px-3.5 py-2.5 rounded-xl rounded-tl-none flex items-center gap-1.5 shadow-2xs">
@@ -628,7 +628,7 @@ export function FloatingAiChat() {
                 type="button"
                 onClick={() => handleSend(item.label)}
                 disabled={isGenerating}
-                className="shrink-0 flex items-center justify-center text-xs font-semibold bg-[#F8FAFC] hover:bg-[#EEF2FF] disabled:opacity-50 text-[#8A8478] hover:text-blue-600 border border-[#EAEAF4] hover:border-blue-600/30 rounded-xl px-3 py-1.5 transition-all duration-200 focus:outline-none cursor-pointer shadow-2xs"
+                className="shrink-0 flex items-center justify-center text-xs font-semibold bg-[#F8FAFC] hover:bg-[#EFF6FF] disabled:opacity-50 text-[#64748B] hover:text-blue-600 border border-[#EAEAF4] hover:border-blue-600/30 rounded-xl px-3 py-1.5 transition-all duration-200 focus:outline-none cursor-pointer shadow-2xs"
               >
                 {item.icon} {item.label}
               </button>
@@ -650,7 +650,7 @@ export function FloatingAiChat() {
                 onChange={(e) => setInput(e.target.value)}
                 disabled={isGenerating}
                 placeholder={isGenerating ? "Nova đang trả lời..." : "Nhập câu hỏi cho Nova..."}
-                className="flex-1 bg-[#F8FAFC] focus:bg-white disabled:bg-gray-100 border border-[#EAEAF4] focus:border-blue-600 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#2C3039] placeholder:text-[#8A8478] focus:outline-none focus:ring-2 focus:ring-blue-600/25 transition-all duration-200"
+                className="flex-1 bg-[#F8FAFC] focus:bg-white disabled:bg-gray-100 border border-[#EAEAF4] focus:border-blue-600 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#0F172A] placeholder:text-[#64748B] focus:outline-none focus:ring-2 focus:ring-blue-600/25 transition-all duration-200"
               />
               {isGenerating ? (
                 <button
@@ -658,11 +658,9 @@ export function FloatingAiChat() {
                   onClick={handleStop}
                   aria-label="Tạm dừng AI trả lời"
                   title="Dừng câu trả lời của AI"
-                  className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#DC2626] via-[#E11D48] to-[#EA580C] hover:opacity-95 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-[0_4px_12px_rgba(225,29,72,0.35)] animate-pulse active:scale-95 cursor-pointer"
+                  className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#3B82F6] to-[#2563EB] hover:from-[#2563EB] hover:to-[#1D4ED8] text-white rounded-xl transition-all duration-200 focus:outline-none shadow-[0_4px_12px_rgba(37,99,235,0.35)] animate-pulse active:scale-95 cursor-pointer"
                 >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <rect x="6" y="6" width="12" height="12" rx="2" />
-                  </svg>
+                  <Square className="w-4 h-4" fill="currentColor" aria-hidden />
                 </button>
               ) : (
                 <button
@@ -709,7 +707,7 @@ export function FloatingAiChat() {
                       toast.success("Đã xóa lịch sử trò chuyện và tạo hội thoại mới");
                       setShowConfirmDelete(false);
                     }}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-red-600 hover:bg-red-700 transition-all shadow-sm cursor-pointer focus:outline-none"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-all shadow-sm cursor-pointer focus:outline-none"
                   >
                     Xóa
                   </button>

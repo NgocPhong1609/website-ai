@@ -96,14 +96,14 @@ export function AdminModerationSupportPage() {
 
  return (
  <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
- <section className="rounded-2xl border -[#FAF7F2]/20 bg-[linear-gradient(120deg,#1f2937_0%,#0f766e_46%,#115e59_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.85)]">
- <p className="text-[10px] uppercase tracking-[0.34em] -[#FAF7F2]/70">Moderation & Support</p>
+ <section className="rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(120deg,#1f2937_0%,#2563EB_46%,#1D4ED8_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.85)]">
+ <p className="text-[10px] uppercase tracking-[0.34em] text-[#F8FAFC]/70">Moderation & Support</p>
  <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Kiểm duyệt nội dung và xử lý khiếu nại</h1>
  <p className="mt-1 text-xs text-slate-100/90">Flag nội dung AI độc hại để admin xử lý thủ công, và tiếp nhận/phản hồi ticket lỗi hệ thống, tranh chấp chấm điểm.</p>
  </section>
 
  <section className="grid gap-4 xl:grid-cols-2">
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <h2 className="mb-3 text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Flag nội dung độc hại</h2>
  <div className="space-y-2">
  {flags.map((flag) => (
@@ -112,7 +112,7 @@ export function AdminModerationSupportPage() {
  <p className="mt-1 text-xs text-slate-500">{flag.input_text?.slice(0, 180) || "(không có nội dung)"}</p>
  <div className="mt-2 flex gap-2">
  <button onClick={() => void reviewFlag(flag.id, "approved")} className="rounded-lg bg-rose-100 px-2 py-1 text-xs font-semibold text-rose-800">Xác nhận vi phạm</button>
- <button onClick={() => void reviewFlag(flag.id, "rejected")} className="rounded-lg -[#FAF7F2] px-2 py-1 text-xs font-semibold -[#2C3039]">False positive</button>
+ <button onClick={() => void reviewFlag(flag.id, "rejected")} className="rounded-lg bg-[#F8FAFC] px-2 py-1 text-xs font-semibold text-[#0F172A]">False positive</button>
  </div>
  </div>
  ))}
@@ -121,7 +121,7 @@ export function AdminModerationSupportPage() {
  </div>
  </div>
 
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <h2 className="mb-3 text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Tiếp nhận khiếu nại/báo lỗi</h2>
  <div className="grid gap-2">
  <select value={ticketForm.type} onChange={(e) => setTicketForm((s) => ({ ...s, type: e.target.value }))} className="rounded-xl border border-slate-200 px-3 py-2 text-sm">
@@ -132,7 +132,7 @@ export function AdminModerationSupportPage() {
  </select>
  <input value={ticketForm.title} onChange={(e) => setTicketForm((s) => ({ ...s, title: e.target.value }))} placeholder="Tiêu đề" className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
  <textarea value={ticketForm.description} onChange={(e) => setTicketForm((s) => ({ ...s, description: e.target.value }))} placeholder="Mô tả" rows={4} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
- <button onClick={() => void createTicket()} className="rounded-xl -[#C0392B] px-4 py-2 text-sm font-semibold text-white">Tạo ticket</button>
+ <button onClick={() => void createTicket()} className="rounded-xl bg-[#3B82F6] px-4 py-2 text-sm font-semibold text-white">Tạo ticket</button>
  </div>
 
  <div className="mt-4 space-y-2">
@@ -143,7 +143,7 @@ export function AdminModerationSupportPage() {
  <p className="mt-1 text-xs text-slate-500">{ticket.description.slice(0, 160)}</p>
  <div className="mt-2 flex gap-2">
  <button onClick={() => void resolveTicket(ticket.id, "in_progress")} className="rounded-lg bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">Đang xử lý</button>
- <button onClick={() => void resolveTicket(ticket.id, "resolved")} className="rounded-lg -[#FAF7F2] px-2 py-1 text-xs font-semibold -[#2C3039]">Đã xong</button>
+ <button onClick={() => void resolveTicket(ticket.id, "resolved")} className="rounded-lg bg-[#F8FAFC] px-2 py-1 text-xs font-semibold text-[#0F172A]">Đã xong</button>
  <button onClick={() => void resolveTicket(ticket.id, "rejected")} className="rounded-lg bg-slate-200 px-2 py-1 text-xs font-semibold text-slate-700">Từ chối</button>
  </div>
  </div>

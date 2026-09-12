@@ -138,18 +138,18 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  {/* Header — bám sát phía trên */}
  <div className="flex items-center gap-2.5 mb-auto">
  <LogoMark />
- <span className="text-[14px] font-bold tracking-tight text-[#2C3039]">MindNova AI</span>
+ <span className="text-[14px] font-bold tracking-tight text-[#0F172A]">MindNova AI</span>
  </div>
 
  {/* Content — căn giữa dọc */}
  <div className="flex flex-col justify-center w-full max-w-[480px] mx-auto py-6">
  <div className="mb-5">
- <h1 className="text-[26px] font-bold text-[#2C3039] leading-tight tracking-tight">
+ <h1 className="text-[26px] font-bold text-[#0F172A] leading-tight tracking-tight">
  Create Account
  </h1>
- <p className="mt-1.5 text-[13px] text-[#8A8478] leading-relaxed">
+ <p className="mt-1.5 text-[13px] text-[#64748B] leading-relaxed">
  Start your personalized learning journey with{" "}
- <span className="text-[#C0392B] font-medium">AI-driven</span> insights.
+ <span className="text-[#3B82F6] font-medium">AI-driven</span> insights.
  </p>
  </div>
 
@@ -158,7 +158,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  className={`mb-3 p-3 rounded-xl text-xs font-medium border ${
   statusMessage.includes("thành công")
   ? "bg-[#E8F8F0] text-[#27AE60] border-[#27AE60]/20"
-  : "bg-[#FADBD8] text-[#C0392B] border-[#C0392B]/30"
+  : "bg-[#EFF6FF] text-[#3B82F6] border-[#3B82F6]/30"
  }`}
  >
  {statusMessage}
@@ -167,14 +167,14 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
 
  <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
  {/* Role Selection */}
- <div className="flex p-1 bg-[#FEFCF9] rounded-xl border border-[#E8E2D9]">
+ <div className="flex p-1 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
  <button
  type="button"
  onClick={() => setValues(prev => ({ ...prev, role: "student" }))}
  className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all duration-200 ${
  values.role === "student"
- ? "bg-white text-[#C0392B] shadow-sm"
- : "text-[#8A8478] hover:text-[#C0392B]"
+ ? "bg-white text-[#3B82F6] shadow-sm"
+ : "text-[#64748B] hover:text-[#2563EB]"
  }`}
  >
  Student
@@ -184,8 +184,8 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  onClick={() => setValues(prev => ({ ...prev, role: "teacher" }))}
  className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all duration-200 ${
  values.role === "teacher"
- ? "bg-white text-[#C0392B] shadow-sm"
- : "text-[#8A8478] hover:text-[#C0392B]"
+ ? "bg-white text-[#3B82F6] shadow-sm"
+ : "text-[#64748B] hover:text-[#2563EB]"
  }`}
  >
  Teacher
@@ -230,7 +230,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  <button
  type="button"
  onClick={togglePassword}
- className="text-[#B8B0A3] hover:text-[#C0392B] transition-colors focus:outline-none"
+ className="text-[#94A3B8] hover:text-[#2563EB] transition-colors focus:outline-none"
  >
  {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
  </button>
@@ -250,7 +250,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  <button
  type="button"
  onClick={toggleConfirmPassword}
- className="text-[#B8B0A3] hover:text-[#C0392B] transition-colors focus:outline-none"
+ className="text-[#94A3B8] hover:text-[#2563EB] transition-colors focus:outline-none"
  >
  {showConfirmPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
  </button>
@@ -261,18 +261,18 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  <button
  type="submit"
  disabled={isLoading || !canSubmit}
- className="mt-1 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#C0392B] shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#C0392B]/30"
+ className="mt-1 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#3B82F6]/30"
  >
  {isLoading ? "Creating account..." : <>Sign Up <ArrowRightIcon /></>}
  </button>
  </form>
 
- <p className="mt-5 text-center text-[13px] text-[#8A8478]">
+ <p className="mt-5 text-center text-[13px] text-[#64748B]">
  Already have an account?{" "}
  <button
  type="button"
  onClick={onFlipToLogin}
- className="font-semibold text-[#C0392B] hover:text-[#C0392B] transition-colors hover:underline underline-offset-2 focus:outline-none"
+ className="font-semibold text-[#3B82F6] hover:text-[#2563EB] transition-colors hover:underline underline-offset-2 focus:outline-none"
  >
  Login
  </button>
@@ -281,7 +281,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
 
  {/* Footer — bám sát phía dưới */}
  <div className="mt-auto text-center">
- <p className="text-[11px] text-[#B8B0A3] leading-relaxed">
+ <p className="text-[11px] text-[#94A3B8] leading-relaxed">
  © 2024 MindNova AI. Empowering global learners through intelligence.
  </p>
  </div>

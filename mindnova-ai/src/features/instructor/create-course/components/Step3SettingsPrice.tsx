@@ -66,9 +66,9 @@ export function Step3SettingsPrice({
  return (
  <div className="w-full flex flex-col gap-6 animate-fadeIn">
  {/* Top Title Banner */}
- <div className="p-5 rounded-2xl bg-white border border-[#E8E2D9] shadow-2xs">
- <h3 className="text-base font-black text-[#2C3039]">Cấu hình Giá bán &amp; Doanh thu</h3>
- <p className="text-xs text-[#8A8478] mt-1">
+ <div className="p-5 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs">
+ <h3 className="text-base font-black text-[#0F172A]">Cấu hình Giá bán &amp; Doanh thu</h3>
+ <p className="text-xs text-[#64748B] mt-1">
  Thiết lập khoảng giá tiêu chuẩn cho khóa học (100,000–100,000,000 VNĐ), lên lịch chương trình ưu đãi khuyến mãi và dự toán thu nhập thực tế theo thời gian thực.
  </p>
  </div>
@@ -80,19 +80,19 @@ export function Step3SettingsPrice({
  <div className="lg:col-span-7 flex flex-col gap-5">
  
  {/* Free vs Paid Toggle */}
- <div className="p-5 rounded-2xl bg-white border border-[#E8E2D9] shadow-2xs flex flex-col gap-4">
+ <div className="p-5 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs flex flex-col gap-4">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
  <div>
- <h4 className="text-sm font-black text-[#2C3039]">Hình Thức Phát Hành Khóa Học</h4>
- <p className="text-xs text-[#8A8478]">Lựa chọn giữa miễn phí cống hiến cho cộng đồng hoặc thu phí chuyên nghiệp.</p>
+ <h4 className="text-sm font-black text-[#0F172A]">Hình Thức Phát Hành Khóa Học</h4>
+ <p className="text-xs text-[#64748B]">Lựa chọn giữa miễn phí cống hiến cho cộng đồng hoặc thu phí chuyên nghiệp.</p>
  </div>
- <div className="flex items-center gap-1 p-1 rounded-xl bg-gray-100 border border-[#E8E2D9] w-fit shrink-0">
+ <div className="flex items-center gap-1 p-1 rounded-xl bg-gray-100 border border-[#E2E8F0] w-fit shrink-0">
  <button
  type="button"
  onClick={() => setIsFree(false)}
  className={twMerge(
  "px-3.5 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer",
- !isFree ? "bg-[#C0392B] text-white shadow-2xs" : "text-[#8A8478] hover:text-[#2C3039]"
+ !isFree ? "bg-[#3B82F6] text-white shadow-2xs" : "text-[#64748B] hover:text-[#0F172A]"
  )}
  >
  Khóa Thu Phí
@@ -102,7 +102,7 @@ export function Step3SettingsPrice({
  onClick={() => setIsFree(true)}
  className={twMerge(
  "px-3.5 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer",
- isFree ? "-[#2C3039] text-white shadow-2xs" : "text-[#8A8478] hover:text-[#2C3039]"
+ isFree ? "text-[#0F172A] text-white shadow-2xs" : "text-[#64748B] hover:text-[#0F172A]"
  )}
  >
  Miễn Phí
@@ -129,11 +129,11 @@ export function Step3SettingsPrice({
  "w-full pl-8 pr-12 py-3 rounded-xl font-black font-mono text-sm border transition-all focus:outline-none",
  validationError
  ? "border-rose-300 text-rose-600 bg-rose-50/20"
- : "border-[#E8E2D9] bg-[#FEFCF9]/50 text-[#2C3039] focus:border-[#C0392B] focus:bg-white"
+ : "border-[#E2E8F0] bg-[#F8FAFC]/50 text-[#0F172A] focus:border-[#3B82F6] focus:bg-white"
  )}
  placeholder="500000"
  />
- <span className="absolute right-3.5 top-3 text-xs font-extrabold text-[#8A8478]">VNĐ</span>
+ <span className="absolute right-3.5 top-3 text-xs font-extrabold text-[#64748B]">VNĐ</span>
  </div>
  </div>
 
@@ -152,12 +152,12 @@ export function Step3SettingsPrice({
  className={twMerge(
  "p-3.5 rounded-xl border text-left transition-all cursor-pointer",
  tier === "standard"
- ? "border-[#C0392B] bg-indigo-50/50 shadow-2xs"
- : "border-[#E8E2D9] bg-white hover:border-gray-300"
+ ? "border-[#3B82F6] bg-blue-50/50 shadow-2xs"
+ : "border-[#E2E8F0] bg-white hover:border-gray-300"
  )}
  >
- <p className="text-xs font-extrabold text-[#2C3039]">Đối Tác Tiêu Chuẩn</p>
- <p className="text-[11px] -[#C0392B] font-bold mt-0.5">30% phí hệ thống (Nhận 70%)</p>
+ <p className="text-xs font-extrabold text-[#0F172A]">Đối Tác Tiêu Chuẩn</p>
+ <p className="text-[11px] text-[#3B82F6] font-bold mt-0.5">30% phí hệ thống (Nhận 70%)</p>
  </button>
 
  <button
@@ -166,12 +166,12 @@ export function Step3SettingsPrice({
  className={twMerge(
  "p-3.5 rounded-xl border text-left transition-all cursor-pointer",
  tier === "exclusive"
- ? "-[#2C3039] bg-emerald-50/50 shadow-2xs"
- : "border-[#E8E2D9] bg-white hover:border-gray-300"
+ ? "text-[#0F172A] bg-emerald-50/50 shadow-2xs"
+ : "border-[#E2E8F0] bg-white hover:border-gray-300"
  )}
  >
- <p className="text-xs font-extrabold text-[#2C3039]"> Hợp Tác Độc Quyền MindNova</p>
- <p className="text-[11px] -[#2C3039] font-bold mt-0.5">Ưu đãi chỉ 15% phí (Nhận 85%)</p>
+ <p className="text-xs font-extrabold text-[#0F172A]"> Hợp Tác Độc Quyền MindNova</p>
+ <p className="text-[11px] text-[#0F172A] font-bold mt-0.5">Ưu đãi chỉ 15% phí (Nhận 85%)</p>
  </button>
  </div>
  </div>
@@ -181,17 +181,17 @@ export function Step3SettingsPrice({
 
  {/* Promotional Discount Scheduler */}
  {!isFree && (
- <div className="p-5 rounded-2xl bg-white border border-[#E8E2D9] shadow-2xs flex flex-col gap-4 animate-fadeIn">
+ <div className="p-5 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs flex flex-col gap-4 animate-fadeIn">
  <div className="flex items-center justify-between">
  <div>
- <h4 className="text-sm font-black text-[#2C3039]"> Lên Lịch Giảm Giá &amp; Khuyến Mãi Flash Sale</h4>
- <p className="text-xs text-[#8A8478] mt-0.5">Tăng tỷ lệ chuyển đổi học viên bằng các đợt giảm giá ngắn hạn hấp dẫn.</p>
+ <h4 className="text-sm font-black text-[#0F172A]"> Lên Lịch Giảm Giá &amp; Khuyến Mãi Flash Sale</h4>
+ <p className="text-xs text-[#64748B] mt-0.5">Tăng tỷ lệ chuyển đổi học viên bằng các đợt giảm giá ngắn hạn hấp dẫn.</p>
  </div>
  <input
  type="checkbox"
  checked={discount.isEnabled}
  onChange={(e) => toggleDiscount(e.target.checked)}
- className="w-5 h-5 rounded-md text-[#C0392B] focus:ring-[#C0392B] border-gray-300 cursor-pointer"
+ className="w-5 h-5 rounded-md text-[#3B82F6] focus:ring-[#3B82F6] border-gray-300 cursor-pointer"
  aria-label="Kích hoạt giảm giá"
  />
  </div>
@@ -207,7 +207,7 @@ export function Step3SettingsPrice({
  max={basePrice}
  value={discount.discountPrice}
  onChange={(e) => updateDiscount("discountPrice", parseFloat(e.target.value) || 100000)}
- className="w-full px-3.5 py-2 rounded-xl border border-[#E8E2D9] font-black font-mono text-xs -[#2C3039] focus:outline-none focus:-[#2C3039] bg-[#FEFCF9]/50"
+ className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] font-black font-mono text-xs text-[#0F172A] focus:outline-none focus:border-[#0F172A] bg-[#F8FAFC]/50"
  />
  </div>
  <div>
@@ -217,7 +217,7 @@ export function Step3SettingsPrice({
  type="date"
  value={discount.startDate}
  onChange={(e) => updateDiscount("startDate", e.target.value)}
- className="w-full px-3.5 py-2 rounded-xl border border-[#E8E2D9] font-bold text-xs text-gray-700 focus:outline-none bg-[#FEFCF9]/50"
+ className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] font-bold text-xs text-gray-700 focus:outline-none bg-[#F8FAFC]/50"
  />
  </div>
  <div>
@@ -227,7 +227,7 @@ export function Step3SettingsPrice({
  type="date"
  value={discount.endDate}
  onChange={(e) => updateDiscount("endDate", e.target.value)}
- className="w-full px-3.5 py-2 rounded-xl border border-[#E8E2D9] font-bold text-xs text-gray-700 focus:outline-none bg-[#FEFCF9]/50"
+ className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] font-bold text-xs text-gray-700 focus:outline-none bg-[#F8FAFC]/50"
  />
  </div>
  </div>
@@ -240,17 +240,17 @@ export function Step3SettingsPrice({
  <div className="lg:col-span-5 flex flex-col gap-5 sticky top-20">
  
  {/* Dynamic Revenue Calculator Panel */}
- <div className="p-6 rounded-2xl bg-[#C0392B] text-white border -[#C0392B] shadow-sm flex flex-col gap-5">
+ <div className="p-6 rounded-2xl bg-[#3B82F6] text-white border-[#3B82F6] shadow-sm flex flex-col gap-5">
  <div className="flex items-center gap-3 border-b border-white/10 pb-4">
  
  <div>
  <h4 className="text-sm font-black text-white">Bảng Dự Toán Doanh Thu AI</h4>
- <p className="text-xs -[#FAF7F2] mt-0.5">Phân tích dòng tiền lợi nhuận sau chiết khấu</p>
+ <p className="text-xs text-[#F8FAFC] mt-0.5">Phân tích dòng tiền lợi nhuận sau chiết khấu</p>
  </div>
  </div>
 
  <div className="flex flex-col gap-3 font-mono text-xs">
- <div className="flex items-center justify-between -[#FAF7F2]">
+ <div className="flex items-center justify-between text-[#F8FAFC]">
  <span>Giá Bán Niêm Yết (Áp dụng):</span>
  <span className="font-extrabold text-white text-sm">{revenue.listPrice.toLocaleString('vi-VN')} VNĐ</span>
  </div>
@@ -265,7 +265,7 @@ export function Step3SettingsPrice({
               <span>Tỷ lệ phân chia Giảng viên:</span>
               <span className="font-extrabold text-white text-sm">{tier === "exclusive" ? "85.0%" : "70.0%"}</span>
             </div>
- <div className="flex items-center justify-between text-sm font-black -[#FAF7F2]">
+ <div className="flex items-center justify-between text-sm font-black text-[#F8FAFC]">
  <span>Thu Nhập Ròng Tích Lũy:</span>
  <span>{revenue.instructorEarnings.toLocaleString('vi-VN')} VNĐ / học viên</span>
  </div>
@@ -277,13 +277,13 @@ export function Step3SettingsPrice({
  </div>
 
  {/* Quick Preview Badge & Save Action */}
- <div className="p-5 rounded-2xl bg-white border border-[#E8E2D9] shadow-2xs flex flex-col gap-4">
- <h5 className="text-xs font-black text-[#2C3039] uppercase tracking-wider">Danh Sách Tiêu Chuẩn Phê Duyệt</h5>
+ <div className="p-5 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs flex flex-col gap-4">
+ <h5 className="text-xs font-black text-[#0F172A] uppercase tracking-wider">Danh Sách Tiêu Chuẩn Phê Duyệt</h5>
  <div className="flex flex-col gap-2">
- <div className="flex items-center gap-2 text-xs font-extrabold -[#2C3039]">
+ <div className="flex items-center gap-2 text-xs font-extrabold text-[#0F172A]">
  <span> Giá niêm yết tuân thủ khung tiêu chuẩn 100,000–100,000,000 VNĐ</span>
  </div>
- <div className="flex items-center gap-2 text-xs font-extrabold -[#C0392B]">
+ <div className="flex items-center gap-2 text-xs font-extrabold text-[#3B82F6]">
  <span> Lịch trình khuyến mãi được đồng bộ hóa thời gian AI</span>
  </div>
  </div>

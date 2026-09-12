@@ -19,7 +19,7 @@ type TabId = (typeof TABS)[number]["id"];
 
 function PageTabs({ active, onChange }: { active: TabId; onChange: (t: TabId) => void }) {
  return (
- <div className="flex items-center gap-2 border-b border-[#E8E2D9] px-6 bg-white">
+ <div className="flex items-center gap-2 border-b border-[#E2E8F0] px-6 bg-white">
  {TABS.map((tab) => (
  <button
  key={tab.id}
@@ -27,13 +27,13 @@ function PageTabs({ active, onChange }: { active: TabId; onChange: (t: TabId) =>
  onClick={() => onChange(tab.id)}
  className={twMerge(
  "relative px-4 py-3 text-xs font-black transition-all duration-150 cursor-pointer",
- active === tab.id ? "text-[#C0392B]" : "text-gray-400 hover:text-gray-700"
+ active === tab.id ? "text-[#3B82F6]" : "text-gray-400 hover:text-gray-700"
  )}
  >
  {tab.label}
  <span
  className={twMerge(
- "absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-[#C0392B] transition-all duration-200",
+ "absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-[#3B82F6] transition-all duration-200",
  active === tab.id ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
  )}
  />
@@ -46,7 +46,7 @@ function PageTabs({ active, onChange }: { active: TabId; onChange: (t: TabId) =>
 function Breadcrumb() {
  return (
  <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs font-bold text-gray-400">
- <Link href="/instructor/courses" className="hover:text-[#C0392B] transition-colors">
+ <Link href="/instructor/courses" className="hover:text-[#2563EB] transition-colors">
  Khóa học của tôi
  </Link>
  <ChevronRightIcon size={12} />
@@ -57,14 +57,14 @@ function Breadcrumb() {
 
 function PageHeader({ onSave }: { onSave: () => void }) {
  return (
- <div className="px-6 pt-5 pb-4 bg-white border-b border-[#E8E2D9] shadow-2xs">
+ <div className="px-6 pt-5 pb-4 bg-white border-b border-[#E2E8F0] shadow-2xs">
  <Breadcrumb />
  <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-2.5 gap-3">
  <div>
- <h1 className="text-lg font-black text-[#2C3039] tracking-tight">
+ <h1 className="text-lg font-black text-[#0F172A] tracking-tight">
  Quản Lý Giá &amp; Kiếm Tiền: Generative AI Masterclass
  </h1>
- <p className="text-xs text-[#8A8478] mt-0.5 max-w-[540px] leading-relaxed">
+ <p className="text-xs text-[#64748B] mt-0.5 max-w-[540px] leading-relaxed">
  Cấu hình mô hình doanh thu, định giá niêm yết và quản lý các chiến lược mã giảm giá khuyến mãi cho khóa học của bạn trên sàn MindNova AI.
  </p>
  </div>
@@ -72,7 +72,7 @@ function PageHeader({ onSave }: { onSave: () => void }) {
  type="button"
  id="btn-save-pricing"
  onClick={onSave}
- className="flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-2xs transition-all cursor-pointer shrink-0"
+ className="flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-extrabold text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-2xs transition-all cursor-pointer shrink-0"
  >
  <SaveIcon size={14} />
  <span>Lưu thiết lập</span>

@@ -17,22 +17,22 @@ export function CertificatesContent() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
         <div className="flex-1">
-          <h3 className="text-[11px] font-bold tracking-widest text-[#8A8478] uppercase mb-2">
+          <h3 className="text-[11px] font-bold tracking-widest text-[#64748B] uppercase mb-2">
             Your Achievements
           </h3>
-          <h1 className="text-3xl font-bold text-[#2C3039] leading-tight mb-3">
+          <h1 className="text-3xl font-bold text-[#0F172A] leading-tight mb-3">
             Certificates &amp; Credentials
           </h1>
-          <p className="text-[14px] text-[#8A8478] max-w-2xl leading-relaxed">
+          <p className="text-[14px] text-[#64748B] max-w-2xl leading-relaxed">
             Celebrate your hard work. Here you can find all your verified AI-powered certifications, ready to be shared with the world.
           </p>
         </div>
         <div className="flex items-center gap-3 shrink-0 flex-wrap">
-          <button className="flex items-center gap-2 px-5 py-3 bg-[#F0F0FF] text-[#8A8478] rounded-xl text-[14px] font-bold hover:bg-[#EAEAF4] transition-colors shadow-sm">
+          <button className="flex items-center gap-2 px-5 py-3 bg-[#F0F0FF] text-[#64748B] rounded-xl text-[14px] font-bold hover:bg-[#EAEAF4] transition-colors shadow-sm">
             <UploadIcon className="w-4 h-4" />
             Export All
           </button>
-          <button className="flex items-center gap-2 px-6 py-3 bg-[#C0392B] text-white rounded-xl text-[14px] font-bold hover:bg-[#C0392B] transition-colors shadow-md">
+          <button className="flex items-center gap-2 px-6 py-3 bg-[#3B82F6] text-white rounded-xl text-[14px] font-bold hover:bg-[#2563EB] transition-colors shadow-md">
             <ShareIcon className="w-4 h-4" />
             Share Portfolio
           </button>
@@ -40,22 +40,22 @@ export function CertificatesContent() {
       </div>
 
       {/* Claim Banner */}
-      <div className="bg-white border border-[#8A8478]/20 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm relative overflow-hidden">
+      <div className="bg-white border border-[#64748B]/20 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm relative overflow-hidden">
         {/* Subtle background glow */}
         <div className="absolute top-0 left-0 w-64 h-full bg-gradient-to-r from-[#F0F0FF] to-transparent pointer-events-none" />
         
         <div className="flex items-center gap-5 relative z-10 w-full md:w-auto">
           <div className="w-16 h-16 rounded-full bg-[#EAEAF4] flex items-center justify-center shrink-0">
-            <PartyPopperIcon className="w-8 h-8 text-[#C0392B]" />
+            <PartyPopperIcon className="w-8 h-8 text-[#3B82F6]" />
           </div>
           <div>
-            <h2 className="text-[18px] font-bold text-[#2C3039] mb-1">Ready to claim!</h2>
-            <p className="text-[14px] text-[#8A8478]">
-              You&apos;ve completed 100% of <span className="font-bold text-[#2C3039]">Neural Networks 101</span>.
+            <h2 className="text-[18px] font-bold text-[#0F172A] mb-1">Ready to claim!</h2>
+            <p className="text-[14px] text-[#64748B]">
+              You&apos;ve completed 100% of <span className="font-bold text-[#0F172A]">Neural Networks 101</span>.
             </p>
           </div>
         </div>
-        <button className="w-full md:w-auto px-8 py-3.5 bg-[#C0392B] text-white rounded-xl text-[15px] font-bold flex items-center justify-center gap-2 hover:bg-[#C0392B] transition-colors shadow-[0_4px_14px_rgba(192,57,43,0.35)] relative z-10 shrink-0">
+        <button className="w-full md:w-auto px-8 py-3.5 bg-[#3B82F6] text-white rounded-xl text-[15px] font-bold flex items-center justify-center gap-2 hover:bg-[#2563EB] transition-colors shadow-[0_4px_14px_rgba(59, 130, 246,0.35)] relative z-10 shrink-0">
           Claim Your Certificate
           <ArrowRightIcon className="w-4 h-4" />
         </button>
@@ -81,15 +81,15 @@ export function CertificatesContent() {
           
           <div className="flex-1 flex flex-col">
             <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="text-[17px] font-bold text-[#2C3039] leading-tight">Next.js Fullstack</h3>
-              <VerifiedBadgeIcon className="w-5 h-5 text-[#C0392B] shrink-0 mt-0.5" />
+              <h3 className="text-[17px] font-bold text-[#0F172A] leading-tight">Next.js Fullstack</h3>
+              <VerifiedBadgeIcon className="w-5 h-5 text-[#3B82F6] shrink-0 mt-0.5" />
             </div>
-            <p className="text-[13px] text-[#8A8478] mb-5">Completed on Oct 12, 2023</p>
+            <p className="text-[13px] text-[#64748B] mb-5">Completed on Oct 12, 2023</p>
             
             <div className="flex items-center gap-2 flex-wrap mt-auto">
               <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">React</span>
               <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Node.js</span>
-              <span className="px-2.5 py-1 bg-[#F0F0FF] text-[#8A8478] border border-[#8A8478]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Expert</span>
+              <span className="px-2.5 py-1 bg-[#F0F0FF] text-[#64748B] border border-[#64748B]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Expert</span>
             </div>
           </div>
         </div>
@@ -109,10 +109,10 @@ export function CertificatesContent() {
           
           <div className="flex-1 flex flex-col">
             <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="text-[17px] font-bold text-[#2C3039] leading-tight">Machine Learning Foundations</h3>
-              <VerifiedBadgeIcon className="w-5 h-5 text-[#C0392B] shrink-0 mt-0.5" />
+              <h3 className="text-[17px] font-bold text-[#0F172A] leading-tight">Machine Learning Foundations</h3>
+              <VerifiedBadgeIcon className="w-5 h-5 text-[#3B82F6] shrink-0 mt-0.5" />
             </div>
-            <p className="text-[13px] text-[#8A8478] mb-5">Completed on Aug 05, 2023</p>
+            <p className="text-[13px] text-[#64748B] mb-5">Completed on Aug 05, 2023</p>
             
             <div className="flex items-center gap-2 flex-wrap mt-auto">
               <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Python</span>
@@ -126,23 +126,23 @@ export function CertificatesContent() {
           {/* Certificate Preview Graphic */}
           <div className="w-full h-[180px] rounded-xl mb-5 relative bg-[#F8F9FB] p-4 flex flex-col items-center justify-center shadow-inner border border-[#EAEAF4]">
             <div className="w-[85%] h-[85%] bg-white shadow-sm border border-[#EAEAF4] flex flex-col items-center justify-center relative p-3">
-              <div className="text-[14px] font-serif text-[#2C3039] mb-2 border-b border-[#EAEAF4] pb-1">Alex Chen</div>
-              <div className="text-[8px] text-[#8A8478] text-center px-4">Has successfully completed the Advanced UI Design course on MindNova AI.</div>
+              <div className="text-[14px] font-serif text-[#0F172A] mb-2 border-b border-[#EAEAF4] pb-1">Alex Chen</div>
+              <div className="text-[8px] text-[#64748B] text-center px-4">Has successfully completed the Advanced UI Design course on MindNova AI.</div>
               {/* Ribbon */}
               <div className="absolute bottom-3 right-3 flex flex-col items-center">
-                <div className="w-6 h-6 rounded-full bg-[#C0392B] border-2 border-white shadow-sm relative z-10" />
-                <div className="w-2 h-4 bg-[#8A8478] transform -rotate-12 translate-x-1 -translate-y-2 absolute bottom-[-8px] right-2" />
-                <div className="w-2 h-4 bg-[#8A8478] transform rotate-12 -translate-x-1 -translate-y-2 absolute bottom-[-8px] left-2" />
+                <div className="w-6 h-6 rounded-full bg-[#3B82F6] border-2 border-white shadow-sm relative z-10" />
+                <div className="w-2 h-4 bg-[#64748B] transform -rotate-12 translate-x-1 -translate-y-2 absolute bottom-[-8px] right-2" />
+                <div className="w-2 h-4 bg-[#64748B] transform rotate-12 -translate-x-1 -translate-y-2 absolute bottom-[-8px] left-2" />
               </div>
             </div>
           </div>
           
           <div className="flex-1 flex flex-col">
             <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="text-[17px] font-bold text-[#2C3039] leading-tight">Advanced UI Design</h3>
-              <VerifiedBadgeIcon className="w-5 h-5 text-[#C0392B] shrink-0 mt-0.5" />
+              <h3 className="text-[17px] font-bold text-[#0F172A] leading-tight">Advanced UI Design</h3>
+              <VerifiedBadgeIcon className="w-5 h-5 text-[#3B82F6] shrink-0 mt-0.5" />
             </div>
-            <p className="text-[13px] text-[#8A8478] mb-5">Completed on June 20, 2023</p>
+            <p className="text-[13px] text-[#64748B] mb-5">Completed on June 20, 2023</p>
             
             <div className="flex items-center gap-2 flex-wrap mt-auto">
               <span className="px-2.5 py-1 bg-[#F4FAFA] text-[#20B2AA] border border-[#20B2AA]/20 rounded-lg text-[10px] font-bold tracking-widest uppercase">Design Systems</span>
@@ -158,12 +158,12 @@ export function CertificatesContent() {
         
         {/* Total Certificates */}
         <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 flex items-center gap-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
-          <div className="w-14 h-14 rounded-2xl bg-[#F0F0FF] text-[#8A8478] flex items-center justify-center shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-[#F0F0FF] text-[#64748B] flex items-center justify-center shrink-0">
             <GraduationCapIcon className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[13px] font-semibold text-[#8A8478] mb-0.5">Total Certificates</p>
-            <p className="text-2xl font-bold text-[#2C3039]">08</p>
+            <p className="text-[13px] font-semibold text-[#64748B] mb-0.5">Total Certificates</p>
+            <p className="text-2xl font-bold text-[#0F172A]">08</p>
           </div>
         </div>
 
@@ -173,19 +173,19 @@ export function CertificatesContent() {
             <StopwatchIcon className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[13px] font-semibold text-[#8A8478] mb-0.5">Learning Hours</p>
-            <p className="text-2xl font-bold text-[#2C3039]">240h</p>
+            <p className="text-[13px] font-semibold text-[#64748B] mb-0.5">Learning Hours</p>
+            <p className="text-2xl font-bold text-[#0F172A]">240h</p>
           </div>
         </div>
 
         {/* Skill Points */}
         <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 flex items-center gap-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
-          <div className="w-14 h-14 rounded-2xl bg-[#F0F0FF] text-[#8A8478] flex items-center justify-center shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-[#F0F0FF] text-[#64748B] flex items-center justify-center shrink-0">
             <MedalIcon className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[13px] font-semibold text-[#8A8478] mb-0.5">Skill Points</p>
-            <p className="text-2xl font-bold text-[#2C3039]">1,250</p>
+            <p className="text-[13px] font-semibold text-[#64748B] mb-0.5">Skill Points</p>
+            <p className="text-2xl font-bold text-[#0F172A]">1,250</p>
           </div>
         </div>
 

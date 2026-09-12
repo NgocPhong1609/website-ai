@@ -15,7 +15,7 @@ const STATUS_STYLES: Record<TransactionStatus, { text: string; clazz: string }> 
  Paid: { text: "Thành công", clazz: "bg-[#EAF8F5] text-[#0f172a] border border-[#0f172a]/25" },
  Refunded: { text: "Đã hoàn tiền", clazz: "bg-[#FFFBEB] text-[#D97706] border border-[#F59E0B]/25" },
  Pending: { text: "Đang xử lý", clazz: "bg-[#f8fafc] text-[#2563eb] border border-[#2563eb]/25" },
- Failed: { text: "Thất bại", clazz: "bg-[#f8fafc] text-[#2563eb] border border-[#EF4444]/25" },
+ Failed: { text: "Thất bại", clazz: "bg-[#f8fafc] text-[#2563eb] border border-[#3B82F6]/25" },
 };
 
 function StatusBadge({ status }: { status: TransactionStatus }) {

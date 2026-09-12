@@ -24,16 +24,16 @@ export async function AdminUsersPage() {
 
  const statusTone = (status: string) => {
  const value = status.toLowerCase();
- if (value.includes("active") || value.includes("hoạt động")) return "bg-emerald-50 -[#2C3039]";
+ if (value.includes("active") || value.includes("hoạt động")) return "bg-emerald-50 text-[#0F172A]";
  if (value.includes("pending") || value.includes("chờ duyệt")) return "bg-amber-50 text-amber-700";
  return "bg-rose-100 text-rose-700";
  };
 
  return (
  <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
- <section className="mn-stagger rounded-2xl border -[#FAF7F2]/20 bg-[linear-gradient(125deg,#0b1636_0%,#0d224a_50%,#115e83_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
+ <section className="mn-stagger rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(125deg,#0b1636_0%,#0d224a_50%,#115e83_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
  <div>
- <p className="text-[10px] uppercase tracking-[0.35em] -[#FAF7F2]/65">Kiểm duyệt người dùng</p>
+ <p className="text-[10px] uppercase tracking-[0.35em] text-[#F8FAFC]/65">Kiểm duyệt người dùng</p>
  <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý kiểm duyệt người dùng</h1>
  <p className="mt-1 max-w-2xl text-xs text-slate-200/90">
  Theo dõi trạng thái tài khoản học viên, giảng viên và xử lý kiểm duyệt quyền truy cập.
@@ -42,21 +42,21 @@ export async function AdminUsersPage() {
  </section>
 
  <section className="grid gap-4 md:grid-cols-3">
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
  <p className="text-sm text-slate-500">Học viên</p>
  <p className="mt-3 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{data.summary.students.toLocaleString()}</p>
  </div>
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
  <p className="text-sm text-slate-500">Giảng viên</p>
  <p className="mt-3 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{data.summary.instructors.toLocaleString()}</p>
  </div>
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
  <p className="text-sm text-slate-500">Quản trị viên</p>
  <p className="mt-3 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{data.summary.admins.toLocaleString()}</p>
  </div>
  </section>
 
- <section className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
+ <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
  <div className="mb-4 flex items-center justify-between">
  <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Tài khoản gần đây</h2>
  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
@@ -77,7 +77,7 @@ export async function AdminUsersPage() {
  </thead>
  <tbody>
  {data.rows.map((row) => (
- <tr key={`${row.id}-${row.joined}`} className="border-t border-slate-200 bg-white hover:bg-cyan-50/35">
+ <tr key={`${row.id}-${row.joined}`} className="border-t border-slate-200 bg-white hover:bg-blue-50/35">
  <td className="px-4 py-3 font-medium text-slate-900">{row.name}</td>
  <td className="px-4 py-3 text-slate-600">{toRoleLabel(row.role)}</td>
  <td className="px-4 py-3">

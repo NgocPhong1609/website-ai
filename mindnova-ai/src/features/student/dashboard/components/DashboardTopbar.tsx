@@ -116,7 +116,7 @@ export function DashboardTopbar() {
 
  return (
  <>
- <header className="sticky top-0 z-50 h-18 shrink-0 flex items-center justify-end gap-4 px-6 lg:px-8 bg-[#FEFCF9]/95 backdrop-blur-sm border-b border-[#E8E2D9] transition-all duration-200">
+ <header className="sticky top-0 z-50 h-18 shrink-0 flex items-center justify-end gap-4 px-6 lg:px-8 bg-[#F8FAFC]/95 backdrop-blur-sm border-b border-[#E2E8F0] transition-all duration-200">
  <div className="flex items-center gap-3">
  <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-[#e2e8f0] shadow-sm">
  {/* Chat Button */}
@@ -131,7 +131,7 @@ export function DashboardTopbar() {
  </svg>
  </div>
  {chatUnreadCount > 0 && (
- <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#ef4444] animate-pulse ring-2 ring-white" />
+ <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#3B82F6] animate-pulse ring-2 ring-white" />
  )}
  </a>
 
@@ -147,7 +147,7 @@ export function DashboardTopbar() {
  <BellIcon />
  </div>
  {unreadCount > 0 && (
- <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#ef4444] animate-pulse ring-2 ring-white" />
+ <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#3B82F6] animate-pulse ring-2 ring-white" />
  )}
  </button>
 
@@ -159,7 +159,7 @@ export function DashboardTopbar() {
  Thông báo ({notifications.length}/50)
  </h3>
  {unreadCount > 0 && (
- <span className="text-[10px] font-semibold bg-[#fee2e2] text-[#ef4444] px-2 py-0.5 rounded-full">
+ <span className="text-[10px] font-semibold bg-[#EFF6FF] text-[#3B82F6] px-2 py-0.5 rounded-full">
  {unreadCount} mới
  </span>
  )}
@@ -284,11 +284,11 @@ export function DashboardTopbar() {
  .join("") || "MN"
  ).toUpperCase()}
  size="md"
- className="ring-2 ring-[#E8E2D9] hover:ring-[#C0392B]/40 transition-all duration-200"
+ className="ring-2 ring-[#E2E8F0] hover:ring-[#3B82F6]/40 transition-all duration-200"
  />
  </div>
  {user?.name && (
- <span className="hidden md:inline text-sm font-semibold text-[#2C3039]">
+ <span className="hidden md:inline text-sm font-semibold text-[#0F172A]">
  {user.name}
  </span>
  )}
@@ -302,14 +302,14 @@ export function DashboardTopbar() {
  <Link
  href="/login"
  onClick={clearAuthCookies}
- className="px-4 py-2 text-sm font-semibold text-[#8A8478] hover:text-[#2C3039] hover:bg-[#F5F0E8] rounded-lg transition-all relative z-[9999]"
+ className="px-4 py-2 text-sm font-semibold text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] rounded-lg transition-all relative z-[9999]"
  >
  Đăng nhập
  </Link>
  <Link
  href="/login?mode=register"
  onClick={clearAuthCookies}
- className="px-4 py-2 text-sm font-semibold text-white bg-[#2C3039] hover:bg-[#1C1D23] rounded-lg transition-all shadow-sm relative z-[9999]"
+ className="px-4 py-2 text-sm font-semibold text-white bg-[#0F172A] hover:bg-[#1C1D23] rounded-lg transition-all shadow-sm relative z-[9999]"
  >
  Đăng ký
  </Link>

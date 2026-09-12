@@ -156,7 +156,7 @@ export function QuizResultContent() {
  <div className={`p-8 rounded-3xl border shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 ${
  isPassed 
  ? " from-[#ECFDF5] via-white to-[#F0FDFA] border-[#0f172a]/30" 
- : " from-[#FFF1F2] via-white to-[#FEF2F2] border-[#2563eb]/30"
+ : " from-[#FFF1F2] via-white to-[#EFF6FF] border-[#2563eb]/30"
  }`}>
  <div className="space-y-2 text-center md:text-left">
  <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block ${
@@ -436,8 +436,8 @@ export function QuizResultContent() {
  item.score >= (item.max_score * 0.8) 
  ? "bg-[#EAF8F5] text-[#0f172a] border-[#0f172a]/20" 
  : item.score > 0 
- ? "bg-[#F5F0E8] text-[#D97706] border-[#D97706]/30"
- : "bg-[#eff6ff] text-[#2563eb] border-[#E11D48]/20"
+ ? "bg-[#F1F5F9] text-[#D97706] border-[#D97706]/30"
+ : "bg-[#eff6ff] text-[#2563eb] border-[#2563EB]/20"
  }`}>
  Điểm: {item.score} / {item.max_score} điểm
  </span>
@@ -505,9 +505,9 @@ export function QuizResultContent() {
  <div className={`p-3.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center gap-2 ${
  item.is_correct 
  ? "bg-[#EAF8F5] border-[#0f172a]/20 text-[#0f172a]" 
- : "bg-[#eff6ff] border-[#E11D48]/20 text-[#2563eb]"
+ : "bg-[#eff6ff] border-[#2563EB]/20 text-[#2563eb]"
  }`}>
- <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 text-white font-bold" style={{ backgroundColor: item.is_correct ? '#0f172a' : '#E11D48' }}>
+ <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 text-white font-bold" style={{ backgroundColor: item.is_correct ? '#0f172a' : '#2563EB' }}>
  {item.is_correct ? '' : ''}
  </span>
  <span>Đáp án bạn chọn: {item.user_answer_text || 'Chưa chọn'}</span>
@@ -572,8 +572,8 @@ export function QuizResultContent() {
  <div className="absolute top-0 right-0 w-44 h-44 rounded-full bg-[#f8fafc] blur-2xl pointer-events-none" />
  <div className="absolute bottom-0 left-0 w-44 h-44 rounded-full bg-[#2563eb]/10 blur-2xl pointer-events-none" />
 
- <div className={`absolute top-5 right-5 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-2xs border ${displayData.passed ? "bg-[#EAF8F5] text-[#0f172a] border-[#0f172a]/20" : "bg-[#eff6ff] text-[#2563eb] border-[#E11D48]/20"}`}>
- <span className={`w-2 h-2 rounded-full ${displayData.passed ? "bg-[#0f172a]" : "bg-[#E11D48]"} animate-pulse`} />
+ <div className={`absolute top-5 right-5 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-2xs border ${displayData.passed ? "bg-[#EAF8F5] text-[#0f172a] border-[#0f172a]/20" : "bg-[#eff6ff] text-[#2563eb] border-[#2563EB]/20"}`}>
+ <span className={`w-2 h-2 rounded-full ${displayData.passed ? "bg-[#0f172a]" : "bg-[#2563EB]"} animate-pulse`} />
  {displayData.passed ? "Đạt Yêu Cầu (Passed)" : "Chưa Đạt (Need Practice)"}
  </div>
 
@@ -651,14 +651,14 @@ export function QuizResultContent() {
  <h4 className="font-semibold text-sm sm:text-base text-[#0f172a]">{t.topic_title}</h4>
  <p className="text-xs text-[#64748b] mt-0.5">{t.sub_title}</p>
  </div>
- <span className={`self-start sm:self-center px-3 py-1 rounded-full text-xs font-medium border ${t.score_percentage >= 80 ? "bg-[#EAF8F5] text-[#0f172a] border-[#0f172a]/20" : t.score_percentage >= 60 ? "bg-[#f8fafc] text-[#2563eb] border-[#2563eb]/20" : "bg-[#eff6ff] text-[#2563eb] border-[#E11D48]/20"}`}>
+ <span className={`self-start sm:self-center px-3 py-1 rounded-full text-xs font-medium border ${t.score_percentage >= 80 ? "bg-[#EAF8F5] text-[#0f172a] border-[#0f172a]/20" : t.score_percentage >= 60 ? "bg-[#f8fafc] text-[#2563eb] border-[#2563eb]/20" : "bg-[#eff6ff] text-[#2563eb] border-[#2563EB]/20"}`}>
  {t.status_label}
  </span>
  </div>
  
  <div className="h-2 w-full bg-[#EAEAF4] rounded-full overflow-hidden p-0.5">
  <div 
- className={`h-full rounded-full transition-all duration-700 ${t.score_percentage >= 80 ? " bg-[#0f172a] " : t.score_percentage >= 60 ? " bg-[#2563eb] " : " from-[#F43F5E] to-[#E11D48]"}`}
+ className={`h-full rounded-full transition-all duration-700 ${t.score_percentage >= 80 ? " bg-[#0f172a] " : t.score_percentage >= 60 ? " bg-[#2563eb] " : " from-[#F43F5E] to-[#2563EB]"}`}
  style={{ width: `${t.score_percentage}%` }}
  />
  </div>
@@ -731,7 +731,7 @@ export function QuizResultContent() {
  {/* Footer Buttons */}
  <div className="flex flex-wrap justify-center items-center gap-4 pt-4">
  <Link href="/practice" className="text-decoration-none">
- <button type="button" className="px-7 py-3 bg-[#2563eb] hover:opacity-95 text-white rounded-xl font-semibold text-xs sm:text-sm shadow-[0_6px_20px_rgba(192,57,43,0.3)] hover:-translate-y-0.5 transition-all cursor-pointer flex items-center gap-2">
+ <button type="button" className="px-7 py-3 bg-[#2563eb] hover:opacity-95 text-white rounded-xl font-semibold text-xs sm:text-sm shadow-[0_6px_20px_rgba(59, 130, 246,0.3)] hover:-translate-y-0.5 transition-all cursor-pointer flex items-center gap-2">
  <span></span>
  <span>Quay lại Trung tâm đánh giá</span>
  </button>

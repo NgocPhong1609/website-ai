@@ -24,10 +24,10 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
  className={twMerge(
  "w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all duration-300",
  isDone
- ? "bg-[#C0392B] text-white shadow-2xs"
+ ? "bg-[#3B82F6] text-white shadow-2xs"
  : isActive
- ? "bg-[#C0392B] text-white ring-4 ring-indigo-100 shadow-sm"
- : "bg-gray-200 text-[#8A8478]"
+ ? "bg-[#3B82F6] text-white ring-4 ring-blue-100 shadow-sm"
+ : "bg-gray-200 text-[#64748B]"
  )}
  >
  {isDone ? <CheckIcon size={14} /> : step.id}
@@ -37,9 +37,9 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
  className={twMerge(
  "text-[11px] transition-colors duration-200 text-center",
  isActive
- ? "text-[#2C3039] font-extrabold"
+ ? "text-[#0F172A] font-extrabold"
  : isDone
- ? "text-[#C0392B] font-bold"
+ ? "text-[#3B82F6] font-bold"
  : "text-gray-400 font-medium"
  )}
  >
@@ -50,7 +50,7 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
  {!isLast && (
  <div className="flex-1 h-[2px] mx-2 mb-5 rounded-full overflow-hidden bg-gray-200">
  <div
- className="h-full bg-[#C0392B] transition-all duration-500 ease-out"
+ className="h-full bg-[#3B82F6] transition-all duration-500 ease-out"
  style={{ width: isDone ? "100%" : "0%" }}
  />
  </div>

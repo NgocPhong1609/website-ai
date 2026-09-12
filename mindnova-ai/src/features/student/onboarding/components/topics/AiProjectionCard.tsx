@@ -18,15 +18,15 @@ const AI_INSIGHT_ACTIVE =
 
 /** Decorative neural network nodes rendered in the visualization banner. */
 const NEURAL_NODES = [
- { top: "28%", left: "50%", size: 7, glow: "#C0392B" },
- { top: "55%", left: "28%", size: 4, glow: "#C0392B" },
- { top: "42%", left: "72%", size: 5, glow: "#C0392B" },
- { top: "72%", left: "56%", size: 3, glow: "#C0392B" },
- { top: "18%", left: "34%", size: 3, glow: "#C0392B" },
- { top: "66%", left: "18%", size: 2, glow: "#C0392B" },
- { top: "22%", left: "78%", size: 2, glow: "#C0392B" },
- { top: "48%", left: "14%", size: 2, glow: "#C0392B" },
- { top: "80%", left: "36%", size: 2, glow: "#C0392B" },
+ { top: "28%", left: "50%", size: 7, glow: "#3B82F6" },
+ { top: "55%", left: "28%", size: 4, glow: "#3B82F6" },
+ { top: "42%", left: "72%", size: 5, glow: "#3B82F6" },
+ { top: "72%", left: "56%", size: 3, glow: "#3B82F6" },
+ { top: "18%", left: "34%", size: 3, glow: "#3B82F6" },
+ { top: "66%", left: "18%", size: 2, glow: "#3B82F6" },
+ { top: "22%", left: "78%", size: 2, glow: "#3B82F6" },
+ { top: "48%", left: "14%", size: 2, glow: "#3B82F6" },
+ { top: "80%", left: "36%", size: 2, glow: "#3B82F6" },
 ] as const;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -56,10 +56,10 @@ function ComplexityMeter({ label, percent, level }: ComplexityMeterProps) {
  <div className="flex items-center gap-2.5">
  <ComplexityIcon />
  <div className="min-w-0">
- <p className="text-xs font-bold text-[#2C3039] truncate">
+ <p className="text-xs font-bold text-[#0F172A] truncate">
  Skill Complexity
  </p>
- <p className="text-[11px] text-[#8A8478] truncate">{label}</p>
+ <p className="text-[11px] text-[#64748B] truncate">{label}</p>
  </div>
  </div>
 
@@ -71,7 +71,7 @@ function ComplexityMeter({ label, percent, level }: ComplexityMeterProps) {
  className={twMerge(
  "h-1.5 flex-1 rounded-full transition-all duration-500",
  i < level
- ? " bg-[#C0392B] "
+ ? " bg-[#3B82F6] "
  : "bg-[#E8E8F0]",
  )}
  />
@@ -121,7 +121,7 @@ function NeuralNetworkVisualization() {
 
  {/* Label */}
  <div className="absolute inset-0 flex flex-col justify-end p-3">
- <span className="text-[9px] font-mono tracking-[0.2em] text-[#C0392B]/50 uppercase">
+ <span className="text-[9px] font-mono tracking-[0.2em] text-[#3B82F6]/50 uppercase">
  AI Neural Map
  </span>
  </div>
@@ -142,8 +142,8 @@ const TIME_ESTIMATES: Record<number, string> = {
 function TimeEstimate({ level }: { level: number }) {
  return (
  <div className="flex items-center justify-between text-[11px]">
- <span className="text-[#B8B0A3]">Est. time to proficiency</span>
- <span className="font-semibold text-[#C0392B]">
+ <span className="text-[#94A3B8]">Est. time to proficiency</span>
+ <span className="font-semibold text-[#3B82F6]">
  {TIME_ESTIMATES[level] ?? "—"}
  </span>
  </div>
@@ -161,11 +161,11 @@ export function AiProjectionCard({ selectedCount }: AiProjectionCardProps) {
  {/* Title */}
  <div className="flex items-center gap-2">
  
- <h2 className="text-sm font-bold text-[#2C3039]">AI Projection</h2>
+ <h2 className="text-sm font-bold text-[#0F172A]">AI Projection</h2>
  </div>
 
  {/* Complexity card */}
- <div className="bg-white border border-[#E8E8F0] rounded-2xl p-4 space-y-3 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_12px_rgba(192,57,43,0.05)]">
+ <div className="bg-white border border-[#E8E8F0] rounded-2xl p-4 space-y-3 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_12px_rgba(59, 130, 246,0.05)]">
  <ComplexityMeter
  label={complexity.label}
  percent={complexity.percent}
@@ -184,7 +184,7 @@ export function AiProjectionCard({ selectedCount }: AiProjectionCardProps) {
  className={twMerge(
  "flex gap-2 p-2.5 rounded-xl transition-all duration-300",
  hasSelection
- ? " bg-[#C0392B] border border-[#E8E2D9]"
+ ? " bg-[#3B82F6] border border-[#E2E8F0]"
  : "bg-[#FAFAFA] border border-[#F0F0F7]",
  )}
  >
@@ -192,7 +192,7 @@ export function AiProjectionCard({ selectedCount }: AiProjectionCardProps) {
  <p
  className={twMerge(
  "text-[10.5px] leading-relaxed transition-colors duration-300",
- hasSelection ? "text-[#C0392B]" : "text-[#B8B0A3]",
+ hasSelection ? "text-[#3B82F6]" : "text-[#94A3B8]",
  )}
  >
  {hasSelection ? AI_INSIGHT_ACTIVE : AI_INSIGHT_PLACEHOLDER}

@@ -28,7 +28,7 @@ export function VerifiedTeacherBadge({
   const badgeElement = (
     <span
       className={twMerge(
-        "inline-flex items-center justify-center shrink-0 font-bold select-none text-white rounded-full bg-gradient-to-tr from-[#383AB8] via-[#4648D4] to-[#6366F1] shadow-sm shadow-indigo-500/30 transition-transform duration-200 hover:scale-110",
+        "inline-flex items-center justify-center shrink-0 font-bold select-none text-white rounded-full bg-gradient-to-tr from-[#2563EB] via-[#2563EB] to-[#3B82F6] shadow-sm shadow-blue-500/30 transition-transform duration-200 hover:scale-110",
         sizeClasses[size],
         className
       )}

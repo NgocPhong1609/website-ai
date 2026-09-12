@@ -7,7 +7,7 @@ import { HelpCircleIcon, BellIcon } from "./icons";
 
 function LogoMark() {
  return (
- <div className="w-8 h-8 rounded-lg bg-[#C0392B] flex items-center justify-center shadow-[0_3px_10px_rgba(107,107,255,0.45)] shrink-0">
+ <div className="w-8 h-8 rounded-lg bg-[#3B82F6] flex items-center justify-center shadow-[0_3px_10px_rgba(59,130,246,0.45)] shrink-0">
  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
  <circle cx="12" cy="12" r="2.5" fill="white" />
  <path
@@ -31,7 +31,7 @@ export function CreateCourseTopbar() {
  aria-label="MindNova AI — Quay lại Dashboard"
  >
  <LogoMark />
- <span className="text-[15px] font-extrabold text-[#2C3039] tracking-tight group-hover:text-[#C0392B] transition-colors duration-150">
+ <span className="text-[15px] font-extrabold text-[#0F172A] tracking-tight group-hover:text-[#2563EB] transition-colors duration-150">
  MindNova AI
  </span>
  </Link>
@@ -40,13 +40,13 @@ export function CreateCourseTopbar() {
  <nav className="flex items-center gap-1" aria-label="Liên kết hỗ trợ">
  <Link
  href="/instructor/guide"
- className="px-3 py-2 rounded-lg text-sm text-[#8A8478] hover:bg-[#E8E2D9] hover:text-[#2C3039] transition-all duration-150"
+ className="px-3 py-2 rounded-lg text-sm text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#0F172A] transition-all duration-150"
  >
  Hướng dẫn
  </Link>
  <Link
  href="/instructor/community"
- className="px-3 py-2 rounded-lg text-sm text-[#8A8478] hover:bg-[#E8E2D9] hover:text-[#2C3039] transition-all duration-150"
+ className="px-3 py-2 rounded-lg text-sm text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#0F172A] transition-all duration-150"
  >
  Cộng đồng
  </Link>
@@ -57,7 +57,7 @@ export function CreateCourseTopbar() {
  <button
  type="button"
  aria-label="Trợ giúp"
- className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8A8478] hover:bg-[#E8E2D9] hover:text-[#C0392B] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#C0392B]/30"
+ className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#2563EB] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30"
  >
  <HelpCircleIcon />
  </button>
@@ -66,10 +66,10 @@ export function CreateCourseTopbar() {
  <button
  type="button"
  aria-label="Thông báo"
- className="relative w-8 h-8 rounded-lg flex items-center justify-center text-[#8A8478] hover:bg-[#E8E2D9] hover:text-[#C0392B] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#C0392B]/30"
+ className="relative w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#2563EB] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30"
  >
  <BellIcon />
- <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-red-400 border border-white" />
+ <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#60A5FA] border border-white" />
  </button>
 
  {/* Avatar */}

@@ -77,7 +77,7 @@ export function FilteredCoursesView() {
  if (isError) {
  return (
  <div className="flex flex-col items-center justify-center py-20 min-h-[400px]">
- <p className="text-red-500 font-medium">Đã xảy ra lỗi khi tải khoá học. Vui lòng thử lại sau.</p>
+ <p className="text-[#3B82F6] font-medium">Đã xảy ra lỗi khi tải khoá học. Vui lòng thử lại sau.</p>
  </div>
  );
  }
