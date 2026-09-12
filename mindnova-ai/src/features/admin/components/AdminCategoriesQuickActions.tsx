@@ -48,9 +48,13 @@ const statusOptions: Array<{ value: CategoryStatus; label: string }> = [
  { value: "inactive", label: "Từ chối" },
 ];
 
+function isPendingStatus(status: string): boolean {
+ return status.toLowerCase().includes("pending");
+}
+
 function toStatusLabel(status: string): string {
  const value = status.toLowerCase();
- if (value.includes("pending")) return "Chờ duyệt";
+ if (isPendingStatus(value)) return "Chờ duyệt";
  if (value.includes("active")) return "Đã duyệt";
  if (value.includes("inactive")) return "Từ chối";
  return status;
@@ -67,6 +71,7 @@ function statusPillClass(status: string): string {
 export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickActionsProps) {
  const router = useRouter();
  const [isOpen, setIsOpen] = useState(false);
+ const [pendingOnly, setPendingOnly] = useState(false);
  const [isSubmitting, setIsSubmitting] = useState(false);
  const [isUpdating, setIsUpdating] = useState<number | null>(null);
  const [isDeleting, setIsDeleting] = useState<number | null>(null);
@@ -77,6 +82,16 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  description: "",
  status: "pending",
  });
+
+ const pendingCount = useMemo(
+ () => rows.filter((row) => isPendingStatus(row.status)).length,
+ [rows],
+ );
+
+ const visibleRows = useMemo(
+ () => (pendingOnly ? rows.filter((row) => isPendingStatus(row.status)) : rows),
+ [rows, pendingOnly],
+ );
 
  const editingCategory = useMemo(
  () => rows.find((row) => row.id === editingCategoryId) ?? null,
@@ -230,6 +245,21 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  >
  + Thêm danh mục
  </button>
+ <button
+ type="button"
+ aria-pressed={pendingOnly}
+ onClick={() => setPendingOnly((current) => !current)}
+ className={
+ pendingOnly
+ ? "rounded-2xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-400"
+ : "rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-100"
+ }
+ >
+ Chưa duyệt{pendingCount > 0 ? ` (${pendingCount})` : ""}
+ </button>
+ <span className="ml-auto rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-[#3B82F6] ring-1 ring-teal-100">
+ {visibleRows.length} danh mục
+ </span>
  </div>
 
  {isOpen && (
@@ -364,7 +394,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  </tr>
  </thead>
  <tbody>
- {rows.map((row) => (
+ {visibleRows.map((row) => (
  <tr key={row.id} className="border-t border-slate-200 bg-white hover:bg-blue-50/35">
  <td className="px-4 py-3 font-medium text-slate-900">{row.name}</td>
  <td className="px-4 py-3 text-slate-600">{row.slug}</td>
@@ -423,10 +453,14 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  </tr>
  ))}
 
- {rows.length === 0 && (
+ {visibleRows.length === 0 && (
  <tr>
  <td colSpan={5} className="p-0">
- <NoData title="Không có dữ liệu" description="Chưa có dữ liệu danh mục." className="py-6" />
+ <NoData
+ title="Không có dữ liệu"
+ description={pendingOnly ? "Không có danh mục chờ duyệt." : "Chưa có dữ liệu danh mục."}
+ className="py-6"
+ />
  </td>
  </tr>
  )}
