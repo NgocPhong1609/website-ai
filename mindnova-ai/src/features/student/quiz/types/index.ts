@@ -28,6 +28,8 @@ export interface PrerequisiteItem {
 
 export interface AssessmentInfo {
  id: string;
+ course_id?: number | string | null;
+ quiz_id?: number | string | null;
  title: string;
  badge_title: string;
  course_title: string;

@@ -82,6 +82,19 @@ describe("light-theme contrast", () => {
     );
   });
 
+  it("binds text-foreground to slate-900 hex instead of var(--foreground)", () => {
+    const css = readFileSync(join(APP_ROOT, "src/shared/styles/globals.css"), "utf8");
+    expect(css).toMatch(/--color-foreground:\s*#0[fF]172[aA]/);
+    expect(css).not.toMatch(/--color-foreground:\s*var\(--foreground\)/);
+  });
+
+  it("keeps --foreground dark even if the OS prefers dark", () => {
+    const css = readFileSync(join(APP_ROOT, "src/shared/styles/globals.css"), "utf8");
+    expect(css).toMatch(
+      /prefers-color-scheme:\s*dark[\s\S]{0,240}--foreground:\s*#0[fF]172[aA]/i,
+    );
+  });
+
   it("does not pair white labels with the page-background slate", () => {
     const files = walkSourceFiles(join(APP_ROOT, "src")).concat(
       walkSourceFiles(join(APP_ROOT, "app")),

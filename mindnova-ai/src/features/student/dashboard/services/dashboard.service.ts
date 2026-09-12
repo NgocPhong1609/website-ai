@@ -1,6 +1,5 @@
 import { apiClient } from "@/src/shared/lib/api-client";
 import type { DashboardOverview, DashboardApiResponse, DashboardCourse, AdvancedRecommendation } from "../types";
-import { AI_SUGGESTION, DASHBOARD_COURSES, FOCUS_AREAS, OVERALL_PROGRESS, STUDY_STREAK, ADVANCED_RECOMMENDATIONS } from "../constants";
 
 /**
  * Normalizes course attributes between API snake_case format and local camelCase format.
@@ -38,22 +37,21 @@ export async function getDashboardOverview(): Promise<DashboardOverview> {
  return {
  ...response.data,
  courses: (response.data.courses || []).map(normalizeCourse),
- advanced_recommendations: (response.data.advanced_recommendations || ADVANCED_RECOMMENDATIONS as unknown as AdvancedRecommendation[]).map(normalizeRecommendation),
+ advanced_recommendations: (response.data.advanced_recommendations || []).map(normalizeRecommendation),
  };
  }
  } catch (error) {
- // Graceful fallback if backend API server is unreachable during local development
- console.warn("[DashboardService] Unable to reach backend /student/dashboard API, using local fallback:", error);
- require('fs').appendFileSync('error.log', String(error) + '\n');
+ console.warn("[DashboardService] Unable to reach backend /student/dashboard API:", error);
  }
 
  return {
+ error: "Không thể tải bảng điều khiển. Vui lòng thử lại.",
  user: null,
- courses: (DASHBOARD_COURSES as unknown as DashboardCourse[]).map(normalizeCourse),
- focus_areas: FOCUS_AREAS,
- ai_suggestion: { ...AI_SUGGESTION },
- overall_progress: { ...OVERALL_PROGRESS },
- study_streak: { ...STUDY_STREAK },
- advanced_recommendations: (ADVANCED_RECOMMENDATIONS as unknown as AdvancedRecommendation[]).map(normalizeRecommendation),
+ courses: [],
+ focus_areas: [],
+ ai_suggestion: { badge: "", message: "", reason: "", estimated: "" },
+ overall_progress: { percent: 0, delta: "" },
+ study_streak: { days: 0, message: "" },
+ advanced_recommendations: [],
  };
 }

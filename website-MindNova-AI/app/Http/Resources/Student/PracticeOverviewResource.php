@@ -15,6 +15,7 @@ class PracticeOverviewResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'modules_list' => $this->resource['modules_list'] ?? [],
             'assessment_info' => $this->resource['assessment_info'] ?? null,
             'readiness' => $this->resource['readiness'] ?? null,
             'instructions' => $this->resource['instructions'] ?? [],

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useGetCourseDetail } from "../../courses/api";
 import { checkoutService } from "../services/checkout.service";
+import { useGetPaymentMethods } from "../../billing/api";
 import { Ticket, AlertTriangle, Gift, PartyPopper, Sparkles } from "lucide-react";
 import { Loader } from "@/src/shared/components/ui/Loader";
 import toast from "react-hot-toast";
@@ -13,7 +14,17 @@ export function CheckoutView({ courseId }: { courseId: number }) {
   const router = useRouter();
   const { data, isLoading, isError } = useGetCourseDetail(courseId);
   const [paymentMethod, setPaymentMethod] = useState<string>("vnpay");
+  const [savedMethodId, setSavedMethodId] = useState<number | null>(null);
+  const [confirmAccount, setConfirmAccount] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { data: savedMethods = [] } = useGetPaymentMethods();
+
+  useEffect(() => {
+    const preferred = savedMethods.find((method) => method.is_default) ?? savedMethods[0];
+    if (preferred && savedMethodId === null) {
+      setSavedMethodId(preferred.id);
+    }
+  }, [savedMethods, savedMethodId]);
 
   // Coupon states
   const [couponCodeInput, setCouponCodeInput] = useState("");
@@ -86,8 +97,22 @@ export function CheckoutView({ courseId }: { courseId: number }) {
         return;
       }
 
-      const methodToUse = isEffectiveFree ? "free" : paymentMethod;
-      const res = await checkoutService.createOrder([courseId], methodToUse, appliedCoupon?.code);
+      if (!isEffectiveFree && savedMethods.length > 0) {
+        if (!savedMethodId) {
+          toast.error("Vui lòng chọn tài khoản đã lưu.");
+          setIsProcessing(false);
+          return;
+        }
+        if (!confirmAccount) {
+          toast.error("Hãy xác nhận tài khoản thanh toán trước khi tiếp tục.");
+          setIsProcessing(false);
+          return;
+        }
+      }
+
+      const selected = savedMethods.find((method) => method.id === savedMethodId);
+      const methodToUse = isEffectiveFree ? "free" : (selected?.provider || paymentMethod);
+      const res = await checkoutService.createOrder([courseId], methodToUse, appliedCoupon?.code, savedMethodId || undefined);
 
       if (res.success) {
         if (isEffectiveFree || !res.payment_url) {
@@ -270,6 +295,24 @@ export function CheckoutView({ courseId }: { courseId: number }) {
               </h2>
               
               <div className="space-y-3 mb-6">
+                {savedMethods.length > 0 ? (
+                  <>
+                    {savedMethods.map((method) => (
+                      <label key={method.id} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${savedMethodId === method.id ? "border-[#3B82F6] bg-[#F8FAFC] ring-1 ring-[#3B82F6]/30" : "border-[#E2E8F0] hover:bg-[#F8FAFC]"}`}>
+                        <input type="radio" name="savedMethod" checked={savedMethodId === method.id} onChange={() => { setSavedMethodId(method.id); setConfirmAccount(false); }} className="w-4 h-4 text-[#3B82F6]" />
+                        <div>
+                          <div className="font-semibold text-sm text-[#0F172A]">{method.label}</div>
+                          <div className="text-xs text-[#64748B]">{method.provider.toUpperCase()}</div>
+                        </div>
+                      </label>
+                    ))}
+                    <label className="flex items-center gap-2 text-xs font-semibold text-[#0F172A]">
+                      <input type="checkbox" checked={confirmAccount} onChange={(e) => setConfirmAccount(e.target.checked)} />
+                      Xác nhận dùng tài khoản đã chọn để thanh toán
+                    </label>
+                  </>
+                ) : (
+                  <>
                 <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'vnpay' ? 'border-[#3B82F6] bg-[#F8FAFC] ring-1 ring-[#3B82F6]/30' : 'border-[#E2E8F0] hover:bg-[#F8FAFC]'}`}>
                   <input type="radio" name="paymentMethod" value="vnpay" checked={paymentMethod === 'vnpay'} onChange={() => setPaymentMethod('vnpay')} className="w-4 h-4 text-[#3B82F6]" />
                   <div className="font-semibold text-sm text-[#0F172A]">Thanh toán qua VNPay</div>
@@ -282,6 +325,8 @@ export function CheckoutView({ courseId }: { courseId: number }) {
                   <input type="radio" name="paymentMethod" value="banking" checked={paymentMethod === 'banking'} onChange={() => setPaymentMethod('banking')} className="w-4 h-4 text-[#3B82F6]" />
                   <div className="font-semibold text-sm text-[#0F172A]">Chuyển khoản Ngân hàng</div>
                 </label>
+                  </>
+                )}
               </div>
 
               <button

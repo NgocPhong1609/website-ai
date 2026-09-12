@@ -1,13 +1,18 @@
 "use client";
 
 import { PaymentMethodsCard } from "./PaymentMethodsCard";
-import { PromoCodeCard } from "./PromoCodeCard";
 import { TransactionHistoryTable } from "./TransactionHistoryTable";
 import { BillingFooter } from "./BillingFooter";
-import { UPCOMING_PAYMENT } from "../constants";
+import { useGetBilling } from "../api";
 import toast from "react-hot-toast";
 
 export default function BillingContainer() {
+ const { data, isLoading, isError, refetch } = useGetBilling();
+ const orders = data?.orders ?? [];
+ const latestPaid = orders.find((order) => order.status === "completed");
+ const amountLabel = latestPaid
+  ? `${Number(latestPaid.total_amount).toLocaleString("vi-VN")} VNĐ`
+  : "0 VNĐ";
  return (
  <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-8">
  
@@ -51,11 +56,11 @@ export default function BillingContainer() {
 
  <div className="text-2xl sm:text-3xl font-bold text-[#0f172a] my-1 flex items-baseline justify-between gap-4">
  <div>
- <span className="text-[#2563eb] font-bold">{UPCOMING_PAYMENT.amount}</span>
- <span className="text-xs font-medium text-[#64748b] ml-1.5">/ kỳ</span>
+ <span className="text-[#2563eb] font-bold">{isLoading ? "..." : amountLabel}</span>
+ <span className="text-xs font-medium text-[#64748b] ml-1.5">gần nhất</span>
  </div>
  <span className="text-xs font-semibold text-[#64748b]">
- Trạng thái: Active
+ {latestPaid ? "Đã thanh toán" : "Chưa có giao dịch"}
  </span>
  </div>
 
@@ -75,13 +80,14 @@ export default function BillingContainer() {
  </section>
 
  {/* ─── Symmetrical 2-Column Grid for Payment Methods & Promo Code ─── */}
- <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+ {isError && (
+ <p className="text-sm text-rose-600">Không thể tải thông tin thanh toán. <button type="button" className="underline" onClick={() => refetch()}>Thử lại</button></p>
+ )}
+
  <PaymentMethodsCard />
- <PromoCodeCard />
- </div>
 
  {/* ─── Transaction History Table ─── */}
- <TransactionHistoryTable />
+ <TransactionHistoryTable orders={orders} isLoading={isLoading} />
 
  {/* ─── Security Footer ─── */}
  <BillingFooter />

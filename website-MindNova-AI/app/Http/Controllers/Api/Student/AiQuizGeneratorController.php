@@ -9,8 +9,26 @@ use Illuminate\Support\Facades\Log;
 
 class AiQuizGeneratorController extends Controller
 {
+    private function requireUserId(Request $request)
+    {
+        $userId = $request->user('sanctum')?->id ?? $request->user()?->id ?? auth('sanctum')->id();
+        if (! $userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vui lòng đăng nhập để sử dụng tính năng này.',
+            ], 401);
+        }
+
+        return (int) $userId;
+    }
+
     public function generate(Request $request)
     {
+        $userId = $this->requireUserId($request);
+        if ($userId instanceof \Illuminate\Http\JsonResponse) {
+            return $userId;
+        }
+
         $validated = $request->validate([
             'topic' => 'required|string|max:255',
             'title' => 'nullable|string|max:255',
@@ -21,7 +39,6 @@ class AiQuizGeneratorController extends Controller
             'custom_prompt' => 'nullable|string|max:1000',
         ]);
 
-        $userId = auth('sanctum')->id() ?? request()->user('sanctum')?->id ?? 201;
         $groqKey = env('GROQ_API_KEY');
 
         if (!$groqKey) {
@@ -221,7 +238,10 @@ PROMPT;
 
     public function history(Request $request)
     {
-        $userId = auth('sanctum')->id() ?? request()->user('sanctum')?->id ?? 201;
+        $userId = $this->requireUserId($request);
+        if ($userId instanceof \Illuminate\Http\JsonResponse) {
+            return $userId;
+        }
 
         $quizzes = AiGeneratedQuiz::where('user_id', $userId)
             ->orderBy('created_at', 'desc')
@@ -234,9 +254,12 @@ PROMPT;
         ]);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $userId = auth('sanctum')->id() ?? request()->user('sanctum')?->id ?? 201;
+        $userId = $this->requireUserId($request);
+        if ($userId instanceof \Illuminate\Http\JsonResponse) {
+            return $userId;
+        }
 
         $quiz = AiGeneratedQuiz::where('id', $id)
             ->where('user_id', $userId)
@@ -254,7 +277,10 @@ PROMPT;
 
     public function submit(Request $request, $id)
     {
-        $userId = auth('sanctum')->id() ?? request()->user('sanctum')?->id ?? 201;
+        $userId = $this->requireUserId($request);
+        if ($userId instanceof \Illuminate\Http\JsonResponse) {
+            return $userId;
+        }
         $userAnswers = $request->input('answers', []);
 
         $quiz = AiGeneratedQuiz::where('id', $id)->where('user_id', $userId)->first();
@@ -307,9 +333,12 @@ PROMPT;
         ]);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        $userId = auth('sanctum')->id() ?? request()->user('sanctum')?->id ?? 201;
+        $userId = $this->requireUserId($request);
+        if ($userId instanceof \Illuminate\Http\JsonResponse) {
+            return $userId;
+        }
 
         $quiz = AiGeneratedQuiz::where('id', $id)
             ->where('user_id', $userId)

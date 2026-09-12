@@ -241,7 +241,7 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  );
 }
 
-export function CourseDetailWorkspace({ courseId = 1 }: { courseId?: string | number }) {
+export function CourseDetailWorkspace({ courseId }: { courseId: string | number }) {
  const { data, isLoading, isError, refetch } = useGetCourseDetail(courseId);
 
  if (isLoading) {

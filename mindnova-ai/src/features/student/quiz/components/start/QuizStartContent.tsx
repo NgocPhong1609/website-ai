@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { axiosClient } from "@/src/shared/lib/axios";
 import { useGetPracticeOverview } from "../../api";
 import { SelfAssessmentModal } from "../self-assessment/SelfAssessmentModal";
 import toast from "react-hot-toast";
@@ -29,23 +30,10 @@ export function QuizStartContent() {
   const [myHistoryQuizzes, setMyHistoryQuizzes] = useState<any[]>([]);
   const [reviewingQuiz, setReviewingQuiz] = useState<any>(null);
 
-  const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/api\/?$/, "");
-
-  // Hàm load lịch sử đề thi
   const fetchMyHistory = async () => {
     try {
-      const res = await fetch(`${baseUrl}/api/student/practice/ai-quizzes/history`, {
-        method: "GET",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (res.ok) {
-        const json = await res.json();
-        setMyHistoryQuizzes(json.data || []);
-      }
+      const { data: json } = await axiosClient.get("/api/student/practice/ai-quizzes/history");
+      setMyHistoryQuizzes(json.data || []);
     } catch (e) {
       console.warn("Chưa lấy được lịch sử bài thi:", e);
     }
@@ -57,21 +45,10 @@ export function QuizStartContent() {
     if (!confirm("Bạn có chắc chắn muốn xóa bài kiểm tra này không?")) return;
 
     try {
-      const res = await fetch(`${baseUrl}/api/student/practice/ai-quizzes/${quizId}`, {
-        method: "DELETE",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (res.ok) {
-        setMyHistoryQuizzes((prev) => prev.filter((q) => q.id !== quizId));
-        if (reviewingQuiz?.id === quizId) setReviewingQuiz(null);
-        toast.success("Đã xóa bài thi");
-      } else {
-        toast.error("Xóa bài thi thất bại!");
-      }
+      await axiosClient.delete(`/api/student/practice/ai-quizzes/${quizId}`);
+      setMyHistoryQuizzes((prev) => prev.filter((q) => q.id !== quizId));
+      if (reviewingQuiz?.id === quizId) setReviewingQuiz(null);
+      toast.success("Đã xóa bài thi");
     } catch (err) {
       console.error(err);
       toast.error("Đã xảy ra lỗi khi xóa bài thi.");
@@ -82,50 +59,8 @@ export function QuizStartContent() {
     fetchMyHistory();
   }, []);
 
-  const defaultModules = [
-    {
-      id: "ai_generator",
-      title: "Khảo Sát Động: Tự Tạo Bộ Đề Đánh Giá Cùng AI",
-      badge_title: "AI On-Demand • Tự Động",
-      course_title: "Trí Tuệ Nhân Tạo Sinh Đề",
-      description: "Nhập chủ đề bất kỳ để Gia sư AI thiết kế một bộ đề khảo sát riêng biệt, lưu trữ lịch sử và chấm điểm chi tiết cho riêng bạn.",
-      time_limit_minutes: 15,
-      questions_count: 10,
-      passing_percentage: 70,
-    },
-    {
-      id: "mod1",
-      title: "Kiểm tra Nền tảng: Mạng Thần Kinh & Deep Learning",
-      badge_title: "Đánh giá Năng lực • Module 1",
-      course_title: "AI & Neural Network Foundations",
-      description: "Kiểm nghiệm vững chắc tư duy kiến trúc Mạng Thần Kinh (ANN/CNN), cơ chế Attention trong Transformer.",
-      time_limit_minutes: 15,
-      questions_count: 10,
-      passing_percentage: 70,
-    },
-    {
-      id: "mod2",
-      title: "Kiểm tra Chuyên môn: Next.js 15 & React 19 Server Actions",
-      badge_title: "Đánh giá Năng lực • Module 2",
-      course_title: "Modern Next.js 15 & React 19",
-      description: "Đọ sức sâu với cơ chế React 19 Actions, useActionState, Suspense Boundaries.",
-      time_limit_minutes: 15,
-      questions_count: 10,
-      passing_percentage: 70,
-    },
-    {
-      id: "mod3",
-      title: "Kiểm tra Chuyên sâu: Bảo mật, Middleware & Rate Limiting",
-      badge_title: "Đánh giá Năng lực • Module 3",
-      course_title: "Next.js 15 Security & Scaling",
-      description: "Phân tích khả năng thiết lập tường lửa Middleware, quản lý token bảo mật Sanctum/JWT.",
-      time_limit_minutes: 15,
-      questions_count: 10,
-      passing_percentage: 70,
-    }
-  ];
-
-  const currentMod = defaultModules.find(m => String(m.id) === String(selectedModId)) || defaultModules[0];
+  const practiceModules = data?.modules_list ?? [];
+  const currentMod = practiceModules.find((m) => String(m.id) === String(selectedModId)) || practiceModules[0];
 
   const handleToggleType = (type: string) => {
     if (questionTypes.includes(type)) {
@@ -143,40 +78,30 @@ export function QuizStartContent() {
 
     setIsGenerating(true);
     try {
-      const res = await fetch(`${baseUrl}/api/student/practice/generate-ai-quiz`, {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          topic,
-          title: title || undefined,
-          question_count: questionCount,
-          difficulty,
-          question_types: questionTypes,
-          time_limit_minutes: timeLimit,
-          custom_prompt: customPrompt || undefined,
-        }),
+      const { data: json } = await axiosClient.post("/api/student/practice/generate-ai-quiz", {
+        topic,
+        title: title || undefined,
+        question_count: questionCount,
+        difficulty,
+        question_types: questionTypes,
+        time_limit_minutes: timeLimit,
+        custom_prompt: customPrompt || undefined,
       });
-
-      const json = await res.json();
-      if (res.ok && json.data) {
+      if (json.data) {
         setGeneratedQuiz(json.data);
         fetchMyHistory();
       } else {
         toast.error(json.message || "Tạo đề thi thất bại, vui lòng thử lại!");
       }
     } catch (err: any) {
-      console.error(err);
-      toast.error("Đã xảy ra lỗi kết nối đến máy chủ.");
+      toast.error(err?.response?.data?.message || "Đã xảy ra lỗi kết nối đến máy chủ.");
     } finally {
       setIsGenerating(false);
     }
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-[1200px] mx-auto min-h-[85vh] flex flex-col gap-8 bg-white">
+    <div className="w-full min-h-[calc(100vh-4.5rem)] -mb-24 bg-white p-6 md:p-8 pb-32 flex flex-col gap-8">
       
       {/* Header & Tabs Navigation */}
       <div className="space-y-6 text-center mt-4">
@@ -429,8 +354,13 @@ export function QuizStartContent() {
       {/* TAB CONTENT: DEFAULT MODULES */}
       {activeTab === "default_modules" && (
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+          {isLoading && <p className="text-center text-sm text-muted-foreground py-16">Đang tải chuyên đề...</p>}
+          {isError && <p className="text-center text-sm text-rose-600 py-16">Không thể tải chuyên đề. Vui lòng thử lại.</p>}
+          {!isLoading && !isError && practiceModules.length === 0 && (
+            <p className="text-center text-sm text-muted-foreground py-16">Chưa có bài kiểm tra nào. Hãy tạo đề AI hoặc ghi danh khóa học.</p>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {defaultModules.filter(m => m.id !== "ai_generator").map((mod) => (
+            {practiceModules.map((mod) => (
               <div key={mod.id} className="p-7 bg-white border border-border rounded-3xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between h-full space-y-6">
                 <div className="space-y-4">
                   <span className="inline-block text-[11px] font-bold px-3 py-1 rounded-full bg-secondary text-muted-foreground tracking-wide uppercase">
@@ -670,8 +600,8 @@ export function QuizStartContent() {
       )}
 
       <SelfAssessmentModal
-        courseId={currentMod.id}
-        courseTitle={currentMod.course_title || currentMod.title}
+        courseId={currentMod?.course_id || currentMod?.id}
+        courseTitle={currentMod?.course_title || currentMod?.title || ""}
         isOpen={isSelfAssessmentOpen}
         onClose={() => setIsSelfAssessmentOpen(false)}
       />

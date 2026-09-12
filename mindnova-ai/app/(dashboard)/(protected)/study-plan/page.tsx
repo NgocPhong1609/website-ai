@@ -33,11 +33,8 @@ export default async function AIStudyPlanPage() {
  Lộ trình học AI • Module {currentIdx} / {totalMods}
  </div>
 
- <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground leading-tight">
- {activeSyllabus.title.split(" ")[0]} {" "}
- <span className="text-blue-600 font-extrabold">
- {activeSyllabus.title.split(" ").slice(1).join(" ")}
- </span>
+ <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A] leading-tight break-words">
+ {activeSyllabus.title}
  </h1>
 
  <p className="text-sm text-muted-foreground leading-relaxed font-medium">

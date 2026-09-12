@@ -13,7 +13,16 @@ import { getDashboardOverview } from "@/src/features/student/dashboard/services/
  */
 export default async function DashboardPage() {
  const dashboardData = await getDashboardOverview();
- const userName = dashboardData.user?.name ?? "Học viên MindNova";
+ if (dashboardData.error) {
+ return (
+ <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
+ <h1 className="text-xl font-bold text-slate-900 mb-2">Không thể tải bảng điều khiển</h1>
+ <p className="text-sm text-slate-500 max-w-md mb-6">{dashboardData.error}</p>
+ <Link href="/" className="px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">Thử lại</Link>
+ </div>
+ );
+ }
+ const userName = dashboardData.user?.name ?? "Học viên";
 
  return (
  <div className="flex flex-col gap-8 p-6 md:p-8 max-w-[1400px] w-full mx-auto min-h-[calc(100vh-4rem)]">
@@ -32,7 +41,7 @@ export default async function DashboardPage() {
  
  <p className="text-sm text-slate-500 leading-relaxed">
  {dashboardData.user 
- ? (dashboardData.welcome_message || "Chuỗi chuyên cần của bạn đang được duy trì vô cùng tích cực! Hiện tại bạn đạt hiệu suất rèn luyện vượt trội hơn 88% học viên cùng chuyên ngành trong tuần này.")
+ ? (dashboardData.welcome_message || "Theo dõi tiến độ học tập và gợi ý từ gia sư AI.")
  : "Vui lòng đăng nhập để theo dõi tiến độ học tập và nhận các gợi ý thông minh từ AI."}
  </p>
  </div>
@@ -90,7 +99,7 @@ export default async function DashboardPage() {
  focusAreas={dashboardData.focus_areas}
  weeklyActivity={dashboardData.weekly_activity}
  checkedInDates={(dashboardData as any).checked_in_dates || []}
- streakFreezeCount={(dashboardData.study_streak as any)?.freeze_count || 1}
+ streakFreezeCount={(dashboardData.study_streak as any)?.freeze_count || 0}
  />
 
  {/* ─── AI Co-Pilot Suggestion Box ─── */}

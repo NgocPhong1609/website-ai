@@ -12,11 +12,18 @@ import type {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 function ProgressCard({ progress }: { progress?: CourseDetailProgressCard }) {
- const percentage = progress?.progress_percentage ?? 65;
- const completed = progress?.completed_lessons_count ?? 14;
- const total = progress?.total_lessons_count ?? 22;
- const timeLeft = progress?.time_left_text ?? "8h 15m thời lượng còn lại";
- const statusTag = progress?.status_tag ?? "Vượt chỉ tiêu +15%";
+ if (!progress) {
+ return (
+ <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 text-sm text-[#64748B]">
+ Chưa có dữ liệu tiến độ cho khóa học này.
+ </div>
+ );
+ }
+ const percentage = progress.progress_percentage ?? 0;
+ const completed = progress.completed_lessons_count ?? 0;
+ const total = progress.total_lessons_count ?? 0;
+ const timeLeft = progress.time_left_text ?? "";
+ const statusTag = progress.status_tag ?? "";
 
  return (
  <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 shadow-sm hover:border-[#94A3B8] transition-all duration-300">
@@ -51,11 +58,18 @@ function ProgressCard({ progress }: { progress?: CourseDetailProgressCard }) {
 }
 
 function AiInsightCard({ aiInsight }: { aiInsight?: CourseDetailAIInsight }) {
- const title = aiInsight?.title || "Gia sư Trí tuệ Nova";
- const statusTag = aiInsight?.status_tag || "Online 24/7";
- const summaryText = aiInsight?.summary_text || "Bạn đang duy trì tốc độ ghi nhớ xuất sắc! Bài học tiếp theo chứa các công thức toán học tối ưu, hãy đảm bảo bạn nắm chắc giải thuật trước khi thi.";
- const suggestionText = aiInsight?.suggestion_text || "Xem nhanh biểu đồ đạo hàm trong tài liệu Notebook trước khi vào bài giảng video.";
- const actionLabel = aiInsight?.action_label || "Mở khung chat Gia sư Nova";
+ if (!aiInsight) {
+ return (
+ <div className="bg-[#F8FAFC] rounded-xl border border-[#E2E8F0] p-5 text-sm text-[#64748B]">
+ Chưa có gợi ý AI cho khóa học này.
+ </div>
+ );
+ }
+ const title = aiInsight.title || "Gia sư Trí tuệ Nova";
+ const statusTag = aiInsight.status_tag || "";
+ const summaryText = aiInsight.summary_text || "";
+ const suggestionText = aiInsight.suggestion_text || "";
+ const actionLabel = aiInsight.action_label || "Mở khung chat Gia sư Nova";
 
  return (
  <div className="bg-[#F8FAFC] rounded-xl border border-[#E2E8F0] p-5 relative overflow-hidden transition-all duration-300 hover:border-[#94A3B8]">
@@ -115,13 +129,7 @@ function ResourceTypeIcon({ type, title }: { type?: string; title?: string }) {
 }
 
 function ResourcesCard({ resources = [] }: { resources?: CourseDetailResourceItem[] }) {
- const defaultResources: CourseDetailResourceItem[] = [
- { id: "1", title: "Source Code & Notebooks (PyTorch 2.0)", type: "zip", size: "45.8 MB", url: "#" },
- { id: "2", title: "Tài liệu Stanford CS231n Deep Learning", type: "pdf", size: "Tham khảo", url: "#" },
- { id: "3", title: "Phòng thảo luận Discord chuyên đề AI", type: "chat", size: "1,248 Members", url: "#" },
- ];
-
- const displayList = resources && resources.length > 0 ? resources : defaultResources;
+ const displayList = resources ?? [];
 
  const handleResourceClick = (res: CourseDetailResourceItem) => {
  toast(`Đang kích hoạt tải/kết nối tới tài liệu: "${res.title}"...`);
@@ -137,6 +145,9 @@ function ResourcesCard({ resources = [] }: { resources?: CourseDetailResourceIte
  </div>
 
  <div className="space-y-2.5">
+ {displayList.length === 0 && (
+ <p className="text-xs text-[#64748B]">Chưa có tài liệu hỗ trợ.</p>
+ )}
  {displayList.map((res, idx) => (
  <button
  key={res.id || idx}
@@ -175,11 +186,18 @@ import { Avatar } from "@/src/shared/components/ui/Avatar";
 import toast from "react-hot-toast";
 
 function InstructorCard({ instructor }: { instructor?: CourseDetailInstructor & { is_verified?: boolean; avatar_url?: string } }) {
- const name = instructor?.name || "TS. Nguyễn Ngọc Phong";
- const role = instructor?.role || "Chuyên gia Kiến trúc Trí tuệ Nhân tạo";
- const bio = instructor?.bio || "Hơn 12 năm kinh nghiệm thiết kế mô hình AI và dẫn dắt các dự án điện toán đám mây thế hệ mới tại các học viện công nghệ hàng đầu.";
- const isVerified = instructor?.is_verified ?? true;
- const avatarSrc = instructor?.avatar_url || (instructor as any)?.avatar || null;
+ if (!instructor?.name) {
+ return (
+ <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 text-sm text-[#64748B] text-center">
+ Chưa có thông tin giảng viên.
+ </div>
+ );
+ }
+ const name = instructor.name;
+ const role = instructor.role || "Giảng viên";
+ const bio = instructor.bio || "";
+ const isVerified = instructor.is_verified ?? false;
+ const avatarSrc = instructor.avatar_url || (instructor as any)?.avatar || null;
 
  return (
  <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col items-center text-center relative overflow-hidden group hover:border-[#94A3B8] transition-all">

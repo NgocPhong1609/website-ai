@@ -179,6 +179,8 @@ class PracticeService
             // Notice we use the REAL LESSON ID from Database as the identifier!
             $modulesList[] = [
                 'id' => (string) ($lesson ? $lesson->id : $quiz->id),
+                'course_id' => $course?->id,
+                'quiz_id' => $quiz->id,
                 'title' => $quiz->title,
                 'badge_title' => $badge,
                 'course_title' => $courseTitle,

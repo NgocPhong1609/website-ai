@@ -581,7 +581,8 @@ Dependencies đặc biệt: `james-heinrich/getid3` (duration video), `openai-ph
 ### Workarounds / TODO / limitation
 
 - Không có TODO/FIXME đáng kể trong app PHP/TS.
-- HistoryService có placeholder stats khi thiếu data (FE cũng fallback mock dashboard/explore).
+- HistoryService có placeholder stats khi thiếu data.
+- Student billing: `GET /api/orders` (auth). Certificates: `GET/POST /api/student/certificates` (auth, bảng `certificates`). Practice modules: `GET /api/student/practice/overview` field `modules_list`. AI quiz practice routes yêu cầu Sanctum, không fallback userId 201.
 - Billing + certificates student: UI tĩnh.
 - `/welcome`, `app/loading.tsx`, `app/not-found.tsx` stub.
 - `ads-hourly` không gắn.
@@ -628,8 +629,8 @@ Các mục sau **không khẳng định** cho đến khi đọc thêm hoặc ch�
 - Production `DB_*`, Reverb host, queue worker, cron `revenue:unlock-pending` có chạy không.
 - Role id thật trên DB production vs hardcoded 2/3.
 - `config/broadcasting.php` có được publish lúc deploy không.
-- Certificate hoàn thành được issue khi nào (model có, FE certificates mock).
-- Admin overview/invoices/categories API có endpoint thật hay chỉ FE stub.
+- Certificate: student claim khi enrollment `completed` hoặc `progress_percentage >= 100`; chưa generate PDF (`certificate_url` có thể null).
+- Admin overview stats lấy từ `GET /api/admin/overview`; hero UI dùng 3 stat đầu.
 - Google OAuth redirect production (code callback có hardcoded `http://localhost:3000/login-success?token=`).
 - ZaloPay có dùng ở môi trường nào không (không có route).
 - Coverage test Pest hiện tại pass/fail trên máy này — chưa chạy trong task này.

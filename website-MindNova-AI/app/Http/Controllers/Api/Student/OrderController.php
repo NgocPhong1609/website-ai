@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Course;
+use App\Models\StudentPaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -14,6 +15,40 @@ use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
+    public function index(Request $request)
+    {
+        $user = $request->user();
+
+        $orders = Order::with('orderItems.course')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'orders' => $orders->map(function (Order $order) {
+                    $titles = $order->orderItems
+                        ->map(fn ($item) => $item->course?->title)
+                        ->filter()
+                        ->values();
+
+                    return [
+                        'id' => $order->id,
+                        'transaction_id' => $order->transaction_id,
+                        'total_amount' => (float) $order->total_amount,
+                        'payment_method' => $order->payment_method,
+                        'status' => $order->status,
+                        'created_at' => optional($order->created_at)->timezone('Asia/Ho_Chi_Minh')?->format('d/m/Y'),
+                        'course_id' => $order->orderItems->first()?->course_id,
+                        'service' => $titles->implode(', ') ?: 'Thanh toán khóa học',
+                    ];
+                })->values(),
+                'payment_methods' => $orders->pluck('payment_method')->unique()->values(),
+            ],
+        ]);
+    }
+
     /**
      * Tạo đơn hàng mới
      */
@@ -23,6 +58,7 @@ class OrderController extends Controller
             'course_ids'     => 'required|array|min:1',
             'course_ids.*'   => 'required|integer|exists:courses,id',
             'payment_method' => 'required|string|in:vnpay,momo,banking,free',
+            'payment_method_id' => 'nullable|integer',
             'coupon_code'    => 'nullable|string',
         ]);
 
@@ -31,6 +67,14 @@ class OrderController extends Controller
         }
 
         $user = $request->user();
+
+        if ($request->filled('payment_method_id') && $request->payment_method !== 'free') {
+            $saved = StudentPaymentMethod::where('user_id', $user->id)->find($request->payment_method_id);
+            if (! $saved) {
+                return response()->json(['success' => false, 'message' => 'Tài khoản thanh toán không hợp lệ.'], 422);
+            }
+            $request->merge(['payment_method' => $saved->provider]);
+        }
 
         // Kiểm tra trùng lặp
         if (DB::table('enrollments')->where('user_id', $user->id)->whereIn('course_id', $request->course_ids)->exists()) {
@@ -623,6 +667,20 @@ class OrderController extends Controller
 
         $courseId = $request->input('course_id');
         $orderId = $request->input('order_id');
+        $paymentMethodId = $request->input('payment_method_id');
+
+        $refundAccount = null;
+        if ($paymentMethodId) {
+            $refundAccount = StudentPaymentMethod::where('user_id', $user->id)->find($paymentMethodId);
+            if (! $refundAccount) {
+                return response()->json(['success' => false, 'message' => 'Tài khoản nhận hoàn tiền không hợp lệ.'], 422);
+            }
+        } elseif (StudentPaymentMethod::where('user_id', $user->id)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vui lòng chọn tài khoản đã lưu để nhận hoàn tiền.',
+            ], 422);
+        }
 
         if (!$courseId && !$orderId) {
             return response()->json(['success' => false, 'message' => 'Vui lòng chọn khóa học hoặc đơn hàng để hoàn tiền.'], 422);
@@ -736,13 +794,18 @@ class OrderController extends Controller
 
             DB::commit();
 
+            $destination = $refundAccount
+                ? ' về '.$refundAccount->toPublicArray()['label']
+                : '';
+
             return response()->json([
                 'success' => true,
-                'message' => "Hoàn tiền khóa học '{$course->title}' thành công! Số tiền " . number_format($order->total_amount) . " VNĐ đã được hoàn trả.",
+                'message' => "Hoàn tiền khóa học '{$course->title}' thành công! Số tiền " . number_format($order->total_amount) . " VNĐ đã được hoàn trả".$destination.'.',
                 'data' => [
                     'order_id' => $order->id,
                     'course_id' => $course->id,
                     'refunded_amount' => $order->total_amount,
+                    'refund_account' => $refundAccount?->toPublicArray(),
                 ]
             ], 200);
         } catch (\Exception $e) {
