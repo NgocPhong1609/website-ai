@@ -28,7 +28,7 @@ export function CustomTooltip({
  return (
  <div className="bg-white rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-[#EAEAF4] px-4 py-3 min-w-[160px] pointer-events-none">
  {/* Hour label */}
- <p className="text-[10px] font-bold text-[#8A8478] uppercase tracking-widest mb-2">
+ <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-widest mb-2">
  Hour {hourStr}
  </p>
 

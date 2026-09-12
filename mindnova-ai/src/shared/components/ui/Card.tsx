@@ -14,27 +14,27 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 
 const variantStyles: Record<CardVariant, string> = {
   default:
-    "bg-white rounded-2xl md:rounded-3xl border border-[#E6E6F0] shadow-2xs text-[#1A1A2E]",
+    "bg-white rounded-2xl md:rounded-3xl border border-[#E6E6F0] shadow-2xs text-[#0F172A]",
   glass:
-    "bg-white/95 backdrop-blur-md rounded-2xl md:rounded-3xl border border-[#6B6BFF]/25 shadow-sm text-[#1A1A2E]",
+    "bg-white/95 backdrop-blur-md rounded-2xl md:rounded-3xl border border-[#3B82F6]/25 shadow-sm text-[#0F172A]",
   gradient:
-    "bg-gradient-to-br from-[#F6F6FB] via-white to-[#EEF2FF] rounded-2xl md:rounded-3xl border border-[#6B6BFF]/20 shadow-[0_8px_30px_rgba(107,107,255,0.06)] text-[#1A1A2E]",
+    "bg-gradient-to-br from-[#F6F6FB] via-white to-[#EFF6FF] rounded-2xl md:rounded-3xl border border-[#3B82F6]/20 shadow-[0_8px_30px_rgba(59,130,246,0.06)] text-[#0F172A]",
   outline:
-    "bg-transparent rounded-2xl md:rounded-3xl border border-[#E6E6F0] text-[#1A1A2E]",
+    "bg-transparent rounded-2xl md:rounded-3xl border border-[#E6E6F0] text-[#0F172A]",
   elevated:
-    "bg-white rounded-2xl md:rounded-3xl border border-[#E8E8F2] shadow-[0_12px_36px_rgba(26,26,46,0.07)] text-[#1A1A2E]",
+    "bg-white rounded-2xl md:rounded-3xl border border-[#E8E8F2] shadow-[0_12px_36px_rgba(26,26,46,0.07)] text-[#0F172A]",
   unstyled: "",
 };
 
 const hoverStyles: Record<CardHoverEffect, string> = {
   none: "",
   lift:
-    "transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_16px_40px_rgba(107,107,255,0.12)] hover:border-[#6B6BFF]/60",
+    "transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_16px_40px_rgba(59,130,246,0.12)] hover:border-[#3B82F6]/60",
   glow:
-    "transition-all duration-300 hover:shadow-[0_0_24px_rgba(107,107,255,0.18)] hover:border-[#6B6BFF]",
+    "transition-all duration-300 hover:shadow-[0_0_24px_rgba(59,130,246,0.18)] hover:border-[#3B82F6]",
   interactive:
-    "transition-all duration-250 hover:-translate-y-1 hover:border-[#6B6BFF]/80 hover:shadow-[0_12px_32px_rgba(107,107,255,0.1)] cursor-pointer active:translate-y-0",
-  border: "transition-colors duration-200 hover:border-[#6B6BFF]",
+    "transition-all duration-250 hover:-translate-y-1 hover:border-[#3B82F6]/80 hover:shadow-[0_12px_32px_rgba(59,130,246,0.1)] cursor-pointer active:translate-y-0",
+  border: "transition-colors duration-200 hover:border-[#3B82F6]",
 };
 
 const paddingStyles: Record<CardPadding, string> = {
@@ -111,7 +111,7 @@ export const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadi
   ({ className = "", children, ...rest }, ref) => (
     <h3
       ref={ref}
-      className={twMerge("text-lg sm:text-xl font-bold text-[#1A1A2E] tracking-tight leading-snug", className)}
+      className={twMerge("text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight leading-snug", className)}
       {...rest}
     >
       {children}

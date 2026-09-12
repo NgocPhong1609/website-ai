@@ -108,9 +108,9 @@ export function MetricDropdown({
  onClick={() => handleSelect(key)}
  className={twMerge(
  "w-full flex items-center gap-2.5 px-3.5 py-2 text-left transition-colors",
- "text-[12.5px] font-semibold text-[#464554]",
- "hover:bg-[#F4F4FD] hover:text-[#1A1A2E]",
- isActive && "bg-[#EEEEFF] text-[#C0392B]"
+ "text-[12.5px] font-semibold text-[#475569]",
+ "hover:bg-[#F4F4FD] hover:text-[#0F172A]",
+ isActive && "bg-[#EEEEFF] text-[#3B82F6]"
  )}
  >
  {/* Color dot */}
@@ -125,7 +125,7 @@ export function MetricDropdown({
  </span>
  )}
  {isActive && (
- <span className="ml-auto text-[#C0392B]">
+ <span className="ml-auto text-[#3B82F6]">
  {/* Checkmark */}
  <></>
  </span>

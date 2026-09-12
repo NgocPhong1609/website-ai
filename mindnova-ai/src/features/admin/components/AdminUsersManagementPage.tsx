@@ -150,8 +150,8 @@ export function AdminUsersManagementPage() {
 
  return (
  <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
- <section className="rounded-2xl border -[#FAF7F2]/20 bg-[linear-gradient(120deg,#0b1d40_0%,#155e75_45%,#134e4a_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.8)]">
- <p className="text-[10px] uppercase tracking-[0.34em] -[#FAF7F2]/70">User Management</p>
+ <section className="rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(120deg,#0b1d40_0%,#1D4ED8_45%,#134e4a_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.8)]">
+ <p className="text-[10px] uppercase tracking-[0.34em] text-[#F8FAFC]/70">User Management</p>
  <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý người dùng và phân quyền</h1>
  <p className="mt-1 max-w-3xl text-xs text-slate-100/90">Cấp quyền, khóa/xóa tài khoản Teacher, Student, Guest; theo dõi đăng nhập, thời gian học, lịch sử thao tác; duyệt hồ sơ giáo viên.</p>
  </section>
@@ -163,7 +163,7 @@ export function AdminUsersManagementPage() {
  <StatCard label="Đang bị khóa" value={summary.locked} />
  </section>
 
- <section className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <div className="grid gap-3 md:grid-cols-4">
  <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tìm theo tên/email" className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
  <select value={role} onChange={(e) => setRole(e.target.value)} className="rounded-xl border border-slate-200 px-3 py-2 text-sm">
@@ -178,11 +178,11 @@ export function AdminUsersManagementPage() {
  <option value="inactive">Inactive</option>
  <option value="banned">Banned</option>
  </select>
- <button onClick={() => void loadAll()} className="rounded-xl -[#C0392B] px-4 py-2 text-sm font-semibold text-white">Lọc dữ liệu</button>
+ <button onClick={() => void loadAll()} className="rounded-xl bg-[#3B82F6] px-4 py-2 text-sm font-semibold text-white">Lọc dữ liệu</button>
  </div>
  </section>
 
- <section className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <h2 className="mb-3 text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Danh sách tài khoản</h2>
  <div className="overflow-x-auto">
  <table className="min-w-full text-sm">
@@ -208,7 +208,7 @@ export function AdminUsersManagementPage() {
  <td className="px-3 py-2">
  <div className="flex flex-wrap gap-2">
  <button onClick={() => void lockToggle(user)} className="rounded-lg bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">{user.is_locked ? "Mở khóa" : "Khóa"}</button>
- <button onClick={() => void viewActivity(user.id)} className="rounded-lg bg-sky-100 px-2 py-1 text-xs font-semibold text-sky-800">Lịch sử</button>
+ <button onClick={() => void viewActivity(user.id)} className="rounded-lg bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">Lịch sử</button>
  <button onClick={() => void removeUser(user.id)} className="rounded-lg bg-rose-100 px-2 py-1 text-xs font-semibold text-rose-800">Xóa</button>
  </div>
  </td>
@@ -226,7 +226,7 @@ export function AdminUsersManagementPage() {
  </section>
 
  <section className="grid gap-4 xl:grid-cols-2">
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Duyệt hồ sơ giáo viên</h3>
  <div className="mt-3 space-y-3">
  {teacherQueue.map((teacher) => (
@@ -235,7 +235,7 @@ export function AdminUsersManagementPage() {
  <p className="mt-1 text-xs text-slate-500">{teacher.bio || "Chưa có mô tả kinh nghiệm/bằng cấp"}</p>
  <p className="mt-1 text-xs text-slate-600">Trạng thái: {teacher.status}</p>
  <div className="mt-2 flex gap-2">
- <button onClick={() => void reviewTeacher(teacher.id, "approved")} className="rounded-lg -[#FAF7F2] px-2 py-1 text-xs font-semibold -[#2C3039]">Duyệt</button>
+ <button onClick={() => void reviewTeacher(teacher.id, "approved")} className="rounded-lg bg-[#F8FAFC] px-2 py-1 text-xs font-semibold text-[#0F172A]">Duyệt</button>
  <button onClick={() => void reviewTeacher(teacher.id, "rejected")} className="rounded-lg bg-rose-100 px-2 py-1 text-xs font-semibold text-rose-800">Từ chối</button>
  </div>
  </div>
@@ -245,7 +245,7 @@ export function AdminUsersManagementPage() {
  </div>
  </div>
 
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Theo dõi hoạt động người dùng</h3>
  {!activity && <p className="mt-3 text-sm text-slate-500">Chọn "Lịch sử" ở bảng bên trái để xem chi tiết.</p>}
 
@@ -281,7 +281,7 @@ export function AdminUsersManagementPage() {
 
 function StatCard({ label, value }: { label: string; value: number }) {
  return (
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 shadow-[0_14px_32px_-25px_rgba(10,18,40,0.4)]">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_14px_32px_-25px_rgba(10,18,40,0.4)]">
  <p className="text-sm text-slate-500">{label}</p>
  <p className="mt-2 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{value.toLocaleString()}</p>
  </div>

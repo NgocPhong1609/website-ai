@@ -68,9 +68,9 @@ export function StudentRefundModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn font-sans">
-      <div className="relative w-full max-w-lg bg-white rounded-2xl border border-[#E8E2D9] shadow-2xl overflow-hidden flex flex-col">
+      <div className="relative w-full max-w-lg bg-white rounded-2xl border border-[#E2E8F0] shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 bg-[#C0392B] text-white">
+        <div className="flex items-center justify-between p-5 bg-[#3B82F6] text-white">
           <div className="flex items-center gap-2.5">
             <span className="flex items-center justify-center p-1.5 bg-white/20 rounded-xl"><Banknote size={24} /></span>
             <div>
@@ -95,15 +95,15 @@ export function StudentRefundModal({
             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">Khóa học yêu cầu hoàn</span>
             <h4 className="text-sm font-black text-slate-900 mt-1">{eligibility?.course_title || courseTitle || "Khóa học của bạn"}</h4>
             {eligibility?.amount && (
-              <p className="text-xs font-bold text-[#C0392B] mt-1">
+              <p className="text-xs font-bold text-[#3B82F6] mt-1">
                 Số tiền thanh toán: {Number(eligibility.amount).toLocaleString("vi-VN")} VNĐ
               </p>
             )}
           </div>
 
           {/* Refund Rules Checklist */}
-          <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#FEFCF9] border border-[#E8E2D9]">
-            <h5 className="text-xs font-black text-[#2C3039] uppercase">Kiểm Tra Điều Kiện Hoàn Tiền</h5>
+          <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+            <h5 className="text-xs font-black text-[#0F172A] uppercase">Kiểm Tra Điều Kiện Hoàn Tiền</h5>
 
             {isLoading ? (
               <p className="text-xs font-medium text-gray-500 text-center py-2">Đang kiểm tra tiến độ học tập và thời hạn đơn hàng...</p>
@@ -111,7 +111,7 @@ export function StudentRefundModal({
               <div className="flex flex-col gap-2 text-xs">
                 {/* Rule 1: Within 30 days */}
                 <div className="flex items-start gap-2">
-                  <span className={twMerge("font-bold flex items-center h-4", eligibility?.within_30_days ? "text-[#27AE60]" : "text-[#C0392B]")}>
+                  <span className={twMerge("font-bold flex items-center h-4", eligibility?.within_30_days ? "text-[#27AE60]" : "text-[#3B82F6]")}>
                     {eligibility?.within_30_days ? <Check size={14} strokeWidth={3} /> : <X size={14} strokeWidth={3} />}
                   </span>
                   <div>
@@ -126,7 +126,7 @@ export function StudentRefundModal({
 
                 {/* Rule 2: Progress <= 10% AND completed <= 5 */}
                 <div className="flex items-start gap-2">
-                  <span className={twMerge("font-bold flex items-center h-4", eligibility?.progress_eligible ? "text-[#27AE60]" : "text-[#C0392B]")}>
+                  <span className={twMerge("font-bold flex items-center h-4", eligibility?.progress_eligible ? "text-[#27AE60]" : "text-[#3B82F6]")}>
                     {eligibility?.progress_eligible ? <Check size={14} strokeWidth={3} /> : <X size={14} strokeWidth={3} />}
                   </span>
                   <div>
@@ -154,12 +154,12 @@ export function StudentRefundModal({
                   </p>
                 </div>
               ) : (
-                <div className="p-4 rounded-xl bg-[#FADBD8] border border-[#C0392B]/20 text-xs text-[#C0392B] flex flex-col gap-2">
-                  <div className="flex items-center gap-1.5 font-bold text-[#C0392B]">
+                <div className="p-4 rounded-xl bg-[#EFF6FF] border border-[#3B82F6]/20 text-xs text-[#3B82F6] flex flex-col gap-2">
+                  <div className="flex items-center gap-1.5 font-bold text-[#3B82F6]">
                     <span className="flex items-center"><AlertTriangle size={16} /></span>
                     <span>Khóa học KHÔNG ĐỦ ĐIỀU KIỆN hoàn tiền</span>
                   </div>
-                  <ul className="list-disc list-inside text-[11px] text-[#A93226] flex flex-col gap-1">
+                  <ul className="list-disc list-inside text-[11px] text-[#2563EB] flex flex-col gap-1">
                     {eligibility?.reasons?.map((r: string, idx: number) => (
                       <li key={idx}>{r}</li>
                     )) || <li>Vui lòng kiểm tra lại tiến độ học tập hoặc thời hạn đơn hàng.</li>}
@@ -176,7 +176,7 @@ export function StudentRefundModal({
               <select
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border border-gray-300 text-xs font-medium text-gray-800 bg-white focus:outline-none focus:border-[#C0392B]"
+                className="w-full h-10 px-3 rounded-xl border border-gray-300 text-xs font-medium text-gray-800 bg-white focus:outline-none focus:border-[#3B82F6]"
               >
                 <option value="Nội dung không phù hợp với nhu cầu">Nội dung không phù hợp với nhu cầu</option>
                 <option value="Mua nhầm khóa học">Mua nhầm khóa học</option>
@@ -187,7 +187,7 @@ export function StudentRefundModal({
           )}
 
           {statusMsg && (
-            <div className={twMerge("p-3 rounded-xl text-xs font-bold", isError ? "bg-[#FADBD8] text-[#C0392B] border border-[#C0392B]/30" : "bg-[#2C3039] text-white")}>
+            <div className={twMerge("p-3 rounded-xl text-xs font-bold", isError ? "bg-[#EFF6FF] text-[#3B82F6] border border-[#3B82F6]/30" : "bg-[#0F172A] text-white")}>
               {statusMsg}
             </div>
           )}
@@ -207,7 +207,7 @@ export function StudentRefundModal({
                 type="button"
                 onClick={() => refundMutation.mutate()}
                 disabled={refundMutation.isPending}
-                className="px-5 py-2.5 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white text-xs font-extrabold shadow-md transition-all disabled:opacity-50 cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white text-xs font-extrabold shadow-md transition-all disabled:opacity-50 cursor-pointer"
               >
                 {refundMutation.isPending ? "Đang xử lý..." : "Xác Nhận & Hoàn Tiền Ngay"}
               </button>

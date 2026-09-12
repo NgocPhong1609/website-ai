@@ -34,7 +34,7 @@ export default function SkillCard({
  "w-full bg-white rounded-2xl p-8 flex flex-col items-center text-center cursor-pointer transition-all duration-300",
  "border border-transparent shadow-[0_4px_24px_rgba(0,0,0,0.02)]",
  "hover:-translate-y-1 hover:shadow-md",
- isActive && "border-[#E8E2D9] ring-1 ring-[#C0392B] bg-[#F8F9FE]",
+ isActive && "border-[#E2E8F0] ring-1 ring-[#3B82F6] bg-[#F8F9FE]",
  )}
  >
  {/* Icon */}
@@ -54,10 +54,10 @@ export default function SkillCard({
  </div>
 
  {/* Title */}
- <h3 className="text-[20px] font-semibold text-[#2C3039] mb-3">{level}</h3>
+ <h3 className="text-[20px] font-semibold text-[#0F172A] mb-3">{level}</h3>
 
  {/* Description */}
- <p className="text-[14px] text-[#2C3039] leading-relaxed mb-8">
+ <p className="text-[14px] text-[#0F172A] leading-relaxed mb-8">
  {description}
  </p>
 
@@ -68,7 +68,7 @@ export default function SkillCard({
  key={barIndex}
  className={twMerge(
  "h-1.5 w-6 rounded-full transition-colors",
- barIndex <= activeBars ? "bg-[#FAF7F2]" : "bg-[#E2E2EA]",
+ barIndex <= activeBars ? "bg-[#F8FAFC]" : "bg-[#E2E2EA]",
  )}
  />
  ))}

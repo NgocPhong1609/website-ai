@@ -10,10 +10,10 @@ function LearningVelocityCard() {
  <div className="bg-white rounded-2xl p-5 shadow-[0_4px_24px_rgba(70,72,212,0.1)] border border-white/80">
  <div className="flex items-start justify-between mb-4">
  <div>
- <p className="text-[10px] font-bold text-[#B8B0A3] uppercase tracking-[0.12em] mb-1">
+ <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-[0.12em] mb-1">
  Learning Velocity
  </p>
- <p className="text-[18px] font-extrabold text-[#C0392B] leading-tight">
+ <p className="text-[18px] font-extrabold text-[#3B82F6] leading-tight">
  Advanced Level
  </p>
  </div>
@@ -30,7 +30,7 @@ function LearningVelocityCard() {
  height: `${h}%`,
  background:
  i >= bars.length - 3
- ? "linear-gradient(to top, #C0392B, #C0392B)"
+ ? "linear-gradient(to top, #3B82F6, #3B82F6)"
  : "linear-gradient(to top, #C8CAFF, #DDE0FF)",
  }}
  />
@@ -45,11 +45,11 @@ function AiTutorCard() {
  <div className="bg-white rounded-2xl p-4 shadow-[0_4px_24px_rgba(70,72,212,0.08)] border border-white/80">
  <div className="flex items-center gap-2 mb-3">
  
- <span className="text-[10px] font-black text-[#C0392B] uppercase tracking-[0.15em]">
+ <span className="text-[10px] font-black text-[#3B82F6] uppercase tracking-[0.15em]">
  AI Tutor
  </span>
  </div>
- <p className="text-[11.5px] text-[#8A8478] leading-[1.6]">
+ <p className="text-[11.5px] text-[#64748B] leading-[1.6]">
  &ldquo;I&apos;ve identified a gap in your Quantum Physics modules. Should we focus on
  Wave-Particle Duality next?&rdquo;
  </p>
@@ -63,12 +63,12 @@ function UserStreakCard() {
  {/* Avatar */}
  <div className="relative shrink-0">
  
- <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full -[#2C3039] border-2 border-white" />
+ <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#0F172A] border-2 border-white" />
  </div>
 
  <div className="flex-1 min-w-0">
- <p className="text-[13px] font-bold text-[#2C3039] truncate">Alex Rivera</p>
- <p className="text-[11px] text-[#8A8478] truncate">Masters in AI Ethics</p>
+ <p className="text-[13px] font-bold text-[#0F172A] truncate">Alex Rivera</p>
+ <p className="text-[11px] text-[#64748B] truncate">Masters in AI Ethics</p>
  </div>
 
  {/* Streak */}
@@ -85,7 +85,7 @@ function UserStreakCard() {
 function NextSessionCard() {
  return (
  <div className="bg-white rounded-2xl p-4 shadow-[0_4px_24px_rgba(70,72,212,0.08)] border border-white/80 space-y-2.5">
- <p className="text-[9px] font-black text-[#B8B0A3] uppercase tracking-[0.2em]">
+ <p className="text-[9px] font-black text-[#94A3B8] uppercase tracking-[0.2em]">
  Recommended Focus
  </p>
 
@@ -93,15 +93,15 @@ function NextSessionCard() {
  <div className="h-1 rounded-full bg-[#EAEAF8] overflow-hidden">
  <div
  className="h-full w-[65%] rounded-full animate-progress-fill"
- style={{ background: "linear-gradient(90deg, #C0392B, #C0392B)" }}
+ style={{ background: "linear-gradient(90deg, #3B82F6, #3B82F6)" }}
  />
  </div>
 
  <div className="flex items-center gap-2 pt-0.5">
  
  <div>
- <p className="text-[12px] font-bold text-[#2C3039]">Next Session</p>
- <p className="text-[10px] text-[#8A8478]">Today, 4:00 PM</p>
+ <p className="text-[12px] font-bold text-[#0F172A]">Next Session</p>
+ <p className="text-[10px] text-[#64748B]">Today, 4:00 PM</p>
  </div>
  </div>
  </div>
@@ -115,16 +115,16 @@ export function LoginPreviewPanel() {
  <div className="relative flex-1 hidden lg:flex flex-col justify-center items-center overflow-hidden from-[#EDEEFF] via-[#F2F3FF] to-[#E6EEFF] px-12 py-12">
 
  {/* Background glow blobs */}
- <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-[#FAF7F2] blur-[80px] pointer-events-none" />
- <div className="absolute -bottom-16 -left-16 w-80 h-80 rounded-full bg-[#C0392B]/10 blur-[60px] pointer-events-none" />
+ <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-[#F8FAFC] blur-[80px] pointer-events-none" />
+ <div className="absolute -bottom-16 -left-16 w-80 h-80 rounded-full bg-[#3B82F6]/10 blur-[60px] pointer-events-none" />
  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full bg-[#A0A0FF]/5 blur-[80px] pointer-events-none" />
 
  {/* Heading text above cards */}
  <div className="relative mb-8 text-center">
- <p className="text-xs font-bold text-[#C0392B]/70 uppercase tracking-[0.2em] mb-1">
+ <p className="text-xs font-bold text-[#3B82F6]/70 uppercase tracking-[0.2em] mb-1">
  Your dashboard preview
  </p>
- <p className="text-[15px] font-bold text-[#2C3039] leading-snug">
+ <p className="text-[15px] font-bold text-[#0F172A] leading-snug">
  Everything you need to accelerate<br />your learning journey
  </p>
  </div>
@@ -153,7 +153,7 @@ export function LoginPreviewPanel() {
  </div>
 
  {/* Bottom caption */}
- <p className="relative mt-8 text-[11px] text-[#B8B0A3] tracking-wide text-center">
+ <p className="relative mt-8 text-[11px] text-[#94A3B8] tracking-wide text-center">
  Powered by MindNova AI · Trusted by 50,000+ learners
  </p>
  </div>

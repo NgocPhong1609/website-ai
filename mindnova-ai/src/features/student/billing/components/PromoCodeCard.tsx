@@ -92,7 +92,7 @@ export function PromoCodeCard() {
  </p>
  )}
  {error && (
- <p className="text-xs font-medium text-[#2563eb] bg-[#f8fafc] p-3 rounded-xl border border-[#EF4444]/20 flex items-center gap-1.5 mt-1">
+ <p className="text-xs font-medium text-[#2563eb] bg-[#f8fafc] p-3 rounded-xl border border-[#3B82F6]/20 flex items-center gap-1.5 mt-1">
  <span>️</span>
  <span>Vui lòng nhập mã voucher hợp lệ để kích hoạt ưu đãi.</span>
  </p>

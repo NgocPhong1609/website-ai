@@ -14,7 +14,7 @@ function CourseCard({ course }: { course: DashboardCourse }) {
  return (
  <div className={`group/card bg-white border rounded-xl flex flex-col justify-between h-full transition-all duration-300 overflow-hidden relative ${
  isAiPlan 
- ? "border-sky-200 hover:border-sky-300"
+ ? "border-blue-200 hover:border-blue-300"
  : "border-slate-100 hover:border-slate-200"
  }`}>
  {/* Compact Thumbnail Container */}

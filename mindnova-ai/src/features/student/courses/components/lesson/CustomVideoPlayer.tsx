@@ -330,10 +330,10 @@ export function CustomVideoPlayer({
  // --- Rendering Load/Error ---
  if (loading) {
  return (
- <div className="relative w-full aspect-video bg-[#0f172a] rounded-2xl overflow-hidden flex items-center justify-center border border-[#E8E2D9]">
+ <div className="relative w-full aspect-video bg-[#0f172a] rounded-2xl overflow-hidden flex items-center justify-center border border-[#E2E8F0]">
  <div className="flex flex-col items-center gap-3">
- <div className="w-10 h-10 border-3 border-[#C0392B] border-t-transparent rounded-full animate-spin" />
- <span className="text-sm text-[#8A8478] font-medium">Đang tải video...</span>
+ <div className="w-10 h-10 border-3 border-[#3B82F6] border-t-transparent rounded-full animate-spin" />
+ <span className="text-sm text-[#64748B] font-medium">Đang tải video...</span>
  </div>
  </div>
  );
@@ -341,8 +341,8 @@ export function CustomVideoPlayer({
 
  if (error) {
  return (
- <div className="relative w-full aspect-video bg-[#FEFCF9] rounded-2xl overflow-hidden flex items-center justify-center border border-[#E8E2D9]">
- <div className="flex flex-col items-center gap-3 text-[#8A8478]">
+ <div className="relative w-full aspect-video bg-[#F8FAFC] rounded-2xl overflow-hidden flex items-center justify-center border border-[#E2E8F0]">
+ <div className="flex flex-col items-center gap-3 text-[#64748B]">
  <></>
  <span className="text-sm font-medium">{error}</span>
  </div>
@@ -368,7 +368,7 @@ export function CustomVideoPlayer({
  }
 
  return (
- <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-sm border border-[#E8E2D9]">
+ <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-sm border border-[#E2E8F0]">
  <iframe
  src={embedUrl}
  title={lesson.title}
@@ -388,7 +388,7 @@ export function CustomVideoPlayer({
  ref={containerRef}
  className={twMerge(
  "relative w-full aspect-video bg-black overflow-hidden shadow-sm flex items-center justify-center group select-none",
- isFullscreen ? "rounded-none fixed inset-0 z-[9999]" : "rounded-2xl border border-[#E8E2D9]"
+ isFullscreen ? "rounded-none fixed inset-0 z-[9999]" : "rounded-2xl border border-[#E2E8F0]"
  )}
  onMouseMove={resetControlsTimeout}
  onMouseLeave={() => isPlaying && setShowControls(false)}
@@ -431,7 +431,7 @@ export function CustomVideoPlayer({
  >
  <button
  onClick={togglePlay}
- className="w-16 h-16 sm:w-20 sm:h-20 bg-[#C0392B]/90 hover:bg-[#A93226] text-white rounded-full flex items-center justify-center backdrop-blur-md shadow-[0_4px_24px_rgba(79,70,229,0.4)] pointer-events-auto transform transition-transform hover:scale-105"
+ className="w-16 h-16 sm:w-20 sm:h-20 bg-[#3B82F6]/90 hover:bg-[#2563EB] text-white rounded-full flex items-center justify-center backdrop-blur-md shadow-[0_4px_24px_rgba(37, 99, 235,0.4)] pointer-events-auto transform transition-transform hover:scale-105"
  >
  {isPlaying ? <PauseIcon /> : <PlayIcon />}
  </button>
@@ -453,7 +453,7 @@ export function CustomVideoPlayer({
  >
  {/* Buffered / Progress Fill */}
  <div
- className="absolute top-0 left-0 h-full bg-[#C0392B] rounded-full transition-all duration-100 ease-linear pointer-events-none"
+ className="absolute top-0 left-0 h-full bg-[#3B82F6] rounded-full transition-all duration-100 ease-linear pointer-events-none"
  style={{ width: `${progressPercent}%` }}
  />
  {/* Thumb */}
@@ -476,19 +476,19 @@ export function CustomVideoPlayer({
  <div className="flex items-center justify-between text-white mt-1">
  {/* Left: Play, Skip, Volume, Time */}
  <div className="flex items-center gap-3 sm:gap-5">
- <button onClick={togglePlay} className="hover:text-[#E8E2D9] transition-colors focus:outline-none">
+ <button onClick={togglePlay} className="hover:text-[#E2E8F0] transition-colors focus:outline-none">
  {isPlaying ? <PauseIcon /> : <PlayIcon />}
  </button>
 
- <button onClick={() => skipTime(-10)} className="hover:text-[#E8E2D9] transition-colors focus:outline-none hidden sm:block" title="Tua lại 10s">
+ <button onClick={() => skipTime(-10)} className="hover:text-[#E2E8F0] transition-colors focus:outline-none hidden sm:block" title="Tua lại 10s">
  <Rewind10Icon />
  </button>
- <button onClick={() => skipTime(10)} className="hover:text-[#E8E2D9] transition-colors focus:outline-none hidden sm:block" title="Tua đi 10s">
+ <button onClick={() => skipTime(10)} className="hover:text-[#E2E8F0] transition-colors focus:outline-none hidden sm:block" title="Tua đi 10s">
  <Forward10Icon />
  </button>
 
  <div className="flex items-center gap-2 group/volume relative">
- <button onClick={toggleMute} className="hover:text-[#E8E2D9] transition-colors focus:outline-none">
+ <button onClick={toggleMute} className="hover:text-[#E2E8F0] transition-colors focus:outline-none">
  <VolumeIcon muted={isMuted} />
  </button>
  {/* Volume Slider (appears on hover) */}
@@ -499,7 +499,7 @@ export function CustomVideoPlayer({
  step="0.05"
  value={isMuted ? 0 : volume}
  onChange={handleVolumeChange}
- className="w-0 opacity-0 group-hover/volume:w-20 group-hover/volume:opacity-100 transition-all duration-300 accent-[#C0392B] cursor-pointer h-1.5 rounded-full appearance-none bg-white/30 outline-none"
+ className="w-0 opacity-0 group-hover/volume:w-20 group-hover/volume:opacity-100 transition-all duration-300 accent-[#3B82F6] cursor-pointer h-1.5 rounded-full appearance-none bg-white/30 outline-none"
  />
  </div>
 
@@ -532,7 +532,7 @@ export function CustomVideoPlayer({
  onClick={() => changePlaybackRate(rate)}
  className={twMerge(
  "px-4 py-2 text-sm text-left hover:bg-white/10 transition-colors",
- playbackRate === rate ? "text-[#F5F0E8] font-bold" : "text-white/80 font-medium"
+ playbackRate === rate ? "text-[#F1F5F9] font-bold" : "text-white/80 font-medium"
  )}
  >
  {rate === 1 ? "Chuẩn" : `${rate}x`}
@@ -545,7 +545,7 @@ export function CustomVideoPlayer({
  {/* Resolution button removed as requested */}
 
  {/* Fullscreen */}
- <button onClick={toggleFullscreen} className="hover:text-[#E8E2D9] transition-colors focus:outline-none">
+ <button onClick={toggleFullscreen} className="hover:text-[#E2E8F0] transition-colors focus:outline-none">
  {isFullscreen ? <MinimizeIcon /> : <FullscreenIcon />}
  </button>
  </div>

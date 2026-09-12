@@ -7,6 +7,7 @@ import { Step2ConfigForm } from "./Step2ConfigForm";
 import { Step3GeneratingState } from "./Step3GeneratingState";
 import { Step4ReviewEditor } from "./Step4ReviewEditor";
 import { Step5SaveAndAttachModal } from "./Step5SaveAndAttachModal";
+import { Sparkles } from "lucide-react";
 
 interface QuizGeneratorWizardProps {
   onSuccessComplete?: (savedQuiz?: any) => void;
@@ -56,20 +57,20 @@ export function QuizGeneratorWizard({
     <div className={`max-w-5xl mx-auto flex flex-col gap-6 ${embeddedMode ? "p-2" : "p-4 md:p-8"}`}>
       {/* Wizard Header Progress Bar */}
       {!embeddedMode && (
-        <div className="bg-white rounded-3xl p-6 border border-[#E8E2D9] shadow-sm flex flex-col gap-4">
+        <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#C0392B] text-white flex items-center justify-center text-xl font-bold shadow-md">
-                🪄
+              <div className="w-10 h-10 rounded-2xl bg-[#3B82F6] text-white flex items-center justify-center shadow-md">
+                <Sparkles className="h-5 w-5" aria-hidden />
               </div>
               <div>
-                <h1 className="text-lg font-black text-[#2C3039]">Trợ Lý Tạo Bài Kiểm Tra AI</h1>
-                <p className="text-xs text-[#8A8478] font-semibold">Tạo bài kiểm tra trắc nghiệm &amp; tự luận bằng AI</p>
+                <h1 className="text-lg font-black text-[#0F172A]">Trợ Lý Tạo Bài Kiểm Tra AI</h1>
+                <p className="text-xs text-[#64748B] font-semibold">Tạo bài kiểm tra trắc nghiệm &amp; tự luận bằng AI</p>
               </div>
             </div>
 
             <div className="flex items-center gap-2 font-mono text-xs font-black">
-              <span className="text-[#C0392B]">Bước {step}</span>
+              <span className="text-[#3B82F6]">Bước {step}</span>
               <span className="text-gray-300">/</span>
               <span className="text-gray-400">5</span>
             </div>
@@ -92,15 +93,15 @@ export function QuizGeneratorWizard({
                   <div
                     className={`h-1.5 rounded-full transition-all duration-300 ${
                       isActive
-                        ? "bg-[#C0392B]"
+                        ? "bg-[#3B82F6]"
                         : isDone
-                        ? "bg-[#2C3039]"
+                        ? "bg-[#0F172A]"
                         : "bg-gray-200"
                     }`}
                   />
                   <span
                     className={`text-[10px] font-extrabold truncate ${
-                      isActive ? "text-[#C0392B]" : isDone ? "text-[#2C3039]" : "text-gray-400"
+                      isActive ? "text-[#3B82F6]" : isDone ? "text-[#0F172A]" : "text-gray-400"
                     }`}
                   >
                     {s.num}. {s.name}

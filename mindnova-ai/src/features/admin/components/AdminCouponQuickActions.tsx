@@ -133,7 +133,7 @@ export function AdminCouponQuickActions() {
  <button
  type="button"
  onClick={() => setIsOpen((current) => !current)}
- className="rounded-2xl -[#2C3039] px-4 py-2 text-sm font-semibold text-white transition hover:-[#2C3039]"
+ className="rounded-2xl bg-[#0F172A] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0F172A]"
  >
  + Tạo mã giảm giá
  </button>
@@ -148,7 +148,7 @@ export function AdminCouponQuickActions() {
  onChange={(event) => setForm((current) => ({ ...current, code: event.target.value }))}
  placeholder="VD: SAVE10"
  required
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#2C3039]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0F172A]"
  />
  </label>
 
@@ -158,7 +158,7 @@ export function AdminCouponQuickActions() {
  value={form.title}
  onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
  placeholder="Khuyến mãi mùa hè"
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#2C3039]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0F172A]"
  />
  </label>
 
@@ -167,7 +167,7 @@ export function AdminCouponQuickActions() {
  <select
  value={form.discount_type}
  onChange={(event) => setForm((current) => ({ ...current, discount_type: event.target.value }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#2C3039]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0F172A]"
  >
  <option value="percent">Phần trăm</option>
  <option value="fixed">Số tiền cố định</option>
@@ -181,7 +181,7 @@ export function AdminCouponQuickActions() {
  min="0"
  value={form.value}
  onChange={(event) => setForm((current) => ({ ...current, value: event.target.value }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#2C3039]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0F172A]"
  />
  </label>
 
@@ -190,7 +190,7 @@ export function AdminCouponQuickActions() {
  <select
  value={form.course_scope}
  onChange={(event) => setForm((current) => ({ ...current, course_scope: event.target.value, course_id: event.target.value === "course" ? current.course_id : "" }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#2C3039]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0F172A]"
  >
  <option value="all">Cho toàn bộ đơn hàng</option>
  <option value="course">Chỉ cho một khóa học</option>
@@ -203,7 +203,7 @@ export function AdminCouponQuickActions() {
  <select
  value={form.course_id}
  onChange={(event) => setForm((current) => ({ ...current, course_id: event.target.value }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#2C3039]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0F172A]"
  required={form.course_scope === "course"}
  >
  <option value="">-- Chọn khóa học --</option>
@@ -223,7 +223,7 @@ export function AdminCouponQuickActions() {
  min="0"
  value={form.min_order_amount}
  onChange={(event) => setForm((current) => ({ ...current, min_order_amount: event.target.value }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#2C3039]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0F172A]"
  />
  </label>
 
@@ -234,7 +234,7 @@ export function AdminCouponQuickActions() {
  min="0"
  value={form.max_discount_amount}
  onChange={(event) => setForm((current) => ({ ...current, max_discount_amount: event.target.value }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#2C3039]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0F172A]"
  />
  </label>
 
@@ -243,7 +243,7 @@ export function AdminCouponQuickActions() {
  <select
  value={form.is_active}
  onChange={(event) => setForm((current) => ({ ...current, is_active: event.target.value }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#2C3039]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0F172A]"
  >
  <option value="true">Hoạt động</option>
  <option value="false">Tạm dừng</option>
@@ -256,7 +256,7 @@ export function AdminCouponQuickActions() {
  value={form.description}
  onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
  rows={3}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#2C3039]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#0F172A]"
  />
  </label>
  </div>
@@ -272,7 +272,7 @@ export function AdminCouponQuickActions() {
  </form>
  )}
 
- {status && <p className="w-full rounded-xl bg-emerald-50 px-3 py-2 text-sm -[#2C3039]">{status}</p>}
+ {status && <p className="w-full rounded-xl bg-emerald-50 px-3 py-2 text-sm bg-[#0F172A]">{status}</p>}
  </div>
  );
 }

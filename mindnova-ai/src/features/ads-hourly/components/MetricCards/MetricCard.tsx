@@ -32,10 +32,10 @@ function StatRow({
 }) {
  return (
  <div className="flex items-center justify-between py-[3px]">
- <span className={twMerge("text-[11.5px] font-medium", className ?? "text-[#8A8478]")}>
+ <span className={twMerge("text-[11.5px] font-medium", className ?? "text-[#64748B]")}>
  {label}
  </span>
- <span className={twMerge("text-[11.5px] font-bold tabular-nums", className ?? "text-[#464554]")}>
+ <span className={twMerge("text-[11.5px] font-bold tabular-nums", className ?? "text-[#475569]")}>
  {value}
  </span>
  </div>
@@ -59,7 +59,7 @@ function HourStatRow({
  <span className={twMerge("text-[11.5px] font-semibold", labelColor)}>
  {label}
  </span>
- <span className="text-[11.5px] font-bold tabular-nums text-[#464554]">
+ <span className="text-[11.5px] font-bold tabular-nums text-[#475569]">
  <span className={twMerge("font-semibold", labelColor)}>{hourStr}</span>
  {" · "}
  {value}
@@ -141,7 +141,7 @@ export function MetricCard({
  aria-expanded={dropdownOpen}
  onClick={handleTriggerClick}
  className={twMerge(
- "flex items-center gap-1 text-[12.5px] font-bold text-[#1A1A2E]",
+ "flex items-center gap-1 text-[12.5px] font-bold text-[#0F172A]",
  "rounded-md px-1 -ml-1 py-0.5",
  "hover:bg-[#F4F4FD] transition-colors focus:outline-none"
  )}
@@ -170,7 +170,7 @@ export function MetricCard({
  label="Best hour"
  hour={stats.bestHour.hour}
  value={cfg.format(stats.bestHour.value)}
- labelColor="-[#2C3039]"
+ labelColor="text-[#0F172A]"
  />
  <HourStatRow
  label="Worst hour"

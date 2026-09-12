@@ -190,8 +190,8 @@ export function AdminContentManagementPage() {
 
  return (
  <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
- <section className="rounded-2xl border -[#FAF7F2]/20 bg-[linear-gradient(120deg,#0f172a_0%,#155e75_50%,#0f766e_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.8)]">
- <p className="text-[10px] uppercase tracking-[0.34em] -[#FAF7F2]/70">Content Management</p>
+ <section className="rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(120deg,#0f172a_0%,#1D4ED8_50%,#2563EB_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.8)]">
+ <p className="text-[10px] uppercase tracking-[0.34em] text-[#F8FAFC]/70">Content Management</p>
  <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý khóa học</h1>
  <p className="mt-1 text-xs text-slate-100/90">Duyệt/gỡ bài giảng, quản lý kho tài liệu mẫu, và phân loại ngân hàng câu hỏi cho AI tạo đề.</p>
  </section>
@@ -202,7 +202,7 @@ export function AdminContentManagementPage() {
  <SmallCard label="Kho tài liệu mẫu" value={resources.length} />
  </section>
 
- <section className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
  <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Kiểm duyệt khóa học</h2>
  <div className="inline-flex rounded-xl bg-slate-100 p-1 text-sm">
@@ -263,7 +263,7 @@ export function AdminContentManagementPage() {
  type="button"
  onClick={() => void openCourseDetail(course.id)}
  disabled={pendingAction === `detail-${course.id}`}
- className="rounded-lg bg-sky-100 px-2 py-1 text-xs font-semibold text-sky-800 disabled:cursor-not-allowed disabled:opacity-60"
+ className="rounded-lg bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
  >
  {pendingAction === `detail-${course.id}` ? "Đang tải..." : "Xem chi tiết"}
  </button>
@@ -273,7 +273,7 @@ export function AdminContentManagementPage() {
  type="button"
  onClick={() => void restoreCourse(course.id)}
  disabled={pendingAction !== null}
- className="rounded-lg -[#FAF7F2] px-2 py-1 text-xs font-semibold -[#2C3039] disabled:cursor-not-allowed disabled:opacity-60"
+ className="rounded-lg bg-[#F8FAFC] px-2 py-1 text-xs font-semibold text-[#0F172A] disabled:cursor-not-allowed disabled:opacity-60"
  >
  {pendingAction === `restore-${course.id}` ? "Đang khôi phục..." : "Khôi phục"}
  </button>
@@ -284,7 +284,7 @@ export function AdminContentManagementPage() {
  type="button"
  onClick={() => void moderateCourse(course.id, "published")}
  disabled={pendingAction !== null}
- className="rounded-lg -[#FAF7F2] px-2 py-1 text-xs font-semibold -[#2C3039] disabled:cursor-not-allowed disabled:opacity-60"
+ className="rounded-lg bg-[#F8FAFC] px-2 py-1 text-xs font-semibold text-[#0F172A] disabled:cursor-not-allowed disabled:opacity-60"
  >
  {pendingAction === `published-${course.id}` ? "Đang duyệt..." : "Duyệt"}
  </button>
@@ -332,7 +332,7 @@ export function AdminContentManagementPage() {
  )}
 
  <section className="grid gap-4 xl:grid-cols-2">
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Kho tài liệu mẫu</h3>
  <div className="mt-3 grid gap-2">
  <input placeholder="Tiêu đề" value={resourceForm.title} onChange={(e) => setResourceForm((s) => ({ ...s, title: e.target.value }))} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
@@ -344,7 +344,7 @@ export function AdminContentManagementPage() {
  </select>
  <input placeholder="URL" value={resourceForm.url} onChange={(e) => setResourceForm((s) => ({ ...s, url: e.target.value }))} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
  <input placeholder="Mô tả" value={resourceForm.description} onChange={(e) => setResourceForm((s) => ({ ...s, description: e.target.value }))} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
- <button onClick={() => void addResource()} className="rounded-xl -[#C0392B] px-4 py-2 text-sm font-semibold text-white">Thêm tài liệu</button>
+ <button onClick={() => void addResource()} className="rounded-xl bg-[#3B82F6] px-4 py-2 text-sm font-semibold text-white">Thêm tài liệu</button>
  </div>
 
  <ul className="mt-4 space-y-2 text-sm text-slate-700">
@@ -357,7 +357,7 @@ export function AdminContentManagementPage() {
  </ul>
  </div>
 
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Ngân hàng câu hỏi</h3>
  <div className="mt-3 space-y-2">
  {questions.slice(0, 12).map((question) => (
@@ -368,7 +368,7 @@ export function AdminContentManagementPage() {
  {["de", "trung_binh", "kho"].map((category) => (
  <button key={category} onClick={() => void classifyQuestion(question.id, category)} className="rounded-lg bg-slate-100 px-2 py-1 text-xs text-slate-700">{category}</button>
  ))}
- <span className="ml-auto text-xs -[#C0392B]">{question.question_category || "chưa phân loại"}</span>
+ <span className="ml-auto text-xs text-[#3B82F6]">{question.question_category || "chưa phân loại"}</span>
  </div>
  </div>
  ))}
@@ -383,7 +383,7 @@ export function AdminContentManagementPage() {
 
 function SmallCard({ label, value }: { label: string; value: number }) {
  return (
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <p className="text-sm text-slate-500">{label}</p>
  <p className="mt-2 text-2xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{value}</p>
  </div>
@@ -399,9 +399,9 @@ function statusLabel(status: string): string {
 }
 
 function statusClassName(status: string): string {
- if (status === "published") return "-[#FAF7F2] -[#2C3039]";
+ if (status === "published") return "text-[#F8FAFC] text-[#0F172A]";
  if (status === "archived") return "bg-amber-100 text-amber-800";
- if (status === "pending_review") return "bg-sky-100 text-sky-800";
+ if (status === "pending_review") return "bg-blue-100 text-blue-800";
  if (status === "draft") return "bg-slate-100 text-slate-700";
  return "bg-slate-100 text-slate-700";
 }

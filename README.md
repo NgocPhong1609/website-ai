@@ -1,5 +1,24 @@
 # website-ai
-# Hướng dẫn GitHub
+
+MindNova: student + instructor + admin.
+
+## Tình trạng hiện tại
+
+Nhánh `TeacherColor`: đồng bộ màu student Blue cho cả dự án, admin dùng Lucide, gỡ icon unicode thừa.
+
+Chi tiết: `mindnova-ai/README.md`, `mindnova-ai/DESIGN.md`, `wiki/Home.md`.
+
+## Quy tắc làm việc
+
+- Xưng hô em với anh.
+- Superpowers + Karpathy: nghĩ trước, code tối giản, đúng phạm vi, kiểm chứng thật.
+- Git bắt buộc.
+- UI bám DESIGN.md. Test browser desktop + mobile, gửi ảnh. Ảnh xóa sau 24h.
+- Audit / review / stress 2 vòng mới được báo pass. Không đoán.
+- Xong hệ thống/tính năng: cập nhật README + wiki.
+
+## Hướng dẫn GitHub
+
 
 
 1

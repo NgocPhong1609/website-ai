@@ -30,7 +30,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({ conversations, activeC
  placeholder="Tìm kiếm nhóm chat..."
  value={searchTerm}
  onChange={(e) => setSearchTerm(e.target.value)}
- className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-gray-50 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#C0392B] focus:border-[#C0392B] sm:text-sm transition duration-150 ease-in-out"
+ className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-gray-50 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#3B82F6] focus:border-[#3B82F6] sm:text-sm transition duration-150 ease-in-out"
  />
  {searchTerm && (
  <button
@@ -79,7 +79,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({ conversations, activeC
  {conv.last_message?.content || 'Chưa có tin nhắn'}
  </p>
  {conv.unread_count > 0 && (
- <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+ <span className="bg-[#3B82F6] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
  {conv.unread_count}
  </span>
  )}

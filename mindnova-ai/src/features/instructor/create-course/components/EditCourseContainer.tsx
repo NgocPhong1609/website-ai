@@ -67,7 +67,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  }, [course]);
 
  if (isLoading) {
- return <div className="p-8 text-center text-[#8A8478] font-medium">Đang tải dữ liệu...</div>;
+ return <div className="p-8 text-center text-[#64748B] font-medium">Đang tải dữ liệu...</div>;
  }
 
  if (!course) {
@@ -145,7 +145,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  return (
  <div className="min-h-screen bg-[#F4F4F8] flex flex-col font-sans pb-16">
  {/* ── HEADER CẬP NHẬT ─────────────────────────────────────────────────── */}
- <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#E8E2D9] px-6 pt-3 pb-2 shadow-2xs">
+ <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#E2E8F0] px-6 pt-3 pb-2 shadow-2xs">
  <div className="max-w-6xl mx-auto flex flex-col gap-2">
  <div className="flex flex-wrap items-center justify-between gap-3">
  
@@ -153,25 +153,25 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <div className="flex items-center gap-3">
  <Link
  href="/instructor/courses"
- className="w-10 h-10 rounded-xl bg-[#FEFCF9] hover:bg-gray-100 text-gray-700 flex items-center justify-center transition-colors shadow-2xs border border-gray-100"
+ className="w-10 h-10 rounded-xl bg-[#F8FAFC] hover:bg-gray-100 text-gray-700 flex items-center justify-center transition-colors shadow-2xs border border-gray-100"
  >
  <ArrowLeftIcon size={18} />
  </Link>
  <div>
- <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs font-bold text-[#8A8478] mb-0.5">
+ <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs font-bold text-[#64748B] mb-0.5">
  <Link href="/instructor/courses" className="hover:text-gray-800 transition-colors">
  Khóa học của tôi
  </Link>
  <span>/</span>
- <span className="text-[#C0392B]">
+ <span className="text-[#3B82F6]">
  Chỉnh sửa khóa học #{courseId}
  </span>
  </nav>
  <div className="flex items-center gap-2.5">
- <h1 className="text-lg font-black text-[#2C3039] tracking-tight truncate max-w-md md:max-w-2xl">
+ <h1 className="text-lg font-black text-[#0F172A] tracking-tight truncate max-w-md md:max-w-2xl">
  {basicInfo.title || "Tên khóa học"}
  </h1>
- <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black tracking-wider uppercase border ${course.status === "published" ? "bg-emerald-50 -[#2C3039] -[#FAF7F2]" : course.status === "pending_review" ? "bg-sky-50 text-sky-600 border-sky-200" : "bg-slate-50 text-slate-600 border-slate-200"}`}>
+ <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black tracking-wider uppercase border ${course.status === "published" ? "bg-emerald-50 text-emerald-700" : course.status === "pending_review" ? "bg-blue-50 text-blue-600 border-blue-200" : "bg-slate-50 text-slate-600 border-slate-200"}`}>
  {course.status === "published" ? "ĐÃ CÔNG KHAI" : course.status === "pending_review" ? "ĐANG CHỜ DUYỆT" : "BẢN NHÁP"}
  </span>
  </div>
@@ -183,7 +183,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <Link
  href={`/courses/lesson?course_id=${courseId}&preview=true`}
  target="_blank"
- className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-gray-700 bg-white border border-[#E8E2D9] hover:bg-[#FEFCF9] transition-all shadow-2xs"
+ className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-gray-700 bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-all shadow-2xs"
  >
  <EyeIcon size={14} />
  <span className="hidden sm:inline">Xem trước</span>
@@ -194,7 +194,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  type="button"
  onClick={handleSubmitReview}
  disabled={isPending}
- className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-sky-500 hover:bg-sky-600 transition-all shadow-sm disabled:bg-gray-400"
+ className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-500 hover:bg-blue-600 transition-all shadow-sm disabled:bg-gray-400"
  >
  <span className="hidden sm:inline">Gửi xét duyệt</span>
  </button>
@@ -216,7 +216,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  disabled={isPending}
  className={twMerge(
  "flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black text-white transition-all shadow-sm cursor-pointer",
- saveSuccess ? "-[#2C3039] hover:-[#2C3039]" : "bg-[#C0392B] hover:bg-[#4338CA] disabled:bg-gray-400"
+ saveSuccess ? "text-[#0F172A] hover:bg-[#0F172A]" : "bg-[#3B82F6] hover:bg-[#2563EB] disabled:bg-gray-400"
  )}
  >
  {isUpdating || isUploading || isUpdatingPrice ? (
@@ -272,34 +272,34 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  {activeTab === "advanced" && (
  <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col gap-2">
  <div className="flex flex-col gap-1 mb-2">
- <h2 className="text-[17px] font-black text-[#2C3039]">Cấu hình Quyền học tập</h2>
- <p className="text-[13px] text-[#8A8478]">Quản lý cấp chứng chỉ tự động và khóa bình luận diễn đàn.</p>
+ <h2 className="text-[17px] font-black text-[#0F172A]">Cấu hình Quyền học tập</h2>
+ <p className="text-[13px] text-[#64748B]">Quản lý cấp chứng chỉ tự động và khóa bình luận diễn đàn.</p>
  </div>
 
- <div className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 bg-[#FEFCF9]/50">
+ <div className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 bg-[#F8FAFC]/50">
  <div className="flex items-center gap-3">
  <span className="text-xl"></span>
  <div>
- <span className="block text-[14px] font-bold text-[#2C3039]">Cấp Chứng Chỉ Tốt Nghiệp Tự Động (Blockchain ID)</span>
- <span className="text-[12px] text-[#8A8478] block mt-0.5">Tự động sinh mã chứng nhận khi học viên đạt trên 80% tiến độ bài giảng</span>
+ <span className="block text-[14px] font-bold text-[#0F172A]">Cấp Chứng Chỉ Tốt Nghiệp Tự Động (Blockchain ID)</span>
+ <span className="text-[12px] text-[#64748B] block mt-0.5">Tự động sinh mã chứng nhận khi học viên đạt trên 80% tiến độ bài giảng</span>
  </div>
  </div>
- <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-[#C0392B] focus:ring-[#C0392B] cursor-pointer" />
+ <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-[#3B82F6] focus:ring-[#3B82F6] cursor-pointer" />
  </div>
 
- <div className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 bg-[#FEFCF9]/50">
+ <div className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 bg-[#F8FAFC]/50">
  <div className="flex items-center gap-3">
  <span className="text-xl"></span>
  <div>
- <span className="block text-[14px] font-bold text-[#2C3039]">Hòm thư thảo luận trực tiếp</span>
- <span className="text-[12px] text-[#8A8478] block mt-0.5">Cho phép học viên đặt câu hỏi Hỏi-Đáp bên dưới từng bài video</span>
+ <span className="block text-[14px] font-bold text-[#0F172A]">Hòm thư thảo luận trực tiếp</span>
+ <span className="text-[12px] text-[#64748B] block mt-0.5">Cho phép học viên đặt câu hỏi Hỏi-Đáp bên dưới từng bài video</span>
  </div>
  </div>
- <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-[#C0392B] focus:ring-[#C0392B] cursor-pointer" />
+ <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-[#3B82F6] focus:ring-[#3B82F6] cursor-pointer" />
  </div>
 
  <div className="mt-4 pt-6 border-t border-rose-50 flex flex-col gap-4">
- <h3 className="text-[12px] font-black uppercase tracking-wider text-[#E11D48] flex items-center gap-1.5">
+ <h3 className="text-[12px] font-black uppercase tracking-wider text-[#2563EB] flex items-center gap-1.5">
  <TrashIcon size={14} />
  <span>Khu Vực Nguy Hiểm (Danger Zone)</span>
  </h3>
@@ -314,7 +314,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  type="button"
  onClick={handleDelete}
  disabled={isPending || isDeleting}
- className="px-5 py-2.5 rounded-xl bg-[#E11D48] hover:bg-rose-700 text-white font-extrabold text-[13px] shadow-sm transition-all shrink-0 cursor-pointer disabled:bg-rose-300 disabled:cursor-not-allowed"
+ className="px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-rose-700 text-white font-extrabold text-[13px] shadow-sm transition-all shrink-0 cursor-pointer disabled:bg-rose-300 disabled:cursor-not-allowed"
  >
  {isDeleting ? "Đang xóa..." : "Xóa bài giảng"}
  </button>

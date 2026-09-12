@@ -24,7 +24,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  */
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus:ring-blue-500",
+    "bg-[#3B82F6] text-white hover:bg-[#2563EB] active:bg-[#1D4ED8] focus:ring-[#3B82F6]",
   secondary:
     "bg-gray-600 text-white hover:bg-gray-700 active:bg-gray-800 focus:ring-gray-500",
   outline:
@@ -32,7 +32,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   ghost:
     "text-gray-600 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-500",
   danger:
-    "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus:ring-red-500",
+    "bg-[#3B82F6] text-white hover:bg-[#2563EB] active:bg-[#1D4ED8] focus:ring-[#3B82F6]",
   unstyled: "", // Không có màu mặc định, toàn quyền cho className quyết định
 };
 

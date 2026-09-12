@@ -68,7 +68,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
  className="group flex flex-col bg-white rounded-2xl border border-[#e2e8f0] overflow-hidden shadow-sm hover:shadow-xl hover:border-[#2563eb]/40 transition-all duration-300 transform hover:-translate-y-1 justify-between h-full"
  >
  {/* Thumbnail */}
- <div className="relative h-44 w-full bg-[#1A1A2E] overflow-hidden shrink-0">
+ <div className="relative h-44 w-full bg-[#0F172A] overflow-hidden shrink-0">
  {safeThumbnailUrl ? (
  <Image
  src={safeThumbnailUrl}
@@ -80,7 +80,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
  ) : (
  <div className="w-full h-full from-[#1E1B4B] via-[#312E81] to-[#4C1D95]" />
  )}
- <div className="absolute inset-0 from-[#1A1A2E]/90 via-transparent to-transparent opacity-80" />
+ <div className="absolute inset-0 from-[#0F172A]/90 via-transparent to-transparent opacity-80" />
  
  <div className="absolute top-4 left-4 flex gap-2">
  <span className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-medium border border-white/20">

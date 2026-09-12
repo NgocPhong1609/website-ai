@@ -36,7 +36,7 @@ export function CourseFilterTabs({ counts, onFilterChange }: CourseFilterTabsPro
  <div
  role="tablist"
  aria-label="Lọc khóa học"
- className="flex items-center gap-1.5 bg-white border border-[#E8E2D9] p-1.5 rounded-xl shadow-2xs shrink-0"
+ className="flex items-center gap-1.5 bg-white border border-[#E2E8F0] p-1.5 rounded-xl shadow-2xs shrink-0"
  >
  {TABS.map(({ key, label }) => {
  const count = counts[key] || 0;
@@ -52,8 +52,8 @@ export function CourseFilterTabs({ counts, onFilterChange }: CourseFilterTabsPro
  className={twMerge(
  "flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer",
  isActive
- ? "bg-[#C0392B] text-white shadow-2xs"
- : "text-[#8A8478] hover:text-[#2C3039] hover:bg-[#FEFCF9]",
+ ? "bg-[#3B82F6] text-white shadow-2xs"
+ : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]",
  )}
  >
  <span>{label}</span>
@@ -62,7 +62,7 @@ export function CourseFilterTabs({ counts, onFilterChange }: CourseFilterTabsPro
  "text-[11px] font-extrabold px-1.5 py-0.5 rounded-md transition-colors",
  isActive
  ? "bg-white/20 text-white"
- : "bg-gray-100 text-[#8A8478]",
+ : "bg-gray-100 text-[#64748B]",
  )}
  >
  {count}

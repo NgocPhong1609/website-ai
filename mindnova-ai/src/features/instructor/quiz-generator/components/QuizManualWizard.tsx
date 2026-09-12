@@ -5,6 +5,7 @@ import { useManualQuizWizard } from "../hooks/useManualQuizWizard";
 import { ManualConfigForm } from "./ManualConfigForm";
 import { ManualQuizEditor } from "./ManualQuizEditor";
 import { Step5SaveAndAttachModal } from "./Step5SaveAndAttachModal";
+import { FileQuestion } from "lucide-react";
 
 interface QuizManualWizardProps {
   onSuccessComplete?: (savedQuiz?: any) => void;
@@ -47,20 +48,20 @@ export function QuizManualWizard({
     <div className={`max-w-5xl mx-auto flex flex-col gap-6 ${embeddedMode ? "p-2" : "p-4 md:p-8"}`}>
       {/* Wizard Header Progress Bar */}
       {!embeddedMode && (
-        <div className="bg-white rounded-3xl p-6 border border-[#E8E2D9] shadow-sm flex flex-col gap-4">
+        <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl font-bold shadow-md">
-                📝
+              <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md">
+                <FileQuestion className="h-5 w-5" aria-hidden />
               </div>
               <div>
-                <h1 className="text-lg font-black text-[#2C3039]">Manual Quiz Creator</h1>
-                <p className="text-xs text-[#8A8478] font-semibold">Tự biên soạn câu hỏi trắc nghiệm &amp; tự luận</p>
+                <h1 className="text-lg font-black text-[#0F172A]">Manual Quiz Creator</h1>
+                <p className="text-xs text-[#64748B] font-semibold">Tự biên soạn câu hỏi trắc nghiệm &amp; tự luận</p>
               </div>
             </div>
 
             <div className="flex items-center gap-2 font-mono text-xs font-black">
-              <span className="text-indigo-600">Bước {step}</span>
+              <span className="text-blue-600">Bước {step}</span>
               <span className="text-gray-300">/</span>
               <span className="text-gray-400">3</span>
             </div>
@@ -81,15 +82,15 @@ export function QuizManualWizard({
                   <div
                     className={`h-1.5 rounded-full transition-all duration-300 ${
                       isActive
-                        ? "bg-indigo-600"
+                        ? "bg-blue-600"
                         : isDone
-                        ? "-[#2C3039]"
+                        ? "text-[#0F172A]"
                         : "bg-gray-200"
                     }`}
                   />
                   <span
                     className={`text-[10px] font-extrabold truncate ${
-                      isActive ? "text-indigo-600" : isDone ? "-[#2C3039]" : "text-gray-400"
+                      isActive ? "text-blue-600" : isDone ? "text-[#0F172A]" : "text-gray-400"
                     }`}
                   >
                     {s.num}. {s.name}

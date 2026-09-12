@@ -25,7 +25,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
 
  return (
  <div className="flex min-h-100 w-full flex-col items-center justify-center px-6 py-12 text-center sm:min-h-[600px]">
- <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-500 shadow-sm">
+ <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#EFF6FF] text-[#3B82F6] shadow-sm">
  <AlertCircleIcon />
  </div>
 
@@ -47,7 +47,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
  <div className="mt-8 flex flex-col gap-3 sm:flex-row">
  <Button
  onClick={reset}
- className="rounded-lg -[#C0392B] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:-[#C0392B]"
+ className="rounded-lg bg-[#3B82F6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#2563EB]"
  >
  Thử lại một lần nữa
  </Button>

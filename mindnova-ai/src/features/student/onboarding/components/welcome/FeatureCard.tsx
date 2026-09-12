@@ -10,11 +10,11 @@ export default function FeatureCard({
 }: FeatureCardProps) {
  return (
  <div className="max-w-43.75 w-full rounded-2xl bg-[#F2F3FF]/50 border border-[#C7C4D7]/30 flex flex-col gap-2 p-4">
- <div className="w-10 h-10 rounded-lg bg-[#C0392B]/10 flex justify-center items-center">
+ <div className="w-10 h-10 rounded-lg bg-[#3B82F6]/10 flex justify-center items-center">
  <Image src={icon} alt="" aria-hidden="true" width={16} height={20} />
  </div>
- <h3 className="text-[13px] font-medium text-[#2C3039]">{title}</h3>
- <p className="text-[11px] text-[#2C3039]">{description}</p>
+ <h3 className="text-[13px] font-medium text-[#0F172A]">{title}</h3>
+ <p className="text-[11px] text-[#0F172A]">{description}</p>
  </div>
  );
 }

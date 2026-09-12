@@ -69,7 +69,7 @@ function toStatusLabel(status: string): string {
 
 function statusPillClass(status: string): string {
  const value = status.toLowerCase();
- if (value.includes("publish")) return "-[#FAF7F2] -[#2C3039]";
+ if (value.includes("publish")) return "text-[#F8FAFC] text-[#0F172A]";
  if (value.includes("draft")) return "bg-amber-100 text-amber-700";
  if (value.includes("archive")) return "bg-rose-100 text-rose-700";
  return "bg-slate-100 text-slate-700";
@@ -265,7 +265,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  <button
  type="button"
  onClick={() => setIsFormOpen((current) => !current)}
- className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold -[#C0392B] transition hover:bg-slate-100"
+ className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-[#3B82F6] transition hover:bg-slate-100"
  >
  + Tạo khóa học
  </button>
@@ -289,7 +289,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
  placeholder="VD: React cơ bản"
  required
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
 
@@ -298,7 +298,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  <select
  value={form.status}
  onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as CourseStatus }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  >
  <option value="draft">Bản nháp</option>
  <option value="published">Đã xuất bản</option>
@@ -311,7 +311,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  <select
  value={form.category_id}
  onChange={(event) => setForm((current) => ({ ...current, category_id: event.target.value }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  >
  <option value="">Chưa phân loại</option>
  {categories.map((category) => (
@@ -327,7 +327,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  <select
  value={form.level}
  onChange={(event) => setForm((current) => ({ ...current, level: event.target.value as CourseFormState["level"] }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  >
  <option value="beginner">Cơ bản</option>
  <option value="intermediate">Trung cấp</option>
@@ -343,7 +343,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  placeholder="0"
  type="number"
  min="0"
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
 
@@ -354,7 +354,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
  placeholder="Mô tả mục tiêu, đối tượng và nội dung khóa học"
  required
- className="min-h-24 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="min-h-24 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
  </div>
@@ -363,7 +363,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  <button
  type="submit"
  disabled={isSubmitting}
- className="rounded-xl -[#C0392B] px-4 py-2 text-sm font-semibold text-white transition hover:-[#C0392B]"
+ className="rounded-xl bg-[#3B82F6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563EB]"
  >
  {isSubmitting ? "Đang tạo..." : "Tạo khóa học"}
  </button>
@@ -379,7 +379,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  )}
 
  {editingCourse && (
- <form onSubmit={handleUpdateCourse} className="rounded-2xl border -[#FAF7F2] bg-indigo-50/60 p-4 shadow-sm">
+ <form onSubmit={handleUpdateCourse} className="rounded-2xl border-[#E2E8F0] bg-blue-50/60 p-4 shadow-sm">
  <div className="mb-3">
  <p className="text-sm font-semibold text-slate-900">Chỉnh sửa khóa học: {editingCourse.title}</p>
  <p className="text-xs text-slate-500">Cập nhật thông tin và trạng thái kiểm duyệt khóa học.</p>
@@ -392,7 +392,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  value={editForm.title}
  onChange={(event) => setEditForm((current) => ({ ...current, title: event.target.value }))}
  required
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
 
@@ -401,7 +401,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  <select
  value={editForm.status}
  onChange={(event) => setEditForm((current) => ({ ...current, status: event.target.value as CourseStatus }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  >
  <option value="draft">Chờ duyệt</option>
  <option value="published">Đã duyệt</option>
@@ -414,7 +414,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  <select
  value={editForm.category_id}
  onChange={(event) => setEditForm((current) => ({ ...current, category_id: event.target.value }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  >
  <option value="">Chưa phân loại</option>
  {categories.map((category) => (
@@ -430,7 +430,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  <select
  value={editForm.level}
  onChange={(event) => setEditForm((current) => ({ ...current, level: event.target.value as CourseFormState["level"] }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  >
  <option value="beginner">Cơ bản</option>
  <option value="intermediate">Trung cấp</option>
@@ -445,7 +445,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  onChange={(event) => setEditForm((current) => ({ ...current, price: event.target.value }))}
  type="number"
  min="0"
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
 
@@ -454,7 +454,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  <textarea
  value={editForm.description}
  onChange={(event) => setEditForm((current) => ({ ...current, description: event.target.value }))}
- className="min-h-24 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="min-h-24 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
  </div>
@@ -463,7 +463,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  <button
  type="submit"
  disabled={isUpdating === editingCourse.id}
- className="rounded-xl -[#C0392B] px-4 py-2 text-sm font-semibold text-white transition hover:-[#C0392B] disabled:cursor-not-allowed disabled:opacity-60"
+ className="rounded-xl bg-[#3B82F6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2563EB] disabled:cursor-not-allowed disabled:opacity-60"
  >
  {isUpdating === editingCourse.id ? "Đang lưu..." : "Lưu thay đổi"}
  </button>
@@ -493,7 +493,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  </thead>
  <tbody>
  {courses.map((course) => (
- <tr key={`${course.id}-${course.title}`} className="border-t border-slate-200 bg-white hover:bg-cyan-50/35">
+ <tr key={`${course.id}-${course.title}`} className="border-t border-slate-200 bg-white hover:bg-blue-50/35">
  <td className="px-4 py-3 font-medium text-slate-900">{course.title}</td>
  <td className="px-4 py-3 text-slate-600">{course.category}</td>
  <td className="px-4 py-3 text-slate-600">{toLevelLabel(course.level)}</td>
@@ -509,7 +509,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  type="button"
  disabled={isUpdating === course.id}
  onClick={() => handleModerate(course.id, "published", "Khóa học đã được duyệt.")}
- className="rounded-lg -[#2C3039] px-2.5 py-1 text-xs font-semibold text-white hover:-[#2C3039] disabled:cursor-not-allowed disabled:opacity-60"
+ className="rounded-lg bg-[#0F172A] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[#0F172A] disabled:cursor-not-allowed disabled:opacity-60"
  >
  Duyệt
  </button>
@@ -536,7 +536,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  <button
  type="button"
  onClick={() => openEdit(course)}
- className="rounded-lg border -[#FAF7F2] bg-cyan-50 px-2.5 py-1 text-xs font-semibold -[#C0392B] hover:-[#FAF7F2]"
+ className="rounded-lg border-[#E2E8F0] bg-blue-50 px-2.5 py-1 text-xs font-semibold text-[#3B82F6] hover:bg-[#F8FAFC]"
  >
  Sửa
  </button>
@@ -564,7 +564,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  </table>
  </div>
 
- {status && <p className="w-full rounded-xl bg-violet-50 px-3 py-2 text-sm -[#C0392B]">{status}</p>}
+ {status && <p className="w-full rounded-xl bg-violet-50 px-3 py-2 text-sm bg-[#3B82F6]">{status}</p>}
  </div>
  );
 }

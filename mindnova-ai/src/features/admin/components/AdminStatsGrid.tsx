@@ -5,16 +5,18 @@ interface AdminStatsGridProps {
 }
 
 export function AdminStatsGrid({ stats }: AdminStatsGridProps) {
+ if (!stats?.length) return null;
+
  return (
  <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
  {stats.map((item) => (
  <article
  key={item.label}
- className="rounded-[24px] border border-slate-200 bg-white/90 p-5 shadow-[0_20px_40px_-32px_rgba(15,23,42,0.7)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_24px_50px_-30px_rgba(14,165,233,0.4)]"
+ className="rounded-[24px] border border-slate-200 bg-white/90 p-5 shadow-[0_20px_40px_-32px_rgba(15,23,42,0.7)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_24px_50px_-30px_rgba(59, 130, 246,0.4)]"
  >
  <div className="flex items-center justify-between text-sm text-slate-500">
  <span>{item.label}</span>
- <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold -[#2C3039] ring-1 ring-emerald-100">
+ <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-100">
  {item.trend}
  </span>
  </div>
@@ -27,7 +29,7 @@ export function AdminStatsGrid({ stats }: AdminStatsGridProps) {
  {[28, 40, 32, 48, 36, 60, 50].map((height, index) => (
  <span
  key={`${item.label}-${index}`}
- className="w-full rounded-t-md -[#C0392B] -[#C0392B]"
+ className="w-full rounded-t-md bg-[#3B82F6]"
  style={{ height: `${height}%` }}
  />
  ))}

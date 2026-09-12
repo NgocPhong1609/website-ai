@@ -54,8 +54,8 @@ function DifficultyToggle({ value, onChange }: DifficultyToggleProps) {
  className={twMerge(
  "px-4 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer",
  value === key
- ? "border-[#C0392B] bg-[#C0392B] text-white shadow-2xs"
- : "border-[#E8E2D9] bg-white text-[#8A8478] hover:border-gray-300 hover:text-[#2C3039] hover:bg-[#FEFCF9]/70"
+ ? "border-[#3B82F6] bg-[#3B82F6] text-white shadow-2xs"
+ : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-gray-300 hover:text-[#0F172A] hover:bg-[#F8FAFC]/70"
  )}
  >
  {label}
@@ -87,10 +87,10 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
 
  return (
  <div className="flex flex-col gap-6 animate-fadeIn">
- <div className="flex items-center justify-between border-b border-[#E8E2D9] pb-4 bg-white p-5 rounded-2xl shadow-2xs">
+ <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-4 bg-white p-5 rounded-2xl shadow-2xs">
  <div>
- <h2 className="text-base font-black text-[#2C3039]">Thông tin cơ bản khóa học</h2>
- <p className="text-xs text-[#8A8478] mt-0.5">Cập nhật tiêu đề và mô tả chính hiển thị trên danh mục học viện MindNova.</p>
+ <h2 className="text-base font-black text-[#0F172A]">Thông tin cơ bản khóa học</h2>
+ <p className="text-xs text-[#64748B] mt-0.5">Cập nhật tiêu đề và mô tả chính hiển thị trên danh mục học viện MindNova.</p>
  </div>
  </div>
 
@@ -100,8 +100,8 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  {/* Left column: Thumbnail + AI tip */}
  <div className="flex flex-col gap-4">
  <div>
- <p className="text-xs font-black text-[#2C3039] uppercase tracking-wider">Ảnh bìa khóa học</p>
- <p className="text-[11px] text-[#8A8478] mt-0.5 leading-relaxed">
+ <p className="text-xs font-black text-[#0F172A] uppercase tracking-wider">Ảnh bìa khóa học</p>
+ <p className="text-[11px] text-[#64748B] mt-0.5 leading-relaxed">
  Tải lên hình ảnh đại diện tỷ lệ 4:3 hấp dẫn để thu hút học viên trên sàn MindNova.
  </p>
  </div>
@@ -114,11 +114,11 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  </div>
 
  {/* Right column: Text fields */}
- <div className="flex flex-col gap-5 bg-white p-6 rounded-2xl border border-[#E8E2D9] shadow-2xs">
+ <div className="flex flex-col gap-5 bg-white p-6 rounded-2xl border border-[#E2E8F0] shadow-2xs">
  {/* Course title */}
  <div className="flex flex-col gap-1.5">
  <div className="flex items-center justify-between">
- <label htmlFor="course-title" className="text-xs font-black text-[#2C3039] uppercase tracking-wider">
+ <label htmlFor="course-title" className="text-xs font-black text-[#0F172A] uppercase tracking-wider">
  Tên khóa học <span className="text-rose-500">*</span>
  </label>
  <CharCount current={data.title.length} max={MAX_TITLE_LENGTH} />
@@ -130,14 +130,14 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  maxLength={MAX_TITLE_LENGTH}
  placeholder="Ví dụ: Lập trình Trí tuệ Nhân tạo AI Mastery với LLM & RAG 2026..."
  onChange={(e) => onChange("title", e.target.value)}
- className="w-full px-4 py-2.5 rounded-xl text-xs font-bold text-[#2C3039] placeholder:text-gray-400 placeholder:font-normal bg-[#FEFCF9]/50 border border-[#E8E2D9] focus:outline-none focus:border-[#C0392B] focus:bg-white transition-all shadow-2xs"
+ className="w-full px-4 py-2.5 rounded-xl text-xs font-bold text-[#0F172A] placeholder:text-gray-400 placeholder:font-normal bg-[#F8FAFC]/50 border border-[#E2E8F0] focus:outline-none focus:border-[#3B82F6] focus:bg-white transition-all shadow-2xs"
  />
  </div>
 
  {/* Description */}
  <div className="flex flex-col gap-1.5">
  <div className="flex items-center justify-between">
- <label htmlFor="course-description" className="text-xs font-black text-[#2C3039] uppercase tracking-wider">
+ <label htmlFor="course-description" className="text-xs font-black text-[#0F172A] uppercase tracking-wider">
  Mô tả ngắn <span className="text-rose-500">*</span>
  </label>
  <CharCount current={data.description.length} max={MAX_DESCRIPTION_LENGTH} />
@@ -149,7 +149,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  rows={4}
  placeholder="Nhập tóm tắt khóa học giúp học viên nhanh chóng nắm bắt được giá trị kiến thức, cơ hội việc làm và mục tiêu đạt được sau tốt nghiệp..."
  onChange={(e) => onChange("description", e.target.value)}
- className="w-full px-4 py-3 rounded-xl text-xs font-medium text-[#2C3039] placeholder:text-gray-400 placeholder:font-normal bg-[#FEFCF9]/50 border border-[#E8E2D9] focus:outline-none focus:border-[#C0392B] focus:bg-white transition-all resize-none leading-relaxed shadow-2xs"
+ className="w-full px-4 py-3 rounded-xl text-xs font-medium text-[#0F172A] placeholder:text-gray-400 placeholder:font-normal bg-[#F8FAFC]/50 border border-[#E2E8F0] focus:outline-none focus:border-[#3B82F6] focus:bg-white transition-all resize-none leading-relaxed shadow-2xs"
  />
  </div>
 
@@ -157,7 +157,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start pt-1">
  {/* Field select */}
  <div className="flex flex-col gap-1.5">
- <label htmlFor="course-field" className="text-xs font-black text-[#2C3039] uppercase tracking-wider">
+ <label htmlFor="course-field" className="text-xs font-black text-[#0F172A] uppercase tracking-wider">
  Lĩnh vực Chuyên môn
  </label>
  <div className="relative">
@@ -165,20 +165,20 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  id="course-field"
  value={data.field}
  onChange={(e) => onChange("field", e.target.value)}
- className={`w-full appearance-none px-4 py-2.5 pr-10 rounded-xl text-xs bg-[#FEFCF9]/50 border border-[#E8E2D9] focus:outline-none focus:border-[#C0392B] focus:ring-2 focus:ring-[#C0392B]/20 focus:bg-white transition-all cursor-pointer shadow-2xs ${
- !data.field ? "text-gray-400 font-normal" : "text-[#2C3039] font-bold"
+ className={`w-full appearance-none px-4 py-2.5 pr-10 rounded-xl text-xs bg-[#F8FAFC]/50 border border-[#E2E8F0] focus:outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 focus:bg-white transition-all cursor-pointer shadow-2xs ${
+ !data.field ? "text-gray-400 font-normal" : "text-[#0F172A] font-bold"
  }`}
  >
  <option value="" disabled className="text-gray-400 font-normal">
  -- Chọn lĩnh vực --
  </option>
  {COURSE_FIELDS.map((f) => (
- <option key={f} value={f} className="text-[#2C3039] font-bold">
+ <option key={f} value={f} className="text-[#0F172A] font-bold">
  {f}
  </option>
  ))}
  </select>
- <div className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-[#8A8478]">
+ <div className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-[#64748B]">
  <ChevronDownIcon size={14} />
  </div>
  </div>
@@ -186,7 +186,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
 
  {/* Difficulty */}
  <div className="flex flex-col gap-1.5">
- <span className="text-xs font-black text-[#2C3039] uppercase tracking-wider">Trình độ Khóa học</span>
+ <span className="text-xs font-black text-[#0F172A] uppercase tracking-wider">Trình độ Khóa học</span>
  <DifficultyToggle
  value={data.difficulty}
  onChange={(v) => onChange("difficulty", v)}

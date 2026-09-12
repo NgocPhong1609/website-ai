@@ -25,13 +25,13 @@ export function AdminRecentUsersTable({ users }: AdminRecentUsersTableProps) {
 
  const statusTone = (status: string) => {
  const value = status.toLowerCase();
- if (value.includes("active") || value.includes("hoạt động")) return "bg-emerald-50 -[#2C3039]";
+ if (value.includes("active") || value.includes("hoạt động")) return "bg-emerald-50 text-[#0F172A]";
  if (value.includes("pending") || value.includes("chờ duyệt")) return "bg-amber-50 text-amber-700";
  return "bg-slate-100 text-slate-600";
  };
 
  return (
- <article className="mn-stagger rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
+ <article className="mn-stagger rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
  <div className="flex items-center justify-between">
  <div>
  <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Người dùng gần đây</h2>
@@ -39,7 +39,7 @@ export function AdminRecentUsersTable({ users }: AdminRecentUsersTableProps) {
  </div>
  <Link
  href="/admin/users"
- className="rounded-full border -[#FAF7F2] bg-cyan-50/70 px-3 py-1.5 text-xs font-semibold -[#C0392B] transition hover:-[#FAF7F2]"
+ className="rounded-full border-[#E2E8F0] bg-blue-50/70 px-3 py-1.5 text-xs font-semibold text-[#3B82F6] transition hover:bg-[#F8FAFC]"
  >
  Xem tất cả
  </Link>
@@ -56,7 +56,7 @@ export function AdminRecentUsersTable({ users }: AdminRecentUsersTableProps) {
  </thead>
  <tbody>
  {users.map((user, index) => (
- <tr key={`${user.name}-${index}`} className="border-t border-slate-200 bg-white/90 hover:bg-cyan-50/35">
+ <tr key={`${user.name}-${index}`} className="border-t border-slate-200 bg-white/90 hover:bg-blue-50/35">
  <td className="px-4 py-3 font-medium text-slate-800">{user.name}</td>
  <td className="px-4 py-3 text-slate-600">{toRoleLabel(user.role)}</td>
  <td className="px-4 py-3">

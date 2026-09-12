@@ -70,14 +70,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }
  <button
  onClick={handleSubmit}
  disabled={isLoading}
- className="px-4 py-1.5 bg-[#C0392B] text-white font-medium text-sm rounded-full hover:bg-[#A93226] transition-colors disabled:bg-[#C0392B]/50 flex items-center justify-center h-8 cursor-pointer shadow-xs"
+ className="px-4 py-1.5 bg-[#3B82F6] text-white font-medium text-sm rounded-full hover:bg-[#2563EB] transition-colors disabled:bg-[#3B82F6]/50 flex items-center justify-center h-8 cursor-pointer shadow-xs"
  >
  {isLoading ? '...' : 'Gửi'}
  </button>
  ) : (
  <button
  disabled={true}
- className="w-8 h-8 flex items-center justify-center bg-[#C0392B] text-white rounded-full transition-colors opacity-40 cursor-not-allowed"
+ className="w-8 h-8 flex items-center justify-center bg-[#3B82F6] text-white rounded-full transition-colors opacity-40 cursor-not-allowed"
  >
  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

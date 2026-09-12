@@ -47,8 +47,8 @@ export function CourseEditTabs({ activeTab, onChangeTab }: CourseEditTabsProps) 
  className={twMerge(
  "flex-1 flex justify-center items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap",
  isActive
- ? "bg-[#C0392B] text-white shadow-sm"
- : "text-[#8A8478] hover:text-[#2C3039] hover:bg-[#FEFCF9]"
+ ? "bg-[#3B82F6] text-white shadow-sm"
+ : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]"
  )}
  >
  <span className={twMerge(isActive ? "text-white" : "text-gray-400")}>

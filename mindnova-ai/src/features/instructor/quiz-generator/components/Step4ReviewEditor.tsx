@@ -46,31 +46,31 @@ export function Step4ReviewEditor({
   const isMore = totalPoints > 10;
 
   return (
-    <div className="p-8 bg-white rounded-3xl border border-[#E8E2D9] shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-3xl border border-[#E2E8F0] shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 bg-indigo-50 text-[#C0392B] text-xs font-black rounded-lg border -[#FAF7F2] uppercase tracking-wider">
+            <span className="px-3 py-1 bg-blue-50 text-[#3B82F6] text-xs font-black rounded-lg border-[#E2E8F0] uppercase tracking-wider">
               Bước 4 / 5
             </span>
-            <h2 className="text-xl font-black text-[#2C3039]">Review &amp; Hiệu Chỉnh Đề Kiểm Tra</h2>
+            <h2 className="text-xl font-black text-[#0F172A]">Review &amp; Hiệu Chỉnh Đề Kiểm Tra</h2>
           </div>
-          <p className="text-xs text-[#8A8478] font-medium mt-1">
+          <p className="text-xs text-[#64748B] font-medium mt-1">
             Bạn giữ toàn quyền biên tập: Chỉnh sửa inline, phê duyệt (Approve), xóa hoặc yêu cầu AI sinh lại từng câu.
           </p>
         </div>
 
         {/* Realtime Summary Badge */}
         <div className="flex items-center gap-3">
-          <div className="px-3 py-2 rounded-2xl bg-indigo-50 border -[#FAF7F2] flex items-center gap-2 text-xs font-bold text-[#C0392B]">
+          <div className="px-3 py-2 rounded-2xl bg-blue-50 border-[#E2E8F0] flex items-center gap-2 text-xs font-bold text-[#3B82F6]">
             <span>🎯 Đã duyệt:</span>
             <span className="font-extrabold text-sm">{approvedCount}/{questions.length}</span>
           </div>
           <div
             className={`px-3 py-2 rounded-2xl border flex items-center gap-2 text-xs font-bold ${
               isValidTotal
-                ? "bg-emerald-50 -[#FAF7F2] -[#2C3039]"
+                ? "bg-emerald-50 text-emerald-700"
                 : "bg-amber-50 border-amber-200 text-amber-800"
             }`}
           >
@@ -83,12 +83,12 @@ export function Step4ReviewEditor({
       {/* Score Validation Banner */}
       <div>
         {isValidTotal ? (
-          <div className="p-4 rounded-2xl bg-emerald-50 border -[#FAF7F2] -[#2C3039] text-xs font-bold flex items-center justify-between shadow-2xs">
+          <div className="p-4 rounded-2xl bg-emerald-50 border-[#E2E8F0] text-[#0F172A] text-xs font-bold flex items-center justify-between shadow-2xs">
             <div className="flex items-center gap-2">
               <span className="text-base">🎉</span>
               <span>Tổng điểm hợp lệ: <strong>10 / 10</strong>. Bài kiểm tra đã sẵn sàng để xuất bản.</span>
             </div>
-            <span className="px-2.5 py-1 -[#2C3039] text-white text-[10px] font-black uppercase rounded-lg">Standard 10.0</span>
+            <span className="px-2.5 py-1 bg-[#0F172A] text-white text-[10px] font-black uppercase rounded-lg">Standard 10.0</span>
           </div>
         ) : isLess ? (
           <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex items-center justify-between shadow-2xs">
@@ -110,7 +110,7 @@ export function Step4ReviewEditor({
       </div>
 
       {/* Control Bar: Filters & Actions */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-[#FAF8FF] border border-indigo-50">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-[#FAF8FF] border border-blue-50">
         {/* Filter Tabs */}
         <div className="flex items-center gap-2">
           <button
@@ -118,8 +118,8 @@ export function Step4ReviewEditor({
             onClick={() => setFilterType("all")}
             className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
               filterType === "all"
-                ? "bg-[#C0392B] text-white shadow-md"
-                : "bg-white text-[#8A8478] hover:bg-gray-100 border border-[#E8E2D9]"
+                ? "bg-[#3B82F6] text-white shadow-md"
+                : "bg-white text-[#64748B] hover:bg-gray-100 border border-[#E2E8F0]"
             }`}
           >
             Tất cả ({questions.length})
@@ -129,8 +129,8 @@ export function Step4ReviewEditor({
             onClick={() => setFilterType("multiple_choice")}
             className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
               filterType === "multiple_choice"
-                ? "bg-[#C0392B] text-white shadow-md"
-                : "bg-white text-[#8A8478] hover:bg-gray-100 border border-[#E8E2D9]"
+                ? "bg-[#3B82F6] text-white shadow-md"
+                : "bg-white text-[#64748B] hover:bg-gray-100 border border-[#E2E8F0]"
             }`}
           >
             Trắc nghiệm ({mcQuestions.length})
@@ -140,8 +140,8 @@ export function Step4ReviewEditor({
             onClick={() => setFilterType("essay")}
             className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
               filterType === "essay"
-                ? "-[#C0392B] text-white shadow-md"
-                : "bg-white text-[#8A8478] hover:bg-gray-100 border border-[#E8E2D9]"
+                ? "text-[#3B82F6] text-white shadow-md"
+                : "bg-white text-[#64748B] hover:bg-gray-100 border border-[#E2E8F0]"
             }`}
           >
             Tự luận ({essayQuestions.length})
@@ -152,7 +152,7 @@ export function Step4ReviewEditor({
         <button
           type="button"
           onClick={onRegenerateAll}
-          className="text-xs font-bold text-[#C0392B] hover:underline flex items-center gap-1 cursor-pointer"
+          className="text-xs font-bold text-[#3B82F6] hover:underline flex items-center gap-1 cursor-pointer"
         >
           <span>🔄 Sinh lại toàn bộ đề</span>
         </button>
@@ -161,7 +161,7 @@ export function Step4ReviewEditor({
       {/* Questions List */}
       <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto pr-1">
         {filteredQuestions.length === 0 ? (
-          <div className="p-12 text-center rounded-2xl bg-[#FEFCF9] border border-[#E8E2D9] text-[#8A8478] font-medium">
+          <div className="p-12 text-center rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#64748B] font-medium">
             Không tìm thấy câu hỏi phù hợp với bộ lọc hiện tại.
           </div>
         ) : (
@@ -224,7 +224,7 @@ export function Step4ReviewEditor({
             type="button"
             onClick={() => onSave("published")}
             disabled={isSaving || questions.length === 0 || !isValidTotal}
-            className="px-8 py-3 bg-[#C0392B] hover:bg-[#a02c20] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+            className="px-8 py-3 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
           >
             {isSaving ? (
               <>

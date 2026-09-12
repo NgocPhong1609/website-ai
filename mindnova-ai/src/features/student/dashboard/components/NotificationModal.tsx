@@ -57,7 +57,7 @@ export function NotificationModal({ isOpen, onClose, notification }: Notificatio
  <>
  {/* Backdrop */}
  <div
- className="fixed inset-0 z-[100] bg-[#2C3039]/70 backdrop-blur-sm animate-in fade-in duration-200"
+ className="fixed inset-0 z-[100] bg-[#0F172A]/70 backdrop-blur-sm animate-in fade-in duration-200"
  onClick={onClose}
  aria-hidden
  />
@@ -67,19 +67,19 @@ export function NotificationModal({ isOpen, onClose, notification }: Notificatio
  <div
  role="dialog"
  aria-modal
- className="pointer-events-auto relative w-full max-w-[600px] bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col animate-in zoom-in-95 fade-in duration-200 border border-[#E8E2D9]"
+ className="pointer-events-auto relative w-full max-w-[600px] bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col animate-in zoom-in-95 fade-in duration-200 border border-[#E2E8F0]"
  >
  {/* Header */}
- <div className="flex items-center px-6 py-4 border-b border-[#E8E2D9] relative bg-[#FAF7F2]">
+ <div className="flex items-center px-6 py-4 border-b border-[#E2E8F0] relative bg-[#F8FAFC]">
  <button
  type="button"
  onClick={onClose}
  aria-label="Đóng"
- className="absolute left-6 w-8 h-8 rounded-full flex items-center justify-center text-[#8A8478] hover:text-[#C0392B] hover:bg-[#F5F0E8] transition-all duration-150 focus:outline-none"
+ className="absolute left-6 w-8 h-8 rounded-full flex items-center justify-center text-[#64748B] hover:text-[#2563EB] hover:bg-[#F1F5F9] transition-all duration-150 focus:outline-none"
  >
  <XIcon />
  </button>
- <h2 className="text-[16px] font-bold text-[#2C3039] tracking-tight w-full text-center pr-8 font-serif">
+ <h2 className="text-[16px] font-bold text-[#0F172A] tracking-tight w-full text-center pr-8 font-serif">
  Chi tiết thông báo
  </h2>
  </div>
@@ -91,11 +91,11 @@ export function NotificationModal({ isOpen, onClose, notification }: Notificatio
  fallback={sender.name.substring(0, 2).toUpperCase()}
  src={sender.avatar}
  size="lg"
- className="ring-2 ring-[#F5F0E8] text-[#C0392B] bg-[#FADBD8]"
+ className="ring-2 ring-[#F1F5F9] text-[#3B82F6] bg-[#EFF6FF]"
  />
  <div>
- <p className="text-[15px] font-bold text-[#2C3039]">{sender.name}</p>
- <p className="text-[12px] text-[#8A8478] font-medium mt-0.5">
+ <p className="text-[15px] font-bold text-[#0F172A]">{sender.name}</p>
+ <p className="text-[12px] text-[#64748B] font-medium mt-0.5">
  {new Date(notification.created_at).toLocaleString("vi-VN", {
  hour: '2-digit', minute: '2-digit',
  day: '2-digit', month: '2-digit', year: 'numeric'
@@ -104,25 +104,25 @@ export function NotificationModal({ isOpen, onClose, notification }: Notificatio
  </div>
  </div>
 
- <h3 className="text-[18px] font-bold text-[#2C3039] mb-3 leading-snug font-serif">
+ <h3 className="text-[18px] font-bold text-[#0F172A] mb-3 leading-snug font-serif">
  {notification.title}
  </h3>
 
- <div className="text-[15px] text-[#8A8478] leading-relaxed whitespace-pre-wrap">
+ <div className="text-[15px] text-[#64748B] leading-relaxed whitespace-pre-wrap">
  {notification.content}
  </div>
  </div>
 
  {/* Footer CTA */}
  {hasAction && (
- <div className="px-6 py-4 border-t border-[#E8E2D9] bg-[#FAF7F2] flex justify-end">
+ <div className="px-6 py-4 border-t border-[#E2E8F0] bg-[#F8FAFC] flex justify-end">
  <button
  type="button"
  onClick={() => {
  onClose();
  router.push(notification.action_url);
  }}
- className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#C0392B] hover:bg-[#A93226] shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 focus:outline-none"
+ className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 focus:outline-none"
  >
  Đến nội dung liên quan
  <ArrowRightIcon />

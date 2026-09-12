@@ -126,7 +126,7 @@ export function ForgotPasswordFlow() {
  <button
  type="submit"
  disabled={isLoading || !email}
- className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#FAF7F2] hover:bg-[#C0392B] transition-colors disabled:opacity-50"
+ className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#F8FAFC] hover:bg-[#2563EB] transition-colors disabled:opacity-50"
  >
  {isLoading ? "Đang xử lý..." : "Gửi mã xác nhận"}
  </button>
@@ -136,7 +136,7 @@ export function ForgotPasswordFlow() {
  case "VERIFY_OTP":
  return (
  <form onSubmit={verifyOtp} className="flex flex-col gap-3">
- <div className="text-sm text-[#8A8478] mb-2 text-center">
+ <div className="text-sm text-[#64748B] mb-2 text-center">
  Mã xác nhận gồm 6 chữ số đã được gửi đến <br /> <b>{email}</b>
  </div>
  <FormField
@@ -151,15 +151,15 @@ export function ForgotPasswordFlow() {
  <button
  type="submit"
  disabled={isLoading || otp.length < 6}
- className="mt-2 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#FAF7F2] hover:bg-[#C0392B] transition-colors disabled:opacity-50"
+ className="mt-2 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#F8FAFC] hover:bg-[#2563EB] transition-colors disabled:opacity-50"
  >
  {isLoading ? "Đang xử lý..." : "Xác nhận OTP"}
  </button>
  <div className="text-center mt-3 text-xs">
  {countdown > 0 ? (
- <span className="text-[#8A8478]">Gửi lại mã sau {countdown}s</span>
+ <span className="text-[#64748B]">Gửi lại mã sau {countdown}s</span>
  ) : (
- <button type="button" onClick={requestOtp} className="text-[#C0392B] hover:underline font-semibold">Gửi lại mã</button>
+ <button type="button" onClick={requestOtp} className="text-[#3B82F6] hover:underline font-semibold">Gửi lại mã</button>
  )}
  </div>
  </form>
@@ -177,7 +177,7 @@ export function ForgotPasswordFlow() {
  onChange={(e) => setNewPassword(e.target.value)}
  leftIcon={<LockIcon />}
  rightElement={
- <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[#B8B0A3] hover:text-[#C0392B]">
+ <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[#94A3B8] hover:text-[#2563EB]">
  {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
  </button>
  }
@@ -191,7 +191,7 @@ export function ForgotPasswordFlow() {
  onChange={(e) => setConfirmPassword(e.target.value)}
  leftIcon={<LockIcon />}
  rightElement={
- <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="text-[#B8B0A3] hover:text-[#C0392B]">
+ <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="text-[#94A3B8] hover:text-[#2563EB]">
  {showConfirmPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
  </button>
  }
@@ -199,7 +199,7 @@ export function ForgotPasswordFlow() {
  <button
  type="submit"
  disabled={isLoading || newPassword.length < 6}
- className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#FAF7F2] hover:bg-[#C0392B] transition-colors disabled:opacity-50"
+ className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#F8FAFC] hover:bg-[#2563EB] transition-colors disabled:opacity-50"
  >
  {isLoading ? "Đang xử lý..." : "Đổi mật khẩu"}
  </button>
@@ -210,9 +210,9 @@ export function ForgotPasswordFlow() {
  return (
  <div className="flex flex-col items-center justify-center text-center py-6">
  
- <h2 className="text-xl font-bold text-[#2C3039] mb-2">Thành công!</h2>
- <p className="text-sm text-[#8A8478] mb-6">Mật khẩu của bạn đã được cập nhật.</p>
- <Link href="/login" className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#2C3039] shadow-md hover:-translate-y-0.5 transition-all">
+ <h2 className="text-xl font-bold text-[#0F172A] mb-2">Thành công!</h2>
+ <p className="text-sm text-[#64748B] mb-6">Mật khẩu của bạn đã được cập nhật.</p>
+ <Link href="/login" className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#0F172A] shadow-md hover:-translate-y-0.5 transition-all">
  Đăng nhập ngay
  </Link>
  </div>
@@ -224,22 +224,22 @@ export function ForgotPasswordFlow() {
  <div className="flex flex-col w-full h-full px-8 sm:px-10 py-8">
  <div className="flex items-center gap-2.5 mb-6">
  <LogoMark />
- <span className="text-[14px] font-bold tracking-tight text-[#2C3039]">MindNova AI</span>
+ <span className="text-[14px] font-bold tracking-tight text-[#0F172A]">MindNova AI</span>
  </div>
 
  <div className="mb-6">
- <h1 className="text-[26px] font-bold text-[#2C3039] leading-tight tracking-tight mb-2">
+ <h1 className="text-[26px] font-bold text-[#0F172A] leading-tight tracking-tight mb-2">
  {step === "REQUEST_OTP" ? "Quên mật khẩu" : step === "VERIFY_OTP" ? "Nhập mã OTP" : step === "RESET_PASSWORD" ? "Đặt lại mật khẩu" : "Hoàn tất"}
  </h1>
  {step === "REQUEST_OTP" && (
- <p className="text-[13px] text-[#8A8478] leading-relaxed">
+ <p className="text-[13px] text-[#64748B] leading-relaxed">
  Nhập email của bạn để nhận mã khôi phục.
  </p>
  )}
  </div>
 
  {errorMsg && (
- <div className="mb-4 p-3 rounded-xl text-xs font-medium bg-primary-muted text-primary border border-red-200">
+ <div className="mb-4 p-3 rounded-xl text-xs font-medium bg-primary-muted text-primary border border-[#DBEAFE]">
  {errorMsg}
  </div>
  )}
@@ -248,7 +248,7 @@ export function ForgotPasswordFlow() {
 
  {step !== "SUCCESS" && (
  <div className="mt-6 text-center">
- <Link href="/login" className="text-[13px] font-semibold text-[#C0392B] hover:text-[#C0392B] hover:underline transition-colors">
+ <Link href="/login" className="text-[13px] font-semibold text-[#3B82F6] hover:text-[#2563EB] hover:underline transition-colors">
  Quay lại đăng nhập
  </Link>
  </div>

@@ -81,7 +81,7 @@ export const getRedirectPath = (input: any): string => {
 import { User, Mail, Lock, Eye, EyeOff, Sparkles, ArrowRight } from "lucide-react";
 
 export function LogoMark() {
-  return <Sparkles size={24} className="text-[#C0392B]" />;
+  return <Sparkles size={24} className="text-[#3B82F6]" />;
 }
 
 export function UserIcon() {
@@ -134,18 +134,18 @@ export function FormField({ id, label, leftIcon, rightElement, labelRight, error
  return (
  <div className="space-y-1.5">
  <div className="flex items-center justify-between">
- <label htmlFor={id} className={`text-sm font-semibold ${error ? "text-red-500" : "text-[#2C3039]"}`}>
+ <label htmlFor={id} className={`text-sm font-semibold ${error ? "text-[#3B82F6]" : "text-[#0F172A]"}`}>
  {label}
  </label>
  {labelRight}
  </div>
  <div className="relative group">
- <div className={`pointer-events-none absolute inset-y-0 left-4 flex items-center transition-colors duration-200 ${error ? "text-red-400 group-focus-within:text-red-500" : "text-[#B8B0A3] group-focus-within:text-[#C0392B]"}`}>
+ <div className={`pointer-events-none absolute inset-y-0 left-4 flex items-center transition-colors duration-200 ${error ? "text-[#60A5FA] group-focus-within:text-[#2563EB]" : "text-[#94A3B8] group-focus-within:text-[#3B82F6]"}`}>
  {leftIcon}
  </div>
  <input
  id={id}
- className={`w-full pl-11 pr-11 py-3.5 rounded-xl text-sm text-[#2C3039] placeholder-[#C0C0D8] bg-[#F8F8FC] border transition-all duration-200 focus:outline-none focus:bg-white ${error ? "border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10 hover:border-red-400" : "border-[#E4E4EF] focus:border-[#E8E2D9] focus:ring-4 focus:ring-[#C0392B]/10 hover:border-[#C8C8E0]"}`}
+ className={`w-full pl-11 pr-11 py-3.5 rounded-xl text-sm text-[#0F172A] placeholder-[#C0C0D8] bg-[#F8F8FC] border transition-all duration-200 focus:outline-none focus:bg-white ${error ? "border-[#93C5FD] focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 hover:border-[#60A5FA]" : "border-[#E4E4EF] focus:border-[#E2E8F0] focus:ring-4 focus:ring-[#3B82F6]/10 hover:border-[#C8C8E0]"}`}
  {...inputProps}
  />
  {rightElement && (
@@ -154,7 +154,7 @@ export function FormField({ id, label, leftIcon, rightElement, labelRight, error
  </div>
  )}
  </div>
- {error && <p className="text-xs text-red-500 font-medium pl-1">{error}</p>}
+ {error && <p className="text-xs text-[#3B82F6] font-medium pl-1">{error}</p>}
  </div>
  );
 }

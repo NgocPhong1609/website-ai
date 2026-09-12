@@ -45,7 +45,7 @@ export function ThumbnailUploader({
 
  if (preview) {
  return (
- <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border border-[#E8E2D9] group shadow-2xs">
+ <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border border-[#E2E8F0] group shadow-2xs">
  <Image
  src={preview}
  alt="Ảnh bìa khóa học"
@@ -81,21 +81,21 @@ export function ThumbnailUploader({
  className={twMerge(
  "w-full aspect-[4/3] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2.5 transition-all duration-200 cursor-pointer",
  isDragging
- ? "border-[#C0392B] bg-indigo-50/50 scale-[1.01]"
- : "border-gray-300 bg-[#FEFCF9]/60 hover:border-[#C0392B] hover:bg-indigo-50/20 shadow-2xs"
+ ? "border-[#3B82F6] bg-blue-50/50 scale-[1.01]"
+ : "border-gray-300 bg-[#F8FAFC]/60 hover:border-[#2563EB] hover:bg-blue-50/20 shadow-2xs"
  )}
  >
  <div
  className={twMerge(
  "w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200",
- isDragging ? "text-[#C0392B]" : "text-gray-400"
+ isDragging ? "text-[#3B82F6]" : "text-gray-400"
  )}
  >
  <ImageIcon size={26} />
  </div>
 
  <div className="flex flex-col items-center gap-0.5 text-center">
- <p className="text-xs font-black text-[#C0392B]">Tải ảnh bìa (4:3)</p>
+ <p className="text-xs font-black text-[#3B82F6]">Tải ảnh bìa (4:3)</p>
  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
  JPG, PNG hoặc WEBP (Tối đa 5MB)
  </p>

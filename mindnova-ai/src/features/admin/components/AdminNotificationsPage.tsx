@@ -127,8 +127,8 @@ export function AdminNotificationsPage() {
 
  return (
  <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
- <section className="mn-stagger rounded-2xl border -[#FAF7F2]/20 bg-[linear-gradient(125deg,#14213d_0%,#113a63_45%,#0f766e_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
- <p className="text-[10px] uppercase tracking-[0.35em] -[#FAF7F2]/70">PB-036 · Email Notification</p>
+ <section className="mn-stagger rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(125deg,#14213d_0%,#113a63_45%,#2563EB_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
+ <p className="text-[10px] uppercase tracking-[0.35em] text-[#F8FAFC]/70">PB-036 · Email Notification</p>
  <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Gửi email thông báo từ trang quản trị</h1>
  <p className="mt-1 max-w-3xl text-xs text-slate-200/90">
  Soạn nội dung thông báo và đưa vào queue để hệ thống gửi nền. Endpoint sử dụng: POST /api/admin/notifications/test-email.
@@ -138,7 +138,7 @@ export function AdminNotificationsPage() {
  <section className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
  <form
  onSubmit={handleSubmit}
- className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]"
+ className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]"
  >
  <div className="mb-4 flex items-center justify-between">
  <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Nội dung thông báo</h2>
@@ -146,21 +146,21 @@ export function AdminNotificationsPage() {
  <button
  type="button"
  onClick={() => applyTemplate("system")}
- className="rounded-full border -[#FAF7F2] bg-cyan-50 px-3 py-1 text-xs font-semibold -[#C0392B] transition hover:-[#FAF7F2]"
+ className="rounded-full border-[#E2E8F0] bg-blue-50 px-3 py-1 text-xs font-semibold text-[#3B82F6] transition hover:bg-[#F8FAFC]"
  >
  Mẫu hệ thống
  </button>
  <button
  type="button"
  onClick={() => applyTemplate("maintenance")}
- className="rounded-full border -[#FAF7F2] bg-indigo-50 px-3 py-1 text-xs font-semibold -[#C0392B] transition hover:-[#FAF7F2]"
+ className="rounded-full border-[#E2E8F0] bg-blue-50 px-3 py-1 text-xs font-semibold text-[#3B82F6] transition hover:bg-[#F8FAFC]"
  >
  Mẫu bảo trì
  </button>
  <button
  type="button"
  onClick={() => applyTemplate("course")}
- className="rounded-full border -[#FAF7F2] bg-teal-50 px-3 py-1 text-xs font-semibold -[#C0392B] transition hover:-[#FAF7F2]"
+ className="rounded-full border-[#E2E8F0] bg-teal-50 px-3 py-1 text-xs font-semibold text-[#3B82F6] transition hover:bg-[#F8FAFC]"
  >
  Mẫu khóa học
  </button>
@@ -175,7 +175,7 @@ export function AdminNotificationsPage() {
  value={form.email}
  onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
  placeholder="để trống để gửi cho email admin đang đăng nhập"
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
 
@@ -185,7 +185,7 @@ export function AdminNotificationsPage() {
  value={form.subject}
  onChange={(event) => setForm((current) => ({ ...current, subject: event.target.value }))}
  placeholder="MindNova Admin Notification"
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
 
@@ -196,7 +196,7 @@ export function AdminNotificationsPage() {
  onChange={(event) => setForm((current) => ({ ...current, message: event.target.value }))}
  placeholder="Thông báo hệ thống từ trang quản trị MindNova."
  rows={8}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:-[#C0392B]"
+ className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
  </label>
  </div>
@@ -205,7 +205,7 @@ export function AdminNotificationsPage() {
  <button
  type="submit"
  disabled={isSubmitting}
- className="rounded-xl -[#C0392B] -[#C0392B] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_28px_-16px_rgba(79,70,229,0.9)] transition hover:-[#C0392B] hover:-[#C0392B] disabled:cursor-not-allowed disabled:opacity-60"
+ className="rounded-xl bg-gradient-to-r from-[#3B82F6] to-[#3B82F6] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_28px_-16px_rgba(37, 99, 235,0.9)] transition hover:bg-[#2563EB] hover:bg-[#2563EB] disabled:cursor-not-allowed disabled:opacity-60"
  >
  {isSubmitting ? "Đang gửi vào queue..." : "Gửi email thông báo"}
  </button>
@@ -223,12 +223,12 @@ export function AdminNotificationsPage() {
  {result && (
  <div
  className={`mt-4 rounded-xl px-3 py-3 text-sm ${
- result.isError ? "bg-rose-50 text-rose-700 ring-1 ring-rose-100" : "bg-emerald-50 -[#2C3039] ring-1 ring-emerald-100"
+ result.isError ? "bg-rose-50 text-rose-700 ring-1 ring-rose-100" : "bg-emerald-50 text-[#0F172A] ring-1 ring-emerald-100"
  }`}
  >
  <p className="font-medium">{result.message}</p>
  {!result.isError && (
- <p className="mt-1 text-xs -[#2C3039]/90">
+ <p className="mt-1 text-xs text-[#0F172A]/90">
  Recipient: {result.recipient ?? "(admin hiện tại)"} · Queue: {result.queue ?? "default"}
  </p>
  )}
@@ -237,7 +237,7 @@ export function AdminNotificationsPage() {
  </form>
 
  <aside className="space-y-4">
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
  <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Trạng thái chức năng</h3>
  <ul className="mt-3 space-y-2 text-sm text-slate-600">
  <li>Route API: /api/admin/notifications/test-email</li>

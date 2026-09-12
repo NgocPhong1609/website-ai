@@ -16,14 +16,14 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
  return (
- <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-[#E8E2D9] shadow-2xs w-fit">
+ <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-[#E2E8F0] shadow-2xs w-fit">
  <Link
  href="/instructor/revenue"
  className={twMerge(
  "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
  active === "overview"
- ? "bg-[#C0392B] text-white shadow-sm"
- : "text-[#8A8478] hover:bg-gray-100 hover:text-[#2C3039]"
+ ? "bg-[#3B82F6] text-white shadow-sm"
+ : "text-[#64748B] hover:bg-gray-100 hover:text-[#0F172A]"
  )}
  >
  <span> Tổng quan Doanh thu</span>
@@ -34,8 +34,8 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  className={twMerge(
  "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
  active === "report"
- ? "bg-[#C0392B] text-white shadow-sm"
- : "text-[#8A8478] hover:bg-gray-100 hover:text-[#2C3039]"
+ ? "bg-[#3B82F6] text-white shadow-sm"
+ : "text-[#64748B] hover:bg-gray-100 hover:text-[#0F172A]"
  )}
  >
  <span> Báo cáo Bán hàng</span>
@@ -46,8 +46,8 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  className={twMerge(
  "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
  active === "history"
- ? "bg-[#C0392B] text-white shadow-sm"
- : "text-[#8A8478] hover:bg-gray-100 hover:text-[#2C3039]"
+ ? "bg-[#3B82F6] text-white shadow-sm"
+ : "text-[#64748B] hover:bg-gray-100 hover:text-[#0F172A]"
  )}
  >
  <span> Lịch sử Giao dịch</span>
@@ -60,21 +60,21 @@ function DatePickerHeader() {
  return (
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
  <div>
- <h1 className="text-xl font-black text-[#2C3039] tracking-tight">Báo cáo Bán hàng &amp; Chuyển đổi</h1>
- <p className="text-xs text-[#8A8478] mt-1">
+ <h1 className="text-xl font-black text-[#0F172A] tracking-tight">Báo cáo Bán hàng &amp; Chuyển đổi</h1>
+ <p className="text-xs text-[#64748B] mt-1">
  Phân tích chi tiết lượt xem, doanh số thuần và tỷ lệ chuyển đổi học viên từ các nền tảng quảng bá.
  </p>
  </div>
  <div className="flex items-center gap-2.5 flex-wrap">
- <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-[#E8E2D9] bg-white text-xs font-bold text-gray-700 shadow-2xs">
+ <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-[#E2E8F0] bg-white text-xs font-bold text-gray-700 shadow-2xs">
  <CalendarIcon />
  <span>Tháng hiện tại</span>
  </div>
- <button type="button" className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E8E2D9] text-xs font-bold text-gray-700 bg-white hover:bg-[#FEFCF9] transition-colors shadow-2xs cursor-pointer">
+ <button type="button" className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-gray-700 bg-white hover:bg-[#F8FAFC] transition-colors shadow-2xs cursor-pointer">
  <DownloadIcon />
  <span>Xuất CSV</span>
  </button>
- <button type="button" className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-sm transition-all cursor-pointer">
+ <button type="button" className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-sm transition-all cursor-pointer">
  <DownloadIcon />
  <span>Xuất Báo cáo PDF</span>
  </button>
@@ -97,20 +97,20 @@ function StatCards({ overview }: { overview: any }) {
  };
 
  const stats = [
- { label: "Tổng Doanh Thu", val: `${overview?.total_sales.toLocaleString('vi-VN') || 0}đ`, diff: getDiffText(overview?.sales_growth || 0), isUp: (overview?.sales_growth || 0) >= 0, color: "-[#2C3039]", width: getWidth(overview?.sales_growth || 0) },
- { label: "Tổng Lượt Bán", val: `${overview?.total_enrollments || 0}`, diff: getDiffText(overview?.enrollments_growth || 0), isUp: (overview?.enrollments_growth || 0) >= 0, color: "bg-[#C0392B]", width: getWidth(overview?.enrollments_growth || 0) },
+ { label: "Tổng Doanh Thu", val: `${overview?.total_sales.toLocaleString('vi-VN') || 0}đ`, diff: getDiffText(overview?.sales_growth || 0), isUp: (overview?.sales_growth || 0) >= 0, color: "text-[#0F172A]", width: getWidth(overview?.sales_growth || 0) },
+ { label: "Tổng Lượt Bán", val: `${overview?.total_enrollments || 0}`, diff: getDiffText(overview?.enrollments_growth || 0), isUp: (overview?.enrollments_growth || 0) >= 0, color: "bg-[#3B82F6]", width: getWidth(overview?.enrollments_growth || 0) },
  { label: "Tổng Lượt Xem", val: `${overview?.total_views || 0}`, diff: getDiffText(overview?.views_growth || 0), isUp: (overview?.views_growth || 0) >= 0, color: "bg-rose-500", width: getWidth(overview?.views_growth || 0) },
- { label: "Tỷ Lệ Chuyển Đổi TB", val: `${overview?.avg_conversion_rate || 0}%`, diff: getDiffText(overview?.conversion_growth || 0), isUp: (overview?.conversion_growth || 0) >= 0, color: "-[#C0392B]", width: getWidth(overview?.conversion_growth || 0) },
+ { label: "Tỷ Lệ Chuyển Đổi TB", val: `${overview?.avg_conversion_rate || 0}%`, diff: getDiffText(overview?.conversion_growth || 0), isUp: (overview?.conversion_growth || 0) >= 0, color: "text-[#3B82F6]", width: getWidth(overview?.conversion_growth || 0) },
  ];
 
  return (
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
  {stats.map((s, i) => (
- <div key={i} className="bg-white rounded-2xl p-5 border border-[#E8E2D9] shadow-2xs flex flex-col justify-between">
- <span className="text-xs font-bold text-[#8A8478] uppercase tracking-wide">{s.label}</span>
+ <div key={i} className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-2xs flex flex-col justify-between">
+ <span className="text-xs font-bold text-[#64748B] uppercase tracking-wide">{s.label}</span>
  <div className="flex items-end justify-between mt-2">
- <span className="text-xl font-black text-[#2C3039] leading-tight">{s.val}</span>
- <span className={twMerge("text-xs font-black", s.isUp ? "-[#2C3039]" : "text-rose-600")}>
+ <span className="text-xl font-black text-[#0F172A] leading-tight">{s.val}</span>
+ <span className={twMerge("text-xs font-black", s.isUp ? "text-[#0F172A]" : "text-rose-600")}>
  {s.diff}
  </span>
  </div>
@@ -136,17 +136,17 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  };
 
  return (
- <div className="bg-white rounded-2xl border border-[#E8E2D9] shadow-2xs p-6 flex flex-col gap-6">
+ <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-2xs p-6 flex flex-col gap-6">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
  <div>
- <h3 className="text-base font-black text-[#2C3039]">Biểu Đồ Tương Quan Doanh Thu vs Hoàn Tiền</h3>
- <p className="text-xs text-[#8A8478] mt-0.5">Theo dõi luồng dòng tiền hàng ngày và tỷ lệ giữ chân học viên.</p>
+ <h3 className="text-base font-black text-[#0F172A]">Biểu Đồ Tương Quan Doanh Thu vs Hoàn Tiền</h3>
+ <p className="text-xs text-[#64748B] mt-0.5">Theo dõi luồng dòng tiền hàng ngày và tỷ lệ giữ chân học viên.</p>
  </div>
  
  <div className="flex items-center gap-4 flex-wrap">
  <div className="flex items-center gap-4">
  <div className="flex items-center gap-1.5">
- <div className="w-3 h-3 rounded-full bg-[#C0392B]" />
+ <div className="w-3 h-3 rounded-full bg-[#3B82F6]" />
  <span className="text-xs font-bold text-gray-700">Doanh thu bán mới</span>
  </div>
  <div className="flex items-center gap-1.5">
@@ -159,7 +159,7 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  <div className="relative">
  <button 
  onClick={() => setIsOpen(!isOpen)}
- className="flex items-center justify-between w-[130px] bg-white border border-[#E8E2D9] text-gray-700 text-xs font-bold rounded-xl px-4 py-2 hover:bg-[#FEFCF9] focus:outline-none focus:-[#C0392B] cursor-pointer shadow-sm transition-colors"
+ className="flex items-center justify-between w-[130px] bg-white border border-[#E2E8F0] text-gray-700 text-xs font-bold rounded-xl px-4 py-2 hover:bg-[#F8FAFC] focus:outline-none focus:border-[#3B82F6] cursor-pointer shadow-sm transition-colors"
  >
  <span>{getRangeText(timeRange)}</span>
  <></>
@@ -178,7 +178,7 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  }}
  className={twMerge(
  "w-full text-left px-4 py-2 text-xs font-bold cursor-pointer transition-colors",
- timeRange === val ? "bg-indigo-50 -[#C0392B]" : "text-gray-700 hover:bg-[#FEFCF9]"
+ timeRange === val ? "bg-blue-50 text-[#3B82F6]" : "text-gray-700 hover:bg-[#F8FAFC]"
  )}
  >
  {getRangeText(val)}
@@ -199,8 +199,8 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
  <defs>
  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
- <stop offset="5%" stopColor="#C0392B" stopOpacity={0.3}/>
- <stop offset="95%" stopColor="#C0392B" stopOpacity={0}/>
+ <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
+ <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
  </linearGradient>
  <linearGradient id="colorRefund" x1="0" y1="0" x2="0" y2="1">
  <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
@@ -225,11 +225,11 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  type="monotone" 
  dataKey="revenue" 
  name="revenue"
- stroke="#C0392B" 
+ stroke="#3B82F6" 
  strokeWidth={3}
  fillOpacity={1} 
  fill="url(#colorRevenue)" 
- activeDot={{ r: 6, fill: "#C0392B", stroke: "#fff", strokeWidth: 2 }}
+ activeDot={{ r: 6, fill: "#3B82F6", stroke: "#fff", strokeWidth: 2 }}
  />
  <Area 
  type="monotone" 
@@ -246,7 +246,7 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  ) : (
  <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
  <span className="text-4xl mb-3 opacity-50 grayscale"></span>
- <span className="text-sm font-bold text-[#8A8478]">Chưa có dữ liệu báo cáo</span>
+ <span className="text-sm font-bold text-[#64748B]">Chưa có dữ liệu báo cáo</span>
  <span className="text-xs font-medium text-gray-400 mt-1">Sẽ hiển thị khi có phát sinh doanh thu/hoàn tiền</span>
  </div>
  )}
@@ -257,13 +257,13 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
 
 function CoursePerformanceTable({ courses }: { courses: any[] }) {
  return (
- <div className="bg-white rounded-2xl border border-[#E8E2D9] shadow-2xs flex flex-col overflow-hidden">
+ <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-2xs flex flex-col overflow-hidden">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border-b border-gray-100 gap-2">
  <div>
- <h3 className="text-sm font-black text-[#2C3039]">Hiệu Năng Từng Khóa Học</h3>
- <p className="text-xs text-[#8A8478]">Dữ liệu phân bổ lượt xem và tỷ lệ chốt đơn theo từng khóa học của bạn.</p>
+ <h3 className="text-sm font-black text-[#0F172A]">Hiệu Năng Từng Khóa Học</h3>
+ <p className="text-xs text-[#64748B]">Dữ liệu phân bổ lượt xem và tỷ lệ chốt đơn theo từng khóa học của bạn.</p>
  </div>
- <span className="text-xs font-bold text-[#C0392B] bg-indigo-50 px-3 py-1 rounded-xl border -[#FAF7F2]">
+ <span className="text-xs font-bold text-[#3B82F6] bg-blue-50 px-3 py-1 rounded-xl border-[#E2E8F0]">
  Cập nhật theo thời gian thực
  </span>
  </div>
@@ -271,7 +271,7 @@ function CoursePerformanceTable({ courses }: { courses: any[] }) {
  <div className="overflow-x-auto">
  <table className="w-full text-left border-collapse min-w-[700px]">
  <thead>
- <tr className="border-b border-[#E8E2D9] bg-[#FEFCF9]/70 text-[11px] font-black text-[#8A8478] uppercase tracking-wider">
+ <tr className="border-b border-[#E2E8F0] bg-[#F8FAFC]/70 text-[11px] font-black text-[#64748B] uppercase tracking-wider">
  <th className="px-6 py-3.5">Khóa Học</th>
  <th className="px-6 py-3.5">Giá Bán</th>
  <th className="px-6 py-3.5">Lượt Xem (Views)</th>
@@ -282,27 +282,27 @@ function CoursePerformanceTable({ courses }: { courses: any[] }) {
  </thead>
  <tbody className="divide-y divide-gray-100 text-xs font-medium">
  {courses?.length > 0 ? courses.map((c, i) => (
- <tr key={c.course_id} className="hover:bg-[#FEFCF9]/80 transition-colors">
+ <tr key={c.course_id} className="hover:bg-[#F8FAFC]/80 transition-colors">
  <td className="px-6 py-4">
  <div className="flex items-center gap-3">
  <div>
- <div className="font-extrabold text-[#2C3039]">{c.course_name}</div>
- <div className="text-[11px] text-[#8A8478]">ID: {c.course_id}</div>
+ <div className="font-extrabold text-[#0F172A]">{c.course_name}</div>
+ <div className="text-[11px] text-[#64748B]">ID: {c.course_id}</div>
  </div>
  </div>
  </td>
  <td className="px-6 py-4 font-bold text-gray-700">{c.price.toLocaleString('vi-VN')}đ</td>
  <td className="px-6 py-4 font-bold text-gray-700">{c.views}</td>
- <td className="px-6 py-4 font-extrabold -[#C0392B]">{c.enrollments}</td>
+ <td className="px-6 py-4 font-extrabold text-[#3B82F6]">{c.enrollments}</td>
  <td className="px-6 py-4">
  <div className="flex items-center gap-2.5">
- <span className="font-extrabold text-[#2C3039] w-12">{c.conversion_rate}%</span>
+ <span className="font-extrabold text-[#0F172A] w-12">{c.conversion_rate}%</span>
  <div className="w-16 h-1.5 rounded-full bg-gray-100 overflow-hidden">
- <div className="h-full rounded-full bg-[#C0392B]" style={{ width: `${Math.min(100, c.conversion_rate * 5)}%` }} />
+ <div className="h-full rounded-full bg-[#3B82F6]" style={{ width: `${Math.min(100, c.conversion_rate * 5)}%` }} />
  </div>
  </div>
  </td>
- <td className="px-6 py-4 font-black font-mono -[#2C3039]">{c.revenue.toLocaleString('vi-VN')}đ</td>
+ <td className="px-6 py-4 font-black font-mono text-[#0F172A]">{c.revenue.toLocaleString('vi-VN')}đ</td>
  </tr>
  )) : (
  <tr>
@@ -331,7 +331,7 @@ export function SalesReportContainer() {
  return (
  <div className="flex flex-col min-h-screen bg-[#F4F4F8] font-sans items-center justify-center">
  
- <p className="text-[#8A8478] font-bold text-sm">Đang tải báo cáo bán hàng...</p>
+ <p className="text-[#64748B] font-bold text-sm">Đang tải báo cáo bán hàng...</p>
  </div>
  );
  }

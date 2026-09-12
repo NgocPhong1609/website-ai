@@ -1,6 +1,18 @@
 "use client";
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
+import {
+  Calendar,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  GraduationCap,
+  Receipt,
+  Scale,
+  Search,
+  X,
+} from "lucide-react";
 import type { AdminRevenueData } from "@/src/features/admin/types";
 
 const formatMoney = (value: number) => {
@@ -154,7 +166,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
           <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Doanh thu Admin (Thực nhận)</p>
-          <p className="mt-2 text-2xl font-black text-indigo-700 [font-family:var(--font-admin-head)]">
+          <p className="mt-2 text-2xl font-black text-blue-700 [font-family:var(--font-admin-head)]">
             {formatMoney(totalAdmin)}
           </p>
           <p className="mt-1 text-[11px] text-slate-400 font-medium">Phí hệ thống 15% - 30%</p>
@@ -189,7 +201,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
 
       {/* Info Callout Banner */}
       <div className="p-4 rounded-xl bg-amber-50/90 border border-amber-200 text-xs font-medium text-amber-950 flex items-start gap-3 shadow-2xs">
-        <span className="text-base shrink-0">⚖️</span>
+        <Scale className="h-4 w-4 shrink-0 text-amber-700" aria-hidden />
         <div className="leading-relaxed">
           <strong className="font-extrabold text-amber-900">Quy tắc Cấn trừ Tiền khi Học sinh Hoàn tiền:</strong>
           <p className="mt-0.5 text-amber-800">
@@ -205,7 +217,8 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-bold text-slate-900 [font-family:var(--font-admin-head)] flex items-center gap-2">
-                <span>🧾 Lịch Sử Mua Hàng &amp; Nhật Ký Cấn Trừ Hoàn Tiền</span>
+                <Receipt className="h-4 w-4 text-[#2563EB]" aria-hidden />
+                <span>Lịch Sử Mua Hàng &amp; Nhật Ký Cấn Trừ Hoàn Tiền</span>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-800">
                   {filteredOrderHistory.length} Giao dịch
                 </span>
@@ -237,7 +250,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                     : "text-rose-700 hover:bg-rose-100/70"
                 }`}
               >
-                ❌ Đã hoàn tiền ({refundedOrders.length})
+                Đã hoàn tiền ({refundedOrders.length})
               </button>
               <button
                 type="button"
@@ -248,7 +261,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                     : "text-amber-800 hover:bg-amber-100/70"
                 }`}
               >
-                ⏳ Tạm giữ (HOLD)
+                Tạm giữ (HOLD)
               </button>
               <button
                 type="button"
@@ -259,7 +272,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                     : "text-emerald-800 hover:bg-emerald-100/70"
                 }`}
               >
-                ✅ Khả dụng
+                Khả dụng
               </button>
             </div>
           </div>
@@ -269,9 +282,9 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
             {/* LIVE TEACHER AUTOCOMPLETE COMBOBOX */}
             <div className="space-y-1 relative" ref={teacherDropdownRef}>
               <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center justify-between">
-                <span>👨‍🏫 Tìm &amp; Chọn Giáo viên:</span>
+                <span className="inline-flex items-center gap-1"><GraduationCap className="h-3.5 w-3.5" aria-hidden /> Tìm &amp; Chọn Giáo viên:</span>
                 {selectedTeacher !== "ALL" && (
-                  <span className="text-indigo-600 font-extrabold normal-case">
+                  <span className="text-blue-600 font-extrabold normal-case">
                     Đã chọn: {selectedTeacher}
                   </span>
                 )}
@@ -290,9 +303,9 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                     setCurrentPage(1);
                   }}
                   placeholder="Gõ tên giảng viên để hiện gợi ý chọn..."
-                  className="w-full text-xs font-semibold text-slate-800 bg-white border border-slate-300 rounded-lg pl-8 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-2xs transition-all"
+                  className="w-full text-xs font-semibold text-slate-800 bg-white border border-slate-300 rounded-lg pl-8 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs transition-all"
                 />
-                <span className="absolute left-2.5 top-2.5 text-slate-400 text-xs">🔍</span>
+                <Search className="pointer-events-none absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" aria-hidden />
 
                 {teacherSearchInput && (
                   <button
@@ -302,9 +315,9 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                       setSelectedTeacher("ALL");
                       setCurrentPage(1);
                     }}
-                    className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer"
+                    className="absolute right-2.5 top-2.5 text-slate-400 hover:text-[#2563EB] cursor-pointer"
                   >
-                    ✕
+                    <X className="h-3.5 w-3.5" aria-hidden />
                   </button>
                 )}
               </div>
@@ -316,7 +329,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                     onClick={() => handleSelectTeacherOption("ALL")}
                     className={`px-3 py-2 text-xs font-bold cursor-pointer transition-colors flex items-center justify-between ${
                       selectedTeacher === "ALL"
-                        ? "bg-indigo-50 text-indigo-700"
+                        ? "bg-blue-50 text-blue-700"
                         : "text-slate-700 hover:bg-slate-50"
                     }`}
                   >
@@ -337,15 +350,15 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                           onClick={() => handleSelectTeacherOption(tName)}
                           className={`px-3 py-2 text-xs font-bold cursor-pointer transition-colors flex items-center justify-between ${
                             isSelected
-                              ? "bg-indigo-600 text-white font-extrabold"
-                              : "text-slate-800 hover:bg-indigo-50 hover:text-indigo-900"
+                              ? "bg-blue-600 text-white font-extrabold"
+                              : "text-slate-800 hover:bg-blue-50 hover:text-blue-900"
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <span>👨‍🏫</span>
+                            <GraduationCap className="h-3.5 w-3.5" aria-hidden />
                             <span>{tName}</span>
                           </div>
-                          {isSelected && <span className="text-xs">✓</span>}
+                          {isSelected && <Check className="h-3.5 w-3.5" aria-hidden />}
                         </div>
                       );
                     })
@@ -357,20 +370,20 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
             {/* Date Range: From Date */}
             <div className="space-y-1">
               <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
-                📅 Từ ngày mua:
+                <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" aria-hidden /> Từ ngày mua:</span>
               </label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => handleFilterChange(() => setStartDate(e.target.value))}
-                className="w-full text-xs font-medium text-slate-800 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer shadow-2xs"
+                className="w-full text-xs font-medium text-slate-800 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs"
               />
             </div>
 
             {/* Date Range: To Date */}
             <div className="space-y-1">
               <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
-                📅 Đến ngày mua:
+                <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" aria-hidden /> Đến ngày mua:</span>
               </label>
 
               <div className="flex items-center gap-2">
@@ -378,7 +391,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                   type="date"
                   value={endDate}
                   onChange={(e) => handleFilterChange(() => setEndDate(e.target.value))}
-                  className="w-full text-xs font-medium text-slate-800 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer shadow-2xs"
+                  className="w-full text-xs font-medium text-slate-800 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs"
                 />
                 {(selectedTeacher !== "ALL" || teacherSearchInput || startDate || endDate || statusFilter !== "ALL") && (
                   <button
@@ -409,7 +422,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                 <th className="px-4 py-3 font-extrabold text-right">Giá thực trả</th>
                 <th className="px-4 py-3 font-extrabold text-center">Tỷ lệ</th>
                 <th className="px-4 py-3 font-extrabold text-right text-emerald-700">GV Nhận / Cấn trừ</th>
-                <th className="px-4 py-3 font-extrabold text-right text-indigo-700">Admin Nhận / Cấn trừ</th>
+                <th className="px-4 py-3 font-extrabold text-right text-blue-700">Admin Nhận / Cấn trừ</th>
                 <th className="px-4 py-3 font-extrabold text-center">Trạng thái &amp; Thời gian hoàn</th>
               </tr>
             </thead>
@@ -441,7 +454,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                       {/* Purchased At (Time) */}
                       <td className="px-4 py-3.5 whitespace-nowrap">
                         <span className="font-medium text-slate-700 block text-xs bg-slate-100 px-2 py-1 rounded border border-slate-200/80 w-fit">
-                          📅 {ord.purchasedAt}
+                          <span className="inline-flex items-center gap-1"><Calendar className="h-3 w-3" aria-hidden /> {ord.purchasedAt}</span>
                         </span>
                       </td>
 
@@ -454,7 +467,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                       {/* Course & Instructor */}
                       <td className="px-4 py-3.5 max-w-[200px]">
                         <span className="font-bold text-slate-900 block truncate">{ord.courseTitle}</span>
-                        <span className="text-[10px] text-slate-600 block font-medium">👨‍🏫 {ord.instructorName}</span>
+                        <span className="text-[10px] text-slate-600 font-medium inline-flex items-center gap-1"><GraduationCap className="h-3 w-3" aria-hidden /> {ord.instructorName}</span>
                       </td>
 
                       {/* Original Price */}
@@ -479,7 +492,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                           <div>
                             <span className="line-through text-slate-400 block text-[11px]">{formatMoney(ord.paidAmount)}</span>
                             <span className="font-extrabold text-rose-700 block text-xs bg-rose-100/80 px-2 py-0.5 rounded border border-rose-200 mt-0.5">
-                              ❌ Hoàn {formatMoney(ord.paidAmount)}
+                              Hoàn {formatMoney(ord.paidAmount)}
                             </span>
                           </div>
                         ) : (
@@ -524,7 +537,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                             <span className="text-[10px] text-rose-600 block text-right font-semibold mt-0.5">Đã cấn trừ Ad</span>
                           </div>
                         ) : (
-                          <span className="font-black text-indigo-600 block">{formatMoney(ord.adminAmount)}</span>
+                          <span className="font-black text-blue-600 block">{formatMoney(ord.adminAmount)}</span>
                         )}
                       </td>
 
@@ -533,21 +546,21 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                         {isRefunded ? (
                           <div>
                             <span className="inline-flex items-center rounded-full bg-rose-100 px-2.5 py-1 text-[10px] font-black text-rose-800 border border-rose-300 shadow-2xs">
-                              ❌ Đã hoàn tiền
+                              Đã hoàn tiền
                             </span>
                             {ord.refundedAt && (
                               <span className="text-[10px] font-bold text-rose-700 block mt-1 bg-white/80 px-1.5 py-0.5 rounded border border-rose-200/80">
-                                🕒 Hoàn: {ord.refundedAt}
+                                <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" aria-hidden /> Hoàn: {ord.refundedAt}</span>
                               </span>
                             )}
                           </div>
                         ) : isPending ? (
                           <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-black text-amber-800 ring-1 ring-amber-200">
-                            ⏳ Tạm giữ (HOLD)
+                            Tạm giữ (HOLD)
                           </span>
                         ) : (
                           <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black text-emerald-800 ring-1 ring-emerald-200">
-                            ✅ Khả dụng
+                            Khả dụng
                           </span>
                         )}
                       </td>
@@ -567,7 +580,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
               <span className="font-bold text-slate-900">
                 {Math.min(startIndex + ITEMS_PER_PAGE, filteredOrderHistory.length)}
               </span>{" "}
-              trên tổng số <span className="font-bold text-indigo-700">{filteredOrderHistory.length}</span> đơn hàng
+              trên tổng số <span className="font-bold text-blue-700">{filteredOrderHistory.length}</span> đơn hàng
             </div>
 
             {/* Pagination Controls */}
@@ -578,10 +591,10 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                 disabled={currentPage === 1}
                 className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-2xs cursor-pointer font-bold"
               >
-                ◀ Trang trước
+                <span className="inline-flex items-center gap-1"><ChevronLeft className="h-3.5 w-3.5" aria-hidden /> Trang trước</span>
               </button>
 
-              <span className="px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-900 font-extrabold">
+              <span className="px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 font-extrabold">
                 Trang {currentPage} / {totalPages}
               </span>
 
@@ -591,7 +604,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                 disabled={currentPage === totalPages}
                 className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-2xs cursor-pointer font-bold"
               >
-                Trang sau ▶
+                <span className="inline-flex items-center gap-1">Trang sau <ChevronRight className="h-3.5 w-3.5" aria-hidden /></span>
               </button>
             </div>
           </div>
@@ -615,7 +628,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                 <th className="px-5 py-3.5 font-bold text-right">Học viên</th>
                 <th className="px-5 py-3.5 font-bold text-right">Tổng giá trị</th>
                 <th className="px-5 py-3.5 font-bold text-right text-emerald-700">GV nhận</th>
-                <th className="px-5 py-3.5 font-bold text-right text-indigo-700">Admin nhận</th>
+                <th className="px-5 py-3.5 font-bold text-right text-blue-700">Admin nhận</th>
               </tr>
             </thead>
             <tbody>
@@ -650,7 +663,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
                       <td className="px-5 py-4 text-right font-medium text-slate-600">{course.students}</td>
                       <td className="px-5 py-4 text-right font-bold text-slate-900">{formatMoney(gross)}</td>
                       <td className="px-5 py-4 text-right font-bold text-emerald-600">{formatMoney(teacherGet)}</td>
-                      <td className="px-5 py-4 text-right font-bold text-indigo-600">{formatMoney(adminGet)}</td>
+                      <td className="px-5 py-4 text-right font-bold text-blue-600">{formatMoney(adminGet)}</td>
                     </tr>
                   );
                 })

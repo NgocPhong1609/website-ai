@@ -7,6 +7,7 @@ import { QuestionCardEssay } from "@/src/features/instructor/quiz-generator/comp
 import { SelectQuizModal } from "@/src/features/instructor/quiz-generator/components/SelectQuizModal";
 import type { GeneratedQuestion, DifficultyType } from "@/src/features/instructor/quiz-generator/types/quizGenerator.types";
 import type { DraftQuizData } from "../types";
+import { Download, Sparkles } from "lucide-react";
 
 interface QuizEditorProps {
   value?: DraftQuizData | any;
@@ -240,7 +241,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
   if (isLoading) {
     return (
       <div className="p-12 text-center flex flex-col items-center justify-center gap-3 bg-white rounded-3xl border border-gray-100">
-        <div className="w-8 h-8 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
         <span className="text-xs font-bold text-gray-500">Đang tải dữ liệu bài kiểm tra...</span>
       </div>
     );
@@ -249,11 +250,11 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
   return (
     <div className="flex flex-col gap-6 animate-fadeIn">
       {/* Import from Bank Banner */}
-      <div className="flex items-center justify-between p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100">
+      <div className="flex items-center justify-between p-4 rounded-2xl bg-blue-50/60 border border-blue-100">
         <div className="flex items-center gap-3">
-          <span className="text-xl">🪄</span>
+          <Sparkles className="h-5 w-5 text-[#3B82F6]" aria-hidden />
           <div>
-            <h4 className="text-xs font-black text-[#1A1A2E]">Chèn đề thi từ Ngân Hàng Quiz</h4>
+            <h4 className="text-xs font-black text-[#0F172A]">Chèn đề thi từ Ngân Hàng Quiz</h4>
             <p className="text-[11px] font-medium text-gray-500">
               {selectedQuizId
                 ? `Đang liên kết với Bài thi #${selectedQuizId}`
@@ -265,9 +266,9 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
         <button
           type="button"
           onClick={() => setIsSelectModalOpen(true)}
-          className="px-4 py-2 bg-[#C0392B] hover:bg-[#a02c20] text-white text-xs font-extrabold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+          className="px-4 py-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white text-xs font-extrabold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
         >
-          <span>📥</span>
+          <Download className="h-3.5 w-3.5" aria-hidden />
           <span>{selectedQuizId ? "Đổi đề thi khác" : "Chọn từ Ngân hàng Quiz"}</span>
         </button>
       </div>
@@ -280,10 +281,10 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
       />
 
       {/* Quiz Meta Settings */}
-      <div className="p-6 rounded-3xl bg-[#FAF8FF] border border-indigo-100 flex flex-col gap-4">
+      <div className="p-6 rounded-3xl bg-[#FAF8FF] border border-blue-100 flex flex-col gap-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-black text-[#1A1A2E] mb-1">Tên bài kiểm tra <span className="text-rose-500">*</span></label>
+            <label className="block text-xs font-black text-[#0F172A] mb-1">Tên bài kiểm tra <span className="text-rose-500">*</span></label>
             <input
               type="text"
               value={title}
@@ -292,13 +293,13 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
                 setTitle(val);
                 notifyParent(questions, val);
               }}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#1A1A2E] focus:outline-none focus:border-[#C0392B]"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6]"
               placeholder="VD: Kiểm tra cuối chương 1"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-black text-[#1A1A2E] mb-1">Mô tả ngắn</label>
+            <label className="block text-xs font-black text-[#0F172A] mb-1">Mô tả ngắn</label>
             <input
               type="text"
               value={description}
@@ -307,13 +308,13 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
                 setDescription(val);
                 notifyParent(questions, title, timeLimit, passingScore, difficulty, val);
               }}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-medium text-[#1A1A2E] focus:outline-none focus:border-[#C0392B]"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-medium text-[#0F172A] focus:outline-none focus:border-[#3B82F6]"
               placeholder="Mục tiêu đánh giá kiến thức..."
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-indigo-50">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-blue-50">
           <div>
             <label className="block text-xs font-black text-gray-700 mb-1">Thời gian làm bài (Phút)</label>
             <input
@@ -326,7 +327,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
                 setTimeLimit(val);
                 notifyParent(questions, title, val);
               }}
-              className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
+              className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
             />
           </div>
 
@@ -342,7 +343,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
                 setPassingScore(val);
                 notifyParent(questions, title, timeLimit, val);
               }}
-              className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
+              className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
             />
           </div>
 
@@ -355,12 +356,12 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
                 setDifficulty(val);
                 notifyParent(questions, title, timeLimit, passingScore, val);
               }}
-              className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
+              className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
             >
-              <option value="easy">🟢 Dễ</option>
-              <option value="medium">🟡 Trung bình</option>
-              <option value="hard">🔴 Khó</option>
-              <option value="mixed">⚡ Hỗn hợp</option>
+              <option value="easy">Dễ</option>
+              <option value="medium">Trung bình</option>
+              <option value="hard">Khó</option>
+              <option value="mixed">Hỗn hợp</option>
             </select>
           </div>
         </div>
@@ -396,14 +397,14 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
       </div>
 
       {/* Question Filter & Action Toolbar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-[#FAF8FF] border border-indigo-50">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-[#FAF8FF] border border-blue-50">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setFilterType("all")}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
               filterType === "all"
-                ? "bg-[#C0392B] text-white shadow-xs"
+                ? "bg-[#3B82F6] text-white shadow-xs"
                 : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
             }`}
           >
@@ -414,7 +415,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
             onClick={() => setFilterType("multiple_choice")}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
               filterType === "multiple_choice"
-                ? "bg-[#C0392B] text-white shadow-xs"
+                ? "bg-[#3B82F6] text-white shadow-xs"
                 : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
             }`}
           >
@@ -425,7 +426,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
             onClick={() => setFilterType("essay")}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
               filterType === "essay"
-                ? "bg-[#C0392B] text-white shadow-xs"
+                ? "bg-[#3B82F6] text-white shadow-xs"
                 : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
             }`}
           >
@@ -437,7 +438,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
           <button
             type="button"
             onClick={() => handleAddQuestion("multiple_choice")}
-            className="px-3.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-[#C0392B] text-xs font-extrabold rounded-xl border border-indigo-100 transition-all cursor-pointer"
+            className="px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-[#3B82F6] text-xs font-extrabold rounded-xl border border-blue-100 transition-all cursor-pointer"
           >
             + Trắc nghiệm
           </button>

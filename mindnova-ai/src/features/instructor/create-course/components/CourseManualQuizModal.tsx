@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import { QuizManualWizard } from "@/src/features/instructor/quiz-generator/components/QuizManualWizard";
+import { PenLine, X } from "lucide-react";
 
 interface CourseManualQuizModalProps {
   isOpen: boolean;
@@ -37,11 +38,11 @@ export function CourseManualQuizModal({
         {/* Modal Header Bar */}
         <div className="px-6 py-4 bg-white border-b border-gray-200 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-lg font-black shadow-sm">
-              ✍️
+            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm">
+              <PenLine className="h-4 w-4" aria-hidden />
             </div>
             <div>
-              <h3 className="text-base font-black text-[#1A1A2E]">Soạn Bài Kiểm Tra Thủ Công Cho Chuyên Đề</h3>
+              <h3 className="text-base font-black text-[#0F172A]">Soạn Bài Kiểm Tra Thủ Công Cho Chuyên Đề</h3>
               <p className="text-xs font-semibold text-gray-500">
                 Biên soạn câu hỏi trắc nghiệm & tự luận và thêm thẳng vào chuyên đề
               </p>
@@ -54,7 +55,7 @@ export function CourseManualQuizModal({
             className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center font-bold text-sm transition-all cursor-pointer"
             title="Đóng modal"
           >
-            ✕
+            <X className="h-4 w-4" aria-hidden />
           </button>
         </div>
 

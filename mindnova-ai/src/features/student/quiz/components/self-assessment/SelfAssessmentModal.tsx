@@ -126,17 +126,17 @@ export function SelfAssessmentModal({
 
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
- <div className="bg-white rounded-3xl border border-[#E8E2D9] shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden relative transition-all">
+ <div className="bg-white rounded-3xl border border-[#E2E8F0] shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden relative transition-all">
 
  {/* Modal Header */}
- <div className="flex items-center justify-between px-6 py-4 border-b border-[#F0F2F8] from-[#EEF2FF] to-[#EAF8F5]">
+ <div className="flex items-center justify-between px-6 py-4 border-b border-[#F0F2F8] from-[#EFF6FF] to-[#EAF8F5]">
  <div className="flex items-center gap-2.5">
  <span className="text-xl"></span>
  <div>
- <h3 className="text-base font-bold text-[#2C3039]">
+ <h3 className="text-base font-bold text-[#0F172A]">
  Đánh giá Năng lực AI — {courseTitle}
  </h3>
- <span className="text-[11px] font-semibold text-[#2C3039]">
+ <span className="text-[11px] font-semibold text-[#0F172A]">
  Tự kiểm tra bằng AI • Không tính tín chỉ • Không ảnh hưởng GPA
  </span>
  </div>
@@ -144,7 +144,7 @@ export function SelfAssessmentModal({
 
  <button
  onClick={onClose}
- className="w-8 h-8 rounded-full bg-white border border-[#E8E2D9] flex items-center justify-center text-[#8A8478] hover:bg-gray-100 transition-colors"
+ className="w-8 h-8 rounded-full bg-white border border-[#E2E8F0] flex items-center justify-center text-[#64748B] hover:bg-gray-100 transition-colors"
  >
  
  </button>
@@ -152,7 +152,7 @@ export function SelfAssessmentModal({
 
  {/* Error Banner */}
  {errorMsg && (
- <div className="mx-6 mt-4 p-3.5 bg-[#FADBD8] border border-[#C0392B] text-[#C0392B] text-xs rounded-xl flex items-center justify-between">
+ <div className="mx-6 mt-4 p-3.5 bg-[#EFF6FF] border border-[#3B82F6] text-[#3B82F6] text-xs rounded-xl flex items-center justify-between">
  <span>️ {errorMsg}</span>
  <button onClick={() => setErrorMsg("")} className="font-bold underline">Ẩn</button>
  </div>
@@ -167,26 +167,26 @@ export function SelfAssessmentModal({
  
 
  <div className="space-y-2 max-w-lg mx-auto">
- <h4 className="text-xl font-bold text-[#2C3039]">
+ <h4 className="text-xl font-bold text-[#0F172A]">
  Bắt Đầu Bài Đánh Giá Năng Lực
  </h4>
- <p className="text-xs sm:text-sm text-[#8A8478] leading-relaxed">
- Gia sư AI Nova sẽ tự động đọc **toàn bộ nội dung các bài học** của khóa <strong className="text-[#C0392B]">{courseTitle}</strong> để tạo ngẫu nhiên bộ **10 câu hỏi trắc nghiệm** phù hợp với năng lực của bạn.
+ <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+ Gia sư AI Nova sẽ tự động đọc **toàn bộ nội dung các bài học** của khóa <strong className="text-[#3B82F6]">{courseTitle}</strong> để tạo ngẫu nhiên bộ **10 câu hỏi trắc nghiệm** phù hợp với năng lực của bạn.
  </p>
  </div>
 
  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left max-w-xl mx-auto">
- <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E8E2D9]">
- <span className="text-xs text-[#8A8478] font-medium block mb-0.5">Số lượng câu hỏi</span>
- <span className="text-sm font-bold text-[#2C3039]">10 Câu Trắc Nghiệm</span>
+ <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+ <span className="text-xs text-[#64748B] font-medium block mb-0.5">Số lượng câu hỏi</span>
+ <span className="text-sm font-bold text-[#0F172A]">10 Câu Trắc Nghiệm</span>
  </div>
- <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E8E2D9]">
- <span className="text-xs text-[#8A8478] font-medium block mb-0.5">Tín chỉ học tập</span>
- <span className="text-sm font-bold text-[#2C3039]">0 Tín (Tự luyện)</span>
+ <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+ <span className="text-xs text-[#64748B] font-medium block mb-0.5">Tín chỉ học tập</span>
+ <span className="text-sm font-bold text-[#0F172A]">0 Tín (Tự luyện)</span>
  </div>
- <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E8E2D9]">
- <span className="text-xs text-[#8A8478] font-medium block mb-0.5">Thời gian đề xuất</span>
- <span className="text-sm font-bold text-[#C0392B]">15 Phút</span>
+ <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+ <span className="text-xs text-[#64748B] font-medium block mb-0.5">Thời gian đề xuất</span>
+ <span className="text-sm font-bold text-[#3B82F6]">15 Phút</span>
  </div>
  </div>
 
@@ -194,14 +194,14 @@ export function SelfAssessmentModal({
  <button
  type="button"
  onClick={onClose}
- className="px-5 py-3 rounded-xl border border-gray-300 text-xs sm:text-sm font-semibold text-[#8A8478] hover:bg-[#FEFCF9] transition-colors"
+ className="px-5 py-3 rounded-xl border border-gray-300 text-xs sm:text-sm font-semibold text-[#64748B] hover:bg-[#F8FAFC] transition-colors"
  >
  Hủy bỏ
  </button>
  <button
  type="button"
  onClick={handleStartGeneration}
- className="px-7 py-3 rounded-xl bg-[#C0392B] text-white text-xs sm:text-sm font-bold shadow-md hover:opacity-95 transition-all flex items-center gap-2 cursor-pointer"
+ className="px-7 py-3 rounded-xl bg-[#3B82F6] text-white text-xs sm:text-sm font-bold shadow-md hover:opacity-95 transition-all flex items-center gap-2 cursor-pointer"
  >
  <span> Tạo Bộ Câu Hỏi Bằng AI</span>
  <span></span>
@@ -214,14 +214,14 @@ export function SelfAssessmentModal({
  {step === "generating" && (
  <div className="py-12 flex flex-col items-center justify-center text-center space-y-4">
  <div className="relative w-16 h-16">
- <div className="w-16 h-16 rounded-full border-4 border-[#EEF2FF] border-t-[#C0392B] animate-spin" />
+ <div className="w-16 h-16 rounded-full border-4 border-[#EFF6FF] border-t-[#3B82F6] animate-spin" />
  <div className="absolute inset-0 flex items-center justify-center text-xl"></div>
  </div>
  <div className="space-y-1 max-w-md">
- <h4 className="text-base font-bold text-[#2C3039] animate-pulse">
+ <h4 className="text-base font-bold text-[#0F172A] animate-pulse">
  Đang tạo bài đánh giá năng lực...
  </h4>
- <p className="text-xs text-[#8A8478] leading-relaxed">
+ <p className="text-xs text-[#64748B] leading-relaxed">
  AI đang tổng hợp kiến thức từ tất cả các bài học trong khóa để biên soạn 10 câu hỏi phù hợp nhất với bạn.
  </p>
  </div>
@@ -234,7 +234,7 @@ export function SelfAssessmentModal({
  {/* Question Progress Header */}
  <div className="flex items-center justify-between border-b border-gray-100 pb-3">
  <div>
- <span className="text-xs font-bold text-[#C0392B] uppercase tracking-wider">
+ <span className="text-xs font-bold text-[#3B82F6] uppercase tracking-wider">
  Câu hỏi {currentQuestionIndex + 1} / {assessment.questions.length}
  </span>
  <span className="text-xs text-gray-400 block font-normal">
@@ -243,7 +243,7 @@ export function SelfAssessmentModal({
  </div>
  <div className="w-36 h-2 bg-gray-100 rounded-full overflow-hidden">
  <div
- className="h-full bg-[#C0392B] transition-all duration-300"
+ className="h-full bg-[#3B82F6] transition-all duration-300"
  style={{ width: `${((currentQuestionIndex + 1) / assessment.questions.length) * 100}%` }}
  />
  </div>
@@ -256,7 +256,7 @@ export function SelfAssessmentModal({
 
  return (
  <div className="space-y-4">
- <h4 className="text-sm sm:text-base font-bold text-[#2C3039] leading-relaxed">
+ <h4 className="text-sm sm:text-base font-bold text-[#0F172A] leading-relaxed">
  {q.order}. {q.content}
  </h4>
 
@@ -269,13 +269,13 @@ export function SelfAssessmentModal({
  onClick={() => handleOptionSelect(q.id, opt.id)}
  className={`p-4 rounded-xl border text-xs sm:text-sm cursor-pointer transition-all flex items-center justify-between ${
  isSelected
- ? "bg-[#FAF7F2] border-[#C0392B] text-[#2C3039] font-semibold ring-1 ring-[#C0392B]"
- : "bg-white border-[#E8E2D9] text-gray-700 hover:bg-[#FEFCF9]"
+ ? "bg-[#F8FAFC] border-[#3B82F6] text-[#0F172A] font-semibold ring-1 ring-[#3B82F6]"
+ : "bg-white border-[#E2E8F0] text-gray-700 hover:bg-[#F8FAFC]"
  }`}
  >
  <span className="leading-relaxed">{opt.content}</span>
  <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
- isSelected ? "border-[#C0392B] bg-[#C0392B]" : "border-gray-300"
+ isSelected ? "border-[#3B82F6] bg-[#3B82F6]" : "border-gray-300"
  }`}>
  {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
  </div>
@@ -293,7 +293,7 @@ export function SelfAssessmentModal({
  type="button"
  disabled={currentQuestionIndex === 0}
  onClick={() => setCurrentQuestionIndex((prev) => prev - 1)}
- className="px-4 py-2.5 rounded-xl border border-gray-300 text-xs font-semibold text-[#8A8478] hover:bg-[#FEFCF9] disabled:opacity-40"
+ className="px-4 py-2.5 rounded-xl border border-gray-300 text-xs font-semibold text-[#64748B] hover:bg-[#F8FAFC] disabled:opacity-40"
  >
  ← Câu trước
  </button>
@@ -302,7 +302,7 @@ export function SelfAssessmentModal({
  <button
  type="button"
  onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
- className="px-5 py-2.5 rounded-xl bg-[#C0392B] text-white text-xs font-semibold hover:bg-[#A93226] transition-colors"
+ className="px-5 py-2.5 rounded-xl bg-[#3B82F6] text-white text-xs font-semibold hover:bg-[#2563EB] transition-colors"
  >
  Câu tiếp theo →
  </button>
@@ -310,7 +310,7 @@ export function SelfAssessmentModal({
  <button
  type="button"
  onClick={handleSubmitQuiz}
- className="px-6 py-2.5 rounded-xl bg-[#2C3039] text-white text-xs font-bold hover:bg-[#1E1B4B] shadow-sm transition-colors flex items-center gap-1.5"
+ className="px-6 py-2.5 rounded-xl bg-[#0F172A] text-white text-xs font-bold hover:bg-[#1E1B4B] shadow-sm transition-colors flex items-center gap-1.5"
  >
  <span> Nộp Bài Đánh Giá</span>
  </button>
@@ -322,8 +322,8 @@ export function SelfAssessmentModal({
  {/* STEP 4: SUBMITTING LOADING STATE */}
  {step === "submitting" && (
  <div className="py-12 flex flex-col items-center justify-center text-center space-y-4">
- <div className="w-12 h-12 rounded-full border-4 border-[#FAF7F2] border-t-[#2C3039] animate-spin" />
- <h4 className="text-base font-bold text-[#2C3039] animate-pulse">
+ <div className="w-12 h-12 rounded-full border-4 border-[#E2E8F0] border-t-[#0F172A] animate-spin" />
+ <h4 className="text-base font-bold text-[#0F172A] animate-pulse">
  Đang chấm điểm bài đánh giá...
  </h4>
  </div>
@@ -333,28 +333,28 @@ export function SelfAssessmentModal({
  {step === "results" && results && (
  <div className="space-y-6">
  {/* Score Header Card */}
- <div className="p-6 rounded-2xl from-[#EEF2FF] via-[#F6F6FB] to-[#EAF8F5] border border-[#C0392B]/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+ <div className="p-6 rounded-2xl from-[#EFF6FF] via-[#F6F6FB] to-[#EAF8F5] border border-[#3B82F6]/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
  <div>
- <span className="text-xs font-bold text-[#2C3039] bg-white px-3 py-1 rounded-full border border-[#2C3039]/20 shadow-2xs inline-block mb-1.5">
+ <span className="text-xs font-bold text-[#0F172A] bg-white px-3 py-1 rounded-full border border-[#0F172A]/20 shadow-2xs inline-block mb-1.5">
  Kết quả tự đánh giá bằng AI
  </span>
- <h4 className="text-xl font-bold text-[#2C3039]">
- Bạn đạt: <span className="text-[#C0392B]">{results.score_text}</span> ({results.score_percentage}%)
+ <h4 className="text-xl font-bold text-[#0F172A]">
+ Bạn đạt: <span className="text-[#3B82F6]">{results.score_text}</span> ({results.score_percentage}%)
  </h4>
- <p className="text-xs text-[#8A8478] mt-1">
+ <p className="text-xs text-[#64748B] mt-1">
  Bài tự luyện — Không tính tín chỉ và không ảnh hưởng điểm khóa học chính thức.
  </p>
  </div>
 
- <div className="shrink-0 w-20 h-20 rounded-2xl bg-white border border-[#C0392B]/30 flex flex-col items-center justify-center shadow-sm">
- <span className="text-2xl font-bold text-[#C0392B]">{results.score_percentage}%</span>
+ <div className="shrink-0 w-20 h-20 rounded-2xl bg-white border border-[#3B82F6]/30 flex flex-col items-center justify-center shadow-sm">
+ <span className="text-2xl font-bold text-[#3B82F6]">{results.score_percentage}%</span>
  <span className="text-[10px] text-gray-400 font-semibold uppercase">{results.passed ? "Đạt Chuẩn" : "Cần Ôn Tập"}</span>
  </div>
  </div>
 
  {/* AI Tutor Insight */}
- <div className="p-4.5 rounded-2xl bg-[#FAF7F2] border border-[#C7D2FE] space-y-2">
- <div className="flex items-center gap-2 text-xs font-bold text-[#C0392B]">
+ <div className="p-4.5 rounded-2xl bg-[#F8FAFC] border border-[#C7D2FE] space-y-2">
+ <div className="flex items-center gap-2 text-xs font-bold text-[#3B82F6]">
  <span> Lời khuyên từ Gia sư AI Nova:</span>
  </div>
  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
@@ -387,7 +387,7 @@ export function SelfAssessmentModal({
  <div
  key={det.id}
  className={`p-3.5 rounded-xl border text-xs space-y-1.5 ${
- det.is_correct ? "bg-[#E8F8F0] border-[#E8F8F0] text-[#2C3039]" : "bg-[#FADBD8] border-[#C0392B] text-[#C0392B]"
+ det.is_correct ? "bg-[#E8F8F0] border-[#E8F8F0] text-[#0F172A]" : "bg-[#EFF6FF] border-[#3B82F6] text-[#3B82F6]"
  }`}
  >
  <div className="flex items-start justify-between gap-2">
@@ -395,13 +395,13 @@ export function SelfAssessmentModal({
  {idx + 1}. {det.content}
  </span>
  <span className={`px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ${
- det.is_correct ? "bg-[#27AE60] text-white" : "bg-[#C0392B] text-white"
+ det.is_correct ? "bg-[#27AE60] text-white" : "bg-[#3B82F6] text-white"
  }`}>
  {det.is_correct ? " Đúng" : " Chưa chính xác"}
  </span>
  </div>
 
- <p className="text-[11px] text-[#8A8478]">
+ <p className="text-[11px] text-[#64748B]">
  <strong>Giải thích AI:</strong> {det.explanation}
  </p>
  </div>
@@ -414,7 +414,7 @@ export function SelfAssessmentModal({
  <button
  type="button"
  onClick={handleReset}
- className="px-5 py-2.5 rounded-xl border border-gray-300 text-xs font-bold text-gray-700 hover:bg-[#FEFCF9] transition-colors"
+ className="px-5 py-2.5 rounded-xl border border-gray-300 text-xs font-bold text-gray-700 hover:bg-[#F8FAFC] transition-colors"
  >
  Thử Sức Lại Lần Nữa (AI Tạo Bộ Đề Mới)
  </button>
@@ -422,7 +422,7 @@ export function SelfAssessmentModal({
  <button
  type="button"
  onClick={onClose}
- className="px-6 py-2.5 rounded-xl bg-[#C0392B] text-white text-xs font-bold hover:bg-[#4338CA] transition-colors"
+ className="px-6 py-2.5 rounded-xl bg-[#3B82F6] text-white text-xs font-bold hover:bg-[#2563EB] transition-colors"
  >
  Đóng
  </button>

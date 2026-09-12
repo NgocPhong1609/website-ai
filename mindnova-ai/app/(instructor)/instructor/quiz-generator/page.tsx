@@ -273,14 +273,14 @@ export default function InstructorQuizListPage() {
       <div className="p-8 rounded-3xl bg-gradient-to-r from-[#1E233E] via-[#2B2D62] to-[#121626] text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl border border-white/10">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3">
-            <span className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#C0392B] to-[#F368E0] flex items-center justify-center text-2xl font-black shadow-md">
+            <span className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#3B82F6] to-[#F368E0] flex items-center justify-center text-2xl font-black shadow-md">
               🪄
             </span>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl font-black text-white">Trợ Lý Tạo Bài Kiểm Tra AI</h1>
                 {courseIdNum && (
-                  <span className="px-2.5 py-0.5 rounded-md bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 text-[10px] font-mono font-black">
+                  <span className="px-2.5 py-0.5 rounded-md bg-blue-500/30 text-blue-200 border border-blue-400/30 text-[10px] font-mono font-black">
                     Course #{courseIdNum}
                   </span>
                 )}
@@ -293,7 +293,7 @@ export default function InstructorQuizListPage() {
 
           {courseIdNum && (
             <div className="mt-2 flex items-center gap-2">
-              <span className="px-3 py-1 rounded-xl bg-indigo-500/20 text-indigo-100 text-xs font-extrabold border border-indigo-400/30 flex items-center gap-1.5">
+              <span className="px-3 py-1 rounded-xl bg-blue-500/20 text-blue-100 text-xs font-extrabold border border-blue-400/30 flex items-center gap-1.5">
                 <span>🎓</span>
                 <span>Khóa học: {courseTitle || `ID #${courseIdNum}`}</span>
               </span>
@@ -310,7 +310,7 @@ export default function InstructorQuizListPage() {
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
             href={createAiUrl}
-            className="px-6 py-3.5 bg-[#C0392B] hover:bg-[#a02c20] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-105 transition-all text-center flex items-center justify-center gap-2"
+            className="px-6 py-3.5 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-105 transition-all text-center flex items-center justify-center gap-2"
           >
             <span>✨ Tạo bằng AI</span>
           </Link>
@@ -326,13 +326,13 @@ export default function InstructorQuizListPage() {
       {/* Filter Controls & Search Section */}
       <div className="bg-white rounded-3xl p-6 border border-[#EAEAF4] shadow-sm flex flex-col gap-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
-          <h2 className="text-base font-black text-[#1A1A2E] flex items-center gap-2">
+          <h2 className="text-base font-black text-[#0F172A] flex items-center gap-2">
             <span>📋</span>
             <span>Danh Sách Tất Cả Bài Kiểm Tra Của Bạn</span>
           </h2>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs font-extrabold text-[#C0392B] bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-xl">
+            <span className="text-xs font-extrabold text-[#3B82F6] bg-blue-50 border border-blue-100 px-3 py-1 rounded-xl">
               Tổng số: {quizzes.length} bài
             </span>
             {hasActiveFilters && (
@@ -353,7 +353,7 @@ export default function InstructorQuizListPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm theo tên Quiz, Khóa học..."
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 bg-[#FAF8FF] text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] transition-all"
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 bg-[#FAF8FF] text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6] transition-all"
             />
           </div>
 
@@ -361,7 +361,7 @@ export default function InstructorQuizListPage() {
           <select
             value={positionFilter}
             onChange={(e) => setPositionFilter(e.target.value)}
-            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] shadow-2xs truncate"
+            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6] shadow-2xs truncate"
           >
             <option value="all">Tất cả Vị trí Quiz</option>
             <option value="capability_assessment">🏆 Kiểm tra tổng quát</option>
@@ -374,7 +374,7 @@ export default function InstructorQuizListPage() {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value as any)}
-            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] shadow-2xs"
+            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6] shadow-2xs"
           >
             <option value="all">Tất cả nguồn (AI / Manual)</option>
             <option value="ai">🤖 AI Quiz</option>
@@ -388,7 +388,7 @@ export default function InstructorQuizListPage() {
               setCourseFilter(e.target.value);
               setModuleFilter("all");
             }}
-            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] shadow-2xs truncate"
+            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6] shadow-2xs truncate"
           >
             <option value="all">Tất cả khóa học</option>
             {coursesList.map((c) => (
@@ -402,7 +402,7 @@ export default function InstructorQuizListPage() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] shadow-2xs"
+            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6] shadow-2xs"
           >
             <option value="newest">Mới nhất</option>
             <option value="oldest">Cũ nhất</option>
@@ -435,7 +435,7 @@ export default function InstructorQuizListPage() {
           <div className="py-16 text-center rounded-2xl bg-gray-50 border border-gray-200 flex flex-col items-center justify-center gap-4 text-gray-500">
             <span className="text-5xl">📋</span>
             <div className="flex flex-col gap-1 max-w-md">
-              <p className="text-sm font-extrabold text-[#1A1A2E]">Chưa có đề kiểm tra nào.</p>
+              <p className="text-sm font-extrabold text-[#0F172A]">Chưa có đề kiểm tra nào.</p>
               <p className="text-xs font-medium text-gray-500">
                 Hãy sử dụng bộ tạo bài kiểm tra AI hoặc tạo thủ công để xây dựng bộ đề đầu tiên cho học viên.
               </p>
@@ -443,7 +443,7 @@ export default function InstructorQuizListPage() {
             <div className="flex items-center gap-3 mt-2">
               <Link
                 href={createAiUrl}
-                className="px-6 py-3 bg-[#C0392B] hover:bg-[#a02c20] text-white text-xs font-black rounded-2xl shadow-md transition-all flex items-center gap-2"
+                className="px-6 py-3 bg-[#3B82F6] hover:bg-[#2563EB] text-white text-xs font-black rounded-2xl shadow-md transition-all flex items-center gap-2"
               >
                 <span>✨ Tạo Quiz bằng AI</span>
               </Link>
@@ -525,7 +525,7 @@ export default function InstructorQuizListPage() {
 
                         {attachedCourseTitle && (
                           <span
-                            className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-900 border border-indigo-200 flex items-center gap-1 truncate max-w-[180px]"
+                            className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-900 border border-blue-200 flex items-center gap-1 truncate max-w-[180px]"
                             title={`Khóa học: ${attachedCourseTitle}`}
                           >
                             <span>🎓</span>
@@ -536,11 +536,11 @@ export default function InstructorQuizListPage() {
 
                       {/* Quiz Title & Module info */}
                       <div>
-                        <h3 className="text-base font-extrabold text-[#1A1A2E] group-hover:text-emerald-700 transition-colors line-clamp-1">
+                        <h3 className="text-base font-extrabold text-[#0F172A] group-hover:text-emerald-700 transition-colors line-clamp-1">
                           {q.title}
                         </h3>
                         {attachedModuleTitle && (
-                          <p className="text-[11px] font-bold text-indigo-600 mt-0.5 flex items-center gap-1">
+                          <p className="text-[11px] font-bold text-blue-600 mt-0.5 flex items-center gap-1">
                             <span>📂 Module:</span>
                             <span className="truncate">{attachedModuleTitle}</span>
                           </p>
@@ -614,7 +614,7 @@ export default function InstructorQuizListPage() {
                         onClick={() => setCurrentPage(pageNum)}
                         className={`w-8 h-8 rounded-xl text-xs font-black transition-all cursor-pointer ${
                           currentPage === pageNum
-                            ? "bg-[#C0392B] text-white shadow-xs"
+                            ? "bg-[#3B82F6] text-white shadow-xs"
                             : "bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200"
                         }`}
                       >
@@ -665,14 +665,14 @@ export default function InstructorQuizListPage() {
                 ⚠️
               </div>
               <div>
-                <h3 className="text-base font-black text-[#1A1A2E]">Xác nhận xóa đề kiểm tra</h3>
+                <h3 className="text-base font-black text-[#0F172A]">Xác nhận xóa đề kiểm tra</h3>
                 <p className="text-xs text-gray-500 font-medium">Hành động này không thể hoàn tác.</p>
               </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-xs flex flex-col gap-1.5">
-              <span className="font-extrabold text-[#1A1A2E]">Bạn có chắc muốn xóa đề kiểm tra này?</span>
-              <span className="font-bold text-[#C0392B]">Đề: {quizToDelete.title}</span>
+              <span className="font-extrabold text-[#0F172A]">Bạn có chắc muốn xóa đề kiểm tra này?</span>
+              <span className="font-bold text-[#3B82F6]">Đề: {quizToDelete.title}</span>
               {quizToDelete.attachments && quizToDelete.attachments.length > 0 && (
                 <span className="text-[11px] text-amber-700 font-medium">
                   ⚠️ Bài kiểm tra này hiện đang được gắn vào một hoặc nhiều khóa học.

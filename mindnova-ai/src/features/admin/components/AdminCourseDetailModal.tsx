@@ -1,6 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import {
+  BookOpen,
+  Check,
+  ClipboardList,
+  CircleDot,
+  FileQuestion,
+  FileText,
+  Flag,
+  Lightbulb,
+  PenLine,
+  Pin,
+  Search,
+  Target,
+  Timer,
+  Trophy,
+  Video,
+  X,
+} from "lucide-react";
 
 function getEmbedUrl(url?: string | null): string | null {
   if (!url) return null;
@@ -141,16 +159,16 @@ export function AdminCourseDetailModal({
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-900 text-white border-b border-slate-800">
           <div className="flex items-center gap-3">
-            <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-sky-500/20 text-sky-300 border border-sky-500/30">
-              🔍 KIỂM DUYỆT KHÓA HỌC (READ-ONLY)
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+              <Search className="h-3.5 w-3.5" aria-hidden /> KIỂM DUYỆT KHÓA HỌC (READ-ONLY)
             </span>
             <h2 className="text-lg font-bold truncate max-w-lg">{course.title}</h2>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-[#2563EB] text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
           >
-            ✕
+            <X className="h-4 w-4" aria-hidden />
           </button>
         </div>
 
@@ -164,7 +182,7 @@ export function AdminCourseDetailModal({
                 : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
             }`}
           >
-            📌 Tổng quan & Giảng viên
+            <span className="inline-flex items-center gap-1.5"><Pin className="h-3.5 w-3.5" aria-hidden /> Tổng quan & Giảng viên</span>
           </button>
 
           <button
@@ -175,7 +193,7 @@ export function AdminCourseDetailModal({
                 : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
             }`}
           >
-            📚 Nội dung bài học ({structuredModules.reduce((acc, m) => acc + (m.lessons?.length || 0), 0)})
+            <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" aria-hidden /> Nội dung bài học ({structuredModules.reduce((acc, m) => acc + (m.lessons?.length || 0), 0)})</span>
           </button>
 
           <button
@@ -186,7 +204,7 @@ export function AdminCourseDetailModal({
                 : "bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-200"
             }`}
           >
-            <span>🏆</span>
+            <Trophy className="h-3.5 w-3.5" aria-hidden />
             <span>A. Kiểm tra tổng quát</span>
             <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${capabilityQuiz ? "bg-emerald-700 text-white" : "bg-amber-200 text-amber-900"}`}>
               {capabilityQuiz ? "Có bài thi" : "Trống"}
@@ -197,13 +215,13 @@ export function AdminCourseDetailModal({
             onClick={() => setActiveTab("final_quiz")}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               activeTab === "final_quiz"
-                ? "bg-indigo-600 text-white shadow-sm"
-                : "bg-indigo-50 text-indigo-900 hover:bg-indigo-100 border border-indigo-200"
+                ? "bg-blue-600 text-white shadow-sm"
+                : "bg-blue-50 text-blue-900 hover:bg-blue-100 border border-blue-200"
             }`}
           >
-            <span>🏁</span>
+            <Flag className="h-3.5 w-3.5" aria-hidden />
             <span>B. Kiểm tra cuối khóa học</span>
-            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${endOfCourseQuiz ? "bg-emerald-700 text-white" : "bg-indigo-200 text-indigo-900"}`}>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${endOfCourseQuiz ? "bg-emerald-700 text-white" : "bg-blue-200 text-blue-900"}`}>
               {endOfCourseQuiz ? "Có bài thi" : "Trống"}
             </span>
           </button>
@@ -227,7 +245,7 @@ export function AdminCourseDetailModal({
                   <div className="p-4 rounded-2xl border border-slate-200 bg-white">
                     <span className="text-xs text-slate-500 font-medium">Danh mục & Cấp độ</span>
                     <p className="text-sm font-bold text-slate-900 mt-1">
-                      {course.category || "Chưa phân loại"} • <span className="uppercase text-sky-700">{course.level || "Tất cả"}</span>
+                      {course.category || "Chưa phân loại"} • <span className="uppercase text-blue-700">{course.level || "Tất cả"}</span>
                     </p>
                   </div>
                   <div className="p-4 rounded-2xl border border-slate-200 bg-white">
@@ -299,7 +317,7 @@ export function AdminCourseDetailModal({
                                 <div>
                                   <span className="text-sm font-semibold text-slate-800">{les.title}</span>
                                   <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500">
-                                    <span className="capitalize font-medium text-sky-700">{les.type || les.item_type || "video"}</span>
+                                    <span className="capitalize font-medium text-blue-700">{les.type || les.item_type || "video"}</span>
                                     <span>•</span>
                                     <span>{les.duration || formatDuration(les.duration_seconds)}</span>
                                   </div>
@@ -327,7 +345,7 @@ export function AdminCourseDetailModal({
                                   <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
                                     <div className="flex items-center gap-2">
                                       <span className="font-extrabold text-slate-900 text-sm">
-                                        {isQuiz ? "📝 Chi tiết bài kiểm tra:" : isVideo ? "🎬 Chi tiết video:" : "📄 Chi tiết tài liệu đọc:"} {les.title}
+                                        {isQuiz ? "Chi tiết bài kiểm tra:" : isVideo ? "Chi tiết video:" : "Chi tiết tài liệu đọc:"} {les.title}
                                       </span>
                                     </div>
                                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-200 text-slate-800">
@@ -338,7 +356,7 @@ export function AdminCourseDetailModal({
                                   {/* VIDEO LESSON RENDER */}
                                   {isVideo && les.video_url && (
                                     <div className="space-y-2">
-                                      <span className="font-bold text-slate-700 block">🎥 Trình phát Video bài giảng:</span>
+                                      <span className="font-bold text-slate-700 inline-flex items-center gap-1.5"><Video className="h-3.5 w-3.5" aria-hidden /> Trình phát Video bài giảng:</span>
                                       <div className="w-full bg-black rounded-2xl overflow-hidden border border-slate-300 flex items-center justify-center relative shadow-sm max-h-[380px]">
                                         {getEmbedUrl(les.video_url) ? (
                                           <iframe
@@ -357,7 +375,7 @@ export function AdminCourseDetailModal({
                                         )}
                                       </div>
                                       <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
-                                        <span>Link trực tiếp: <a href={les.video_url} target="_blank" rel="noreferrer" className="text-sky-600 underline font-semibold hover:text-sky-800">{les.video_url}</a></span>
+                                        <span>Link trực tiếp: <a href={les.video_url} target="_blank" rel="noreferrer" className="text-blue-600 underline font-semibold hover:text-blue-800">{les.video_url}</a></span>
                                       </div>
                                     </div>
                                   )}
@@ -365,7 +383,7 @@ export function AdminCourseDetailModal({
                                   {/* ARTICLE / DOCUMENT LESSON RENDER */}
                                   {isDoc && (
                                     <div className="space-y-2">
-                                      <span className="font-bold text-slate-700 block">📖 Nội dung bài đọc chi tiết (Article):</span>
+                                      <span className="font-bold text-slate-700 inline-flex items-center gap-1.5"><FileText className="h-3.5 w-3.5" aria-hidden /> Nội dung bài đọc chi tiết (Article):</span>
                                       {les.content ? (
                                         <div 
                                           className="p-5 bg-white rounded-2xl border border-slate-200 text-slate-800 text-sm leading-relaxed max-h-[450px] overflow-y-auto shadow-2xs prose max-w-none prose-img:rounded-xl prose-img:max-h-[350px] prose-img:mx-auto"
@@ -384,24 +402,24 @@ export function AdminCourseDetailModal({
                                     <div className="space-y-4">
                                       {quizData ? (
                                         <div className="space-y-4">
-                                          <div className="p-4 rounded-2xl bg-white border border-indigo-100 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
+                                          <div className="p-4 rounded-2xl bg-white border border-blue-100 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
                                             <div>
                                               <h4 className="text-sm font-black text-slate-900">{quizData.title || les.title}</h4>
                                               {quizData.description && (
                                                 <p className="text-xs text-slate-500 mt-0.5">{quizData.description}</p>
                                               )}
                                             </div>
-                                            <div className="flex items-center gap-3 text-xs font-bold text-slate-700 bg-indigo-50/60 px-3 py-1.5 rounded-xl border border-indigo-100">
-                                              <span>⏱ Thời gian: <strong className="text-indigo-600">{quizData.time_limit_minutes || 15} phút</strong></span>
+                                            <div className="flex items-center gap-3 text-xs font-bold text-slate-700 bg-blue-50/60 px-3 py-1.5 rounded-xl border border-blue-100">
+                                              <span className="inline-flex items-center gap-1"><Timer className="h-3 w-3" aria-hidden /> Thời gian: <strong className="text-blue-600">{quizData.time_limit_minutes || 15} phút</strong></span>
                                               <span>•</span>
-                                              <span>🎯 Điểm đạt: <strong className="text-indigo-600">{quizData.passing_score || 70}%</strong></span>
+                                              <span className="inline-flex items-center gap-1"><Target className="h-3 w-3" aria-hidden /> Điểm đạt: <strong className="text-blue-600">{quizData.passing_score || 70}%</strong></span>
                                               <span>•</span>
-                                              <span>❓ Số câu hỏi: <strong className="text-indigo-600">{quizData.questions?.length || quizData.total_questions || 0} câu</strong></span>
+                                              <span className="inline-flex items-center gap-1"><FileQuestion className="h-3 w-3" aria-hidden /> Số câu hỏi: <strong className="text-blue-600">{quizData.questions?.length || quizData.total_questions || 0} câu</strong></span>
                                             </div>
                                           </div>
 
                                           <div className="space-y-3">
-                                            <h5 className="text-xs font-black text-slate-800 uppercase tracking-wider">📋 Danh sách câu hỏi trong bài kiểm tra:</h5>
+                                            <h5 className="text-xs font-black text-slate-800 uppercase tracking-wider inline-flex items-center gap-1.5"><ClipboardList className="h-3.5 w-3.5" aria-hidden /> Danh sách câu hỏi trong bài kiểm tra:</h5>
                                             {(!quizData.questions || quizData.questions.length === 0) ? (
                                               <div className="p-4 bg-white rounded-xl border border-slate-200 text-slate-400 italic text-center">
                                                 Bài kiểm tra này chưa được tạo câu hỏi.
@@ -439,8 +457,8 @@ export function AdminCourseDetailModal({
               {!capabilityQuiz ? (
                 /* Empty State matching Instructor UI */
                 <div className="p-12 text-center bg-amber-50/40 rounded-3xl border-2 border-dashed border-amber-200/80 space-y-4">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-2xl font-bold">
-                    🏆
+                  <div className="w-16 h-16 mx-auto rounded-full bg-amber-100 text-amber-700 flex items-center justify-center">
+                    <Trophy className="h-7 w-7" aria-hidden />
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-slate-900">A. KIỂM TRA TỔNG QUÁT</h3>
@@ -459,11 +477,11 @@ export function AdminCourseDetailModal({
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-600 text-white shadow-2xs">
-                          🏆 A. KIỂM TRA TỔNG QUÁT CẤP KHÓA HỌC
+                          <span className="inline-flex items-center gap-1.5"><Trophy className="h-3.5 w-3.5" aria-hidden /> A. KIỂM TRA TỔNG QUÁT CẤP KHÓA HỌC</span>
                         </span>
                         {capabilityQuiz.is_active && (
                           <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            ✓ ĐANG CHỌN LÀM BÀI THI CHÍNH
+                            <span className="inline-flex items-center gap-1"><Check className="h-3 w-3" aria-hidden /> ĐANG CHỌN LÀM BÀI THI CHÍNH</span>
                           </span>
                         )}
                       </div>
@@ -474,18 +492,18 @@ export function AdminCourseDetailModal({
                     </div>
 
                     <div className="flex items-center gap-4 text-xs font-bold text-slate-800 bg-white px-4 py-2.5 rounded-2xl border border-amber-200 shadow-2xs">
-                      <div>⏱ Thời gian: <span className="text-amber-700 font-extrabold">{capabilityQuiz.time_limit_minutes} phút</span></div>
+                      <div className="inline-flex items-center gap-1"><Timer className="h-3 w-3" aria-hidden /> Thời gian: <span className="text-amber-700 font-extrabold">{capabilityQuiz.time_limit_minutes} phút</span></div>
                       <div>•</div>
-                      <div>🎯 Điểm đạt: <span className="text-amber-700 font-extrabold">{capabilityQuiz.passing_score}%</span></div>
+                      <div className="inline-flex items-center gap-1"><Target className="h-3 w-3" aria-hidden /> Điểm đạt: <span className="text-amber-700 font-extrabold">{capabilityQuiz.passing_score}%</span></div>
                       <div>•</div>
-                      <div>❓ Số câu: <span className="text-amber-700 font-extrabold">{capabilityQuiz.total_questions} câu</span></div>
+                      <div className="inline-flex items-center gap-1"><FileQuestion className="h-3 w-3" aria-hidden /> Số câu: <span className="text-amber-700 font-extrabold">{capabilityQuiz.total_questions} câu</span></div>
                     </div>
                   </div>
 
                   {/* Questions List */}
                   <div className="p-6 space-y-4">
                     <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
-                      📋 Danh sách câu hỏi trong bài kiểm tra tổng quát ({capabilityQuiz.questions?.length || 0} câu)
+                      <span className="inline-flex items-center gap-1.5"><ClipboardList className="h-3.5 w-3.5" aria-hidden /> Danh sách câu hỏi trong bài kiểm tra tổng quát ({capabilityQuiz.questions?.length || 0} câu)</span>
                     </h4>
 
                     {(!capabilityQuiz.questions || capabilityQuiz.questions.length === 0) ? (
@@ -508,13 +526,13 @@ export function AdminCourseDetailModal({
             <div className="space-y-6">
               {!endOfCourseQuiz ? (
                 /* Empty State matching Instructor UI */
-                <div className="p-12 text-center bg-indigo-50/40 rounded-3xl border-2 border-dashed border-indigo-200/80 space-y-4">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-2xl font-bold">
-                    🏁
+                <div className="p-12 text-center bg-blue-50/40 rounded-3xl border-2 border-dashed border-blue-200/80 space-y-4">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-blue-100 text-blue-700 flex items-center justify-center">
+                    <Flag className="h-7 w-7" aria-hidden />
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-slate-900">B. KIỂM TRA CUỐI KHÓA HỌC</h3>
-                    <p className="text-sm font-semibold text-indigo-800 mt-1">
+                    <p className="text-sm font-semibold text-blue-800 mt-1">
                       Chưa có bài kiểm tra cuối khóa nào được chọn.
                     </p>
                     <p className="text-xs text-slate-500 mt-0.5">
@@ -523,17 +541,17 @@ export function AdminCourseDetailModal({
                   </div>
                 </div>
               ) : (
-                <div className="rounded-3xl border-2 border-indigo-300 bg-white overflow-hidden shadow-sm">
+                <div className="rounded-3xl border-2 border-blue-300 bg-white overflow-hidden shadow-sm">
                   {/* Header Banner */}
-                  <div className="p-6 bg-gradient-to-r from-indigo-500/15 via-indigo-100/60 to-purple-50 border-b border-indigo-200 flex flex-wrap items-center justify-between gap-4">
+                  <div className="p-6 bg-gradient-to-r from-[#3B82F6]/15 via-[#EFF6FF] to-[#DBEAFE] border-b border-[#DBEAFE] flex flex-wrap items-center justify-between gap-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-700 text-white shadow-2xs">
-                          🏁 B. KIỂM TRA CUỐI KHÓA HỌC
+                        <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-blue-700 text-white shadow-2xs">
+                          <span className="inline-flex items-center gap-1.5"><Flag className="h-3.5 w-3.5" aria-hidden /> B. KIỂM TRA CUỐI KHÓA HỌC</span>
                         </span>
                         {endOfCourseQuiz.is_active && (
                           <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            ✓ ĐANG CHỌN LÀM BÀI THI CHÍNH
+                            <span className="inline-flex items-center gap-1"><Check className="h-3 w-3" aria-hidden /> ĐANG CHỌN LÀM BÀI THI CHÍNH</span>
                           </span>
                         )}
                       </div>
@@ -543,19 +561,19 @@ export function AdminCourseDetailModal({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs font-bold text-slate-800 bg-white px-4 py-2.5 rounded-2xl border border-indigo-200 shadow-2xs">
-                      <div>⏱ Thời gian: <span className="text-indigo-700 font-extrabold">{endOfCourseQuiz.time_limit_minutes} phút</span></div>
+                    <div className="flex items-center gap-4 text-xs font-bold text-slate-800 bg-white px-4 py-2.5 rounded-2xl border border-blue-200 shadow-2xs">
+                      <div className="inline-flex items-center gap-1"><Timer className="h-3 w-3" aria-hidden /> Thời gian: <span className="text-blue-700 font-extrabold">{endOfCourseQuiz.time_limit_minutes} phút</span></div>
                       <div>•</div>
-                      <div>🎯 Điểm đạt: <span className="text-indigo-700 font-extrabold">{endOfCourseQuiz.passing_score}%</span></div>
+                      <div className="inline-flex items-center gap-1"><Target className="h-3 w-3" aria-hidden /> Điểm đạt: <span className="text-blue-700 font-extrabold">{endOfCourseQuiz.passing_score}%</span></div>
                       <div>•</div>
-                      <div>❓ Số câu: <span className="text-indigo-700 font-extrabold">{endOfCourseQuiz.total_questions} câu</span></div>
+                      <div className="inline-flex items-center gap-1"><FileQuestion className="h-3 w-3" aria-hidden /> Số câu: <span className="text-blue-700 font-extrabold">{endOfCourseQuiz.total_questions} câu</span></div>
                     </div>
                   </div>
 
                   {/* Questions List */}
                   <div className="p-6 space-y-4">
                     <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
-                      📋 Danh sách câu hỏi trong bài kiểm tra cuối khóa ({endOfCourseQuiz.questions?.length || 0} câu)
+                      <span className="inline-flex items-center gap-1.5"><ClipboardList className="h-3.5 w-3.5" aria-hidden /> Danh sách câu hỏi trong bài kiểm tra cuối khóa ({endOfCourseQuiz.questions?.length || 0} câu)</span>
                     </h4>
 
                     {(!endOfCourseQuiz.questions || endOfCourseQuiz.questions.length === 0) ? (
@@ -592,7 +610,9 @@ export function AdminCourseDetailModal({
                 disabled={pendingAction !== null}
                 className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-colors cursor-pointer disabled:opacity-50"
               >
-                {pendingAction === `published-${course.id}` ? "Đang duyệt..." : "✓ Duyệt công khai khóa học"}
+                {pendingAction === `published-${course.id}` ? "Đang duyệt..." : (
+                  <span className="inline-flex items-center gap-1"><Check className="h-3.5 w-3.5" aria-hidden /> Duyệt công khai khóa học</span>
+                )}
               </button>
             )}
 
@@ -634,9 +654,13 @@ function RenderQuestionDetail({ question, index }: { question: any; index: numbe
             Câu {index + 1}
           </span>
           <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded uppercase ${
-            isEssay ? "bg-amber-100 text-amber-900" : "bg-sky-100 text-sky-900"
+            isEssay ? "bg-amber-100 text-amber-900" : "bg-blue-100 text-blue-900"
           }`}>
-            {isEssay ? "✍️ Tự luận" : "🔘 Trắc nghiệm"}
+            {isEssay ? (
+              <span className="inline-flex items-center gap-1"><PenLine className="h-3 w-3" aria-hidden /> Tự luận</span>
+            ) : (
+              <span className="inline-flex items-center gap-1"><CircleDot className="h-3 w-3" aria-hidden /> Trắc nghiệm</span>
+            )}
           </span>
           <span className="text-[11px] text-slate-500 font-medium">({question.points || (isEssay ? 2.5 : 0.5)} điểm)</span>
         </div>
@@ -704,7 +728,7 @@ function RenderQuestionDetail({ question, index }: { question: any; index: numbe
         <div className="space-y-2 p-3 bg-amber-50/50 rounded-xl border border-amber-200/60 text-xs">
           {question.sample_answer && (
             <div>
-              <span className="font-extrabold text-amber-900 block mb-0.5">💡 Đáp án tham khảo mẫu:</span>
+              <span className="font-extrabold text-amber-900 mb-0.5 inline-flex items-center gap-1"><Lightbulb className="h-3.5 w-3.5" aria-hidden /> Đáp án tham khảo mẫu:</span>
               <p className="text-amber-950 whitespace-pre-line leading-relaxed bg-white p-2.5 rounded-lg border border-amber-200/50">
                 {question.sample_answer}
               </p>
@@ -712,7 +736,7 @@ function RenderQuestionDetail({ question, index }: { question: any; index: numbe
           )}
           {question.rubric && (
             <div>
-              <span className="font-extrabold text-amber-900 block mb-0.5">📋 Gợi ý Rubric chấm điểm:</span>
+              <span className="font-extrabold text-amber-900 mb-0.5 inline-flex items-center gap-1"><ClipboardList className="h-3.5 w-3.5" aria-hidden /> Gợi ý Rubric chấm điểm:</span>
               <p className="text-amber-950 whitespace-pre-line leading-relaxed bg-white p-2.5 rounded-lg border border-amber-200/50">
                 {question.rubric}
               </p>
@@ -723,7 +747,7 @@ function RenderQuestionDetail({ question, index }: { question: any; index: numbe
 
       {question.explanation && (
         <p className="text-[11px] text-slate-500 italic bg-slate-50 p-2 rounded-lg">
-          💡 Giải thích: {question.explanation}
+          <span className="inline-flex items-start gap-1"><Lightbulb className="h-3.5 w-3.5 mt-0.5 shrink-0" aria-hidden /> Giải thích: {question.explanation}</span>
         </p>
       )}
     </div>
@@ -741,7 +765,7 @@ function statusLabel(status: string): string {
 function statusClassName(status: string): string {
   if (status === "published") return "bg-emerald-100 text-emerald-800 border border-emerald-300";
   if (status === "archived") return "bg-amber-100 text-amber-800 border border-amber-300";
-  if (status === "pending_review") return "bg-sky-100 text-sky-800 border border-sky-300";
+  if (status === "pending_review") return "bg-blue-100 text-blue-800 border border-blue-300";
   return "bg-slate-100 text-slate-700 border border-slate-200";
 }
 

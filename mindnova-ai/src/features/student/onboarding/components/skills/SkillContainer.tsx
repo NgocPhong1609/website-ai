@@ -25,10 +25,10 @@ export default function SkillContainer() {
 
  {/* Header */}
  <div className="w-full flex flex-col items-center gap-3">
- <h1 className="font-bold text-[32px] text-[#2C3039]">
+ <h1 className="font-bold text-[32px] text-[#0F172A]">
  What is your current skill level?
  </h1>
- <p className="text-[16px] max-w-127.5 w-full text-center text-[#2C3039]">
+ <p className="text-[16px] max-w-127.5 w-full text-center text-[#0F172A]">
  This helps our AI tailor the complexity of your study plan and
  practice exercises to your specific needs.
  </p>
@@ -56,8 +56,8 @@ export default function SkillContainer() {
  onClick={() => router.push("/onboarding/topics")}
  className={`py-[21.6px] px-[57.6px] rounded-lg transition-colors text-[14.4px] mt-8 ${
  selectedId !== null
- ? "bg-[#FAF7F2] text-white shadow-md hover:bg-[#5757EE]"
- : "bg-[#E2E8F0] text-[#2C3039]/40 cursor-not-allowed"
+ ? "bg-[#F8FAFC] text-white shadow-md hover:bg-[#5757EE]"
+ : "bg-[#E2E8F0] text-[#0F172A]/40 cursor-not-allowed"
  }`}
  rightIcon={<ArrowRightIcon />}
  >

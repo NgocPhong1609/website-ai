@@ -29,9 +29,9 @@ export function CoursePagination({
  }
 
  return (
- <div className="flex items-center justify-between pt-4 mt-2 border-t border-[#E8E2D9] text-xs">
- <p className="font-bold text-[#8A8478]">
- Hiển thị <span className="text-[#2C3039]">{from}–{to}</span> trong số <span className="text-[#2C3039]">{totalItems}</span> khóa học
+ <div className="flex items-center justify-between pt-4 mt-2 border-t border-[#E2E8F0] text-xs">
+ <p className="font-bold text-[#64748B]">
+ Hiển thị <span className="text-[#0F172A]">{from}–{to}</span> trong số <span className="text-[#0F172A]">{totalItems}</span> khóa học
  </p>
 
  <div className="flex items-center gap-1.5" role="navigation" aria-label="Phân trang">
@@ -41,7 +41,7 @@ export function CoursePagination({
  aria-label="Trang trước"
  disabled={currentPage === 1}
  onClick={() => onPageChange(Math.max(1, currentPage - 1))}
- className="w-8 h-8 rounded-xl flex items-center justify-center text-[#8A8478] border border-[#E8E2D9] bg-white hover:bg-[#FEFCF9] hover:text-[#2C3039] disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shadow-2xs"
+ className="w-8 h-8 rounded-xl flex items-center justify-center text-[#64748B] border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] hover:text-[#0F172A] disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shadow-2xs"
  >
  <ChevronLeftIcon />
  </button>
@@ -56,8 +56,8 @@ export function CoursePagination({
  className={twMerge(
  "w-8 h-8 rounded-xl font-extrabold transition-all cursor-pointer shadow-2xs",
  p === currentPage
- ? "bg-[#C0392B] text-white border border-[#C0392B]"
- : "text-[#8A8478] border border-[#E8E2D9] bg-white hover:bg-[#FEFCF9] hover:text-[#2C3039]"
+ ? "bg-[#3B82F6] text-white border border-[#3B82F6]"
+ : "text-[#64748B] border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] hover:text-[#0F172A]"
  )}
  >
  {p}
@@ -70,7 +70,7 @@ export function CoursePagination({
  aria-label="Trang sau"
  disabled={currentPage === totalPages}
  onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
- className="w-8 h-8 rounded-xl flex items-center justify-center text-[#8A8478] border border-[#E8E2D9] bg-white hover:bg-[#FEFCF9] hover:text-[#2C3039] disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shadow-2xs"
+ className="w-8 h-8 rounded-xl flex items-center justify-center text-[#64748B] border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] hover:text-[#0F172A] disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shadow-2xs"
  >
  <ChevronRightIcon />
  </button>

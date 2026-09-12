@@ -24,7 +24,7 @@ export const Loader: React.FC<LoaderProps> = ({
     <div className={twMerge("flex flex-col items-center justify-center gap-3", className)}>
       <div
         className={twMerge(
-          "animate-spin rounded-full border-gray-200 border-t-indigo-600",
+          "animate-spin rounded-full border-gray-200 border-t-blue-600",
           sizeClasses[size]
         )}
       />

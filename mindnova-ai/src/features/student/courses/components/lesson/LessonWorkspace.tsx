@@ -121,10 +121,10 @@ function getLessonTypeLabel(type: string): string {
 
 function getLessonTypeColor(type: string): string {
  switch (type) {
- case 'video': return 'bg-[#F5F0E8] text-[#2C3039]';
- case 'article': return 'bg-[#ECFDF5] text-[#2C3039]';
- case 'quiz_module': return 'bg-[#FFF7ED] text-[#EA580C]';
- default: return 'bg-[#F5F0E8] text-[#8A8478]';
+ case 'video': return 'bg-[#F1F5F9] text-[#0F172A]';
+ case 'article': return 'bg-[#ECFDF5] text-[#0F172A]';
+ case 'quiz_module': return 'bg-[#FFFBEB] text-[#F59E0B]';
+ default: return 'bg-[#F1F5F9] text-[#64748B]';
  }
 }
 
@@ -169,7 +169,7 @@ function ArticleRenderer({
 
  if (!lesson.content) {
  return (
- <div className="w-full p-12 flex flex-col items-center justify-center text-gray-400 bg-[#FEFCF9] rounded-2xl border border-[#E8E2D9]">
+ <div className="w-full p-12 flex flex-col items-center justify-center text-gray-400 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0]">
  <></>
  <span className="text-sm font-medium mt-3">Nội dung bài học chưa được cập nhật.</span>
  </div>
@@ -180,17 +180,17 @@ function ArticleRenderer({
  <div className="flex flex-col gap-4">
  {/* Reading progress bar */}
  {!completedRef.current && (
- <div className="flex items-center gap-3 p-3 rounded-xl bg-[#FEFCF9] border border-[#E8E2D9]">
+ <div className="flex items-center gap-3 p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
  <></>
  <div className="flex-1">
  <div className="w-full h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
  <div
- className="h-full bg-[#C0392B] rounded-full transition-all duration-1000"
+ className="h-full bg-[#3B82F6] rounded-full transition-all duration-1000"
  style={{ width: `${progressPercent}%` }}
  />
  </div>
  </div>
- <span className="text-[11px] font-semibold text-[#8A8478] shrink-0">
+ <span className="text-[11px] font-semibold text-[#64748B] shrink-0">
  {Math.floor(timeSpent / 60)}:{String(timeSpent % 60).padStart(2, '0')} / {Math.floor(requiredTime / 60)}:{String(requiredTime % 60).padStart(2, '0')}
  </span>
  </div>
@@ -199,26 +199,26 @@ function ArticleRenderer({
  {/* CKEditor HTML Content — Styled Container */}
  <div
  className="ck-content prose prose-sm sm:prose max-w-none
- bg-white rounded-2xl border border-[#E8E2D9] p-6 sm:p-8 shadow-sm
- [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-[#2C3039] [&_h1]:mb-4 [&_h1]:mt-6
- [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-[#2C3039] [&_h2]:mb-3 [&_h2]:mt-5
- [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-[#2C3039] [&_h3]:mb-2 [&_h3]:mt-4
- [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-[#2C3039] [&_h4]:mb-2
- [&_p]:text-[15px] [&_p]:text-[#2C3039] [&_p]:leading-relaxed [&_p]:mb-4
- [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ul]:text-[#2C3039]
- [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_ol]:text-[#2C3039]
+ bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 shadow-sm
+ [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-[#0F172A] [&_h1]:mb-4 [&_h1]:mt-6
+ [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-[#0F172A] [&_h2]:mb-3 [&_h2]:mt-5
+ [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-[#0F172A] [&_h3]:mb-2 [&_h3]:mt-4
+ [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-[#0F172A] [&_h4]:mb-2
+ [&_p]:text-[15px] [&_p]:text-[#0F172A] [&_p]:leading-relaxed [&_p]:mb-4
+ [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ul]:text-[#0F172A]
+ [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_ol]:text-[#0F172A]
  [&_li]:mb-1.5 [&_li]:text-[15px] [&_li]:leading-relaxed
- [&_a]:text-[#2C3039] [&_a]:underline [&_a]:hover:text-[#A93226]
+ [&_a]:text-[#0F172A] [&_a]:underline [&_a]:hover:text-[#2563EB]
  [&_img]:rounded-xl [&_img]:shadow-sm [&_img]:my-4 [&_img]:max-w-full [&_img]:h-auto
- [&_blockquote]:border-l-4 [&_blockquote]:border-[#C0392B] [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-[#8A8478] [&_blockquote]:my-4
+ [&_blockquote]:border-l-4 [&_blockquote]:border-[#3B82F6] [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-[#64748B] [&_blockquote]:my-4
  [&_table]:w-full [&_table]:border-collapse [&_table]:my-4
- [&_th]:bg-[#F5F0E8] [&_th]:border [&_th]:border-[#E8E2D9] [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_th]:text-sm
- [&_td]:border [&_td]:border-[#E8E2D9] [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm
+ [&_th]:bg-[#F1F5F9] [&_th]:border [&_th]:border-[#E2E8F0] [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_th]:text-sm
+ [&_td]:border [&_td]:border-[#E2E8F0] [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm
  [&_pre]:bg-[#1F2937] [&_pre]:text-gray-200 [&_pre]:rounded-xl [&_pre]:p-4 [&_pre]:overflow-x-auto [&_pre]:my-4
  [&_code]:font-mono [&_code]:text-sm
- [&_hr]:border-[#E8E2D9] [&_hr]:my-6
+ [&_hr]:border-[#E2E8F0] [&_hr]:my-6
  [&_figure]:my-4 [&_figure]:mx-auto
- [&_figcaption]:text-center [&_figcaption]:text-sm [&_figcaption]:text-[#8A8478] [&_figcaption]:mt-2
+ [&_figcaption]:text-center [&_figcaption]:text-sm [&_figcaption]:text-[#64748B] [&_figcaption]:mt-2
  [&_strong]:font-bold [&_em]:italic
  [&_mark]:bg-yellow-200 [&_mark]:px-1 [&_mark]:rounded"
  dangerouslySetInnerHTML={{ __html: lesson.content }}
@@ -591,16 +591,16 @@ function QuizRenderer({
 
  if (loading) {
  return (
- <div className="w-full p-12 flex flex-col items-center justify-center bg-[#FEFCF9] rounded-2xl border border-[#E8E2D9]">
- <div className="w-10 h-10 border-3 border-[#C0392B] border-t-transparent rounded-full animate-spin" />
- <span className="text-sm text-[#8A8478] font-medium mt-3">Đang tải bài kiểm tra...</span>
+ <div className="w-full p-12 flex flex-col items-center justify-center bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0]">
+ <div className="w-10 h-10 border-3 border-[#3B82F6] border-t-transparent rounded-full animate-spin" />
+ <span className="text-sm text-[#64748B] font-medium mt-3">Đang tải bài kiểm tra...</span>
  </div>
  );
  }
 
  if (error || !quizData || quizData.questions.length === 0) {
  return (
- <div className="w-full p-12 flex flex-col items-center justify-center text-gray-400 bg-[#FEFCF9] rounded-2xl border border-[#E8E2D9]">
+ <div className="w-full p-12 flex flex-col items-center justify-center text-gray-400 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0]">
  <></>
  <span className="text-sm font-medium mt-3">{error || "Bài kiểm tra chưa có câu hỏi."}</span>
  </div>
@@ -610,9 +610,9 @@ function QuizRenderer({
  // Result Phase
  if (submittingFinal) {
  return (
- <div className="w-full p-12 flex flex-col items-center justify-center bg-[#FEFCF9] rounded-2xl border border-[#E8E2D9]">
- <div className="w-10 h-10 border-3 border-[#C0392B] border-t-transparent rounded-full animate-spin" />
- <span className="text-sm text-[#8A8478] font-medium mt-3">Đang nộp bài...</span>
+ <div className="w-full p-12 flex flex-col items-center justify-center bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0]">
+ <div className="w-10 h-10 border-3 border-[#3B82F6] border-t-transparent rounded-full animate-spin" />
+ <span className="text-sm text-[#64748B] font-medium mt-3">Đang nộp bài...</span>
  </div>
  );
  }
@@ -630,23 +630,23 @@ function QuizRenderer({
           : Number(((scorePercent / 100) * 10).toFixed(1)));
 
     return (
-      <div className="w-full bg-white rounded-2xl border border-[#E8E2D9] shadow-sm p-8 flex flex-col items-center gap-6">
+      <div className="w-full bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-8 flex flex-col items-center gap-6">
         <div className={twMerge(
           "w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold",
-          passed ? "bg-[#FAF7F2] text-[#065F46]" : "bg-[#FAF7F2] text-[#C0392B]"
+          passed ? "bg-[#F8FAFC] text-[#065F46]" : "bg-[#F8FAFC] text-[#3B82F6]"
         )}>
           {passed ? <PartyPopper size={16} className="inline mr-1" /> : <AlertTriangle size={16} className="inline mr-1" />}
         </div>
 
-        <h2 className="text-2xl font-bold text-[#2C3039]">
+        <h2 className="text-2xl font-bold text-[#0F172A]">
           {passed ? "Chúc mừng! Bạn đã vượt qua!" : "Chưa đạt yêu cầu"}
         </h2>
 
         <div className="text-center space-y-1">
-          <p className="text-2xl font-extrabold text-[#2C3039]">
+          <p className="text-2xl font-extrabold text-[#0F172A]">
             {score10} / 10 điểm
           </p>
-          <p className="text-xs font-semibold text-[#8A8478]">
+          <p className="text-xs font-semibold text-[#64748B]">
             Tỷ lệ đạt: {scorePercent}% — Yêu cầu tối thiểu: {quizData?.passing_score}%
           </p>
           <p className="text-[11px] text-gray-400 mt-0.5">
@@ -656,11 +656,11 @@ function QuizRenderer({
 
         {/* Progress bar */}
         <div className="w-full max-w-xs">
-          <div className="w-full h-3 bg-[#F5F0E8] rounded-full overflow-hidden">
+          <div className="w-full h-3 bg-[#F1F5F9] rounded-full overflow-hidden">
             <div
               className={twMerge(
                 "h-full rounded-full transition-all duration-700",
-                passed ? "bg-[#059669]" : "bg-[#DC2626]"
+                passed ? "bg-[#059669]" : "bg-[#2563EB]"
               )}
               style={{ width: `${scorePercent}%` }}
             />
@@ -669,12 +669,12 @@ function QuizRenderer({
 
  {passed ? (
  <div className="flex flex-col items-center gap-3">
- <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FAF7F2] text-[#065F46] font-semibold text-sm">
+ <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F8FAFC] text-[#065F46] font-semibold text-sm">
  HOÀN THÀNH
  </div>
  <button
  onClick={handleRetry}
- className="px-4 py-2 text-sm text-[#2C3039] hover:text-[#A93226] font-medium transition-colors cursor-pointer"
+ className="px-4 py-2 text-sm text-[#0F172A] hover:text-[#2563EB] font-medium transition-colors cursor-pointer"
  >
  Làm lại để luyện tập
  </button>
@@ -682,7 +682,7 @@ function QuizRenderer({
  ) : (
  <button
  onClick={handleRetry}
- className="px-6 py-3 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white font-semibold text-sm transition-colors cursor-pointer shadow-sm"
+ className="px-6 py-3 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm transition-colors cursor-pointer shadow-sm"
  >
  Làm lại
  </button>
@@ -696,19 +696,19 @@ function QuizRenderer({
  const isLast = currentIndex === quizData.questions.length - 1;
 
  return (
- <div className="w-full bg-white rounded-2xl border border-[#E8E2D9] shadow-sm overflow-hidden">
+ <div className="w-full bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
  {/* Quiz Header */}
- <div className="flex items-center justify-between px-6 py-4 bg-[#FEFCF9] border-b border-[#E8E2D9]">
+ <div className="flex items-center justify-between px-6 py-4 bg-[#F8FAFC] border-b border-[#E2E8F0]">
  <div className="flex items-center gap-3">
- <span className="text-sm font-bold text-[#2C3039]">{quizData.title}</span>
- <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#F5F0E8] text-[#2C3039]">
+ <span className="text-sm font-bold text-[#0F172A]">{quizData.title}</span>
+ <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#F1F5F9] text-[#0F172A]">
  Câu {currentIndex + 1}/{quizData.questions.length}
  </span>
  </div>
  {timeLeft !== null && (
  <span className={twMerge(
  "text-sm font-semibold px-3 py-1 rounded-full",
- timeLeft < 60 ? "bg-[#FADBD8] text-[#C0392B] animate-pulse" : "bg-[#F5F0E8] text-[#8A8478]"
+ timeLeft < 60 ? "bg-[#EFF6FF] text-[#3B82F6] animate-pulse" : "bg-[#F1F5F9] text-[#64748B]"
  )}>
  {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
  </span>
@@ -717,39 +717,39 @@ function QuizRenderer({
 
  {/* Question */}
  <div className="p-6 sm:p-8">
-  <h3 className="text-lg font-bold text-[#2C3039] mb-6 leading-relaxed">
+  <h3 className="text-lg font-bold text-[#0F172A] mb-6 leading-relaxed">
   {question.content}
   </h3>
 
   {/* Answers - MCQ or Essay */}
   {((question as any).type === "essay" || !question.answers || question.answers.length === 0) ? (
   <div className="flex flex-col gap-3 mb-6">
-  <label className="text-xs font-bold text-[#2C3039]">Câu trả lời tự luận của bạn:</label>
+  <label className="text-xs font-bold text-[#0F172A]">Câu trả lời tự luận của bạn:</label>
   <textarea
   value={essayText}
   onChange={(e) => setEssayText(e.target.value)}
   disabled={answered}
   rows={4}
   placeholder="Nhập nội dung bài làm tự luận của bạn..."
-  className="w-full p-4 rounded-xl border border-[#E8E2D9] text-sm text-[#2C3039] focus:border-[#C0392B] focus:outline-none bg-white font-medium shadow-2xs"
+  className="w-full p-4 rounded-xl border border-[#E2E8F0] text-sm text-[#0F172A] focus:border-[#3B82F6] focus:outline-none bg-white font-medium shadow-2xs"
   />
 
   {answered && (
-  <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E8E2D9] flex flex-col gap-4 text-xs animate-fadeIn mt-2 shadow-2xs">
+  <div className="p-5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] flex flex-col gap-4 text-xs animate-fadeIn mt-2 shadow-2xs">
   {essayResult[question.id] ? (
-  <div className="flex flex-col gap-3 p-4 rounded-xl bg-white border border-[#E8E2D9] shadow-2xs">
+  <div className="flex flex-col gap-3 p-4 rounded-xl bg-white border border-[#E2E8F0] shadow-2xs">
     <div className="flex items-center justify-between pb-2 border-b border-gray-100">
       <div className="flex items-center gap-2">
-        <Bot size={16} className="text-[#A93226]" />
-        <span className="font-extrabold text-[#2C3039] text-sm">Kết quả đánh giá từ Gia sư AI (Gemini):</span>
+        <Bot size={16} className="text-[#2563EB]" />
+        <span className="font-extrabold text-[#0F172A] text-sm">Kết quả đánh giá từ Gia sư AI (Gemini):</span>
       </div>
       <div className="px-3 py-1 rounded-full bg-[#E8F8F0] text-[#27AE60] font-extrabold text-xs">
         <Target size={14} className="inline mr-1 text-[#27AE60]" /> Điểm: {essayResult[question.id].score} / {essayResult[question.id].max_score || (question as any).points || 2.5} điểm
       </div>
     </div>
 
-    <p className="text-[#8A8478] font-medium text-xs leading-relaxed bg-[#F5F0E8]/50 p-3 rounded-lg border border-[#E8E2D9]/60">
-      <MessageSquare size={14} className="inline mr-1 text-[#2C3039]" /> <strong>Nhận xét AI:</strong> {essayResult[question.id].feedback}
+    <p className="text-[#64748B] font-medium text-xs leading-relaxed bg-[#F1F5F9]/50 p-3 rounded-lg border border-[#E2E8F0]/60">
+      <MessageSquare size={14} className="inline mr-1 text-[#0F172A]" /> <strong>Nhận xét AI:</strong> {essayResult[question.id].feedback}
     </p>
 
     {Array.isArray(essayResult[question.id].ai_analysis?.matched_points) && essayResult[question.id].ai_analysis.matched_points.length > 0 && (
@@ -765,8 +765,8 @@ function QuizRenderer({
 
     {Array.isArray(essayResult[question.id].ai_analysis?.missing_points) && essayResult[question.id].ai_analysis.missing_points.length > 0 && (
       <div className="flex flex-col gap-1">
-        <span className="font-bold text-[#C0392B] text-[11px]"><AlertTriangle size={12} className="inline mr-1" /> Cần bổ sung / hoàn thiện:</span>
-        <ul className="list-disc list-inside text-[#A93226] text-xs space-y-0.5 pl-1">
+        <span className="font-bold text-[#3B82F6] text-[11px]"><AlertTriangle size={12} className="inline mr-1" /> Cần bổ sung / hoàn thiện:</span>
+        <ul className="list-disc list-inside text-[#2563EB] text-xs space-y-0.5 pl-1">
           {essayResult[question.id].ai_analysis.missing_points.map((pt: string, pIdx: number) => (
             <li key={pIdx}>{pt}</li>
           ))}
@@ -782,16 +782,16 @@ function QuizRenderer({
   )}
 
   <div className="flex flex-col gap-1.5">
-    <span className="text-[#2C3039] font-extrabold text-xs"><Lightbulb size={12} className="inline mr-1 text-[#D97706]" /> Đáp án tham khảo mẫu từ Giảng viên:</span>
-    <p className="text-[#8A8478] font-medium leading-relaxed whitespace-pre-line bg-white p-4 rounded-xl border border-[#E8E2D9] shadow-2xs">
+    <span className="text-[#0F172A] font-extrabold text-xs"><Lightbulb size={12} className="inline mr-1 text-[#D97706]" /> Đáp án tham khảo mẫu từ Giảng viên:</span>
+    <p className="text-[#64748B] font-medium leading-relaxed whitespace-pre-line bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-2xs">
       {(question as any).sample_answer || "Yêu cầu học viên phân tích đầy đủ các luận điểm chính trong bài học."}
     </p>
   </div>
 
   {(question as any).rubric && (
-  <div className="flex flex-col gap-1.5 pt-2 border-t border-[#E8E2D9]">
-  <span className="font-extrabold text-[#C0392B] text-xs"><ClipboardList size={12} className="inline mr-1 text-[#C0392B]" /> Thang điểm & Rubric chấm điểm:</span>
-  <p className="text-[#A93226] font-medium leading-relaxed whitespace-pre-line bg-[#FADBD8]/60 p-3.5 rounded-xl border border-[#C0392B]/20">
+  <div className="flex flex-col gap-1.5 pt-2 border-t border-[#E2E8F0]">
+  <span className="font-extrabold text-[#3B82F6] text-xs"><ClipboardList size={12} className="inline mr-1 text-[#3B82F6]" /> Thang điểm & Rubric chấm điểm:</span>
+  <p className="text-[#2563EB] font-medium leading-relaxed whitespace-pre-line bg-[#EFF6FF]/60 p-3.5 rounded-xl border border-[#3B82F6]/20">
     {(question as any).rubric}
   </p>
   </div>
@@ -804,14 +804,14 @@ function QuizRenderer({
   {question.answers.map((ans: any, idx: number) => {
   const letter = String.fromCharCode(65 + idx);
   const isSelected = selectedAnswer === ans.id;
-  let ansStyle = "bg-white border-[#E8E2D9] hover:border-[#C0392B] hover:bg-[#FEFCF9]";
+  let ansStyle = "bg-white border-[#E2E8F0] hover:border-[#2563EB] hover:bg-[#F8FAFC]";
 
   if (answered && isSelected) {
   ansStyle = answerResult
-  ? "bg-[#FAF7F2] border-[#34D399] text-[#065F46]"
-  : "bg-[#FAF7F2] border-[#F87171] text-[#C0392B]";
+  ? "bg-[#F8FAFC] border-[#34D399] text-[#065F46]"
+  : "bg-[#F8FAFC] border-[#60A5FA] text-[#3B82F6]";
   } else if (isSelected) {
-  ansStyle = "bg-[#F5F0E8] border-[#C0392B]";
+  ansStyle = "bg-[#F1F5F9] border-[#3B82F6]";
   }
 
   return (
@@ -827,10 +827,10 @@ function QuizRenderer({
   >
   <span className={twMerge(
   "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 border-2",
-  isSelected && !answered ? "bg-[#C0392B] text-white border-[#C0392B]" :
+  isSelected && !answered ? "bg-[#3B82F6] text-white border-[#3B82F6]" :
   answered && isSelected && answerResult ? "bg-[#059669] text-white border-[#059669]" :
-  answered && isSelected && !answerResult ? "bg-[#DC2626] text-white border-[#DC2626]" :
-  "bg-[#F5F0E8] text-[#8A8478] border-[#E8E2D9]"
+  answered && isSelected && !answerResult ? "bg-[#2563EB] text-white border-[#2563EB]" :
+  "bg-[#F1F5F9] text-[#64748B] border-[#E2E8F0]"
   )}>
   {letter}
   </span>
@@ -845,7 +845,7 @@ function QuizRenderer({
   {answered && !((question as any).type === "essay" || !question.answers || question.answers.length === 0) && (
   <div className={twMerge(
   "p-4 rounded-xl mb-4 text-sm font-semibold",
-  answerResult ? "bg-[#FAF7F2] text-[#065F46]" : "bg-[#FAF7F2] text-[#C0392B]"
+  answerResult ? "bg-[#F8FAFC] text-[#065F46]" : "bg-[#F8FAFC] text-[#3B82F6]"
   )}>
   {answerResult ? " Chính xác!" : " Chưa đúng. Hãy cố gắng ở câu tiếp theo!"}
   </div>
@@ -861,7 +861,7 @@ function QuizRenderer({
       ? (!essayText.trim() || submitting)
       : (!selectedAnswer || submitting)
   }
-  className="px-6 py-2.5 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white font-semibold text-sm transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm flex items-center gap-2"
+  className="px-6 py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm flex items-center gap-2"
   >
   {submitting ? (
     ((question as any).type === "essay" || !question.answers || question.answers.length === 0)
@@ -872,7 +872,7 @@ function QuizRenderer({
  ) : (
  <button
  onClick={handleNext}
- className="px-6 py-2.5 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white font-semibold text-sm transition-colors cursor-pointer shadow-sm flex items-center gap-2"
+ className="px-6 py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm transition-colors cursor-pointer shadow-sm flex items-center gap-2"
  >
  {isLast ? "Hoàn thành" : "Câu tiếp theo"}
  <></>
@@ -1126,11 +1126,11 @@ function LessonWorkspaceContent() {
 
  if (!parsedCourseId || parsedCourseId <= 0) {
  return (
- <div className="w-full h-screen flex flex-col items-center justify-center bg-[#FEFCF9] p-6">
- <div className="bg-white p-8 rounded-3xl shadow-sm max-w-md w-full text-center border border-[#E8E2D9]">
- <h2 className="text-xl font-bold text-[#2C3039] mb-2">Không tìm thấy khóa học</h2>
- <p className="text-sm text-[#8A8478] mb-6">Vui lòng chọn một khóa học để bắt đầu học.</p>
- <a href="/courses" className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white font-semibold transition-all shadow-sm">
+ <div className="w-full h-screen flex flex-col items-center justify-center bg-[#F8FAFC] p-6">
+ <div className="bg-white p-8 rounded-3xl shadow-sm max-w-md w-full text-center border border-[#E2E8F0]">
+ <h2 className="text-xl font-bold text-[#0F172A] mb-2">Không tìm thấy khóa học</h2>
+ <p className="text-sm text-[#64748B] mb-6">Vui lòng chọn một khóa học để bắt đầu học.</p>
+ <a href="/courses" className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold transition-all shadow-sm">
  Xem danh sách khóa học
  </a>
  </div>
@@ -1139,7 +1139,7 @@ function LessonWorkspaceContent() {
  }
 
  if (!activeLesson) {
- return <div className="p-12 text-center text-[#8A8478]">Không tìm thấy bài học nào cho khóa này.</div>;
+ return <div className="p-12 text-center text-[#64748B]">Không tìm thấy bài học nào cho khóa này.</div>;
  }
 
  // Course title from API
@@ -1148,14 +1148,14 @@ function LessonWorkspaceContent() {
  // Render check for enrollment
  if (apiDetail && !apiDetail.header_info?.is_enrolled && !isPreview) {
  return (
- <div className="w-full h-screen flex flex-col items-center justify-center bg-[#FEFCF9] p-6">
- <div className="bg-white p-8 rounded-3xl shadow-sm max-w-md w-full text-center border border-[#E8E2D9]">
+ <div className="w-full h-screen flex flex-col items-center justify-center bg-[#F8FAFC] p-6">
+ <div className="bg-white p-8 rounded-3xl shadow-sm max-w-md w-full text-center border border-[#E2E8F0]">
  
- <h2 className="text-xl font-bold text-[#2C3039] mb-2">Bạn chưa đăng ký khóa học này</h2>
- <p className="text-sm text-[#8A8478] mb-6">Hãy đăng ký khóa học để bắt đầu học và trải nghiệm toàn bộ nội dung.</p>
+ <h2 className="text-xl font-bold text-[#0F172A] mb-2">Bạn chưa đăng ký khóa học này</h2>
+ <p className="text-sm text-[#64748B] mb-6">Hãy đăng ký khóa học để bắt đầu học và trải nghiệm toàn bộ nội dung.</p>
  <Link
  href={`/courses/detail?courseId=${parsedCourseId}`}
- className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white font-semibold transition-all shadow-sm"
+ className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold transition-all shadow-sm"
  >
  Xem khóa học
  </Link>
@@ -1168,13 +1168,13 @@ function LessonWorkspaceContent() {
     <div className="flex flex-col min-h-screen bg-white pb-24 relative">
       {/* ─── Instructor Preview Mode Sticky Banner ─── */}
       {isPreview && (
-        <div className="sticky top-0 z-50 bg-[#2C3039] text-white px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md border-b border-black animate-fadeIn">
+        <div className="sticky top-0 z-50 bg-[#0F172A] text-white px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md border-b border-black animate-fadeIn">
           <div className="flex items-center gap-3">
-            <span className="px-2.5 py-0.5 rounded bg-[#C0392B] text-white text-[10px] font-black uppercase tracking-wider shadow-xs">
-              <Eye size={12} className="inline mr-1 text-[#C0392B]" /> CHẾ ĐỘ XEM TRƯỚC
+            <span className="px-2.5 py-0.5 rounded bg-[#3B82F6] text-white text-[10px] font-black uppercase tracking-wider shadow-xs">
+              <Eye size={12} className="inline mr-1 text-[#3B82F6]" /> CHẾ ĐỘ XEM TRƯỚC
             </span>
             <span className="text-xs font-bold text-gray-200">
-              <GraduationCap size={14} className="inline mr-1 text-[#2C3039]" /> Giao diện Học viên - Giảng viên trải nghiệm Video, Bài đọc &amp; Thi thử Quiz (Dữ liệu tiến độ &amp; bài thi không lưu vào hệ thống)
+              <GraduationCap size={14} className="inline mr-1 text-[#0F172A]" /> Giao diện Học viên - Giảng viên trải nghiệm Video, Bài đọc &amp; Thi thử Quiz (Dữ liệu tiến độ &amp; bài thi không lưu vào hệ thống)
             </span>
           </div>
           <button
@@ -1194,29 +1194,29 @@ function LessonWorkspaceContent() {
       )}
 
       {/* ─── Top Header & Breadcrumb ─── */}
-      <header className="w-full bg-white border-b border-[#E8E2D9] px-6 py-4 sticky top-0 z-30 shadow-2xs">
+      <header className="w-full bg-white border-b border-[#E2E8F0] px-6 py-4 sticky top-0 z-30 shadow-2xs">
  <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
  <div className="flex items-center gap-3 min-w-0">
  <Link
  href={`/courses/detail?courseId=${parsedCourseId}`}
- className="w-9 h-9 rounded-xl bg-white border border-[#E8E2D9] hover:bg-[#FEFCF9] flex items-center justify-center text-[#8A8478] hover:text-[#2C3039] transition-colors shrink-0 text-decoration-none shadow-2xs"
+ className="w-9 h-9 rounded-xl bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] flex items-center justify-center text-[#64748B] hover:text-[#0F172A] transition-colors shrink-0 text-decoration-none shadow-2xs"
  title="Quay lại chi tiết Khóa học"
  >
  <></>
  </Link>
  <div className="min-w-0">
- <nav className="flex items-center gap-2 text-[13px] font-medium text-[#8A8478] mb-0.5 truncate">
- <Link href="/courses" className="hover:text-[#2C3039] transition-colors text-decoration-none">Khoá học</Link>
+ <nav className="flex items-center gap-2 text-[13px] font-medium text-[#64748B] mb-0.5 truncate">
+ <Link href="/courses" className="hover:text-[#0F172A] transition-colors text-decoration-none">Khoá học</Link>
  <></>
- <span className="text-[#2C3039] font-semibold truncate">{courseTitle}</span>
+ <span className="text-[#0F172A] font-semibold truncate">{courseTitle}</span>
  </nav>
- <h1 className="text-base sm:text-lg font-bold text-[#2C3039] truncate">{activeLesson.title}</h1>
+ <h1 className="text-base sm:text-lg font-bold text-[#0F172A] truncate">{activeLesson.title}</h1>
  </div>
  </div>
 
  <div className="flex items-center gap-3 shrink-0">
- <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#F5F0E8] text-[#2C3039]">
- <span className="w-2 h-2 rounded-full bg-[#C0392B]" />
+ <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#F1F5F9] text-[#0F172A]">
+ <span className="w-2 h-2 rounded-full bg-[#3B82F6]" />
  <span>Tiến độ: {computedProgressPercentage}% ({completedCount}/{totalLessonCount} bài)</span>
  </div>
  </div>
@@ -1230,17 +1230,17 @@ function LessonWorkspaceContent() {
  <main className="lg:col-span-8 flex flex-col gap-6 w-full min-w-0">
 
  {/* AI Notice */}
- <div className="w-full p-4 rounded-xl bg-[#F5F0E8] border border-[#C7D2FE] flex items-center justify-between gap-3 text-[#2C3039]">
+ <div className="w-full p-4 rounded-xl bg-[#F1F5F9] border border-[#C7D2FE] flex items-center justify-between gap-3 text-[#0F172A]">
  <div className="flex items-center gap-2.5 min-w-0">
- <span className="w-2 h-2 rounded-full bg-[#C0392B] shrink-0" />
- <span className="text-[#2C3039] font-bold text-xs sm:text-sm shrink-0">Gia sư AI Nova:</span>
- <span className="text-xs sm:text-sm text-[#8A8478] truncate">
+ <span className="w-2 h-2 rounded-full bg-[#3B82F6] shrink-0" />
+ <span className="text-[#0F172A] font-bold text-xs sm:text-sm shrink-0">Gia sư AI Nova:</span>
+ <span className="text-xs sm:text-sm text-[#64748B] truncate">
  {activeLesson.type === 'video' ? "Video bài giảng nhúng trực tiếp. Hãy theo dõi thực hành mã nguồn ở các thẻ Tab phía dưới!" :
  activeLesson.type === 'article' ? "Đọc kỹ nội dung bài học. Thời gian đọc sẽ được ghi nhận tự động." :
  "Hãy hoàn thành bài kiểm tra để đánh giá kiến thức của bạn!"}
  </span>
  </div>
- <span className="hidden sm:inline-block px-2.5 py-1 rounded text-[10px] font-bold bg-[#C0392B] text-white tracking-wider uppercase shrink-0">
+ <span className="hidden sm:inline-block px-2.5 py-1 rounded text-[10px] font-bold bg-[#3B82F6] text-white tracking-wider uppercase shrink-0">
  {activeLesson.type === 'video' ? '4K STREAM' : activeLesson.type === 'article' ? 'VĂN BẢN' : 'KIỂM TRA'}
  </span>
  </div>
@@ -1264,13 +1264,13 @@ function LessonWorkspaceContent() {
  )}
 
  {/* ─── Tabs: Content Info / AI / Discussion ─── */}
- <div className="bg-white rounded-2xl border border-[#E8E2D9] shadow-sm overflow-hidden">
- <div className="flex items-center border-b border-[#E8E2D9] px-6 gap-6 bg-white overflow-x-auto">
+ <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
+ <div className="flex items-center border-b border-[#E2E8F0] px-6 gap-6 bg-white overflow-x-auto">
  <button
  onClick={() => setActiveTab("content")}
  className={twMerge(
  "py-3.5 font-semibold text-xs sm:text-sm border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 focus:outline-none",
- activeTab === "content" ? "border-[#C0392B] text-[#2C3039]" : "border-transparent text-[#8A8478] hover:text-[#2C3039]"
+ activeTab === "content" ? "border-[#3B82F6] text-[#0F172A]" : "border-transparent text-[#64748B] hover:text-[#0F172A]"
  )}
  >
  <span>Nội dung & Mã nguồn</span>
@@ -1279,21 +1279,21 @@ function LessonWorkspaceContent() {
  onClick={() => setActiveTab("ai_tips")}
  className={twMerge(
  "py-3.5 font-semibold text-xs sm:text-sm border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 focus:outline-none",
- activeTab === "ai_tips" ? "border-[#C0392B] text-[#2C3039]" : "border-transparent text-[#8A8478] hover:text-[#2C3039]"
+ activeTab === "ai_tips" ? "border-[#3B82F6] text-[#0F172A]" : "border-transparent text-[#64748B] hover:text-[#0F172A]"
  )}
  >
  <span>Cố vấn AI Nova</span>
- <span className="px-2 py-0.5 rounded-full bg-[#F5F0E8] text-[#2C3039] text-[10px] font-bold">0</span>
+ <span className="px-2 py-0.5 rounded-full bg-[#F1F5F9] text-[#0F172A] text-[10px] font-bold">0</span>
  </button>
  <button
  onClick={() => setActiveTab("discussion")}
  className={twMerge(
  "py-3.5 font-semibold text-xs sm:text-sm border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 focus:outline-none",
- activeTab === "discussion" ? "border-[#C0392B] text-[#2C3039]" : "border-transparent text-[#8A8478] hover:text-[#2C3039]"
+ activeTab === "discussion" ? "border-[#3B82F6] text-[#0F172A]" : "border-transparent text-[#64748B] hover:text-[#0F172A]"
  )}
  >
  <span>Thảo luận & Ghi chú</span>
- <span className="px-2 py-0.5 rounded-full bg-[#F5F0E8] text-[#8A8478] text-[10px] font-bold">{apiDiscussions?.length || 0}</span>
+ <span className="px-2 py-0.5 rounded-full bg-[#F1F5F9] text-[#64748B] text-[10px] font-bold">{apiDiscussions?.length || 0}</span>
  </button>
  </div>
 
@@ -1305,15 +1305,15 @@ function LessonWorkspaceContent() {
  <span className={twMerge("inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold", getLessonTypeColor(activeLesson.type))}>
  {getLessonTypeLabel(activeLesson.type)}
  </span>
- <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#F5F0E8] text-[#8A8478]">
+ <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#F1F5F9] text-[#64748B]">
  <span>Thời lượng:</span> {activeLesson.duration}
  </span>
  {activeLesson.completed ? (
- <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-[#FAF7F2] text-[#065F46]">
+ <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-[#F8FAFC] text-[#065F46]">
  HOÀN THÀNH
  </span>
  ) : (
- <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-[#F5F0E8] text-[#2C3039]">
+ <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-[#F1F5F9] text-[#0F172A]">
  Đang học
  </span>
  )}
@@ -1324,11 +1324,11 @@ function LessonWorkspaceContent() {
  {/* Tab 2: AI Tips */}
  {activeTab === "ai_tips" && (
  <div className="flex flex-col gap-5">
- <div className="p-4 rounded-xl bg-[#FEFCF9] border border-[#E8E2D9] flex items-center gap-4">
+ <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center gap-4">
  <span className="text-2xl"></span>
  <div>
- <h3 className="font-bold text-[#2C3039] text-sm sm:text-base">Phân tích chuyên sâu từ MindNova Co-Pilot</h3>
- <p className="text-xs sm:text-sm text-[#8A8478]">Các lưu ý chuyên môn được đúc kết từ thực tiễn.</p>
+ <h3 className="font-bold text-[#0F172A] text-sm sm:text-base">Phân tích chuyên sâu từ MindNova Co-Pilot</h3>
+ <p className="text-xs sm:text-sm text-[#64748B]">Các lưu ý chuyên môn được đúc kết từ thực tiễn.</p>
  </div>
  </div>
  </div>
@@ -1337,17 +1337,17 @@ function LessonWorkspaceContent() {
  {/* Tab 3: Discussion */}
  {activeTab === "discussion" && (
  <div className="flex flex-col gap-6">
- <form onSubmit={handlePostComment} className="flex flex-col gap-3 p-5 rounded-xl bg-[#FEFCF9] border border-[#E8E2D9]">
- <h4 className="font-semibold text-sm text-[#2C3039]">Gửi câu hỏi cho Gia sư AI hoặc thảo luận cùng lớp học</h4>
+ <form onSubmit={handlePostComment} className="flex flex-col gap-3 p-5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+ <h4 className="font-semibold text-sm text-[#0F172A]">Gửi câu hỏi cho Gia sư AI hoặc thảo luận cùng lớp học</h4>
  <textarea
  rows={3}
  value={newCommentText}
  onChange={(e) => setNewCommentText(e.target.value)}
  placeholder="Nhập câu hỏi hoặc ghi chú học tập cá nhân..."
- className="w-full p-3.5 rounded-xl border border-[#E8E2D9] bg-white text-[#2C3039] text-sm placeholder:text-[#8A8478] focus:outline-none focus:border-[#C0392B] focus:ring-2 focus:ring-[#C0392B]/20 transition-all resize-none"
+ className="w-full p-3.5 rounded-xl border border-[#E2E8F0] bg-white text-[#0F172A] text-sm placeholder:text-[#64748B] focus:outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 transition-all resize-none"
  />
  <div className="flex justify-end">
- <button disabled={isSubmittingDiscussion} type="submit" className="px-5 py-2.5 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-sm">
+ <button disabled={isSubmittingDiscussion} type="submit" className="px-5 py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-sm">
  {isSubmittingDiscussion ? "Đang gửi..." : "Gửi thảo luận"}
  </button>
  </div>
@@ -1355,7 +1355,7 @@ function LessonWorkspaceContent() {
 
  <div className="flex flex-col gap-4">
  {isDiscussionsLoading ? (
- <div className="p-8 text-center text-[#8A8478]">Đang tải thảo luận...</div>
+ <div className="p-8 text-center text-[#64748B]">Đang tải thảo luận...</div>
  ) : apiDiscussions?.length === 0 ? (
  <div className="py-6">
  <NoDataAvailable
@@ -1370,18 +1370,18 @@ function LessonWorkspaceContent() {
  <div key={item.id} className="flex flex-col gap-3">
  {/* Student Question */}
  {editingDiscussionId === item.id ? (
- <form onSubmit={(e) => handleEditDiscussionSubmit(e, item.id)} className="p-4 sm:p-5 rounded-xl border border-[#E8E2D9] bg-white flex flex-col gap-3">
+ <form onSubmit={(e) => handleEditDiscussionSubmit(e, item.id)} className="p-4 sm:p-5 rounded-xl border border-[#E2E8F0] bg-white flex flex-col gap-3">
  <textarea
  value={editDiscussionText}
  onChange={(e) => setEditDiscussionText(e.target.value)}
  rows={3}
- className="w-full resize-none rounded-xl border border-[var(--border-color)] bg-white px-4 py-3 text-sm text-[#2C3039] outline-none focus:border-[var(--primary-color)]"
+ className="w-full resize-none rounded-xl border border-[var(--border-color)] bg-white px-4 py-3 text-sm text-[#0F172A] outline-none focus:border-[var(--primary-color)]"
  />
  <div className="flex justify-end gap-2">
  <button
  type="button"
  onClick={() => setEditingDiscussionId(null)}
- className="rounded-xl border border-[var(--border-color)] px-4 py-2 text-xs font-semibold text-[#8A8478] hover:bg-[#FEFCF9]"
+ className="rounded-xl border border-[var(--border-color)] px-4 py-2 text-xs font-semibold text-[#64748B] hover:bg-[#F8FAFC]"
  >
  Hủy
  </button>
@@ -1401,12 +1401,12 @@ function LessonWorkspaceContent() {
  </div>
  <div className="flex-1 min-w-0">
  <div className="flex items-center justify-between gap-2 mb-1">
- <span className="font-bold text-sm text-[#2C3039]">{item.student.name}</span>
+ <span className="font-bold text-sm text-[#0F172A]">{item.student.name}</span>
  <div className="flex items-center gap-2">
- <span className="text-xs text-[#8A8478]">{new Date(item.created_at).toLocaleString('vi-VN')}</span>
+ <span className="text-xs text-[#64748B]">{new Date(item.created_at).toLocaleString('vi-VN')}</span>
  <button
  onClick={() => handleEditDiscussion(item.id, item.content)}
- className="text-xs font-semibold text-[#2C3039] hover:text-[var(--primary-hover)] transition-colors"
+ className="text-xs font-semibold text-[#0F172A] hover:text-[var(--primary-hover)] transition-colors"
  >
  Sửa
  </button>
@@ -1419,7 +1419,7 @@ function LessonWorkspaceContent() {
  </button>
  </div>
  </div>
- <p className="text-xs sm:text-sm text-[#8A8478] leading-relaxed">{item.content}</p>
+ <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">{item.content}</p>
  </div>
  </div>
  )}
@@ -1432,14 +1432,14 @@ function LessonWorkspaceContent() {
  </div>
  <div className="flex-1 min-w-0">
  <div className="flex items-center justify-between gap-2 mb-1">
- <span className="font-bold text-sm text-[#2C3039] flex items-center gap-1.5">
+ <span className="font-bold text-sm text-[#0F172A] flex items-center gap-1.5">
  <span>{reply.user.name}</span>
  <VerifiedTeacherBadge isVerified={(reply.user as any).is_verified ?? true} size="xs" />
  <span className="px-2 py-0.5 rounded text-[10px] font-bold text-white bg-[var(--primary-color)] uppercase tracking-wider">Giảng viên</span>
  </span>
- <span className="text-xs text-[#8A8478]">{new Date(reply.created_at).toLocaleString('vi-VN')}</span>
+ <span className="text-xs text-[#64748B]">{new Date(reply.created_at).toLocaleString('vi-VN')}</span>
  </div>
- <p className="text-xs sm:text-sm text-[#8A8478] leading-relaxed">{reply.content}</p>
+ <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">{reply.content}</p>
  </div>
  </div>
  ))}
@@ -1460,17 +1460,17 @@ function LessonWorkspaceContent() {
  <div className="bg-white rounded-2xl border border-[var(--border-color)] shadow-sm p-5 flex flex-col gap-3.5 shrink-0">
  <div className="flex items-center justify-between">
  <div>
- <h2 className="text-[17px] font-extrabold text-[#2C3039] flex items-center gap-2">
+ <h2 className="text-[17px] font-extrabold text-[#0F172A] flex items-center gap-2">
  <span>Lộ trình Học tập</span>
  </h2>
- <p className="text-[12px] font-medium text-[#8A8478] mt-0.5">Tiến trình hoàn thành toàn khóa</p>
+ <p className="text-[12px] font-medium text-[#64748B] mt-0.5">Tiến trình hoàn thành toàn khóa</p>
  </div>
- <span className="text-xs font-bold text-[#2C3039] bg-[var(--bg-light)] border border-[var(--primary-light)]/60 px-3 py-1.5 rounded-full shrink-0 shadow-2xs">
+ <span className="text-xs font-bold text-[#0F172A] bg-[var(--bg-light)] border border-[var(--primary-light)]/60 px-3 py-1.5 rounded-full shrink-0 shadow-2xs">
  {completedCount}/{totalLessonCount} Bài học
  </span>
  </div>
  <div className="w-full h-2.5 bg-[var(--bg-light)] rounded-full overflow-hidden p-0.5 border border-[var(--border-color)]">
- <div className="h-full bg-[var(--primary-color)] rounded-full transition-all duration-700 shadow-[0_0_8px_rgba(79,70,229,0.35)]" style={{ width: `${computedProgressPercentage}%` }} />
+ <div className="h-full bg-[var(--primary-color)] rounded-full transition-all duration-700 shadow-[0_0_8px_rgba(37, 99, 235,0.35)]" style={{ width: `${computedProgressPercentage}%` }} />
  </div>
  </div>
 
@@ -1493,29 +1493,29 @@ function LessonWorkspaceContent() {
  {/* Module Header */}
  <div
  onClick={() => toggleModule(mod.id)}
- className="flex items-start justify-between p-4.5 cursor-pointer hover:bg-[#FEFCF9]/70 transition-colors group select-none"
+ className="flex items-start justify-between p-4.5 cursor-pointer hover:bg-[#F8FAFC]/70 transition-colors group select-none"
  >
  <div className="flex items-start gap-3.5 min-w-0 pr-2">
  <div className={twMerge(
  "w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shrink-0 mt-0.5 transition-all shadow-2xs",
  isModuleCompleted ? "bg-[var(--primary-color)] text-white" :
- isModuleCurrent ? "bg-white border-2 border-[var(--primary-color)] text-[#2C3039]" :
- "bg-gray-100 text-[#8A8478]"
+ isModuleCurrent ? "bg-white border-2 border-[var(--primary-color)] text-[#0F172A]" :
+ "bg-gray-100 text-[#64748B]"
  )}>
  {isModuleCompleted ? "" : moduleIndex + 1}
  </div>
  <div className="min-w-0 flex-1">
- <p className="text-[11px] font-bold uppercase tracking-wider text-[#2C3039] truncate">{mod.title}</p>
- <h3 className="text-[15px] font-bold text-[#2C3039] mt-1 leading-snug">Nhiều bài học</h3>
+ <p className="text-[11px] font-bold uppercase tracking-wider text-[#0F172A] truncate">{mod.title}</p>
+ <h3 className="text-[15px] font-bold text-[#0F172A] mt-1 leading-snug">Nhiều bài học</h3>
  <div className="flex items-center gap-2 mt-2">
- <span className="text-[12px] font-semibold text-[#8A8478]">
+ <span className="text-[12px] font-semibold text-[#64748B]">
  {modCompletedCount}/{mod.lessons.length} bài đã học
  </span>
  {isModuleCurrent && <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary-color)]" />}
  </div>
  </div>
  </div>
- <button className="text-[#8A8478] group-hover:text-[#2C3039] transition-colors p-1 shrink-0">
+ <button className="text-[#64748B] group-hover:text-[#0F172A] transition-colors p-1 shrink-0">
  ↕
  </button>
  </div>
@@ -1533,7 +1533,7 @@ function LessonWorkspaceContent() {
  onClick={() => handleSelectLesson(lesson.id)}
  className={twMerge(
  "flex items-center justify-between py-3 px-3.5 rounded-xl relative cursor-pointer transition-all duration-150 border",
- isCurrent ? "bg-[var(--bg-light)] border-[var(--primary-light)] shadow-xs" : "bg-white border-[var(--border-color)]/60 hover:border-[var(--border-color)] hover:bg-[#FEFCF9]"
+ isCurrent ? "bg-[var(--bg-light)] border-[var(--primary-light)] shadow-xs" : "bg-white border-[var(--border-color)]/60 hover:border-[var(--border-color)] hover:bg-[#F8FAFC]"
  )}
  >
  {isCurrent && <div className="absolute left-0 top-2 bottom-2 w-[3.5px] bg-[var(--primary-color)] rounded-r-full" />}
@@ -1541,9 +1541,9 @@ function LessonWorkspaceContent() {
  <div className="flex items-center gap-3 min-w-0 pr-2">
  <div className={twMerge(
  "w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all",
- isCompleted ? "bg-[#C0392B] text-white shadow-2xs" :
- isCurrent ? "bg-white border-2 border-[#C0392B] text-[#2C3039]" :
- "border-2 border-gray-300 text-transparent bg-[#FEFCF9]"
+ isCompleted ? "bg-[#3B82F6] text-white shadow-2xs" :
+ isCurrent ? "bg-white border-2 border-[#3B82F6] text-[#0F172A]" :
+ "border-2 border-gray-300 text-transparent bg-[#F8FAFC]"
  )}>
  {isCompleted ? "" : isCurrent ? "▶" : <span className="w-1.5 h-1.5 rounded-full bg-gray-300" />}
  </div>
@@ -1551,7 +1551,7 @@ function LessonWorkspaceContent() {
  <div className="min-w-0 flex-1">
  <h4 className={twMerge(
  "text-[13.5px] sm:text-[14px] leading-snug truncate",
- isCurrent ? "text-[#2C3039] font-extrabold" : "text-[#2C3039] font-bold"
+ isCurrent ? "text-[#0F172A] font-extrabold" : "text-[#0F172A] font-bold"
  )}>
  {lesson.title}
  </h4>
@@ -1563,16 +1563,16 @@ function LessonWorkspaceContent() {
  )}>
  {getLessonTypeLabel(lesson.type)}
  </span>
- <span className="text-[11px] font-medium text-[#8A8478]"> {lesson.duration}</span>
+ <span className="text-[11px] font-medium text-[#64748B]"> {lesson.duration}</span>
  {/* Status Badge */}
  {isCurrent && !isCompleted && (
- <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-black text-[#2C3039] bg-white border border-[#A5B4FC] uppercase tracking-wider shadow-2xs">
- <span className="w-1.5 h-1.5 rounded-full bg-[#2C3039] animate-pulse" />
+ <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-black text-[#0F172A] bg-white border border-[#A5B4FC] uppercase tracking-wider shadow-2xs">
+ <span className="w-1.5 h-1.5 rounded-full bg-[#0F172A] animate-pulse" />
  ĐANG HỌC
  </span>
  )}
  {isCompleted && (
- <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-black text-[#2C3039] bg-[#FAF7F2] border border-[#6EE7B7] uppercase tracking-wider">
+ <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-black text-[#0F172A] bg-[#F8FAFC] border border-[#6EE7B7] uppercase tracking-wider">
  HOÀN THÀNH
  </span>
  )}
@@ -1580,9 +1580,9 @@ function LessonWorkspaceContent() {
  </div>
  </div>
 
- <div className="shrink-0 text-[#8A8478]">
+ <div className="shrink-0 text-[#64748B]">
  {isCurrent ? (
- <span className="w-2.5 h-2.5 rounded-full bg-[#C0392B] inline-block animate-ping" />
+ <span className="w-2.5 h-2.5 rounded-full bg-[#3B82F6] inline-block animate-ping" />
  ) : (
  <></>
  )}
@@ -1600,12 +1600,12 @@ function LessonWorkspaceContent() {
  </div>
 
  {/* ─── Sticky Bottom Toolbar ─── */}
- <footer className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#E8E2D9] px-6 py-3.5 z-40 shadow-sm">
+ <footer className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#E2E8F0] px-6 py-3.5 z-40 shadow-sm">
  <div className="max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-4">
  <button
  onClick={handleGoPrevious}
  disabled={!hasPrevious}
- className="flex items-center gap-2 px-5 py-2 rounded-xl border border-[#E8E2D9] bg-white hover:bg-[#FEFCF9] text-[#8A8478] font-semibold text-xs sm:text-sm transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm"
+ className="flex items-center gap-2 px-5 py-2 rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#64748B] font-semibold text-xs sm:text-sm transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm"
  >
  <></>
  <span>Bài trước</span>
@@ -1613,13 +1613,13 @@ function LessonWorkspaceContent() {
 
  {/* Completion status indicator — no manual "Mark Complete" */}
  {activeLesson.completed ? (
- <div className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#FAF7F2] text-[#065F46] font-semibold text-xs sm:text-sm border border-[#6EE7B7]">
+ <div className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#F8FAFC] text-[#065F46] font-semibold text-xs sm:text-sm border border-[#6EE7B7]">
  <></>
  <span>Đã hoàn thành</span>
  </div>
  ) : (
- <div className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#F5F0E8] text-[#2C3039] font-semibold text-xs sm:text-sm border border-[#C7D2FE]">
- <span className="w-2 h-2 rounded-full bg-[#C0392B] animate-pulse" />
+ <div className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#F1F5F9] text-[#0F172A] font-semibold text-xs sm:text-sm border border-[#C7D2FE]">
+ <span className="w-2 h-2 rounded-full bg-[#3B82F6] animate-pulse" />
  <span>Đang học — hoàn thành tự động</span>
  </div>
  )}
@@ -1646,7 +1646,7 @@ function LessonWorkspaceContent() {
           toast.error("Bài kiểm tra tổng quát hiện chưa được giáo viên thiết lập cho khóa học này.");
         }
       }}
-      className="flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-[#2C3039] bg-[#FEFCF9] border border-[#E8E2D9] hover:bg-[#F5F0E8] transition-all cursor-pointer shadow-2xs"
+      className="flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-[#0F172A] bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-[#F1F5F9] transition-all cursor-pointer shadow-2xs"
       title={
         assessmentStatus?.general_quiz?.is_passed
           ? `Đã đạt (${assessmentStatus.general_quiz.best_score}/10) - Bấm để làm lại`
@@ -1722,7 +1722,7 @@ function LessonWorkspaceContent() {
   <button
     onClick={handleGoNext}
     disabled={!hasNext}
-    className="flex items-center gap-2 px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#C0392B] hover:bg-[#A93226] transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm"
+    className="flex items-center gap-2 px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm"
   >
     <span>Bài tiếp theo</span>
   </button>
@@ -1736,7 +1736,7 @@ function LessonWorkspaceContent() {
 // ─── Exported Master Component ────────────────────────────────────────────────
 export function LessonWorkspace() {
  return (
- <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center font-semibold text-[#8A8478]">Đang tải khoá học Trợ lý AI MindNova...</div>}>
+ <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center font-semibold text-[#64748B]">Đang tải khoá học Trợ lý AI MindNova...</div>}>
  <LessonWorkspaceContent />
  </Suspense>
  );

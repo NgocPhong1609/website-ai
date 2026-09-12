@@ -242,11 +242,11 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  
  {/* Header */}
  <div className="flex items-center justify-between px-6 py-4 border-b border-[#F0F0F8]">
- <h2 className="text-[16px] font-bold text-[#2C3039]">Chỉnh sửa bài học</h2>
+ <h2 className="text-[16px] font-bold text-[#0F172A]">Chỉnh sửa bài học</h2>
  <button 
  type="button" 
  onClick={handleClose}
- className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8A8478] hover:bg-[#E8E2D9] transition-colors"
+ className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#E2E8F0] transition-colors"
  >
  
  </button>
@@ -256,20 +256,20 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-6">
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  <div className="flex flex-col gap-1.5">
- <label className="text-sm font-semibold text-[#2C3039]">Tên bài học</label>
+ <label className="text-sm font-semibold text-[#0F172A]">Tên bài học</label>
  <input
  type="text"
  value={title}
  onChange={(e) => setTitle(e.target.value)}
- className="w-full px-4 py-2.5 rounded-xl text-sm border border-[#E8E2D9] focus:border-[#E8E2D9] focus:ring-2 focus:ring-[#C0392B]/20 outline-none transition-all"
+ className="w-full px-4 py-2.5 rounded-xl text-sm border border-[#E2E8F0] focus:border-[#E2E8F0] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none transition-all"
  />
  </div>
  <div className="flex flex-col gap-1.5">
- <label className="text-sm font-semibold text-[#2C3039]">Loại bài học</label>
+ <label className="text-sm font-semibold text-[#0F172A]">Loại bài học</label>
  <select
  value={type}
  onChange={(e) => setType(e.target.value as any)}
- className="w-full px-4 py-2.5 rounded-xl text-sm border border-[#E8E2D9] focus:border-[#E8E2D9] focus:ring-2 focus:ring-[#C0392B]/20 outline-none transition-all appearance-none bg-white"
+ className="w-full px-4 py-2.5 rounded-xl text-sm border border-[#E2E8F0] focus:border-[#E2E8F0] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none transition-all appearance-none bg-white"
  >
  <option value="video">Video bài giảng</option>
  <option value="article">Tài liệu đọc</option>
@@ -279,25 +279,25 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  </div>
 
  <div className="flex flex-col gap-1.5">
- <label className="text-sm font-semibold text-[#2C3039]">Trạng thái</label>
+ <label className="text-sm font-semibold text-[#0F172A]">Trạng thái</label>
  <div className="flex items-center gap-4">
  <label className="flex items-center gap-2 cursor-pointer">
  <input 
  type="radio" 
  checked={status === 'published'} 
  onChange={() => setStatus('published')}
- className="w-4 h-4 text-[#C0392B] focus:ring-[#C0392B]"
+ className="w-4 h-4 text-[#3B82F6] focus:ring-[#3B82F6]"
  />
- <span className="text-sm text-[#464554]">Đã xuất bản</span>
+ <span className="text-sm text-[#475569]">Đã xuất bản</span>
  </label>
  <label className="flex items-center gap-2 cursor-pointer">
  <input 
  type="radio" 
  checked={status === 'draft'} 
  onChange={() => setStatus('draft')}
- className="w-4 h-4 text-[#C0392B] focus:ring-[#C0392B]"
+ className="w-4 h-4 text-[#3B82F6] focus:ring-[#3B82F6]"
  />
- <span className="text-sm text-[#464554]">Bản nháp</span>
+ <span className="text-sm text-[#475569]">Bản nháp</span>
  </label>
  </div>
  </div>
@@ -311,21 +311,21 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  courseId={courseId ? Number(courseId) : undefined}
  />
  ) : type === 'video' ? (
- <div className="flex flex-col gap-3 mb-6 p-4 border border-[#E8E2D9] rounded-xl bg-[#F8F8FC]">
+ <div className="flex flex-col gap-3 mb-6 p-4 border border-[#E2E8F0] rounded-xl bg-[#F8F8FC]">
  <div className="flex items-center justify-between">
- <label className="text-sm font-semibold text-[#2C3039]">Video bài học</label>
+ <label className="text-sm font-semibold text-[#0F172A]">Video bài học</label>
  <div className="flex gap-2">
  <button 
  type="button" 
  onClick={() => handleVideoMethodChange('url')}
- className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${videoMethod === 'url' ? 'bg-[#C0392B] text-white' : 'bg-white text-[#8A8478] border border-[#E8E2D9]'}`}
+ className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${videoMethod === 'url' ? 'bg-[#3B82F6] text-white' : 'bg-white text-[#64748B] border border-[#E2E8F0]'}`}
  >
  Dùng URL
  </button>
  <button 
  type="button" 
  onClick={() => handleVideoMethodChange('upload')}
- className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${videoMethod === 'upload' ? 'bg-[#C0392B] text-white' : 'bg-white text-[#8A8478] border border-[#E8E2D9]'}`}
+ className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${videoMethod === 'upload' ? 'bg-[#3B82F6] text-white' : 'bg-white text-[#64748B] border border-[#E2E8F0]'}`}
  >
  Tải lên
  </button>
@@ -338,26 +338,26 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  value={videoUrl}
  onChange={(e) => setVideoUrl(e.target.value)}
  placeholder="Nhập đường dẫn video (YouTube, Vimeo, v.v.)..."
- className="w-full px-4 py-2.5 rounded-xl text-sm border border-[#E8E2D9] focus:border-[#E8E2D9] focus:ring-2 focus:ring-[#C0392B]/20 outline-none"
+ className="w-full px-4 py-2.5 rounded-xl text-sm border border-[#E2E8F0] focus:border-[#E2E8F0] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none"
  />
  ) : (
  <div className="flex flex-col gap-2">
  <div className="flex items-center gap-3">
- <label className="cursor-pointer px-4 py-2.5 rounded-xl text-sm font-medium text-white bg-[#64647A] hover:bg-[#464554] transition-colors">
+ <label className="cursor-pointer px-4 py-2.5 rounded-xl text-sm font-medium text-white bg-[#64647A] hover:bg-[#475569] transition-colors">
  Chọn file video
  <input type="file" accept="video/*" className="hidden" onChange={handleVideoFileUpload} disabled={isUploadingVideo} />
  </label>
- <span className="text-sm text-[#8A8478] truncate flex-1">
+ <span className="text-sm text-[#64748B] truncate flex-1">
  {isUploadingVideo ? `Đang tải lên... ${videoUploadProgress}%` : (videoUrl || "Chưa chọn file")}
  </span>
  </div>
  {isUploadingVideo && (
  <div className="w-full h-2 bg-[#EAEAF4] rounded-full overflow-hidden">
- <div className="h-full bg-[#C0392B] transition-all duration-300" style={{ width: `${videoUploadProgress}%` }} />
+ <div className="h-full bg-[#3B82F6] transition-all duration-300" style={{ width: `${videoUploadProgress}%` }} />
  </div>
  )}
  {videoUrl && !isUploadingVideo && videoUrl.includes('r2.dev') && (
- <div className="text-xs text-[#2C3039] font-medium bg-[#ECFDF5] px-3 py-1.5 rounded-lg inline-flex max-w-fit">
+ <div className="text-xs text-[#0F172A] font-medium bg-[#ECFDF5] px-3 py-1.5 rounded-lg inline-flex max-w-fit">
  Video đã được tải lên Cloudflare R2
  </div>
  )}
@@ -365,7 +365,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  )}
 
  {videoUrl && !isUploadingVideo && (
- <div className="mt-2 w-full bg-black rounded-xl overflow-hidden border border-[#E8E2D9] flex items-center justify-center relative min-h-[300px]">
+ <div className="mt-2 w-full bg-black rounded-xl overflow-hidden border border-[#E2E8F0] flex items-center justify-center relative min-h-[300px]">
  {getEmbedUrl(videoUrl) ? (
  <iframe
  src={getEmbedUrl(videoUrl)!}
@@ -386,7 +386,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  </div>
  ) : (
  <>
- <label className="text-sm font-semibold text-[#2C3039]">Nội dung chi tiết</label>
+ <label className="text-sm font-semibold text-[#0F172A]">Nội dung chi tiết</label>
  <RichTextEditor
  value={content}
  onChange={setContent}
@@ -405,7 +405,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  type="button"
  onClick={handleClose}
  disabled={isSaving}
- className="px-5 py-2.5 rounded-xl text-sm font-medium text-[#8A8478] bg-white border border-[#E8E2D9] hover:bg-[#E8E2D9] transition-colors disabled:opacity-50"
+ className="px-5 py-2.5 rounded-xl text-sm font-medium text-[#64748B] bg-white border border-[#E2E8F0] hover:bg-[#E2E8F0] transition-colors disabled:opacity-50"
  >
  Hủy bỏ
  </button>
@@ -413,7 +413,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  type="button"
  onClick={handleSave}
  disabled={isSaving || isUploadingVideo || activeImageUploads > 0}
- className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#C0392B] shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:-translate-y-0 disabled:cursor-not-allowed"
+ className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#3B82F6] shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:-translate-y-0 disabled:cursor-not-allowed"
  >
  {(isSaving || activeImageUploads > 0) ? (
  <>

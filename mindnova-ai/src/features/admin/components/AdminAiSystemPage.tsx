@@ -79,24 +79,24 @@ export function AdminAiSystemPage() {
 
  return (
  <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
- <section className="rounded-2xl border -[#FAF7F2]/20 bg-[linear-gradient(120deg,#1e293b_0%,#0f766e_55%,#0369a1_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.85)]">
- <p className="text-[10px] uppercase tracking-[0.34em] -[#FAF7F2]/70">AI & System Configuration</p>
+ <section className="rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(120deg,#1e293b_0%,#2563EB_55%,#2563EB_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.85)]">
+ <p className="text-[10px] uppercase tracking-[0.34em] text-[#F8FAFC]/70">AI & System Configuration</p>
  <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý cấu hình AI và hạn mức sử dụng</h1>
  <p className="mt-1 text-xs text-slate-100/90">Quản lý API key provider, quota Student/Guest, và System Prompt cho AI trợ giảng/chấm bài.</p>
  </section>
 
  <section className="grid gap-4 md:grid-cols-2">
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <p className="text-sm text-slate-500">Yêu cầu AI hôm nay</p>
  <p className="mt-2 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{data.usage_today.total_requests}</p>
  </div>
- <div className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4">
+ <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <p className="text-sm text-slate-500">Chi phí API ước tính hôm nay</p>
  <p className="mt-2 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">${data.usage_today.estimated_cost.toFixed(4)}</p>
  </div>
  </section>
 
- <section className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 space-y-4">
+ <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 space-y-4">
  <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">API Model Provider</h2>
 
  <label className="block text-sm text-slate-700">
@@ -115,7 +115,7 @@ export function AdminAiSystemPage() {
  </label>
  </section>
 
- <section className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 space-y-4">
+ <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 space-y-4">
  <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Quota AI theo ngày</h2>
 
  <div className="grid gap-3 md:grid-cols-2">
@@ -130,7 +130,7 @@ export function AdminAiSystemPage() {
  </div>
  </section>
 
- <section className="rounded-2xl border -[#FAF7F2]/80 bg-white/95 p-4 space-y-4">
+ <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 space-y-4">
  <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">System Prompt</h2>
 
  <label className="block text-sm text-slate-700">
@@ -144,7 +144,7 @@ export function AdminAiSystemPage() {
  </label>
  </section>
 
- <button disabled={saving} onClick={() => void save()} className="rounded-xl -[#C0392B] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">{saving ? "Đang lưu..." : "Lưu cấu hình"}</button>
+ <button disabled={saving} onClick={() => void save()} className="rounded-xl bg-[#3B82F6] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">{saving ? "Đang lưu..." : "Lưu cấu hình"}</button>
  {message && <p className="rounded-xl bg-slate-100 px-3 py-2 text-sm text-slate-700">{message}</p>}
  </div>
  );

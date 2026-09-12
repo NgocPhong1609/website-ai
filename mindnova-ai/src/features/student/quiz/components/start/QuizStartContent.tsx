@@ -509,7 +509,7 @@ export function QuizStartContent() {
                         <td className="px-6 py-4 text-muted-foreground font-medium">{quiz.difficulty} <span className="mx-1 text-stone-300">•</span> {quiz.questions_count} câu</td>
                         <td className="px-6 py-4">
                           {quiz.is_completed ? (
-                            <span className={`inline-flex items-center gap-1.5 font-bold px-2.5 py-1 rounded-full text-xs ${quiz.score >= 70 ? "bg-success-bg text-success" : "bg-blue-600-muted text-red-700"}`}>
+                            <span className={`inline-flex items-center gap-1.5 font-bold px-2.5 py-1 rounded-full text-xs ${quiz.score >= 70 ? "bg-success-bg text-success" : "bg-blue-600-muted text-[#1D4ED8]"}`}>
                               {quiz.score >= 70 ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                               {quiz.score}%
                             </span>
@@ -568,7 +568,7 @@ export function QuizStartContent() {
                 </span>
                 <h3 className="text-xl font-bold text-foreground tracking-tight">{reviewingQuiz.title}</h3>
                 <p className="text-[15px] text-muted-foreground mt-2 flex items-center gap-2 font-medium">
-                  Điểm số: <strong className={`px-2 py-0.5 rounded-md ${reviewingQuiz.score >= 70 ? "bg-emerald-100 text-success" : "bg-red-100 text-red-700"}`}>{reviewingQuiz.score}%</strong> 
+                  Điểm số: <strong className={`px-2 py-0.5 rounded-md ${reviewingQuiz.score >= 70 ? "bg-emerald-100 text-success" : "bg-[#EFF6FF] text-[#1D4ED8]"}`}>{reviewingQuiz.score}%</strong> 
                   <span className="text-stone-300">•</span> Đúng: <strong className="text-foreground">{reviewingQuiz.correct_count || 0}/{reviewingQuiz.questions_count}</strong> câu
                 </p>
               </div>
@@ -609,7 +609,7 @@ export function QuizStartContent() {
                       <h4 className="text-base font-bold text-foreground leading-relaxed">
                         <span className="text-stone-400 font-medium">Câu {idx + 1}.</span> {q.question}
                       </h4>
-                      <span className={`text-xs font-bold px-3 py-1 rounded-full shrink-0 flex items-center gap-1.5 ${isCorrect ? "bg-success-bg text-success border border-emerald-100" : "bg-blue-600-muted text-red-700 border border-red-100"}`}>
+                      <span className={`text-xs font-bold px-3 py-1 rounded-full shrink-0 flex items-center gap-1.5 ${isCorrect ? "bg-success-bg text-success border border-emerald-100" : "bg-blue-600-muted text-[#1D4ED8] border border-[#DBEAFE]"}`}>
                         {isCorrect ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                         {isCorrect ? "Đúng" : "Sai"}
                       </span>
@@ -637,7 +637,7 @@ export function QuizStartContent() {
                           if (isRightKey) {
                             optStyle = "bg-success-bg border-emerald-200 text-emerald-800 font-semibold";
                           } else if (isChosen && !isRightKey) {
-                            optStyle = "bg-blue-600-muted border-blue-200 text-red-700 font-semibold";
+                            optStyle = "bg-blue-600-muted border-blue-200 text-[#1D4ED8] font-semibold";
                           }
 
                           return (
@@ -656,7 +656,7 @@ export function QuizStartContent() {
                     )}
 
                     {q.explanation && (
-                      <div className="p-4 rounded-xl border border-red-100 bg-blue-600-muted/50 text-sm">
+                      <div className="p-4 rounded-xl border border-[#DBEAFE] bg-blue-600-muted/50 text-sm">
                         <span className="font-bold text-blue-800 block mb-1 flex items-center gap-1.5"><Brain className="w-4 h-4" /> Gia sư Nova giải thích:</span>
                         <p className="leading-relaxed text-blue-900/80">{q.explanation}</p>
                       </div>

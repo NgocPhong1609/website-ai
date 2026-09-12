@@ -72,7 +72,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
               onRecall(message.id);
             }
           }}
-          className="opacity-0 group-hover:opacity-100 transition-all duration-200 mr-2 mb-1 text-gray-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center p-1.5 rounded-full bg-white shadow-md border border-gray-200 cursor-pointer"
+          className="opacity-0 group-hover:opacity-100 transition-all duration-200 mr-2 mb-1 text-gray-400 hover:text-[#2563EB] hover:bg-[#EFF6FF] flex items-center justify-center p-1.5 rounded-full bg-white shadow-md border border-gray-200 cursor-pointer"
           title="Thu hồi tin nhắn"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -91,7 +91,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
         <div 
           className={`relative px-4 py-2.5 rounded-2xl shadow-sm transition-all ${
             isOwn 
-              ? 'bg-[#C0392B] text-white rounded-br-xs' 
+              ? 'bg-[#3B82F6] text-white rounded-br-xs' 
               : 'bg-white border border-gray-200/80 text-gray-800 rounded-bl-xs'
           }`}
         >
@@ -148,7 +148,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
                 </svg>
               )}
               {isOwn && message.status === 'failed' && (
-                <span className="text-red-200 font-bold" title="Lỗi khi gửi">!</span>
+                <span className="text-[#DBEAFE] font-bold" title="Lỗi khi gửi">!</span>
               )}
             </div>
           )}
