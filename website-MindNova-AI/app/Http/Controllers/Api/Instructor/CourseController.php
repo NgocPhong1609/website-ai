@@ -56,6 +56,7 @@ class CourseController extends Controller
         Gate::authorize('create', Course::class);
 
         $course = $this->courseService->createCourse($request->validated(), $request->user()->id);
+        $course->load('category');
 
         return $this->createdResponse(new CourseResource($course), 'Course created successfully.');
     }
@@ -64,7 +65,7 @@ class CourseController extends Controller
     {
         Gate::authorize('view', $course);
 
-        $course->load(['modules.lessons']);
+        $course->load(['modules.lessons', 'category']);
         if (Schema::hasColumn('lessons', 'course_id')) {
             $course->load('lessons');
         }
@@ -77,6 +78,7 @@ class CourseController extends Controller
         Gate::authorize('update', $course);
 
         $course = $this->courseService->updateCourse($course, $request->validated());
+        $course->load('category');
 
         return $this->successResponse(new CourseResource($course), 'Course updated successfully.');
     }

@@ -54,6 +54,15 @@ test('instructor can list only active categories and propose a pending one', fun
     ]);
 });
 
+test('admin created categories are approved automatically', function () {
+    $admin = makeRoleUser('admin');
+
+    $this->actingAs($admin, 'sanctum')
+        ->postJson('/api/admin/categories', ['name' => 'Thiết kế game', 'status' => 'pending'])
+        ->assertCreated()
+        ->assertJsonPath('data.status', 'active');
+});
+
 test('admin can approve a teacher-requested category', function () {
     $admin = makeRoleUser('admin');
     $category = Category::query()->create([

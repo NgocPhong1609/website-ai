@@ -65,7 +65,9 @@ export function useInstructorCategories() {
     queryKey: ["instructor", "categories"],
     queryFn: async () => {
       const { data } = await axiosClient.get("/api/instructor/categories");
-      return (data.data ?? []) as InstructorCategory[];
+      const payload = data?.data ?? data;
+      const rows = Array.isArray(payload) ? payload : payload?.data;
+      return (Array.isArray(rows) ? rows : []) as InstructorCategory[];
     },
     staleTime: 30_000,
   });

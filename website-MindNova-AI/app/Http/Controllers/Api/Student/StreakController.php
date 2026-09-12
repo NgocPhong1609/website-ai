@@ -16,27 +16,25 @@ class StreakController extends Controller
 
         // Mốc thời gian chuẩn theo giờ Việt Nam
         $today = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
-        $yesterday = Carbon::now('Asia/Ho_Chi_Minh')->subDay()->startOfDay();
+        $yesterday = Carbon::now('Asia/Ho_Chi_Minh')->subDay()->toDateString();
 
-        // Lấy hoặc tạo mới dữ liệu Streak của user này
         $streak = UserStreak::firstOrCreate(
             ['user_id' => $user->id],
             ['current_streak' => 0, 'longest_streak' => 0, 'freeze_count' => 1]
         );
 
-        // Ngày check-in cuối cùng dạng Carbon object
-        $lastCheckin = $streak->last_checkin_date ? Carbon::parse($streak->last_checkin_date)->startOfDay() : null;
+        $lastCheckinDate = $streak->last_checkin_date
+            ? Carbon::parse($streak->last_checkin_date)->timezone('Asia/Ho_Chi_Minh')->toDateString()
+            : null;
 
-        // 1. Kiểm tra: Hôm nay điểm danh chưa?
-        if ($lastCheckin && $lastCheckin->equalTo($today)) {
+        if ($lastCheckinDate === $today) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Hôm nay bạn đã điểm danh rồi!'
             ], 400);
         }
 
-        // 2. Logic tính toán chuỗi
-        if ($lastCheckin && $lastCheckin->equalTo($yesterday)) {
+        if ($lastCheckinDate === $yesterday) {
             // Hôm qua có học -> Cộng dồn chuỗi
             $streak->current_streak += 1;
         } else {

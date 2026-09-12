@@ -14,7 +14,6 @@ type CategoryStatus = "pending" | "active" | "inactive";
 type CategoryFormState = {
  name: string;
  description: string;
- status: CategoryStatus;
 };
 
 function readStoredToken(): string {
@@ -41,12 +40,6 @@ function getAuthHeaders(): Record<string, string> {
 interface AdminCategoriesQuickActionsProps {
  rows: AdminCategoryRow[];
 }
-
-const statusOptions: Array<{ value: CategoryStatus; label: string }> = [
- { value: "pending", label: "Chờ duyệt" },
- { value: "active", label: "Đã duyệt" },
- { value: "inactive", label: "Từ chối" },
-];
 
 function isPendingStatus(status: string): boolean {
  return status.toLowerCase().includes("pending");
@@ -80,7 +73,6 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  const [form, setForm] = useState<CategoryFormState>({
  name: "",
  description: "",
- status: "pending",
  });
 
  const pendingCount = useMemo(
@@ -101,7 +93,6 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  const [editForm, setEditForm] = useState<CategoryFormState>({
  name: "",
  description: "",
- status: "pending",
  });
 
  const handleOpenEdit = (category: AdminCategoryRow) => {
@@ -109,7 +100,6 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  setEditForm({
  name: category.name,
  description: category.description,
- status: (category.status as CategoryStatus) || "pending",
  });
  setStatus(null);
  };
@@ -139,7 +129,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  }
 
  setStatus("Tạo danh mục thành công.");
- setForm({ name: "", description: "", status: "pending" });
+ setForm({ name: "", description: "" });
  setIsOpen(false);
  router.refresh();
  } catch (error) {
@@ -268,7 +258,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-sm"
  >
  <div className="grid gap-3 md:grid-cols-3">
- <label className="space-y-1 text-sm text-slate-700 md:col-span-2">
+ <label className="space-y-1 text-sm text-slate-700 md:col-span-3">
  <span className="font-medium">Tên danh mục</span>
  <input
  value={form.name}
@@ -276,21 +266,6 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  required
  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
- </label>
-
- <label className="space-y-1 text-sm text-slate-700">
- <span className="font-medium">Trạng thái</span>
- <select
- value={form.status}
- onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as CategoryStatus }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
- >
- {statusOptions.map((option) => (
- <option key={option.value} value={option.value}>
- {option.label}
- </option>
- ))}
- </select>
  </label>
 
  <label className="space-y-1 text-sm text-slate-700 md:col-span-3">
@@ -327,7 +302,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  <form onSubmit={handleUpdate} className="rounded-2xl border-[#E2E8F0] bg-blue-50/60 p-4 shadow-sm">
  <div className="mb-3 text-sm font-semibold text-slate-900">Chỉnh sửa danh mục: {editingCategory.name}</div>
  <div className="grid gap-3 md:grid-cols-3">
- <label className="space-y-1 text-sm text-slate-700 md:col-span-2">
+ <label className="space-y-1 text-sm text-slate-700 md:col-span-3">
  <span className="font-medium">Tên danh mục</span>
  <input
  value={editForm.name}
@@ -335,21 +310,6 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  required
  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
  />
- </label>
-
- <label className="space-y-1 text-sm text-slate-700">
- <span className="font-medium">Trạng thái</span>
- <select
- value={editForm.status}
- onChange={(event) => setEditForm((current) => ({ ...current, status: event.target.value as CategoryStatus }))}
- className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-[#3B82F6]"
- >
- {statusOptions.map((option) => (
- <option key={option.value} value={option.value}>
- {option.label}
- </option>
- ))}
- </select>
  </label>
 
  <label className="space-y-1 text-sm text-slate-700 md:col-span-3">
@@ -405,11 +365,13 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  </td>
  <td className="px-4 py-3">
  <div className="flex flex-wrap gap-2">
+ {isPendingStatus(row.status) && (
+ <>
  <button
  type="button"
  disabled={isUpdating === row.id}
  onClick={() => handleModerate(row.id, "active", "Đã duyệt danh mục thành công.")}
- className="rounded-lg bg-[#0F172A] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[#0F172A] disabled:cursor-not-allowed disabled:opacity-60"
+ className="rounded-lg bg-[#3B82F6] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[#2563EB] disabled:cursor-not-allowed disabled:opacity-60"
  >
  Duyệt
  </button>
@@ -421,14 +383,28 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  >
  Từ chối
  </button>
+ </>
+ )}
+ {row.status.toLowerCase().includes("active") && (
  <button
  type="button"
  disabled={isUpdating === row.id}
- onClick={() => handleModerate(row.id, "pending", "Đã chuyển danh mục về chờ duyệt.")}
- className="rounded-lg bg-amber-500 px-2.5 py-1 text-xs font-semibold text-white hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60"
+ onClick={() => handleModerate(row.id, "inactive", "Đã thu hồi duyệt danh mục.")}
+ className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
  >
- Chờ duyệt
+ Thu hồi duyệt
  </button>
+ )}
+ {row.status.toLowerCase().includes("inactive") && (
+ <button
+ type="button"
+ disabled={isUpdating === row.id}
+ onClick={() => handleModerate(row.id, "active", "Đã duyệt danh mục thành công.")}
+ className="rounded-lg bg-[#3B82F6] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[#2563EB] disabled:cursor-not-allowed disabled:opacity-60"
+ >
+ Duyệt lại
+ </button>
+ )}
  </div>
  </td>
  <td className="px-4 py-3">

@@ -37,6 +37,8 @@ export interface OverallProgress {
 export interface StudyStreak {
  days: number;
  message: string;
+ freeze_count?: number;
+ is_checked_in_today?: boolean;
 }
 
 export interface UserProfileSummary {
@@ -81,6 +83,7 @@ export interface DashboardOverview {
  advanced_recommendations?: AdvancedRecommendation[];
  daily_goal?: DailyGoal;
  weekly_activity?: Record<string, boolean>;
+ checked_in_dates?: string[];
 }
 
 export interface DashboardApiResponse {

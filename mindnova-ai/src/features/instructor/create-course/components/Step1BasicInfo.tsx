@@ -72,7 +72,7 @@ interface Step1BasicInfoProps {
 }
 
 export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
- const { data: categories = [], isLoading: categoriesLoading } = useInstructorCategories();
+ const { data: categories = [], isLoading: categoriesLoading, isError: categoriesError, refetch: refetchCategories } = useInstructorCategories();
  const [search, setSearch] = useState("");
  const [open, setOpen] = useState(false);
 
@@ -85,7 +85,9 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  const selectedName =
  data.field === OTHER_CATEGORY_VALUE
  ? "Khác"
- : categories.find((c) => c.id === data.categoryId)?.name ?? "";
+ : categories.find((c) => Number(c.id) === Number(data.categoryId))?.name
+   ?? data.categoryName
+   ?? "";
 
  const handleThumbnail = useCallback(
  (file: File, preview: string) => {
@@ -190,7 +192,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  <ChevronDownIcon size={14} />
  </div>
  {open && (
- <div className="absolute z-20 mt-1 w-full rounded-xl border border-[#E2E8F0] bg-white shadow-lg">
+ <div className="absolute z-50 mt-1 w-full rounded-xl border border-[#E2E8F0] bg-white shadow-lg">
  <input
  autoFocus
  value={search}
@@ -198,14 +200,23 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  placeholder="Tìm danh mục..."
  className="w-full border-b border-[#E2E8F0] px-3 py-2 text-xs text-[#0F172A] outline-none"
  />
- <ul className="max-h-48 overflow-y-auto py-1">
+ <ul className="max-h-56 overflow-y-auto py-1">
+ {categoriesError && (
+ <li className="px-3 py-2 text-xs text-rose-600">
+ Không tải được danh mục.{" "}
+ <button type="button" className="font-bold underline" onClick={() => void refetchCategories()}>
+ Thử lại
+ </button>
+ </li>
+ )}
  {filtered.map((c) => (
  <li key={c.id}>
  <button
  type="button"
  className="w-full px-3 py-2 text-left text-xs font-semibold text-[#0F172A] hover:bg-[#EFF6FF]"
  onClick={() => {
- onChange("categoryId", c.id);
+ onChange("categoryId", Number(c.id));
+ onChange("categoryName", c.name);
  onChange("field", String(c.id));
  onChange("otherName", "");
  setOpen(false);
@@ -216,7 +227,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  </button>
  </li>
  ))}
- {filtered.length === 0 && (
+ {!categoriesError && filtered.length === 0 && (
  <li className="px-3 py-2 text-xs text-[#64748B]">Không tìm thấy danh mục</li>
  )}
  <li className="border-t border-[#E2E8F0]">

@@ -12,7 +12,7 @@ export function AdminHeroBanner({ hero, stats = [] }: AdminHeroBannerProps) {
  const router = useRouter();
  const title = hero?.title ?? "Bảng điều khiển MindNova";
  const description = hero?.description ?? "Theo dõi người dùng, nội dung và hệ thống trên cùng một palette xanh với student.";
- const primaryAction = hero?.primaryAction ?? "Quản lý nội dung";
+ const primaryAction = hero?.primaryAction ?? "Quản lý khóa học";
  const secondaryAction = hero?.secondaryAction ?? "Xem báo cáo";
 
  const handleSecondaryAction = () => {

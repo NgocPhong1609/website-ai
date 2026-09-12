@@ -39,22 +39,34 @@ class DashboardController extends Controller
         $today = Carbon::now('Asia/Ho_Chi_Minh')->toDateString();
 
         // So sánh trực tiếp chuỗi ngày (VD: "2026-08-23")
-        $isCheckedInToday = $streak->last_checkin_date && Carbon::parse($streak->last_checkin_date)->toDateString() === $today;
+        $isCheckedInToday = $streak->last_checkin_date
+            && Carbon::parse($streak->last_checkin_date)->timezone('Asia/Ho_Chi_Minh')->toDateString() === $today;
 
-        // 3. Lấy danh sách các ngày đã điểm danh trong tháng này
+        $nowVn = Carbon::now('Asia/Ho_Chi_Minh');
+        $monthStartUtc = $nowVn->copy()->startOfMonth()->utc();
+        $monthEndUtc = $nowVn->copy()->endOfMonth()->utc();
+
         $checkedInDates = ActivityLog::where('user_id', $user->id)
             ->where('action', 'check_in_daily')
-            ->whereMonth('created_at', Carbon::now('Asia/Ho_Chi_Minh')->month)
+            ->whereBetween('created_at', [$monthStartUtc, $monthEndUtc])
             ->pluck('created_at')
-            ->map(fn($date) => Carbon::parse($date)->toDateString())
-            ->toArray();
+            ->map(fn ($date) => Carbon::parse($date)->timezone('Asia/Ho_Chi_Minh')->toDateString())
+            ->unique()
+            ->values()
+            ->all();
 
-        // Nếu hôm nay đã điểm danh (lưu ở user_streaks) nhưng trong ActivityLog chưa kịp đẩy vào mảng checkedInDates, ta cộng thêm vào để lịch sáng luôn
-        if ($isCheckedInToday && !in_array($today, $checkedInDates)) {
+        if ($isCheckedInToday && ! in_array($today, $checkedInDates, true)) {
             $checkedInDates[] = $today;
         }
 
-        // 4. Trả về cấu trúc JSON đồng bộ hoàn toàn với Frontend Next.js
+        $weekStart = $nowVn->copy()->startOfWeek(Carbon::MONDAY);
+        $weekKeys = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+        $weeklyActivity = [];
+        foreach ($weekKeys as $offset => $key) {
+            $date = $weekStart->copy()->addDays($offset)->toDateString();
+            $weeklyActivity[$key] = in_array($date, $checkedInDates, true);
+        }
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -64,7 +76,7 @@ class DashboardController extends Controller
                 'study_streak' => [
                     'days' => $streak->current_streak,
                     'longest' => $streak->longest_streak,
-                    'is_checked_in_today' => $isCheckedInToday, // 🚀 Trạng thái chuẩn xác tuyệt đối
+                    'is_checked_in_today' => $isCheckedInToday,
                     'freeze_count' => $streak->freeze_count,
                 ],
                 'checked_in_dates' => $checkedInDates,
@@ -78,9 +90,7 @@ class DashboardController extends Controller
                     'completed' => 0,
                     'target' => 3
                 ],
-                'weekly_activity' => [
-                    "T2" => true, "T3" => true, "T4" => true, "T5" => true, "T6" => false, "T7" => false, "CN" => false
-                ],
+                'weekly_activity' => $weeklyActivity,
                 'courses' => [],
                 'focus_areas' => [],
                 'ai_suggestion' => null,

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AdminCategoriesQuickActions } from "../AdminCategoriesQuickActions";
 import type { AdminCategoryRow } from "@/src/features/admin/types";
@@ -48,5 +48,22 @@ describe("AdminCategoriesQuickActions pending filter", () => {
 
     expect(screen.getByText("Không có danh mục chờ duyệt.")).toBeInTheDocument();
     expect(screen.getByText("0 danh mục")).toBeInTheDocument();
+  });
+
+  it("shows approve actions only for pending categories and hides status on create", () => {
+    render(<AdminCategoriesQuickActions rows={rows} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "+ Thêm danh mục" }));
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Trạng thái")).not.toBeInTheDocument();
+
+    const pendingRow = screen.getByText("Blockchain nông nghiệp").closest("tr")!;
+    expect(within(pendingRow).getByRole("button", { name: "Duyệt" })).toBeInTheDocument();
+    expect(within(pendingRow).getByRole("button", { name: "Từ chối" })).toBeInTheDocument();
+    expect(within(pendingRow).queryByRole("button", { name: "Chờ duyệt" })).not.toBeInTheDocument();
+
+    const activeRow = screen.getByText("Trí tuệ nhân tạo").closest("tr")!;
+    expect(within(activeRow).getByRole("button", { name: "Thu hồi duyệt" })).toBeInTheDocument();
+    expect(within(activeRow).queryByRole("button", { name: "Duyệt" })).not.toBeInTheDocument();
   });
 });

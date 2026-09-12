@@ -28,6 +28,7 @@ const INITIAL_COURSE_INFO: CourseBasicInfo = {
  description: "",
  field: "",
  categoryId: null,
+ categoryName: "",
  otherName: "",
  difficulty: "beginner",
  thumbnailFile: null,

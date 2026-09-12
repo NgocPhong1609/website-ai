@@ -30,6 +30,7 @@ class CourseResource extends JsonResource
             'level' => $this->level,
             'status' => $this->status,
             'category_id' => $this->category_id,
+            'category_name' => $this->category?->name,
             'totalLessons' => $this->total_lessons,
             'durationHours' => $this->duration_hours,
             'modules' => $this->whenLoaded('modules', function () {

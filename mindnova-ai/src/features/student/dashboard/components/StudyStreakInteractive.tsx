@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 import { Flame, Snowflake, X } from "lucide-react";
@@ -22,25 +22,53 @@ interface StudyStreakInteractiveProps {
   };
 }
 
+function vietnamNow(): Date {
+  return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+}
+
+function todayKeyFromClock(): DayOfWeek {
+  const map: DayOfWeek[] = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+  return map[vietnamNow().getDay()];
+}
+
+function weeklyActivityFromDates(dates: string[]): Record<DayOfWeek, boolean> {
+  const now = vietnamNow();
+  const day = now.getDay();
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + mondayOffset);
+  const weekDays: DayOfWeek[] = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+  const result = {} as Record<DayOfWeek, boolean>;
+  weekDays.forEach((key, index) => {
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + index);
+    const iso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    result[key] = dates.includes(iso);
+  });
+  return result;
+}
+
 export function StudyStreakInteractive({ 
   data, 
   weeklyActivity, 
-  todayKey = "CN",
+  todayKey,
   checkedInDates = [], 
-  streakFreezeCount = 1,
-  aiInsight = {
-    type: "warning",
-    message: "Hệ thống AI nhận thấy bạn thường có xu hướng quên học vào các ngày Thứ 6 (tỷ lệ drop 68%). Bạn có muốn thiết lập nhắc nhở tự động qua Email vào chiều mai không?",
-    actionLabel: "Bật nhắc nhở Thứ 6"
-  }
+  streakFreezeCount = 0,
+  aiInsight,
 }: StudyStreakInteractiveProps) {
   const router = useRouter();
   const { days } = data;
   const weekDays: DayOfWeek[] = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+  const resolvedTodayKey = todayKey ?? todayKeyFromClock();
+  const derivedWeekly = checkedInDates.length
+    ? weeklyActivityFromDates(checkedInDates)
+    : weeklyActivity ?? { T2: false, T3: false, T4: false, T5: false, T6: false, T7: false, CN: false };
   
-  const [activeDays, setActiveDays] = useState<Record<DayOfWeek, boolean>>(
-    weeklyActivity || { "T2": false, "T3": false, "T4": false, "T5": false, "T6": false, "T7": false, "CN": false }
-  );
+  const [activeDays, setActiveDays] = useState<Record<DayOfWeek, boolean>>(derivedWeekly);
+
+  useEffect(() => {
+    setActiveDays(derivedWeekly);
+  }, [checkedInDates.join("|"), JSON.stringify(weeklyActivity)]);
   const [streakDays, setStreakDays] = useState(days);
   
   const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
@@ -121,7 +149,7 @@ export function StudyStreakInteractive({
       // Thành công -> Cập nhật giao diện ngay lập tức
       setIsCheckedIn(true);
       setStreakDays(response.data.data?.current_streak || (prev => prev + 1));
-      setActiveDays(prev => ({ ...prev, [todayKey]: true }));
+      setActiveDays(prev => ({ ...prev, [resolvedTodayKey]: true }));
 
       // F5 ngầm để đồng bộ dữ liệu vĩnh viễn vào Database
       router.refresh(); 
@@ -167,11 +195,15 @@ export function StudyStreakInteractive({
           {weekDays.map((d) => (
              <div key={d} className="flex flex-col items-center gap-1.5">
                <span className="text-[10px] font-medium text-slate-500 uppercase">{d}</span>
-               <div className={twMerge(
-                 "w-full h-1.5 rounded-full transition-all duration-300",
-                 activeDays[d] || (d === todayKey && isCheckedIn) ? "bg-gradient-to-r from-blue-500 to-blue-600" : "bg-slate-100",
-                 d === todayKey && !isCheckedIn && "bg-slate-200 relative overflow-hidden after:absolute after:inset-0 after:bg-blue-500/50 after:animate-pulse"
-               )}/>
+               <div
+                 data-checked={activeDays[d] || (d === resolvedTodayKey && isCheckedIn) ? "true" : "false"}
+                 className={twMerge(
+                   "w-full h-1.5 rounded-full transition-all duration-300",
+                   activeDays[d] || (d === resolvedTodayKey && isCheckedIn)
+                     ? "bg-gradient-to-r from-blue-500 to-blue-600"
+                     : "bg-slate-100"
+                 )}
+               />
              </div>
           ))}
         </div>
@@ -253,6 +285,7 @@ export function StudyStreakInteractive({
                 </button>
               )}
 
+              {aiInsight?.message ? (
               <div className="mt-auto bg-white rounded-2xl p-5 border border-slate-100 relative shadow-sm">
                  <div className="absolute -top-3 left-4 bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-semibold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" /> AI LỊCH TRÌNH
@@ -269,6 +302,7 @@ export function StudyStreakInteractive({
                    )}
                  </div>
               </div>
+              ) : null}
             </div>
 
           </div>

@@ -53,5 +53,7 @@ export async function getDashboardOverview(): Promise<DashboardOverview> {
  overall_progress: { percent: 0, delta: "" },
  study_streak: { days: 0, message: "" },
  advanced_recommendations: [],
+ weekly_activity: { T2: false, T3: false, T4: false, T5: false, T6: false, T7: false, CN: false },
+ checked_in_dates: [],
  };
 }

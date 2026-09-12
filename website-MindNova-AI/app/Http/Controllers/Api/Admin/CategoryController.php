@@ -43,7 +43,7 @@ class CategoryController extends Controller
             'name' => $data['name'],
             'slug' => $this->uniqueSlug($data['name']),
             'description' => $data['description'] ?? null,
-            'status' => $data['status'] ?? 'active',
+            'status' => 'active',
         ]);
 
         return response()->json([

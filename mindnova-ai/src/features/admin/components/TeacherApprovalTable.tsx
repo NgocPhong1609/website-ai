@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 import type { AdminTeacherApprovalRow, AdminTeacherCertificateItem } from "@/src/features/admin/types";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 import { axiosClient } from "@/src/shared/lib/axios";
+import { X } from "lucide-react";
 
 interface TeacherApprovalTableProps {
  rows: AdminTeacherApprovalRow[];
@@ -319,8 +320,8 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
 
  {/* Detail Modal / Drawer */}
  {selectedRow && (
- <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm overflow-y-auto">
- <div className="relative w-full max-w-4xl rounded-[32px] border border-slate-200 bg-white shadow-2xl my-8 overflow-hidden">
+ <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm overflow-y-auto" onClick={() => setSelectedRow(null)}>
+ <div className="relative w-full max-w-4xl rounded-[32px] border border-slate-200 bg-white shadow-2xl my-8 overflow-hidden" onClick={(event) => event.stopPropagation()}>
  {/* Modal Header */}
  <div className="flex items-center justify-between border-b border-slate-200 px-8 py-5 bg-slate-50">
  <div className="flex items-center gap-3">
@@ -347,9 +348,10 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  <button
  type="button"
  onClick={() => setSelectedRow(null)}
+ aria-label="Đóng"
  className="w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-500 hover:bg-slate-100 flex items-center justify-center font-bold"
  >
- 
+ <X className="h-4 w-4" aria-hidden />
  </button>
  </div>
 
@@ -610,6 +612,15 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  )}
  </div>
  </div>
+ <div className="flex justify-end border-t border-slate-200 bg-slate-50 px-8 py-4">
+ <button
+ type="button"
+ onClick={() => setSelectedRow(null)}
+ className="rounded-xl border border-slate-200 bg-white px-5 py-2 text-xs font-black text-slate-700 hover:bg-slate-100"
+ >
+ Đóng
+ </button>
+ </div>
  </div>
  </div>
  )}
@@ -756,9 +767,10 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  </h4>
  <button
  onClick={() => setEvidenceViewer(null)}
+ aria-label="Đóng"
  className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center font-bold"
  >
- 
+ <X className="h-4 w-4" aria-hidden />
  </button>
  </div>
 

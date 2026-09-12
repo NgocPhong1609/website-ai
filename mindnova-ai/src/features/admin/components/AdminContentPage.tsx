@@ -7,7 +7,7 @@ export async function AdminContentPage() {
  <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
  <section className="rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(125deg,#0b1636_0%,#0d224a_50%,#115e83_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
  <p className="text-[10px] uppercase tracking-[0.35em] text-[#F8FAFC]/65">Content management</p>
- <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý nội dung</h1>
+ <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý khóa học</h1>
  <p className="mt-1 max-w-2xl text-xs text-slate-200/90">
  Duyệt và kiểm soát khóa học, module, quiz và tài liệu do giáo viên đóng góp.
  </p>

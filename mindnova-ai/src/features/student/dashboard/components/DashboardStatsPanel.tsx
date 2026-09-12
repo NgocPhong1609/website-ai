@@ -149,9 +149,9 @@ export function DashboardStatsPanel({
  studyStreak = STUDY_STREAK,
  focusAreas = FOCUS_AREAS,
  weeklyActivity,
- todayKey = "CN",
+ todayKey,
  checkedInDates = [],
- streakFreezeCount = 1,
+ streakFreezeCount = 0,
 }: DashboardStatsPanelProps) {
  return (
  <section className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-label="Thống kê tổng quan học tập và trọng tâm AI">

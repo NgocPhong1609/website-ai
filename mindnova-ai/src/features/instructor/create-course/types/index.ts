@@ -14,6 +14,7 @@ export interface CourseBasicInfo {
  description: string;
  field: string;
  categoryId: number | null;
+ categoryName?: string | null;
  otherName: string;
  difficulty: DifficultyLevel;
  thumbnailFile: File | null;

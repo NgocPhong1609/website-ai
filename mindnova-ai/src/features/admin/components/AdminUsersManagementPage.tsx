@@ -25,15 +25,6 @@ type UserListResponse = {
  };
 };
 
-type TeacherReviewRow = {
- id: number;
- name: string;
- email: string;
- status: string;
- note?: string | null;
- bio?: string | null;
-};
-
 type UserActivityResponse = {
  user: {
  id: number;
@@ -54,7 +45,6 @@ export function AdminUsersManagementPage() {
  guests: 0,
  locked: 0,
  });
- const [teacherQueue, setTeacherQueue] = useState<TeacherReviewRow[]>([]);
  const [activity, setActivity] = useState<UserActivityResponse | null>(null);
  const [search, setSearch] = useState("");
  const [role, setRole] = useState("");
@@ -72,14 +62,10 @@ export function AdminUsersManagementPage() {
  if (role) params.set("role", role);
  if (status) params.set("status", status);
 
- const [usersRes, teachersRes] = await Promise.all([
- adminApi<UserListResponse>(`/admin/users?${params.toString()}`),
- adminApi<{ data: TeacherReviewRow[] }>("/admin/teachers/review-queue"),
- ]);
+ const usersRes = await adminApi<UserListResponse>(`/admin/users?${params.toString()}`);
 
  setUsers(usersRes.data);
  setSummary(usersRes.summary);
- setTeacherQueue(teachersRes.data);
  } catch (error) {
  setMessage(error instanceof Error ? error.message : "Không thể tải dữ liệu.");
  } finally {
@@ -123,22 +109,6 @@ export function AdminUsersManagementPage() {
  }
  };
 
- const reviewTeacher = async (teacherId: number, reviewStatus: "approved" | "rejected") => {
- try {
- await adminApi(`/admin/teachers/${teacherId}/verify`, {
- method: "PATCH",
- body: JSON.stringify({
- status: reviewStatus,
- note: reviewStatus === "approved" ? "Hồ sơ hợp lệ." : "Cần bổ sung thông tin/bằng cấp.",
- }),
- });
- await loadAll();
- setMessage("Đã cập nhật duyệt hồ sơ giáo viên.");
- } catch (error) {
- setMessage(error instanceof Error ? error.message : "Duyệt hồ sơ thất bại.");
- }
- };
-
  const viewActivity = async (userId: number) => {
  try {
  const payload = await adminApi<UserActivityResponse>(`/admin/users/${userId}/activity`);
@@ -153,7 +123,7 @@ export function AdminUsersManagementPage() {
  <section className="rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(120deg,#0b1d40_0%,#1D4ED8_45%,#134e4a_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.8)]">
  <p className="text-[10px] uppercase tracking-[0.34em] text-[#F8FAFC]/70">User Management</p>
  <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý người dùng và phân quyền</h1>
- <p className="mt-1 max-w-3xl text-xs text-slate-100/90">Cấp quyền, khóa/xóa tài khoản Teacher, Student, Guest; theo dõi đăng nhập, thời gian học, lịch sử thao tác; duyệt hồ sơ giáo viên.</p>
+ <p className="mt-1 max-w-3xl text-xs text-slate-100/90">Cấp quyền, khóa/xóa tài khoản Teacher, Student, Guest; theo dõi đăng nhập, thời gian học và lịch sử thao tác.</p>
  </section>
 
  <section className="grid gap-4 md:grid-cols-4">
@@ -225,26 +195,7 @@ export function AdminUsersManagementPage() {
  </div>
  </section>
 
- <section className="grid gap-4 xl:grid-cols-2">
- <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
- <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Duyệt hồ sơ giáo viên</h3>
- <div className="mt-3 space-y-3">
- {teacherQueue.map((teacher) => (
- <div key={teacher.id} className="rounded-xl border border-slate-200 p-3">
- <p className="font-medium text-slate-900">{teacher.name} ({teacher.email})</p>
- <p className="mt-1 text-xs text-slate-500">{teacher.bio || "Chưa có mô tả kinh nghiệm/bằng cấp"}</p>
- <p className="mt-1 text-xs text-slate-600">Trạng thái: {teacher.status}</p>
- <div className="mt-2 flex gap-2">
- <button onClick={() => void reviewTeacher(teacher.id, "approved")} className="rounded-lg bg-[#F8FAFC] px-2 py-1 text-xs font-semibold text-[#0F172A]">Duyệt</button>
- <button onClick={() => void reviewTeacher(teacher.id, "rejected")} className="rounded-lg bg-rose-100 px-2 py-1 text-xs font-semibold text-rose-800">Từ chối</button>
- </div>
- </div>
- ))}
-
- {teacherQueue.length === 0 && <p className="text-sm text-slate-500">Không có hồ sơ chờ duyệt.</p>}
- </div>
- </div>
-
+ <section className="grid gap-4">
  <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Theo dõi hoạt động người dùng</h3>
  {!activity && <p className="mt-3 text-sm text-slate-500">Chọn &quot;Lịch sử&quot; ở bảng bên trái để xem chi tiết.</p>}

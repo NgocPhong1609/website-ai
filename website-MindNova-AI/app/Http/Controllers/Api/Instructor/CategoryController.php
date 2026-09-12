@@ -15,7 +15,9 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::query()
-            ->where('status', 'active')
+            ->where(function ($query) {
+                $query->where('status', 'active')->orWhereNull('status');
+            })
             ->orderBy('name')
             ->get(['id', 'name', 'slug']);
 
