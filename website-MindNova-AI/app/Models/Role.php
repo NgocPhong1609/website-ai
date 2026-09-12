@@ -36,4 +36,29 @@ class Role extends Model
     {
         return $this->permissions()->where('name', $permissionName)->exists();
     }
+
+    /**
+     * Resolve a role by name. Creates the row if migrate ran without db:seed.
+     */
+    public static function idFor(string $name): int
+    {
+        $defaults = [
+            'admin' => [
+                'display_name' => 'Quản trị viên',
+                'description' => 'Quản trị toàn quyền hệ thống',
+            ],
+            'teacher' => [
+                'display_name' => 'Giáo viên',
+                'description' => 'Người tạo, quản lý khóa học và xem tiến độ học sinh',
+            ],
+            'student' => [
+                'display_name' => 'Học sinh',
+                'description' => 'Người tham gia học tập và làm quiz',
+            ],
+        ];
+
+        $meta = $defaults[$name] ?? ['display_name' => $name, 'description' => null];
+
+        return static::query()->firstOrCreate(['name' => $name], $meta)->id;
+    }
 }

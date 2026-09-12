@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\PasswordOtp;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +42,8 @@ class AuthController extends Controller
                 'is_locked' => 0,
             ]);
 
-            $roleId = ($request->role === 'teacher') ? 2 : 3;
+            $roleName = $request->role === 'teacher' ? 'teacher' : 'student';
+            $roleId = Role::idFor($roleName);
 
 DB::table('role_user')->insert([
     'user_id' => $user->id, 
@@ -263,7 +265,12 @@ DB::table('user_streaks')->insert([
                     'is_locked' => 0,
                 ]);
 
-                DB::table('role_user')->insert(['user_id' => $user->id, 'role_id' => 3, 'created_at' => now(), 'updated_at' => now()]);
+                DB::table('role_user')->insert([
+                    'user_id' => $user->id,
+                    'role_id' => Role::idFor('student'),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
                 DB::table('user_profiles')->insert(['user_id' => $user->id, 'created_at' => now(), 'updated_at' => now()]);
                 DB::table('user_streaks')->insert(['user_id' => $user->id, 'created_at' => now(), 'updated_at' => now()]);
             } else {
