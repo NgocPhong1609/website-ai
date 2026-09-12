@@ -13,8 +13,8 @@ class DiscussionSeeder extends Seeder
     public function run(): void
     {
         // Lấy 1 giảng viên và 1 học sinh bất kỳ
-        $teacher = \App\Models\User::where('role', 'instructor')->first();
-        $student = \App\Models\User::where('role', 'student')->first();
+        $teacher = \App\Models\User::query()->withRole('teacher')->first();
+        $student = \App\Models\User::query()->withRole('student')->first();
         
         // Lấy 1 bài học bất kỳ thuộc khóa học của giảng viên
         $lesson = \App\Models\Lesson::whereHas('module.course', function ($query) use ($teacher) {

@@ -9,6 +9,8 @@ Cột thêm bằng vòng lặp PHP (parser không gắn được vào từng b�
 
 ## Bảng `users`
 
+Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON vẫn có field `role`.
+
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
 |---|---|---|---|---|---|---|
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
@@ -19,23 +21,21 @@ Cột thêm bằng vòng lặp PHP (parser không gắn được vào từng b�
 | 6 | remember_token | varchar | 100 |  |  | Token ghi nhớ đăng nhập |
 | 7 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 8 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-| 9 | role | varchar | 255 | X |  | Vai trò legacy trên users |
-| 10 | is_locked | tinyint | 1 | X |  | Khóa tài khoản |
-| 11 | last_login_at | timestamp |  |  |  |  |
-| 12 | google_id | varchar | 255 |  |  | ID Google OAuth |
-| 13 | avatar_url | varchar | 255 |  |  | Đường dẫn ảnh đại diện |
-| 14 | status | enum('active,banned,inactive') |  | X |  | Trạng thái bản ghi |
-| 15 | deleted_at | timestamp |  |  |  | Thời điểm xóa mềm (cột tồn tại, model không dùng SoftDeletes) |
-| 16 | teacher_verification_status | varchar | 255 | X |  |  |
-| 17 | teacher_verified_at | timestamp |  |  |  |  |
-| 18 | teacher_verification_note | text |  |  |  |  |
-| 19 | onboarding_data | json |  |  |  |  |
-| 20 | is_onboarded | tinyint | 1 | X |  |  |
-| 21 | notification_email | tinyint | 1 |  |  |  |
-| 22 | weekly_report | tinyint | 1 |  |  |  |
-| 23 | ai_suggestions | tinyint | 1 |  |  |  |
-| 24 | is_verified | tinyint | 1 | X |  |  |
-| 25 | payout_info | json |  |  |  |  |
+| 9 | is_locked | tinyint | 1 | X |  | Khóa tài khoản |
+| 10 | last_login_at | timestamp |  |  |  |  |
+| 11 | google_id | varchar | 255 |  |  | ID Google OAuth |
+| 12 | avatar_url | varchar | 255 |  |  | Đường dẫn ảnh đại diện |
+| 13 | status | enum('active,banned,inactive') |  | X |  | Trạng thái bản ghi |
+| 14 | teacher_verification_status | varchar | 255 | X |  |  |
+| 15 | teacher_verified_at | timestamp |  |  |  |  |
+| 16 | teacher_verification_note | text |  |  |  |  |
+| 17 | onboarding_data | json |  |  |  |  |
+| 18 | is_onboarded | tinyint | 1 | X |  |  |
+| 19 | notification_email | tinyint | 1 |  |  |  |
+| 20 | weekly_report | tinyint | 1 |  |  |  |
+| 21 | ai_suggestions | tinyint | 1 |  |  |  |
+| 22 | is_verified | tinyint | 1 | X |  |  |
+| 23 | payout_info | json |  |  |  |  |
 
 ## Bảng `password_reset_tokens`
 

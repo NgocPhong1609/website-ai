@@ -19,11 +19,10 @@ class CheckRole
         }
 
         $user = $request->user();
-        $userRoles = $user->roles->pluck('name')->toArray();
-        $legacyRole = (string) ($user->getRawOriginal('role') ?? $user->role ?? '');
-
-        if ($legacyRole !== '') {
-            $userRoles[] = $legacyRole;
+        $user->loadMissing('roles');
+        $userRoles = $user->roles->pluck('name')->all();
+        if ($user->role) {
+            $userRoles[] = $user->role;
         }
 
         // Expand required roles to include aliases

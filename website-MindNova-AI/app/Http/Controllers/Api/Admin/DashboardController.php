@@ -146,9 +146,7 @@ class DashboardController extends Controller
     public function teacherApprovals(): JsonResponse
     {
         $teachers = User::query()
-            ->where(function ($query) {
-                $query->where('role', 'teacher')->orWhere('role', 'instructor');
-            })
+            ->withRole(['teacher', 'instructor'])
             ->with(['profile', 'credentials'])
             ->latest()
             ->take(10)
@@ -372,8 +370,8 @@ class DashboardController extends Controller
         $completedEnrollments = Enrollment::where('status', 'completed')->count();
         $completionRate = $totalEnrollments > 0 ? round(($completedEnrollments / $totalEnrollments) * 100, 1) : 0;
 
-        $teacherCount = User::whereIn('role', ['teacher', 'instructor'])->count();
-        $activeTeacherCount = User::whereIn('role', ['teacher', 'instructor'])->where('status', 'active')->count();
+        $teacherCount = User::query()->withRole(['teacher', 'instructor'])->count();
+        $activeTeacherCount = User::query()->withRole(['teacher', 'instructor'])->where('status', 'active')->count();
         $teacherRetention = $teacherCount > 0 ? round(($activeTeacherCount / $teacherCount) * 100, 0) : 0;
 
         $avgProgress = round((float) Enrollment::avg('progress_percentage'), 0);
@@ -425,7 +423,7 @@ class DashboardController extends Controller
                     ['label' => 'Total learners', 'value' => number_format($totalLearners), 'change' => $this->percentChange(User::query())],
                     ['label' => 'Completion rate', 'value' => $completionRate.'%', 'change' => $this->percentChange(Enrollment::where('status', 'completed'), 'enrolled_at')],
                     ['label' => 'Avg. progress', 'value' => $avgProgress.'%', 'change' => $this->percentChange(Enrollment::query(), 'enrolled_at')],
-                    ['label' => 'Teacher retention', 'value' => $teacherRetention.'%', 'change' => $this->percentChange(User::whereIn('role', ['teacher', 'instructor']))],
+                    ['label' => 'Teacher retention', 'value' => $teacherRetention.'%', 'change' => $this->percentChange(User::query()->withRole(['teacher', 'instructor']))],
                 ],
                 'traffic' => $traffic,
                 'subjects' => $subjects,

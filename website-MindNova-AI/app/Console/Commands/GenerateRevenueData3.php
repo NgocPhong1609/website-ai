@@ -38,7 +38,7 @@ class GenerateRevenueData3 extends Command
             return;
         }
 
-        $students = User::where('role', 'user')->get();
+        $students = User::query()->withRole(['user', 'student'])->get();
         if ($students->isEmpty()) {
             $this->error('No students found.');
 

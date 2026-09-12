@@ -165,10 +165,7 @@ class AnalyticsController extends Controller
 
     private function countByRole(string $role): int
     {
-        return User::query()
-            ->where('role', $role)
-            ->orWhereHas('roles', fn ($q) => $q->where('name', $role))
-            ->count();
+        return User::query()->withRole($role)->count();
     }
 
     private function safeQuizAttemptCount(string $status, Carbon $start): int

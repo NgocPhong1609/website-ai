@@ -16,6 +16,7 @@ Xong:
 - Logout admin/student dùng Blue, không còn `red-*`.
 - Gỡ trang admin **AI & System** (`/admin/ai-system`) và API `GET/PUT /api/admin/ai-config`. AI học viên/giáo viên giữ nguyên.
 - Admin: đổi **Nội dung** thành **Quản lý khóa học**, gỡ duyệt GV khỏi Users, sidebar tông sáng như Instructor, danh mục admin tạo là đã duyệt, chuỗi chuyên cần theo điểm danh thật.
+- Role chỉ lưu ở `roles` + `role_user`. Đã bỏ cột trùng `users.role` và cột không dùng `users.deleted_at`.
 
 Sắp làm:
 

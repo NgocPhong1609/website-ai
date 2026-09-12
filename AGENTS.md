@@ -150,7 +150,7 @@ Pattern: Request → middleware → Controller → Service → Model. Không có
 - FE login/register: `src/features/student/auth/`
 - FE onboarding: `src/features/student/onboarding/` + store Zustand
 - Register nhận `role` `student|teacher`. Form FE hiện **cố định `student`**.
-- Register gán `role_id` cứng: **2 = teacher, 3 = student** (giả định seed admin=1). Google callback luôn `role_id = 3`.
+- Register/Google gắn role qua `roles` + `role_user` (`Role::idFor`), không ghi cột `users.role`.
 - Login từ chối `is_locked`.
 - Token lưu `localStorage.accessToken` + cookie `accessToken` (middleware chỉ đọc cookie) + `userRole`.
 - FE normalize role: `src/features/student/auth/components/login/AuthShared.tsx` (teacher/instructor/lecturer → instructor).
@@ -353,7 +353,7 @@ Không SoftDeletes trên model. `users.deleted_at` có thể tồn tại trên D
 
 ### Identity
 
-- `users`: status active/banned/inactive; `is_locked`; dual role (`users.role` + pivot `role_user`); `teacher_verification_status` none/pending/approved/rejected/revoked; onboarding JSON; `payout_info`
+- `users`: status active/banned/inactive; `is_locked`; role chỉ qua `roles` + `role_user` (không còn cột `users.role`); `teacher_verification_status` none/pending/approved/rejected/revoked; onboarding JSON; `payout_info`
 - `roles` / `permissions` / `role_user` / `permission_role` — permission **gần như không enforce** ở middleware
 - Seed names: `admin`, `teacher`, `student`
 - `user_profiles` 1:1
@@ -430,7 +430,7 @@ Tables migrated nhưng **không có model**: `knowledge_topics`, `user_topic_per
 
 - InstructorSeeder: roles + teacher/student demo (email trong seeder; password hash local — không dùng như secret production).
 - QuizAssessmentSeeder: **xóa toàn bộ quizzes** rồi insert — nguy hiểm trên DB có data thật.
-- DiscussionSeeder tìm `users.role = 'instructor'` — lệch seed `teacher` — có thể flaky.
+- DiscussionSeeder tìm teacher qua `roles` pivot (`withRole('teacher')`).
 - SampleCourseSeeder hard-code `versionable_id => 1`.
 
 ---
@@ -446,7 +446,7 @@ Tables migrated nhưng **không có model**: `knowledge_topics`, `user_topic_per
 
 ### Authorization
 
-- Middleware alias `role` = `CheckRole`: pivot + legacy `users.role`; alias teacher↔instructor, student↔learner.
+- Middleware alias `role` = `CheckRole`: `roles` + `role_user`; alias teacher↔instructor, student↔learner.
 - `RoleMiddleware.php` JSON duplicate — **không alias, không dùng**.
 - `admin` middleware: `x-admin-secret` == `ADMIN_SECRET` **hoặc** `isAdmin()`. Alias **không gắn** lên group `/api/admin` (group dùng `role:admin`). Vẫn là backdoor nếu ai gắn `admin`.
 - `client`: user không phải admin.
@@ -562,7 +562,7 @@ Dependencies đặc biệt: `james-heinrich/getid3` (duration video), `openai-ph
 ### Invariant kỹ thuật
 
 - Dual auth storage: sửa login/logout phải set **cả** localStorage và cookie, không thì middleware lệch.
-- Dual role storage: pivot + `users.role`. Đừng chỉ sửa một bên.
+- Role storage: chỉ `roles` + `role_user`. API vẫn trả field `role` từ accessor.
 - Register `role_id` 2/3 phụ thuộc thứ tự seed — fragile.
 - API student nhiều GET/AI **public** — đừng “fix” bằng cách giả định đã auth.
 - `PaymentService` callback: nếu không resolve user thì fallback `User::first()` — nguy hiểm, đừng nhân rộng.

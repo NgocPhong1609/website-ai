@@ -17,6 +17,8 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    private ?string $pendingRoleName = null;
+
     protected $fillable = [
         'name',
         'email',
@@ -136,34 +138,115 @@ class User extends Authenticatable
 
     public function hasRole(string $roleName): bool
     {
-        return $this->roles()->where('name', $roleName)->exists();
+        $roleName = $this->normalizeRoleName($roleName) ?? strtolower(trim($roleName));
+        $aliases = $this->roleAliases($roleName);
+
+        if ($this->relationLoaded('roles')) {
+            return $this->roles->contains(fn (Role $role) => in_array(strtolower((string) $role->name), $aliases, true));
+        }
+
+        return $this->roles()->whereIn('name', $aliases)->exists();
     }
 
     public function isAdmin(): bool
     {
-        return $this->hasRole('admin') || $this->role === 'admin';
+        return $this->hasRole('admin');
     }
 
-    /**
-     * Kiểm tra người dùng có quyền teacher không (Phục vụ cho việc chọn giáo viên)
-     */
     public function isTeacher(): bool
     {
-        return $this->role === 'teacher' || $this->hasRole('teacher');
+        return $this->hasRole('teacher');
+    }
+
+    public function scopeWithRole($query, string|array $names)
+    {
+        $aliases = collect((array) $names)
+            ->flatMap(fn (string $name) => $this->roleAliases($this->normalizeRoleName($name) ?? $name))
+            ->unique()
+            ->values()
+            ->all();
+
+        return $query->whereHas('roles', fn ($q) => $q->whereIn('name', $aliases));
     }
 
     public function getRoleAttribute(): ?string
     {
         $role = $this->relationLoaded('roles')
-            ? $this->roles->pluck('name')->first() ?? $this->attributes['role'] ?? null
-            : $this->roles()->value('name') ?? $this->attributes['role'] ?? null;
+            ? $this->roles->pluck('name')->first()
+            : $this->roles()->value('name');
 
-        if (! is_string($role)) {
+        if (! is_string($role) && array_key_exists('role', $this->attributes)) {
+            $role = $this->attributes['role'];
+        }
+
+        return $this->normalizeRoleName(is_string($role) ? $role : null);
+    }
+
+    public function setRoleAttribute(?string $value): void
+    {
+        $name = $this->normalizeRoleName($value);
+        if ($name === null) {
+            return;
+        }
+
+        unset($this->attributes['role']);
+
+        if ($this->exists) {
+            $this->syncNamedRole($name);
+
+            return;
+        }
+
+        $this->pendingRoleName = $name;
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(function (User $user): void {
+            if ($user->pendingRoleName === null) {
+                return;
+            }
+
+            $user->syncNamedRole($user->pendingRoleName);
+            $user->pendingRoleName = null;
+        });
+    }
+
+    public function syncNamedRole(string $roleName): void
+    {
+        $roleName = $this->normalizeRoleName($roleName) ?? $roleName;
+        $this->roles()->sync([Role::idFor($roleName)]);
+        $this->unsetRelation('roles');
+    }
+
+    private function normalizeRoleName(?string $value): ?string
+    {
+        if (! is_string($value)) {
             return null;
         }
 
-        $role = strtolower(trim($role));
+        $role = strtolower(trim($value));
+        if ($role === '') {
+            return null;
+        }
 
-        return $role !== '' ? $role : null;
+        if (in_array($role, ['instructor', 'lecturer'], true)) {
+            return 'teacher';
+        }
+
+        return $role;
+    }
+
+    private function roleAliases(string $roleName): array
+    {
+        if (in_array($roleName, ['teacher', 'instructor', 'lecturer'], true)) {
+            return ['teacher', 'instructor', 'lecturer'];
+        }
+
+        if (in_array($roleName, ['student', 'learner'], true)) {
+            return ['student', 'learner'];
+        }
+
+        return [$roleName];
     }
 }

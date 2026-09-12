@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,10 +27,7 @@ class UserManagementController extends Controller
 
         if ($request->filled('role')) {
             $role = (string) $request->string('role');
-            $query->where(function ($subQuery) use ($role): void {
-                $subQuery->where('role', $role)
-                    ->orWhereHas('roles', fn ($q) => $q->where('name', $role));
-            });
+            $query->withRole($role);
         }
 
         if ($request->filled('status')) {
@@ -92,13 +88,12 @@ class UserManagementController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => $data['role'],
             'status' => $data['status'] ?? 'active',
             'is_locked' => false,
             'teacher_verification_status' => $data['role'] === 'teacher' ? 'pending' : 'approved',
         ]);
 
-        $this->syncRole($user, $data['role']);
+        $user->syncNamedRole($data['role']);
 
         $this->writeActivity((int) Auth::id(), 'admin_create_user', User::class, $user->id, [
             'created_role' => $data['role'],
@@ -123,8 +118,6 @@ class UserManagementController extends Controller
             return response()->json(['message' => 'Khong the doi role cua chinh minh.'], 422);
         }
 
-        $user->role = $data['role'];
-
         if ($data['role'] === 'teacher' && !isset($user->teacher_verification_status)) {
             $user->teacher_verification_status = 'pending';
         }
@@ -135,8 +128,7 @@ class UserManagementController extends Controller
         }
 
         $user->save();
-
-        $this->syncRole($user, $data['role']);
+        $user->syncNamedRole($data['role']);
 
         $this->writeActivity((int) Auth::id(), 'role_changed', User::class, $user->id, [
             'from' => $oldRole,
@@ -207,10 +199,7 @@ class UserManagementController extends Controller
     {
         $query = User::query()
             ->with(['profile', 'teacherCertificates.evidences'])
-            ->where(function ($builder) {
-                $builder->where('role', 'teacher')
-                    ->orWhereHas('roles', fn ($q) => $q->where('name', 'teacher'));
-            })
+            ->withRole('teacher')
             ->latest();
 
         if ($request->filled('status') && $request->string('status') !== 'all') {
@@ -228,10 +217,7 @@ class UserManagementController extends Controller
 
     public function showTeacherVerificationDetail(int $id): JsonResponse
     {
-        $user = User::where(function ($builder) {
-            $builder->where('role', 'teacher')
-                ->orWhereHas('roles', fn ($q) => $q->where('name', 'teacher'));
-        })->findOrFail($id);
+        $user = User::query()->withRole('teacher')->findOrFail($id);
 
         $verificationService = app(\App\Services\TeacherVerificationService::class);
         $data = $verificationService->getTeacherProfileData($user);
@@ -407,23 +393,14 @@ class UserManagementController extends Controller
         ]);
     }
 
-    private function syncRole(User $user, string $roleName): void
-    {
-        $role = Role::query()->firstOrCreate(['name' => $roleName], ['description' => $roleName]);
-        $user->roles()->sync([$role->id]);
-    }
-
     private function resolveRole(User $user): string
     {
-        return $user->roles->pluck('name')->first() ?? (string) ($user->role ?? 'guest');
+        return $user->role ?? 'guest';
     }
 
     private function countByRole(string $role): int
     {
-        return User::query()
-            ->where('role', $role)
-            ->orWhereHas('roles', fn ($q) => $q->where('name', $role))
-            ->count();
+        return User::query()->withRole($role)->count();
     }
 
     private function writeActivity(int $adminId, string $action, string $subjectType, int $subjectId, ?array $metadata): void

@@ -182,7 +182,7 @@ Seed `InstructorSeeder.php`: tên pivot `admin`, `teacher`, `student`.
 
 Dual storage:
 
-- Cột `users.role` (default `'user'` trong migration)
+- Role nằm ở `roles` + `role_user`; API vẫn trả field `role` từ accessor.
 - Pivot `role_user` + bảng `roles`
 
 `User::getRoleAttribute()` ưu tiên `roles.name`, rồi `attributes['role']`.
@@ -217,7 +217,7 @@ Permission table tồn tại; **gần như không enforce** ở middleware.
 - BE: `auth:sanctum` + `role:admin`.
 - Middleware `admin` (header `x-admin-secret` == `ADMIN_SECRET` hoặc `isAdmin()`) **không gắn** lên group `/api/admin`.
 
-**Web Blade `role:client`:** không khớp seed `student` trừ khi `users.role`/`pivot` đúng chữ `client`.
+**Web Blade `role:client`:** không khớp seed `student` trừ khi pivot `roles.name` đúng chữ `client`.
 
 ---
 
@@ -371,7 +371,7 @@ Nguồn: migrations + models `website-MindNova-AI/app/Models/`. Không SoftDelet
 
 ### Identity
 
-- `users` — status `active|banned|inactive`; `is_locked`; dual role; `teacher_verification_status`; `onboarding_data`; `payout_info`
+- `users` — status `active|banned|inactive`; `is_locked`; role qua pivot `role_user`; `teacher_verification_status`; `onboarding_data`; `payout_info`
 - `roles`, `permissions`, `role_user`, `permission_role`
 - `user_profiles` 1:1
 - `password_otps`

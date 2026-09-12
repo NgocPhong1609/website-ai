@@ -38,16 +38,7 @@ class RoleMiddleware
             if ($r === 'instructor') $expandedRoles[] = 'teacher';
         }
 
-        // Check if user has any of the required roles via pivot table
-        $hasRole = $user->roles()->whereIn('name', $expandedRoles)->exists();
-
-        // Fallback: check users.role column
-        if (!$hasRole) {
-            $legacyRole = (string) ($user->getRawOriginal('role') ?? $user->role ?? '');
-            if ($legacyRole !== '' && in_array($legacyRole, $expandedRoles, true)) {
-                $hasRole = true;
-            }
-        }
+        $hasRole = collect($expandedRoles)->contains(fn (string $role) => $user->hasRole($role));
 
         if (!$hasRole) {
             return response()->json([
