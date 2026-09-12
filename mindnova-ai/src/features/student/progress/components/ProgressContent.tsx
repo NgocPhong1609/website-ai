@@ -14,7 +14,7 @@ export function ProgressContent() {
 
   if (isLoading) {
     return (
-      <div className="p-6 md:p-12 max-w-[1400px] mx-auto min-h-[70vh] flex items-center justify-center">
+      <div className="w-full min-h-[calc(100vh-4.5rem)] -mb-24 bg-white p-6 md:p-12 pb-32 flex items-center justify-center">
         <Loader size="lg" text="Đang đồng bộ tiến trình học tập từ Gia sư Trí tuệ Nhân tạo Nova..." />
       </div>
     );
@@ -22,7 +22,7 @@ export function ProgressContent() {
 
   if (isError || !data) {
     return (
-      <div className="p-6 md:p-12 max-w-[1400px] mx-auto min-h-[60vh] flex flex-col items-center justify-center text-center gap-3">
+      <div className="w-full min-h-[calc(100vh-4.5rem)] -mb-24 bg-white p-6 md:p-12 pb-32 flex flex-col items-center justify-center text-center gap-3">
         <div className="w-16 h-16 rounded-2xl bg-[#EFF6FF] text-[#2563eb] flex items-center justify-center text-2xl mb-1 shadow-sm border border-[#DBEAFE]/40">
           
         </div>
@@ -44,7 +44,7 @@ export function ProgressContent() {
   const { overview_card, key_metrics, roadmap_modules, ai_insights } = data;
 
   return (
-    <div className="p-6 md:p-8 max-w-[1200px] mx-auto min-h-[85vh] flex flex-col gap-8 bg-white">
+    <div className="w-full min-h-[calc(100vh-4.5rem)] -mb-24 bg-white p-6 md:p-8 pb-32 flex flex-col gap-8">
       
       {/* Header & Tabs Navigation */}
       <div className="space-y-6 text-center">

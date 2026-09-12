@@ -101,7 +101,7 @@ export function QuizStartContent() {
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-[1200px] mx-auto min-h-[85vh] flex flex-col gap-8 bg-white">
+    <div className="w-full min-h-[calc(100vh-4.5rem)] -mb-24 bg-white p-6 md:p-8 pb-32 flex flex-col gap-8">
       
       {/* Header & Tabs Navigation */}
       <div className="space-y-6 text-center mt-4">
