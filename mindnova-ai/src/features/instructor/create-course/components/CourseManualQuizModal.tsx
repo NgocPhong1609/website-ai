@@ -37,7 +37,7 @@ export function CourseManualQuizModal({
         {/* Modal Header Bar */}
         <div className="px-6 py-4 bg-white border-b border-gray-200 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-lg font-black shadow-sm">
+            <div className="w-9 h-9 rounded-xl bg-[#C0392B] text-white flex items-center justify-center text-lg font-black shadow-sm">
               ✍️
             </div>
             <div>

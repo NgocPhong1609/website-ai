@@ -240,13 +240,13 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: St
                   </span>
                 </div>
               ) : initialCourseId ? (
-                <div className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex items-center justify-between">
+                <div className="p-4 rounded-2xl bg-red-50/70 border border-red-100 flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-black text-[#C0392B] uppercase tracking-wider">
                         Khóa học được chọn
                       </span>
-                      <span className="px-2 py-0.5 bg-white text-[#C0392B] font-black text-[10px] rounded-md border border-indigo-100 shadow-sm">
+                      <span className="px-2 py-0.5 bg-white text-[#C0392B] font-black text-[10px] rounded-md border border-red-100 shadow-sm">
                         Cố định từ bước tạo
                       </span>
                     </div>
@@ -257,7 +257,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: St
                       ID: #{selectedCourseId}
                     </span>
                     {isLoadingCourseDetails ? (
-                      <span className="text-[10px] font-bold text-indigo-600 animate-pulse">Đang nạp Modules...</span>
+                      <span className="text-[10px] font-bold text-[#C0392B] animate-pulse">Đang nạp Modules...</span>
                     ) : (
                       <span className="text-[10px] text-emerald-600 font-semibold">{modules.length} Modules</span>
                     )}
@@ -282,7 +282,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: St
                     <div className="flex items-center justify-between px-2 text-[11px]">
                       <span className="font-semibold text-gray-500">
                         {isLoadingCourseDetails ? (
-                          <span className="text-indigo-600 font-bold animate-pulse">⏳ Đang nạp Modules & Lessons...</span>
+                          <span className="text-[#C0392B] font-bold animate-pulse">⏳ Đang nạp Modules & Lessons...</span>
                         ) : (
                           <span className="text-emerald-700 font-bold">
                             ✓ {modules.length} Modules, {lessons.length} Lessons đã nạp
@@ -311,7 +311,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: St
                     type="button"
                     onClick={() => handlePositionChange(pos.key as any)}
                     className={`p-3.5 rounded-xl border text-xs font-extrabold flex flex-col items-center gap-1.5 transition-all cursor-pointer text-center ${position === pos.key
-                      ? "border-[#C0392B] bg-indigo-50 text-[#C0392B] shadow-xs ring-1 ring-[#C0392B]/30"
+                      ? "border-[#C0392B] bg-red-50 text-[#C0392B] shadow-xs ring-1 ring-[#C0392B]/30"
                       : "border-[#FAF7F2] text-[#8A8478] hover:border-gray-300 bg-white"
                       }`}
                   >

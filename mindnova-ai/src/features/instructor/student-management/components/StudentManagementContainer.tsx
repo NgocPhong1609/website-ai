@@ -17,11 +17,11 @@ function StudentNavigationTabs({ active }: { active: "students" | "analytics" })
         className={twMerge(
           "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
           active === "students"
-            ? "bg-[#4F46E5] text-white shadow-sm"
+            ? "bg-[#C0392B] text-white shadow-sm"
             : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
         )}
       >
-        <span>👥 Danh sách &amp; Chăm sóc Học viên</span>
+        <span>Danh sách &amp; Chăm sóc Học viên</span>
       </Link>
 
       <Link
@@ -29,11 +29,11 @@ function StudentNavigationTabs({ active }: { active: "students" | "analytics" })
         className={twMerge(
           "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
           active === "analytics"
-            ? "bg-[#4F46E5] text-white shadow-sm"
+            ? "bg-[#C0392B] text-white shadow-sm"
             : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
         )}
       >
-        <span>📈 Phân tích Tương tác &amp; AI Insights</span>
+        <span>Phân tích Tương tác &amp; AI Insights</span>
       </Link>
     </div>
   );
@@ -82,7 +82,7 @@ function PageHeader({ onOpenModal, onExport }: { onOpenModal: () => void, onExpo
           type="button"
           id="btn-send-notification"
           onClick={onOpenModal}
-          className="flex items-center gap-2 px-4.5 py-2 rounded-xl text-xs font-extrabold text-white bg-[#4F46E5] hover:bg-[#4338CA] shadow-sm transition-all cursor-pointer"
+          className="flex items-center gap-2 px-4.5 py-2 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#a8392b] shadow-sm transition-all cursor-pointer"
         >
           <SparklesIcon size={14} />
           <span>Gửi Thông Báo AI</span>

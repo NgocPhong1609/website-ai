@@ -17,7 +17,7 @@ export function CreateCourseCard() {
             </div>
 
             <div className="flex flex-col gap-1 max-w-[200px]">
-                <p className="text-[15px] font-bold text-[#2C3039] group-hover:text-[#C0392B] transition-colors">
+                <p className="text-[15px] font-bold text-[#2C3039] group-hover:text-[#a8392b] transition-colors">
                     Tạo khóa học mới
                 </p>
                 <p className="text-[12px] text-[#8A8478] font-medium leading-relaxed">

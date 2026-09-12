@@ -26,7 +26,7 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
  isDone
  ? "bg-[#C0392B] text-white shadow-2xs"
  : isActive
- ? "bg-[#C0392B] text-white ring-4 ring-indigo-100 shadow-sm"
+ ? "bg-[#C0392B] text-white ring-4 ring-red-100 shadow-sm"
  : "bg-gray-200 text-[#8A8478]"
  )}
  >

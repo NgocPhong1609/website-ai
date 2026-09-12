@@ -153,7 +153,7 @@ export function AIInsightsTab() {
                                 )}
 
                                 {/* AI Rationale & Remediation Suggestion */}
-                                <div className="p-3.5 mt-2 rounded-xl bg-indigo-50/60 border border-[#FAF7F2] text-xs font-medium text-indigo-950 leading-relaxed flex flex-col gap-1.5">
+                                <div className="p-3.5 mt-2 rounded-xl bg-red-50/60 border border-[#FAF7F2] text-xs font-medium text-[#2C3039] leading-relaxed flex flex-col gap-1.5">
                                     <div className="flex items-center gap-2">
                                         <span className="text-base shrink-0"></span>
                                         <strong className="font-extrabold text-[#C0392B]">Đề xuất Kế hoạch hành động: </strong>
@@ -171,7 +171,7 @@ export function AIInsightsTab() {
                                 <button
                                     type="button"
                                     onClick={() => alert(`Đang điều hướng...`)}
-                                    className="flex-1 md:flex-none px-4 py-2 rounded-xl bg-[#C0392B] hover:bg-[#4338CA] text-white text-xs font-extrabold shadow-2xs transition-all whitespace-nowrap cursor-pointer"
+                                    className="flex-1 md:flex-none px-4 py-2 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white text-xs font-extrabold shadow-2xs transition-all whitespace-nowrap cursor-pointer"
                                 >
                                     Tối Ưu Hóa Ngay
                                 </button>

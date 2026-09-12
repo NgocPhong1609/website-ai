@@ -50,7 +50,7 @@ export function QuizManualWizard({
         <div className="bg-white rounded-3xl p-6 border border-[#FAF7F2] shadow-sm flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl font-bold shadow-md">
+              <div className="w-10 h-10 rounded-2xl bg-[#C0392B] text-white flex items-center justify-center text-xl font-bold shadow-md">
                 📝
               </div>
               <div>
@@ -60,7 +60,7 @@ export function QuizManualWizard({
             </div>
 
             <div className="flex items-center gap-2 font-mono text-xs font-black">
-              <span className="text-indigo-600">Bước {step}</span>
+              <span className="text-[#C0392B]">Bước {step}</span>
               <span className="text-gray-300">/</span>
               <span className="text-gray-400">3</span>
             </div>
@@ -80,14 +80,14 @@ export function QuizManualWizard({
                 <div key={s.num} className="flex flex-col gap-1">
                   <div
                     className={`h-1.5 rounded-full transition-all duration-300 ${isActive
-                      ? "bg-indigo-600"
+                      ? "bg-[#C0392B]"
                       : isDone
                         ? "-[#2C3039]"
                         : "bg-gray-200"
                       }`}
                   />
                   <span
-                    className={`text-[10px] font-extrabold truncate ${isActive ? "text-indigo-600" : isDone ? "-[#2C3039]" : "text-gray-400"
+                    className={`text-[10px] font-extrabold truncate ${isActive ? "text-[#C0392B]" : isDone ? "-[#2C3039]" : "text-gray-400"
                       }`}
                   >
                     {s.num}. {s.name}

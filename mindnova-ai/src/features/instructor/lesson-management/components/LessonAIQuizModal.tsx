@@ -171,7 +171,7 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
                                             {/* Top Tag & Status */}
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="w-7 h-7 rounded-xl bg-indigo-50 -[#C0392B] font-black text-xs flex items-center justify-center">
+                                                    <span className="w-7 h-7 rounded-xl bg-red-50 -[#C0392B] font-black text-xs flex items-center justify-center">
                                                         #{idx + 1}
                                                     </span>
                                                     <span className="text-[11px] font-black uppercase px-2.5 py-1 rounded-lg bg-gray-100 text-[#8A8478] border">
@@ -200,7 +200,7 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
                                                     <button
                                                         type="button"
                                                         onClick={() => (isEditing ? commitEdit(q.id) : startEdit(q))}
-                                                        className="px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:-[#C0392B] -[#C0392B] hover:text-white border -[#FAF7F2] text-xs font-extrabold transition-all"
+                                                        className="px-3.5 py-1.5 rounded-xl bg-red-50 hover:-[#C0392B] -[#C0392B] hover:text-white border -[#FAF7F2] text-xs font-extrabold transition-all"
                                                     >
                                                         {isEditing ? "Save Edit" : " Edit"}
                                                     </button>

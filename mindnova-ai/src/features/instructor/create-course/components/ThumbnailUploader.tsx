@@ -81,8 +81,8 @@ export function ThumbnailUploader({
             className={twMerge(
                 "w-full aspect-[4/3] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2.5 transition-all duration-200 cursor-pointer",
                 isDragging
-                    ? "border-[#C0392B] bg-indigo-50/50 scale-[1.01]"
-                    : "border-gray-300 bg-[#FEFCF9]/60 hover:border-[#C0392B] hover:bg-indigo-50/20 shadow-2xs"
+                    ? "border-[#C0392B] bg-red-50/50 scale-[1.01]"
+                    : "border-gray-300 bg-[#FEFCF9]/60 hover:border-[#C0392B] hover:bg-red-50/20 shadow-2xs"
             )}
         >
             <div

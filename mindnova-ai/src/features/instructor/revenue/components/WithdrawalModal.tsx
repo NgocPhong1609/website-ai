@@ -210,7 +210,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
                 <button
                   type="button"
                   onClick={() => setAmount(formatCurrency(availableBalance.toString()))}
-                  className="px-2.5 py-1 rounded-lg bg-indigo-50 text-[#C0392B] font-extrabold text-xs hover:bg-[#C0392B] hover:text-white transition-all cursor-pointer border border-[#FAF7F2]"
+                  className="px-2.5 py-1 rounded-lg bg-red-50 text-[#C0392B] font-extrabold text-xs hover:bg-[#C0392B] hover:text-white transition-all cursor-pointer border border-[#FAF7F2]"
                 >
                   Tối đa
                 </button>
@@ -237,7 +237,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
                 <button
                   type="button"
                   onClick={() => setIsEditingBank(true)}
-                  className="text-xs font-bold text-indigo-600 hover:text-indigo-800 underline cursor-pointer"
+                  className="text-xs font-bold text-[#C0392B] hover:text-[#A93226] underline cursor-pointer"
                 >
                   Thay đổi tài khoản
                 </button>
@@ -304,17 +304,17 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
                   <button
                     type="submit"
                     disabled={saveBankMutation.isPending}
-                    className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold shadow-sm transition-all cursor-pointer disabled:opacity-50"
+                    className="px-4 py-1.5 rounded-lg bg-[#C0392B] hover:bg-[#A93226] text-white text-xs font-extrabold shadow-sm transition-all cursor-pointer disabled:opacity-50"
                   >
                     {saveBankMutation.isPending ? "Đang lưu..." : "Lưu tài khoản"}
                   </button>
                 </div>
               </form>
             ) : (
-              <div className="p-4 rounded-xl bg-indigo-50/60 border border-indigo-200 flex items-center justify-between gap-3">
+              <div className="p-4 rounded-xl bg-red-50/60 border border-red-200 flex items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-black text-indigo-950">{bankName}</span>
+                    <span className="text-xs font-black text-[#2C3039]">{bankName}</span>
                     <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
                       Đã xác minh
                     </span>
@@ -342,7 +342,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
             type="button"
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#4338CA] active:scale-98 shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#A93226] active:scale-98 shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             <span>{withdrawMutation.isPending ? "Đang xử lý..." : "Xác Nhận & Gửi Yêu Cầu Rút Tiền"}</span>
             {!withdrawMutation.isPending && <ArrowRightIcon size={16} />}

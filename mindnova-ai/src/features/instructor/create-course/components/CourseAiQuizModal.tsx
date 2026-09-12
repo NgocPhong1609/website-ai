@@ -53,7 +53,7 @@ export function CourseAiQuizModal({
         <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-xl font-black shadow-sm ${
-              isGeneral ? "bg-amber-500 text-white" : "bg-indigo-600 text-white"
+              isGeneral ? "bg-amber-500 text-white" : "bg-[#C0392B] text-white"
             }`}>
               {position ? (isGeneral ? "🏆" : "🏁") : "🤖"}
             </div>

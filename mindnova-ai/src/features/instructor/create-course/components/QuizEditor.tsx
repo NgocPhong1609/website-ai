@@ -276,13 +276,13 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
       {isLoading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 rounded-3xl backdrop-blur-[2px]">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin" />
+            <div className="w-8 h-8 rounded-full border-4 border-[#C0392B] border-t-transparent animate-spin" />
             <span className="text-xs font-bold text-gray-500">Đang tải dữ liệu bài kiểm tra...</span>
           </div>
         </div>
       )}
       {/* Import from Bank Banner */}
-      <div className="flex items-center justify-between p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100">
+      <div className="flex items-center justify-between p-4 rounded-2xl bg-red-50/60 border border-red-100">
         <div className="flex items-center gap-3">
           <span className="text-xl">🪄</span>
           <div>
@@ -313,7 +313,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
       />
 
       {/* Quiz Meta Settings */}
-      <div className="p-6 rounded-3xl bg-[#FAF8FF] border border-indigo-100 flex flex-col gap-4">
+      <div className="p-6 rounded-3xl bg-red-50/30 border border-red-100 flex flex-col gap-4">
         <QuizImageField
           label="Ảnh đại diện Quiz"
           purpose="thumbnail"
@@ -366,7 +366,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-indigo-50">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-red-100">
           <div>
             <label className="block text-xs font-black text-gray-700 mb-1">Thời gian làm bài (Phút)</label>
             <input
@@ -449,7 +449,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
       </div>
 
       {/* Question Filter & Action Toolbar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-[#FAF8FF] border border-indigo-50">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-red-50/30 border border-red-100">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -490,7 +490,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
           <button
             type="button"
             onClick={() => handleAddQuestion("multiple_choice")}
-            className="px-3.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-[#C0392B] text-xs font-extrabold rounded-xl border border-indigo-100 transition-all cursor-pointer"
+            className="px-3.5 py-1.5 bg-red-50 hover:bg-red-100 text-[#C0392B] text-xs font-extrabold rounded-xl border border-red-100 transition-all cursor-pointer"
           >
             + Trắc nghiệm
           </button>

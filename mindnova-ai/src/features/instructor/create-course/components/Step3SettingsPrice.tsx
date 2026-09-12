@@ -117,7 +117,7 @@ export function Step3SettingsPrice({
  className={twMerge(
  "p-3.5 rounded-xl border text-left transition-all cursor-pointer",
  tier === definition.tier
- ? "border-[#C0392B] bg-indigo-50/50 shadow-2xs"
+ ? "border-[#C0392B] bg-red-50/50 shadow-2xs"
  : "border-[#E8E2D9] bg-white hover:border-gray-300"
  )}
  >

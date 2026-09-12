@@ -7,6 +7,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "./icons";
 import { getStudents, exportStudentsCSV, getNotificationOptions } from "../api";
 import { StudentDetailSidebar, type StudentDetailData } from "./StudentDetailSidebar";
 import { DownloadIcon } from "./icons"; // Import if needed for export button inside table header
+import { formatAvatarUrl } from "@/src/shared/components/ui/Avatar";
 
 export type ProgressStatus = "Hoàn tất" | "Đang học" | "Chưa bắt đầu" | "Nguy cơ trễ";
 
@@ -19,7 +20,7 @@ function ProgressBadge({ progress, status }: { progress: number; status: Progres
     if (status === "Hoàn tất" || status === "completed") {
         bar = "bg-[#5eff6c]"; text = "text-[#2C3039]"; bg = "bg-emerald-50 -[#FAF7F2]"; label = "Hoàn tất";
     } else if (status === "Đang học" || status === "in-progress") {
-        bar = "bg-[#C0392B]"; text = "text-[#C0392B]"; bg = "bg-indigo-50 -[#FAF7F2]"; label = "Đang học";
+        bar = "bg-[#C0392B]"; text = "text-[#C0392B]"; bg = "bg-red-50 -[#FAF7F2]"; label = "Đang học";
     } else if (status === "Nguy cơ trễ" || status === "at-risk") {
         bar = "bg-rose-500"; text = "text-rose-600"; bg = "bg-rose-50 border-rose-200"; label = "Nguy cơ trễ";
     } else if (status === "Chưa bắt đầu") {
@@ -45,11 +46,12 @@ function Avatar({ name, avatarUrl }: { name: string; avatarUrl?: string | null }
     const [hasError, setHasError] = useState(false);
     useEffect(() => { setHasError(false); }, [avatarUrl]);
     const initials = name ? name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase() : "U";
+    const resolvedUrl = formatAvatarUrl(avatarUrl);
 
-    if (avatarUrl && !hasError) {
+    if (resolvedUrl && !hasError) {
         return (
             <img
-                src={avatarUrl}
+                src={resolvedUrl}
                 alt={name}
                 onError={() => setHasError(true)}
                 className="w-10 h-10 rounded-2xl shadow-sm object-cover shrink-0"
@@ -117,7 +119,7 @@ function CustomSelect({
                             className={twMerge(
                                 "w-full text-left px-3.5 py-2.5 text-xs font-semibold transition-colors cursor-pointer",
                                 value === opt.id
-                                    ? "bg-indigo-50/70 text-[#C0392B]"
+                                    ? "bg-red-50/70 text-[#C0392B]"
                                     : "text-gray-700 hover:bg-[#FEFCF9] hover:text-[#2C3039]"
                             )}
                         >
@@ -253,7 +255,7 @@ export function StudentTable({
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="text-xs font-extrabold text-[#C0392B] bg-indigo-50 px-2.5 py-1 rounded-lg border border-[#FAF7F2] whitespace-nowrap">
+                                            <span className="text-xs font-extrabold text-[#C0392B] bg-red-50 px-2.5 py-1 rounded-lg border border-[#FAF7F2] whitespace-nowrap">
                                                 {st.course.title}
                                             </span>
                                         </td>

@@ -72,7 +72,7 @@ function PageHeader({ onSave }: { onSave: () => void }) {
                     type="button"
                     id="btn-save-pricing"
                     onClick={onSave}
-                    className="flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-2xs transition-all cursor-pointer shrink-0"
+                    className="flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#A93226] shadow-2xs transition-all cursor-pointer shrink-0"
                 >
                     <SaveIcon size={14} />
                     <span>Lưu thiết lập</span>

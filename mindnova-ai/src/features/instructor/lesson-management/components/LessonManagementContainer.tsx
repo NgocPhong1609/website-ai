@@ -166,7 +166,7 @@ function LessonRow({ lesson, onEdit, onDelete, onGenerateQuiz }: LessonRowProps)
                     type="button"
                     aria-label="Chỉnh sửa bài học"
                     onClick={onEdit}
-                    className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-indigo-50 transition-all duration-150"
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-red-50 transition-all duration-150"
                 >
                     <PencilIcon size={12} />
                 </button>
@@ -222,7 +222,7 @@ function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLes
                         type="button"
                         aria-label="Chỉnh sửa chương"
                         onClick={onEdit}
-                        className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-indigo-50 transition-all duration-150"
+                        className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-red-50 transition-all duration-150"
                     >
                         <PencilIcon size={13} />
                     </button>
@@ -238,7 +238,7 @@ function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLes
                         type="button"
                         aria-label={chapter.collapsed ? "Mở rộng chương" : "Thu gọn chương"}
                         onClick={onToggle}
-                        className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-indigo-50 transition-all duration-150"
+                        className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-red-50 transition-all duration-150"
                     >
                         {chapter.collapsed ? <ChevronDownIcon size={14} /> : <ChevronUpIcon size={14} />}
                     </button>
@@ -262,7 +262,7 @@ function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLes
                     <button
                         type="button"
                         onClick={onAddLesson}
-                        className="w-full flex items-center gap-2 px-4 py-3 text-[12px] font-semibold text-[#C0392B] hover:bg-indigo-50/50 transition-colors duration-150 border-t border-dashed -[#FAF7F2] group"
+                        className="w-full flex items-center gap-2 px-4 py-3 text-[12px] font-semibold text-[#C0392B] hover:bg-red-50/50 transition-colors duration-150 border-t border-dashed -[#FAF7F2] group"
                     >
                         <PlusIcon size={13} />
                         Thêm bài học mới vào chương {chapter.index}
@@ -302,7 +302,7 @@ export function AIAssistCard({ courseId, onSuggestChapter }: {
  return (
  <section
   aria-label="MindNova AI Assist"
-  className="overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-purple-50 shadow-sm"
+  className="overflow-hidden rounded-3xl border border-red-100 bg-gradient-to-br from-red-50 via-white to-rose-50 shadow-sm"
  >
   <div className="flex flex-col gap-5 p-4 sm:p-6">
    <div className="flex items-start gap-3">
@@ -326,9 +326,9 @@ export function AIAssistCard({ courseId, onSuggestChapter }: {
     <Link
      href={`/instructor/quiz-generator?course_id=${courseId || ""}`}
      aria-describedby="ai-assist-quiz-description"
-     className="group flex min-h-24 items-start gap-3 rounded-2xl border border-indigo-200 bg-white p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C0392B] focus-visible:ring-offset-2"
+     className="group flex min-h-24 items-start gap-3 rounded-2xl border border-red-200 bg-white p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-red-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C0392B] focus-visible:ring-offset-2"
     >
-     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-[#C0392B] transition-colors group-hover:bg-[#C0392B] group-hover:text-white">
+     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-[#C0392B] transition-colors group-hover:bg-[#C0392B] group-hover:text-white">
       <SparklesIcon size={18} aria-hidden="true" />
      </span>
      <span className="min-w-0">
@@ -442,10 +442,10 @@ function FilterBar({ active, onChange, total, published, draft, totalHours, tota
 
                 {/* Sort icons */}
                 <div className="flex items-center gap-1">
-                    <button type="button" aria-label="Lọc" className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-indigo-50 transition-all">
+                    <button type="button" aria-label="Lọc" className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-red-50 transition-all">
                         <FilterIcon size={14} />
                     </button>
-                    <button type="button" aria-label="Sắp xếp" className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-indigo-50 transition-all">
+                    <button type="button" aria-label="Sắp xếp" className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#C0392B] hover:bg-red-50 transition-all">
                         <SortIcon size={14} />
                     </button>
                 </div>
@@ -460,9 +460,9 @@ function AddChapterButton({ onClick }: { onClick: () => void }) {
             type="button"
             id="btn-add-chapter"
             onClick={onClick}
-            className="w-full flex flex-col items-center justify-center gap-2 py-7 rounded-2xl border-2 border-dashed border-gray-300 bg-white hover:border-[#C0392B] hover:bg-indigo-50/30 transition-all duration-200 group cursor-pointer shadow-2xs"
+            className="w-full flex flex-col items-center justify-center gap-2 py-7 rounded-2xl border-2 border-dashed border-gray-300 bg-white hover:border-[#C0392B] hover:bg-red-50/30 transition-all duration-200 group cursor-pointer shadow-2xs"
         >
-            <span className="w-10 h-10 rounded-xl border-2 border-dashed border-gray-300 group-hover:border-[#C0392B] group-hover:bg-indigo-50 flex items-center justify-center text-gray-400 group-hover:text-[#C0392B] transition-all">
+            <span className="w-10 h-10 rounded-xl border-2 border-dashed border-gray-300 group-hover:border-[#C0392B] group-hover:bg-red-50 flex items-center justify-center text-gray-400 group-hover:text-[#C0392B] transition-all">
                 <PlusCircleIcon size={20} />
             </span>
             <span className="text-xs font-black text-[#8A8478] group-hover:text-[#C0392B] transition-colors duration-200 uppercase tracking-wider">
@@ -594,7 +594,7 @@ function ChapterModal({ isOpen, editingChapter, onSave, onClose }: ChapterModalP
                     <button
                         type="button"
                         onClick={handleSave}
-                        className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-2xs hover:shadow-sm transition-all"
+                        className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#C0392B] hover:bg-[#A93226] shadow-2xs hover:shadow-sm transition-all"
                     >
                         {editingChapter ? "Lưu thay đổi" : "Thêm Module"}
                     </button>
@@ -752,7 +752,7 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
                                 type="button"
                                 id="btn-add-lesson"
                                 onClick={() => addLesson(chapters[0]?.id?.toString() || "ch1")}
-                                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-2xs transition-all cursor-pointer"
+                                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#A93226] shadow-2xs transition-all cursor-pointer"
                             >
                                 <PlusIcon size={14} />
                                 <span>Thêm bài giảng</span>

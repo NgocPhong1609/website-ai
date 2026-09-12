@@ -17,6 +17,7 @@ import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/q
 import toast from "react-hot-toast";
 import { LessonAttachments } from "@/src/features/instructor/lesson-management/components/LessonAttachments";
 import type { LessonAttachment } from "@/src/features/instructor/lesson-management/api";
+import { Avatar } from "@/src/shared/components/ui/Avatar";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 function CheckIcon({ className = "w-4 h-4" }: { className?: string }) {
@@ -1408,9 +1409,12 @@ function LessonWorkspaceContent() {
                             </form>
                           ) : (
                             <div className="p-4 sm:p-5 rounded-xl border transition-all flex items-start gap-3.5 bg-white border-[var(--border-color)]">
-                              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--bg-light)] text-[var(--primary-color)] font-bold shrink-0 border border-[var(--bg-light)]">
-                                {item.student.name.slice(0, 2).toUpperCase()}
-                              </div>
+                              <Avatar
+                                src={(item.student as any)?.avatar_url || (item.student as any)?.avatar || (item.student as any)?.profile_image || null}
+                                alt={item.student.name}
+                                fallback={item.student.name}
+                                className="w-10 h-10 rounded-2xl bg-[#C0392B] text-white font-bold shrink-0 shadow-2xs"
+                              />
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-2 mb-1">
                                   <span className="font-bold text-sm text-[#2C3039]">{item.student.name}</span>

@@ -67,9 +67,9 @@ export function SelectQuizModal({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 bg-black/50 backdrop-blur-xs animate-fadeIn">
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden border border-indigo-100">
+      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden border border-red-100">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-indigo-50 bg-[#FAF8FF]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-red-100 bg-red-50/30">
           <div className="flex items-center gap-2.5">
             <span className="w-9 h-9 rounded-xl bg-[#C0392B] text-white flex items-center justify-center text-lg font-black shadow-xs">
               📥
@@ -122,11 +122,11 @@ export function SelectQuizModal({
               return (
                 <div
                   key={q.id}
-                  className="p-4 rounded-2xl border border-gray-200 hover:border-[#C0392B] bg-white hover:bg-indigo-50/30 transition-all flex items-center justify-between gap-4 group"
+                  className="p-4 rounded-2xl border border-gray-200 hover:border-[#C0392B] bg-white hover:bg-red-50/30 transition-all flex items-center justify-between gap-4 group"
                 >
                   <div className="flex flex-col gap-1 flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-indigo-50 text-[#C0392B] border border-indigo-100">
+                      <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-red-50 text-[#C0392B] border border-red-100">
                         Quiz #{q.id}
                       </span>
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
@@ -150,7 +150,7 @@ export function SelectQuizModal({
                     type="button"
                     disabled={isSelectedLoading}
                     onClick={() => handleChoose(q)}
-                    className="px-4 py-2 bg-[#C0392B] hover:bg-[#a02c20] disabled:bg-gray-300 text-white font-extrabold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
+                    className="px-4 py-2 bg-[#C0392B] hover:bg-[#A93226] disabled:bg-gray-300 text-white font-extrabold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
                   >
                     {isSelectedLoading ? (
                       <>
@@ -168,7 +168,7 @@ export function SelectQuizModal({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-100 bg-[#FAF8FF] flex justify-end">
+        <div className="p-4 border-t border-gray-100 bg-red-50/20 flex justify-end">
           <button
             type="button"
             onClick={onClose}

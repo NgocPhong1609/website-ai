@@ -94,7 +94,7 @@ export function QuestionCardMultipleChoice({
             {/* Top Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <span className="w-7 h-7 rounded-xl bg-indigo-50 text-[#C0392B] font-black text-xs flex items-center justify-center border -[#FAF7F2]">
+                    <span className="w-7 h-7 rounded-xl bg-red-50 text-[#C0392B] font-black text-xs flex items-center justify-center border -[#FAF7F2]">
                         #{index + 1}
                     </span>
                     <span className="text-[11px] font-black uppercase px-2.5 py-1 rounded-lg -[#FAF7F2]/80 text-[#C0392B] border -[#FAF7F2]">
@@ -126,7 +126,7 @@ export function QuestionCardMultipleChoice({
                     <button
                         type="button"
                         onClick={() => (isEditing ? handleSaveEdit() : setIsEditing(true))}
-                        className="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-[#C0392B] text-[#C0392B] hover:text-white border -[#FAF7F2] text-xs font-extrabold transition-all cursor-pointer"
+                        className="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-[#C0392B] text-[#C0392B] hover:text-white border -[#FAF7F2] text-xs font-extrabold transition-all cursor-pointer"
                     >
                         {isEditing ? " Lưu sửa" : " Chỉnh sửa"}
                     </button>
@@ -292,7 +292,7 @@ export function QuestionCardMultipleChoice({
                     </div>
 
                     {question.explanation && (
-                        <div className="p-3 rounded-xl bg-indigo-50/60 border -[#FAF7F2] text-xs -[#C0392B] font-medium leading-relaxed">
+                        <div className="p-3 rounded-xl bg-red-50/60 border -[#FAF7F2] text-xs -[#C0392B] font-medium leading-relaxed">
                             <strong className="text-[#C0392B] font-extrabold"> Giải thích từ AI:</strong> {question.explanation}
                         </div>
                     )}

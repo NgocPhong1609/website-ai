@@ -58,12 +58,12 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
                 </div>
 
                 <div className="flex flex-col gap-6">
-                    <div className="bg-indigo-50/50 p-6 rounded-2xl border border-[#FAF7F2] flex flex-col justify-center h-full shadow-2xs">
+                    <div className="bg-red-50/50 p-6 rounded-2xl border border-[#FAF7F2] flex flex-col justify-center h-full shadow-2xs">
 
-                        <h2 className="text-3xl font-black text-indigo-950 mb-1">
+                        <h2 className="text-3xl font-black text-[#2C3039] mb-1">
                             {metricsLoading ? "..." : metrics.total_learning_hours} Giờ
                         </h2>
-                        <p className="text-xs font-bold text-indigo-700/80 uppercase tracking-wider">Tổng Thời Gian Học Tập</p>
+                        <p className="text-xs font-bold text-[#C0392B]/80 uppercase tracking-wider">Tổng Thời Gian Học Tập</p>
                     </div>
 
                     <div className="bg-emerald-50/50 p-6 rounded-2xl border border-[#FAF7F2] flex flex-col justify-center h-full shadow-2xs">
@@ -83,7 +83,7 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
                         <h3 className="text-base font-black text-[#2C3039]">Danh Sách Học Viên Mới Gia Nhập</h3>
                         <p className="text-xs text-[#8A8478] mt-1">Theo dõi hồ sơ và tiến độ chi tiết của học viên mới ghi danh trong 30 ngày qua.</p>
                     </div>
-                    <button className="text-sm font-bold text-[#C0392B] hover:text-[#4338CA] transition-colors cursor-pointer">
+                    <button className="text-sm font-bold text-[#C0392B] hover:text-[#A93226] transition-colors cursor-pointer">
                         Xem Toàn Bộ Học Viên &rarr;
                     </button>
                 </div>
@@ -125,7 +125,7 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
                                         </td>
                                         <td className="px-5 py-4">
                                             {st.status === 'ĐANG HOẠT ĐỘNG' ? (
-                                                <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black bg-emerald-50 -[#2C3039] border -[#FAF7F2]">
+                                                <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black bg-[#31d928] -[#2C3039] border -[#FAF7F2]">
 
                                                     ĐANG HOẠT ĐỘNG
                                                 </span>

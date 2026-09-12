@@ -319,7 +319,7 @@ export function CreateCourseContainer() {
                 type="button"
                 id="btn-finish-publish"
                 onClick={() => setIsOutlineOpen(true)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-2xs transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#A93226] shadow-2xs transition-all cursor-pointer"
               >
                 <SparklesIcon size={13} />
                 <span>Sinh đề cương AI</span>
@@ -377,7 +377,7 @@ export function CreateCourseContainer() {
             type="button"
             onClick={step === 3 ? handlePublish : handleNext}
             disabled={isPublishing}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#4338CA] shadow-2xs transition-all cursor-pointer disabled:opacity-70"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-[#C0392B] hover:bg-[#A93226] shadow-2xs transition-all cursor-pointer disabled:opacity-70"
           >
             {step === 3 ? (
               <>

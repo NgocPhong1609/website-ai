@@ -50,7 +50,7 @@ export function ManualQuizEditor({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 bg-indigo-50 text-[#C0392B] text-xs font-black rounded-lg border -[#FAF7F2] uppercase tracking-wider">
+            <span className="px-3 py-1 bg-red-50 text-[#C0392B] text-xs font-black rounded-lg border -[#FAF7F2] uppercase tracking-wider">
               Bước 2 / 3
             </span>
             <h2 className="text-xl font-black text-[#2C3039]">Biên Soạn Câu Hỏi</h2>
@@ -62,7 +62,7 @@ export function ManualQuizEditor({
 
         {/* Realtime Summary Badge */}
         <div className="flex items-center gap-3">
-          <div className="px-3 py-2 rounded-2xl bg-indigo-50 border -[#FAF7F2] flex items-center gap-2 text-xs font-bold text-[#C0392B]">
+          <div className="px-3 py-2 rounded-2xl bg-red-50 border -[#FAF7F2] flex items-center gap-2 text-xs font-bold text-[#C0392B]">
             <span> Tổng câu:</span>
             <span className="font-extrabold text-sm">{questions.length}</span>
           </div>
@@ -108,7 +108,7 @@ export function ManualQuizEditor({
       </div>
 
       {/* Control Bar: Filters & Actions */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-[#FAF8FF] border border-indigo-50">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-red-50/30 border border-red-100">
         {/* Filter Tabs */}
         <div className="flex items-center gap-2">
           <button
@@ -148,7 +148,7 @@ export function ManualQuizEditor({
           <button
             type="button"
             onClick={() => onAddQuestion("multiple_choice")}
-            className="px-4 py-2 bg-indigo-50 hover:-[#FAF7F2] text-[#C0392B] text-xs font-extrabold rounded-xl border border-indigo-100 transition-all cursor-pointer"
+            className="px-4 py-2 bg-red-50 hover:-[#FAF7F2] text-[#C0392B] text-xs font-extrabold rounded-xl border border-red-100 transition-all cursor-pointer"
           >
             + Trắc nghiệm
           </button>

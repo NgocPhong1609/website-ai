@@ -69,7 +69,7 @@ function PageHeader({ onOpenWithdrawal, onToggleForecast }: { onOpenWithdrawal: 
                 <button
                     type="button"
                     onClick={onToggleForecast}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#E8E2D9] text-xs font-extrabold text-[#C0392B] bg-indigo-50/80 hover:border-[#E8E2D9] transition-all cursor-pointer shadow-2xs"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#E8E2D9] text-xs font-extrabold text-[#C0392B] bg-red-50/80 hover:border-[#E8E2D9] transition-all cursor-pointer shadow-2xs"
                 >
                     <SparklesIcon size={15} />
                     <span>Dự báo Thu nhập AI</span>
@@ -164,12 +164,12 @@ function AIForecastSection({ onClose, forecast }: { onClose: () => void; forecas
                     <span className="text-xs font-semibold text-[#8A8478] mt-1">Chiếm {forecast?.top_course_percentage}% doanh số từ nguồn liên kết chia sẻ</span>
                 </div>
 
-                <div className="p-4 rounded-xl bg-indigo-50/60 border border-[#E8E2D9] flex flex-col justify-between gap-3">
+                <div className="p-4 rounded-xl bg-red-50/60 border border-[#E8E2D9] flex flex-col justify-between gap-3">
                     <div>
                         <span className="text-xs font-black text-[#C0392B] uppercase flex items-center gap-1.5">
                             <span> Đề xuất nhanh từ AI</span>
                         </span>
-                        <p className="text-xs font-medium text-indigo-950 mt-1 leading-relaxed">
+                        <p className="text-xs font-medium text-[#2C3039] mt-1 leading-relaxed">
                             Khóa &ldquo;Machine Learning Basics&rdquo; đang giảm nhẹ 14% lượt xem. Khuyến nghị tạo ngay mã giảm giá 20% hoặc đẩy link giới thiệu.
                         </p>
                     </div>
@@ -196,7 +196,7 @@ function RevenueChart({ chartData }: { chartData: any[] }) {
                     <p className="text-xs text-[#8A8478] mt-0.5">Tỷ lệ phân chia tự động tùy thuộc vào nguồn ghi danh của học viên.</p>
                 </div>
 
-                <span className="px-3 py-1 rounded-xl bg-indigo-50 text-[#C0392B] border border-indigo-100 text-xs font-bold">
+                <span className="px-3 py-1 rounded-xl bg-red-50 text-[#C0392B] border border-red-100 text-xs font-bold">
                     Tỷ lệ thực nhận được lưu theo từng giao dịch
                 </span>
             </div>
@@ -242,7 +242,7 @@ function RevenueChart({ chartData }: { chartData: any[] }) {
 
 function RecentTransactions({ transactions }: { transactions: any[] }) {
     const getStatusStyle = (status: string, type: string) => {
-        if (type === "withdrawal") return "text-[#C0392B] bg-indigo-50 border-[#E8E2D9]";
+        if (type === "withdrawal") return "text-[#C0392B] bg-red-50 border-[#E8E2D9]";
         if (type === "refund") return "text-rose-700 bg-rose-50 border-rose-200";
         if (status === "escrow") return "text-amber-700 bg-amber-50 border-amber-200";
         if (status === "available" || status === "completed") return "text-[#2C3039] bg-emerald-50 border-[#E8E2D9]";

@@ -219,7 +219,7 @@ export function VerificationRequestModal({
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="p-3 rounded-xl bg-indigo-50/50 border -[#FAF7F2]">
+                            <div className="p-3 rounded-xl bg-red-50/50 border -[#FAF7F2]">
                                 <label className="block text-[11px] font-extrabold uppercase text-[#C0392B] mb-0.5">
                                     Ảnh Bằng cấp (Public)
                                 </label>
@@ -228,7 +228,7 @@ export function VerificationRequestModal({
                                     type="file"
                                     accept="image/jpeg,image/png,image/webp"
                                     onChange={(e) => handleFileChange(e, false)}
-                                    className="text-[11px] font-semibold text-gray-700 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-[#C0392B] file:text-white hover:file:bg-[#383AB8]"
+                                    className="text-[11px] font-semibold text-gray-700 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-[#C0392B] file:text-white hover:file:bg-[#A93226]"
                                 />
                             </div>
 
@@ -286,7 +286,7 @@ export function VerificationRequestModal({
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="px-5 py-2 rounded-xl text-xs font-black text-white bg-[#C0392B] hover:bg-[#383AB8] shadow-md shadow-[#C0392B]/30 transition-all disabled:opacity-50 flex items-center gap-1.5"
+                            className="px-5 py-2 rounded-xl text-xs font-black text-white bg-[#C0392B] hover:bg-[#A93226] shadow-md shadow-[#C0392B]/30 transition-all disabled:opacity-50 flex items-center gap-1.5"
                         >
                             {isSubmitting ? (
                                 <>

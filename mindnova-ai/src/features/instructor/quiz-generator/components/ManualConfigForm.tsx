@@ -55,7 +55,7 @@ export function ManualConfigForm({
     <div className="p-8 bg-white rounded-3xl border border-[#FAF7F2] shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header */}
       <div className="flex items-start gap-4 border-b border-gray-100 pb-5">
-        <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-2xl font-black text-[#C0392B] border border-indigo-100">
+        <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center text-2xl font-black text-[#C0392B] border border-red-100">
           ⚙️
         </div>
         <div className="flex flex-col gap-1">
@@ -74,7 +74,7 @@ export function ManualConfigForm({
             <h3 className="text-sm font-extrabold text-[#1A1A2E] flex items-center gap-2">
               <span>📋</span> Thông tin chung
             </h3>
-            <div className="p-5 rounded-2xl bg-[#FAF8FF] border border-indigo-50 flex flex-col gap-4">
+            <div className="p-5 rounded-2xl bg-red-50/30 border border-red-100 flex flex-col gap-4">
               {!embeddedMode && !config.course_id && (
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-extrabold text-gray-700">Khóa học gắn kết <span className="text-rose-500">*</span></label>

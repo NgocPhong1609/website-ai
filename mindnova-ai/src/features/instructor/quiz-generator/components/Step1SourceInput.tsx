@@ -115,7 +115,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 bg-indigo-50 text-[#C0392B] text-xs font-black rounded-lg border border-indigo-100 uppercase tracking-wider">
+          <span className="px-3 py-1 bg-red-50 text-[#C0392B] text-xs font-black rounded-lg border border-red-100 uppercase tracking-wider">
             Bước 1 / 5
           </span>
           <h2 className="text-xl font-black text-[#2C3039]">Chọn Khóa Học</h2>
@@ -165,12 +165,12 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
                   className="p-5 rounded-2xl border-2 border-[#FAF7F2] hover:border-[#C0392B]/50 bg-white transition-all duration-200 flex flex-col justify-between gap-4 shadow-2xs hover:shadow-md group"
                 >
                   <div className="flex items-start gap-3.5">
-                    <div className="w-11 h-11 rounded-2xl bg-indigo-50 text-[#C0392B] border border-indigo-100 flex items-center justify-center text-xl shrink-0 font-bold group-hover:scale-105 transition-transform">
+                    <div className="w-11 h-11 rounded-2xl bg-red-50 text-[#C0392B] border border-red-100 flex items-center justify-center text-xl shrink-0 font-bold group-hover:scale-105 transition-transform">
                       📚
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-black uppercase text-[#C0392B] bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-md">
+                        <span className="text-[10px] font-black uppercase text-[#C0392B] bg-red-50 border border-red-100 px-2 py-0.5 rounded-md">
                           {course.status === "published" ? "Đã xuất bản" : "Bản nháp"}
                         </span>
                       </div>
@@ -188,7 +188,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
                   <button
                     type="button"
                     onClick={() => handleSelectCourse(course)}
-                    className="w-full py-2.5 px-4 bg-[#C0392B] hover:bg-[#4338CA] text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer shadow-2xs flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 px-4 bg-[#C0392B] hover:bg-[#A93226] text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer shadow-2xs flex items-center justify-center gap-1.5"
                   >
                     <span>🎯 Chọn khóa học này</span>
                   </button>
@@ -240,7 +240,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
               </div>
 
               <div className="flex items-center gap-2 text-xs font-bold shrink-0">
-                <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-[#C0392B] border border-indigo-100">
+                <span className="px-2.5 py-1 rounded-lg bg-red-50 text-[#C0392B] border border-red-100">
                   {modulesList.length} Modules
                 </span>
                 <span className="px-2.5 py-1 rounded-lg bg-purple-50 text-purple-800 border border-purple-100">
@@ -299,7 +299,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
             onNext();
           }}
           disabled={!config.course_id}
-          className="px-8 py-3 bg-[#C0392B] hover:bg-[#4338CA] text-white font-black text-xs rounded-2xl shadow-lg hover:scale-[1.02] transition-all disabled:opacity-40 disabled:hover:scale-100 cursor-pointer disabled:cursor-not-allowed"
+          className="px-8 py-3 bg-[#C0392B] hover:bg-[#A93226] text-white font-black text-xs rounded-2xl shadow-lg hover:scale-[1.02] transition-all disabled:opacity-40 disabled:hover:scale-100 cursor-pointer disabled:cursor-not-allowed"
         >
           Tiếp theo: Cấu hình Quiz ➡️
         </button>

@@ -124,8 +124,8 @@ function ModelCard({
             className={twMerge(
                 "relative flex flex-col items-center gap-2 p-4 rounded-xl border text-center cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#C0392B]/30",
                 isSelected
-                    ? "border-[#FAF7F2] bg-[#F5F3FF] shadow-[0_0_0_3px_rgba(107,107,255,0.18)]"
-                    : "border-[#FAF7F2] bg-white hover:border-[#C5C6FF] hover:bg-[#FAFAFE]",
+                    ? "border-[#FAF7F2] bg-red-50 shadow-[0_0_0_3px_rgba(192,57,43,0.18)]"
+                    : "border-[#FAF7F2] bg-white hover:border-[#FADBD8] hover:bg-[#FEFCF9]",
             )}
         >
             {/* Radio dot */}
@@ -275,7 +275,7 @@ function FlashSaleInputs({
 
 function AIBadge() {
     return (
-        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#C0392B] text-[10px] font-bold text-white tracking-wide shadow-[0_2px_8px_rgba(107,107,255,0.35)]">
+        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#C0392B] text-[10px] font-bold text-white tracking-wide shadow-[0_2px_8px_rgba(192,57,43,0.35)]">
             <SparklesIcon size={9} />
             AI Recommended
         </span>

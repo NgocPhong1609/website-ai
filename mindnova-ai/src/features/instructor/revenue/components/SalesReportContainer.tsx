@@ -178,7 +178,7 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
                                                 }}
                                                 className={twMerge(
                                                     "w-full text-left px-4 py-2 text-xs font-bold cursor-pointer transition-colors",
-                                                    timeRange === val ? "bg-indigo-50 text-[#C0392B]" : "text-gray-700 hover:bg-[#FEFCF9]"
+                                                    timeRange === val ? "bg-red-50 text-[#C0392B]" : "text-gray-700 hover:bg-[#FEFCF9]"
                                                 )}
                                             >
                                                 {getRangeText(val)}
@@ -263,7 +263,7 @@ function CoursePerformanceTable({ courses }: { courses: any[] }) {
                     <h3 className="text-sm font-black text-[#2C3039]">Hiệu Năng Từng Khóa Học</h3>
                     <p className="text-xs text-[#8A8478]">Dữ liệu phân bổ lượt xem và tỷ lệ chốt đơn theo từng khóa học của bạn.</p>
                 </div>
-                <span className="text-xs font-bold text-[#C0392B] bg-indigo-50 px-3 py-1 rounded-xl border border-[#FAF7F2]">
+                <span className="text-xs font-bold text-[#C0392B] bg-red-50 px-3 py-1 rounded-xl border border-[#FAF7F2]">
                     Cập nhật theo thời gian thực
                 </span>
             </div>

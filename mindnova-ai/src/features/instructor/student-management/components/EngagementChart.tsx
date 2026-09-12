@@ -44,7 +44,7 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
                                         }}
                                         className={twMerge(
                                             "w-full text-left px-4 py-2 text-xs font-bold cursor-pointer transition-colors",
-                                            timeRange === val ? "bg-indigo-50 -[#C0392B]" : "text-gray-700 hover:bg-[#FEFCF9]"
+                                            timeRange === val ? "bg-red-50 -[#C0392B]" : "text-gray-700 hover:bg-[#FEFCF9]"
                                         )}
                                     >
                                         {getRangeText(val)}

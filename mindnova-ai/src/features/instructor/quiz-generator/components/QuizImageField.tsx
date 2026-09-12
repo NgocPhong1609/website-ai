@@ -93,7 +93,7 @@ export function QuizImageField({ label, purpose, value, onChange }: QuizImageFie
         <img src={value.url} alt={`Xem trước ${label}`} className="h-28 w-full rounded-lg border object-contain" />
       )}
       <div className="flex flex-wrap gap-2">
-        <label className="cursor-pointer rounded-lg bg-indigo-50 px-3 py-2 text-xs font-bold text-[#C0392B]">
+        <label className="cursor-pointer rounded-lg bg-red-50 hover:bg-red-100 transition-colors px-3 py-2 text-xs font-bold text-[#C0392B]">
           {isUploading ? "Đang tải..." : "Tải ảnh"}
           <input
             ref={fileInputRef}

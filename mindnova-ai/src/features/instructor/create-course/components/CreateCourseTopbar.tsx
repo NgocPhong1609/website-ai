@@ -7,7 +7,7 @@ import { HelpCircleIcon, BellIcon } from "./icons";
 
 function LogoMark() {
     return (
-        <div className="w-8 h-8 rounded-lg bg-[#C0392B] flex items-center justify-center shadow-[0_3px_10px_rgba(107,107,255,0.45)] shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-[#C0392B] flex items-center justify-center shadow-[0_3px_10px_rgba(192,57,43,0.35)] shrink-0">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <circle cx="12" cy="12" r="2.5" fill="white" />
                 <path

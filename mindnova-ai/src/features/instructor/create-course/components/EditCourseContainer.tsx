@@ -171,7 +171,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
                                     <h1 className="text-lg font-black text-[#2C3039] tracking-tight truncate max-w-md md:max-w-2xl">
                                         {basicInfo.title || "Tên khóa học"}
                                     </h1>
-                                    <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black tracking-wider uppercase border ${course.status === "published" ? "bg-emerald-50 -[#2C3039] -[#FAF7F2]" : course.status === "pending_review" ? "bg-sky-50 text-sky-600 border-sky-200" : "bg-slate-50 text-slate-600 border-slate-200"}`}>
+                                    <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black tracking-wider uppercase border ${course.status === "published" ? "bg-emerald-50 -[#2C3039] -[#FAF7F2]" : course.status === "pending_review" ? "bg-red-50 text-[#C0392B] border-red-200" : "bg-slate-50 text-slate-600 border-slate-200"}`}>
                                         {course.status === "published" ? "ĐÃ CÔNG KHAI" : course.status === "pending_review" ? "ĐANG CHỜ DUYỆT" : "BẢN NHÁP"}
                                     </span>
                                 </div>
@@ -194,7 +194,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
                                     type="button"
                                     onClick={handleSubmitReview}
                                     disabled={isPending}
-                                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-sky-500 hover:bg-sky-600 transition-all shadow-sm disabled:bg-gray-400"
+                                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[#C0392B] hover:bg-[#A93226] transition-all shadow-sm disabled:bg-gray-400"
                                 >
                                     <span className="hidden sm:inline">Gửi xét duyệt</span>
                                 </button>
@@ -216,7 +216,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
                                 disabled={isPending}
                                 className={twMerge(
                                     "flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black text-white transition-all shadow-sm cursor-pointer",
-                                    saveSuccess ? "-[#2C3039] hover:-[#2C3039]" : "bg-[#C0392B] hover:bg-[#4338CA] disabled:bg-gray-400"
+                                    saveSuccess ? "-[#2C3039] hover:-[#2C3039]" : "bg-[#C0392B] hover:bg-[#A93226] disabled:bg-gray-400"
                                 )}
                             >
                                 {isUpdating || isUploading || isUpdatingPrice ? (

@@ -103,7 +103,7 @@ function getLessonIcon(kind: "quiz" | "video" | "document") {
 
 function getLessonColor(kind: "quiz" | "video" | "document") {
   if (kind === "quiz") return "bg-emerald-100 text-emerald-800 border border-emerald-300";
-  if (kind === "video") return "bg-indigo-100 text-indigo-800 border border-indigo-300";
+  if (kind === "video") return "bg-red-50 text-[#C0392B] border border-red-200";
   return "bg-amber-100 text-amber-800 border border-amber-300";
 }
 
@@ -145,7 +145,7 @@ function LessonRow({
           : isQuiz
             ? "border-emerald-200 bg-emerald-50/20 hover:bg-emerald-50/50"
             : isVideo
-              ? "border-indigo-200 bg-indigo-50/20 hover:bg-indigo-50/50"
+              ? "border-red-200 bg-red-50/20 hover:bg-red-50/50"
               : "border-amber-200 bg-amber-50/20 hover:bg-amber-50/50"
       )}
     >
@@ -170,7 +170,7 @@ function LessonRow({
           <div className="flex items-center gap-2 truncate">
             <span className={twMerge(
               "text-xs font-bold truncate",
-              isQuiz ? "text-emerald-950 font-black" : isVideo ? "text-indigo-950 font-black" : "text-amber-950 font-black"
+              isQuiz ? "text-emerald-950 font-black" : isVideo ? "text-[#2C3039] font-black" : "text-amber-950 font-black"
             )}>
               {index + 1}. {lesson.title}
             </span>
@@ -180,7 +180,7 @@ function LessonRow({
               isQuiz
                 ? "bg-emerald-100 text-emerald-800 border-emerald-200"
                 : isVideo
-                  ? "bg-indigo-100 text-indigo-800 border-indigo-200"
+                  ? "bg-red-50 text-[#C0392B] border-red-200"
                   : "bg-amber-100 text-amber-800 border-amber-200"
             )}>
               {isQuiz ? "📝 Bài thi Trắc nghiệm / AI Quiz" : isVideo ? "🎥 Video" : "📄 Tài liệu"}
@@ -223,7 +223,7 @@ function LessonRow({
               isQuiz
                 ? "text-emerald-800 bg-emerald-100 hover:bg-emerald-200 border-emerald-300"
                 : isVideo
-                  ? "text-indigo-800 bg-indigo-100 hover:bg-indigo-200 border-indigo-300"
+                  ? "text-[#C0392B] bg-red-50 hover:bg-red-100 border-red-200"
                   : "text-amber-800 bg-amber-100 hover:bg-amber-200 border-amber-300"
             )}
             title="Xem & Chỉnh sửa chi tiết"
@@ -666,10 +666,10 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
 
       {/* KHU VỰC 2 — QUẢN LÝ QUIZ CẤP KHÓA HỌC */}
       {courseId && (
-        <div className="w-full p-6 rounded-3xl bg-gradient-to-b from-[#FAF8FF] to-white border-2 border-indigo-100 shadow-xs flex flex-col gap-6">
+        <div className="w-full p-6 rounded-3xl bg-gradient-to-b from-red-50/30 to-white border-2 border-red-100 shadow-xs flex flex-col gap-6">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-base font-black shadow-xs">
+              <span className="w-8 h-8 rounded-xl bg-[#C0392B] text-white flex items-center justify-center text-base font-black shadow-xs">
                 🏆
               </span>
               <h3 className="text-base font-black text-[#1A1A2E]">
@@ -772,7 +772,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                         <button
                           type="button"
                           onClick={() => setEditingLesson({ chapterId: "", lesson: { id: `quiz-${activeGeneralQuiz.id}`, quiz_id: activeGeneralQuiz.id, title: activeGeneralQuiz.title, type: "quiz" } as any })}
-                          className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-[11px] font-black rounded-lg border border-indigo-100 transition-all cursor-pointer"
+                          className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-[#C0392B] text-[11px] font-black rounded-lg border border-red-100 transition-all cursor-pointer"
                         >
                           👁 Xem &amp; Sửa
                         </button>
@@ -792,15 +792,15 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
             </div>
 
             {/* Sub-section B: 🏁 Kiểm tra cuối khóa học */}
-            <div className="p-5 rounded-2xl bg-white border border-indigo-200/80 shadow-2xs flex flex-col justify-between gap-4 h-full">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-indigo-100 pb-3 gap-2 min-h-[58px]">
+            <div className="p-5 rounded-2xl bg-white border border-red-200/80 shadow-2xs flex flex-col justify-between gap-4 h-full">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-red-100 pb-3 gap-2 min-h-[58px]">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <span className="text-xl shrink-0">🏁</span>
                   <div className="min-w-0">
-                    <h4 className="text-xs font-black text-indigo-950 uppercase tracking-wider truncate">
+                    <h4 className="text-xs font-black text-[#2C3039] uppercase tracking-wider truncate">
                       B. Kiểm tra cuối khóa học
                     </h4>
-                    <span className="text-[11px] text-indigo-700 font-semibold block truncate">
+                    <span className="text-[11px] text-[#C0392B] font-semibold block truncate">
                       Đánh giá hoàn thành toàn bộ khóa học
                     </span>
                   </div>
@@ -810,7 +810,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                   <button
                     type="button"
                     onClick={() => setSelectQuizModal({ isOpen: true, position: "end_of_course" })}
-                    className="px-3 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-900 border border-indigo-300 text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                    className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-[#C0392B] border border-red-200 text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
                     title="Mở popup chọn bài kiểm tra từ danh sách"
                   >
                     <span>📑 Chọn bài thi ({finalQuizzes.length})</span>
@@ -819,7 +819,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                   <button
                     type="button"
                     onClick={() => setAiQuizModal({ isOpen: true, position: "end_of_course" })}
-                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                    className="px-3 py-1.5 bg-[#C0392B] hover:bg-[#A93226] text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
                   >
                     <span>+ Tạo mới</span>
                   </button>
@@ -829,16 +829,16 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
               {/* ONLY DISPLAY THE SELECTED/ACTIVE QUIZ CARD */}
               <div className="flex-1 flex flex-col justify-center">
                 {!activeFinalQuiz ? (
-                  <div className="p-6 rounded-2xl bg-indigo-50/50 border border-dashed border-indigo-200 text-center flex flex-col items-center justify-center gap-2 h-full">
+                  <div className="p-6 rounded-2xl bg-red-50/50 border border-dashed border-red-200 text-center flex flex-col items-center justify-center gap-2 h-full">
                     <span className="text-3xl">🏁</span>
-                    <p className="text-xs font-bold text-indigo-900">Chưa có bài kiểm tra cuối khóa nào được chọn.</p>
-                    <p className="text-[11px] text-indigo-700 max-w-xs">
+                    <p className="text-xs font-bold text-[#2C3039]">Chưa có bài kiểm tra cuối khóa nào được chọn.</p>
+                    <p className="text-[11px] text-[#C0392B] max-w-xs">
                       Bấm nút bên dưới để chọn bài thi chính từ danh sách hoặc tạo bài thi mới.
                     </p>
                     <button
                       type="button"
                       onClick={() => setSelectQuizModal({ isOpen: true, position: "end_of_course" })}
-                      className="mt-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-xl transition-all shadow-2xs cursor-pointer flex items-center gap-1"
+                      className="mt-2 px-4 py-2 bg-[#C0392B] hover:bg-[#A93226] text-white text-xs font-extrabold rounded-xl transition-all shadow-2xs cursor-pointer flex items-center gap-1"
                     >
                       <span>📑 Chọn bài thi từ danh sách</span>
                     </button>
@@ -881,7 +881,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                         <button
                           type="button"
                           onClick={() => setEditingLesson({ chapterId: "", lesson: { id: `quiz-${activeFinalQuiz.id}`, quiz_id: activeFinalQuiz.id, title: activeFinalQuiz.title, type: "quiz" } as any })}
-                          className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-[11px] font-black rounded-lg border border-indigo-100 transition-all cursor-pointer"
+                          className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-[#C0392B] text-[11px] font-black rounded-lg border border-red-100 transition-all cursor-pointer"
                         >
                           👁 Xem &amp; Sửa
                         </button>
@@ -930,7 +930,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
             <button
               type="button"
               onClick={() => handleAddChapter()}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C0392B] hover:bg-[#4338CA] text-white text-xs font-extrabold shadow-2xs transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white text-xs font-extrabold shadow-2xs transition-all cursor-pointer"
             >
               <PlusIcon size={14} />
               <span>Thêm Chuyên Đề</span>
@@ -947,7 +947,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
               <button
                 type="button"
                 onClick={() => handleAddChapter("Chuyên đề 1: Nền tảng Core Architecture")}
-                className="mt-2 px-5 py-2.5 bg-[#C0392B] hover:bg-[#4338CA] text-white text-xs font-extrabold rounded-xl shadow-2xs transition-all cursor-pointer"
+                className="mt-2 px-5 py-2.5 bg-[#C0392B] hover:bg-[#A93226] text-white text-xs font-extrabold rounded-xl shadow-2xs transition-all cursor-pointer"
               >
                 + Tạo Chuyên Đề Đầu Tiên
               </button>
@@ -993,7 +993,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                         {isCollapsed && (
                           <span
                             onClick={() => toggleModuleCollapse(chap.id)}
-                            className="text-[11px] font-bold text-[#C0392B] bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100 cursor-pointer shrink-0"
+                            className="text-[11px] font-bold text-[#C0392B] bg-red-50 px-2.5 py-1 rounded-lg border border-red-100 cursor-pointer shrink-0"
                           >
                             📂 {chap.lessons.length} bài học
                           </span>
@@ -1005,7 +1005,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                       <button
                         type="button"
                         onClick={() => handleAddVideoLesson(chap.id, chap.lessons.length)}
-                        className="px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-[#C0392B] border border-indigo-100 text-xs font-bold transition-all cursor-pointer"
+                        className="px-2.5 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-[#C0392B] border border-red-100 text-xs font-bold transition-all cursor-pointer"
                       >
                         + Video
                       </button>

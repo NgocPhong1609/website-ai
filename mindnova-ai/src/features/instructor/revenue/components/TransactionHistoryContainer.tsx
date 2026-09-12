@@ -165,7 +165,7 @@ function Filters({
                                     className={twMerge(
                                         "w-full text-left px-4 py-2.5 text-xs font-bold transition-colors cursor-pointer",
                                         activeDateRange === opt.id
-                                            ? "bg-indigo-50 text-[#C0392B]"
+                                            ? "bg-red-50 text-[#C0392B]"
                                             : "text-[#8A8478] hover:bg-[#FEFCF9] hover:text-[#2C3039]"
                                     )}
                                 >
@@ -218,7 +218,7 @@ function TransactionTable({
 
     const getStatusStyle = (status: string) => {
         if (status === 'available' || status === 'completed') return "text-[#2C3039] bg-emerald-50 border-[#FAF7F2]";
-        if (status === 'processing') return "text-[#C0392B] bg-indigo-50 border-[#FAF7F2]";
+        if (status === 'processing') return "text-[#C0392B] bg-red-50 border-[#FAF7F2]";
         if (status === 'escrow') return "text-amber-700 bg-amber-50 border-amber-200";
         return "text-gray-700 bg-[#FEFCF9] border-[#FAF7F2]";
     };
@@ -364,7 +364,7 @@ function BottomCards() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white rounded-2xl border border-[#FAF7F2] p-5 shadow-2xs flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-indigo-50 text-[#C0392B] flex items-center justify-center shrink-0 border border-[#FAF7F2]">
+                <div className="w-12 h-12 rounded-xl bg-red-50 text-[#C0392B] flex items-center justify-center shrink-0 border border-[#FAF7F2]">
                     <BuildingBankIcon size={22} />
                 </div>
                 <div>
@@ -383,7 +383,7 @@ function BottomCards() {
                 </div>
             </div>
 
-            <div className="bg-indigo-50/50 rounded-2xl border border-[#FAF7F2] p-5 flex items-center justify-between gap-3 shadow-2xs">
+            <div className="bg-red-50/50 rounded-2xl border border-[#FAF7F2] p-5 flex items-center justify-between gap-3 shadow-2xs">
                 <div>
                     <span className="text-sm font-black text-[#C0392B] block">Yêu Cầu Rút Tiền Hoa Hồng</span>
                     <span className="text-xs text-[#C0392B]/80 font-medium mt-0.5 block">Hệ thống thanh toán nhanh 24/7</span>

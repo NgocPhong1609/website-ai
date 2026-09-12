@@ -51,6 +51,7 @@ function MenuIcon() {
 import { useSearchParams } from "next/navigation";
 import { InstructorSidebar } from "@/src/features/instructor/management/components/InstructorSidebar";
 import { resolveUserRole } from "@/src/features/student/auth/components/login/AuthShared";
+import { axiosClient } from "@/src/shared/lib/axios";
 
 export default function Sidebar() {
   const searchParams = useSearchParams();
@@ -61,6 +62,20 @@ export default function Sidebar() {
   const [isMounted, setIsMounted] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await axiosClient.post("/api/logout");
+    } catch (error) {
+      console.error("Logout API failed", error);
+    } finally {
+      window.localStorage.removeItem("accessToken");
+      window.localStorage.removeItem("userInfo");
+      document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      window.location.replace("/login");
+    }
+  };
 
   useEffect(() => {
     setIsMounted(true);

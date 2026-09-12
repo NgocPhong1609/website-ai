@@ -102,9 +102,9 @@ function CreateCouponDialog({
     <>
       <div className="fixed inset-0 z-40 bg-black/25 backdrop-blur-[2px]" onClick={onClose} aria-hidden />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-        <div className="pointer-events-auto w-full max-w-[460px] bg-white rounded-2xl border border-[#FAF7F2] shadow-[0_20px_60px_rgba(70,72,212,0.15)] overflow-hidden">
-          <div className="flex items-center gap-3 px-5 py-4 border-b border-[#F0F0F8]">
-            <div className="w-8 h-8 rounded-xl bg-[#EEF0FF] text-[#C0392B] flex items-center justify-center">
+        <div className="pointer-events-auto w-full max-w-[460px] bg-white rounded-2xl border border-[#FAF7F2] shadow-[0_20px_60px_rgba(192,57,43,0.15)] overflow-hidden">
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-[#FAF7F2]">
+            <div className="w-8 h-8 rounded-xl bg-red-50 text-[#C0392B] flex items-center justify-center">
               <GiftIcon size={15} />
             </div>
             <div className="flex-1">
@@ -209,7 +209,7 @@ function CreateCouponDialog({
 
             <div className="flex gap-2 pt-2">
               <button type="button" onClick={onClose} disabled={isSubmitting} className="flex-1 h-10 rounded-xl border border-[#FAF7F2] text-sm text-[#8A8478] hover:bg-[#FAF7F2] cursor-pointer">Hủy</button>
-              <button type="submit" disabled={isSubmitting} className="flex-1 h-10 rounded-xl bg-[#C0392B] text-sm font-semibold text-white shadow-[0_4px_14px_rgba(70,72,212,0.35)] disabled:opacity-50 cursor-pointer">
+              <button type="submit" disabled={isSubmitting} className="flex-1 h-10 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-sm font-semibold text-white shadow-[0_4px_14px_rgba(192,57,43,0.35)] disabled:opacity-50 cursor-pointer">
                 {isSubmitting ? "Đang tạo..." : "Tạo mã"}
               </button>
             </div>
@@ -241,15 +241,15 @@ function CouponRow({ coupon, onDelete, onToggleStatus }: { coupon: Coupon; onDel
   }
 
   return (
-    <tr className="group hover:bg-[#FAFAFE] transition-colors duration-100">
+    <tr className="group hover:bg-[#FEFCF9] transition-colors duration-100">
       <td className="px-4 py-3 text-left">
-        <span className="font-mono text-[13px] font-bold text-[#C0392B] bg-[#EEF0FF] px-2 py-0.5 rounded-md">{coupon.code}</span>
+        <span className="font-mono text-[13px] font-bold text-[#C0392B] bg-red-50 px-2 py-0.5 rounded-md">{coupon.code}</span>
       </td>
       <td className="px-4 py-3 text-[12px] text-[#464554]">{coupon.type === "percent" ? "Phần trăm (%)" : "Cố định (VNĐ)"}</td>
       <td className="px-4 py-3 text-[13px] font-extrabold text-[#2C3039]">{formattedValue}</td>
       <td className="px-4 py-3 text-[12px]">
         {coupon.course_id ? (
-          <span className="inline-block px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 font-semibold text-[11px]">
+          <span className="inline-block px-2 py-0.5 rounded bg-red-50 text-[#C0392B] border border-red-200 font-semibold text-[11px]">
             Khóa #{coupon.course_id}
           </span>
         ) : (
@@ -268,7 +268,7 @@ function CouponRow({ coupon, onDelete, onToggleStatus }: { coupon: Coupon; onDel
       <td className="px-4 py-3"><StatusBadge status={coupon.status} /></td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          <button type="button" onClick={() => onToggleStatus(coupon.id, coupon.status === 'active' ? 'disabled' : 'active')} className="px-2 py-1 text-[10px] font-bold rounded-lg text-[#C0392B] bg-indigo-50 hover:bg-[#FAF7F2] transition-colors cursor-pointer">
+          <button type="button" onClick={() => onToggleStatus(coupon.id, coupon.status === 'active' ? 'disabled' : 'active')} className="px-2 py-1 text-[10px] font-bold rounded-lg text-[#C0392B] bg-red-50 hover:bg-[#FAF7F2] transition-colors cursor-pointer">
             {coupon.status === 'active' ? 'Tắt' : 'Bật'}
           </button>
           <button type="button" aria-label={`Xóa mã ${coupon.code}`} onClick={() => { if (confirm('Xác nhận xóa?')) onDelete(coupon.id); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-[#8A8478] hover:text-red-500 hover:bg-red-50 transition-all duration-150 cursor-pointer">

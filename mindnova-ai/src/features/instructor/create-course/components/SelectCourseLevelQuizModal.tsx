@@ -57,11 +57,11 @@ export function SelectCourseLevelQuizModal({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs animate-fadeIn">
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden border border-indigo-100">
+      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden border border-red-100">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-indigo-50 bg-[#FAF8FF] shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-red-100 bg-red-50/30 shrink-0">
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl font-black shadow-xs">
+            <span className="w-10 h-10 rounded-2xl bg-[#C0392B] text-white flex items-center justify-center text-xl font-black shadow-xs">
               {isGeneral ? "🏆" : "🏁"}
             </span>
             <div>
@@ -92,7 +92,7 @@ export function SelectCourseLevelQuizModal({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Tìm bài kiểm tra theo tên..."
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-[#1A1A2E] focus:outline-none focus:border-indigo-600 focus:bg-white transition-all"
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-[#1A1A2E] focus:outline-none focus:border-[#C0392B] focus:bg-white transition-all"
             />
           </div>
 
@@ -133,7 +133,7 @@ export function SelectCourseLevelQuizModal({
                   className={`p-4 rounded-2xl border-2 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                     isActive
                       ? "border-emerald-500 bg-emerald-50/40 shadow-2xs"
-                      : "border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-50/20"
+                      : "border-gray-200 bg-white hover:border-red-300 hover:bg-red-50/20"
                   }`}
                 >
                   <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -167,7 +167,7 @@ export function SelectCourseLevelQuizModal({
                         onClose();
                         onEditQuiz(quiz);
                       }}
-                      className="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-[11px] font-extrabold rounded-xl border border-indigo-200 transition-all cursor-pointer"
+                      className="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-[#C0392B] text-[11px] font-extrabold rounded-xl border border-red-200 transition-all cursor-pointer"
                       title="Xem và chỉnh sửa bài thi"
                     >
                       👁 Xem
@@ -182,7 +182,7 @@ export function SelectCourseLevelQuizModal({
                         type="button"
                         disabled={isLoadingThis}
                         onClick={() => handleSelect(quiz.id)}
-                        className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white text-xs font-extrabold rounded-xl shadow-2xs transition-all cursor-pointer flex items-center gap-1"
+                        className="px-4 py-1.5 bg-[#C0392B] hover:bg-[#A93226] disabled:bg-gray-300 text-white text-xs font-extrabold rounded-xl shadow-2xs transition-all cursor-pointer flex items-center gap-1"
                       >
                         {isLoadingThis ? (
                           <span>⏳ Đang xử lý...</span>

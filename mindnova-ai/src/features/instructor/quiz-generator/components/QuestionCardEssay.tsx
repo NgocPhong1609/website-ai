@@ -112,7 +112,7 @@ export function QuestionCardEssay({
           <button
             type="button"
             onClick={() => (isEditing ? handleSaveEdit() : setIsEditing(true))}
-            className="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-[#C0392B] text-[#C0392B] hover:text-white border -[#FAF7F2] text-xs font-extrabold transition-all cursor-pointer"
+            className="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-[#C0392B] text-[#C0392B] hover:text-white border -[#FAF7F2] text-xs font-extrabold transition-all cursor-pointer"
           >
             {isEditing ? " Lưu sửa" : " Chỉnh sửa"}
           </button>

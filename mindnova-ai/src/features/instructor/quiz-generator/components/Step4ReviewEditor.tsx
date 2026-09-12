@@ -80,7 +80,7 @@ export function Step4ReviewEditor({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 bg-indigo-50 text-[#C0392B] text-xs font-black rounded-lg border -[#FAF7F2] uppercase tracking-wider">
+            <span className="px-3 py-1 bg-red-50 text-[#C0392B] text-xs font-black rounded-lg border -[#FAF7F2] uppercase tracking-wider">
               Bước 4 / 5
             </span>
             <h2 className="text-xl font-black text-[#2C3039]">Review &amp; Hiệu Chỉnh Đề Kiểm Tra</h2>
@@ -92,7 +92,7 @@ export function Step4ReviewEditor({
 
         {/* Realtime Summary Badge */}
         <div className="flex items-center gap-3">
-          <div className="px-3 py-2 rounded-2xl bg-indigo-50 border -[#FAF7F2] flex items-center gap-2 text-xs font-bold text-[#C0392B]">
+          <div className="px-3 py-2 rounded-2xl bg-red-50 border -[#FAF7F2] flex items-center gap-2 text-xs font-bold text-[#C0392B]">
             <span>🎯 Đã duyệt:</span>
             <span className="font-extrabold text-sm">{approvedCount}/{questions.length}</span>
           </div>
@@ -109,7 +109,7 @@ export function Step4ReviewEditor({
       </div>
 
       {/* Final configuration remains visible while questions are reviewed. */}
-      <section aria-labelledby="review-config-heading" className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-4 sm:p-5">
+      <section aria-labelledby="review-config-heading" className="rounded-2xl border border-red-100 bg-red-50/50 p-4 sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
             <h3 id="review-config-heading" className="text-sm font-black text-[#2C3039]">
@@ -122,25 +122,25 @@ export function Step4ReviewEditor({
               </p>
             )}
             <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-bold text-[#5F5A52]">
-              <span className="rounded-lg border border-indigo-100 bg-white px-2.5 py-1.5">
+              <span className="rounded-lg border border-red-100 bg-white px-2.5 py-1.5">
                 {config.time_limit_minutes} phút
               </span>
-              <span className="rounded-lg border border-indigo-100 bg-white px-2.5 py-1.5">
+              <span className="rounded-lg border border-red-100 bg-white px-2.5 py-1.5">
                 {questions.length} câu hỏi
               </span>
-              <span className="rounded-lg border border-indigo-100 bg-white px-2.5 py-1.5">
+              <span className="rounded-lg border border-red-100 bg-white px-2.5 py-1.5">
                 {mcQuestions.length} câu trắc nghiệm
               </span>
-              <span className="rounded-lg border border-indigo-100 bg-white px-2.5 py-1.5">
+              <span className="rounded-lg border border-red-100 bg-white px-2.5 py-1.5">
                 {essayQuestions.length} câu tự luận
               </span>
-              <span className="rounded-lg border border-indigo-100 bg-white px-2.5 py-1.5">
+              <span className="rounded-lg border border-red-100 bg-white px-2.5 py-1.5">
                 Độ khó: {config.difficulty}
               </span>
             </div>
           </div>
 
-          <label className="flex w-full shrink-0 items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-white px-3 py-2.5 text-xs font-extrabold text-[#2C3039] sm:w-auto lg:flex-col lg:items-start lg:gap-1.5">
+          <label className="flex w-full shrink-0 items-center justify-between gap-3 rounded-xl border border-red-100 bg-white px-3 py-2.5 text-xs font-extrabold text-[#2C3039] sm:w-auto lg:flex-col lg:items-start lg:gap-1.5">
             <span>Điểm đạt (%)</span>
             <input
               type="number"
@@ -152,7 +152,7 @@ export function Step4ReviewEditor({
               disabled={isSaving}
               aria-invalid={!isPassingScoreValid}
               aria-describedby={!isPassingScoreValid ? "passing-score-error" : undefined}
-              className="w-24 rounded-lg border border-[#D9D3C9] bg-[#FEFCF9] px-3 py-2 text-right text-sm font-black text-[#2C3039] outline-none transition focus:border-[#C0392B] focus:ring-2 focus:ring-indigo-100"
+              className="w-24 rounded-lg border border-[#D9D3C9] bg-[#FEFCF9] px-3 py-2 text-right text-sm font-black text-[#2C3039] outline-none transition focus:border-[#C0392B] focus:ring-2 focus:ring-red-100"
             />
             {!isPassingScoreValid && (
               <span id="passing-score-error" role="alert" className="max-w-48 text-[11px] font-semibold leading-relaxed text-rose-700">
@@ -193,7 +193,7 @@ export function Step4ReviewEditor({
       </div>
 
       {/* Control Bar: Filters & Actions */}
-      <div className="flex flex-col items-stretch justify-between gap-4 rounded-2xl border border-indigo-50 bg-[#FAF8FF] p-3 sm:p-4 md:flex-row md:items-center">
+      <div className="flex flex-col items-stretch justify-between gap-4 rounded-2xl border border-red-100 bg-red-50/30 p-3 sm:p-4 md:flex-row md:items-center">
         {/* Filter Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
           <button

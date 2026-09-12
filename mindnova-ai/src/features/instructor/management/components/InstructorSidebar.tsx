@@ -22,7 +22,7 @@ import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBad
 
 function LogoMark() {
     return (
-        <div className="w-9 h-9 rounded-xl bg-[#C0392B] to-[#383AB8] text-white flex items-center justify-center font-black text-lg shadow-md shrink-0 border -[#FAF7F2]">
+        <div className="w-9 h-9 rounded-xl bg-[#C0392B] to-[#A93226] text-white flex items-center justify-center font-black text-lg shadow-md shrink-0 border -[#FAF7F2]">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <circle cx="12" cy="12" r="2.5" fill="white" />
                 <path
@@ -42,7 +42,7 @@ function CreateCourseCTA() {
             <Link
                 href="/instructor/create-course"
                 title="Create New Course"
-                className="flex items-center justify-center gap-2 px-4 py-3 w-full rounded-xl text-xs font-black text-white bg-[#C0392B] hover:bg-[#383AB8] shadow-md transition-all duration-200"
+                className="flex items-center justify-center gap-2 px-4 py-3 w-full rounded-xl text-xs font-black text-white bg-[#C0392B] hover:bg-[#a8392b] shadow-md transition-all duration-200"
             >
                 <svg aria-hidden viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" className="shrink-0">
                     <line x1="12" y1="5" x2="12" y2="19" />
@@ -271,7 +271,7 @@ export function InstructorSidebar() {
                     <Link
                         href="/instructor/create-course"
                         title="Create New Course"
-                        className="flex items-center justify-center w-full h-10 rounded-xl text-xs font-black text-white bg-[#C0392B] hover:bg-[#383AB8] shadow-md transition-all duration-200"
+                        className="flex items-center justify-center w-full h-10 rounded-xl text-xs font-black text-white bg-[#C0392B] hover:bg-[#A93226] shadow-md transition-all duration-200"
                     >
                         <svg aria-hidden viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" className="shrink-0">
                             <line x1="12" y1="5" x2="12" y2="19" />

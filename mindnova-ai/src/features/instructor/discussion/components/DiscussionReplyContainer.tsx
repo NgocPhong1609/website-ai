@@ -5,12 +5,14 @@ import { twMerge } from "tailwind-merge";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
+import { Avatar } from "@/src/shared/components/ui/Avatar";
 
 // ─── Types ────────────────────────────────────────────────────────
 
 export interface CommentThread {
     id: string;
     studentName: string;
+    studentAvatar?: string | null;
     studentEmail?: string;
     course: string;
     lesson: string;
@@ -33,6 +35,7 @@ export function DiscussionReplyContainer() {
     const pathname = usePathname();
 
     const [threads, setThreads] = useState<CommentThread[]>([]);
+    const [studentAvatarMap, setStudentAvatarMap] = useState<Record<string, string>>({});
     const [filter, setFilter] = useState<"all" | "unanswered" | "needs_attention">(() => {
         const f = searchParams.get("filter");
         if (f === "needs_attention" || f === "unanswered") return f as any;
@@ -42,6 +45,33 @@ export function DiscussionReplyContainer() {
     const [pagination, setPagination] = useState<any>(null);
 
     const [draftReplies, setDraftReplies] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        async function loadStudentAvatars() {
+            try {
+                const res = await axiosClient.get("/api/instructor/students");
+                const list = res.data?.data?.data || res.data?.data || [];
+                const map: Record<string, string> = {};
+                if (Array.isArray(list)) {
+                    list.forEach((s: any) => {
+                        const avatar =
+                            s.avatar_url ||
+                            s.avatar ||
+                            s.profile_image ||
+                            s.profile?.avatar_url ||
+                            s.profile?.avatar;
+                        if (avatar) {
+                            if (s.name) map[s.name.toLowerCase().trim()] = avatar;
+                            if (s.id) map[String(s.id)] = avatar;
+                            if (s.email) map[s.email.toLowerCase().trim()] = avatar;
+                        }
+                    });
+                }
+                setStudentAvatarMap(map);
+            } catch (e) { }
+        }
+        loadStudentAvatars();
+    }, []);
 
     const formatTimeAgo = (dateStr: string) => {
         const diff = Date.now() - new Date(dateStr).getTime();
@@ -61,11 +91,45 @@ export function DiscussionReplyContainer() {
             const data = res.data.data.data.map((item: any) => {
                 let bestReply = item.replies?.find((r: any) => r.is_best_answer);
                 let instructorReply = item.replies?.find((r: any) => !r.is_best_answer);
+                const studentObj = item.student || item.user || {};
+                const studentUserObj = studentObj.user || studentObj;
+                const studentProfileObj = studentUserObj.profile || studentObj.profile || {};
+                const studentName = studentUserObj.name || studentObj.name || studentProfileObj.name || "Sinh viên";
+                let studentAvatar =
+                    item.student_avatar ||
+                    item.avatar ||
+                    item.user_avatar ||
+                    studentProfileObj.avatar_url ||
+                    studentProfileObj.avatar ||
+                    studentProfileObj.profile_image ||
+                    studentProfileObj.avatar_path ||
+                    studentUserObj.avatar_url ||
+                    studentUserObj.avatar ||
+                    studentUserObj.profile_image ||
+                    studentUserObj.avatar_path ||
+                    studentUserObj.profile_photo_url ||
+                    studentUserObj.image ||
+                    studentObj.avatar_url ||
+                    studentObj.avatar ||
+                    studentObj.profile_image ||
+                    studentObj.avatar_path ||
+                    studentObj.profile_photo_url ||
+                    studentObj.image ||
+                    null;
+
+                if (!studentAvatar && studentName) {
+                    studentAvatar =
+                        studentAvatarMap[studentName.toLowerCase().trim()] ||
+                        (studentObj.id ? studentAvatarMap[String(studentObj.id)] : null) ||
+                        null;
+                }
+
                 return {
                     id: item.id.toString(),
-                    studentName: item.student.name,
+                    studentName,
+                    studentAvatar,
                     course: item.course?.title || "Khóa học chung",
-                    lesson: item.lesson.title,
+                    lesson: item.lesson?.title || "Bài học",
                     timeAgo: formatTimeAgo(item.created_at),
                     content: item.content,
                     isPinned: item.is_pinned,
@@ -88,7 +152,7 @@ export function DiscussionReplyContainer() {
 
     useEffect(() => {
         fetchDiscussions();
-    }, [filter]);
+    }, [filter, studentAvatarMap]);
 
     // Thread Actions
     const togglePin = async (id: string) => {
@@ -141,7 +205,7 @@ export function DiscussionReplyContainer() {
     const filteredThreads = threads;
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#FAF8FF]">
+        <div className="flex flex-col min-h-screen bg-[#FAF7F2]">
             <main className="flex-1 overflow-y-auto">
                 <div className="max-w-[1080px] mx-auto px-6 py-8 flex flex-col gap-8">
 
@@ -157,7 +221,7 @@ export function DiscussionReplyContainer() {
                         <button
                             type="button"
                             onClick={() => router.push('/instructor/messages')}
-                            className="px-5 py-2.5 -[#C0392B] hover:-[#C0392B] text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer"
+                            className="px-5 py-2.5 bg-[#C0392B] hover:-[#C0392B] text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer"
                         >
                             <></>
                             Mở phòng trao đổi
@@ -185,7 +249,7 @@ export function DiscussionReplyContainer() {
                                         className={twMerge(
                                             "px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer",
                                             filter === tab.id
-                                                ? "bg-[#FAF7F2] text-white shadow-sm"
+                                                ? "bg-[#C0392B] text-white shadow-sm"
                                                 : "bg-white text-[#8A8478] border border-[#FAF7F2] hover:bg-[#FEFCF9]"
                                         )}
                                     >
@@ -216,15 +280,18 @@ export function DiscussionReplyContainer() {
                                         {/* Thread Top Info */}
                                         <div className="flex items-start justify-between gap-4">
                                             <div className="flex items-center gap-3.5">
-                                                <div className="w-11 h-11 rounded-2xl -[#C0392B] -[#C0392B] text-white font-black text-sm flex items-center justify-center shadow-sm">
-                                                    {thread.studentName.slice(0, 2).toUpperCase()}
-                                                </div>
+                                                <Avatar
+                                                    src={thread.studentAvatar}
+                                                    alt={thread.studentName}
+                                                    fallback={thread.studentName}
+                                                    className="w-11 h-11 rounded-2xl bg-[#C0392B] text-white font-black text-sm shadow-sm shrink-0"
+                                                />
                                                 <div>
                                                     <div className="flex items-center gap-2">
                                                         <h4 className="text-sm font-black text-[#2C3039]">{thread.studentName}</h4>
                                                         <span className="text-[11px] font-bold text-gray-400">({thread.timeAgo})</span>
                                                     </div>
-                                                    <p className="text-xs font-semibold -[#C0392B] mt-0.5">
+                                                    <p className="text-xs font-semibold text-[#C0392B] mt-0.5">
                                                         {thread.course} • <span className="text-[#8A8478]">{thread.lesson}</span>
                                                     </p>
                                                 </div>
@@ -241,14 +308,14 @@ export function DiscussionReplyContainer() {
                                         </div>
 
                                         {/* Content Body */}
-                                        <div className="p-4 rounded-2xl bg-[#F8F9FF] border border-[#FAF7F2] text-sm font-medium text-gray-800 leading-relaxed">
+                                        <div className="p-4 rounded-2xl bg-[#FEFCF9] border border-[#FAF7F2] text-sm font-medium text-gray-800 leading-relaxed">
                                             {thread.content}
                                         </div>
 
                                         {/* Previous Reply Display */}
                                         {thread.replyText && (
-                                            <div className="p-5 rounded-2xl from-emerald-50/60 to-teal-50/20 border -[#FAF7F2] text-xs font-medium text-gray-800 flex flex-col gap-2">
-                                                <div className="flex items-center gap-2 font-black -[#2C3039] text-xs">
+                                            <div className="p-5 rounded-2xl bg-emerald-50/60 border border-emerald-100 text-xs font-medium text-gray-800 flex flex-col gap-2">
+                                                <div className="flex items-center gap-2 font-black text-[#2C3039] text-xs">
 
                                                     <span>Phản hồi của giảng viên:</span>
                                                     <VerifiedTeacherBadge isVerified={true} size="xs" />
@@ -273,7 +340,7 @@ export function DiscussionReplyContainer() {
                                                         onClick={() => toggleResolvedStatus(thread.id, thread.isResolved)}
                                                         className={twMerge(
                                                             "px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
-                                                            thread.isResolved ? "-[#2C3039] text-white shadow-sm" : "bg-emerald-50 hover:-[#FAF7F2] -[#2C3039] border -[#FAF7F2]"
+                                                            thread.isResolved ? "bg-[#2C3039] text-white shadow-sm" : "bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200"
                                                         )}
                                                     >
                                                         {thread.isResolved ? " Đã phản hồi" : "️ Xác nhận đã phản hồi"}
@@ -296,7 +363,7 @@ export function DiscussionReplyContainer() {
                                                         placeholder="Viết hướng dẫn hoặc ví dụ mã hữu ích..."
                                                         value={draftReplies[thread.id] || ""}
                                                         onChange={(e) => setDraftReplies((prev) => ({ ...prev, [thread.id]: e.target.value }))}
-                                                        className="flex-1 px-4 py-3 rounded-2xl border border-[#D5D5FF] bg-white text-xs font-bold focus:outline-none focus:border-[#FAF7F2]"
+                                                        className="flex-1 px-4 py-3 rounded-2xl border border-[#FAF7F2] bg-white text-xs font-bold focus:outline-none focus:border-[#C0392B]"
                                                     />
                                                     <button
                                                         type="button"

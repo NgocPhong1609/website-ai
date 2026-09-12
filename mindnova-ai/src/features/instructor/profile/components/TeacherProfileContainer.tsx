@@ -179,7 +179,7 @@ export function TeacherProfileContainer() {
             <p className="text-sm font-semibold text-[#8A8478]">{profileData?.email}</p>
 
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-1">
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-[#C0392B] border -[#FAF7F2] uppercase tracking-wide">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-[#C0392B] border -[#FAF7F2] uppercase tracking-wide">
                 ‍ Giảng viên
               </span>
               <span
@@ -274,13 +274,13 @@ export function TeacherProfileContainer() {
                 </button>
               </div>
             ) : (
-              <div className="p-4 rounded-2xl bg-indigo-50/50 border -[#FAF7F2] space-y-3">
+              <div className="p-4 rounded-2xl bg-red-50/50 border -[#FAF7F2] space-y-3">
                 <p className="text-xs text-[#8A8478] font-semibold leading-relaxed">
                   Tài khoản của bạn chưa được xác minh. Nộp bằng cấp/chứng chỉ để Admin kiểm tra và cấp tích xanh xác minh uy tín.
                 </p>
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="w-full py-2.5 rounded-xl bg-[#C0392B] hover:bg-[#383AB8] text-white font-black text-xs shadow-md shadow-[#C0392B]/20 transition-all"
+                  className="w-full py-2.5 rounded-xl bg-[#C0392B] hover:bg-[#A93226] text-white font-black text-xs shadow-md shadow-[#C0392B]/20 transition-all"
                 >
                   Yêu cầu cấp tích xanh
                 </button>
@@ -489,7 +489,7 @@ export function TeacherProfileContainer() {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-6 py-2.5 rounded-xl text-xs font-black text-white bg-[#C0392B] hover:bg-[#383AB8] shadow-md shadow-[#C0392B]/30 transition-all disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-xl text-xs font-black text-white bg-[#C0392B] hover:bg-[#A93226] shadow-md shadow-[#C0392B]/30 transition-all disabled:opacity-50"
                 >
                   {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
                 </button>

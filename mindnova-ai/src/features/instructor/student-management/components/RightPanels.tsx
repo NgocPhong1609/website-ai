@@ -98,8 +98,8 @@ function AIAnnouncementPanel({ onOpenModal }: { onOpenModal: (topic?: string) =>
     const [activeTag, setActiveTag] = useState<string | null>(null);
 
     return (
-        <div className="rounded-2xl border border-[#FAF7F2] bg-indigo-50/20 shadow-2xs overflow-hidden">
-            <div className="p-4 border-b border-[#FAF7F2] flex items-center gap-2 bg-indigo-50/50">
+        <div className="rounded-2xl border border-[#FAF7F2] bg-red-50/20 shadow-2xs overflow-hidden">
+            <div className="p-4 border-b border-[#FAF7F2] flex items-center gap-2 bg-red-50/50">
                 <span className="text-[#C0392B]"><SparklesIcon size={16} /></span>
                 <span className="text-xs font-black text-[#C0392B] tracking-wide uppercase">Trợ lý Thông báo AI</span>
             </div>
