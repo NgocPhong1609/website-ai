@@ -1,26 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, Loader2, AlertTriangle } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import { fetchVideoUrl } from "../../api";
 import type { LessonData } from "./LessonWorkspace";
-
-// --- Icons ---
-function PlayIcon({ className = "w-6 h-6" }: { className?: string }) {
-  return (
-    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
-      <path d="M8 5v14l11-7z" />
-    </svg>
-  );
-}
-
-function PauseIcon({ className = "w-6 h-6" }: { className?: string }) {
-  return (
-    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
-      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-    </svg>
-  );
-}
 
 function Rewind10Icon({ className = "w-5 h-5" }: { className?: string }) {
   return (
@@ -40,46 +24,7 @@ function Forward10Icon({ className = "w-5 h-5" }: { className?: string }) {
   );
 }
 
-function VolumeIcon({ muted, className = "w-5 h-5" }: { muted: boolean; className?: string }) {
-  if (muted) {
-    return (
-      <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-      </svg>
-    );
-  }
-  return (
-    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-    </svg>
-  );
-}
 
-function FullscreenIcon({ className = "w-5 h-5" }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-    </svg>
-  );
-}
-
-function MinimizeIcon({ className = "w-5 h-5" }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L4 20m0 0h4m-4 0v-4m11-11l5-5m-5 0h4m-4 0v4M9 9L4 4m0 0h4M4 4v4m11 11l5 5m-5 0h4m-4 0v-4" />
-    </svg>
-  );
-}
-
-function SpinnerIcon({ className = "w-8 h-8 animate-spin text-white" }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}
 
 function formatTime(seconds: number): string {
  if (isNaN(seconds)) return "00:00";
@@ -343,7 +288,7 @@ export function CustomVideoPlayer({
  return (
  <div className="relative w-full aspect-video bg-[#F8FAFC] rounded-2xl overflow-hidden flex items-center justify-center border border-[#E2E8F0]">
  <div className="flex flex-col items-center gap-3 text-[#64748B]">
- <></>
+ <AlertTriangle size={28} strokeWidth={1.75} aria-hidden />
  <span className="text-sm font-medium">{error}</span>
  </div>
  </div>
@@ -416,49 +361,49 @@ export function CustomVideoPlayer({
  {/* Buffering Indicator */}
  {isWaiting && (
  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
- <div className="text-white/80">
- <SpinnerIcon />
- </div>
+ <Loader2 className="w-12 h-12 text-white animate-spin" aria-hidden />
  </div>
  )}
 
- {/* Center Play/Pause Button (Shows briefly when toggled or hovered when paused) */}
+ {/* YouTube-style center play (paused) */}
  <div
  className={twMerge(
- "absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300",
+ "absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-200",
  !isPlaying && showControls ? "opacity-100" : "opacity-0"
  )}
  >
  <button
+ type="button"
  onClick={togglePlay}
- className="w-16 h-16 sm:w-20 sm:h-20 bg-[#3B82F6]/90 hover:bg-[#2563EB] text-white rounded-full flex items-center justify-center backdrop-blur-md shadow-[0_4px_24px_rgba(37, 99, 235,0.4)] pointer-events-auto transform transition-transform hover:scale-105"
+ aria-label="Phát video"
+ className="w-[68px] h-[68px] rounded-full bg-black/70 hover:bg-black/85 text-white flex items-center justify-center pointer-events-auto transition-transform hover:scale-110"
  >
- {isPlaying ? <PauseIcon /> : <PlayIcon />}
+ <Play className="w-9 h-9 fill-current ml-1" />
  </button>
  </div>
 
  {/* Controls Overlay */}
  <div
  className={twMerge(
- "absolute inset-x-0 bottom-0 from-black/90 via-black/50 to-transparent pt-12 pb-4 px-4 sm:px-6 transition-opacity duration-300 flex flex-col gap-2",
+ "absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pt-12 pb-3 px-3 sm:px-4 transition-opacity duration-300 flex flex-col gap-1.5",
  showControls ? "opacity-100 visible" : "opacity-0 invisible"
  )}
  >
  {/* Progress Bar (Hoverable & Draggable) */}
  <div
- className="relative w-full h-2 sm:h-1.5 bg-white/20 rounded-full cursor-pointer group/progress transition-all hover:h-3 sm:hover:h-2"
+ className="relative w-full h-1 hover:h-1.5 bg-white/30 rounded-full cursor-pointer group/progress transition-all"
  onClick={handleSeekDrag}
  onMouseMove={handleProgressHover}
  onMouseLeave={() => setHoverTime(null)}
  >
  {/* Buffered / Progress Fill */}
  <div
- className="absolute top-0 left-0 h-full bg-[#3B82F6] rounded-full transition-all duration-100 ease-linear pointer-events-none"
+ className="absolute top-0 left-0 h-full bg-[#FF0000] rounded-full pointer-events-none"
  style={{ width: `${progressPercent}%` }}
  />
  {/* Thumb */}
  <div
- className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-md scale-0 group-hover/progress:scale-100 transition-transform pointer-events-none"
+ className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-[#FF0000] rounded-full shadow-sm scale-0 group-hover/progress:scale-100 transition-transform pointer-events-none ring-2 ring-white"
  style={{ left: `calc(${progressPercent}% - 8px)` }}
  />
  {/* Hover Tooltip */}
@@ -476,8 +421,8 @@ export function CustomVideoPlayer({
  <div className="flex items-center justify-between text-white mt-1">
  {/* Left: Play, Skip, Volume, Time */}
  <div className="flex items-center gap-3 sm:gap-5">
- <button onClick={togglePlay} className="hover:text-[#E2E8F0] transition-colors focus:outline-none">
- {isPlaying ? <PauseIcon /> : <PlayIcon />}
+ <button type="button" onClick={togglePlay} className="hover:text-white/80 transition-colors focus:outline-none" aria-label={isPlaying ? "Tạm dừng" : "Phát"}>
+ {isPlaying ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current" />}
  </button>
 
  <button onClick={() => skipTime(-10)} className="hover:text-[#E2E8F0] transition-colors focus:outline-none hidden sm:block" title="Tua lại 10s">
@@ -488,8 +433,8 @@ export function CustomVideoPlayer({
  </button>
 
  <div className="flex items-center gap-2 group/volume relative">
- <button onClick={toggleMute} className="hover:text-[#E2E8F0] transition-colors focus:outline-none">
- <VolumeIcon muted={isMuted} />
+ <button type="button" onClick={toggleMute} className="hover:text-white/80 transition-colors focus:outline-none" aria-label={isMuted ? "Bật tiếng" : "Tắt tiếng"}>
+ {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
  </button>
  {/* Volume Slider (appears on hover) */}
  <input
@@ -499,7 +444,7 @@ export function CustomVideoPlayer({
  step="0.05"
  value={isMuted ? 0 : volume}
  onChange={handleVolumeChange}
- className="w-0 opacity-0 group-hover/volume:w-20 group-hover/volume:opacity-100 transition-all duration-300 accent-[#3B82F6] cursor-pointer h-1.5 rounded-full appearance-none bg-white/30 outline-none"
+ className="w-0 opacity-0 group-hover/volume:w-20 group-hover/volume:opacity-100 transition-all duration-300 accent-[#FF0000] cursor-pointer h-1 rounded-full appearance-none bg-white/30 outline-none"
  />
  </div>
 
@@ -545,8 +490,8 @@ export function CustomVideoPlayer({
  {/* Resolution button removed as requested */}
 
  {/* Fullscreen */}
- <button onClick={toggleFullscreen} className="hover:text-[#E2E8F0] transition-colors focus:outline-none">
- {isFullscreen ? <MinimizeIcon /> : <FullscreenIcon />}
+ <button type="button" onClick={toggleFullscreen} className="hover:text-white/80 transition-colors focus:outline-none" aria-label={isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}>
+ {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
  </button>
  </div>
  </div>

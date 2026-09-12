@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
-import { CheckCircle2, AlertTriangle, Lightbulb, Bot, Target, MessageSquare, ClipboardList, Eye, GraduationCap, X, FileEdit, Check, Lock, Flag, Trophy, PartyPopper, ChevronsUpDown } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Lightbulb, Bot, Target, MessageSquare, ClipboardList, Eye, GraduationCap, X, FileEdit, Check, Lock, Flag, Trophy, PartyPopper, ChevronsUpDown, ArrowLeft, ChevronRight, BookOpen } from "lucide-react";
 import { LessonStatusIcon, lessonDisplayTitle } from "../LessonStatusIcon";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,47 +18,6 @@ import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/q
 import toast from "react-hot-toast";
 import { LessonAttachments } from "@/src/features/instructor/lesson-management/components/LessonAttachments";
 import type { LessonAttachment } from "@/src/features/instructor/lesson-management/api";
-
-// ─── Icons ────────────────────────────────────────────────────────────────────
-function CheckIcon({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-    </svg>
-  );
-}
-
-function PlayCircleIcon({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
-    </svg>
-  );
-}
-
-function ChevronIcon({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-    </svg>
-  );
-}
-
-function ArrowLeftIcon({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-    </svg>
-  );
-}
-
-function ChevronRightIcon({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-    </svg>
-  );
-}
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 export interface LessonData {
@@ -174,7 +133,7 @@ function ArticleRenderer({
  if (!lesson.content) {
  return (
  <div className="w-full p-12 flex flex-col items-center justify-center text-gray-400 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0]">
- <></>
+ <BookOpen size={28} strokeWidth={1.75} aria-hidden />
  <span className="text-sm font-medium mt-3">Nội dung bài học chưa được cập nhật.</span>
  </div>
  );
@@ -185,7 +144,7 @@ function ArticleRenderer({
  {/* Reading progress bar */}
  {!completedRef.current && (
  <div className="flex items-center gap-3 p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
- <></>
+ <BookOpen size={16} className="text-[#3B82F6] shrink-0" aria-hidden />
  <div className="flex-1">
  <div className="w-full h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
  <div
@@ -613,7 +572,7 @@ function QuizRenderer({
  if (error || !quizData || quizData.questions.length === 0) {
  return (
  <div className="w-full p-12 flex flex-col items-center justify-center text-gray-400 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0]">
- <></>
+ <AlertTriangle size={28} strokeWidth={1.75} aria-hidden />
  <span className="text-sm font-medium mt-3">{error || "Bài kiểm tra chưa có câu hỏi."}</span>
  </div>
  );
@@ -887,7 +846,7 @@ function QuizRenderer({
  className="px-6 py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm transition-colors cursor-pointer shadow-sm flex items-center gap-2"
  >
  {isLast ? "Hoàn thành" : "Câu tiếp theo"}
- <></>
+ <ChevronRight size={16} aria-hidden />
  </button>
  )}
  </div>
@@ -1214,13 +1173,14 @@ function LessonWorkspaceContent() {
  href={`/courses/detail?courseId=${parsedCourseId}`}
  className="w-9 h-9 rounded-xl bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] flex items-center justify-center text-[#64748B] hover:text-[#0F172A] transition-colors shrink-0 text-decoration-none shadow-2xs"
  title="Quay lại chi tiết Khóa học"
+ aria-label="Quay lại chi tiết Khóa học"
  >
- <></>
+ <ArrowLeft size={18} strokeWidth={2} />
  </Link>
  <div className="min-w-0">
  <nav className="flex items-center gap-2 text-[13px] font-medium text-[#64748B] mb-0.5 truncate">
  <Link href="/courses" className="hover:text-[#0F172A] transition-colors text-decoration-none">Khoá học</Link>
- <></>
+ <ChevronRight size={12} className="text-[#94A3B8] shrink-0" aria-hidden />
  <span className="text-[#0F172A] font-semibold truncate">{courseTitle}</span>
  </nav>
  <h1 className="text-base sm:text-lg font-bold text-[#0F172A] truncate">{activeLesson.title}</h1>
@@ -1515,7 +1475,7 @@ function LessonWorkspaceContent() {
  isModuleCurrent ? "bg-white border-2 border-[var(--primary-color)] text-[#0F172A]" :
  "bg-gray-100 text-[#64748B]"
  )}>
- {isModuleCompleted ? "" : moduleIndex + 1}
+ {isModuleCompleted ? <Check size={14} strokeWidth={2.5} aria-hidden /> : moduleIndex + 1}
  </div>
  <div className="min-w-0 flex-1">
  <p className="text-[11px] font-bold uppercase tracking-wider text-[#0F172A] truncate">{mod.title}</p>
@@ -1556,7 +1516,7 @@ function LessonWorkspaceContent() {
  "w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all",
  isCompleted ? "bg-[#3B82F6] text-white shadow-2xs" :
  isCurrent ? "bg-white border-2 border-[#3B82F6] text-[#0F172A]" :
- "border-2 border-gray-300 text-transparent bg-[#F8FAFC]"
+ "border-2 border-[#CBD5E1] text-[#64748B] bg-white"
  )}>
  <LessonStatusIcon
  lesson={{
@@ -1604,7 +1564,7 @@ function LessonWorkspaceContent() {
  {isCurrent ? (
  <span className="w-2.5 h-2.5 rounded-full bg-[#3B82F6] inline-block animate-ping" />
  ) : (
- <></>
+ <ChevronRight size={16} className="text-[#94A3B8]" aria-hidden />
  )}
  </div>
  </div>
@@ -1627,14 +1587,14 @@ function LessonWorkspaceContent() {
  disabled={!hasPrevious}
  className="flex items-center gap-2 px-5 py-2 rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#64748B] font-semibold text-xs sm:text-sm transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm"
  >
- <></>
+ <ArrowLeft size={16} strokeWidth={2} aria-hidden />
  <span>Bài trước</span>
  </button>
 
  {/* Completion status indicator — no manual "Mark Complete" */}
  {activeLesson.completed ? (
  <div className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#F8FAFC] text-[#065F46] font-semibold text-xs sm:text-sm border border-[#6EE7B7]">
- <></>
+ <CheckCircle2 size={16} aria-hidden />
  <span>Đã hoàn thành</span>
  </div>
  ) : (
@@ -1745,6 +1705,7 @@ function LessonWorkspaceContent() {
     className="flex items-center gap-2 px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm"
   >
     <span>Bài tiếp theo</span>
+    <ChevronRight size={16} strokeWidth={2} aria-hidden />
   </button>
  </div>
  </div>
