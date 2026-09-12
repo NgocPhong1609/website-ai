@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\Student\NotificationController as StudentNotificati
 use App\Http\Controllers\Api\Student\StreakController;
 use App\Http\Controllers\Api\Student\AiQuizGeneratorController;
 use App\Http\Controllers\Api\Student\CertificateController as StudentCertificateController;
+use App\Http\Controllers\Api\Student\PaymentMethodController as StudentPaymentMethodController;
 use App\Http\Controllers\Api\Student\AnalyzeLessonController;
 use App\Http\Controllers\Api\Student\SelfAssessmentController;
 use App\Http\Controllers\Api\Student\PaymentController as StudentPaymentController;
@@ -169,6 +170,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/certificates', [StudentCertificateController::class, 'index']);
         Route::post('/certificates/claim', [StudentCertificateController::class, 'claim']);
+
+        Route::get('/payment-methods', [StudentPaymentMethodController::class, 'index']);
+        Route::post('/payment-methods', [StudentPaymentMethodController::class, 'store']);
+        Route::delete('/payment-methods/{id}', [StudentPaymentMethodController::class, 'destroy']);
+        Route::post('/payment-methods/{id}/default', [StudentPaymentMethodController::class, 'setDefault']);
 
         // Check Order Status by Transaction ID
         Route::get('/orders/transaction/{transactionId}', [OrderController::class, 'showByTransaction']);

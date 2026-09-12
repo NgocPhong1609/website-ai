@@ -104,6 +104,11 @@ class User extends Authenticatable
         return $this->hasMany(Subscription::class);
     }
 
+    public function studentPaymentMethods(): HasMany
+    {
+        return $this->hasMany(StudentPaymentMethod::class);
+    }
+
     public function notifications(): HasMany
     {
         return $this->hasMany(Notification::class);

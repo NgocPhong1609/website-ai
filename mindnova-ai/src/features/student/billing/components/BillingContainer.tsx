@@ -1,7 +1,6 @@
 "use client";
 
 import { PaymentMethodsCard } from "./PaymentMethodsCard";
-import { PromoCodeCard } from "./PromoCodeCard";
 import { TransactionHistoryTable } from "./TransactionHistoryTable";
 import { BillingFooter } from "./BillingFooter";
 import { useGetBilling } from "../api";
@@ -10,7 +9,6 @@ import toast from "react-hot-toast";
 export default function BillingContainer() {
  const { data, isLoading, isError, refetch } = useGetBilling();
  const orders = data?.orders ?? [];
- const methods = data?.payment_methods ?? [];
  const latestPaid = orders.find((order) => order.status === "completed");
  const amountLabel = latestPaid
   ? `${Number(latestPaid.total_amount).toLocaleString("vi-VN")} VNĐ`
@@ -86,10 +84,7 @@ export default function BillingContainer() {
  <p className="text-sm text-rose-600">Không thể tải thông tin thanh toán. <button type="button" className="underline" onClick={() => refetch()}>Thử lại</button></p>
  )}
 
- <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
- <PaymentMethodsCard methods={methods} isLoading={isLoading} />
- <PromoCodeCard courseId={orders[0]?.course_id} />
- </div>
+ <PaymentMethodsCard />
 
  {/* ─── Transaction History Table ─── */}
  <TransactionHistoryTable orders={orders} isLoading={isLoading} />
