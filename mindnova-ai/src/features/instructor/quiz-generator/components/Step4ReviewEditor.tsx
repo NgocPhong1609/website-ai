@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
-import { GeneratedQuestion } from "../types/quizGenerator.types";
+import React, { useEffect, useState } from "react";
+import { GeneratedQuestion, QuizConfig } from "../types/quizGenerator.types";
 import { QuestionCardMultipleChoice } from "./QuestionCardMultipleChoice";
 import { QuestionCardEssay } from "./QuestionCardEssay";
 
 interface Step4ReviewEditorProps {
   questions: GeneratedQuestion[];
+  config: QuizConfig;
+  onChangeConfig: (fields: Partial<QuizConfig>) => void;
   onUpdateQuestion: (id: string, updated: Partial<GeneratedQuestion>) => void;
   onApproveQuestion: (id: string) => void;
   onDeleteQuestion: (id: string) => void;
@@ -15,10 +17,21 @@ interface Step4ReviewEditorProps {
   onSave: (status: "draft" | "published") => void;
   onBack: () => void;
   isSaving: boolean;
+  isReviewConfirmed: boolean;
+  onConfirmAll: () => void;
+}
+
+function parsePassingScore(value: string): number | null {
+  if (!/^\d+$/.test(value)) return null;
+
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 0 && parsed <= 100 ? parsed : null;
 }
 
 export function Step4ReviewEditor({
   questions,
+  config,
+  onChangeConfig,
   onUpdateQuestion,
   onApproveQuestion,
   onDeleteQuestion,
@@ -27,8 +40,15 @@ export function Step4ReviewEditor({
   onSave,
   onBack,
   isSaving,
+  isReviewConfirmed,
+  onConfirmAll,
 }: Step4ReviewEditorProps) {
   const [filterType, setFilterType] = useState<"all" | "multiple_choice" | "essay">("all");
+  const [passingScoreInput, setPassingScoreInput] = useState(String(config.passing_score));
+
+  useEffect(() => {
+    setPassingScoreInput(String(config.passing_score));
+  }, [config.passing_score]);
 
   const mcQuestions = questions.filter((q) => q.type === "multiple_choice");
   const essayQuestions = questions.filter((q) => q.type === "essay");
@@ -43,7 +63,16 @@ export function Step4ReviewEditor({
   const totalPoints = Number(rawTotal.toFixed(2));
   const isValidTotal = Math.abs(totalPoints - 10) < 0.001;
   const isLess = totalPoints < 10;
-  const isMore = totalPoints > 10;
+  const isPassingScoreValid = parsePassingScore(passingScoreInput) !== null;
+
+  const handlePassingScoreChange = (value: string) => {
+    setPassingScoreInput(value);
+    const parsed = parsePassingScore(value);
+
+    if (parsed !== null) {
+      onChangeConfig({ passing_score: parsed });
+    }
+  };
 
   return (
     <div className="p-8 bg-white rounded-3xl border border-[#E2E8F0] shadow-sm flex flex-col gap-6 animate-fadeIn">
@@ -80,6 +109,61 @@ export function Step4ReviewEditor({
         </div>
       </div>
 
+      {/* Final configuration remains visible while questions are reviewed. */}
+      <section aria-labelledby="review-config-heading" className="rounded-2xl border border-blue-100 bg-blue-50/50 p-4 sm:p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0">
+            <h3 id="review-config-heading" className="text-sm font-black text-[#0F172A]">
+              Cấu hình bài kiểm tra
+            </h3>
+            <p className="mt-1 truncate text-base font-extrabold text-[#0F172A]">{config.title}</p>
+            {config.description && (
+              <p className="mt-1 line-clamp-2 text-xs font-medium leading-relaxed text-[#64748B]">
+                {config.description}
+              </p>
+            )}
+            <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-bold text-[#475569]">
+              <span className="rounded-lg border border-blue-100 bg-white px-2.5 py-1.5">
+                {config.time_limit_minutes} phút
+              </span>
+              <span className="rounded-lg border border-blue-100 bg-white px-2.5 py-1.5">
+                {questions.length} câu hỏi
+              </span>
+              <span className="rounded-lg border border-blue-100 bg-white px-2.5 py-1.5">
+                {mcQuestions.length} câu trắc nghiệm
+              </span>
+              <span className="rounded-lg border border-blue-100 bg-white px-2.5 py-1.5">
+                {essayQuestions.length} câu tự luận
+              </span>
+              <span className="rounded-lg border border-blue-100 bg-white px-2.5 py-1.5">
+                Độ khó: {config.difficulty}
+              </span>
+            </div>
+          </div>
+
+          <label className="flex w-full shrink-0 items-center justify-between gap-3 rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-xs font-extrabold text-[#0F172A] sm:w-auto lg:flex-col lg:items-start lg:gap-1.5">
+            <span>Điểm đạt (%)</span>
+            <input
+              type="number"
+              min={0}
+              max={100}
+              step={1}
+              value={passingScoreInput}
+              onChange={(event) => handlePassingScoreChange(event.target.value)}
+              disabled={isSaving}
+              aria-invalid={!isPassingScoreValid}
+              aria-describedby={!isPassingScoreValid ? "passing-score-error" : undefined}
+              className="w-24 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 text-right text-sm font-black text-[#0F172A] outline-none transition focus:border-[#3B82F6] focus:ring-2 focus:ring-blue-100"
+            />
+            {!isPassingScoreValid && (
+              <span id="passing-score-error" role="alert" className="max-w-48 text-[11px] font-semibold leading-relaxed text-rose-700">
+                Điểm đạt phải là số nguyên từ 0 đến 100.
+              </span>
+            )}
+          </label>
+        </div>
+      </section>
+
       {/* Score Validation Banner */}
       <div>
         {isValidTotal ? (
@@ -110,9 +194,9 @@ export function Step4ReviewEditor({
       </div>
 
       {/* Control Bar: Filters & Actions */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-[#FAF8FF] border border-blue-50">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-[#EFF6FF] border border-blue-50">
         {/* Filter Tabs */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
           <button
             type="button"
             onClick={() => setFilterType("all")}
@@ -195,7 +279,7 @@ export function Step4ReviewEditor({
       </div>
 
       {/* Footer Navigation & Save Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-gray-100 pt-4 mt-2">
+      <div className="flex flex-col justify-between gap-4 border-t border-gray-100 pt-4 mt-2 sm:flex-row sm:items-start">
         <button
           type="button"
           onClick={onBack}
@@ -204,7 +288,16 @@ export function Step4ReviewEditor({
           🠔 Sửa cấu hình
         </button>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+          <button
+            type="button"
+            onClick={onConfirmAll}
+            disabled={isSaving || questions.length === 0 || !isValidTotal || !isPassingScoreValid || isReviewConfirmed}
+            className="px-5 py-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold text-xs transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isReviewConfirmed ? "✓ Đã xác nhận toàn bộ" : "✓ Xác nhận toàn bộ câu hỏi"}
+          </button>
+
           {!isValidTotal && (
             <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-2 rounded-xl border border-amber-200">
               ⚠️ Tổng điểm phải bằng 10 để lưu.
@@ -214,7 +307,7 @@ export function Step4ReviewEditor({
           <button
             type="button"
             onClick={() => onSave("draft")}
-            disabled={isSaving || !isValidTotal}
+            disabled={isSaving || !isValidTotal || !isPassingScoreValid || !isReviewConfirmed}
             className="px-6 py-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-extrabold text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isSaving ? "Đang lưu..." : "💾 Lưu Nháp"}
@@ -223,7 +316,7 @@ export function Step4ReviewEditor({
           <button
             type="button"
             onClick={() => onSave("published")}
-            disabled={isSaving || questions.length === 0 || !isValidTotal}
+            disabled={isSaving || questions.length === 0 || !isValidTotal || !isPassingScoreValid || !isReviewConfirmed}
             className="px-8 py-3 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
           >
             {isSaving ? (

@@ -5,13 +5,14 @@ import { twMerge } from "tailwind-merge";
 import { useInstructorPricing } from "@/src/hooks/instructor/useInstructorPricing";
 import { useCreateCourseStore } from "../stores/createCourseStore";
 import { CouponSection } from "@/src/features/instructor/pricing/components/CouponSection";
+import { useCommissionTiers } from "../api";
 
 export interface Step3SettingsPriceProps {
  courseId?: string;
  courseTitle?: string;
  thumbnailPreview?: string | null;
  initialPrice?: number | null;
- initialTier?: "standard" | "exclusive";
+ initialTier?: string;
  initialFlashSale?: boolean;
  initialSalePrice?: number | null;
  initialSaleStartDate?: string | null;
@@ -32,6 +33,8 @@ export function Step3SettingsPrice({
  onSaveConfig 
 }: Step3SettingsPriceProps) {
  const setSettings = useCreateCourseStore((s) => s.setSettings);
+ const commissionTiers = useCommissionTiers();
+ const tierDefinitions = commissionTiers.data ?? [];
  
  const {
  isFree,
@@ -51,7 +54,8 @@ export function Step3SettingsPrice({
  initialSalePrice ?? undefined,
  initialSaleStartDate ?? undefined,
  initialSaleEndDate ?? undefined,
- initialTier ?? "standard"
+ initialTier ?? "standard",
+ tierDefinitions,
  );
 
  useEffect(() => {
@@ -145,34 +149,29 @@ export function Step3SettingsPrice({
 
  <div className="flex flex-col gap-2 pt-1">
  <label className="text-xs font-black text-gray-700 uppercase tracking-wider">Cấp Độ Hợp Tác Giảng Viên:</label>
+ {commissionTiers.isLoading && <p role="status" className="text-xs text-gray-500">Đang tải cấu hình hoa hồng...</p>}
+ {commissionTiers.isError && <p role="alert" className="text-xs font-bold text-rose-600">Không thể tải tỷ lệ hoa hồng. Bạn vẫn có thể giữ lựa chọn cấp hợp tác và thử lại sau.</p>}
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+ {(tierDefinitions.length > 0 ? tierDefinitions : [{ tier: "standard" }, { tier: "exclusive" }]).map((definition) => (
  <button
+ key={definition.tier}
  type="button"
- onClick={() => setTier("standard")}
+ onClick={() => setTier(definition.tier)}
  className={twMerge(
  "p-3.5 rounded-xl border text-left transition-all cursor-pointer",
- tier === "standard"
+ tier === definition.tier
  ? "border-[#3B82F6] bg-blue-50/50 shadow-2xs"
  : "border-[#E2E8F0] bg-white hover:border-gray-300"
  )}
  >
- <p className="text-xs font-extrabold text-[#0F172A]">Đối Tác Tiêu Chuẩn</p>
- <p className="text-[11px] text-[#3B82F6] font-bold mt-0.5">30% phí hệ thống (Nhận 70%)</p>
- </button>
-
- <button
- type="button"
- onClick={() => setTier("exclusive")}
- className={twMerge(
- "p-3.5 rounded-xl border text-left transition-all cursor-pointer",
- tier === "exclusive"
- ? "text-[#0F172A] bg-emerald-50/50 shadow-2xs"
- : "border-[#E2E8F0] bg-white hover:border-gray-300"
+ <p className="text-xs font-extrabold text-[#0F172A]">{"label" in definition ? definition.label : definition.tier}</p>
+ {"platform_commission_percent" in definition && (
+ <p className="text-[11px] text-[#3B82F6] font-bold mt-0.5">
+ {definition.platform_commission_percent}% phí hệ thống (Nhận {definition.instructor_percent}%)
+ </p>
  )}
- >
- <p className="text-xs font-extrabold text-[#0F172A]"> Hợp Tác Độc Quyền MindNova</p>
- <p className="text-[11px] text-[#0F172A] font-bold mt-0.5">Ưu đãi chỉ 15% phí (Nhận 85%)</p>
  </button>
+ ))}
  </div>
  </div>
  </div>
@@ -256,14 +255,14 @@ export function Step3SettingsPrice({
  </div>
  {!isFree && (
  <div className="flex items-center justify-between text-rose-200">
- <span>Phí Hạ Tầng Nền Tảng ({revenue.commissionRate}%):</span>
+ <span>Phí Hạ Tầng Nền Tảng ({revenue.commissionRate ?? "—"}%):</span>
  <span>-{revenue.platformFee.toLocaleString('vi-VN')} VNĐ</span>
  </div>
  )}
  <div className="h-px bg-white/10 w-full my-0.5" />
             <div className="flex items-center justify-between text-white/90">
               <span>Tỷ lệ phân chia Giảng viên:</span>
-              <span className="font-extrabold text-white text-sm">{tier === "exclusive" ? "85.0%" : "70.0%"}</span>
+              <span className="font-extrabold text-white text-sm">{revenue.instructorPercent == null ? "—" : `${revenue.instructorPercent}%`}</span>
             </div>
  <div className="flex items-center justify-between text-sm font-black text-[#F8FAFC]">
  <span>Thu Nhập Ròng Tích Lũy:</span>

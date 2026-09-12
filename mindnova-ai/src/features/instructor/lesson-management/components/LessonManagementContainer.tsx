@@ -275,12 +275,28 @@ function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLes
 
 // ─── AI Assist Card ───────────────────────────────────────────────────────────
 
-function AIAssistCard({ courseId, onSuggestChapter }: {
+export function AIAssistCard({ courseId, onSuggestChapter }: {
  courseId?: string;
- onSuggestChapter: () => void;
+ onSuggestChapter: () => void | Promise<void>;
 }) {
+ const [isSuggesting, setIsSuggesting] = useState(false);
+ const [suggestionError, setSuggestionError] = useState<string | null>(null);
+
+ const handleSuggestChapter = async () => {
+  setSuggestionError(null);
+  setIsSuggesting(true);
+  try {
+   await onSuggestChapter();
+  } catch (cause) {
+   setSuggestionError(cause instanceof Error ? cause.message : "Không thể mở trình soạn thảo");
+  } finally {
+   setIsSuggesting(false);
+  }
+ };
+
  return (
- <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50/80 via-purple-50/50 to-blue-50/80 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+ <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50/80 via-purple-50/50 to-blue-50/80 p-5 flex flex-col gap-4 shadow-sm">
+ <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
  <div className="flex flex-col gap-1.5 flex-1 min-w-0">
  <div className="flex items-center gap-2 text-[#3B82F6]">
  <span className="animate-pulse"><SparklesIcon size={13} /></span>
@@ -302,17 +318,36 @@ function AIAssistCard({ courseId, onSuggestChapter }: {
  className="px-4 py-2.5 rounded-xl text-[13px] font-extrabold text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-md transition-all cursor-pointer flex items-center gap-1.5"
  >
  <SparklesIcon size={13} />
- <span>🤖 Tạo Quiz bằng AI</span>
+ <span>Tạo Quiz bằng AI</span>
  </Link>
  <button
  type="button"
- onClick={onSuggestChapter}
- className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-[#0F172A] bg-white border border-[#E2E8F0] hover:bg-gray-50 transition-all duration-200 focus:outline-none"
+ onClick={() => void handleSuggestChapter()}
+ disabled={isSuggesting}
+ className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-[#0F172A] bg-white border border-[#E2E8F0] hover:bg-gray-50 transition-all duration-200 focus:outline-none disabled:cursor-wait disabled:opacity-70"
  >
- <PlusIcon size={13} />
- Gợi ý Chương mới
+ {isSuggesting ? (
+  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" />
+ ) : (
+  <PlusIcon size={13} />
+ )}
+ {isSuggesting ? "Đang mở trình soạn thảo" : "Gợi ý Chương mới"}
  </button>
  </div>
+ </div>
+ {suggestionError && (
+  <div role="alert" className="flex flex-col gap-2 rounded-2xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800 sm:flex-row sm:items-center sm:justify-between">
+   <span className="font-semibold">{suggestionError}</span>
+   <button
+    type="button"
+    onClick={() => void handleSuggestChapter()}
+    disabled={isSuggesting}
+    className="self-start rounded-xl border border-rose-200 bg-white px-3 py-2 font-extrabold text-rose-700 transition-colors hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60 sm:self-auto"
+   >
+    Thử lại
+   </button>
+  </div>
+ )}
  </div>
  );
 }

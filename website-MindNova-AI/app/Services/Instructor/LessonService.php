@@ -6,17 +6,21 @@ use App\Models\ContentVersion;
 use App\Models\CourseModule;
 use App\Models\DeletionRequest;
 use App\Models\Lesson;
+use App\Models\LessonAttachment;
 use App\Models\LessonMedia;
 use App\Services\ContentAuditService;
 use App\Services\ContentReviewService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Throwable;
 
 class LessonService
 {
     public function __construct(
         private readonly ContentAuditService $auditService,
         private readonly ContentReviewService $reviewService,
+        private readonly QuizMediaService $quizMediaService,
     ) {}
 
     public function createLesson(CourseModule $module, array $data): Lesson
@@ -122,8 +126,83 @@ class LessonService
             Storage::disk('r2')->delete($media->r2_key);
         }
 
+        foreach ($lesson->attachments as $attachment) {
+            Storage::disk('r2')->delete($attachment->r2_key);
+        }
+
+        if ($lesson->quiz) {
+            $this->quizMediaService->deleteKeys($this->quizMediaService->managedKeys($lesson->quiz));
+        }
+
         $lesson->delete();
     }
+
+    /**
+     * @param array<int, UploadedFile> $files
+     * @return array<int, LessonAttachment>
+     */
+    public function uploadAttachments(Lesson $lesson, array $files, int $uploaderId): array
+    {
+        $uploadedKeys = [];
+        $attachments = [];
+
+        try {
+            foreach ($files as $file) {
+                $extension = strtolower($file->getClientOriginalExtension());
+                $key = "lessons/{$lesson->id}/attachments/".Str::uuid().".{$extension}";
+
+                Storage::disk('r2')->putFileAs(
+                    "lessons/{$lesson->id}/attachments",
+                    $file,
+                    basename($key),
+                );
+                $uploadedKeys[] = $key;
+
+                $attachments[] = $lesson->attachments()->create([
+                    'uploaded_by' => $uploaderId,
+                    'display_name' => $file->getClientOriginalName(),
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getMimeType() ?: 'application/octet-stream',
+                    'extension' => $extension,
+                    'size_bytes' => $file->getSize(),
+                    'r2_key' => $key,
+                ]);
+            }
+        } catch (Throwable $exception) {
+            Storage::disk('r2')->delete($uploadedKeys);
+            foreach ($attachments as $attachment) {
+                $attachment->delete();
+            }
+
+            throw $exception;
+        }
+
+        return $attachments;
+    }
+
+    public function renameAttachment(LessonAttachment $attachment, string $displayName): LessonAttachment
+    {
+        $attachment->update(['display_name' => trim($displayName)]);
+
+        return $attachment->fresh();
+    }
+
+    public function deleteAttachment(LessonAttachment $attachment): void
+    {
+        Storage::disk('r2')->delete($attachment->r2_key);
+        $attachment->delete();
+    }
+
+    public function attachmentDownloadUrl(LessonAttachment $attachment): array
+    {
+        $expiresAt = now()->addHour();
+
+        return [
+            'signed_url' => Storage::disk('r2')->temporaryUrl($attachment->r2_key, $expiresAt),
+            'expires_at' => $expiresAt,
+        ];
+    }
+
 
     /**
      * Request deletion of a published lesson.
@@ -379,6 +458,10 @@ class LessonService
 
         $targetQuizId = $quizData['quiz_id'] ?? ($quizData['id'] ?? null);
         $quiz = null;
+        $existingQuiz = $targetQuizId && is_numeric($targetQuizId)
+            ? \App\Models\Quiz::find((int) $targetQuizId)
+            : \App\Models\Quiz::where('lesson_id', $lesson->id)->first();
+        $oldManagedKeys = $existingQuiz ? $this->quizMediaService->managedKeys($existingQuiz) : [];
 
         if ($targetQuizId && is_numeric($targetQuizId)) {
             $foundQuiz = \App\Models\Quiz::find((int) $targetQuizId);
@@ -388,6 +471,8 @@ class LessonService
                     'instructor_id' => $teacherId ?? $foundQuiz->instructor_id,
                     'title' => $quizData['title'] ?? $foundQuiz->title,
                     'description' => $quizData['description'] ?? $foundQuiz->description,
+                    'thumbnail_url' => array_key_exists('thumbnail_url', $quizData) ? $quizData['thumbnail_url'] : $foundQuiz->thumbnail_url,
+                    'thumbnail_r2_key' => array_key_exists('thumbnail_r2_key', $quizData) ? $quizData['thumbnail_r2_key'] : $foundQuiz->thumbnail_r2_key,
                     'time_limit_minutes' => $quizData['time_limit_minutes'] ?? $foundQuiz->time_limit_minutes ?? 15,
                     'passing_score' => $quizData['passing_score'] ?? $foundQuiz->passing_score ?? 70,
                     'difficulty' => $quizData['difficulty'] ?? $foundQuiz->difficulty ?? 'mixed',
@@ -407,6 +492,8 @@ class LessonService
                     'instructor_id' => $teacherId,
                     'title' => $quizData['title'] ?? 'Bài kiểm tra',
                     'description' => $quizData['description'] ?? null,
+                    'thumbnail_url' => $quizData['thumbnail_url'] ?? null,
+                    'thumbnail_r2_key' => $quizData['thumbnail_r2_key'] ?? null,
                     'time_limit_minutes' => $quizData['time_limit_minutes'] ?? 15,
                     'passing_score' => $quizData['passing_score'] ?? 70,
                     'difficulty' => $quizData['difficulty'] ?? 'mixed',
@@ -417,6 +504,15 @@ class LessonService
                 ]
             );
         }
+
+        $instructor = auth()->user() ?? \App\Models\User::findOrFail($teacherId);
+        $promotion = $this->quizMediaService->promotePayload($instructor, $quiz, $quizData);
+        $quizData = $promotion['data'];
+        $questionsData = $quizData['questions'] ?? [];
+        $quiz->update([
+            'thumbnail_url' => $quizData['thumbnail_url'] ?? null,
+            'thumbnail_r2_key' => $quizData['thumbnail_r2_key'] ?? null,
+        ]);
 
         $courseId = $lesson->course_id ?? ($lesson->module->course_id ?? null);
         if ($courseId) {
@@ -442,7 +538,10 @@ class LessonService
 
                 $question = $quiz->questions()->create([
                     'type' => $type,
+                    'selection_type' => $qData['selection_type'] ?? 'single_choice',
                     'content' => $content,
+                    'image_url' => $qData['image_url'] ?? null,
+                    'image_r2_key' => $qData['image_r2_key'] ?? null,
                     'explanation' => $qData['explanation'] ?? null,
                     'sample_answer' => $type === 'essay' ? ($qData['sample_answer'] ?? null) : null,
                     'rubric' => $type === 'essay' ? ($qData['rubric'] ?? null) : null,
@@ -456,10 +555,16 @@ class LessonService
 
                     if (empty($answersList) && !empty($qData['options']) && is_array($qData['options'])) {
                         $correctIdx = is_numeric($qData['correct_answer_index'] ?? null) ? (int)$qData['correct_answer_index'] : 0;
+                        $correctIndices = is_array($qData['correct_answer_indices'] ?? null) ? $qData['correct_answer_indices'] : [$correctIdx];
                         foreach ($qData['options'] as $optIdx => $optContent) {
+                            $isCorrect = ($qData['selection_type'] ?? 'single_choice') === 'multiple_choice'
+                                ? in_array($optIdx, $correctIndices, true)
+                                : $optIdx === $correctIdx;
                             $answersList[] = [
                                 'content' => (string) $optContent,
-                                'is_correct' => $optIdx == $correctIdx,
+                                'is_correct' => $isCorrect,
+                                'image_url' => $qData['answer_images'][$optIdx]['url'] ?? null,
+                                'image_r2_key' => $qData['answer_images'][$optIdx]['r2_key'] ?? null,
                             ];
                         }
                     }
@@ -468,10 +573,15 @@ class LessonService
                         $question->answers()->create([
                             'content' => $aData['content'] ?? $aData['answer'] ?? '',
                             'is_correct' => !empty($aData['is_correct']),
+                            'image_url' => $aData['image_url'] ?? null,
+                            'image_r2_key' => $aData['image_r2_key'] ?? null,
                         ]);
                     }
                 }
             }
         }
+
+        $currentKeys = $this->quizMediaService->managedKeys($quiz->fresh());
+        $this->quizMediaService->deleteKeys(array_values(array_diff($oldManagedKeys, $currentKeys)));
     }
 }

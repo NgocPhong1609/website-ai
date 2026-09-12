@@ -17,15 +17,25 @@ class LessonResource extends JsonResource
                 'quiz_id' => $this->quiz->id,
                 'title' => $this->quiz->title,
                 'description' => $this->quiz->description,
+                'thumbnail_url' => $this->quiz->thumbnail_url,
+                'thumbnail_r2_key' => $this->quiz->thumbnail_r2_key,
                 'time_limit_minutes' => $this->quiz->time_limit_minutes ?? 15,
                 'passing_score' => $this->quiz->passing_score ?? 70,
                 'difficulty' => $this->quiz->difficulty ?? 'mixed',
                 'questions' => $this->quiz->questions ? $this->quiz->questions->map(function ($q) {
-                    $answers = $q->answers ? $q->answers->map(function ($a) {
+                    $answerImages = [];
+                    $answers = $q->answers ? $q->answers->map(function ($a) use (&$answerImages) {
+                        $answerImages[] = [
+                            'url' => $a->image_url,
+                            'r2_key' => $a->image_r2_key,
+                        ];
+
                         return [
                             'id' => $a->id,
                             'content' => $a->content,
                             'is_correct' => (bool) $a->is_correct,
+                            'image_url' => $a->image_url,
+                            'image_r2_key' => $a->image_r2_key,
                         ];
                     })->values()->toArray() : [];
 
@@ -43,6 +53,8 @@ class LessonResource extends JsonResource
                         'type' => $q->type ?? 'multiple_choice',
                         'question' => $q->content,
                         'content' => $q->content,
+                        'image_url' => $q->image_url,
+                        'image_r2_key' => $q->image_r2_key,
                         'explanation' => $q->explanation,
                         'sample_answer' => $q->sample_answer,
                         'rubric' => $q->rubric,
@@ -51,6 +63,7 @@ class LessonResource extends JsonResource
                         'order' => $q->order,
                         'options' => $options,
                         'correct_answer_index' => $correctIdx,
+                        'answer_images' => $answerImages,
                         'answers' => $answers,
                     ];
                 })->values()->toArray() : [],
@@ -69,6 +82,14 @@ class LessonResource extends JsonResource
             'order' => $this->order,
             'status' => $this->status,
             'quizData' => $quizData,
+            'attachments' => $this->attachments()->orderBy('id')->get()->map(fn ($attachment) => [
+                'id' => $attachment->id,
+                'display_name' => $attachment->display_name,
+                'original_name' => $attachment->original_name,
+                'mime_type' => $attachment->mime_type,
+                'extension' => $attachment->extension,
+                'size_bytes' => $attachment->size_bytes,
+            ])->values()->toArray(),
             // ── Versioning info ──
             'current_version' => $this->current_version,
             'published_version_id' => $this->published_version_id,

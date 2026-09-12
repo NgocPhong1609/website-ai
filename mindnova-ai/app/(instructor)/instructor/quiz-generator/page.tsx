@@ -7,6 +7,7 @@ import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/q
 import { QuizSummary } from "@/src/features/instructor/quiz-generator/types/quizGenerator.types";
 import { Loader } from "@/src/shared/components/ui/Loader";
 import { CreateLessonEditModal } from "@/src/features/instructor/create-course/components/CreateLessonEditModal";
+import { QuizThumbnail } from "@/src/features/instructor/quiz-generator/components/QuizThumbnail";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -155,7 +156,7 @@ export default function InstructorQuizListPage() {
 
   // Filter & Sort Logic
   const filteredQuizzes = useMemo(() => {
-    let result = quizzes.filter((q) => {
+    const result = quizzes.filter((q) => {
       // 1. Search Query
       if (searchQuery.trim()) {
         const term = searchQuery.toLowerCase().trim();
@@ -486,11 +487,13 @@ export default function InstructorQuizListPage() {
                 return (
                   <div
                     key={q.id}
-                    className="p-6 rounded-2xl bg-white border border-[#EAEAF4] hover:border-emerald-500/50 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between gap-4 group"
+                    className="p-4 rounded-2xl bg-white border border-[#EAEAF4] hover:border-emerald-500/50 shadow-2xs hover:shadow-md transition-all flex items-start gap-4 group"
                   >
-                    <div className="flex flex-col gap-3">
+                    <QuizThumbnail title={q.title} src={q.thumbnail_url} />
+                    <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 self-stretch">
+                      <div className="flex flex-col gap-3">
                       {/* Badges Row */}
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-2 flex-wrap">
                         {/* Position Badge */}
                         <span className="text-[11px] font-black uppercase px-2.5 py-1 rounded-lg border flex items-center gap-1 bg-amber-50 text-amber-950 border-amber-200">
                           {qPos === "capability_assessment" || q.type === "capability_assessment" ? (
@@ -549,11 +552,11 @@ export default function InstructorQuizListPage() {
                           {q.description || "Không có mô tả chi tiết."}
                         </p>
                       </div>
-                    </div>
+                      </div>
 
                     {/* Metadata Specs & Action Buttons */}
-                    <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs font-semibold text-gray-500">
-                      <div className="flex items-center gap-3 text-[11px]">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 pt-3 text-xs font-semibold text-gray-500">
+                      <div className="flex flex-wrap items-center gap-3 text-[11px]">
                         <span>❓ {q.questions_count || q.total_questions || 0} câu</span>
                         <span>⏱️ {q.time_limit_minutes || 15}p</span>
                         <span>🎯 {q.passing_score || 70}%</span>
@@ -582,6 +585,7 @@ export default function InstructorQuizListPage() {
                           <span className="text-sm">🗑</span>
                         </button>
                       </div>
+                    </div>
                     </div>
                   </div>
                 );

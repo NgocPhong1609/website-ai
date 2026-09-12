@@ -27,6 +27,7 @@ export function useAiQuizWizard(options?: {
  const [step, setStep] = useState<number>(options?.embeddedMode ? 2 : 1);
  const [isGenerating, setIsGenerating] = useState<boolean>(false);
  const [isSaving, setIsSaving] = useState<boolean>(false);
+ const [isReviewConfirmed, setIsReviewConfirmed] = useState<boolean>(false);
  const [error, setError] = useState<string | null>(null);
  const [savedQuiz, setSavedQuiz] = useState<QuizSummary | null>(null);
 
@@ -45,6 +46,8 @@ export function useAiQuizWizard(options?: {
  const [config, setConfig] = useState<QuizConfig>({
  title: getDefaultTitle(),
  description: getDefaultDescription(),
+ thumbnail_url: null,
+ thumbnail_r2_key: null,
  source_type: courseIdParam ? "course" : "topic",
  course_id: courseIdParam || undefined,
  source_content: "",
@@ -75,6 +78,7 @@ export function useAiQuizWizard(options?: {
 
  // Update Config
  const updateConfig = useCallback((fields: Partial<QuizConfig>) => {
+ setIsReviewConfirmed(false);
  setConfig((prev) => {
  const next = { ...prev, ...fields };
  return next;
@@ -83,6 +87,7 @@ export function useAiQuizWizard(options?: {
 
  // Generate Questions from AI
  const handleGenerate = useCallback(async () => {
+ setIsReviewConfirmed(false);
  setIsGenerating(true);
  setError(null);
  setErrorInfo(null);
@@ -94,6 +99,13 @@ export function useAiQuizWizard(options?: {
  if (response.success && response.data?.questions) {
  const genQuestions: GeneratedQuestion[] = response.data.questions.map((q: any) => ({
  ...q,
+ selection_type: q.selection_type || "single_choice",
+ image_url: q.image_url || null,
+ image_r2_key: q.image_r2_key || null,
+ correct_answer_indices: q.type === "multiple_choice" ? [q.correct_answer_index ?? 0] : [],
+ answer_images: q.type === "multiple_choice"
+ ? (q.options || []).map(() => ({ url: null, r2_key: null }))
+ : [],
  reviewStatus: "pending",
  }));
  setQuestions(genQuestions);
@@ -127,6 +139,7 @@ export function useAiQuizWizard(options?: {
 
  // Question editing
  const updateQuestion = useCallback((id: string, updatedFields: Partial<GeneratedQuestion>) => {
+ setIsReviewConfirmed(false);
  setQuestions((prev) =>
  prev.map((q) => (q.id === id ? { ...q, ...updatedFields, reviewStatus: "edited" } : q))
  );
@@ -139,11 +152,17 @@ export function useAiQuizWizard(options?: {
  }, []);
 
  const deleteQuestion = useCallback((id: string) => {
+ setIsReviewConfirmed(false);
  setQuestions((prev) => prev.filter((q) => q.id !== id));
+ }, []);
+
+ const confirmAllQuestions = useCallback(() => {
+ setIsReviewConfirmed(true);
  }, []);
 
  // Regenerate Single Question
  const regenerateSingleQuestion = useCallback(async (id: string, type: "multiple_choice" | "essay", difficulty: string) => {
+ setIsReviewConfirmed(false);
  try {
  const contextText = config.source_type === "content" ? config.source_content : config.topic;
  const res = await quizGeneratorApi.regenerateSingleQuestion(type, difficulty, contextText);
@@ -170,6 +189,8 @@ export function useAiQuizWizard(options?: {
   const response = await quizGeneratorApi.saveQuiz({
     title: config.title,
     description: config.description,
+    thumbnail_url: config.thumbnail_url,
+    thumbnail_r2_key: config.thumbnail_r2_key,
     source_type: config.source_type,
     source_content: config.source_type === "course" ? (config.course_title || "") : (config.source_type === "content" ? config.source_content : config.topic),
     course_id: targetCourseId,
@@ -242,6 +263,7 @@ export function useAiQuizWizard(options?: {
  questions,
  isGenerating,
  isSaving,
+ isReviewConfirmed,
  error,
  errorInfo,
  setError,
@@ -251,6 +273,7 @@ export function useAiQuizWizard(options?: {
  updateQuestion,
  approveQuestion,
  deleteQuestion,
+ confirmAllQuestions,
  regenerateSingleQuestion,
  handleSaveQuiz,
  approvedCount,

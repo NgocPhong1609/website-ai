@@ -3,43 +3,58 @@
 namespace App\Services\Ai;
 
 use App\DTOs\AiMessageDto;
-use App\Contracts\AiProviderInterface;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use App\Exceptions\AiTransientException;
 use Exception;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class BackupAiService extends AbstractAiService
 {
     public function getProviderName(): string
     {
-        return "backup";
+        return 'backup';
+    }
+
+    public function isReady(): bool
+    {
+        return ! empty($this->resolveApiKey());
+    }
+
+    private function resolveApiKey(): mixed
+    {
+        $provider = config('services.backup_ai.provider', 'openai');
+        $apiKey = config('services.backup_ai.api_key');
+
+        if (empty($apiKey)) {
+            if ($provider === 'groq') {
+                $apiKey = config('services.groq.key');
+            } else {
+                $apiKey = config('services.openai.key');
+            }
+        }
+
+        return $apiKey;
     }
 
     public function sendMessage(array $messages, array $options = []): string
     {
-        $provider = env('BACKUP_AI_PROVIDER', 'openai');
-        $apiKey = config('services.backup_ai.api_key');
-        
+        $provider = config('services.backup_ai.provider', 'openai');
+        $apiKey = $this->resolveApiKey();
+
         if (empty($apiKey)) {
-            if ($provider === 'groq') {
-                $apiKey = env('GROQ_API_KEY');
-            } else {
-                $apiKey = env('OPENAI_API_KEY') ?: config('services.openai.key'); // fallback to old config
-            }
-        }
-        
-        if (empty($apiKey)) {
-            throw new Exception("Chưa cấu hình API key cho Backup AI.");
+            $this->recordAttempt($options, config('services.backup_ai.model', 'gpt-4o-mini'), microtime(true), 'failed', 'missing_api_key');
+            throw new Exception('Chưa cấu hình API key cho Backup AI.');
         }
 
         $model = config('services.backup_ai.model', 'gpt-4o-mini');
-        
+
         $openAiMessages = [];
         foreach ($messages as $msg) {
             /** @var AiMessageDto $msg */
             $openAiMessages[] = [
                 'role' => $msg->role,
-                'content' => $msg->content
+                'content' => $msg->content,
             ];
         }
 
@@ -56,79 +71,71 @@ class BackupAiService extends AbstractAiService
             'temperature' => 0.7,
             'max_tokens' => (int) ($options['max_tokens'] ?? $defaultMaxTokens),
         ];
-        
-        if (!empty($options['response_mime_type']) && $options['response_mime_type'] === 'application/json') {
+
+        if (! empty($options['response_mime_type']) && $options['response_mime_type'] === 'application/json') {
             $payload['response_format'] = ['type' => 'json_object'];
         }
 
-        $maxRetries = $options['max_retries'] ?? 1;
-        $lastException = null;
+        $maxRetries = max(1, (int) ($options['max_retries'] ?? 1));
+        $options['request_id'] ??= (string) Str::uuid();
 
-        $baseUrl = 'https://api.openai.com/v1/chat/completions';
-        if ($provider === 'groq') {
-            $baseUrl = 'https://api.groq.com/openai/v1/chat/completions';
-        }
+        $baseUrl = $provider === 'groq'
+            ? 'https://api.groq.com/openai/v1/chat/completions'
+            : 'https://api.openai.com/v1/chat/completions';
 
         for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            $startedAt = microtime(true);
             try {
-                $response = Http::withToken($apiKey)
-                    ->timeout(90)
-                    ->post($baseUrl, $payload);
+                $response = Http::withToken($apiKey)->timeout(90)->post($baseUrl, $payload);
+            } catch (ConnectionException $exception) {
+                $this->recordAttempt($options, $model, $startedAt, 'failed', 'connection_error');
+                if ($attempt < $maxRetries) {
+                    sleep(2 ** ($attempt - 1));
 
-                if ($response->successful()) {
-                    $responseContent = $response->json('choices.0.message.content') ?? '';
-                    
-                    // Trich xuat usage metadata
-                    $data = $response->json();
-                    $promptTokens = $data['usage']['prompt_tokens'] ?? 0;
-                    $completionTokens = $data['usage']['completion_tokens'] ?? 0;
-                    
-                    $userId = $options["user_id"] ?? null;
-                    $feature = $options["feature"] ?? "general";
-                    $this->logUsage($userId, $model, $feature, $promptTokens, $completionTokens, 0, $payload);
-
-                    return $responseContent;
+                    continue;
                 }
-                
-                // Transient error handle
-                if (in_array($response->status(), [503, 429, 500, 502, 504]) && $attempt <= $maxRetries) {
-                    if ($attempt < $maxRetries) {
-                        $waitSeconds = pow(2, $attempt - 1);
-                        Log::warning("Backup AI returned {$response->status()}, retrying in {$waitSeconds}s (attempt {$attempt}/{$maxRetries})");
-                        sleep($waitSeconds);
-                        continue;
-                    } else {
-                        Log::error("Backup AI Error: Transient error {$response->status()} after {$maxRetries} attempts. " . $response->body());
-                        throw new \App\Exceptions\AiTransientException("Backup AI transient error: " . $response->status());
-                    }
-                }
-
-                Log::error("Backup AI Error (" . $response->status() . "): " . $response->body());
-                throw new Exception("Lỗi khi gọi Backup AI API ({$response->status()}): " . $response->body());
-
-            } catch (Exception $e) {
-                $lastException = $e;
-                if ($e instanceof \App\Exceptions\AiTransientException) {
-                    throw $e;
-                }
-                
-                $isNetworkError = $e instanceof \Illuminate\Http\Client\ConnectionException || str_contains($e->getMessage(), 'cURL error');
-                if ($isNetworkError && $attempt <= $maxRetries) {
-                    if ($attempt < $maxRetries) {
-                        $waitSeconds = pow(2, $attempt - 1);
-                        Log::warning("Backup AI Network Exception on attempt {$attempt}: {$e->getMessage()}, retrying in {$waitSeconds}s");
-                        sleep($waitSeconds);
-                        continue;
-                    } else {
-                        throw new \App\Exceptions\AiTransientException("Backup AI network transient error: " . $e->getMessage());
-                    }
-                }
-
-                Log::error("Backup AI Exception after {$maxRetries} attempts: " . $e->getMessage());
-                throw $e;
+                // Never retain the original exception: its message/URL may contain credentials.
+                throw new AiTransientException('Backup network temporarily unavailable');
+            } catch (Exception $exception) {
+                $this->recordAttempt($options, $model, $startedAt, 'failed', 'request_error');
+                throw new Exception('Backup request failed');
             }
+
+            if ($response->successful()) {
+                $content = $response->json('choices.0.message.content');
+                $inputTokens = $response->json('usage.prompt_tokens');
+                $outputTokens = $response->json('usage.completion_tokens');
+                $providerRequestId = $response->json('id') ?? $response->header('x-request-id');
+
+                if (! is_string($content) || trim($content) === '') {
+                    $this->recordAttempt($options, $model, $startedAt, 'failed', 'empty_response',
+                        $inputTokens, $outputTokens, $providerRequestId ?: null);
+                    if ($attempt < $maxRetries) {
+                        continue;
+                    }
+                    throw new AiTransientException('Backup returned an empty response');
+                }
+
+                $this->recordAttempt($options, $model, $startedAt, 'success', null,
+                    $inputTokens, $outputTokens, $providerRequestId ?: null);
+
+                return $content;
+            }
+
+            $status = $response->status();
+            $this->recordAttempt($options, $model, $startedAt, 'failed', 'http_'.$status);
+            if (in_array($status, [429, 500, 502, 503, 504], true)) {
+                if ($attempt < $maxRetries) {
+                    sleep(2 ** ($attempt - 1));
+
+                    continue;
+                }
+                throw new AiTransientException('Backup transient error: '.$status);
+            }
+
+            throw new Exception('Lỗi khi gọi Backup AI API: '.$status);
         }
 
-        throw $lastException ?? new Exception("Backup AI failed after {$maxRetries} attempts");
+        throw new Exception('Backup request failed');
     }
 }

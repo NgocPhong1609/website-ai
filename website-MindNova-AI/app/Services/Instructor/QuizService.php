@@ -12,12 +12,19 @@ use Illuminate\Support\Facades\DB;
 
 class QuizService
 {
+    public function __construct(private readonly QuizMediaService $quizMediaService)
+    {
+    }
+
     /**
      * Create a standalone quiz with MCQ and Essay questions.
      */
     public function createStandaloneQuiz(User $instructor, array $data): Quiz
     {
-        return DB::transaction(function () use ($instructor, $data) {
+        $promotedKeys = [];
+
+        try {
+            return DB::transaction(function () use ($instructor, $data, &$promotedKeys) {
             $questionsData = $data['questions'] ?? [];
             $mcCount = 0;
             $essayCount = 0;
@@ -36,6 +43,8 @@ class QuizService
                 'instructor_id' => $instructor->id,
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,
+                'thumbnail_url' => $data['thumbnail_url'] ?? null,
+                'thumbnail_r2_key' => $data['thumbnail_r2_key'] ?? null,
                 'source_type' => $data['source_type'] ?? 'topic',
                 'source_content' => $data['source_content'] ?? null,
                 'type' => $data['type'] ?? 'normal',
@@ -49,6 +58,15 @@ class QuizService
                 'status' => $data['status'] ?? 'published',
             ]);
 
+            $promotion = $this->quizMediaService->promotePayload($instructor, $quiz, $data);
+            $data = $promotion['data'];
+            $promotedKeys = $promotion['promoted_keys'];
+            $questionsData = $data['questions'] ?? [];
+            $quiz->update([
+                'thumbnail_url' => $data['thumbnail_url'] ?? null,
+                'thumbnail_r2_key' => $data['thumbnail_r2_key'] ?? null,
+            ]);
+
             if (!empty($data['course_id'])) {
                 QuizCourseAttachment::create([
                     'quiz_id' => $quiz->id,
@@ -60,7 +78,11 @@ class QuizService
             $this->saveQuestionsAndAnswers($quiz, $questionsData);
 
             return $quiz->load('questions.answers', 'attachments.course');
-        });
+            });
+        } catch (\Throwable $exception) {
+            $this->quizMediaService->deleteKeys($promotedKeys);
+            throw $exception;
+        }
     }
 
     /**
@@ -68,7 +90,14 @@ class QuizService
      */
     public function updateStandaloneQuiz(Quiz $quiz, array $data): Quiz
     {
-        return DB::transaction(function () use ($quiz, $data) {
+        $oldManagedKeys = $this->quizMediaService->managedKeys($quiz);
+        $promotedKeys = [];
+
+        try {
+            $updatedQuiz = DB::transaction(function () use ($quiz, $data, &$promotedKeys) {
+            $promotion = $this->quizMediaService->promotePayload($quiz->instructor, $quiz, $data);
+            $data = $promotion['data'];
+            $promotedKeys = $promotion['promoted_keys'];
             $questionsData = $data['questions'] ?? [];
             $mcCount = 0;
             $essayCount = 0;
@@ -86,6 +115,8 @@ class QuizService
             $quiz->update([
                 'title' => $data['title'] ?? $quiz->title,
                 'description' => $data['description'] ?? $quiz->description,
+                'thumbnail_url' => array_key_exists('thumbnail_url', $data) ? $data['thumbnail_url'] : $quiz->thumbnail_url,
+                'thumbnail_r2_key' => array_key_exists('thumbnail_r2_key', $data) ? $data['thumbnail_r2_key'] : $quiz->thumbnail_r2_key,
                 'source_type' => $data['source_type'] ?? $quiz->source_type,
                 'source_content' => $data['source_content'] ?? $quiz->source_content,
                 'difficulty' => $data['difficulty'] ?? $quiz->difficulty,
@@ -113,7 +144,16 @@ class QuizService
             $this->saveQuestionsAndAnswers($quiz, $questionsData);
 
             return $quiz->load('questions.answers', 'attachments.course');
-        });
+            });
+        } catch (\Throwable $exception) {
+            $this->quizMediaService->deleteKeys($promotedKeys);
+            throw $exception;
+        }
+
+        $currentKeys = $this->quizMediaService->managedKeys($updatedQuiz);
+        $this->quizMediaService->deleteKeys(array_values(array_diff($oldManagedKeys, $currentKeys)));
+
+        return $updatedQuiz;
     }
 
     /**
@@ -128,8 +168,11 @@ class QuizService
 
             $question = $quiz->questions()->create([
                 'type' => $type,
+                'selection_type' => $qData['selection_type'] ?? 'single_choice',
                 'difficulty' => $qData['difficulty'] ?? 'medium',
                 'content' => $qData['content'] ?? $qData['question'] ?? '',
+                'image_url' => $qData['image_url'] ?? null,
+                'image_r2_key' => $qData['image_r2_key'] ?? null,
                 'explanation' => $qData['explanation'] ?? null,
                 'sample_answer' => $type === 'essay' ? ($qData['sample_answer'] ?? null) : null,
                 'rubric' => $type === 'essay' ? ($qData['rubric'] ?? null) : null,
@@ -142,10 +185,16 @@ class QuizService
 
                 if (empty($answersList) && !empty($qData['options']) && is_array($qData['options'])) {
                     $correctIdx = is_numeric($qData['correct_answer_index'] ?? null) ? (int)$qData['correct_answer_index'] : 0;
+                    $correctIndices = is_array($qData['correct_answer_indices'] ?? null) ? $qData['correct_answer_indices'] : [$correctIdx];
                     foreach ($qData['options'] as $idx => $optContent) {
+                        $isCorrect = ($qData['selection_type'] ?? 'single_choice') === 'multiple_choice'
+                            ? in_array($idx, $correctIndices, true)
+                            : $idx === $correctIdx;
                         $answersList[] = [
                             'content' => (string) $optContent,
-                            'is_correct' => $idx == $correctIdx,
+                            'is_correct' => $isCorrect,
+                            'image_url' => $qData['answer_images'][$idx]['url'] ?? null,
+                            'image_r2_key' => $qData['answer_images'][$idx]['r2_key'] ?? null,
                         ];
                     }
                 }
@@ -154,6 +203,8 @@ class QuizService
                     $question->answers()->create([
                         'content' => $aData['content'] ?? $aData['answer'] ?? '',
                         'is_correct' => !empty($aData['is_correct']),
+                        'image_url' => $aData['image_url'] ?? null,
+                        'image_r2_key' => $aData['image_r2_key'] ?? null,
                     ]);
                 }
             }
@@ -322,6 +373,8 @@ class QuizService
                 'lesson_id' => $quiz->lesson_id,
                 'title' => $quiz->title,
                 'description' => $quiz->description,
+                'thumbnail_url' => $quiz->thumbnail_url,
+                'thumbnail_r2_key' => $quiz->thumbnail_r2_key,
                 'source_type' => $quiz->source_type ?? 'topic',
                 'type' => $quiz->type ?? 'normal',
                 'difficulty' => $quiz->difficulty ?? 'mixed',
@@ -360,6 +413,8 @@ class QuizService
                             'id' => $a->id,
                             'content' => $a->content,
                             'is_correct' => (bool) $a->is_correct,
+                            'image_url' => $a->image_url,
+                            'image_r2_key' => $a->image_r2_key,
                         ];
                     })->values()->toArray() : [];
 
@@ -375,6 +430,9 @@ class QuizService
                     return [
                         'id' => $q->id,
                         'type' => $q->type ?? 'multiple_choice',
+                        'selection_type' => $q->selection_type ?? 'single_choice',
+                        'image_url' => $q->image_url,
+                        'image_r2_key' => $q->image_r2_key,
                         'question' => $q->content,
                         'content' => $q->content,
                         'explanation' => $q->explanation,
@@ -397,7 +455,11 @@ class QuizService
      */
     public function createOrUpdateQuiz(Lesson $lesson, array $data): Quiz
     {
-        return DB::transaction(function () use ($lesson, $data) {
+        $oldManagedKeys = [];
+        $promotedKeys = [];
+
+        try {
+            $savedQuiz = DB::transaction(function () use ($lesson, $data, &$oldManagedKeys, &$promotedKeys) {
             $questionsData = $data['questions'] ?? [];
             $mcCount = 0;
             $essayCount = 0;
@@ -417,6 +479,13 @@ class QuizService
             $targetQuizId = $data['quiz_id'] ?? ($data['id'] ?? null);
             $quiz = null;
 
+            $existingQuiz = $targetQuizId && is_numeric($targetQuizId)
+                ? Quiz::find((int) $targetQuizId)
+                : Quiz::where('lesson_id', $lesson->id)->first();
+            if ($existingQuiz) {
+                $oldManagedKeys = $this->quizMediaService->managedKeys($existingQuiz);
+            }
+
             if ($targetQuizId && is_numeric($targetQuizId)) {
                 $foundQuiz = Quiz::find((int) $targetQuizId);
                 if ($foundQuiz) {
@@ -425,6 +494,8 @@ class QuizService
                         'instructor_id' => $teacherId ?? $foundQuiz->instructor_id,
                         'title' => $data['title'] ?? $foundQuiz->title,
                         'description' => $data['description'] ?? $foundQuiz->description,
+                        'thumbnail_url' => array_key_exists('thumbnail_url', $data) ? $data['thumbnail_url'] : $foundQuiz->thumbnail_url,
+                        'thumbnail_r2_key' => array_key_exists('thumbnail_r2_key', $data) ? $data['thumbnail_r2_key'] : $foundQuiz->thumbnail_r2_key,
                         'time_limit_minutes' => $data['time_limit_minutes'] ?? $foundQuiz->time_limit_minutes ?? 15,
                         'passing_score' => $data['passing_score'] ?? $foundQuiz->passing_score ?? 70,
                         'difficulty' => $data['difficulty'] ?? $foundQuiz->difficulty ?? 'mixed',
@@ -444,6 +515,8 @@ class QuizService
                         'instructor_id' => $teacherId,
                         'title' => $data['title'],
                         'description' => $data['description'] ?? null,
+                        'thumbnail_url' => $data['thumbnail_url'] ?? null,
+                        'thumbnail_r2_key' => $data['thumbnail_r2_key'] ?? null,
                         'time_limit_minutes' => $data['time_limit_minutes'] ?? 15,
                         'passing_score' => $data['passing_score'] ?? 70,
                         'difficulty' => $data['difficulty'] ?? 'mixed',
@@ -454,6 +527,16 @@ class QuizService
                     ]
                 );
             }
+
+            $instructor = auth()->user() ?? User::findOrFail($teacherId);
+            $promotion = $this->quizMediaService->promotePayload($instructor, $quiz, $data);
+            $data = $promotion['data'];
+            $promotedKeys = $promotion['promoted_keys'];
+            $questionsData = $data['questions'] ?? [];
+            $quiz->update([
+                'thumbnail_url' => $data['thumbnail_url'] ?? null,
+                'thumbnail_r2_key' => $data['thumbnail_r2_key'] ?? null,
+            ]);
 
             $courseId = $lesson->course_id ?? ($lesson->module->course_id ?? null);
             if ($courseId) {
@@ -474,7 +557,10 @@ class QuizService
                 $type = $questionData['type'] ?? 'multiple_choice';
                 $question = $quiz->questions()->create([
                     'type' => $type,
+                    'selection_type' => $questionData['selection_type'] ?? 'single_choice',
                     'content' => $questionData['content'] ?? $questionData['question'] ?? '',
+                    'image_url' => $questionData['image_url'] ?? null,
+                    'image_r2_key' => $questionData['image_r2_key'] ?? null,
                     'explanation' => $questionData['explanation'] ?? null,
                     'sample_answer' => $type === 'essay' ? ($questionData['sample_answer'] ?? null) : null,
                     'rubric' => $type === 'essay' ? ($questionData['rubric'] ?? null) : null,
@@ -502,6 +588,8 @@ class QuizService
                         $question->answers()->create([
                             'content' => $answerData['content'] ?? $answerData['answer'] ?? '',
                             'is_correct' => !empty($answerData['is_correct']),
+                            'image_url' => $answerData['image_url'] ?? null,
+                            'image_r2_key' => $answerData['image_r2_key'] ?? null,
                         ]);
                     }
                 }
@@ -512,7 +600,16 @@ class QuizService
             ]);
 
             return $quiz->load('questions.answers');
-        });
+            });
+        } catch (\Throwable $exception) {
+            $this->quizMediaService->deleteKeys($promotedKeys);
+            throw $exception;
+        }
+
+        $currentKeys = $this->quizMediaService->managedKeys($savedQuiz);
+        $this->quizMediaService->deleteKeys(array_values(array_diff($oldManagedKeys, $currentKeys)));
+
+        return $savedQuiz;
     }
 
     public function getQuizWithDetails(Lesson $lesson): ?Quiz
@@ -524,7 +621,12 @@ class QuizService
 
     public function deleteQuiz(Lesson $lesson): void
     {
-        Quiz::where('lesson_id', $lesson->id)->delete();
+        $quizzes = Quiz::where('lesson_id', $lesson->id)->with('questions.answers')->get();
+        foreach ($quizzes as $quiz) {
+            $keys = $this->quizMediaService->managedKeys($quiz);
+            $quiz->delete();
+            $this->quizMediaService->deleteKeys($keys);
+        }
     }
 
     public function gradeSubmission(Quiz $quiz, array $submittedAnswers): array

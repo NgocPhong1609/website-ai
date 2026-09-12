@@ -13,6 +13,56 @@ export interface Lesson {
  signed_url?: string;
  order: number;
  quizData?: any;
+ attachments?: LessonAttachment[];
+}
+
+export interface LessonAttachment {
+ id: number;
+ display_name: string;
+ original_name: string;
+ mime_type: string;
+ extension: string;
+ size_bytes: number;
+}
+
+export async function uploadLessonAttachments(
+ lessonId: string | number,
+ files: File[],
+): Promise<LessonAttachment[]> {
+ const formData = new FormData();
+ files.forEach((file) => formData.append("attachments[]", file));
+ const { data } = await axiosClient.post(`/api/instructor/lessons/${lessonId}/attachments`, formData);
+ return data.data;
+}
+
+export async function renameLessonAttachment(
+ lessonId: string | number,
+ attachmentId: number,
+ displayName: string,
+): Promise<LessonAttachment> {
+ const { data } = await axiosClient.patch(
+ `/api/instructor/lessons/${lessonId}/attachments/${attachmentId}`,
+ { display_name: displayName },
+ );
+ return data.data;
+}
+
+export async function deleteLessonAttachment(
+ lessonId: string | number,
+ attachmentId: number,
+): Promise<void> {
+ await axiosClient.delete(`/api/instructor/lessons/${lessonId}/attachments/${attachmentId}`);
+}
+
+export async function downloadLessonAttachment(
+ lessonId: string | number,
+ attachmentId: number,
+ audience: "instructor" | "student" = "instructor",
+): Promise<string> {
+ const { data } = await axiosClient.get(
+ `/api/${audience}/lessons/${lessonId}/attachments/${attachmentId}/download`,
+ );
+ return data.data.signed_url;
 }
 
 export interface Chapter {
@@ -153,11 +203,14 @@ export function formatQuizPayloadForBackend(payload: any) {
     const content = q.content || q.question || "Nội dung câu hỏi";
     const points = typeof q.points === "number" ? q.points : (parseFloat(q.points) || (type === "essay" ? 5.0 : 1.0));
     const explanation = q.explanation || "";
+    const selectionType = q.selection_type === "multiple_choice" ? "multiple_choice" : "single_choice";
 
     if (type === "essay") {
       return {
         type: "essay",
         content,
+        image_url: q.image_url || null,
+        image_r2_key: q.image_r2_key || null,
         explanation,
         sample_answer: q.sample_answer || "",
         rubric: q.rubric || "",
@@ -168,15 +221,20 @@ export function formatQuizPayloadForBackend(payload: any) {
 
     let answers: Array<{ content: string; is_correct: boolean }> = [];
     if (Array.isArray(q.answers) && q.answers.length > 0) {
-      answers = q.answers.map((a: any) => ({
+      answers = q.answers.map((a: any, index: number) => ({
         content: String(a.content || a.answer || ""),
         is_correct: Boolean(a.is_correct),
+        image_url: a.image_url || q.answer_images?.[index]?.url || null,
+        image_r2_key: a.image_r2_key || q.answer_images?.[index]?.r2_key || null,
       }));
     } else if (Array.isArray(q.options) && q.options.length > 0) {
       const correctIdx = typeof q.correct_answer_index === "number" ? q.correct_answer_index : 0;
+      const correctIndices = Array.isArray(q.correct_answer_indices) ? q.correct_answer_indices : [correctIdx];
       answers = q.options.map((opt: any, i: number) => ({
         content: String(opt),
-        is_correct: i === correctIdx,
+        is_correct: selectionType === "multiple_choice" ? correctIndices.includes(i) : i === correctIdx,
+        image_url: q.answer_images?.[i]?.url || null,
+        image_r2_key: q.answer_images?.[i]?.r2_key || null,
       }));
     }
 
@@ -189,7 +247,7 @@ export function formatQuizPayloadForBackend(payload: any) {
     const correctCount = answers.filter((a) => a.is_correct).length;
     if (correctCount === 0) {
       answers[0].is_correct = true;
-    } else if (correctCount > 1) {
+    } else if (selectionType === "single_choice" && correctCount > 1) {
       let firstFound = false;
       answers = answers.map((a) => {
         if (a.is_correct && !firstFound) {
@@ -202,7 +260,10 @@ export function formatQuizPayloadForBackend(payload: any) {
 
     return {
       type: "multiple_choice",
+      selection_type: selectionType,
       content,
+      image_url: q.image_url || null,
+      image_r2_key: q.image_r2_key || null,
       explanation,
       points,
       answers,
@@ -211,6 +272,8 @@ export function formatQuizPayloadForBackend(payload: any) {
 
   return {
     title,
+    thumbnail_url: payload.thumbnail_url || null,
+    thumbnail_r2_key: payload.thumbnail_r2_key || null,
     time_limit_minutes: timeLimit,
     passing_score: passingScore,
     questions: formattedQuestions,

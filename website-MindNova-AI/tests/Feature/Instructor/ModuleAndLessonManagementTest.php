@@ -17,6 +17,7 @@ class ModuleAndLessonManagementTest extends TestCase
     use RefreshDatabase;
 
     private User $teacher;
+
     private Course $course;
 
     protected function setUp(): void
@@ -47,7 +48,7 @@ class ModuleAndLessonManagementTest extends TestCase
             ]);
 
         $response->assertStatus(201)
-                 ->assertJsonPath('data.title', 'Module 1');
+            ->assertJsonPath('data.title', 'Module 1');
 
         $this->assertDatabaseHas('course_modules', [
             'course_id' => $this->course->id,
@@ -73,7 +74,7 @@ class ModuleAndLessonManagementTest extends TestCase
             ]);
 
         $response->assertStatus(201)
-                 ->assertJsonPath('data.title', 'Lesson 1');
+            ->assertJsonPath('data.title', 'Lesson 1');
 
         $this->assertDatabaseHas('lessons', [
             'module_id' => $module->id,
@@ -83,7 +84,7 @@ class ModuleAndLessonManagementTest extends TestCase
 
     public function test_teacher_can_upload_video()
     {
-        Storage::fake('public');
+        Storage::fake('r2');
 
         $module = CourseModule::create([
             'course_id' => $this->course->id,
@@ -92,6 +93,7 @@ class ModuleAndLessonManagementTest extends TestCase
         ]);
 
         $lesson = Lesson::create([
+            'course_id' => $this->course->id,
             'module_id' => $module->id,
             'title' => 'Lesson 1',
             'type' => 'video',
@@ -106,6 +108,6 @@ class ModuleAndLessonManagementTest extends TestCase
             ]);
 
         $response->assertStatus(200);
-        $this->assertNotNull($response->json('data.video_url'));
+        $this->assertNotNull($response->json('data.signed_url'));
     }
 }

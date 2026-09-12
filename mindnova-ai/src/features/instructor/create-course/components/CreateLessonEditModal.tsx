@@ -7,6 +7,8 @@ import type { DraftLesson, DraftLessonType, DraftQuizData } from "../types";
 import { useUploadTempMedia, useDeleteTempMedia } from "../api";
 import { quizGeneratorApi } from "../../quiz-generator/api/quizGeneratorApi";
 import { FileQuestion, FileText, Video, X } from "lucide-react";
+import { serializeQuizQuestion } from "../../quiz-generator/api/serializeQuizQuestion";
+import { LessonAttachments } from "../../lesson-management/components/LessonAttachments";
 
 function getEmbedUrl(url: string): string | null {
   if (!url) return null;
@@ -30,6 +32,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
 
   const [tempMediaMap, setTempMediaMap] = useState<Map<string, number>>(new Map());
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   
   const [videoMethod, setVideoMethod] = useState<'upload' | 'url'>('upload');
   const [videoUrl, setVideoUrl] = useState((lesson as any).videoUrl || (lesson as any).video_url || "");
@@ -181,6 +184,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
 
   const handleSave = async () => {
     setIsSaving(true);
+    setSaveError(null);
     try {
       let finalContent = content;
       finalContent = finalContent.replace(/poster="data:image\/[^"]+"/g, 'poster=""');
@@ -192,8 +196,17 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
         }
       });
 
+      let savedQuizData = quizData;
       if (isQuiz && quizData) {
         const qAny = quizData as any;
+        const serializedQuestions = Array.isArray(qAny.questions)
+          ? qAny.questions.map(serializeQuizQuestion)
+          : [];
+        savedQuizData = {
+          ...qAny,
+          questions: serializedQuestions,
+        };
+
         const targetQuizId =
           (lesson as any).quiz_id ||
           (lesson as any).quizData?.quiz_id ||
@@ -205,17 +218,20 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
             : undefined);
 
         if (targetQuizId && !isNaN(Number(targetQuizId))) {
-          try {
-            await quizGeneratorApi.updateQuiz(Number(targetQuizId), {
-              title: qAny.title || title,
-              description: qAny.description || "",
-              time_limit_minutes: qAny.time_limit_minutes || 15,
-              passing_score: qAny.passing_score || 70,
-              difficulty: qAny.difficulty || "mixed",
-              questions: qAny.questions || [],
-            });
-          } catch (err: any) {
-            console.warn("Không thể cập nhật trực tiếp Quiz ID " + targetQuizId + " trên máy chủ:", err);
+          const response = await quizGeneratorApi.updateQuiz(Number(targetQuizId), {
+            title: qAny.title || title,
+            description: qAny.description || "",
+            thumbnail_url: qAny.thumbnail_url || null,
+            thumbnail_r2_key: qAny.thumbnail_r2_key || null,
+            time_limit_minutes: qAny.time_limit_minutes || 15,
+            passing_score: qAny.passing_score || 70,
+            difficulty: qAny.difficulty || "mixed",
+            questions: serializedQuestions,
+          });
+          const updatedQuiz = response?.data || response;
+          if (updatedQuiz) {
+            savedQuizData = { ...qAny, ...updatedQuiz };
+            setQuizData(savedQuizData);
           }
         }
       }
@@ -224,22 +240,44 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
         title, 
         type, 
         content: finalContent, 
-        quizData: isQuiz ? quizData : undefined, 
+        quizData: isQuiz ? savedQuizData : undefined,
         video_url: isVideo ? videoUrl : undefined,
         videoUrl: isVideo ? videoUrl : undefined,
         temp_media_ids: usedTempMediaIds 
       } as any);
       setTempMediaMap(new Map());
+    } catch (error: any) {
+      setSaveError(
+        error?.response?.data?.message
+        || error?.message
+        || "Không thể lưu thay đổi. Vui lòng thử lại.",
+      );
     } finally {
       setIsSaving(false);
     }
   };
 
+  // Track whether mousedown originated on the backdrop to prevent
+  // accidental modal close when native file picker dialog dismisses.
+  const backdropMouseDownRef = useRef(false);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div 
         className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
-        onClick={handleClose}
+        onMouseDown={(e) => {
+          // Only mark if the mousedown is directly on the backdrop itself
+          if (e.target === e.currentTarget) {
+            backdropMouseDownRef.current = true;
+          }
+        }}
+        onClick={(e) => {
+          // Only close if mousedown also originated on the backdrop
+          if (e.target === e.currentTarget && backdropMouseDownRef.current) {
+            handleClose();
+          }
+          backdropMouseDownRef.current = false;
+        }}
       />
       <div className={`relative w-full ${isQuiz ? 'max-w-5xl' : 'max-w-4xl'} bg-white rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-fadeIn`}>
         
@@ -259,6 +297,12 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
             <X className="h-4 w-4" aria-hidden />
           </button>
         </div>
+
+        {saveError && (
+          <div role="alert" className="mx-6 mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-bold text-rose-700">
+            {saveError}
+          </div>
+        )}
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-6">
@@ -390,6 +434,16 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
                   onVideoUpload={handleVideoUpload}
                   onImageUpload={handleImageUpload}
                 />
+                {/^\d+$/.test(String(lesson.id)) ? (
+                  <LessonAttachments
+                    lessonId={lesson.id}
+                    initialAttachments={(lesson as any).attachments ?? []}
+                  />
+                ) : (
+                  <p className="text-xs text-[#64748B]">
+                    Lưu bài học trước để tải tài liệu đính kèm.
+                  </p>
+                )}
               </>
             ) : null}
           </div>

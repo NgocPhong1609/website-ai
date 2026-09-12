@@ -15,6 +15,8 @@ import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBad
 import { NoDataAvailable } from "@/src/shared/components/ui";
 import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/quizGeneratorApi";
 import toast from "react-hot-toast";
+import { LessonAttachments } from "@/src/features/instructor/lesson-management/components/LessonAttachments";
+import type { LessonAttachment } from "@/src/features/instructor/lesson-management/api";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 function CheckIcon({ className = "w-4 h-4" }: { className?: string }) {
@@ -71,6 +73,7 @@ export interface LessonData {
  quiz_id?: number | string | null;
  quizData?: any;
  questions?: any[];
+ attachments?: LessonAttachment[];
 }
 
 interface ModuleData {
@@ -223,6 +226,14 @@ function ArticleRenderer({
  [&_mark]:bg-yellow-200 [&_mark]:px-1 [&_mark]:rounded"
  dangerouslySetInnerHTML={{ __html: lesson.content }}
  />
+ {lesson.attachments && lesson.attachments.length > 0 && (
+   <LessonAttachments
+     lessonId={lesson.id}
+     initialAttachments={lesson.attachments}
+     readOnly
+     audience="student"
+   />
+ )}
  </div>
  );
 }
@@ -946,6 +957,7 @@ function LessonWorkspaceContent() {
         quiz_id: l.quiz_id || l.quizId || null,
         quizData: l.quizData || l.quiz || null,
         questions: l.questions || l.quiz_questions || null,
+        attachments: l.attachments || [],
       })),
     }));
   }, [apiDetail, instructorModules]);

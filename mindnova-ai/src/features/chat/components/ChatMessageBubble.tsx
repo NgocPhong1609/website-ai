@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChatMessage } from '../types';
+import { InstructorChatBadge, isInstructorRole } from './InstructorChatBadge';
 
 interface ChatMessageBubbleProps {
   message: ChatMessage;
@@ -18,6 +19,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
 }) => {
   // Relax frontend time check to 24h to avoid clock skew issues; backend strictly enforces 1h
   const isRecallable = isOwn && !message.is_recalled && (Math.abs(Date.now() - new Date(message.created_at).getTime()) < 24 * 60 * 60 * 1000);
+  const isInstructor = !isOwn && isInstructorRole(message.sender?.role);
 
   if (message.is_recalled) {
     return (
@@ -35,9 +37,10 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
         )}
         <div className={`max-w-[70%] flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
           {!isOwn && isFirstInGroup && (
-            <span className="text-xs text-gray-500 mb-1 ml-1 font-medium">
-              {message.sender?.name}
-            </span>
+            <div className="mb-1 ml-1 flex items-center gap-1.5">
+              <span className="text-xs font-medium text-gray-500">{message.sender?.name}</span>
+              <InstructorChatBadge role={message.sender?.role} />
+            </div>
           )}
           <div className="px-4 py-2 rounded-2xl bg-gray-100 border border-gray-200 text-gray-400 italic text-xs text-center">
             Tin nhắn đã bị thu hồi
@@ -83,16 +86,19 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
 
       <div className={`max-w-[70%] sm:max-w-[65%] flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
         {!isOwn && isFirstInGroup && (
-          <span className="text-[11px] text-gray-500 mb-1 ml-1 font-medium">
-            {message.sender?.name}
-          </span>
+          <div className="mb-1 ml-1 flex items-center gap-1.5">
+            <span className="text-[11px] font-medium text-gray-500">{message.sender?.name}</span>
+            <InstructorChatBadge role={message.sender?.role} />
+          </div>
         )}
         
         <div 
           className={`relative px-4 py-2.5 rounded-2xl shadow-sm transition-all ${
             isOwn 
               ? 'bg-[#3B82F6] text-white rounded-br-xs' 
-              : 'bg-white border border-gray-200/80 text-gray-800 rounded-bl-xs'
+              : isInstructor
+                ? 'bg-[#EFF6FF] border border-[#DBEAFE] text-gray-800 rounded-bl-xs'
+                : 'bg-white border border-gray-200/80 text-gray-800 rounded-bl-xs'
           }`}
         >
           {message.content && (

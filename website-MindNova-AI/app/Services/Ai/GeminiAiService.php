@@ -3,21 +3,39 @@
 namespace App\Services\Ai;
 
 use App\DTOs\AiMessageDto;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use App\Exceptions\AiTransientException;
 use Exception;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class GeminiAiService extends AbstractAiService
 {
     public function getProviderName(): string
     {
-        return "gemini";
+        return 'gemini';
+    }
+
+    public function isReady(): bool
+    {
+        return $this->resolveApiKey() !== null && ! config('services.gemini.force_failure', false);
+    }
+
+    private function resolveApiKey(): ?string
+    {
+        $apiKey = config('services.gemini.api_key');
+
+        return is_string($apiKey) && trim($apiKey) !== '' ? $apiKey : null;
     }
 
     public function sendMessage(array $messages, array $options = []): string
     {
-        $apiKey = config("services.gemini.api_key");
-        $model = config("services.gemini.model", "gemini-3.6-flash");
+        $apiKey = $this->resolveApiKey();
+        $model = config('services.gemini.model', 'gemini-3.6-flash');
+        if ($apiKey === null) {
+            $this->recordAttempt($options, $model, microtime(true), 'failed', 'missing_api_key');
+            throw new Exception('Chưa cấu hình API key cho Gemini.');
+        }
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
 
         // Chuyen doi messages tu AiMessageDto sang format cua Gemini
@@ -26,29 +44,29 @@ class GeminiAiService extends AbstractAiService
 
         foreach ($messages as $msg) {
             /** @var AiMessageDto $msg */
-            if ($msg->role === "system") {
+            if ($msg->role === 'system') {
                 $systemInstruction = [
-                    "parts" => [
-                        ["text" => $msg->content]
-                    ]
+                    'parts' => [
+                        ['text' => $msg->content],
+                    ],
                 ];
             } else {
-                $role = $msg->role === "user" ? "user" : "model";
+                $role = $msg->role === 'user' ? 'user' : 'model';
                 $contents[] = [
-                    "role" => $role,
-                    "parts" => [
-                        ["text" => $msg->content]
-                    ]
+                    'role' => $role,
+                    'parts' => [
+                        ['text' => $msg->content],
+                    ],
                 ];
             }
         }
 
         $payload = [
-            "contents" => $contents,
+            'contents' => $contents,
         ];
 
         if ($systemInstruction) {
-            $payload["systemInstruction"] = $systemInstruction;
+            $payload['systemInstruction'] = $systemInstruction;
         }
 
         $defaultMaxTokens = match ($options['feature'] ?? 'general') {
@@ -59,99 +77,84 @@ class GeminiAiService extends AbstractAiService
         };
 
         $generationConfig = [
-            'maxOutputTokens' => (int) ($options['max_tokens'] ?? $defaultMaxTokens)
+            'maxOutputTokens' => (int) ($options['max_tokens'] ?? $defaultMaxTokens),
         ];
 
-        if (!empty($options['response_mime_type'])) {
+        if (! empty($options['response_mime_type'])) {
             $generationConfig['responseMimeType'] = $options['response_mime_type'];
         }
 
         $payload['generationConfig'] = $generationConfig;
 
-        $maxRetries = $options['max_retries'] ?? 4;
-        $lastException = null;
+        $maxRetries = max(1, (int) ($options['max_retries'] ?? 4));
+        $options['request_id'] ??= (string) Str::uuid();
 
         for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            $startedAt = microtime(true);
             try {
-                // Simulate failure in development
-                if (env('AI_FORCE_PRIMARY_FAILURE', false)) {
-                    Log::warning("AI_FORCE_PRIMARY_FAILURE is true, simulating 503 error.");
-                    $response = Http::response('Service Unavailable', 503);
-                } else {
-                    $response = Http::withHeaders([
-                        "Content-Type" => "application/json",
-                    ])->timeout(90)->post($url, $payload);
+                if (config('services.gemini.force_failure', false)) {
+                    throw new AiTransientException('Gemini temporarily unavailable');
                 }
+                $response = Http::withHeaders(['Content-Type' => 'application/json'])
+                    ->timeout(90)->post($url, $payload);
+            } catch (ConnectionException $exception) {
+                $this->recordAttempt($options, $model, $startedAt, 'failed', 'connection_error');
+                if ($attempt < $maxRetries) {
+                    sleep(2 ** ($attempt - 1));
 
-                if ($response->successful()) {
-                    $data = $response->json();
-                    
-                    // Trich xuat noi dung tra ve
-                    $responseContent = $data["candidates"][0]["content"]["parts"][0]["text"] ?? "No response";
+                    continue;
+                }
+                // Never retain the original exception: its message/URL may contain credentials.
+                throw new AiTransientException('Gemini network temporarily unavailable');
+            } catch (AiTransientException $exception) {
+                $this->recordAttempt($options, $model, $startedAt, 'failed', 'http_503');
+                if ($attempt < $maxRetries) {
+                    sleep(2 ** ($attempt - 1));
 
-                    // Trich xuat usage metadata
-                    $promptTokens = $data["usageMetadata"]["promptTokenCount"] ?? 0;
-                    $completionTokens = $data["usageMetadata"]["candidatesTokenCount"] ?? 0;
-
-                    // Ghi log token usage (kể cả user hoặc guest để đảm bảo 100% observability)
-                    $userId = $options["user_id"] ?? null;
-                    $feature = $options["feature"] ?? "general";
-                    
-                    $this->logUsage($userId, $model, $feature, $promptTokens, $completionTokens, 0, $payload);
-
-                    return $responseContent;
+                    continue;
                 }
-
-                // Neu gap loi 503 (Service Unavailable) hoac 429 (Rate Limit) hoac timeout, retry
-                if (in_array($response->status(), [503, 429, 500, 502, 504]) && $attempt <= $maxRetries) {
-                    if ($attempt < $maxRetries) {
-                        $waitSeconds = pow(2, $attempt - 1); // 1s, 2s, 4s
-                        Log::warning("Gemini API returned {$response->status()}, retrying in {$waitSeconds}s (attempt {$attempt}/{$maxRetries})");
-                        sleep($waitSeconds);
-                        continue;
-                    } else {
-                        // Thrown on max attempts reached
-                        Log::error("Gemini API Error: Transient error {$response->status()} after {$maxRetries} attempts. " . $response->body());
-                        throw new \App\Exceptions\AiTransientException("Gemini transient error: " . $response->status());
-                    }
-                }
-                
-                // 404 is usually a wrong model name, but we should fallback to Backup AI to not disrupt user experience
-                if ($response->status() === 404) {
-                    Log::error("Gemini API Error 404: Model not found. Throwing transient exception to trigger fallback immediately. " . $response->body());
-                    throw new \App\Exceptions\AiTransientException("Gemini model not found (404)");
-                }
-
-                Log::error("Gemini API Error: " . $response->body());
-                throw new Exception("Loi khi goi Gemini API: " . $response->status());
-                
-            } catch (Exception $e) {
-                $lastException = $e;
-                if ($e instanceof \App\Exceptions\AiTransientException) {
-                    throw $e;
-                }
-                if (str_contains($e->getMessage(), 'Loi khi goi Gemini API') && $attempt >= $maxRetries) {
-                    throw $e;
-                }
-                
-                // If it's a network error (like ConnectionException), we can treat it as transient
-                $isNetworkError = $e instanceof \Illuminate\Http\Client\ConnectionException || str_contains($e->getMessage(), 'cURL error');
-                if ($isNetworkError && $attempt <= $maxRetries) {
-                    if ($attempt < $maxRetries) {
-                        $waitSeconds = pow(2, $attempt - 1);
-                        Log::warning("Gemini API Network Exception on attempt {$attempt}: {$e->getMessage()}, retrying in {$waitSeconds}s");
-                        sleep($waitSeconds);
-                        continue;
-                    } else {
-                        throw new \App\Exceptions\AiTransientException("Gemini network transient error: " . $e->getMessage());
-                    }
-                }
-                
-                Log::error("Gemini API Exception after {$maxRetries} attempts: " . $e->getMessage());
-                throw $e;
+                throw $exception;
+            } catch (Exception $exception) {
+                $this->recordAttempt($options, $model, $startedAt, 'failed', 'request_error');
+                throw new Exception('Gemini request failed');
             }
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $content = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+                $inputTokens = $data['usageMetadata']['promptTokenCount'] ?? null;
+                $outputTokens = $data['usageMetadata']['candidatesTokenCount'] ?? null;
+                $providerRequestId = $data['responseId'] ?? $response->header('x-request-id');
+
+                if (! is_string($content) || trim($content) === '') {
+                    $this->recordAttempt($options, $model, $startedAt, 'failed', 'empty_response',
+                        $inputTokens, $outputTokens, $providerRequestId ?: null);
+                    if ($attempt < $maxRetries) {
+                        continue;
+                    }
+                    throw new AiTransientException('Gemini returned an empty response');
+                }
+
+                $this->recordAttempt($options, $model, $startedAt, 'success', null,
+                    $inputTokens, $outputTokens, $providerRequestId ?: null);
+
+                return $content;
+            }
+
+            $status = $response->status();
+            $this->recordAttempt($options, $model, $startedAt, 'failed', 'http_'.$status);
+            if (in_array($status, [429, 500, 502, 503, 504], true)) {
+                if ($attempt < $maxRetries) {
+                    sleep(2 ** ($attempt - 1));
+
+                    continue;
+                }
+                throw new AiTransientException('Gemini transient error: '.$status);
+            }
+
+            throw new Exception('Loi khi goi Gemini API: '.$status);
         }
 
-        throw $lastException ?? new Exception("Gemini API failed after {$maxRetries} attempts");
+        throw new Exception('Gemini request failed');
     }
 }

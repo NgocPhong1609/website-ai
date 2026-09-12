@@ -5,8 +5,9 @@ import { MessageCircle, Sparkles, Trash2, Lightbulb, Target, BookOpen, Square } 
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { sendAiChatMessage } from "@/src/features/student/ai-study-plan/services/ai-chat.client-service";
 import toast from "react-hot-toast";
+import type { AiQuotaMeta } from "@/src/features/student/ai-study-plan/types";
+import { AiQuotaError, sendAiChatMessage } from "@/src/features/student/ai-study-plan/services/ai-chat.client-service";
 
 interface Message {
   id: string;
@@ -198,12 +199,36 @@ export function FloatingAiChat() {
   const [isTyping, setIsTyping] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [stoppedMsgIds, setStoppedMsgIds] = useState<string[]>([]);
+  const [quota, setQuota] = useState<AiQuotaMeta | null>(null);
+  const [quotaResetReached, setQuotaResetReached] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const isDraggingRef = useRef(false);
 
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (quota?.remaining !== 0) return;
+    const resetAt = Date.parse(quota.resets_at);
+    if (!Number.isFinite(resetAt) || resetAt <= Date.now()) return;
+
+    const timer = window.setTimeout(
+      () => setQuotaResetReached(true),
+      Math.min(resetAt - Date.now(), 2_147_483_647)
+    );
+    return () => window.clearTimeout(timer);
+  }, [quota]);
+
+  const resetAt = quota ? Date.parse(quota.resets_at) : Number.NaN;
+  const isQuotaBlocked = quota?.remaining === 0
+    && !quotaResetReached
+    && (!Number.isFinite(resetAt) || resetAt > Date.now());
+
+  const updateQuota = (nextQuota: AiQuotaMeta) => {
+    setQuota(nextQuota);
+    setQuotaResetReached(false);
+  };
 
   const scrollToBottom = (smooth: boolean = false) => {
     // Direct container scrollTop assignment prevents browser window layout jumps or stuttering during typewriter animation
@@ -342,7 +367,9 @@ export function FloatingAiChat() {
       }));
       return sendAiChatMessage(queryText, history);
     },
-    onSuccess: (newAiMessage) => {
+    onSuccess: (result) => {
+      if (result.quota) updateQuota(result.quota);
+      const newAiMessage = result.message;
       const aiReply: Message = {
         id: newAiMessage.id || `ai-${Date.now()}`,
         sender: "ai",
@@ -354,7 +381,10 @@ export function FloatingAiChat() {
     },
     onError: (error) => {
       console.error("[FloatingAiChat] Failed to reach AI backend:", error);
-      const friendlyText = error instanceof Error && (error.message.includes("Gia sư") || error.message.includes("⏳"))
+      if (error instanceof AiQuotaError && error.quota) updateQuota(error.quota);
+      const friendlyText = error instanceof AiQuotaError
+        ? error.message
+        : error instanceof Error && (error.message.includes("Gia sư") || error.message.includes("⏳"))
         ? error.message
         : "⏳ **Gia sư Nova hiện đang bận xíu hoặc hệ thống đang chịu tải cao, bạn vui lòng chờ khoảng 1 phút rồi quay lại trò chuyện với mình nhé!** 😊";
       const fallbackReply: Message = {
@@ -399,7 +429,7 @@ export function FloatingAiChat() {
 
   const handleSend = (textToSend?: string) => {
     const query = (textToSend || input).trim();
-    if (!query || isGenerating) return;
+    if (!query || isGenerating || isQuotaBlocked) return;
 
     const userMsg: Message = {
       id: `user-${Date.now()}`,
@@ -421,7 +451,7 @@ export function FloatingAiChat() {
       setIsOpen(true);
       if (customEvent.detail?.initialQuery) {
         const query = customEvent.detail.initialQuery;
-        if (customEvent.detail.autoSend && !chatMutation.isPending) {
+        if (customEvent.detail.autoSend && !chatMutation.isPending && !isQuotaBlocked) {
           const userMsg: Message = {
             id: `user-${Date.now()}`,
             sender: "user",
@@ -437,7 +467,7 @@ export function FloatingAiChat() {
     };
     window.addEventListener("open-ai-tutor-chat", handleOpenAiChat);
     return () => window.removeEventListener("open-ai-tutor-chat", handleOpenAiChat);
-  }, [chatMutation]);
+  }, [chatMutation, isQuotaBlocked]);
 
   const quickSuggestions = [
     { label: "Tổng hợp tiến độ", icon: <Lightbulb size={12} className="mr-1.5" /> },
@@ -627,7 +657,7 @@ export function FloatingAiChat() {
                 key={idx}
                 type="button"
                 onClick={() => handleSend(item.label)}
-                disabled={isGenerating}
+                disabled={isGenerating || isQuotaBlocked}
                 className="shrink-0 flex items-center justify-center text-xs font-semibold bg-[#F8FAFC] hover:bg-[#EFF6FF] disabled:opacity-50 text-[#64748B] hover:text-blue-600 border border-[#EAEAF4] hover:border-blue-600/30 rounded-xl px-3 py-1.5 transition-all duration-200 focus:outline-none cursor-pointer shadow-2xs"
               >
                 {item.icon} {item.label}
@@ -636,21 +666,21 @@ export function FloatingAiChat() {
           </div>
 
           {/* Footer Input Bar */}
-          <div className="p-2.5 bg-white border-t border-[#E8E9F2] shrink-0">
+          <div role="group" aria-label="Khung nhập tin nhắn AI" className="w-full min-w-0 p-2.5 bg-white border-t border-[#E8E9F2] shrink-0">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (!isGenerating) handleSend();
+                if (!isGenerating && !isQuotaBlocked) handleSend();
               }}
-              className="flex items-center gap-2"
+              className="flex min-w-0 items-center gap-2"
             >
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                disabled={isGenerating}
+                disabled={isGenerating || isQuotaBlocked}
                 placeholder={isGenerating ? "Nova đang trả lời..." : "Nhập câu hỏi cho Nova..."}
-                className="flex-1 bg-[#F8FAFC] focus:bg-white disabled:bg-gray-100 border border-[#EAEAF4] focus:border-blue-600 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#0F172A] placeholder:text-[#64748B] focus:outline-none focus:ring-2 focus:ring-blue-600/25 transition-all duration-200"
+                className="min-w-0 flex-1 bg-[#F8FAFC] focus:bg-white disabled:bg-gray-100 border border-[#EAEAF4] focus:border-blue-600 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#0F172A] placeholder:text-[#64748B] focus:outline-none focus:ring-2 focus:ring-blue-600/25 transition-all duration-200"
               />
               {isGenerating ? (
                 <button
@@ -666,8 +696,8 @@ export function FloatingAiChat() {
                 <button
                   type="submit"
                   aria-label="Gửi tin nhắn"
-                  disabled={!input.trim()}
-                  className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 hover:opacity-95 disabled:opacity-50 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-sm active:scale-95 cursor-pointer"
+                  disabled={!input.trim() || isQuotaBlocked}
+                  className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#3B82F6] to-[#2563EB] hover:from-[#2563EB] hover:to-[#1D4ED8] disabled:opacity-50 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-sm active:scale-95 cursor-pointer"
                 >
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
@@ -675,6 +705,11 @@ export function FloatingAiChat() {
                 </button>
               )}
             </form>
+            {quota && (
+              <span aria-label="Hạn mức AI hôm nay" className="mt-1.5 block text-center text-[11px] text-[#64748B]">
+                Còn {quota.remaining}/{quota.daily_limit} lượt hôm nay
+              </span>
+            )}
           </div>
           
           {/* Custom Confirm Delete Modal */}

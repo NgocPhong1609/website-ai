@@ -13,6 +13,8 @@ class QuizResource extends JsonResource
             'id' => $this->id,
             'lesson_id' => $this->lesson_id,
             'title' => $this->title,
+            'thumbnail_url' => $this->thumbnail_url,
+            'thumbnail_r2_key' => $this->thumbnail_r2_key,
             'time_limit_minutes' => $this->time_limit_minutes,
             'passing_score' => $this->passing_score,
             'questions' => $this->whenLoaded('questions', function () {
@@ -22,6 +24,8 @@ class QuizResource extends JsonResource
                             'id' => $a->id,
                             'content' => $a->content,
                             'is_correct' => (bool) $a->is_correct,
+                            'image_url' => $a->image_url,
+                            'image_r2_key' => $a->image_r2_key,
                         ];
                     })->values()->toArray() : [];
 
@@ -37,6 +41,9 @@ class QuizResource extends JsonResource
                     return [
                         'id' => $q->id,
                         'type' => $q->type ?? 'multiple_choice',
+                        'selection_type' => $q->selection_type ?? 'single_choice',
+                        'image_url' => $q->image_url,
+                        'image_r2_key' => $q->image_r2_key,
                         'question' => $q->content,
                         'content' => $q->content,
                         'explanation' => $q->explanation,

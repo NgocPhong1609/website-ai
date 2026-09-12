@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Instructor;
 
+use App\Services\Instructor\QuizMediaService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreAiQuizRequest extends FormRequest
@@ -35,6 +36,8 @@ class StoreAiQuizRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'thumbnail_url' => $this->mediaUrlRules('thumbnail_r2_key'),
+            'thumbnail_r2_key' => 'nullable|string|max:2048',
             'source_type' => 'nullable|string|in:content,topic,course,manual',
             'source_content' => 'nullable|string',
             'course_id' => 'nullable|integer|exists:courses,id',
@@ -44,7 +47,10 @@ class StoreAiQuizRequest extends FormRequest
             'status' => 'nullable|string|in:draft,published',
             'questions' => 'required|array|min:1',
             'questions.*.type' => 'required|string|in:multiple_choice,essay',
+            'questions.*.selection_type' => 'nullable|string|in:single_choice,multiple_choice',
             'questions.*.content' => 'required|string',
+            'questions.*.image_url' => $this->mediaUrlRules('questions.*.image_r2_key'),
+            'questions.*.image_r2_key' => 'nullable|string|max:2048',
             'questions.*.difficulty' => 'nullable|string|in:easy,medium,hard',
             'questions.*.explanation' => 'nullable|string',
             'questions.*.sample_answer' => 'nullable|string',
@@ -53,6 +59,8 @@ class StoreAiQuizRequest extends FormRequest
             'questions.*.answers' => 'required_if:questions.*.type,multiple_choice|array',
             'questions.*.answers.*.content' => 'required|string',
             'questions.*.answers.*.is_correct' => 'required|boolean',
+            'questions.*.answers.*.image_url' => $this->mediaUrlRules('questions.*.answers.*.image_r2_key'),
+            'questions.*.answers.*.image_r2_key' => 'nullable|string|max:2048',
         ];
     }
 
@@ -80,8 +88,37 @@ class StoreAiQuizRequest extends FormRequest
             $questions = $this->input('questions', []);
             if (is_array($questions) && count($questions) > 0) {
                 $totalPoints = 0.0;
-                foreach ($questions as $q) {
+                foreach ($questions as $qIndex => $q) {
                     $totalPoints += (float) ($q['points'] ?? 0);
+
+                    if (($q['type'] ?? null) !== 'multiple_choice') {
+                        continue;
+                    }
+
+                    $answers = $q['answers'] ?? [];
+                    if (count($answers) < 2) {
+                        $validator->errors()->add(
+                            "questions.{$qIndex}.answers",
+                            'Câu hỏi trắc nghiệm phải có ít nhất 2 đáp án.'
+                        );
+                        continue;
+                    }
+
+                    $correctCount = collect($answers)->where('is_correct', true)->count();
+                    $selectionType = $q['selection_type'] ?? 'single_choice';
+                    $validCorrectCount = $selectionType === 'multiple_choice'
+                        ? $correctCount >= 2
+                        : $correctCount === 1;
+
+                    if (!$validCorrectCount) {
+                        $requirement = $selectionType === 'multiple_choice'
+                            ? 'ít nhất 2 đáp án đúng'
+                            : 'đúng 1 đáp án đúng';
+                        $validator->errors()->add(
+                            "questions.{$qIndex}.answers",
+                            "Câu hỏi " . ($qIndex + 1) . " phải có {$requirement} (hiện có {$correctCount})."
+                        );
+                    }
                 }
                 if (abs($totalPoints - 10.0) > 0.001) {
                     $validator->errors()->add(
@@ -90,6 +127,53 @@ class StoreAiQuizRequest extends FormRequest
                     );
                 }
             }
+
+            $this->validateManagedMediaKeys($validator);
         });
+    }
+
+    private function mediaUrlRules(string $keyPath): array
+    {
+        return ['nullable', 'string', 'max:2048', function (string $attribute, mixed $value, \Closure $fail) use ($keyPath) {
+            $resolvedKeyPath = $keyPath;
+            preg_match_all('/\.([0-9]+)(?:\.|$)/', $attribute, $matches);
+            foreach ($matches[1] as $index) {
+                $resolvedKeyPath = preg_replace('/\*/', $index, $resolvedKeyPath, 1);
+            }
+
+            if (data_get($this->all(), $resolvedKeyPath)) {
+                return;
+            }
+
+            $scheme = is_string($value) ? strtolower((string) parse_url($value, PHP_URL_SCHEME)) : '';
+            if (!filter_var($value, FILTER_VALIDATE_URL) || !in_array($scheme, ['http', 'https'], true)) {
+                $fail('The :attribute field must be a valid HTTP or HTTPS URL.');
+            }
+        }];
+    }
+
+    private function validateManagedMediaKeys($validator): void
+    {
+        $pairs = [[
+            'path' => 'thumbnail_r2_key',
+            'key' => $this->input('thumbnail_r2_key'),
+        ]];
+        foreach ($this->input('questions', []) as $qIndex => $question) {
+            $pairs[] = ['path' => "questions.{$qIndex}.image_r2_key", 'key' => $question['image_r2_key'] ?? null];
+            foreach ($question['answers'] ?? [] as $aIndex => $answer) {
+                $pairs[] = ['path' => "questions.{$qIndex}.answers.{$aIndex}.image_r2_key", 'key' => $answer['image_r2_key'] ?? null];
+            }
+        }
+
+        $quiz = $this->route('quiz');
+        $media = app(QuizMediaService::class);
+        foreach ($pairs as $pair) {
+            if (!$pair['key']) {
+                continue;
+            }
+            if (!$media->isManagedKeyValid($this->user(), $quiz, $pair['key'])) {
+                $validator->errors()->add($pair['path'], 'Managed quiz media key is invalid or not owned by this instructor.');
+            }
+        }
     }
 }

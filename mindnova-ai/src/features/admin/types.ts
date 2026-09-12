@@ -1,3 +1,5 @@
+import type { AdminAiSystemData } from "./ai-system/types";
+
 export type AdminStatItem = {
  label: string;
  value: string;
@@ -93,6 +95,8 @@ export type AdminInvoicesPageData = {
 };
 
 export type AdminOverviewData = {
+ error?: string;
+ ai_summary: Pick<AdminAiSystemData, "providers" | "usage" | "packages"> | null;
  hero: {
  title: string;
  description: string;
@@ -174,33 +178,6 @@ export type AdminTeacherApprovalData = {
  rows: AdminTeacherApprovalRow[];
 };
 
-export type AiProviderConfig = {
- provider: string;
- model: string;
- status: "connected" | "warning" | "offline";
- apiKeyHint: string;
-};
-
-export type AiQuotaConfig = {
- label: string;
- limit: number;
- used: number;
-};
-
-export type SystemPromptItem = {
- id: number;
- name: string;
- purpose: string;
- status: "active" | "draft";
- updatedAt: string;
-};
-
-export type AdminAiConfigData = {
- providers: AiProviderConfig[];
- quotas: AiQuotaConfig[];
- systemPrompts: SystemPromptItem[];
-};
-
 export type AdminContentRow = {
  id: number;
  title: string;
@@ -237,10 +214,12 @@ export type AdminRevenueCourseRow = {
   courseId: number;
   courseTitle: string;
   instructorName: string;
-  partnershipTier?: "standard" | "exclusive";
+  partnershipTier?: string | null;
   grossRevenue?: number;
   adminRevenue?: number;
   teacherRevenue?: number;
+  platformCommissionPercent?: number | null;
+  instructorPercent?: number | null;
   revenue: number;
   students: number;
   conversionRate: number;
@@ -254,12 +233,14 @@ export type AdminOrderHistoryRow = {
   studentEmail: string;
   courseTitle: string;
   instructorName: string;
-  partnershipTier: "standard" | "exclusive";
+  partnershipTier: string;
   originalPrice: number;
   discountAmount: number;
   paidAmount: number;
   teacherAmount: number;
   adminAmount: number;
+  platformCommissionPercent: number | null;
+  instructorPercent: number | null;
   allocationStatus: string;
   orderStatus: string;
   refundedAt?: string | null;
@@ -272,6 +253,14 @@ export type AdminRevenueData = {
   courseCount: number;
   courses: AdminRevenueCourseRow[];
   orderHistory?: AdminOrderHistoryRow[];
+  commissionTiers?: CommissionTierDefinition[];
+};
+
+export type CommissionTierDefinition = {
+  tier: string;
+  label: string;
+  platform_commission_percent: number;
+  instructor_percent: number;
 };
 
 export type AdminModerationRow = {
