@@ -53,6 +53,37 @@ export function useCourseHealth(courseId: string, enabled = true) {
  });
 }
 
+export type InstructorCategory = {
+  id: number;
+  name: string;
+  slug: string;
+  status?: string;
+};
+
+export function useInstructorCategories() {
+  return useQuery({
+    queryKey: ["instructor", "categories"],
+    queryFn: async () => {
+      const { data } = await axiosClient.get("/api/instructor/categories");
+      return (data.data ?? []) as InstructorCategory[];
+    },
+    staleTime: 30_000,
+  });
+}
+
+export function useProposeCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (name: string) => {
+      const { data } = await axiosClient.post("/api/instructor/categories", { name });
+      return data.data as InstructorCategory;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "categories"] });
+    },
+  });
+}
+
 export function useCreateCourse() {
  const queryClient = useQueryClient();
 

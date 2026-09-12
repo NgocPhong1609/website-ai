@@ -27,6 +27,8 @@ const INITIAL_COURSE_INFO: CourseBasicInfo = {
  title: "",
  description: "",
  field: "",
+ categoryId: null,
+ otherName: "",
  difficulty: "beginner",
  thumbnailFile: null,
  thumbnailPreview: null,
@@ -60,6 +62,8 @@ function saveToSession(state: ICreateCourseState): void {
  title: state.courseInfo.title,
  description: state.courseInfo.description,
  field: state.courseInfo.field,
+ categoryId: state.courseInfo.categoryId,
+ otherName: state.courseInfo.otherName,
  difficulty: state.courseInfo.difficulty,
  thumbnailPreview: state.courseInfo.thumbnailPreview,
  },
@@ -80,6 +84,7 @@ function loadFromSession(): Partial<ICreateCourseState> | null {
  return {
  step: parsed.step,
  courseInfo: {
+ ...INITIAL_COURSE_INFO,
  ...parsed.courseInfo,
  thumbnailFile: null, // Cannot restore File from session
  thumbnailPreview: null, // Clear preview as well since we need the File object to upload

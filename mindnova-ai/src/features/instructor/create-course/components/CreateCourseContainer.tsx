@@ -9,7 +9,7 @@ import { Step2CourseStructure } from "./Step2CourseStructure";
 import { Step3SettingsPrice } from "./Step3SettingsPrice";
 import { AIOutlineModal } from "./AIOutlineModal";
 import type { CourseBasicInfo, StepKey } from "../types";
-import { useCreateCourse, useUploadCourseThumbnail, useUpdateCoursePrice, useUpdateCourseStatus } from "../api";
+import { useCreateCourse, useUploadCourseThumbnail, useUpdateCoursePrice, useUpdateCourseStatus, useProposeCategory } from "../api";
 import { useCreateModule, useCreateLesson, useCreateQuiz } from "../../lesson-management/api";
 import { useCreateCourseStore } from "../stores/createCourseStore";
 import {
@@ -24,7 +24,7 @@ import {
  ArrowRightIcon,
  ArrowLeftIcon,
 } from "./icons";
-import { COURSE_FIELDS } from "../constants";
+import { OTHER_CATEGORY_VALUE } from "../constants";
 
 export function CreateCourseContainer() {
  const mode = "create"; // Currently creating course
@@ -48,6 +48,7 @@ export function CreateCourseContainer() {
 
  // ── API mutations ─────────────────────────────────────────────────────────────
  const { mutateAsync: createCourse } = useCreateCourse();
+ const { mutateAsync: proposeCategory } = useProposeCategory();
  const { mutateAsync: uploadThumbnail } = useUploadCourseThumbnail();
  const { mutateAsync: updatePrice } = useUpdateCoursePrice();
  const { mutateAsync: updateStatus } = useUpdateCourseStatus();
@@ -175,7 +176,15 @@ export function CreateCourseContainer() {
  throw new Error("Vui lòng tải lên ảnh bìa khóa học.");
  }
 
- const categoryId = Math.max(1, COURSE_FIELDS.indexOf(courseInfo.field as any) + 1);
+ let categoryId = courseInfo.categoryId;
+ if (courseInfo.field === OTHER_CATEGORY_VALUE || !categoryId) {
+ const otherName = courseInfo.otherName.trim();
+ if (!otherName) {
+ throw new Error("Vui lòng chọn danh mục hoặc nhập lĩnh vực khác.");
+ }
+ const proposed = await proposeCategory(otherName);
+ categoryId = proposed.id;
+ }
 
  // We bypass upload if thumbnailFile is missing but preview exists (mock behavior or previously uploaded)
  // In production, we'd upload the file if it exists.

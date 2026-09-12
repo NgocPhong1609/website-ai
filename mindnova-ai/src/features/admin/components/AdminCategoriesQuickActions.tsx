@@ -6,7 +6,8 @@ import { NoData } from "@/src/shared/components/ui/NoData";
 
 import type { AdminCategoryRow } from "@/src/features/admin/types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000").replace(/\/+$/, "");
+const CATEGORIES_API = `${API_BASE_URL}/api/admin/categories`;
 
 type CategoryStatus = "pending" | "active" | "inactive";
 
@@ -109,7 +110,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  setStatus(null);
 
  try {
- const response = await fetch(`${API_BASE_URL}/admin/categories`, {
+ const response = await fetch(CATEGORIES_API, {
  method: "POST",
  headers: getAuthHeaders(),
  credentials: "include",
@@ -145,7 +146,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  setStatus(null);
 
  try {
- const response = await fetch(`${API_BASE_URL}/admin/categories/${editingCategory.id}`, {
+ const response = await fetch(`${CATEGORIES_API}/${editingCategory.id}`, {
  method: "PUT",
  headers: getAuthHeaders(),
  credentials: "include",
@@ -175,7 +176,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  setStatus(null);
 
  try {
- const response = await fetch(`${API_BASE_URL}/admin/categories/${categoryId}`, {
+ const response = await fetch(`${CATEGORIES_API}/${categoryId}`, {
  method: "DELETE",
  headers: getAuthHeaders(),
  credentials: "include",
@@ -199,7 +200,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  setStatus(null);
 
  try {
- const response = await fetch(`${API_BASE_URL}/admin/categories/${categoryId}`, {
+ const response = await fetch(`${CATEGORIES_API}/${categoryId}`, {
  method: "PUT",
  headers: getAuthHeaders(),
  credentials: "include",

@@ -13,6 +13,8 @@ export interface CourseBasicInfo {
  title: string;
  description: string;
  field: string;
+ categoryId: number | null;
+ otherName: string;
  difficulty: DifficultyLevel;
  thumbnailFile: File | null;
  thumbnailPreview: string | null;

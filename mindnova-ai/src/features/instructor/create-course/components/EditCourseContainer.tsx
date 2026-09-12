@@ -21,7 +21,8 @@ import {
  CheckIcon,
 } from "./icons";
 
-import { COURSE_FIELDS } from "../constants";
+import { OTHER_CATEGORY_VALUE } from "../constants";
+import { useProposeCategory } from "../api";
 
 export function EditCourseContainer({ courseId }: { courseId: string }) {
  const router = useRouter();
@@ -32,6 +33,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  const { mutateAsync: deleteCourse, isPending: isDeleting } = useDeleteCourse();
  const { mutateAsync: updateStatus, isPending: isUpdatingStatus } = useUpdateCourseStatus();
  const { mutateAsync: submitForReview, isPending: isSubmittingReview } = useSubmitForReview();
+ const { mutateAsync: proposeCategory } = useProposeCategory();
 
  const [activeTab, setActiveTab] = useState("overview");
  const [saveSuccess, setSaveSuccess] = useState(false);
@@ -39,6 +41,8 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  title: "",
  description: "",
  field: "",
+ categoryId: null,
+ otherName: "",
  difficulty: "beginner",
  thumbnailFile: null,
  thumbnailPreview: null,
@@ -54,7 +58,9 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  ...prev,
  title: course.title,
  description: course.description || "",
- field: course.category_id ? COURSE_FIELDS[Number(course.category_id) - 1] || "" : "",
+ field: course.category_id ? String(course.category_id) : "",
+ categoryId: course.category_id ? Number(course.category_id) : null,
+ otherName: "",
  difficulty: (course.level as DifficultyLevel) || "beginner",
  thumbnailPreview: course.thumbnail || null,
  }));
@@ -76,7 +82,15 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
 
  const handleSave = async () => {
  try {
- const categoryId = Math.max(1, COURSE_FIELDS.indexOf(basicInfo.field as any) + 1);
+ let categoryId = basicInfo.categoryId;
+ if (basicInfo.field === OTHER_CATEGORY_VALUE || !categoryId) {
+ const otherName = basicInfo.otherName.trim();
+ if (!otherName) {
+ throw new Error("Vui lòng chọn danh mục hoặc nhập lĩnh vực khác.");
+ }
+ const proposed = await proposeCategory(otherName);
+ categoryId = proposed.id;
+ }
  
  await updateCourse({
  courseId,

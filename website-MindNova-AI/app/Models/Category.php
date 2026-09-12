@@ -14,6 +14,7 @@ class Category extends Model
         'description',
         'parent_id',
         'status',
+        'requested_by',
     ];
 
     /**
@@ -38,5 +39,10 @@ class Category extends Model
     public function courses(): HasMany
     {
         return $this->hasMany(Course::class);
+    }
+
+    public function requester(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'requested_by');
     }
 }

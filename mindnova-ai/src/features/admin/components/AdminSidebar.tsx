@@ -16,6 +16,7 @@ import {
   DollarSign,
   TicketPercent,
   Users,
+  Tags,
   type LucideProps,
 } from "lucide-react";
 
@@ -29,6 +30,7 @@ const navItems: Array<{
   { label: "Duyệt giáo viên", href: "/admin/teacher-approvals", icon: GraduationCap },
   { label: "AI & System", href: "/admin/ai-system", icon: Cpu },
   { label: "Nội dung", href: "/admin/content", icon: BookOpen },
+  { label: "Quản lý danh mục", href: "/admin/categories", icon: Tags },
   { label: "Mã giảm giá", href: "/admin/coupons", icon: TicketPercent },
   { label: "Doanh thu", href: "/admin/revenue", icon: DollarSign },
   { label: "Báo cáo", href: "/admin/analytics", icon: BarChart3 },

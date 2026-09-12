@@ -46,6 +46,7 @@ use App\Http\Controllers\Api\Admin\SystemConfigController as AdminSystemConfigCo
 use App\Http\Controllers\Api\Admin\UserManagementController as AdminUserManagementController;
 use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Api\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
 
 // Nhóm Instructor (Giáo viên)
@@ -68,6 +69,7 @@ use App\Http\Controllers\Api\Instructor\StudentAnalyticsController;
 use App\Http\Controllers\Api\Instructor\OrderController as InstructorOrderController;
 use App\Http\Controllers\Api\Instructor\ReviewController as InstructorReviewController;
 use App\Http\Controllers\Api\Instructor\CouponController as InstructorCouponController;
+use App\Http\Controllers\Api\Instructor\CategoryController as InstructorCategoryController;
 
 // ==========================================
 // 1. NHÓM API PUBLIC (Không cần đăng nhập)
@@ -222,6 +224,8 @@ Route::middleware('auth:sanctum')->group(function () {
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group(function () {
     Route::get('commission-tiers', [CourseController::class, 'commissionTiers']);
+    Route::get('categories', [InstructorCategoryController::class, 'index']);
+    Route::post('categories', [InstructorCategoryController::class, 'store']);
 
     // Khóa học
     Route::apiResource('courses', CourseController::class);
@@ -391,6 +395,11 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
 
     // 4.5) Coupons
     Route::apiResource('/coupons', AdminCouponController::class);
+
+    Route::get('/categories', [AdminCategoryController::class, 'index']);
+    Route::post('/categories', [AdminCategoryController::class, 'store']);
+    Route::put('/categories/{category}', [AdminCategoryController::class, 'update']);
+    Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy']);
 
     // 5) Moderation and support
     Route::get('/moderation/flags', [AdminModerationSupportController::class, 'flags']);
