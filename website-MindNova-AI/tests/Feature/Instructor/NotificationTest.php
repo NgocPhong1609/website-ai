@@ -108,13 +108,13 @@ class NotificationTest extends TestCase
         
         $inputData = [
             'vnp_TxnRef' => 'TXN123',
-            'vnp_ResponseCode' => '00',
-            'vnp_Amount' => 10000000,
+            'vnp_ResponseCode' => '00'
         ];
-
-        $vnPay = app(\App\Services\VNPayService::class);
-        config(['services.vnpay.hash_secret' => $vnp_HashSecret]);
-        $inputData['vnp_SecureHash'] = $vnPay->secureHash($inputData);
+        
+        ksort($inputData);
+        $hashData = http_build_query($inputData);
+        $vnp_SecureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
+        $inputData['vnp_SecureHash'] = $vnp_SecureHash;
 
         $response = $this->getJson('/api/student/payment/vnpay-ipn?' . http_build_query($inputData));
         $response->assertStatus(200);

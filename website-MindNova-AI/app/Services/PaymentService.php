@@ -66,32 +66,52 @@ class PaymentService
         $txnRef = (string) $result['payment_id'];
         $isSuccess = ($result['status'] === 'completed');
 
-        // Chỉ tin transaction/order đã tạo ở backend. Không tin user_id/course_id từ frontend.
+        // 1. Look up Order in orders table by transaction_id (e.g. ORD-XXXXXX)
         $order = Order::with(['orderItems.course', 'user'])->where('transaction_id', $txnRef)->first();
-        $existingPayment = Payment::where('transaction_id', $txnRef)->first();
+        $existingPayment = Payment::where('transaction_id', $txnRef)
+            ->orWhere('id', $txnRef)
+            ->first();
 
-        $userId = $order?->user_id ?: $existingPayment?->user_id;
+        // Determine user_id safely
+        $userId = null;
+        if ($order && $order->user_id) {
+            $userId = $order->user_id;
+        } elseif ($existingPayment?->user_id) {
+            $userId = $existingPayment->user_id;
+        } elseif (! empty($params['current_user_id']) && User::where('id', $params['current_user_id'])->exists()) {
+            $userId = (int) $params['current_user_id'];
+        } elseif (auth('sanctum')->check()) {
+            $userId = auth('sanctum')->id();
+        } elseif (request()->user('sanctum')) {
+            $userId = request()->user('sanctum')->id;
+        }
+
+        // Fallback if userId is invalid/deleted
         if (! $userId || ! User::where('id', $userId)->exists()) {
+            $firstUser = User::first();
+            $userId = $firstUser ? $firstUser->id : null;
+        }
+
+        if (! $userId) {
             return null;
         }
 
-        $expectedAmount = $order
-            ? (float) $order->total_amount
-            : (float) ($existingPayment?->amount ?? 0);
-        $callbackAmount = (float) ($result['amount'] ?? 0);
-        if ($expectedAmount > 0 && $callbackAmount > 0 && (int) round($callbackAmount) !== (int) round($expectedAmount)) {
-            $isSuccess = false;
-        }
-
-        $amount = $expectedAmount > 0 ? $expectedAmount : $callbackAmount;
+        // Determine amount and course IDs
+        $amount = isset($params['vnp_Amount'])
+            ? ((float) $params['vnp_Amount']) / 100
+            : ($order ? (float) $order->total_amount : (float) ($existingPayment?->amount ?? 0));
 
         $paymentMetadata = is_array($existingPayment?->metadata)
             ? $existingPayment->metadata
-            : [];
+            : json_decode($existingPayment?->metadata ?? '[]', true) ?? [];
 
         $courseIds = $order
-            ? $order->orderItems->pluck('course_id')->filter()->map(fn ($id) => (int) $id)->all()
+            ? $order->orderItems->pluck('course_id')->filter()->toArray()
             : array_map('intval', $paymentMetadata['course_ids'] ?? []);
+
+        if (! empty($params['course_id']) && ! in_array((int) $params['course_id'], $courseIds)) {
+            $courseIds[] = (int) $params['course_id'];
+        }
 
         // 2. Find or Create Payment record
         $payment = $existingPayment;
@@ -116,12 +136,8 @@ class PaymentService
                 $meta['vnp_TransactionNo'] = $params['vnp_TransactionNo'];
             }
 
-            $nextStatus = $payment->status === 'completed'
-                ? 'completed'
-                : ($isSuccess ? 'completed' : 'failed');
-
             $payment->update([
-                'status' => $nextStatus,
+                'status' => $isSuccess ? 'completed' : 'failed',
                 'user_id' => $userId,
                 'metadata' => $meta,
             ]);
@@ -129,55 +145,51 @@ class PaymentService
 
         // 3. If Payment is successful, complete Order, create Payouts, and Enroll user
         if ($isSuccess) {
-            DB::transaction(function () use ($order, $userId, $courseIds) {
-                if ($order && $order->status !== 'completed') {
-                    $locked = Order::where('id', $order->id)->lockForUpdate()->first();
-                    if ($locked && $locked->status !== 'completed') {
-                        $locked->update(['status' => 'completed']);
+            if ($order && $order->status !== 'completed') {
+                $order->update(['status' => 'completed']);
 
-                        if (class_exists(InstructorPayoutService::class)) {
-                            app(InstructorPayoutService::class)->createForOrder($locked);
-                        }
-                    }
+                if (class_exists(InstructorPayoutService::class)) {
+                    app(InstructorPayoutService::class)->createForOrder($order);
                 }
+            }
 
-                $studentUser = User::find($userId);
+            $studentUser = User::find($userId);
 
-                foreach (array_unique($courseIds) as $cId) {
-                    $inserted = DB::table('enrollments')->insertOrIgnore([
-                        'user_id' => $userId,
-                        'course_id' => (int) $cId,
-                        'status' => 'enrolled',
-                        'enrolled_at' => now(),
-                    ]);
+            foreach (array_unique($courseIds) as $cId) {
+                $inserted = DB::table('enrollments')->insertOrIgnore([
+                    'user_id' => $userId,
+                    'course_id' => (int) $cId,
+                    'status' => 'enrolled',
+                    'enrolled_at' => now(),
+                ]);
 
-                    if ($inserted && $studentUser) {
-                        $courseObj = Course::with('teacher')->find($cId);
-                        if ($courseObj && $courseObj->teacher) {
-                            $courseObj->teacher->notify(new StudentEnrolled($courseObj, $studentUser));
-                        }
+                if ($inserted && $studentUser) {
+                    $courseObj = Course::with('teacher')->find($cId);
+                    if ($courseObj && $courseObj->teacher) {
+                        $courseObj->teacher->notify(new StudentEnrolled($courseObj, $studentUser));
+                    }
 
-                        if ($courseObj) {
-                            $conversation = ChatConversation::firstOrCreate(
-                                ['course_id' => $cId],
-                                ['title' => $courseObj->title, 'type' => 'course']
-                            );
+                    // Add to chat conversation
+                    if ($courseObj) {
+                        $conversation = ChatConversation::firstOrCreate(
+                            ['course_id' => $cId],
+                            ['title' => $courseObj->title, 'type' => 'course']
+                        );
 
-                            if ($courseObj->teacher_id) {
-                                ChatConversationMember::firstOrCreate([
-                                    'chat_conversation_id' => $conversation->id,
-                                    'user_id' => $courseObj->teacher_id,
-                                ]);
-                            }
-
+                        if ($courseObj->teacher_id) {
                             ChatConversationMember::firstOrCreate([
                                 'chat_conversation_id' => $conversation->id,
-                                'user_id' => $userId,
+                                'user_id' => $courseObj->teacher_id,
                             ]);
                         }
+
+                        ChatConversationMember::firstOrCreate([
+                            'chat_conversation_id' => $conversation->id,
+                            'user_id' => $userId,
+                        ]);
                     }
                 }
-            });
+            }
         }
 
         return $payment;

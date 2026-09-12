@@ -32,11 +32,12 @@ export const checkoutService = {
     }
   },
 
-  createOrder: async (courseIds: number[], paymentMethod: string, couponCode?: string): Promise<OrderResponse> => {
+  createOrder: async (courseIds: number[], paymentMethod: string, couponCode?: string, paymentMethodId?: number): Promise<OrderResponse> => {
     try {
       const { data } = await axiosClient.post<OrderResponse>("/api/orders", {
         course_ids: courseIds,
         payment_method: paymentMethod,
+        payment_method_id: paymentMethodId || undefined,
         coupon_code: couponCode || undefined,
       });
       return data;

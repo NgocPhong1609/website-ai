@@ -178,7 +178,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Check Order Status by Transaction ID
         Route::get('/orders/transaction/{transactionId}', [OrderController::class, 'showByTransaction']);
-        Route::post('/orders/{id}/pay', [OrderController::class, 'retryPayment']);
 
         // Student Course Refund
         Route::get('/courses/{courseId}/refund-eligibility', [OrderController::class, 'checkRefundEligibility']);

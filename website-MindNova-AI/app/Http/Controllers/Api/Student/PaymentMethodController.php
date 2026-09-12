@@ -23,10 +23,39 @@ class PaymentMethodController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        return response()->json([
-            'success' => false,
-            'message' => 'Website không lưu số tài khoản, số ví hoặc thông tin ngân hàng. Vui lòng thanh toán trực tiếp qua VNPAY hoặc MoMo.',
-        ], 422);
+        $validated = $request->validate([
+            'provider' => 'required|string|in:vnpay,momo,banking',
+            'holder_name' => 'required|string|max:120',
+            'account_number' => 'required|string|min:6|max:40',
+            'bank_name' => 'nullable|string|max:120',
+            'is_default' => 'sometimes|boolean',
+        ]);
+
+        if ($validated['provider'] === 'banking' && blank($validated['bank_name'] ?? null)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vui lòng nhập tên ngân hàng.',
+            ], 422);
+        }
+
+        $user = $request->user();
+        $isFirst = ! StudentPaymentMethod::where('user_id', $user->id)->exists();
+        $makeDefault = $isFirst || $request->boolean('is_default');
+
+        if ($makeDefault) {
+            StudentPaymentMethod::where('user_id', $user->id)->update(['is_default' => false]);
+        }
+
+        $method = StudentPaymentMethod::create([
+            'user_id' => $user->id,
+            'provider' => $validated['provider'],
+            'holder_name' => $validated['holder_name'],
+            'account_number' => preg_replace('/\s+/', '', $validated['account_number']),
+            'bank_name' => $validated['bank_name'] ?? null,
+            'is_default' => $makeDefault,
+        ]);
+
+        return response()->json(['success' => true, 'data' => $method->toPublicArray()], 201);
     }
 
     public function destroy(Request $request, int $id): JsonResponse
