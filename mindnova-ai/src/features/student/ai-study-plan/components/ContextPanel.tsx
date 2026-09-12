@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import type { CoreConcept, LessonResource } from "../types";
+import { formatStudyDuration } from "../lib/format-study-duration";
 import {
  Lightbulb,
  History,
@@ -75,7 +76,7 @@ interface ContextPanelProps {
  <div className="flex items-center justify-between mb-2">
  <div className="flex items-center gap-2">
  <span className={`w-2 h-2 rounded-full ${isMastered ? "bg-emerald-500" : isInProgress ? "bg-blue-500" : "bg-slate-300"}`} />
- <span className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">{concept.title}</span>
+ <span className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2">{concept.title}</span>
  </div>
  {isMastered && (
  <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-medium bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
@@ -95,7 +96,7 @@ interface ContextPanelProps {
  )}
  </div>
  <p className="text-xs text-slate-500 leading-relaxed font-normal pl-4 border-l-2 border-slate-200 group-hover:border-blue-300 transition-colors">
- {concept.description}
+ {formatStudyDuration(concept.description)}
  </p>
  {isExpanded && (
  <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col gap-3">

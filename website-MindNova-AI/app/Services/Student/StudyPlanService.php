@@ -151,10 +151,12 @@ class StudyPlanService
 
                             $coreConcepts[] = [
                                 'id' => 'concept-'.$les->id,
-                                'title' => mb_substr($les->title, 0, 40, 'UTF-8'),
+                                'title' => $les->title,
                                 'status' => $conceptStatus,
                                 'status_color' => $conceptColor,
-                                'description' => $les->duration_seconds ? ($les->duration_seconds / 60).' phút học' : 'Tài nguyên bài học',
+                                'description' => $les->duration_seconds
+                                    ? $this->formatStudyMinutes((int) $les->duration_seconds)
+                                    : 'Tài nguyên bài học',
                             ];
                         }
 
@@ -232,5 +234,15 @@ class StudyPlanService
             'text' => $answer['content'],
             'quota' => $answer['quota'],
         ];
+    }
+
+    private function formatStudyMinutes(int $seconds): string
+    {
+        $minutes = round($seconds / 60, 1);
+        $label = abs($minutes - round($minutes)) < 0.05
+            ? (string) (int) round($minutes)
+            : number_format($minutes, 1, '.', '');
+
+        return $label.' phút học';
     }
 }

@@ -32,19 +32,19 @@ function renderFormattedText(text: string) {
       const token = match[0];
       if (token.startsWith("**") && token.endsWith("**")) {
         parts.push(
-          <strong key={`bold-${idx++}`} className="font-semibold text-blue-800 bg-blue-50 px-1.5 py-0.5 rounded-md border border-blue-100">
+          <strong key={`bold-${idx++}`} className="font-semibold text-[#0F172A]">
             {token.slice(2, -2)}
           </strong>
         );
       } else if (token.startsWith("*") && token.endsWith("*")) {
         parts.push(
-          <span key={`italic-${idx++}`} className="font-medium text-foreground bg-secondary px-1.5 py-0.5 rounded-md border border-border">
+          <em key={`italic-${idx++}`} className="italic text-[#0F172A]">
             {token.slice(1, -1)}
-          </span>
+          </em>
         );
       } else if (token.startsWith("`") && token.endsWith("`")) {
         parts.push(
-          <code key={`code-${idx++}`} className="font-mono text-xs text-muted-foreground bg-secondary px-1.5 py-0.5 rounded-md border border-border">
+          <code key={`code-${idx++}`} className="font-mono text-xs text-[#475569] bg-[#F8FAFC] px-1 py-0.5 rounded">
             {token.slice(1, -1)}
           </code>
         );
@@ -404,7 +404,7 @@ export function ChatPanel({
                     {isPinned && <span className="text-[11px] font-medium bg-secondary text-muted-foreground px-2.5 py-0.5 rounded-full border border-border"><Star size={12} fill="currentColor" className="mr-1 inline" /> Đã lưu</span>}
                   </div>
                 </div>
-                <div className="bg-white text-foreground px-5 py-4 rounded-2xl rounded-tl-sm border border-border shadow-sm text-sm sm:text-[14.5px] leading-relaxed font-normal transition-all">
+                <div className="bg-white text-[#0F172A] px-5 py-4 rounded-2xl rounded-tl-sm border border-border shadow-sm text-sm sm:text-[14.5px] leading-relaxed font-normal transition-all break-words">
                   {msg.animate ? (
                     <TypewriterText
                       id={msg.id}
