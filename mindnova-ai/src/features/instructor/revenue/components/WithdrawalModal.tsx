@@ -159,8 +159,8 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
-      <div className="relative w-full max-w-lg bg-white rounded-2xl border border-[#E8E2D9] shadow-xl flex flex-col overflow-hidden font-sans">
-        
+      <div className="relative w-full max-w-lg bg-white rounded-2xl border border-[#FAF7F2] shadow-xl flex flex-col overflow-hidden font-sans">
+
         {/* Header */}
         <div className="flex items-center justify-between p-5 bg-[#C0392B] text-white">
           <div>
@@ -178,7 +178,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
         </div>
 
         <div className="p-6 flex flex-col gap-5 overflow-y-auto max-h-[80vh]">
-          
+
           {/* Balance Breakdown */}
           <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex flex-col justify-between">
             <div className="flex items-center justify-between">
@@ -202,7 +202,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
                 placeholder="Nhập số tiền (VD: 500.000)..."
                 className={twMerge(
                   "w-full h-11 pl-4 pr-32 rounded-xl border font-bold text-base focus:outline-none focus:ring-2 focus:ring-[#C0392B]/30 transition-all",
-                  isBelowMinimum || isExceedingAvailable ? "border-rose-400 bg-rose-50/20 text-rose-700" : "border-[#E8E2D9] bg-white text-[#2C3039] focus:border-[#C0392B]"
+                  isBelowMinimum || isExceedingAvailable ? "border-rose-400 bg-rose-50/20 text-rose-700" : "border-[#FAF7F2] bg-white text-[#2C3039] focus:border-[#C0392B]"
                 )}
               />
               <div className="absolute right-2.5 flex items-center gap-1.5">
@@ -210,7 +210,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
                 <button
                   type="button"
                   onClick={() => setAmount(formatCurrency(availableBalance.toString()))}
-                  className="px-2.5 py-1 rounded-lg bg-indigo-50 text-[#C0392B] font-extrabold text-xs hover:bg-[#C0392B] hover:text-white transition-all cursor-pointer border border-[#E8E2D9]"
+                  className="px-2.5 py-1 rounded-lg bg-indigo-50 text-[#C0392B] font-extrabold text-xs hover:bg-[#C0392B] hover:text-white transition-all cursor-pointer border border-[#FAF7F2]"
                 >
                   Tối đa
                 </button>
@@ -251,7 +251,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
             ) : isEditingBank || !hasValidBank ? (
               <form onSubmit={handleSaveBankInfo} className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col gap-3">
                 <p className="text-xs font-bold text-slate-700">Điền thông tin tài khoản ngân hàng / ví nhận tiền của bạn:</p>
-                
+
                 <div>
                   <label className="block text-[11px] font-extrabold text-gray-600 mb-1">Tên Ngân hàng / Cổng nhận tiền *</label>
                   <input
@@ -355,7 +355,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
             Thời gian nhận tiền dự kiến qua hệ thống tự động: <strong className="text-gray-700 font-bold">1 - 3 ngày làm việc</strong>
           </span>
         </div>
-        
+
       </div>
     </div>
   );

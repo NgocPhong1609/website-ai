@@ -83,7 +83,7 @@ function CourseActionButtons({ courseId }: { courseId: string }) {
     <div className="grid grid-cols-1 gap-2 p-3.5 mt-auto border-t border-gray-100 bg-[#FEFCF9]/50">
       <Link
         href={`/instructor/courses/${courseId}/edit`}
-        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#2C3039] bg-white border border-[#E8E2D9] hover:bg-[#FAF7F2] hover:text-[#C0392B] active:scale-98 transition-all duration-150 cursor-pointer shadow-2xs"
+        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#2C3039] bg-white border border-[#FAF7F2] hover:bg-[#FAF7F2] hover:text-[#C0392B] active:scale-98 transition-all duration-150 cursor-pointer shadow-2xs"
       >
         <span className="text-[#C0392B]">
           <BookOpenIcon />
@@ -113,7 +113,7 @@ export function CourseCard({ course }: CourseCardProps) {
   return (
     <article
       aria-label={`Khóa học: ${course.title}`}
-      className="group relative flex flex-col rounded-2xl bg-white border border-[#E8E2D9] overflow-hidden hover:border-gray-300 hover:shadow-md transition-all duration-200 shadow-2xs h-full"
+      className="group relative flex flex-col rounded-2xl bg-white border border-[#FAF7F2] overflow-hidden hover:border-gray-300 hover:shadow-md transition-all duration-200 shadow-2xs h-full"
     >
       <div className="relative">
         <CourseThumbnail title={course.title} thumbnail={course.thumbnail} />

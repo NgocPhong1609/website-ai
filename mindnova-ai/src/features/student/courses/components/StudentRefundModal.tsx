@@ -68,7 +68,7 @@ export function StudentRefundModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn font-sans">
-      <div className="relative w-full max-w-lg bg-white rounded-2xl border border-[#E8E2D9] shadow-2xl overflow-hidden flex flex-col">
+      <div className="relative w-full max-w-lg bg-white rounded-2xl border border-[#FAF7F2] shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-5 bg-[#C0392B] text-white">
           <div className="flex items-center gap-2.5">
@@ -102,7 +102,7 @@ export function StudentRefundModal({
           </div>
 
           {/* Refund Rules Checklist */}
-          <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#FEFCF9] border border-[#E8E2D9]">
+          <div className="flex flex-col gap-3 p-4 rounded-xl bg-[#FEFCF9] border border-[#FAF7F2]">
             <h5 className="text-xs font-black text-[#2C3039] uppercase">Kiểm Tra Điều Kiện Hoàn Tiền</h5>
 
             {isLoading ? (

@@ -175,7 +175,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: St
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md animate-fadeIn">
-      <div className="bg-white rounded-3xl border border-[#E8E2D9] shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col gap-6 p-8">
+      <div className="bg-white rounded-3xl border border-[#FAF7F2] shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col gap-6 p-8">
         {/* Header */}
         <div className="flex items-center gap-4 border-b border-gray-100 pb-5">
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-black border border-emerald-100">
@@ -268,7 +268,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: St
                   <select
                     value={selectedCourseId || ""}
                     onChange={(e) => handleCourseChange(Number(e.target.value))}
-                    className="w-full p-3.5 rounded-2xl border-2 border-[#E8E2D9] bg-white text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] shadow-sm cursor-pointer"
+                    className="w-full p-3.5 rounded-2xl border-2 border-[#FAF7F2] bg-white text-xs font-bold text-[#2C3039] focus:outline-none focus:border-[#C0392B] shadow-sm cursor-pointer"
                   >
                     <option value="" disabled>-- Bắt buộc chọn khóa học để gắn bài kiểm tra --</option>
                     {courses.map((c) => (
@@ -310,11 +310,10 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: St
                     key={pos.key}
                     type="button"
                     onClick={() => handlePositionChange(pos.key as any)}
-                    className={`p-3.5 rounded-xl border text-xs font-extrabold flex flex-col items-center gap-1.5 transition-all cursor-pointer text-center ${
-                      position === pos.key
-                        ? "border-[#C0392B] bg-indigo-50 text-[#C0392B] shadow-xs ring-1 ring-[#C0392B]/30"
-                        : "border-[#E8E2D9] text-[#8A8478] hover:border-gray-300 bg-white"
-                    }`}
+                    className={`p-3.5 rounded-xl border text-xs font-extrabold flex flex-col items-center gap-1.5 transition-all cursor-pointer text-center ${position === pos.key
+                      ? "border-[#C0392B] bg-indigo-50 text-[#C0392B] shadow-xs ring-1 ring-[#C0392B]/30"
+                      : "border-[#FAF7F2] text-[#8A8478] hover:border-gray-300 bg-white"
+                      }`}
                   >
                     <span className="text-xl">{pos.icon}</span>
                     <span className="leading-tight">{pos.label}</span>

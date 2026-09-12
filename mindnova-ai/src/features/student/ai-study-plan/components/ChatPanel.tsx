@@ -303,11 +303,11 @@ export function ChatPanel({
 
   return (
     <div className="flex-1 flex flex-col w-full min-h-[700px] h-[calc(100vh-7.5rem)] bg-white rounded-2xl border border-[#F5F0E8] shadow-sm relative overflow-hidden transition-all duration-200">
-      
+
       {/* ─── Synchronized Chat Header ─── */}
       <header className="shrink-0 bg-white border-b border-[#F5F0E8] flex flex-wrap items-center justify-between px-6 py-4 gap-4 shadow-2xs">
         <div className="flex items-center gap-3.5">
-          <div className="relative w-11 h-11 rounded-xl bg-[#FAF7F2] text-[#C0392B] border border-[#E8E2D9] flex items-center justify-center font-bold shadow-2xs shrink-0">
+          <div className="relative w-11 h-11 rounded-xl bg-[#FAF7F2] text-[#C0392B] border border-[#FAF7F2] flex items-center justify-center font-bold shadow-2xs shrink-0">
             <Sparkles className="w-4 h-4 text-white" />
             <span className="absolute -top-1 -right-1 flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#27AE60] opacity-75" />
@@ -343,7 +343,7 @@ export function ChatPanel({
             <span></span>
             <span>Xóa lịch sử</span>
           </button>
-          <div className="flex items-center gap-2 bg-[#FAF7F2] px-3.5 py-1.5 rounded-xl border border-[#E8E2D9] text-xs font-semibold text-[#C0392B]">
+          <div className="flex items-center gap-2 bg-[#FAF7F2] px-3.5 py-1.5 rounded-xl border border-[#FAF7F2] text-xs font-semibold text-[#C0392B]">
             <Sparkles className="w-3.5 h-3.5" /><span>Gemini + OpenAI Neural Hub Ready</span>
           </div>
         </div>
@@ -384,26 +384,25 @@ export function ChatPanel({
                     renderFormattedText(msg.text)
                   )}
                 </div>
-                
+
                 {/* Micro-Interaction Action Button Bar */}
                 <div className="flex items-center flex-wrap gap-2 ml-1 mt-0.5">
                   <button
                     type="button"
                     onClick={() => handleCopy(msg.id, msg.text)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium text-[#8A8478] hover:text-[#C0392B] bg-[#FAF7F2] hover:bg-[#FAF7F2] border border-[#E8E2D9] transition-all cursor-pointer shadow-2xs"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium text-[#8A8478] hover:text-[#C0392B] bg-[#FAF7F2] hover:bg-[#FAF7F2] border border-[#FAF7F2] transition-all cursor-pointer shadow-2xs"
                   >
                     <span>{isCopied ? <Check size={12} /> : <Clipboard size={12} />}</span>
                     <span>{isCopied ? "Đã chép!" : "Sao chép"}</span>
                   </button>
-                  
+
                   <button
                     type="button"
                     onClick={() => togglePin(msg.id)}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer shadow-2xs border ${
-                      isPinned
-                        ? "bg-[#FAF7F2] text-[#8A8478] border-[#8A8478]/30"
-                        : "text-[#8A8478] hover:text-[#8A8478] bg-[#FAF7F2] hover:bg-[#FAF7F2] border-[#E8E2D9]"
-                    }`}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer shadow-2xs border ${isPinned
+                      ? "bg-[#FAF7F2] text-[#8A8478] border-[#8A8478]/30"
+                      : "text-[#8A8478] hover:text-[#8A8478] bg-[#FAF7F2] hover:bg-[#FAF7F2] border-[#FAF7F2]"
+                      }`}
                   >
                     <span><Star size={12} fill={isPinned ? "currentColor" : "none"} /></span>
                     <span>{isPinned ? "Đã lưu" : "Lưu chú thích"}</span>
@@ -424,7 +423,7 @@ export function ChatPanel({
           ) : (
             /* User Message */
             <div key={msg.id} className="flex items-start gap-3 max-w-[85%] sm:max-w-[75%] self-end flex-row-reverse group">
-              <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 mt-0.5 border border-[#E8E2D9] shadow-2xs">
+              <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 mt-0.5 border border-[#FAF7F2] shadow-2xs">
                 <Image
                   src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=250&auto=format&fit=crop"
                   width={36}
@@ -453,7 +452,7 @@ export function ChatPanel({
             <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-[#C0392B] to-[#C0392B] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm animate-pulse">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <div className="bg-white border border-[#E8E2D9] px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm flex flex-col gap-2 w-fit">
+            <div className="bg-white border border-[#FAF7F2] px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm flex flex-col gap-2 w-fit">
               <div className="flex items-center gap-2.5">
                 <span className="w-2 h-2 rounded-full bg-[#27AE60] animate-ping" />
                 <span className="text-xs font-semibold text-[#C0392B]">Nova đang tổng hợp câu trả lời cho bạn...</span>
@@ -486,7 +485,7 @@ export function ChatPanel({
                 type="button"
                 onClick={() => handleSend(prompt.query)}
                 disabled={isGenerating}
-                className="group relative text-left p-3.5 rounded-xl bg-white hover:bg-[#FAF7F2] disabled:opacity-50 border border-[#E8E2D9] hover:border-[#C0392B]/50 shadow-2xs hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 focus:outline-none cursor-pointer flex flex-col justify-between gap-2.5"
+                className="group relative text-left p-3.5 rounded-xl bg-white hover:bg-[#FAF7F2] disabled:opacity-50 border border-[#FAF7F2] hover:border-[#C0392B]/50 shadow-2xs hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 focus:outline-none cursor-pointer flex flex-col justify-between gap-2.5"
               >
                 <div className="flex items-center justify-between">
                   <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-lg border ${prompt.color}`}>
@@ -517,7 +516,7 @@ export function ChatPanel({
                 onKeyDown={handleKeyDown}
                 disabled={isGenerating}
                 placeholder={isGenerating ? "Nova đang tổng hợp câu trả lời cho bạn..." : "Hỏi Nova bất cứ điều gì về bài tập hay lộ trình học bối rối nhé..."}
-                className="w-full bg-[#FAF7F2] focus:bg-white disabled:bg-gray-100 border border-[#E8E2D9] focus:border-[#C0392B] rounded-xl pl-4 pr-24 py-2.5 text-xs sm:text-sm text-[#2C3039] placeholder:text-[#9092A8] shadow-inner focus:outline-none focus:ring-2 focus:ring-[#C0392B]/15 transition-all duration-200 font-medium"
+                className="w-full bg-[#FAF7F2] focus:bg-white disabled:bg-gray-100 border border-[#FAF7F2] focus:border-[#C0392B] rounded-xl pl-4 pr-24 py-2.5 text-xs sm:text-sm text-[#2C3039] placeholder:text-[#9092A8] shadow-inner focus:outline-none focus:ring-2 focus:ring-[#C0392B]/15 transition-all duration-200 font-medium"
               />
               <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-bold text-[#8A8478] hidden sm:block">
                 <span>Enter ↵</span>
@@ -546,7 +545,7 @@ export function ChatPanel({
               </button>
             )}
           </div>
-          
+
           <div className="flex items-center justify-center text-xs font-normal text-[#8A8478] pt-1">
             <span> <strong>Mẹo nhỏ:</strong> Bạn có thể dán công thức toán học, bài toán khó hoặc xin code ví dụ bằng Python/JavaScript trực tiếp.</span>
           </div>

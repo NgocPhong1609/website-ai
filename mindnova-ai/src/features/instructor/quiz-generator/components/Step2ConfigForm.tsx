@@ -31,7 +31,7 @@ export function Step2ConfigForm({
   const essayPercent = total > 0 ? Math.round((essay / total) * 100) : 0;
 
   return (
-    <div className="p-8 bg-white rounded-3xl border border-[#E8E2D9] shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-3xl border border-[#FAF7F2] shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
@@ -73,7 +73,7 @@ export function Step2ConfigForm({
               type="text"
               value={config.title}
               onChange={(e) => onChangeConfig({ title: e.target.value })}
-              className="w-full p-3.5 rounded-xl border border-[#E8E2D9] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
+              className="w-full p-3.5 rounded-xl border border-[#FAF7F2] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
               placeholder="VD: Kiểm tra Hệ nhị phân & Máy tính"
             />
           </div>
@@ -85,7 +85,7 @@ export function Step2ConfigForm({
                 type="text"
                 value={config.topic || ""}
                 onChange={(e) => onChangeConfig({ topic: e.target.value })}
-                className="w-full p-3.5 rounded-xl border border-[#E8E2D9] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
+                className="w-full p-3.5 rounded-xl border border-[#FAF7F2] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
                 placeholder="VD: Kiến thức bài học, HTML/CSS căn bản, React Hooks..."
               />
             </div>
@@ -97,7 +97,7 @@ export function Step2ConfigForm({
               value={config.description}
               onChange={(e) => onChangeConfig({ description: e.target.value })}
               rows={3}
-              className="w-full p-3.5 rounded-xl border border-[#E8E2D9] bg-[#FAF8FF] text-xs font-medium text-gray-800 focus:outline-none focus:border-[#C0392B]"
+              className="w-full p-3.5 rounded-xl border border-[#FAF7F2] bg-[#FAF8FF] text-xs font-medium text-gray-800 focus:outline-none focus:border-[#C0392B]"
               placeholder="Mô tả mục tiêu của bài kiểm tra..."
             />
           </div>
@@ -123,11 +123,10 @@ export function Step2ConfigForm({
                   key={diff.key}
                   type="button"
                   onClick={() => onChangeConfig({ difficulty: diff.key as DifficultyType })}
-                  className={`p-2.5 rounded-xl border text-xs font-extrabold flex flex-col items-center gap-1 transition-all ${
-                    config.difficulty === diff.key
-                      ? "border-[#C0392B] bg-indigo-50 text-[#C0392B] shadow-xs"
-                      : "border-[#E8E2D9] text-[#8A8478] hover:border-gray-300"
-                  }`}
+                  className={`p-2.5 rounded-xl border text-xs font-extrabold flex flex-col items-center gap-1 transition-all ${config.difficulty === diff.key
+                    ? "border-[#C0392B] bg-indigo-50 text-[#C0392B] shadow-xs"
+                    : "border-[#FAF7F2] text-[#8A8478] hover:border-gray-300"
+                    }`}
                 >
                   <span className="text-sm">{diff.icon}</span>
                   <span>{diff.label}</span>
@@ -145,7 +144,7 @@ export function Step2ConfigForm({
                 max={180}
                 value={config.time_limit_minutes}
                 onChange={(e) => onChangeConfig({ time_limit_minutes: parseInt(e.target.value) || 0 })}
-                className="w-full p-3 rounded-xl border border-[#E8E2D9] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
+                className="w-full p-3 rounded-xl border border-[#FAF7F2] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
               />
             </div>
             <div>
@@ -156,7 +155,7 @@ export function Step2ConfigForm({
                 max={100}
                 value={config.passing_score}
                 onChange={(e) => onChangeConfig({ passing_score: parseInt(e.target.value) || 70 })}
-                className="w-full p-3 rounded-xl border border-[#E8E2D9] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
+                className="w-full p-3 rounded-xl border border-[#FAF7F2] bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#C0392B]"
               />
             </div>
           </div>

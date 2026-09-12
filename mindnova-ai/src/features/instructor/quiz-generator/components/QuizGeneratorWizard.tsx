@@ -58,7 +58,7 @@ export function QuizGeneratorWizard({
     <div className={`max-w-5xl mx-auto flex flex-col gap-6 ${embeddedMode ? "p-2" : "p-4 md:p-8"}`}>
       {/* Wizard Header Progress Bar */}
       {!embeddedMode && (
-        <div className="bg-white rounded-3xl p-6 border border-[#E8E2D9] shadow-sm flex flex-col gap-4">
+        <div className="bg-white rounded-3xl p-6 border border-[#FAF7F2] shadow-sm flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-[#C0392B] text-white flex items-center justify-center text-xl font-bold shadow-md">
@@ -92,18 +92,16 @@ export function QuizGeneratorWizard({
               return (
                 <div key={s.num} className="flex flex-col gap-1">
                   <div
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      isActive
-                        ? "bg-[#C0392B]"
-                        : isDone
+                    className={`h-1.5 rounded-full transition-all duration-300 ${isActive
+                      ? "bg-[#C0392B]"
+                      : isDone
                         ? "bg-[#2C3039]"
                         : "bg-gray-200"
-                    }`}
+                      }`}
                   />
                   <span
-                    className={`text-[10px] font-extrabold truncate ${
-                      isActive ? "text-[#C0392B]" : isDone ? "text-[#2C3039]" : "text-gray-400"
-                    }`}
+                    className={`text-[10px] font-extrabold truncate ${isActive ? "text-[#C0392B]" : isDone ? "text-[#2C3039]" : "text-gray-400"
+                      }`}
                   >
                     {s.num}. {s.name}
                   </span>

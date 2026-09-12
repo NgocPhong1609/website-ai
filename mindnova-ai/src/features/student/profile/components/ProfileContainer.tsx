@@ -43,15 +43,15 @@ export default function ProfileContainer() {
 
   return (
     <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-8">
-      
+
       {/* ─── Synchronized Universal Hero Banner matching /courses & /study-plan ─── */}
-      <section className="relative overflow-hidden rounded-2xl bg-[#FEFCF9] border border-[#E8E2D9] p-6 sm:p-7 transition-all duration-300 w-full">
+      <section className="relative overflow-hidden rounded-2xl bg-[#FEFCF9] border border-[#FAF7F2] p-6 sm:p-7 transition-all duration-300 w-full">
         <div className="absolute -top-16 -right-16 w-60 h-60 rounded-full bg-[#C0392B]/5 blur-3xl pointer-events-none animate-pulse" />
-        <div className="absolute -bottom-16 -left-16 w-60 h-60 rounded-full bg-[#E8E2D9]/50 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-60 h-60 rounded-full bg-[#FAF7F2]/50 blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 w-full">
           <div className="space-y-3 max-w-xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#E8E2D9] text-xs font-semibold text-[#8A8478] shadow-sm">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#FAF7F2] text-xs font-semibold text-[#8A8478] shadow-sm">
               <span className="w-2 h-2 rounded-full bg-[#27AE60] animate-ping" />
               <span className="w-2 h-2 rounded-full bg-[#27AE60] absolute" />
               Hồ sơ Học viên • Xác thực hợp lệ
@@ -67,7 +67,7 @@ export default function ProfileContainer() {
           </div>
 
           {/* Universal Wide Mastery Card matching /study-plan & /courses */}
-          <div className="group shrink-0 bg-white rounded-2xl p-5 border border-[#E8E2D9] flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm hover:border-[#C0392B]/30 hover:-translate-y-0.5 transition-all duration-300">
+          <div className="group shrink-0 bg-white rounded-2xl p-5 border border-[#FAF7F2] flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm hover:border-[#C0392B]/30 hover:-translate-y-0.5 transition-all duration-300">
             <div className="w-full flex items-center justify-between gap-4 mb-2">
               <span className="text-xs font-semibold text-[#8A8478] group-hover:text-[#2C3039] transition-colors">Độ hoàn thiện hồ sơ ↗</span>
               <span className="text-[11px] font-bold text-[#27AE60] bg-[#E8F8F0] px-2.5 py-0.5 rounded-full border border-[#27AE60]/20">
@@ -85,7 +85,7 @@ export default function ProfileContainer() {
               </span>
             </div>
 
-            <div className="w-full h-2 bg-[#F5F0E8] rounded-full mt-2 overflow-hidden p-0.5 border border-[#E8E2D9]">
+            <div className="w-full h-2 bg-[#F5F0E8] rounded-full mt-2 overflow-hidden p-0.5 border border-[#FAF7F2]">
               <div
                 className="h-full bg-[#C0392B] rounded-full transition-all duration-1000"
                 style={{ width: `${profile.completionPercent}%` }}
@@ -93,7 +93,7 @@ export default function ProfileContainer() {
             </div>
 
             <p className="text-xs font-semibold text-[#8A8478] mt-3 flex items-center justify-between gap-4">
-              <span className="flex items-center gap-1.5"><Flame size={14} className="text-[#C0392B]"/> Hồ sơ đang được xác minh đầy đủ!</span>
+              <span className="flex items-center gap-1.5"><Flame size={14} className="text-[#C0392B]" /> Hồ sơ đang được xác minh đầy đủ!</span>
               <span className="text-[#2C3039] font-bold cursor-pointer hover:underline flex items-center gap-1">Cập nhật ngay <ArrowRight size={14} /></span>
             </p>
           </div>

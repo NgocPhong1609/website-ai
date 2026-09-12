@@ -27,12 +27,12 @@ import { useCreateCourseStore } from "../stores/createCourseStore";
 function GripIcon({ size = 16 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="9" cy="12" r="1"/>
-      <circle cx="9" cy="5" r="1"/>
-      <circle cx="9" cy="19" r="1"/>
-      <circle cx="15" cy="12" r="1"/>
-      <circle cx="15" cy="5" r="1"/>
-      <circle cx="15" cy="19" r="1"/>
+      <circle cx="9" cy="12" r="1" />
+      <circle cx="9" cy="5" r="1" />
+      <circle cx="9" cy="19" r="1" />
+      <circle cx="15" cy="12" r="1" />
+      <circle cx="15" cy="5" r="1" />
+      <circle cx="15" cy="19" r="1" />
     </svg>
   );
 }
@@ -40,8 +40,8 @@ function GripIcon({ size = 16 }: { size?: number }) {
 function VideoIcon({ size = 16 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="23 7 16 12 23 17 23 7"/>
-      <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+      <polygon points="23 7 16 12 23 17 23 7" />
+      <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
     </svg>
   );
 }
@@ -49,10 +49,10 @@ function VideoIcon({ size = 16 }: { size?: number }) {
 function QuizIcon({ size = 16 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-      <polyline points="14 2 14 8 20 8"/>
-      <line x1="9" y1="13" x2="15" y2="13"/>
-      <line x1="9" y1="17" x2="13" y2="17"/>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="9" y1="13" x2="15" y2="13" />
+      <line x1="9" y1="17" x2="13" y2="17" />
     </svg>
   );
 }
@@ -60,8 +60,8 @@ function QuizIcon({ size = 16 }: { size?: number }) {
 function DocIcon({ size = 16 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-      <polyline points="14 2 14 8 20 8"/>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
     </svg>
   );
 }
@@ -69,8 +69,8 @@ function DocIcon({ size = 16 }: { size?: number }) {
 function PlusIcon({ size = 14 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" y1="5" x2="12" y2="19"/>
-      <line x1="5" y1="12" x2="19" y2="12"/>
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
   );
 }
@@ -78,8 +78,8 @@ function PlusIcon({ size = 14 }: { size?: number }) {
 function TrashIcon({ size = 14 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="3 6 5 6 21 6"/>
-      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
     </svg>
   );
 }
@@ -143,10 +143,10 @@ function LessonRow({
         lesson.status === "draft"
           ? "border-amber-200 bg-amber-50/20 hover:bg-amber-50/50"
           : isQuiz
-          ? "border-emerald-200 bg-emerald-50/20 hover:bg-emerald-50/50"
-          : isVideo
-          ? "border-indigo-200 bg-indigo-50/20 hover:bg-indigo-50/50"
-          : "border-amber-200 bg-amber-50/20 hover:bg-amber-50/50"
+            ? "border-emerald-200 bg-emerald-50/20 hover:bg-emerald-50/50"
+            : isVideo
+              ? "border-indigo-200 bg-indigo-50/20 hover:bg-indigo-50/50"
+              : "border-amber-200 bg-amber-50/20 hover:bg-amber-50/50"
       )}
     >
       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -180,8 +180,8 @@ function LessonRow({
               isQuiz
                 ? "bg-emerald-100 text-emerald-800 border-emerald-200"
                 : isVideo
-                ? "bg-indigo-100 text-indigo-800 border-indigo-200"
-                : "bg-amber-100 text-amber-800 border-amber-200"
+                  ? "bg-indigo-100 text-indigo-800 border-indigo-200"
+                  : "bg-amber-100 text-amber-800 border-amber-200"
             )}>
               {isQuiz ? "📝 Bài thi Trắc nghiệm / AI Quiz" : isVideo ? "🎥 Video" : "📄 Tài liệu"}
             </span>
@@ -223,8 +223,8 @@ function LessonRow({
               isQuiz
                 ? "text-emerald-800 bg-emerald-100 hover:bg-emerald-200 border-emerald-300"
                 : isVideo
-                ? "text-indigo-800 bg-indigo-100 hover:bg-indigo-200 border-indigo-300"
-                : "text-amber-800 bg-amber-100 hover:bg-amber-200 border-amber-300"
+                  ? "text-indigo-800 bg-indigo-100 hover:bg-indigo-200 border-indigo-300"
+                  : "text-amber-800 bg-amber-100 hover:bg-amber-200 border-amber-300"
             )}
             title="Xem & Chỉnh sửa chi tiết"
           >
@@ -322,7 +322,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
     position?: "capability_assessment" | "end_of_course";
   }>({ isOpen: false });
   const [manualQuizModal, setManualQuizModal] = useState<{ isOpen: boolean; moduleId?: string }>({ isOpen: false });
-  
+
   // Select Quiz Popup Modal State for Course-Level Quizzes
   const [selectQuizModal, setSelectQuizModal] = useState<{
     isOpen: boolean;
@@ -960,7 +960,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
               const isCollapsed = Boolean(collapsedModules[chap.id]);
 
               return (
-                <div key={chap.id} className="p-5 rounded-2xl bg-white border border-[#E8E2D9] shadow-2xs flex flex-col gap-4">
+                <div key={chap.id} className="p-5 rounded-2xl bg-white border border-[#FAF7F2] shadow-2xs flex flex-col gap-4">
                   {/* Chapter Header */}
                   <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-100 pb-3.5 gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -1047,7 +1047,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
 
                   {/* Lessons & Quizzes List in Chapter (Hidden when Collapsed) */}
                   {!isCollapsed && (
-                    <div className="flex flex-col gap-2.5 min-h-[50px] rounded-xl p-2 bg-[#FEFCF9]/70 border border-[#E8E2D9]">
+                    <div className="flex flex-col gap-2.5 min-h-[50px] rounded-xl p-2 bg-[#FEFCF9]/70 border border-[#FAF7F2]">
                       {chap.lessons.length === 0 ? (
                         <NoData
                           title="Chưa có bài giảng hoặc bài thi"

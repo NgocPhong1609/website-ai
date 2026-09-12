@@ -54,7 +54,7 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
   return (
     <div className="mb-8">
       {/* ─── Editorial Hero Banner ─── */}
-      <section className="relative overflow-hidden rounded-2xl bg-[#FEFCF9] border border-[#E8E2D9] p-6 sm:p-8 transition-all duration-300">
+      <section className="relative overflow-hidden rounded-2xl bg-[#FEFCF9] border border-[#FAF7F2] p-6 sm:p-8 transition-all duration-300">
         <div className="relative z-10 flex flex-col gap-6">
           {/* Breadcrumb & Pill tag */}
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -63,16 +63,16 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
                 Khóa học của tôi
               </Link>
               <span className="text-[#B8B0A3]">/</span>
-              <span className="text-[#C0392B] font-semibold bg-[#FAF7F2] px-2.5 py-0.5 rounded-full border border-[#E8E2D9]">
+              <span className="text-[#C0392B] font-semibold bg-[#FAF7F2] px-2.5 py-0.5 rounded-full border border-[#FAF7F2]">
                 Chi tiết học phần
               </span>
             </nav>
 
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold text-[#2C3039] bg-white px-2.5 py-1 rounded-full border border-[#E8E2D9]">
+              <span className="text-[11px] font-semibold text-[#2C3039] bg-white px-2.5 py-1 rounded-full border border-[#FAF7F2]">
                 {categoryTag}
               </span>
-              <span className="text-[11px] font-semibold text-[#8A8478] bg-[#F5F0E8] px-2.5 py-1 rounded-full border border-[#E8E2D9]">
+              <span className="text-[11px] font-semibold text-[#8A8478] bg-[#F5F0E8] px-2.5 py-1 rounded-full border border-[#FAF7F2]">
                 Level: {level}
               </span>
             </div>
@@ -89,20 +89,20 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
           </div>
 
           {/* Metadata Badges Row */}
-          <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-[#8A8478] pt-2 border-t border-[#E8E2D9]">
-            <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-[#E8E2D9]">
+          <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-[#8A8478] pt-2 border-t border-[#FAF7F2]">
+            <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-[#FAF7F2]">
               <span className="font-semibold text-[#8A8478]">Thời lượng:</span>
               <span>{durationText}</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-[#E8E2D9]">
+            <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-[#FAF7F2]">
               <span className="font-semibold text-[#8A8478]">Học viên:</span>
               <span>{studentsText}</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-[#E8E2D9]">
+            <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-[#FAF7F2]">
               <span className="font-semibold text-[#8A8478]">Đánh giá:</span>
               <span className="text-[#C0392B] font-bold">{ratingText}</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-[#E8E2D9] text-[#2C3039] font-bold">
+            <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-[#FAF7F2] text-[#2C3039] font-bold">
               <span>Chứng nhận kỹ năng AI MindNova</span>
             </span>
           </div>
@@ -126,11 +126,10 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
                 <button
                   type="button"
                   onClick={handleSaveToggle}
-                  className={`flex items-center justify-center px-4 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                    isSaved
-                      ? "bg-[#2C3039] border-[#2C3039] text-white"
-                      : "bg-white border-[#E8E2D9] text-[#2C3039] hover:bg-[#F5F0E8]"
-                  }`}
+                  className={`flex items-center justify-center px-4 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${isSaved
+                    ? "bg-[#2C3039] border-[#2C3039] text-white"
+                    : "bg-white border-[#FAF7F2] text-[#2C3039] hover:bg-[#F5F0E8]"
+                    }`}
                 >
                   <span>{isSaved ? "Đã lưu vào danh mục" : "Lưu khóa học"}</span>
                 </button>
@@ -161,11 +160,10 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
                 <button
                   type="button"
                   onClick={handleSaveToggle}
-                  className={`flex items-center justify-center px-4 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                    isSaved
-                      ? "bg-[#2C3039] border-[#2C3039] text-white"
-                      : "bg-white border-[#E8E2D9] text-[#2C3039] hover:bg-[#F5F0E8]"
-                  }`}
+                  className={`flex items-center justify-center px-4 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${isSaved
+                    ? "bg-[#2C3039] border-[#2C3039] text-white"
+                    : "bg-white border-[#FAF7F2] text-[#2C3039] hover:bg-[#F5F0E8]"
+                    }`}
                 >
                   <span>{isSaved ? "Đã lưu vào danh mục" : "Lưu khóa học"}</span>
                 </button>

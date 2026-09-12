@@ -23,18 +23,18 @@ export function ProgressContent() {
     return (
       <div className="p-6 md:p-12 max-w-[1400px] mx-auto min-h-[60vh] flex flex-col items-center justify-center text-center gap-3">
         <div className="w-16 h-16 rounded-2xl bg-[#FEF2F2] text-[#C0392B] flex items-center justify-center text-2xl mb-1 shadow-sm border border-[#FCA5A5]/40">
-          
+
         </div>
         <h3 className="text-lg font-bold text-[#2C3039]">Không thể tải dữ liệu tiến trình học tập</h3>
         <p className="text-xs text-[#8A8478] max-w-md leading-relaxed">
           Đã có trở ngại khi kết nối tới máy chủ AI MindNova. Vui lòng kiểm tra lại đường truyền mạng hoặc khởi tạo lại phiên kết nối.
         </p>
-        <button 
+        <button
           type="button"
-          onClick={() => refetch()} 
+          onClick={() => refetch()}
           className="mt-2 px-6 py-2.5 bg-[#C0392B] text-white text-xs font-semibold rounded-xl hover:bg-[#C0392B] transition-all cursor-pointer shadow-sm"
         >
-           Thử tải lại ngay
+          Thử tải lại ngay
         </button>
       </div>
     );
@@ -100,7 +100,7 @@ export function ProgressContent() {
               </span>
             </div>
 
-            <div className="w-full h-2 bg-[#F4F4FA] rounded-full mt-2.5 overflow-hidden p-0.5 border border-[#E8E2D9]/80">
+            <div className="w-full h-2 bg-[#F4F4FA] rounded-full mt-2.5 overflow-hidden p-0.5 border border-[#FAF7F2]/80">
               <div
                 className="h-full bg-gradient-to-r from-[#C0392B] via-[#C0392B] to-[#27AE60] rounded-full shadow-[0_0_8px_rgba(192,57,43,0.4)] transition-all duration-1000 group-hover:brightness-110"
                 style={{ width: `${overview_card.completion_percentage || 65}%` }}
@@ -108,7 +108,7 @@ export function ProgressContent() {
             </div>
 
             <p className="text-xs font-medium text-[#C0392B] mt-3 flex items-center justify-between">
-              <span className="flex items-center gap-1.5"><Flame size={14} className="text-[#C0392B]"/> Tiếp tục phát huy nhé!</span>
+              <span className="flex items-center gap-1.5"><Flame size={14} className="text-[#C0392B]" /> Tiếp tục phát huy nhé!</span>
               <span className="text-[#C0392B] font-semibold flex items-center gap-1">{overview_card.next_module_label || "Module 2"} <ArrowRight size={14} /></span>
             </p>
           </div>
@@ -117,10 +117,10 @@ export function ProgressContent() {
 
       {/* ─── 3 Key Metrics Row (Dynamic Real API Data) ─── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
+
         {/* Card 1: Study Time */}
-        <div className="bg-white border border-[#E8E2D9] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-5 group hover:border-[#C0392B]/40">
-          
+        <div className="bg-white border border-[#FAF7F2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-5 group hover:border-[#C0392B]/40">
+
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium text-[#8A8478] mb-1">Tổng thời gian học</p>
             <div className="flex items-baseline justify-between flex-wrap gap-1">
@@ -135,8 +135,8 @@ export function ProgressContent() {
         </div>
 
         {/* Card 2: Quiz Average */}
-        <div className="bg-white border border-[#E8E2D9] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-5 group hover:border-[#C0392B]/40">
-          
+        <div className="bg-white border border-[#FAF7F2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-5 group hover:border-[#C0392B]/40">
+
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium text-[#8A8478] mb-1">Điểm trung bình Quiz</p>
             <div className="flex items-baseline justify-between flex-wrap gap-1">
@@ -151,8 +151,8 @@ export function ProgressContent() {
         </div>
 
         {/* Card 3: Skills Mastered */}
-        <div className="bg-white border border-[#E8E2D9] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-5 group hover:border-[#C0392B]/40">
-          
+        <div className="bg-white border border-[#FAF7F2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-5 group hover:border-[#C0392B]/40">
+
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium text-[#8A8478] mb-1">Kỹ năng thành thạo</p>
             <div className="flex items-baseline justify-between flex-wrap gap-1">
@@ -170,16 +170,16 @@ export function ProgressContent() {
 
       {/* ─── Main Roadmap & AI Co-Pilot Analytics Workspace ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
+
         {/* Left Area: Visual Roadmap (8 cols) */}
         <div className="lg:col-span-8 flex flex-col gap-6 w-full min-w-0">
-          
-          <div className="bg-white rounded-2xl p-7 shadow-sm border border-[#E8E2D9] transition-all duration-300 hover:shadow-md flex flex-col gap-6">
-            
+
+          <div className="bg-white rounded-2xl p-7 shadow-sm border border-[#FAF7F2] transition-all duration-300 hover:shadow-md flex flex-col gap-6">
+
             {/* Roadmap Header with Interactive Tabs */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E8E2D9] pb-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#FAF7F2] pb-5">
               <div className="flex items-center gap-3">
-                
+
                 <div>
                   <h2 className="text-base sm:text-lg font-bold text-[#2C3039]">Bản đồ lộ trình học tập (Roadmap)</h2>
                   <p className="text-xs font-normal text-[#8A8478]">Cấu trúc chương trình học AI theo từng tầng năng lực chuyên sâu</p>
@@ -187,26 +187,24 @@ export function ProgressContent() {
               </div>
 
               {/* Interactive Segment Toggle */}
-              <div className="flex items-center bg-[#F8FAFC] border border-[#E8E2D9] p-1 rounded-xl shadow-2xs">
+              <div className="flex items-center bg-[#F8FAFC] border border-[#FAF7F2] p-1 rounded-xl shadow-2xs">
                 <button
                   type="button"
                   onClick={() => setViewMode("linear")}
-                  className={`px-4 py-1.5 rounded-lg text-xs transition-all duration-200 cursor-pointer ${
-                    viewMode === "linear"
-                      ? "bg-gradient-to-r from-[#C0392B] to-[#C0392B] text-white shadow-sm font-semibold"
-                      : "text-[#8A8478] hover:text-[#2C3039] font-normal"
-                  }`}
+                  className={`px-4 py-1.5 rounded-lg text-xs transition-all duration-200 cursor-pointer ${viewMode === "linear"
+                    ? "bg-gradient-to-r from-[#C0392B] to-[#C0392B] text-white shadow-sm font-semibold"
+                    : "text-[#8A8478] hover:text-[#2C3039] font-normal"
+                    }`}
                 >
                   Tuyến tính
                 </button>
                 <button
                   type="button"
                   onClick={() => setViewMode("module")}
-                  className={`px-4 py-1.5 rounded-lg text-xs transition-all duration-200 cursor-pointer ${
-                    viewMode === "module"
-                      ? "bg-gradient-to-r from-[#C0392B] to-[#C0392B] text-white shadow-sm font-semibold"
-                      : "text-[#8A8478] hover:text-[#2C3039] font-normal"
-                  }`}
+                  className={`px-4 py-1.5 rounded-lg text-xs transition-all duration-200 cursor-pointer ${viewMode === "module"
+                    ? "bg-gradient-to-r from-[#C0392B] to-[#C0392B] text-white shadow-sm font-semibold"
+                    : "text-[#8A8478] hover:text-[#2C3039] font-normal"
+                    }`}
                 >
                   Theo Mô-đun
                 </button>
@@ -228,9 +226,9 @@ export function ProgressContent() {
                     if (isCompleted) {
                       return (
                         <div key={mod.id || i} className="relative flex items-start gap-5 group">
-                          
-                          
-                          <div className="flex-1 bg-[#FAF7F2] border border-[#E8E2D9] rounded-xl p-4 sm:p-5 hover:border-[#C0392B]/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+
+                          <div className="flex-1 bg-[#FAF7F2] border border-[#FAF7F2] rounded-xl p-4 sm:p-5 hover:border-[#C0392B]/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
                                 <span className="text-[11px] font-semibold text-[#C0392B] bg-[#FAF7F2] px-2 py-0.5 rounded-md">{mod.module_number}</span>
@@ -241,7 +239,7 @@ export function ProgressContent() {
                             </div>
 
                             <Link href={mod.action_link || "/courses"} className="shrink-0 text-decoration-none">
-                              <button type="button" className="px-4 py-2 rounded-lg bg-white border border-[#E8E2D9] hover:bg-[#FAF7F2] hover:border-[#C0392B]/30 text-[#C0392B] font-semibold text-xs transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                              <button type="button" className="px-4 py-2 rounded-lg bg-white border border-[#FAF7F2] hover:bg-[#FAF7F2] hover:border-[#C0392B]/30 text-[#C0392B] font-semibold text-xs transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
                                 <span>{mod.action_text || " Ôn tập lại"}</span>
                               </button>
                             </Link>
@@ -278,14 +276,14 @@ export function ProgressContent() {
                             </div>
 
                             {/* Progress Bar inside Active Card */}
-                            <div className="space-y-1 pt-3 border-t border-[#E8E2D9]/80">
+                            <div className="space-y-1 pt-3 border-t border-[#FAF7F2]/80">
                               <div className="flex items-center justify-between text-xs font-medium">
                                 <span className="text-[#8A8478]">Tiến trình Module</span>
                                 <span className="text-[#C0392B] font-semibold">{mod.progress_text || `${mod.progress_percentage || 35}% Hoàn thành (3 / 8 Bài)`}</span>
                               </div>
-                              <div className="w-full h-2 bg-[#E8E2D9] rounded-full overflow-hidden p-0.5 border border-[#E8E2D9]">
-                                <div 
-                                  className="h-full bg-gradient-to-r from-[#C0392B] to-[#C0392B] rounded-full shadow-xs transition-all duration-1000" 
+                              <div className="w-full h-2 bg-[#FAF7F2] rounded-full overflow-hidden p-0.5 border border-[#FAF7F2]">
+                                <div
+                                  className="h-full bg-gradient-to-r from-[#C0392B] to-[#C0392B] rounded-full shadow-xs transition-all duration-1000"
                                   style={{ width: `${mod.progress_percentage || 35}%` }}
                                 />
                               </div>
@@ -298,19 +296,19 @@ export function ProgressContent() {
                     // Locked fallback
                     return (
                       <div key={mod.id || i} className="relative flex items-start gap-5 opacity-75 hover:opacity-100 transition-opacity">
-                        
 
-                        <div className="flex-1 bg-white border border-[#E8E2D9] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+                        <div className="flex-1 bg-white border border-[#FAF7F2] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-[11px] font-semibold text-[#8A8478] bg-[#E8E2D9] px-2 py-0.5 rounded-md">{mod.module_number}</span>
+                              <span className="text-[11px] font-semibold text-[#8A8478] bg-[#FAF7F2] px-2 py-0.5 rounded-md">{mod.module_number}</span>
                               <span className="text-xs font-normal text-[#8A8478]">{mod.lesson_count_text}</span>
                             </div>
                             <h3 className="text-sm sm:text-base font-semibold text-[#2C3039]">{mod.title}</h3>
                             <p className="text-xs font-normal text-[#8A8478] leading-relaxed">{mod.subtitle}</p>
                           </div>
 
-                          <span className="shrink-0 px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#8A8478] font-medium text-xs border border-[#E8E2D9] flex items-center gap-1.5">
+                          <span className="shrink-0 px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#8A8478] font-medium text-xs border border-[#FAF7F2] flex items-center gap-1.5">
                             <span className="flex items-center gap-1.5"><Lock size={14} /> {mod.action_text || "Cần hoàn tất Module trước"}</span>
                           </span>
                         </div>
@@ -327,7 +325,7 @@ export function ProgressContent() {
 
                   if (isCompleted) {
                     return (
-                      <div key={mod.id || i} className="bg-[#FAF7F2] border border-[#E8E2D9] rounded-2xl p-5 hover:border-[#C0392B]/30 transition-all flex flex-col justify-between gap-4 group shadow-sm">
+                      <div key={mod.id || i} className="bg-[#FAF7F2] border border-[#FAF7F2] rounded-2xl p-5 hover:border-[#C0392B]/30 transition-all flex flex-col justify-between gap-4 group shadow-sm">
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
                             <span className="text-[11px] font-semibold text-[#C0392B] bg-[#FAF7F2] px-2 py-0.5 rounded-md">{mod.module_number}</span>
@@ -336,10 +334,10 @@ export function ProgressContent() {
                           <h3 className="text-sm font-semibold text-[#2C3039] line-clamp-2">{mod.title}</h3>
                           <p className="text-xs font-normal text-[#8A8478] line-clamp-2 leading-relaxed">{mod.subtitle}</p>
                         </div>
-                        <div className="pt-3 border-t border-[#E8E2D9]/60 flex items-center justify-between">
-                          
+                        <div className="pt-3 border-t border-[#FAF7F2]/60 flex items-center justify-between">
+
                           <Link href={mod.action_link || "/courses"} className="text-decoration-none">
-                            <button type="button" className="px-3 py-1.5 rounded-lg bg-white border border-[#E8E2D9] hover:bg-[#FAF7F2] hover:border-[#C0392B]/30 text-[#C0392B] font-semibold text-xs transition-all shadow-2xs cursor-pointer">
+                            <button type="button" className="px-3 py-1.5 rounded-lg bg-white border border-[#FAF7F2] hover:bg-[#FAF7F2] hover:border-[#C0392B]/30 text-[#C0392B] font-semibold text-xs transition-all shadow-2xs cursor-pointer">
                               {mod.action_text || " Ôn tập"}
                             </button>
                           </Link>
@@ -360,16 +358,16 @@ export function ProgressContent() {
                           <h3 className="text-sm font-bold text-[#2C3039] line-clamp-2">{mod.title}</h3>
                           <p className="text-xs font-normal text-[#8A8478] line-clamp-2 leading-relaxed">{mod.subtitle}</p>
                         </div>
-                        
+
                         <div className="space-y-3 relative z-10">
                           <div className="space-y-1">
                             <div className="flex items-center justify-between text-[10px] font-medium">
                               <span className="text-[#8A8478]">Tiến trình</span>
                               <span className="text-[#C0392B] font-semibold">{mod.progress_text || `${mod.progress_percentage || 35}%`}</span>
                             </div>
-                            <div className="w-full h-1.5 bg-[#E8E2D9] rounded-full overflow-hidden border border-[#E8E2D9]/50">
-                              <div 
-                                className="h-full bg-gradient-to-r from-[#C0392B] to-[#C0392B] rounded-full" 
+                            <div className="w-full h-1.5 bg-[#FAF7F2] rounded-full overflow-hidden border border-[#FAF7F2]/50">
+                              <div
+                                className="h-full bg-gradient-to-r from-[#C0392B] to-[#C0392B] rounded-full"
                                 style={{ width: `${mod.progress_percentage || 35}%` }}
                               />
                             </div>
@@ -386,17 +384,17 @@ export function ProgressContent() {
 
                   // Locked fallback
                   return (
-                    <div key={mod.id || i} className="bg-white border border-[#E8E2D9] rounded-2xl p-5 opacity-75 hover:opacity-100 transition-opacity flex flex-col justify-between gap-4 shadow-sm">
+                    <div key={mod.id || i} className="bg-white border border-[#FAF7F2] rounded-2xl p-5 opacity-75 hover:opacity-100 transition-opacity flex flex-col justify-between gap-4 shadow-sm">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-semibold text-[#8A8478] bg-[#E8E2D9] px-2 py-0.5 rounded-md">{mod.module_number}</span>
+                          <span className="text-[11px] font-semibold text-[#8A8478] bg-[#FAF7F2] px-2 py-0.5 rounded-md">{mod.module_number}</span>
                           <span className="text-[10px] font-normal text-[#8A8478]">{mod.lesson_count_text}</span>
                         </div>
                         <h3 className="text-sm font-semibold text-[#2C3039] line-clamp-2">{mod.title}</h3>
                         <p className="text-xs font-normal text-[#8A8478] line-clamp-2 leading-relaxed">{mod.subtitle}</p>
                       </div>
-                      <div className="pt-3 border-t border-[#E8E2D9]/60">
-                        <span className="flex items-center justify-center gap-1.5 w-full px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#8A8478] font-medium text-[11px] border border-[#E8E2D9]">
+                      <div className="pt-3 border-t border-[#FAF7F2]/60">
+                        <span className="flex items-center justify-center gap-1.5 w-full px-3 py-1.5 rounded-lg bg-[#F8FAFC] text-[#8A8478] font-medium text-[11px] border border-[#FAF7F2]">
                           {mod.action_text || <><Lock size={12} /> Cần hoàn tất Module trước</>}
                         </span>
                       </div>
@@ -412,11 +410,11 @@ export function ProgressContent() {
 
         {/* Right Area: Nova AI Insights & Performance (4 cols) */}
         <div className="lg:col-span-4 flex flex-col gap-6 w-full">
-          
+
           {/* Nova's AI Analytics & Recommendations Card */}
           <div className="bg-gradient-to-br from-white via-[#F5F0E8] to-[#FAF7F2]/70 rounded-2xl p-6 border border-[#C0392B]/25 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col gap-5">
-            
-            <div className="flex items-center justify-between border-b border-[#E8E2D9] pb-4">
+
+            <div className="flex items-center justify-between border-b border-[#FAF7F2] pb-4">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C0392B] to-[#C0392B] text-white flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(192,57,43,0.3)]">
                   <SparklesIcon className="w-5 h-5 animate-spin-slow" />
@@ -431,7 +429,7 @@ export function ProgressContent() {
 
             {/* AI Recommendations Mapping */}
             {ai_insights?.recommendations?.map((rec) => (
-              <div key={rec.id} className="bg-white p-4 rounded-xl border border-[#E8E2D9] shadow-2xs space-y-2 hover:border-[#C0392B]/40 transition-colors">
+              <div key={rec.id} className="bg-white p-4 rounded-xl border border-[#FAF7F2] shadow-2xs space-y-2 hover:border-[#C0392B]/40 transition-colors">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-semibold text-[#C0392B] flex items-center gap-1.5">
                     <span>{rec.title}</span>
@@ -451,16 +449,16 @@ export function ProgressContent() {
               </div>
             ))}
 
-            <hr className="border-[#E8E2D9]" />
+            <hr className="border-[#FAF7F2]" />
 
             {/* Performance Stats List */}
             <div className="space-y-3">
               <h4 className="text-xs font-bold text-[#2C3039] tracking-wide">
-                 Bảng vàng thành tích cá nhân
+                Bảng vàng thành tích cá nhân
               </h4>
 
               {ai_insights?.performance_stats?.map((stat, i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white border border-[#E8E2D9]/80">
+                <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white border border-[#FAF7F2]/80">
                   <div className="flex items-center gap-2.5">
                     <span className="text-base">{stat.icon || "⭐"}</span>
                     <span className="text-xs font-medium text-[#2C3039]">{stat.label}</span>
@@ -475,8 +473,8 @@ export function ProgressContent() {
           </div>
 
           {/* Supportive Help Card */}
-          <div className="bg-white rounded-2xl p-5 border border-[#E8E2D9] shadow-2xs flex items-center gap-4 hover:border-[#C0392B]/30 transition-colors">
-            <div className="w-11 h-11 rounded-xl bg-[#F8FAFC] text-[#C0392B] flex items-center justify-center shrink-0 border border-[#E8E2D9]">
+          <div className="bg-white rounded-2xl p-5 border border-[#FAF7F2] shadow-2xs flex items-center gap-4 hover:border-[#C0392B]/30 transition-colors">
+            <div className="w-11 h-11 rounded-xl bg-[#F8FAFC] text-[#C0392B] flex items-center justify-center shrink-0 border border-[#FAF7F2]">
               <MessageCircle size={20} />
             </div>
             <div className="flex-1 min-w-0">

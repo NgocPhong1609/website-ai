@@ -41,11 +41,11 @@ export function ManualQuizEditor({
 
   // We reuse the components that expect these props, but for manual mode, approve/regenerate don't make sense,
   // so we pass dummy functions
-  const dummyApprove = (id: string) => {};
-  const dummyRegenerate = (id: string) => {};
+  const dummyApprove = (id: string) => { };
+  const dummyRegenerate = (id: string) => { };
 
   return (
-    <div className="p-8 bg-white rounded-3xl border border-[#E8E2D9] shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-3xl border border-[#FAF7F2] shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-5">
         <div>
@@ -67,11 +67,10 @@ export function ManualQuizEditor({
             <span className="font-extrabold text-sm">{questions.length}</span>
           </div>
           <div
-            className={`px-3 py-2 rounded-2xl border flex items-center gap-2 text-xs font-bold ${
-              isValidTotal
-                ? "bg-emerald-50 -[#FAF7F2] -[#2C3039]"
-                : "bg-amber-50 border-amber-200 text-amber-800"
-            }`}
+            className={`px-3 py-2 rounded-2xl border flex items-center gap-2 text-xs font-bold ${isValidTotal
+              ? "bg-emerald-50 -[#FAF7F2] -[#2C3039]"
+              : "bg-amber-50 border-amber-200 text-amber-800"
+              }`}
           >
             <span> Tổng điểm hiện tại:</span>
             <span className="font-black text-sm">{totalPoints} / 10</span>
@@ -115,33 +114,30 @@ export function ManualQuizEditor({
           <button
             type="button"
             onClick={() => setFilterType("all")}
-            className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
-              filterType === "all"
-                ? "bg-[#C0392B] text-white shadow-md"
-                : "bg-white text-[#8A8478] hover:bg-gray-100 border border-[#E8E2D9]"
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${filterType === "all"
+              ? "bg-[#C0392B] text-white shadow-md"
+              : "bg-white text-[#8A8478] hover:bg-gray-100 border border-[#FAF7F2]"
+              }`}
           >
             Tất cả ({questions.length})
           </button>
           <button
             type="button"
             onClick={() => setFilterType("multiple_choice")}
-            className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
-              filterType === "multiple_choice"
-                ? "bg-[#C0392B] text-white shadow-md"
-                : "bg-white text-[#8A8478] hover:bg-gray-100 border border-[#E8E2D9]"
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${filterType === "multiple_choice"
+              ? "bg-[#C0392B] text-white shadow-md"
+              : "bg-white text-[#8A8478] hover:bg-gray-100 border border-[#FAF7F2]"
+              }`}
           >
             Trắc nghiệm ({mcQuestions.length})
           </button>
           <button
             type="button"
             onClick={() => setFilterType("essay")}
-            className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
-              filterType === "essay"
-                ? "-[#C0392B] text-white shadow-md"
-                : "bg-white text-[#8A8478] hover:bg-gray-100 border border-[#E8E2D9]"
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${filterType === "essay"
+              ? "-[#C0392B] text-white shadow-md"
+              : "bg-white text-[#8A8478] hover:bg-gray-100 border border-[#FAF7F2]"
+              }`}
           >
             Tự luận ({essayQuestions.length})
           </button>
@@ -169,7 +165,7 @@ export function ManualQuizEditor({
       {/* Questions List */}
       <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto pr-1">
         {filteredQuestions.length === 0 ? (
-          <div className="p-12 text-center rounded-2xl bg-[#FEFCF9] border border-[#E8E2D9] text-[#8A8478] font-medium">
+          <div className="p-12 text-center rounded-2xl bg-[#FEFCF9] border border-[#FAF7F2] text-[#8A8478] font-medium">
             Chưa có câu hỏi nào. Hãy bấm thêm câu hỏi trắc nghiệm hoặc tự luận.
           </div>
         ) : (

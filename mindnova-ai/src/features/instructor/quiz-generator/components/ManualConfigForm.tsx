@@ -52,7 +52,7 @@ export function ManualConfigForm({
   const isFormValid = config.title.trim().length > 0 && config.time_limit_minutes > 0;
 
   return (
-    <div className="p-8 bg-white rounded-3xl border border-[#E8E2D9] shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-3xl border border-[#FAF7F2] shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header */}
       <div className="flex items-start gap-4 border-b border-gray-100 pb-5">
         <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-2xl font-black text-[#C0392B] border border-indigo-100">
@@ -193,11 +193,10 @@ export function ManualConfigForm({
                       key={level.val}
                       type="button"
                       onClick={() => onChangeConfig({ difficulty: level.val as any })}
-                      className={`py-2 rounded-xl text-[11px] font-black transition-all border cursor-pointer ${
-                        config.difficulty === level.val
-                          ? "bg-[#2C3039] text-white border-[#2C3039] shadow-sm"
-                          : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
-                      }`}
+                      className={`py-2 rounded-xl text-[11px] font-black transition-all border cursor-pointer ${config.difficulty === level.val
+                        ? "bg-[#2C3039] text-white border-[#2C3039] shadow-sm"
+                        : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+                        }`}
                     >
                       {level.label}
                     </button>

@@ -78,7 +78,7 @@ function CourseManagementContent() {
     <div className="min-h-screen bg-[#F4F4F8] font-sans">
       <div className="max-w-[1200px] w-full mx-auto p-6 lg:p-8 flex flex-col gap-8 pb-20 animate-fadeIn">
         {/* ── Page Header & Filter Tabs ───────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#E8E2D9] pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#FAF7F2] pb-6">
           <div>
             <h1 className="text-2xl lg:text-3xl font-black text-[#2C3039] tracking-tight">
               Quản lý khóa học
@@ -92,7 +92,7 @@ function CourseManagementContent() {
         </div>
 
         {/* ── Search & Sort Bar ────────────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#E8E2D9] shadow-2xs">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#FAF7F2] shadow-2xs">
           {/* Search Box */}
           <div className="relative flex-1 max-w-md">
             <span className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-[#8A8478]">
@@ -106,7 +106,7 @@ function CourseManagementContent() {
                 setSearchQuery(e.target.value);
                 setPage(1);
               }}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-[#E8E2D9] bg-[#FEFCF9] text-xs font-semibold text-[#2C3039] placeholder:text-[#8A8478] focus:outline-none focus:ring-2 focus:ring-[#C0392B] transition-all"
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-[#FAF7F2] bg-[#FEFCF9] text-xs font-semibold text-[#2C3039] placeholder:text-[#8A8478] focus:outline-none focus:ring-2 focus:ring-[#C0392B] transition-all"
             />
             {searchQuery && (
               <button
@@ -127,7 +127,7 @@ function CourseManagementContent() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-3.5 py-2.5 rounded-xl border border-[#E8E2D9] bg-[#FEFCF9] text-xs font-bold text-[#2C3039] focus:outline-none focus:ring-2 focus:ring-[#C0392B] cursor-pointer"
+              className="px-3.5 py-2.5 rounded-xl border border-[#FAF7F2] bg-[#FEFCF9] text-xs font-bold text-[#2C3039] focus:outline-none focus:ring-2 focus:ring-[#C0392B] cursor-pointer"
             >
               <option value="newest">Mới nhất</option>
               <option value="oldest">Cũ nhất</option>

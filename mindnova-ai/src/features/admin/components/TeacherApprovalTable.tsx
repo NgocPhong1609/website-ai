@@ -244,12 +244,23 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  <tr key={row.id} className="hover:bg-slate-50/80 transition-colors">
  <td className="px-6 py-4 min-w-[240px]">
  <div className="flex items-center gap-3">
- <div className="w-10 h-10 rounded-full bg-amber-50 text-[#C0392B] flex items-center justify-center font-black overflow-hidden border border-amber-100 shrink-0">
+ <div className="w-10 h-10 rounded-2xl bg-[#C0392B] text-white flex items-center justify-center font-black overflow-hidden shrink-0 shadow-2xs">
  {avatar ? (
- <img src={avatar} alt={row.name} className="w-full h-full object-cover" />
- ) : (
- row.name?.charAt(0).toUpperCase()
- )}
+ <img 
+   src={avatar} 
+   alt={row.name} 
+   className="w-full h-full object-cover"
+   onError={(e) => {
+     e.currentTarget.style.display = 'none';
+     if (e.currentTarget.nextElementSibling) {
+       (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'inline';
+     }
+   }} 
+ />
+ ) : null}
+ <span style={{ display: avatar ? 'none' : 'inline' }}>
+   {row.name?.charAt(0).toUpperCase()}
+ </span>
  </div>
  <div>
  <div className="flex items-center gap-1 font-bold text-slate-900">

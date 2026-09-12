@@ -128,11 +128,11 @@ export function CheckoutView({ courseId }: { courseId: number }) {
     <div className="w-full flex flex-col lg:flex-row gap-8">
       {/* Cột trái: Tóm tắt hóa đơn & Nhập mã giảm giá */}
       <div className="flex-1 space-y-6">
-        <div className="bg-white rounded-2xl border border-[#E8E2D9] p-6 shadow-sm">
+        <div className="bg-white rounded-2xl border border-[#FAF7F2] p-6 shadow-sm">
           <h2 className="text-lg font-bold text-[#2C3039] mb-6 border-b border-[#F0F0F8] pb-4">
             Tóm tắt Đơn hàng
           </h2>
-          
+
           <div className="flex gap-4 mb-6">
             {header_info.thumbnail ? (
               <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 relative border border-gray-100">
@@ -145,7 +145,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
               <h3 className="text-base font-bold text-[#2C3039] leading-snug mb-1">
                 {header_info.title}
               </h3>
-              <span className="inline-block px-2.5 py-1 bg-[#FAF7F2] text-[#C0392B] text-xs font-bold rounded-lg border border-[#E8E2D9]">
+              <span className="inline-block px-2.5 py-1 bg-[#FAF7F2] text-[#C0392B] text-xs font-bold rounded-lg border border-[#FAF7F2]">
                 {header_info.level}
               </span>
             </div>
@@ -187,7 +187,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
                     if (couponError) setCouponError(null);
                   }}
                   placeholder="Nhập mã giảm giá (VD: TEST)..."
-                  className="flex-1 px-4 py-2.5 rounded-xl text-xs font-bold border border-[#E8E2D9] focus:border-[#C0392B] focus:ring-2 focus:ring-[#C0392B]/20 outline-none uppercase text-[#2C3039]"
+                  className="flex-1 px-4 py-2.5 rounded-xl text-xs font-bold border border-[#FAF7F2] focus:border-[#C0392B] focus:ring-2 focus:ring-[#C0392B]/20 outline-none uppercase text-[#2C3039]"
                 />
                 <button
                   type="submit"
@@ -220,7 +220,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
               </div>
             )}
 
-            <div className="flex justify-between text-lg font-bold text-[#2C3039] pt-2 border-t border-[#E8E2D9]">
+            <div className="flex justify-between text-lg font-bold text-[#2C3039] pt-2 border-t border-[#FAF7F2]">
               <span>Tổng thanh toán</span>
               <span className="text-[#C0392B]">
                 {isEffectiveFree ? "0 VND (Miễn phí)" : `${finalTotal.toLocaleString()} VND`}
@@ -232,7 +232,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
 
       {/* Cột phải: Phương thức thanh toán hoặc nhận khóa học */}
       <div className="w-full lg:w-[400px] shrink-0 space-y-6">
-        <div className="bg-white rounded-2xl border border-[#E8E2D9] p-6 shadow-sm">
+        <div className="bg-white rounded-2xl border border-[#FAF7F2] p-6 shadow-sm">
           {isEffectiveFree ? (
             <>
               <h2 className="text-lg font-bold text-[#2C3039] mb-4 border-b border-[#F0F0F8] pb-4 flex items-center gap-2">
@@ -268,17 +268,17 @@ export function CheckoutView({ courseId }: { courseId: number }) {
               <h2 className="text-lg font-bold text-[#2C3039] mb-6 border-b border-[#F0F0F8] pb-4">
                 Phương thức thanh toán
               </h2>
-              
+
               <div className="space-y-3 mb-6">
-                <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'vnpay' ? 'border-[#C0392B] bg-[#FAF7F2] ring-1 ring-[#C0392B]/30' : 'border-[#E8E2D9] hover:bg-[#F8FAFC]'}`}>
+                <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'vnpay' ? 'border-[#C0392B] bg-[#FAF7F2] ring-1 ring-[#C0392B]/30' : 'border-[#FAF7F2] hover:bg-[#F8FAFC]'}`}>
                   <input type="radio" name="paymentMethod" value="vnpay" checked={paymentMethod === 'vnpay'} onChange={() => setPaymentMethod('vnpay')} className="w-4 h-4 text-[#C0392B]" />
                   <div className="font-semibold text-sm text-[#2C3039]">Thanh toán qua VNPay</div>
                 </label>
-                <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'momo' ? 'border-[#C0392B] bg-[#FAF7F2] ring-1 ring-[#C0392B]/30' : 'border-[#E8E2D9] hover:bg-[#F8FAFC]'}`}>
+                <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'momo' ? 'border-[#C0392B] bg-[#FAF7F2] ring-1 ring-[#C0392B]/30' : 'border-[#FAF7F2] hover:bg-[#F8FAFC]'}`}>
                   <input type="radio" name="paymentMethod" value="momo" checked={paymentMethod === 'momo'} onChange={() => setPaymentMethod('momo')} className="w-4 h-4 text-[#C0392B]" />
                   <div className="font-semibold text-sm text-[#2C3039]">Ví điện tử Momo</div>
                 </label>
-                <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'banking' ? 'border-[#C0392B] bg-[#FAF7F2] ring-1 ring-[#C0392B]/30' : 'border-[#E8E2D9] hover:bg-[#F8FAFC]'}`}>
+                <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'banking' ? 'border-[#C0392B] bg-[#FAF7F2] ring-1 ring-[#C0392B]/30' : 'border-[#FAF7F2] hover:bg-[#F8FAFC]'}`}>
                   <input type="radio" name="paymentMethod" value="banking" checked={paymentMethod === 'banking'} onChange={() => setPaymentMethod('banking')} className="w-4 h-4 text-[#C0392B]" />
                   <div className="font-semibold text-sm text-[#2C3039]">Chuyển khoản Ngân hàng</div>
                 </label>
@@ -299,7 +299,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
             type="button"
             onClick={() => router.back()}
             disabled={isProcessing}
-            className="w-full mt-3 py-3 rounded-xl text-sm font-semibold text-[#8A8478] bg-white border border-[#E8E2D9] hover:bg-[#FAF7F2] transition-all cursor-pointer"
+            className="w-full mt-3 py-3 rounded-xl text-sm font-semibold text-[#8A8478] bg-white border border-[#FAF7F2] hover:bg-[#FAF7F2] transition-all cursor-pointer"
           >
             Quay lại
           </button>

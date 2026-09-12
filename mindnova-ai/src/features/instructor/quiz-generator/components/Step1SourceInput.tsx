@@ -111,7 +111,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
   }
 
   return (
-    <div className="p-8 bg-white rounded-3xl border border-[#E8E2D9] shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-3xl border border-[#FAF7F2] shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
@@ -162,7 +162,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
               {filteredCourses.map((course) => (
                 <div
                   key={course.id}
-                  className="p-5 rounded-2xl border-2 border-[#E8E2D9] hover:border-[#C0392B]/50 bg-white transition-all duration-200 flex flex-col justify-between gap-4 shadow-2xs hover:shadow-md group"
+                  className="p-5 rounded-2xl border-2 border-[#FAF7F2] hover:border-[#C0392B]/50 bg-white transition-all duration-200 flex flex-col justify-between gap-4 shadow-2xs hover:shadow-md group"
                 >
                   <div className="flex items-start gap-3.5">
                     <div className="w-11 h-11 rounded-2xl bg-indigo-50 text-[#C0392B] border border-indigo-100 flex items-center justify-center text-xl shrink-0 font-bold group-hover:scale-105 transition-transform">
@@ -228,7 +228,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
           </div>
 
           {/* Selected Course Modules & Lessons Preview Card */}
-          <div className="p-5 rounded-2xl bg-white border border-[#E8E2D9] shadow-sm flex flex-col gap-3">
+          <div className="p-5 rounded-2xl bg-white border border-[#FAF7F2] shadow-sm flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-xs font-black text-[#2C3039]">
@@ -262,7 +262,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
                   {lessonsList.map((les, idx) => (
                     <span
                       key={les.id || idx}
-                      className="px-2.5 py-1 rounded-lg bg-[#FEFCF9] border border-[#E8E2D9] text-gray-700 text-[11px] font-bold truncate max-w-xs"
+                      className="px-2.5 py-1 rounded-lg bg-[#FEFCF9] border border-[#FAF7F2] text-gray-700 text-[11px] font-bold truncate max-w-xs"
                       title={les.title}
                     >
                       Bài {idx + 1}: {les.title}

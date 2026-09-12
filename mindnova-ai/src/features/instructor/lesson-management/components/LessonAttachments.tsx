@@ -81,7 +81,7 @@ export function LessonAttachments({
   };
 
   return (
-    <section className="flex flex-col gap-3 rounded-xl border border-[#E8E2D9] bg-[#FEFCF9] p-4">
+    <section className="flex flex-col gap-3 rounded-xl border border-[#FAF7F2] bg-[#FEFCF9] p-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h3 className="text-sm font-bold text-[#2C3039]">Tài liệu đính kèm</h3>
@@ -113,12 +113,12 @@ export function LessonAttachments({
       ) : (
         <ul className="flex flex-col gap-2">
           {attachments.map((attachment) => (
-            <li key={attachment.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-[#E8E2D9] bg-white p-3">
+            <li key={attachment.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-[#FAF7F2] bg-white p-3">
               {readOnly ? (
                 <span className="min-w-0 flex-1 truncate text-sm font-semibold text-[#2C3039]">{attachment.display_name}</span>
               ) : (
                 <input
-                  className="min-w-0 flex-1 rounded-md border border-[#E8E2D9] px-2 py-1 text-sm font-semibold text-[#2C3039]"
+                  className="min-w-0 flex-1 rounded-md border border-[#FAF7F2] px-2 py-1 text-sm font-semibold text-[#2C3039]"
                   value={names[attachment.id] ?? attachment.display_name}
                   onChange={(event) => setNames((current) => ({ ...current, [attachment.id]: event.target.value }))}
                 />

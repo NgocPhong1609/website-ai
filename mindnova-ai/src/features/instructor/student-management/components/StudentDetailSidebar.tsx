@@ -8,6 +8,8 @@ export interface StudentDetailData {
   name: string;
   email: string;
   avatar_url?: string;
+  avatar?: string;
+  profile_image?: string;
   course: {
     id: number | string;
     title: string;
@@ -20,13 +22,35 @@ export interface StudentDetailData {
   enrolled_at?: string;
 }
 
+function SidebarAvatar({ name, avatarUrl }: { name: string; avatarUrl?: string | null }) {
+  const [hasError, setHasError] = React.useState(false);
+  React.useEffect(() => { setHasError(false); }, [avatarUrl]);
+  const initials = name ? name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase() : "U";
+
+  if (avatarUrl && !hasError) {
+    return (
+      <img
+        src={avatarUrl}
+        alt={name}
+        onError={() => setHasError(true)}
+        className="w-16 h-16 rounded-2xl shadow-sm object-cover shrink-0"
+      />
+    );
+  }
+  return (
+    <div className="w-16 h-16 rounded-2xl bg-[#C0392B] text-white font-black text-xl flex items-center justify-center shrink-0 shadow-sm">
+      {initials}
+    </div>
+  );
+}
+
 export function StudentDetailSidebar({ student, onClose }: { student: StudentDetailData | null, onClose: () => void }) {
   if (!student) return null;
 
-  const initials = student.name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+  const avatarUrl = student.avatar_url || student.avatar || student.profile_image || null;
 
   return (
-    <div className="fixed inset-y-0 right-0 w-80 bg-white border-l border-[#E8E2D9] shadow-2xl z-50 flex flex-col animate-slideInRight font-sans">
+    <div className="fixed inset-y-0 right-0 w-80 bg-white border-l border-[#FAF7F2] shadow-2xl z-50 flex flex-col animate-slideInRight font-sans">
       <div className="p-4 border-b border-gray-100 flex items-center justify-between">
         <h3 className="font-black text-[#2C3039] text-sm">Hồ Sơ Học Viên</h3>
         <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg text-[#8A8478] transition-colors cursor-pointer">
@@ -36,16 +60,10 @@ export function StudentDetailSidebar({ student, onClose }: { student: StudentDet
           </svg>
         </button>
       </div>
-      
+
       <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-5">
         <div className="flex flex-col items-center gap-2 mb-2 text-center">
-          {student.avatar_url ? (
-            <img src={student.avatar_url} alt={student.name} className="w-16 h-16 rounded-2xl shadow-sm object-cover" />
-          ) : (
-            <div className="w-16 h-16 rounded-2xl bg-[#C0392B] text-white font-black text-xl flex items-center justify-center shadow-sm">
-              {initials}
-            </div>
-          )}
+          <SidebarAvatar name={student.name} avatarUrl={avatarUrl} />
           <div>
             <h4 className="font-black text-base text-[#2C3039]">{student.name}</h4>
             <p className="text-xs text-[#8A8478]">{student.email}</p>
@@ -94,7 +112,7 @@ export function StudentDetailSidebar({ student, onClose }: { student: StudentDet
           </div>
         )}
       </div>
-      
+
       <div className="p-4 border-t border-gray-100 bg-[#FEFCF9]">
         <a href={`mailto:${student.email}`} className="w-full py-2.5 rounded-xl bg-[#1A1A2E] hover:bg-[#C0392B] text-white text-xs font-bold shadow-sm transition-colors text-center block">
           Gửi Email Trực Tiếp

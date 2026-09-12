@@ -9,7 +9,7 @@
   --color-ivory: #FEFCF9;
   --color-warm-bg: #FAF7F2;
   --color-parchment: #F5F0E8;
-  --color-sand: #E8E2D9;
+  --color-sand: #FAF7F2;
   --color-warm-gray: #B8B0A3;
   --color-charcoal: #2C3039;
   --color-charcoal-light: #4A4F5C;
@@ -39,7 +39,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #1C1A17;
-    --foreground: #E8E2D9;
+    --foreground: #FAF7F2;
   }
 }
 
@@ -86,20 +86,27 @@ body {
 }
 
 /* ─── Global Form Input Value & Placeholder Contrast ─── */
-input, textarea, select {
+input,
+textarea,
+select {
   color: #2C3039 !important;
 }
 
-input::placeholder, textarea::placeholder, select::placeholder {
+input::placeholder,
+textarea::placeholder,
+select::placeholder {
   color: #B8B0A3 !important;
   opacity: 1 !important;
 }
 
-input:disabled, textarea:disabled, select:disabled {
+input:disabled,
+textarea:disabled,
+select:disabled {
   color: #8A8478 !important;
 }
 
-input[type="date"], input[type="datetime-local"] {
+input[type="date"],
+input[type="datetime-local"] {
   color: #2C3039 !important;
 }
 
@@ -109,6 +116,7 @@ input[type="date"], input[type="datetime-local"] {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -116,8 +124,13 @@ input[type="date"], input[type="datetime-local"] {
 }
 
 @keyframes progress-fill {
-  from { width: 0%; }
-  to   { width: 65%; }
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: 65%;
+  }
 }
 
 @keyframes admin-reveal-up {
@@ -125,6 +138,7 @@ input[type="date"], input[type="datetime-local"] {
     opacity: 0;
     transform: translateY(12px) scale(0.992);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -166,7 +180,9 @@ input[type="date"], input[type="datetime-local"] {
 }
 
 /* ─── CKEditor Headings Styling (H1, H2, H3) ─── */
-.ck-content h1, .ckeditor-wrapper h1, .ck-heading_heading1 {
+.ck-content h1,
+.ckeditor-wrapper h1,
+.ck-heading_heading1 {
   font-size: 2em !important;
   font-weight: 800 !important;
   margin-top: 0.8em !important;
@@ -175,7 +191,9 @@ input[type="date"], input[type="datetime-local"] {
   color: #2C3039 !important;
 }
 
-.ck-content h2, .ckeditor-wrapper h2, .ck-heading_heading2 {
+.ck-content h2,
+.ckeditor-wrapper h2,
+.ck-heading_heading2 {
   font-size: 1.5em !important;
   font-weight: 700 !important;
   margin-top: 0.7em !important;
@@ -184,7 +202,9 @@ input[type="date"], input[type="datetime-local"] {
   color: #2C3039 !important;
 }
 
-.ck-content h3, .ckeditor-wrapper h3, .ck-heading_heading3 {
+.ck-content h3,
+.ckeditor-wrapper h3,
+.ck-heading_heading3 {
   font-size: 1.25em !important;
   font-weight: 700 !important;
   margin-top: 0.6em !important;
@@ -193,8 +213,97 @@ input[type="date"], input[type="datetime-local"] {
   color: #2C3039 !important;
 }
 
-.ck-content p, .ckeditor-wrapper p {
+.ck-content p,
+.ckeditor-wrapper p {
   font-size: 1em;
   margin-bottom: 0.5em;
   line-height: 1.6;
+}
+
+/* ─── Custom Project Scrollbar Design System ─── */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(192, 57, 43, 0.4) transparent;
+}
+
+*:hover {
+  scrollbar-color: #C0392B transparent;
+}
+
+/* WebKit / Chromium (Chrome, Edge, Safari, Brave) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(192, 57, 43, 0.35);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C0392B;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #A93226;
+}
+
+/* Hide scrollbar arrow buttons at both ends completely */
+::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+*::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Custom helper utilities for specific scrollbar needs */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #FAF7F2;
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #C0392B;
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }

@@ -32,7 +32,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
   const [tempMediaMap, setTempMediaMap] = useState<Map<string, number>>(new Map());
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  
+
   const [videoMethod, setVideoMethod] = useState<'upload' | 'url'>('upload');
   const [videoUrl, setVideoUrl] = useState((lesson as any).videoUrl || (lesson as any).video_url || "");
   const [videoUploadProgress, setVideoUploadProgress] = useState(0);
@@ -50,7 +50,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
 
   const initialVideoUrl = useRef((lesson as any).videoUrl || (lesson as any).video_url || "").current;
 
-  const hasUnsavedChanges = 
+  const hasUnsavedChanges =
     title !== lesson.title ||
     type !== lesson.type ||
     content !== ((lesson as any).content || "") ||
@@ -149,7 +149,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
         return;
       }
     }
-    
+
     if (tempMediaMap.size > 0) {
       Array.from(tempMediaMap.values()).forEach(mediaId => {
         void deleteTempMedia.mutateAsync(mediaId).catch(console.error);
@@ -235,14 +235,14 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
         }
       }
 
-      await onSave(lesson.id, { 
-        title, 
-        type, 
-        content: finalContent, 
+      await onSave(lesson.id, {
+        title,
+        type,
+        content: finalContent,
         quizData: isQuiz ? savedQuizData : undefined,
         video_url: isVideo ? videoUrl : undefined,
         videoUrl: isVideo ? videoUrl : undefined,
-        temp_media_ids: usedTempMediaIds 
+        temp_media_ids: usedTempMediaIds
       } as any);
       setTempMediaMap(new Map());
     } catch (error: any) {
@@ -262,8 +262,8 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-      <div 
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onMouseDown={(e) => {
           // Only mark if the mousedown is directly on the backdrop itself
           if (e.target === e.currentTarget) {
@@ -279,14 +279,14 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
         }}
       />
       <div className={`relative w-full ${isQuiz ? 'max-w-5xl' : 'max-w-4xl'} bg-white rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-fadeIn`}>
-        
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E8E2D9]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#FAF7F2]">
           <h2 className="text-base font-black text-[#2C3039]">
             {isVideo ? '🎬 Soạn thảo Video' : isQuiz ? '📝 Chỉnh Sửa Bài Kiểm Tra' : '📄 Soạn thảo Tài liệu'}
           </h2>
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={handleClose}
             className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8A8478] hover:bg-gray-100 hover:text-[#2C3039] transition-colors cursor-pointer"
           >
@@ -309,7 +309,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl text-sm border border-[#E8E2D9] focus:border-[#C0392B] focus:ring-2 focus:ring-[#C0392B]/20 outline-none transition-all font-bold text-[#2C3039]"
+                className="w-full px-4 py-2.5 rounded-xl text-sm border border-[#FAF7F2] focus:border-[#C0392B] focus:ring-2 focus:ring-[#C0392B]/20 outline-none transition-all font-bold text-[#2C3039]"
                 placeholder="Nhập tên bài học..."
               />
             </div>
@@ -317,7 +317,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
 
           <div className="flex flex-col gap-1.5 flex-1 min-h-[400px]">
             {isQuiz ? (
-              <QuizEditor 
+              <QuizEditor
                 value={quizData}
                 onChange={(updatedQuiz) => {
                   setQuizData(updatedQuiz);
@@ -329,19 +329,19 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
                 courseId={courseId ? Number(courseId) : undefined}
               />
             ) : isVideo ? (
-              <div className="flex flex-col gap-3 mb-6 p-5 border border-[#E8E2D9] rounded-2xl bg-[#FEFCF9]/50 shadow-2xs">
+              <div className="flex flex-col gap-3 mb-6 p-5 border border-[#FAF7F2] rounded-2xl bg-[#FEFCF9]/50 shadow-2xs">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-black text-[#2C3039]">Nguồn video bài học</label>
-                  <div className="flex gap-2 p-1 rounded-xl bg-gray-100 border border-[#E8E2D9]">
-                    <button 
-                      type="button" 
+                  <div className="flex gap-2 p-1 rounded-xl bg-gray-100 border border-[#FAF7F2]">
+                    <button
+                      type="button"
                       onClick={() => handleVideoMethodChange('url')}
                       className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer ${videoMethod === 'url' ? 'bg-white text-[#2C3039] shadow-2xs' : 'text-[#8A8478] hover:text-gray-700'}`}
                     >
                       Dùng URL
                     </button>
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => handleVideoMethodChange('upload')}
                       className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer ${videoMethod === 'upload' ? 'bg-[#C0392B] text-white shadow-2xs' : 'text-[#8A8478] hover:text-gray-700'}`}
                     >
@@ -349,14 +349,14 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
                     </button>
                   </div>
                 </div>
-                
+
                 {videoMethod === 'url' ? (
                   <input
                     type="text"
                     value={videoUrl}
                     onChange={(e) => setVideoUrl(e.target.value)}
                     placeholder="Nhập đường dẫn video (YouTube, Vimeo, v.v.)..."
-                    className="w-full px-4 py-2.5 rounded-xl text-sm font-medium border border-[#E8E2D9] focus:border-[#C0392B] focus:ring-2 focus:ring-[#C0392B]/20 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl text-sm font-medium border border-[#FAF7F2] focus:border-[#C0392B] focus:ring-2 focus:ring-[#C0392B]/20 outline-none"
                   />
                 ) : (
                   (!videoUrl || isUploadingVideo) && (
@@ -392,7 +392,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
 
                 {videoUrl && !isUploadingVideo && (
                   <div className="mt-3 flex flex-col gap-3">
-                    <div className="w-full bg-black rounded-2xl overflow-hidden border border-[#E8E2D9] flex items-center justify-center relative shadow-sm min-h-[300px]">
+                    <div className="w-full bg-black rounded-2xl overflow-hidden border border-[#FAF7F2] flex items-center justify-center relative shadow-sm min-h-[300px]">
                       {getEmbedUrl(videoUrl) ? (
                         <iframe
                           src={getEmbedUrl(videoUrl)!}
@@ -402,9 +402,9 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
                           allowFullScreen
                         />
                       ) : (
-                        <video 
-                          src={videoUrl} 
-                          controls 
+                        <video
+                          src={videoUrl}
+                          controls
                           className="w-full max-h-[350px] object-contain"
                         />
                       )}
@@ -446,7 +446,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-[#E8E2D9] flex justify-end gap-3 bg-[#FEFCF9]">
+        <div className="px-6 py-4 border-t border-[#FAF7F2] flex justify-end gap-3 bg-[#FEFCF9]">
           <button
             type="button"
             onClick={handleClose}

@@ -87,7 +87,7 @@ export function QuizImageField({ label, purpose, value, onChange }: QuizImageFie
   };
 
   return (
-    <div className="space-y-2 rounded-xl border border-[#E8E2D9] p-3">
+    <div className="space-y-2 rounded-xl border border-[#FAF7F2] p-3">
       <span className="block text-xs font-bold text-gray-700">{label}</span>
       {value.url && (
         <img src={value.url} alt={`Xem trước ${label}`} className="h-28 w-full rounded-lg border object-contain" />

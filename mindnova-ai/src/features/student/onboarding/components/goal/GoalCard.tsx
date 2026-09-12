@@ -3,43 +3,43 @@ import { twMerge } from "tailwind-merge";
 import type { IGoal } from "@/src/features/student/onboarding/types";
 
 interface GoalCardProps extends Omit<IGoal, "id"> {
- isActive?: boolean;
- onClick?: () => void;
+    isActive?: boolean;
+    onClick?: () => void;
 }
 
 export default function GoalCard({
- icon,
- title,
- description,
- isActive = false,
- onClick,
+    icon,
+    title,
+    description,
+    isActive = false,
+    onClick,
 }: GoalCardProps) {
- return (
- <article
- role="button"
- tabIndex={0}
- onClick={onClick}
- onKeyDown={(e) => e.key === "Enter" && onClick?.()}
- aria-pressed={isActive}
- className={twMerge(
- "w-full p-6 bg-white border rounded-xl cursor-pointer transition-all duration-200",
- "hover:-translate-y-0.5 hover:shadow-md",
- isActive
- ? "border-[#E8E2D9] ring-1 ring-[#C0392B] bg-[#F8F9FE]"
- : "border-[#C7C4D7]",
- )}
- >
- <div className="flex flex-col items-start gap-4">
- <div className="w-12 h-12 bg-[#EAEDFF] rounded-lg flex justify-center items-center">
- <Image src={icon} width={24} height={24} alt="" aria-hidden="true" />
- </div>
- <h3 className="max-w-[275.33px] w-full text-[20px] font-semibold text-[#2C3039]">
- {title}
- </h3>
- <p className="max-w-[275.33px] w-full text-[14px] text-[#2C3039]">
- {description}
- </p>
- </div>
- </article>
- );
+    return (
+        <article
+            role="button"
+            tabIndex={0}
+            onClick={onClick}
+            onKeyDown={(e) => e.key === "Enter" && onClick?.()}
+            aria-pressed={isActive}
+            className={twMerge(
+                "w-full p-6 bg-white border rounded-xl cursor-pointer transition-all duration-200",
+                "hover:-translate-y-0.5 hover:shadow-md",
+                isActive
+                    ? "border-[#FAF7F2] ring-1 ring-[#C0392B] bg-[#F8F9FE]"
+                    : "border-[#C7C4D7]",
+            )}
+        >
+            <div className="flex flex-col items-start gap-4">
+                <div className="w-12 h-12 bg-[#EAEDFF] rounded-lg flex justify-center items-center">
+                    <Image src={icon} width={24} height={24} alt="" aria-hidden="true" />
+                </div>
+                <h3 className="max-w-[275.33px] w-full text-[20px] font-semibold text-[#2C3039]">
+                    {title}
+                </h3>
+                <p className="max-w-[275.33px] w-full text-[14px] text-[#2C3039]">
+                    {description}
+                </p>
+            </div>
+        </article>
+    );
 }
