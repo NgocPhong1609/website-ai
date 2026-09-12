@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -15,6 +16,13 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->timestamps();
         });
+
+        $now = now();
+        DB::table('roles')->insert([
+            ['name' => 'admin', 'display_name' => 'Quản trị viên', 'description' => 'Quản trị toàn quyền hệ thống', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'teacher', 'display_name' => 'Giáo viên', 'description' => 'Người tạo, quản lý khóa học và xem tiến độ học sinh', 'created_at' => $now, 'updated_at' => $now],
+            ['name' => 'student', 'display_name' => 'Học sinh', 'description' => 'Người tham gia học tập và làm quiz', 'created_at' => $now, 'updated_at' => $now],
+        ]);
 
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
