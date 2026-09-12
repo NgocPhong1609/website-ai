@@ -15,9 +15,8 @@ export async function AdminCategoriesPage() {
  </section>
 
  <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
- <div className="mb-4 flex items-center justify-between gap-3">
+ <div className="mb-4">
  <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Danh sách danh mục</h2>
- <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-[#3B82F6] ring-1 ring-teal-100">{data.rows.length} danh mục</span>
  </div>
  <AdminCategoriesQuickActions rows={data.rows} />
  </section>
