@@ -5,6 +5,8 @@ Nguồn: `website-MindNova-AI/database/migrations/` (schema sau khi chạy hết
 `X` = bắt buộc (NOT NULL). PK = khóa chính. FK = khóa ngoại.
 Đã loại bảng bị drop: `course_classes`, `ai_recommendations`, `cache_locks`.
 
+Cột thêm bằng vòng lặp PHP (parser không gắn được vào từng bảng): `courses.lock_version` và `lessons.lock_version` — `int`, default 1, NOT NULL, ghi chú: khóa lạc quan khi sửa nháp (`2026_08_18_000002_add_instructor_reliability_foundation.php`).
+
 ## Bảng `users`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
