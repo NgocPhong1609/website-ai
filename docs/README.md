@@ -5,4 +5,4 @@
 
 Cách đưa lên Google Docs: Tệp → Mở → tải file `.docx`.
 
-Lưu ý: ảnh chụp màn hình nhà thuốc cũ vẫn còn trong file (không thay được nếu không có ảnh MindNova). Từ mục 3.9 PHẦN V trở đi là bảng mẫu cũ; dùng file markdown trên cho cột đúng.
+Lưu ý: ảnh chụp màn hình nhà thuốc cũ vẫn còn trong file (không thay được nếu không có ảnh MindNova). Mục 3. Chi tiết các bảng đã thay bằng schema MindNova hiện tại (67 bảng nghiệp vụ).

@@ -4,12 +4,8 @@ Nguồn: `website-MindNova-AI/database/migrations/` (schema sau khi chạy hết
 Định dạng cột theo mẫu báo cáo: STT, Tên, Kiểu dữ liệu, Độ dài, Không để trống, Khóa chính, Ghi chú.
 `X` = bắt buộc (NOT NULL). PK = khóa chính. FK = khóa ngoại.
 Đã loại bảng bị drop: `course_classes`, `ai_recommendations`, `cache_locks`.
-
-Cột thêm bằng vòng lặp PHP (parser không gắn được vào từng bảng): `courses.lock_version` và `lessons.lock_version` — `int`, default 1, NOT NULL, ghi chú: khóa lạc quan khi sửa nháp (`2026_08_18_000002_add_instructor_reliability_foundation.php`).
-
+Vai trò người dùng chỉ lưu qua `roles` + `role_user` (không có cột `users.role`).
 ## Bảng `users`
-
-Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON vẫn có field `role`.
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
 |---|---|---|---|---|---|---|
@@ -25,18 +21,17 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 10 | last_login_at | timestamp |  |  |  |  |
 | 11 | google_id | varchar | 255 |  |  | ID Google OAuth |
 | 12 | avatar_url | varchar | 255 |  |  | Đường dẫn ảnh đại diện |
-| 13 | status | enum('active,banned,inactive') |  | X |  | Trạng thái bản ghi |
-| 14 | teacher_verification_status | varchar | 255 | X |  |  |
+| 13 | status | enum('active','banned','inactive') |  | X |  | Trạng thái bản ghi |
+| 14 | teacher_verification_status | varchar | 255 | X |  | pending / approved / rejected |
 | 15 | teacher_verified_at | timestamp |  |  |  |  |
 | 16 | teacher_verification_note | text |  |  |  |  |
-| 17 | onboarding_data | json |  |  |  |  |
-| 18 | is_onboarded | tinyint | 1 | X |  |  |
+| 17 | onboarding_data | json |  |  |  | JSON wizard onboarding |
+| 18 | is_onboarded | tinyint | 1 | X |  | Đã hoàn thành onboarding |
 | 19 | notification_email | tinyint | 1 |  |  |  |
 | 20 | weekly_report | tinyint | 1 |  |  |  |
 | 21 | ai_suggestions | tinyint | 1 |  |  |  |
-| 22 | is_verified | tinyint | 1 | X |  |  |
-| 23 | payout_info | json |  |  |  |  |
-
+| 22 | is_verified | tinyint | 1 | X |  | Giảng viên đã được duyệt |
+| 23 | payout_info | json |  |  |  | JSON thông tin nhận tiền giảng viên |
 ## Bảng `password_reset_tokens`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -44,7 +39,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 1 | email | varchar | 255 | X | PK | Email đăng nhập, duy nhất |
 | 2 | token | varchar | 255 | X |  |  |
 | 3 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
-
 ## Bảng `sessions`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -55,7 +49,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 4 | user_agent | text |  |  |  |  |
 | 5 | payload | longtext |  | X |  |  |
 | 6 | last_activity | int | 11 | X |  |  |
-
 ## Bảng `cache`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -63,7 +56,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 1 | key | varchar | 255 | X | PK |  |
 | 2 | value | mediumtext |  | X |  |  |
 | 3 | expiration | bigint | 20 | X |  |  |
-
 ## Bảng `jobs`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -75,7 +67,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 5 | reserved_at | int | 11 |  |  |  |
 | 6 | available_at | int | 11 | X |  |  |
 | 7 | created_at | int | 11 | X |  | Thời điểm tạo bản ghi |
-
 ## Bảng `job_batches`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -90,7 +81,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 8 | cancelled_at | int | 11 |  |  |  |
 | 9 | created_at | int | 11 | X |  | Thời điểm tạo bản ghi |
 | 10 | finished_at | int | 11 |  |  |  |
-
 ## Bảng `failed_jobs`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -102,7 +92,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 5 | payload | longtext |  | X |  |  |
 | 6 | exception | longtext |  | X |  |  |
 | 7 | failed_at | timestamp |  | X |  |  |
-
 ## Bảng `payments`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -119,7 +108,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 10 | metadata | json |  |  |  |  |
 | 11 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 12 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `activity_logs`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -134,7 +122,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 8 | metadata | json |  |  |  |  |
 | 9 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 10 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `notifications`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -148,7 +135,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 7 | metadata | json |  |  |  |  |
 | 8 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 9 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `subscriptions`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -163,7 +149,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 8 | metadata | json |  |  |  |  |
 | 9 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 10 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `admin_logs`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -177,7 +162,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 7 | metadata | json |  |  |  |  |
 | 8 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 9 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `personal_access_tokens`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -192,7 +176,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 8 | expires_at | timestamp |  |  |  |  |
 | 9 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 10 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `categories`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -201,11 +184,11 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 2 | name | varchar | 255 | X |  | Tên hiển thị |
 | 3 | slug | varchar | 255 | X |  | Unique |
 | 4 | description | text |  |  |  | Mô tả |
-| 5 | parent_id | bigint | 20 |  |  |  |
+| 5 | parent_id | bigint | 20 |  |  | Danh mục cha, nullable |
 | 6 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 7 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
 | 8 | status | varchar | 255 | X |  | Trạng thái bản ghi |
-
+| 9 | requested_by | bigint | 20 |  | FK | User đề xuất danh mục (nullable) |
 ## Bảng `courses`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -218,20 +201,20 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 6 | description | text |  | X |  | Mô tả |
 | 7 | thumbnail | varchar | 255 |  |  | Ảnh thumbnail |
 | 8 | price | decimal | 12,2 | X |  | Giá |
-| 9 | level | enum('beginner,intermediate,advanced') |  | X |  |  |
+| 9 | level | enum('beginner','intermediate','advanced') |  | X |  |  |
 | 10 | status | enum('draft','pending_review','under_review','approved','needs_fixes','rejected','published','archived') |  | X |  | Trạng thái bản ghi |
 | 11 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 12 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-| 13 | views_count | int | 11 | X |  |  |
-| 14 | admin_hidden_at | timestamp |  |  |  |  |
-| 15 | sale_price | decimal | 12,2 |  |  |  |
+| 13 | views_count | int | 11 | X |  | Lượt xem khóa học |
+| 14 | admin_hidden_at | timestamp |  |  |  | Admin ẩn khóa khỏi catalog |
+| 15 | sale_price | decimal | 12,2 |  |  | Giá khuyến mãi |
 | 16 | sale_start_date | timestamp |  |  |  |  |
 | 17 | sale_end_date | timestamp |  |  |  |  |
 | 18 | is_flash_sale | tinyint | 1 | X |  |  |
-| 19 | published_version_id | bigint | 20 |  |  | Phiên bản nội dung đang public |
-| 20 | current_version | int | 11 | X |  |  |
-| 21 | partnership_tier | varchar | 20 | X |  | Hạng hợp tác: standard hoặc exclusive |
-
+| 19 | published_version_id | bigint | 20 |  | FK | Phiên bản nội dung đang public; Khóa ngoại tới content_versions.id |
+| 20 | current_version | int | 11 | X |  | Số phiên bản nháp hiện tại |
+| 21 | lock_version | int | 11 | X |  | Khóa lạc quan khi sửa nháp |
+| 22 | partnership_tier | varchar | 20 | X |  | Hạng hợp tác: standard hoặc exclusive |
 ## Bảng `orders`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -239,12 +222,11 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
 | 2 | user_id | bigint | 20 | X | FK | Khóa ngoại tới users.id |
 | 3 | total_amount | decimal | 10,2 | X |  | Tổng tiền đơn hàng |
-| 4 | payment_method | enum('vnpay', 'momo', 'banking', 'free') |  | X |  | Cổng thanh toán: vnpay, momo, banking, free |
-| 5 | status | enum('pending,completed,failed,refunded') |  | X |  | Trạng thái bản ghi |
+| 4 | payment_method | enum('vnpay','momo','banking','free') |  | X |  | Cổng thanh toán: vnpay, momo, banking, free |
+| 5 | status | enum('pending','completed','failed','refunded') |  | X |  | Trạng thái bản ghi |
 | 6 | transaction_id | varchar | 100 |  |  | Unique |
 | 7 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 8 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `order_items`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -255,48 +237,42 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 4 | price | decimal | 10,2 | X |  | Giá |
 | 5 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 6 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `roles`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
 |---|---|---|---|---|---|---|
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
 | 2 | name | varchar | 255 | X |  | Unique |
-| 3 | display_name | varchar | 255 |  |  |  |
-| 4 | description | varchar | 255 |  |  | Mô tả |
+| 3 | display_name | varchar | 255 |  |  | Tên hiển thị |
+| 4 | description | text |  |  |  | Mô tả |
 | 5 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 6 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `permissions`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
 |---|---|---|---|---|---|---|
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
 | 2 | name | varchar | 255 | X |  | Unique |
-| 3 | display_name | varchar | 255 |  |  |  |
+| 3 | display_name | varchar | 255 |  |  | Tên hiển thị |
 | 4 | description | text |  |  |  | Mô tả |
 | 5 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 6 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `role_user`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
 |---|---|---|---|---|---|---|
-| 1 | role_id | bigint | 20 | X | FK |  |
-| 2 | user_id | bigint | 20 | X | FK | Khóa ngoại tới users.id |
+| 1 | role_id | bigint | 20 | X | PK | Khóa ngoại tới roles.id; PK kép (role_id, user_id) |
+| 2 | user_id | bigint | 20 | X | PK | Khóa ngoại tới users.id; PK kép (role_id, user_id) |
 | 3 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 4 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-| 5 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
-
 ## Bảng `permission_role`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
 |---|---|---|---|---|---|---|
-| 1 | permission_id | bigint | 20 | X |  |  |
-| 2 | role_id | bigint | 20 | X |  |  |
+| 1 | permission_id | bigint | 20 | X | PK | Khóa ngoại tới permissions.id; PK kép (permission_id, role_id) |
+| 2 | role_id | bigint | 20 | X | PK | Khóa ngoại tới roles.id; PK kép (permission_id, role_id) |
 | 3 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 4 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `lessons`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -312,11 +288,11 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 9 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
 | 10 | status | enum('draft','pending_review','under_review','approved','needs_fixes','rejected','published') |  | X |  | Trạng thái bản ghi |
 | 11 | module_id | bigint | 20 |  | FK | Khóa ngoại tới course_modules.id |
-| 12 | type | enum('video,article,quiz_module') |  | X |  | Loại bản ghi |
-| 13 | duration_seconds | int | 11 | X |  |  |
-| 14 | published_version_id | bigint | 20 |  |  | Phiên bản nội dung đang public |
-| 15 | current_version | int | 11 | X |  |  |
-
+| 12 | type | enum('video','article','quiz_module') |  | X |  | Loại bản ghi |
+| 13 | duration_seconds | int | 11 | X |  | Thời lượng giây |
+| 14 | published_version_id | bigint | 20 |  | FK | Phiên bản nội dung đang public; Khóa ngoại tới content_versions.id |
+| 15 | current_version | int | 11 | X |  | Số phiên bản nháp hiện tại |
+| 16 | lock_version | int | 11 | X |  | Khóa lạc quan khi sửa nháp |
 ## Bảng `discussions`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -326,12 +302,11 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 3 | student_id | bigint | 20 | X | FK |  |
 | 4 | title | varchar | 255 | X |  | Tiêu đề |
 | 5 | content | text |  | X |  | Nội dung |
-| 6 | status | enum('open,answered,closed') |  | X |  | Trạng thái bản ghi |
+| 6 | status | enum('open','answered','closed') |  | X |  | Trạng thái bản ghi |
 | 7 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 8 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
 | 9 | is_pinned | tinyint | 1 | X |  |  |
 | 10 | is_resolved | tinyint | 1 | X |  |  |
-
 ## Bảng `discussion_replies`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -343,7 +318,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 5 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 6 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
 | 7 | is_best_answer | tinyint | 1 | X |  |  |
-
 ## Bảng `enrollments`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -353,23 +327,22 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 3 | course_id | bigint | 20 | X | FK | Khóa ngoại tới courses.id |
 | 4 | progress_percentage | int | 11 | X |  | Phần trăm hoàn thành |
 | 5 | enrolled_at | timestamp |  | X |  | Thời điểm ghi danh |
-| 6 | status | enum('waiting,enrolled,completed,cancelled') |  | X |  | Trạng thái bản ghi |
+| 6 | status | enum('waiting','enrolled','completed','cancelled') |  | X |  | Trạng thái bản ghi |
 | 7 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 8 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `lesson_media`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
 |---|---|---|---|---|---|---|
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
 | 2 | lesson_id | bigint | 20 | X | FK | Khóa ngoại tới lessons.id |
-| 3 | media_type | enum('video,image') |  | X |  |  |
+| 3 | media_type | enum('video','image') |  | X |  |  |
 | 4 | r2_key | varchar | 500 | X |  | Key object trên Cloudflare R2 |
 | 5 | original_filename | varchar | 255 | X |  |  |
 | 6 | file_size | bigint | 20 | X |  |  |
 | 7 | mime_type | varchar | 100 | X |  |  |
-| 8 | duration_seconds | int | 11 |  |  |  |
-| 9 | status | enum('processing,ready,failed') |  | X |  | Trạng thái bản ghi |
+| 8 | duration_seconds | int | 11 |  |  | Thời lượng giây |
+| 9 | status | enum('processing','ready','failed') |  | X |  | Trạng thái bản ghi |
 | 10 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 11 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
 | 12 | is_temp | tinyint | 1 | X |  | File tạm trên R2 |
@@ -381,7 +354,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 18 | processing_started_at | timestamp |  |  |  |  |
 | 19 | ready_at | timestamp |  |  |  |  |
 | 20 | expires_at | timestamp |  |  |  |  |
-
 ## Bảng `user_profiles`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -396,7 +368,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 8 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 9 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
 | 10 | cv_path | varchar | 255 |  |  |  |
-
 ## Bảng `course_modules`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -407,8 +378,7 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 4 | order | int | 11 | X |  |  |
 | 5 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 6 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-| 7 | status | enum('draft,published') |  | X |  | Trạng thái bản ghi |
-
+| 7 | status | enum('draft','published') |  | X |  | Trạng thái bản ghi |
 ## Bảng `knowledge_topics`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -419,7 +389,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 4 | description | text |  |  |  | Mô tả |
 | 5 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 6 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `quizzes`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -445,7 +414,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 19 | credits | int | 11 | X |  |  |
 | 20 | thumbnail_url | text |  |  |  |  |
 | 21 | thumbnail_r2_key | text |  |  |  |  |
-
 ## Bảng `questions`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -465,10 +433,9 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 13 | sample_answer | text |  |  |  |  |
 | 14 | rubric | text |  |  |  |  |
 | 15 | points | float |  | X |  |  |
-| 16 | selection_type | varchar | 255 | X |  |  |
+| 16 | selection_type | varchar | 255 | X |  | single hoặc multiple |
 | 17 | image_url | text |  |  |  |  |
 | 18 | image_r2_key | text |  |  |  |  |
-
 ## Bảng `answers`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -481,7 +448,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 6 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
 | 7 | image_url | text |  |  |  |  |
 | 8 | image_r2_key | text |  |  |  |  |
-
 ## Bảng `lesson_completions`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -490,7 +456,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 2 | user_id | bigint | 20 | X | FK | Khóa ngoại tới users.id |
 | 3 | lesson_id | bigint | 20 | X | FK | Khóa ngoại tới lessons.id |
 | 4 | completed_at | timestamp |  | X |  |  |
-
 ## Bảng `user_quiz_attempts`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -501,11 +466,10 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 4 | score | int | 11 | X |  |  |
 | 5 | accuracy | int | 11 | X |  |  |
 | 6 | time_taken_seconds | int | 11 | X |  |  |
-| 7 | status | enum('passed,failed') |  | X |  | Trạng thái bản ghi |
+| 7 | status | enum('passed','failed') |  | X |  | Trạng thái bản ghi |
 | 8 | created_at | timestamp |  | X |  | Thời điểm tạo bản ghi |
 | 9 | score_10 | float |  |  |  |  |
 | 10 | grading_status | varchar | 255 | X |  |  |
-
 ## Bảng `user_topic_performance`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -517,7 +481,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 5 | total_correct | int | 11 | X |  |  |
 | 6 | accuracy_percentage | int | 11 | X |  |  |
 | 7 | updated_at | timestamp |  | X |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `ai_tutor_conversations`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -528,17 +491,15 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 4 | title | varchar | 255 | X |  | Tiêu đề |
 | 5 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 6 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `ai_tutor_messages`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
 |---|---|---|---|---|---|---|
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
 | 2 | conversation_id | bigint | 20 | X | FK |  |
-| 3 | sender | enum('user,ai') |  | X |  |  |
+| 3 | sender | enum('user','ai') |  | X |  |  |
 | 4 | message | longtext |  | X |  |  |
 | 5 | created_at | timestamp |  | X |  | Thời điểm tạo bản ghi |
-
 ## Bảng `admin_settings`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -548,7 +509,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 3 | value | json |  |  |  |  |
 | 4 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 5 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `ai_usage_logs`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -578,7 +538,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 23 | cost_source | varchar | 32 |  |  |  |
 | 24 | cost_amount | decimal | 12,6 |  |  |  |
 | 25 | cost_currency | char | 3 |  |  |  |
-
 ## Bảng `ai_moderation_flags`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -597,7 +556,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 12 | reviewed_at | timestamp |  |  |  |  |
 | 13 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 14 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `support_tickets`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -614,7 +572,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 10 | handled_at | timestamp |  |  |  |  |
 | 11 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 12 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `shared_resources`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -628,7 +585,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 7 | uploaded_by | bigint | 20 |  | FK |  |
 | 8 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 9 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `teacher_payouts`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -647,7 +603,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 12 | metadata | json |  |  |  |  |
 | 13 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 14 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `instructor_transactions`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -663,7 +618,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 9 | available_at | timestamp |  |  |  |  |
 | 10 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 11 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `withdrawals`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -676,7 +630,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 6 | admin_note | text |  |  |  |  |
 | 7 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 8 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `certificates`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -684,11 +637,10 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
 | 2 | user_id | bigint | 20 | X | FK | Khóa ngoại tới users.id |
 | 3 | course_id | bigint | 20 | X | FK | Khóa ngoại tới courses.id |
-| 4 | certificate_url | varchar | 255 |  |  | URL file chứng chỉ (có thể null) |
+| 4 | certificate_url | varchar | 255 |  |  | URL file chứng chỉ |
 | 5 | issued_at | timestamp |  | X |  |  |
 | 6 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 7 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `reviews`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -700,32 +652,23 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 5 | comment | text |  |  |  |  |
 | 6 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 7 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `coupons`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
 |---|---|---|---|---|---|---|
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
 | 2 | code | varchar | 255 | X |  | Unique |
-| 3 | type | enum('percent,fixed') |  | X |  | Loại bản ghi |
+| 3 | type | enum('percent','fixed') |  | X |  | Loại bản ghi |
 | 4 | value | decimal | 10,2 | X |  |  |
 | 5 | max_uses | int | 11 |  |  |  |
 | 6 | used_count | int | 11 | X |  |  |
 | 7 | expires_at | timestamp |  |  |  |  |
-| 8 | status | enum('active,disabled,expired') |  | X |  | Trạng thái bản ghi |
+| 8 | status | enum('active','disabled','expired') |  | X |  | Trạng thái bản ghi |
 | 9 | instructor_id | bigint | 20 | X | FK |  |
-| 10 | course_id | bigint | 20 |  |  | Khóa ngoại tới courses.id |
+| 10 | course_id | bigint | 20 |  | FK | Khóa ngoại tới courses.id |
 | 11 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 12 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-| 13 | title | varchar | 255 |  |  | Tiêu đề |
-| 14 | description | text |  |  |  | Mô tả |
-| 15 | discount_type | enum('percent,fixed') |  | X |  |  |
-| 16 | min_order_amount | decimal | 10,2 |  |  |  |
-| 17 | max_discount_amount | decimal | 10,2 |  |  |  |
-| 18 | is_active | tinyint | 1 | X |  |  |
-| 19 | starts_at | timestamp |  |  |  |  |
-| 20 | usage_limit | int | 11 |  |  |  |
-
+| 13 | starts_at | timestamp |  |  |  |  |
 ## Bảng `teacher_credentials`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -736,7 +679,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 4 | file_path | varchar | 255 | X |  |  |
 | 5 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 6 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `content_versions`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -746,35 +688,28 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 3 | versionable_id | bigint | 20 | X |  |  |
 | 4 | version_number | int | 11 | X |  |  |
 | 5 | snapshot_data | json |  | X |  |  |
-| 6 | status | enum('
-                draft,pending_review,under_review,
-                approved,rejected,needs_fixes,published,
-            ') |  | X |  | Trạng thái bản ghi |
+| 6 | status | enum('draft','pending_review','under_review','approved','rejected','needs_fixes','published') |  | X |  | Trạng thái bản ghi |
 | 7 | is_published | tinyint | 1 | X |  |  |
-| 8 | created_by | bigint | 20 |  |  |  |
+| 8 | created_by | bigint | 20 |  | FK | Khóa ngoại tới users.id |
 | 9 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 10 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `review_submissions`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
 |---|---|---|---|---|---|---|
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
 | 2 | course_id | bigint | 20 | X | FK | Khóa ngoại tới courses.id |
-| 3 | course_version_id | bigint | 20 | X |  |  |
+| 3 | course_version_id | bigint | 20 | X | FK | Khóa ngoại tới content_versions.id |
 | 4 | submitted_by | bigint | 20 | X | FK |  |
 | 5 | submitted_at | timestamp |  | X |  |  |
-| 6 | status | enum('
-                pending,under_review,approved,rejected,needs_fixes,
-            ') |  | X |  | Trạng thái bản ghi |
-| 7 | reviewed_by | bigint | 20 |  |  |  |
+| 6 | status | enum('pending','under_review','approved','rejected','needs_fixes') |  | X |  | Trạng thái bản ghi |
+| 7 | reviewed_by | bigint | 20 |  | FK | Khóa ngoại tới users.id |
 | 8 | reviewed_at | timestamp |  |  |  |  |
 | 9 | review_feedback | text |  |  |  |  |
 | 10 | stale_at | timestamp |  |  |  |  |
 | 11 | metadata | json |  |  |  |  |
 | 12 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 13 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `review_submission_items`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -782,11 +717,10 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
 | 2 | submission_id | bigint | 20 | X | FK |  |
 | 3 | lesson_id | bigint | 20 | X | FK | Khóa ngoại tới lessons.id |
-| 4 | lesson_version_id | bigint | 20 | X |  |  |
-| 5 | change_type | enum('new,modified,deleted,reordered') |  | X |  |  |
+| 4 | lesson_version_id | bigint | 20 | X | FK | Khóa ngoại tới content_versions.id |
+| 5 | change_type | enum('new','modified','deleted','reordered') |  | X |  |  |
 | 6 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 7 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `review_comments`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -799,7 +733,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 6 | content | text |  | X |  | Nội dung |
 | 7 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 8 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `content_audit_logs`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -817,7 +750,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 11 | created_at | timestamp |  | X |  | Thời điểm tạo bản ghi |
 | 12 | course_id | bigint | 20 |  | FK | Khóa ngoại tới courses.id |
 | 13 | correlation_id | char | 36 |  |  |  |
-
 ## Bảng `deletion_requests`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -825,15 +757,14 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
 | 2 | lesson_id | bigint | 20 | X | FK | Khóa ngoại tới lessons.id |
 | 3 | course_id | bigint | 20 | X | FK | Khóa ngoại tới courses.id |
-| 4 | requested_by | bigint | 20 | X | FK |  |
+| 4 | requested_by | bigint | 20 | X | FK | User đề xuất danh mục (nullable) |
 | 5 | requested_at | timestamp |  | X |  |  |
-| 6 | status | enum('pending,approved,rejected') |  | X |  | Trạng thái bản ghi |
-| 7 | reviewed_by | bigint | 20 |  |  |  |
+| 6 | status | enum('pending','approved','rejected') |  | X |  | Trạng thái bản ghi |
+| 7 | reviewed_by | bigint | 20 |  | FK | Khóa ngoại tới users.id |
 | 8 | reviewed_at | timestamp |  |  |  |  |
 | 9 | reason | text |  |  |  |  |
 | 10 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 11 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `chat_conversations`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -841,10 +772,9 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
 | 2 | course_id | bigint | 20 |  | FK | Khóa ngoại tới courses.id |
 | 3 | title | varchar | 255 |  |  | Tiêu đề |
-| 4 | type | enum('course,group,direct') |  | X |  | Loại bản ghi |
+| 4 | type | enum('course','group','direct') |  | X |  | Loại bản ghi |
 | 5 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 6 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `chat_conversation_members`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -855,7 +785,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 4 | last_read_message_id | bigint | 20 |  |  |  |
 | 5 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 6 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `chat_messages`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -864,11 +793,10 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 2 | chat_conversation_id | bigint | 20 | X | FK |  |
 | 3 | sender_id | bigint | 20 | X | FK |  |
 | 4 | content | text |  |  |  | Nội dung |
-| 5 | type | enum('text,file,image') |  | X |  | Loại bản ghi |
+| 5 | type | enum('text','file','image') |  | X |  | Loại bản ghi |
 | 6 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 7 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
 | 8 | is_recalled | tinyint | 1 | X |  | Tin nhắn đã thu hồi |
-
 ## Bảng `chat_attachments`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -881,7 +809,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 6 | size | bigint | 20 |  |  |  |
 | 7 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 8 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `password_otps`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -895,7 +822,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 7 | attempts | int | 11 | X |  |  |
 | 8 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 9 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `teacher_certificates`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -918,7 +844,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 16 | is_public | tinyint | 1 | X |  |  |
 | 17 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 18 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `teacher_certificate_evidences`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -932,7 +857,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 7 | mime_type | varchar | 255 |  |  |  |
 | 8 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 9 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `teacher_verifications`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -949,7 +873,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 10 | revoked_at | timestamp |  |  |  |  |
 | 11 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 12 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `teacher_verification_logs`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -965,7 +888,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 9 | metadata | json |  |  |  |  |
 | 10 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 11 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `draft_revisions`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -982,7 +904,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 10 | parent_revision_id | bigint | 20 |  | FK |  |
 | 11 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 12 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `quiz_course_attachments`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -997,7 +918,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 8 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
 | 9 | order | int | 11 | X |  |  |
 | 10 | is_active | tinyint | 1 | X |  |  |
-
 ## Bảng `ai_generation_logs`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -1013,7 +933,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 9 | error_message | text |  |  |  |  |
 | 10 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 11 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `user_quiz_attempt_answers`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -1032,7 +951,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 12 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 13 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
 | 14 | selected_answer_ids | json |  |  |  |  |
-
 ## Bảng `user_streaks`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -1045,13 +963,12 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 6 | last_checkin_date | date |  |  |  |  |
 | 7 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 8 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `ai_generated_quizzes`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
 |---|---|---|---|---|---|---|
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
-| 2 | user_id | bigint | 20 | X |  | Khóa ngoại tới users.id |
+| 2 | user_id | bigint | 20 | X | FK | Khóa ngoại tới users.id |
 | 3 | title | varchar | 255 | X |  | Tiêu đề |
 | 4 | topic | varchar | 255 | X |  |  |
 | 5 | difficulty | varchar | 255 | X |  |  |
@@ -1066,7 +983,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 14 | is_completed | tinyint | 1 | X |  | Đã hoàn thành |
 | 15 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 16 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `revenue_allocations`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -1091,7 +1007,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 18 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 19 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
 | 20 | partnership_tier | varchar | 20 |  |  | Hạng hợp tác: standard hoặc exclusive |
-
 ## Bảng `lesson_attachments`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -1099,7 +1014,7 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 1 | id | bigint | 20 | X | PK | Khóa chính, tự tăng |
 | 2 | lesson_id | bigint | 20 | X | FK | Khóa ngoại tới lessons.id |
 | 3 | uploaded_by | bigint | 20 |  | FK |  |
-| 4 | display_name | varchar | 255 | X |  |  |
+| 4 | display_name | varchar | 255 | X |  | Tên hiển thị |
 | 5 | original_name | varchar | 255 | X |  |  |
 | 6 | mime_type | varchar | 150 | X |  |  |
 | 7 | extension | varchar | 10 | X |  |  |
@@ -1107,7 +1022,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 9 | r2_key | varchar | 255 | X |  | Unique |
 | 10 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 11 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `ai_daily_quota_usages`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |
@@ -1119,7 +1033,6 @@ Vai trò không lưu trên `users`. Nguồn: `roles` + `role_user`. API JSON v�
 | 5 | used | int | 11 | X |  |  |
 | 6 | created_at | timestamp |  |  |  | Thời điểm tạo bản ghi |
 | 7 | updated_at | timestamp |  |  |  | Thời điểm cập nhật bản ghi |
-
 ## Bảng `student_payment_methods`
 
 | STT | Tên | Kiểu dữ liệu | Độ dài | Không để trống | Khóa chính | Ghi chú |

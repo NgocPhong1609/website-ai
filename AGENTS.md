@@ -80,7 +80,7 @@ Repo GitHub ghi trong README root: `website-ai`. Product UI sống ở Next.js, 
 ├── AGENTS.md                          ← file này
 ├── README.md                          ← git workflow + tình trạng nhánh
 ├── wiki/Home.md                       ← wiki từ README
-├── database.sql                       ← dump phpMyAdmin cũ (2026-06-11), KHÔNG phải schema hiện tại
+├── database.sql                       ← schema hiện tại (structure-only, sinh từ migrations)
 ├── INSTRUCTOR_FULL_FUNCTION_TEST_CHECKLIST.md
 ├── mindnova-ai/                       ← Frontend Next.js
 └── website-MindNova-AI/               ← Backend Laravel

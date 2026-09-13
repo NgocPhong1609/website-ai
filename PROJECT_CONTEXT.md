@@ -2,7 +2,7 @@
 
 Tài liệu nguồn cho AI viết/chỉnh sửa báo cáo dự án. Mọi mô tả dưới đây lấy từ source code, migration, `package.json` / `composer.json`, `routes/api.php`, và tài liệu trong repo (`AGENTS.md`, `DESIGN.md`). Không dùng kiến thức chung để điền chỗ trống. Chỗ chưa đủ bằng chứng ghi rõ.
 
-Nguồn schema: `website-MindNova-AI/database/migrations/`. File `database.sql` (dump phpMyAdmin 2026-06-11, DB `du_an_tot_nghiep`) **không phải schema hiện tại**.
+Nguồn schema: `website-MindNova-AI/database/migrations/`. File `database.sql` là dump cấu trúc hiện tại (không kèm data), sinh từ migration.
 
 ---
 
@@ -367,7 +367,7 @@ Không token → `/login` nếu path:
 
 ## 8. DATABASE
 
-Nguồn: migrations + models `website-MindNova-AI/app/Models/`. Không SoftDeletes trên model. `users.deleted_at` có thể tồn tại từ migration cũ.
+Nguồn: migrations + models `website-MindNova-AI/app/Models/`. Không SoftDeletes trên model. Cột `users.role` và `users.deleted_at` đã drop.
 
 ### Identity
 
