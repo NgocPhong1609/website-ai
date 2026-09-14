@@ -1,159 +1,108 @@
-# MindNova AI - Backend Service (Laravel 13)
+# MindNova AI — Backend (Laravel 13)
 
-Nền tảng API Service cho hệ thống **MindNova AI** (Student + Instructor + Admin).
+API cho student, instructor, admin. Product UI là Next.js ở `../mindnova-ai` (`:3000`). Hướng dẫn đầy đủ (clone → FE + BE) nằm ở [README gốc](../README.md).
 
----
+## Yêu cầu
 
-## 1. Yêu cầu môi trường (Prerequisites)
+Đối chiếu `composer.json` / `composer.lock`:
 
-Trước khi bắt đầu, hãy đảm bảo máy tính của bạn đã cài đặt các công cụ sau:
+- PHP `^8.3` với `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`, `fileinfo`, `curl` (Laravel còn dùng `dom`, `filter`, `hash`, `pcre`, `session`)
+- Composer 2
+- MySQL 8 hoặc MariaDB. Config default nếu thiếu env là sqlite — local chuẩn dùng MySQL
+- Redis không bắt buộc: `.env.example` để cache/session/queue = `database`
 
-- **PHP**: `>= 8.3` (Yêu cầu các extension: `pdo_mysql`, `mbstring`, `openssl`, `bcmath`, `curl`, `gd`, `fileinfo`)
-- **Composer**: `>= 2.x`
-- **Database**: MySQL `>= 8.0` hoặc MariaDB (Khuyên dùng Laragon, XAMPP hoặc Docker)
-- **Node.js**: `>= 20.x` & **PNPM** (đối với Frontend Next.js)
+## Cài backend
 
----
-
-## 2. Hướng dẫn cài đặt từng bước (Setup Guide)
-
-### Bước 1: Clone dự án từ GitHub
-
-```bash
-git clone https://github.com/NgocPhong1609/website-ai.git
-cd website-ai
-```
-
-### Bước 2: Chuyển vào thư mục Backend
+Từ root repo:
 
 ```bash
 cd website-MindNova-AI
-```
-
-### Bước 3: Cài đặt các thư viện PHP (Composer)
-
-```bash
 composer install
-```
-
-> **Lưu ý trên Windows**: Nếu gặp lỗi `Resource temporarily unavailable` hoặc lock file `vendor/composer/installed.php`, hãy tắt các tiến trình PHP/Artisan server đang chạy ngầm rồi thử lại.
-
-### Bước 4: Cấu hình tệp môi trường (`.env`)
-
-Tạo file `.env` từ file mẫu `.env.example`:
-
-```bash
-# บน Windows PowerShell
-copy .env.example .env
-
-# Hoặc trên Bash / Linux / macOS
 cp .env.example .env
+php artisan key:generate
 ```
 
-Mở tệp `.env` và cập nhật thông tin kết nối Database của bạn:
+Tạo DB rồi khớp `DB_*`:
+
+```sql
+CREATE DATABASE du_an CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+`.env` local tối thiểu (đã có trong `.env.example`):
 
 ```env
 APP_NAME="MindNova AI"
-APP_ENV=local
-APP_KEY=
-APP_DEBUG=true
-APP_URL=http://localhost:8000
-
+APP_URL=http://127.0.0.1:8000
+FRONTEND_URL=http://localhost:3000
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=du_an
 DB_USERNAME=root
-DB_PASSWORD=your_mysql_password
+DB_PASSWORD=
 ```
 
-### Bước 5: Khởi tạo Application Key
+`APP_URL` dùng `127.0.0.1:8000` cho khớp `php artisan serve` và fallback frontend (`NEXT_PUBLIC_API_URL` / `BACKEND_URL`).
 
 ```bash
-php artisan key:generate
-```
-
-### Bước 6: Chạy Database Migrations và Seeder
-
-Tạo cơ sở dữ liệu (ví dụ tên DB `du_an` trong MySQL) trước khi chạy lệnh:
-
-```bash
-# Chạy migration tạo toàn bộ bảng database
 php artisan migrate
-
-# (Tùy chọn) Nạp dữ liệu mẫu thử nghiệm (Seeders)
 php artisan db:seed
-```
-
-### Bước 7: Tạo symbolic link cho bộ nhớ Storage
-
-```bash
 php artisan storage:link
+php artisan serve --host=127.0.0.1 --port=8000
 ```
 
-### Bước 8: Khởi chạy Backend Server
+API: http://127.0.0.1:8000/api
+
+Không import `../database.sql` để cài. Schema đi từ `database/migrations/`.
+
+Queue (mail OTP, job) — terminal riêng:
 
 ```bash
-php artisan serve
+php artisan queue:listen --tries=1 --timeout=0
 ```
 
-Server Backend Laravel sẽ hoạt động tại địa chỉ: `http://127.0.0.1:8000`
+Không dùng `composer run dev` cho product UI (script đó chạy Vite/Blade legacy).
 
----
+## Tài khoản seed
 
-## 3. Khởi chạy hệ thống Frontend (Next.js)
+Từ `database/seeders/InstructorSeeder.php` (password `password`):
 
-Để giao diện web hiển thị đầy đủ, khởi chạy ứng dụng Frontend `mindnova-ai`:
+- `teacher@mindnova.ai`
+- `hieu.student@mindnova.ai`
+
+Seeder không tạo user admin.
+
+## Frontend
 
 ```bash
-# Mở một cửa sổ Terminal mới tại thư mục gốc dự án website-ai
-cd mindnova-ai
-
-# Cài đặt thư viện frontend
+cd ../mindnova-ai
 pnpm install
-
-# Khởi chạy Frontend Dev Server
+cp .env.example .env.local
 pnpm dev
 ```
 
-Frontend Next.js sẽ hoạt động tại địa chỉ: `http://localhost:3000`
+`.env.local`: `NEXT_PUBLIC_API_URL=http://127.0.0.1:8000`, `BACKEND_URL=http://127.0.0.1:8000`. App: http://localhost:3000
 
----
+## Test
 
-## 4. Kiểm thử & Các lệnh thường dùng
+`phpunit.xml` dùng MySQL `du_an_testing` — tạo DB này trước:
 
-### Chạy kiểm thử (Automated Tests - Pest)
+```sql
+CREATE DATABASE du_an_testing CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
 
 ```bash
 php artisan test
 ```
 
-### Xóa Cache hệ thống khi thay đổi `.env` hoặc Config
+## Realtime
 
-```bash
-php artisan config:clear
-php artisan route:clear
-php artisan cache:clear
-```
+`php artisan reverb:start` **chưa dùng được trên main**: `config/broadcasting.php` chỉ còn `.bak`, `.env.example` để `BROADCAST_CONNECTION=log`. REST API vẫn chạy thiếu Reverb.
 
-### Khởi chạy Queue Worker (Xử lý tác vụ ngầm như Email, AI)
+## Cấu trúc
 
-```bash
-php artisan queue:work
-```
-
-### Khởi chạy Reverb WebSocket Server (Chat Realtime)
-
-```bash
-php artisan reverb:start
-```
-
----
-
-## 5. Cấu trúc dự án Backend chính
-
-- `app/Http/Controllers/Api/`: Các API Controllers cho Auth, Student, Instructor, Admin, Chat.
-- `app/Services/`: Xử lý Business Logic chính (AI Router, Thanh toán VNPay/MoMo, Doanh thu, Content Review).
-- `app/Models/`: Danh sách các Eloquent Models.
-- `routes/api.php`: Định nghĩa toàn bộ RESTful API endpoints.
-- `database/migrations/`: Nguồn quản lý cấu trúc cơ sở dữ liệu (~99 migrations).
+- `app/Http/Controllers/Api/` — Auth, Student, Instructor, Admin, Chat
+- `app/Services/` — business logic
+- `app/Models/`
+- `routes/api.php`
+- `database/migrations/`
