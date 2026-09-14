@@ -1,58 +1,159 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# MindNova AI - Backend Service (Laravel 13)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Nền tảng API Service cho hệ thống **MindNova AI** (Student + Instructor + Admin).
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 1. Yêu cầu môi trường (Prerequisites)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Trước khi bắt đầu, hãy đảm bảo máy tính của bạn đã cài đặt các công cụ sau:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **PHP**: `>= 8.3` (Yêu cầu các extension: `pdo_mysql`, `mbstring`, `openssl`, `bcmath`, `curl`, `gd`, `fileinfo`)
+- **Composer**: `>= 2.x`
+- **Database**: MySQL `>= 8.0` hoặc MariaDB (Khuyên dùng Laragon, XAMPP hoặc Docker)
+- **Node.js**: `>= 20.x` & **PNPM** (đối với Frontend Next.js)
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 2. Hướng dẫn cài đặt từng bước (Setup Guide)
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### Bước 1: Clone dự án từ GitHub
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/NgocPhong1609/website-ai.git
+cd website-ai
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Bước 2: Chuyển vào thư mục Backend
 
-## Contributing
+```bash
+cd website-MindNova-AI
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Bước 3: Cài đặt các thư viện PHP (Composer)
 
-## Code of Conduct
+```bash
+composer install
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+> **Lưu ý trên Windows**: Nếu gặp lỗi `Resource temporarily unavailable` hoặc lock file `vendor/composer/installed.php`, hãy tắt các tiến trình PHP/Artisan server đang chạy ngầm rồi thử lại.
 
-## Security Vulnerabilities
+### Bước 4: Cấu hình tệp môi trường (`.env`)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Tạo file `.env` từ file mẫu `.env.example`:
 
-## License
+```bash
+# บน Windows PowerShell
+copy .env.example .env
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Hoặc trên Bash / Linux / macOS
+cp .env.example .env
+```
+
+Mở tệp `.env` và cập nhật thông tin kết nối Database của bạn:
+
+```env
+APP_NAME="MindNova AI"
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=du_an
+DB_USERNAME=root
+DB_PASSWORD=your_mysql_password
+```
+
+### Bước 5: Khởi tạo Application Key
+
+```bash
+php artisan key:generate
+```
+
+### Bước 6: Chạy Database Migrations và Seeder
+
+Tạo cơ sở dữ liệu (ví dụ tên DB `du_an` trong MySQL) trước khi chạy lệnh:
+
+```bash
+# Chạy migration tạo toàn bộ bảng database
+php artisan migrate
+
+# (Tùy chọn) Nạp dữ liệu mẫu thử nghiệm (Seeders)
+php artisan db:seed
+```
+
+### Bước 7: Tạo symbolic link cho bộ nhớ Storage
+
+```bash
+php artisan storage:link
+```
+
+### Bước 8: Khởi chạy Backend Server
+
+```bash
+php artisan serve
+```
+
+Server Backend Laravel sẽ hoạt động tại địa chỉ: `http://127.0.0.1:8000`
+
+---
+
+## 3. Khởi chạy hệ thống Frontend (Next.js)
+
+Để giao diện web hiển thị đầy đủ, khởi chạy ứng dụng Frontend `mindnova-ai`:
+
+```bash
+# Mở một cửa sổ Terminal mới tại thư mục gốc dự án website-ai
+cd mindnova-ai
+
+# Cài đặt thư viện frontend
+pnpm install
+
+# Khởi chạy Frontend Dev Server
+pnpm dev
+```
+
+Frontend Next.js sẽ hoạt động tại địa chỉ: `http://localhost:3000`
+
+---
+
+## 4. Kiểm thử & Các lệnh thường dùng
+
+### Chạy kiểm thử (Automated Tests - Pest)
+
+```bash
+php artisan test
+```
+
+### Xóa Cache hệ thống khi thay đổi `.env` hoặc Config
+
+```bash
+php artisan config:clear
+php artisan route:clear
+php artisan cache:clear
+```
+
+### Khởi chạy Queue Worker (Xử lý tác vụ ngầm như Email, AI)
+
+```bash
+php artisan queue:work
+```
+
+### Khởi chạy Reverb WebSocket Server (Chat Realtime)
+
+```bash
+php artisan reverb:start
+```
+
+---
+
+## 5. Cấu trúc dự án Backend chính
+
+- `app/Http/Controllers/Api/`: Các API Controllers cho Auth, Student, Instructor, Admin, Chat.
+- `app/Services/`: Xử lý Business Logic chính (AI Router, Thanh toán VNPay/MoMo, Doanh thu, Content Review).
+- `app/Models/`: Danh sách các Eloquent Models.
+- `routes/api.php`: Định nghĩa toàn bộ RESTful API endpoints.
+- `database/migrations/`: Nguồn quản lý cấu trúc cơ sở dữ liệu (~99 migrations).
