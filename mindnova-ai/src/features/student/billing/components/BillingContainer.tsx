@@ -32,28 +32,11 @@ export default function BillingContainer() {
  Quản lý lịch sử giao dịch học phí, thiết lập phương thức thanh toán an toàn và theo dõi quyền lợi gói học AI Pro. Dữ liệu của bạn được mã hóa bảo mật chuẩn SSL 256-bit.
  </p>
 
- {/* Cleaned Action button - Removed invoice VAT info button */}
- <div className="flex flex-wrap items-center gap-3 pt-1">
- <button
- type="button"
- onClick={() => toast("Bạn đang trải nghiệm trọn vẹn quyền lợi cao cấp của gói MindNova Pro AI!")}
- className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#2563eb] transition-all duration-200 cursor-pointer focus:outline-none flex items-center gap-2"
- >
- <span> Nâng cấp Gói học Pro</span>
- <span></span>
- </button>
- </div>
+
  </div>
 
  {/* Universal Wide Mastery Card representing Active Subscription (No automatic renewal / gia hạn messaging) */}
  <div className="group shrink-0 bg-white/95 backdrop-blur-md rounded-2xl p-5 sm:p-6 border border-[#e2e8f0] flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm hover:border-[#e2e8f0] hover:-translate-y-0.5 transition-all duration-300">
- <div className="w-full flex items-center justify-between gap-4 mb-2">
- <span className="text-xs font-semibold text-[#64748b] group-hover:text-[#2563eb] transition-colors">Gói cước đang kích hoạt </span>
- <span className="text-[11px] font-semibold text-[#0f172a] bg-[#f8fafc] px-3 py-0.5 rounded-full border border-[#0f172a]">
- Đặc quyền VIP
- </span>
- </div>
-
  <div className="text-2xl sm:text-3xl font-bold text-[#0f172a] my-1 flex items-baseline justify-between gap-4">
  <div>
  <span className="text-[#2563eb] font-bold">{isLoading ? "..." : amountLabel}</span>

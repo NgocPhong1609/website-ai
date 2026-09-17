@@ -3,7 +3,7 @@
 import React from "react";
 import { Loader } from "@/src/shared/components/ui/Loader";
 import { NoDataAvailable } from "@/src/shared/components/ui";
-import { MessageSquareOff } from "lucide-react";
+import { MessageSquareOff, Star } from "lucide-react";
 import { useGetCourseDetail, useGetCourseReviews, useCreateCourseReview, useUpdateCourseReview, useDeleteCourseReview } from "../../api";
 import { CourseHeader } from "./CourseHeader";
 import { CurriculumAccordion } from "./CurriculumAccordion";
@@ -90,7 +90,7 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
  <div>
  <p className="text-xs font-bold uppercase tracking-widest text-[#94A3B8]">Bình luận & nhận xét</p>
- <h3 className="mt-2 text-2xl font-bold text-[#0F172A] font-serif">Đánh giá khóa học</h3>
+ <h3 className="mt-2 text-2xl font-semibold text-[#0F172A]">Đánh giá khóa học</h3>
  </div>
  <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-2 text-sm font-semibold text-[#0F172A]">
  Đánh giá: {averageRating.toFixed(1)} / 5
@@ -98,21 +98,20 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  </div>
 
  <form onSubmit={onSubmit} className="mt-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
- <div className="flex items-center gap-2 mb-2">
- <span className="text-sm font-semibold text-[#64748B] mr-2">Mức độ hài lòng:</span>
+ <div className="flex items-center gap-1 mb-2">
+ <span className="text-sm font-medium text-[#64748B] mr-2">Mức độ hài lòng:</span>
  {[1, 2, 3, 4, 5].map((star) => (
  <button
  key={star}
  type="button"
  onClick={() => setRating(star)}
- className={`w-8 h-8 rounded-md text-sm font-bold border transition-colors ${
- star <= rating 
- ? "bg-[#0F172A] text-white border-[#0F172A]" 
- : "bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#94A3B8]"
- }`}
+ className="w-8 h-8 flex items-center justify-center transition-transform hover:scale-110 cursor-pointer"
  aria-label={`Chọn ${star} sao`}
  >
- {star}
+ <Star 
+ size={24} 
+ className={star <= rating ? "text-[#F59E0B] fill-[#F59E0B]" : "text-[#E2E8F0]"} 
+ />
  </button>
  ))}
  </div>
@@ -156,7 +155,7 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  <div key={review.id} className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
  <div className="flex items-start justify-between gap-3">
  <div className="flex items-center gap-3">
- <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0F172A] text-sm font-bold text-white font-serif">
+ <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0F172A] text-sm font-bold text-white">
  {(review.user?.name ?? "H").charAt(0).toUpperCase()}
  </div>
  <div>
@@ -258,7 +257,7 @@ export function CourseDetailWorkspace({ courseId }: { courseId: string | number 
  <div className="px-4 py-1.5 rounded-md bg-[#3B82F6] text-white text-xs font-bold tracking-widest uppercase mb-1">
  LỖI
  </div>
- <h3 className="text-lg font-bold text-[#0F172A] font-serif">Không thể tải thông tin khóa học</h3>
+ <h3 className="text-lg font-semibold text-[#0F172A]">Không thể tải thông tin khóa học</h3>
  <p className="text-xs text-[#64748B] max-w-md leading-relaxed">
  Đã xảy ra sự cố khi kết nối tới máy chủ khóa học MindNova AI. Vui lòng kiểm tra kết nối mạng và thử tải lại sau ít phút.
  </p>

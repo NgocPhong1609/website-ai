@@ -3,15 +3,13 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import type { CourseDetailHeaderInfo } from "../../types";
-import { StudentRefundModal } from "../StudentRefundModal";
-import { Banknote } from "lucide-react";
+import { Clock, Star, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 
 const SAVED_COURSES_KEY = "mindnova_saved_courses_v1";
 
 export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
   const [isSaved, setIsSaved] = useState(false);
-  const [isRefundOpen, setIsRefundOpen] = useState(false);
 
   useEffect(() => {
     if (!info?.id) return;
@@ -58,29 +56,29 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
         <div className="relative z-10 flex flex-col gap-6">
           {/* Breadcrumb & Pill tag */}
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <nav className="flex items-center gap-2 text-xs font-medium text-[#64748B]">
+            <nav className="flex items-center gap-1.5 text-xs font-medium text-[#64748B]">
               <Link href="/courses" className="hover:text-[#0F172A] transition-colors text-decoration-none">
                 Khóa học của tôi
               </Link>
-              <span className="text-[#94A3B8]">/</span>
-              <span className="text-[#3B82F6] font-semibold bg-[#F8FAFC] px-2.5 py-0.5 rounded-full border border-[#E2E8F0]">
+              <ChevronRight size={14} className="text-[#94A3B8]" />
+              <span className="text-[#0F172A] font-semibold">
                 Chi tiết học phần
               </span>
             </nav>
 
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold text-[#0F172A] bg-white px-2.5 py-1 rounded-full border border-[#E2E8F0]">
+              <span className="inline-block text-[11px] font-semibold text-[#2563EB] bg-[#EFF6FF] px-2.5 py-1 rounded-md border border-[#BFDBFE]">
                 {categoryTag}
               </span>
-              <span className="text-[11px] font-semibold text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-full border border-[#E2E8F0]">
-                Level: {level}
+              <span className="inline-block text-[11px] font-medium text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-md border border-[#E2E8F0] capitalize">
+                {level}
               </span>
             </div>
           </div>
 
           {/* Title & Description */}
           <div className="space-y-3">
-            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-tight text-[#0F172A] leading-tight font-serif">
+            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-semibold tracking-tight text-[#0F172A] leading-tight">
               {title}
             </h1>
             <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed max-w-3xl">
@@ -89,21 +87,14 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
           </div>
 
           {/* Metadata Badges Row */}
-          <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-[#64748B] pt-2 border-t border-[#E2E8F0]">
-            <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-[#E2E8F0]">
-              <span className="font-semibold text-[#64748B]">Thời lượng:</span>
-              <span>{durationText}</span>
+          <div className="flex flex-wrap items-center gap-3 text-xs pt-4 mt-2 border-t border-[#E2E8F0]/60">
+            <span className="inline-flex items-center gap-1.5 px-1 py-1.5 text-[#0F172A]">
+              <Clock size={14} className="text-[#64748B]" />
+              <span className="font-semibold">{durationText}</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-[#E2E8F0]">
-              <span className="font-semibold text-[#64748B]">Học viên:</span>
-              <span>{studentsText}</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-[#E2E8F0]">
-              <span className="font-semibold text-[#64748B]">Đánh giá:</span>
-              <span className="text-[#3B82F6] font-bold">{ratingText}</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-[#E2E8F0] text-[#0F172A] font-bold">
-              <span>Chứng nhận kỹ năng AI MindNova</span>
+            <span className="inline-flex items-center gap-1.5 px-1 py-1.5 text-[#0F172A]">
+              <Star size={14} className="fill-[#EAB308] text-[#EAB308]" />
+              <span className="font-semibold">{ratingText}</span>
             </span>
           </div>
 
@@ -128,21 +119,13 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
                   onClick={handleSaveToggle}
                   className={`flex items-center justify-center px-4 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                     isSaved
-                      ? "bg-[#0F172A] border-[#0F172A] text-white"
-                      : "bg-white border-[#E2E8F0] text-[#0F172A] hover:bg-[#F1F5F9]"
+                      ? "bg-[#EFF6FF] border-[#BFDBFE] text-[#2563EB] hover:bg-[#DBEAFE]"
+                      : "bg-white border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC]"
                   }`}
                 >
                   <span>{isSaved ? "Đã lưu vào danh mục" : "Lưu khóa học"}</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setIsRefundOpen(true)}
-                  className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-xs font-bold bg-[#EFF6FF] hover:bg-[#EFF6FF]/80 text-[#3B82F6] border border-[#3B82F6]/20 transition-all cursor-pointer shadow-2xs"
-                  title="Yêu cầu hoàn tiền khóa học nếu tiến độ ≤ 10% hoặc chưa học quá 5 bài"
-                >
-                  <span className="flex items-center gap-1.5"><Banknote size={16} /> Yêu cầu hoàn tiền</span>
-                </button>
               </>
             ) : (
               <>
@@ -163,8 +146,8 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
                   onClick={handleSaveToggle}
                   className={`flex items-center justify-center px-4 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                     isSaved
-                      ? "bg-[#0F172A] border-[#0F172A] text-white"
-                      : "bg-white border-[#E2E8F0] text-[#0F172A] hover:bg-[#F1F5F9]"
+                      ? "bg-[#EFF6FF] border-[#BFDBFE] text-[#2563EB] hover:bg-[#DBEAFE]"
+                      : "bg-white border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC]"
                   }`}
                 >
                   <span>{isSaved ? "Đã lưu vào danh mục" : "Lưu khóa học"}</span>
@@ -175,14 +158,6 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
         </div>
       </section>
 
-      {isEnrolled && (
-        <StudentRefundModal
-          isOpen={isRefundOpen}
-          onClose={() => setIsRefundOpen(false)}
-          courseId={info?.id || 1}
-          courseTitle={title}
-        />
-      )}
     </div>
   );
 }

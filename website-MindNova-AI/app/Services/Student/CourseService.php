@@ -428,8 +428,8 @@ class CourseService
         $timeLeftText = ($totalLessons - $completedLessons) * 15; // Giả định mỗi bài 15 phút
         $timeLeftTextStr = $timeLeftText > 0 ? floor($timeLeftText / 60) . 'h ' . ($timeLeftText % 60) . 'm thời lượng còn lại' : 'Đã hoàn thành khóa học';
         $ratingText = $reviewCount > 0
-            ? number_format($averageRating, 1, '.', '') . ' ⭐ (' . $reviewCount . ' Đánh giá)'
-            : '0.0 ⭐ (0 Đánh giá)';
+            ? number_format($averageRating, 1, '.', '') . ' (' . $reviewCount . ' Đánh giá)'
+            : '0.0 (0 Đánh giá)';
         $studentsText = $studentsCount . ' Học viên tích cực';
 
         return [

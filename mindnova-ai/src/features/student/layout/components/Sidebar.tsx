@@ -91,17 +91,7 @@ export default function Sidebar() {
 
  {/* Help + Auth */}
  <div className="flex flex-col gap-0.5 w-full">
- <Link
- href="/help"
- title={isCollapsed ? "Help" : undefined}
- className={twMerge(
- "flex items-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all duration-150 shrink-0",
- isCollapsed ? "justify-center w-10 h-10 mx-auto" : "gap-2.5 px-3 py-2 text-sm w-full text-left"
- )}
- >
- <HelpIcon />
- {!isCollapsed && <span>Help</span>}
- </Link>
+
  
  {isMounted && isLoggedIn ? (
  <button
