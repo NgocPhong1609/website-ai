@@ -55,12 +55,12 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
       className={`flex w-full ${isLastInGroup ? 'mb-3' : 'mb-1'} ${isOwn ? 'justify-end' : 'justify-start'} relative group items-end`}
     >
       {!isOwn && (
-        <div className="w-8 h-8 rounded-full overflow-hidden mr-2 flex-shrink-0 mb-1">
+        <div className="w-8 h-8 rounded-full overflow-hidden mr-2.5 flex-shrink-0 mb-1 shadow-sm border border-slate-200/50">
           {isFirstInGroup ? (
             message.sender?.avatar_url ? (
-              <img src={message.sender.avatar_url} alt={message.sender.name} className="w-full h-full object-cover bg-gray-200" />
+              <img src={message.sender.avatar_url} alt={message.sender.name} className="w-full h-full object-cover bg-slate-100" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-600 text-xs font-bold bg-gray-200">
+              <div className="w-full h-full flex items-center justify-center text-slate-500 text-[11px] font-bold bg-gradient-to-br from-slate-100 to-slate-200">
                 {message.sender?.name?.charAt(0) || 'U'}
               </div>
             )
@@ -86,23 +86,23 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
 
       <div className={`max-w-[70%] sm:max-w-[65%] flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
         {!isOwn && isFirstInGroup && (
-          <div className="mb-1 ml-1 flex items-center gap-1.5">
-            <span className="text-[11px] font-medium text-gray-500">{message.sender?.name}</span>
+          <div className="mb-1.5 ml-1 flex items-center gap-1.5">
+            <span className="text-[12px] font-semibold text-slate-600">{message.sender?.name}</span>
             <InstructorChatBadge role={message.sender?.role} />
           </div>
         )}
         
         <div 
-          className={`relative px-4 py-2.5 rounded-2xl shadow-sm transition-all ${
+          className={`relative px-4 py-2.5 rounded-2xl transition-all ${
             isOwn 
-              ? 'bg-[#3B82F6] text-white rounded-br-xs' 
+              ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-br-sm shadow-[0_4px_12px_-4px_rgba(59,130,246,0.4)]' 
               : isInstructor
-                ? 'bg-[#EFF6FF] border border-[#DBEAFE] text-gray-800 rounded-bl-xs'
-                : 'bg-white border border-gray-200/80 text-gray-800 rounded-bl-xs'
+                ? 'bg-blue-50/80 border border-blue-100/50 text-slate-800 rounded-bl-sm shadow-[0_2px_10px_-4px_rgba(59,130,246,0.1)]'
+                : 'bg-white border border-slate-100/80 text-slate-800 rounded-bl-sm shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]'
           }`}
         >
           {message.content && (
-            <p className="text-sm leading-relaxed whitespace-pre-wrap break-words select-text">
+            <p className="text-[15px] leading-relaxed whitespace-pre-wrap break-words select-text">
               {message.content}
             </p>
           )}
@@ -138,7 +138,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
           )}
 
           {isLastInGroup && (
-            <div className={`text-[10px] flex items-center justify-end mt-1 gap-1.5 font-medium ${isOwn ? 'text-white/80' : 'text-gray-400'}`}>
+            <div className={`text-[10px] flex items-center justify-end mt-1.5 gap-1.5 font-medium ${isOwn ? 'text-white/80' : 'text-slate-400'}`}>
               <span>
                 {new Date(message.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
               </span>
@@ -154,7 +154,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
                 </svg>
               )}
               {isOwn && message.status === 'failed' && (
-                <span className="text-[#DBEAFE] font-bold" title="Lỗi khi gửi">!</span>
+                <span className="text-blue-100 font-bold" title="Lỗi khi gửi">!</span>
               )}
             </div>
           )}

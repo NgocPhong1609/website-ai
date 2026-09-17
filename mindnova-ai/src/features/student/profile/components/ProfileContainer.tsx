@@ -28,8 +28,68 @@ export default function ProfileContainer() {
 
   if (isLoading) {
     return (
-      <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex items-center justify-center">
-        <Loader size="lg" text="Đang tải thông tin hồ sơ..." />
+      <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-6 animate-pulse">
+        {/* Hero Banner Skeleton */}
+        <section className="rounded-2xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-3 flex-1">
+              <div className="h-8 w-64 bg-slate-200 rounded-lg"></div>
+              <div className="h-4 w-full max-w-md bg-slate-200 rounded mt-2"></div>
+              <div className="h-4 w-3/4 max-w-sm bg-slate-200 rounded"></div>
+            </div>
+            <div className="shrink-0 flex items-center gap-5 bg-slate-50 rounded-xl p-4 border border-slate-200 min-w-[280px]">
+              <div className="w-14 h-14 bg-slate-200 rounded-full shrink-0"></div>
+              <div className="space-y-2 flex-1">
+                <div className="h-5 w-32 bg-slate-200 rounded"></div>
+                <div className="h-3 w-40 bg-slate-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Main Layout Skeleton */}
+        <div className="flex flex-col lg:flex-row items-start gap-6 flex-1 min-h-0">
+          {/* Sidebar Skeleton */}
+          <div className="w-full lg:w-72 shrink-0 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-slate-200 rounded-full shrink-0"></div>
+              <div className="space-y-2 flex-1">
+                <div className="h-5 w-full bg-slate-200 rounded"></div>
+                <div className="h-3 w-2/3 bg-slate-200 rounded"></div>
+              </div>
+            </div>
+            <div className="h-px bg-slate-200 w-full"></div>
+            <div className="space-y-3">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-10 w-full bg-slate-200 rounded-xl"></div>
+              ))}
+            </div>
+          </div>
+
+          {/* Active Panel Skeleton */}
+          <div className="flex-1 min-w-0 w-full rounded-2xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm space-y-8">
+            <div className="space-y-3">
+              <div className="h-6 w-48 bg-slate-200 rounded-md"></div>
+              <div className="h-4 w-full max-w-md bg-slate-200 rounded"></div>
+            </div>
+            <div className="h-px bg-slate-200 w-full"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <div className="h-4 w-24 bg-slate-200 rounded"></div>
+                  <div className="h-10 w-full bg-slate-200 rounded-xl"></div>
+                </div>
+              ))}
+            </div>
+            <div className="space-y-2 mt-4">
+              <div className="h-4 w-24 bg-slate-200 rounded"></div>
+              <div className="h-24 w-full bg-slate-200 rounded-xl"></div>
+            </div>
+            <div className="pt-4 flex justify-end">
+              <div className="h-10 w-32 bg-slate-200 rounded-xl"></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

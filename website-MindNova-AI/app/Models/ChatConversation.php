@@ -19,4 +19,8 @@ class ChatConversation extends Model
     public function messages() {
         return $this->hasMany(ChatMessage::class);
     }
+
+    public function lastMessage() {
+        return $this->hasOne(ChatMessage::class)->latestOfMany();
+    }
 }
