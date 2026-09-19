@@ -1165,7 +1165,7 @@ function LessonWorkspaceContent() {
               <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1 truncate">
                 <Link href="/courses" className="hover:text-slate-900 transition-colors">Khoá học</Link>
                 <ChevronRight size={12} className="text-slate-300 shrink-0" aria-hidden />
-                <span className="text-slate-700 truncate">{apiDetail?.title || "Khóa học"}</span>
+                <span className="text-slate-700 truncate">{apiDetail?.header_info?.title || (apiDetail as any)?.title || "Khóa học"}</span>
               </nav>
               <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 truncate tracking-tight">{activeLesson.title}</h1>
             </div>

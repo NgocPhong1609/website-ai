@@ -1,13 +1,19 @@
 import Link from "next/link";
-
-import { Sparkles } from "lucide-react";
+import Image from "next/image";
 
 // ─── Logo mark ────────────────────────────────────────────────────────────────
 
 function LogoMark() {
   return (
-    <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-blue-500 to-blue-600 flex items-center justify-center shadow-sm shrink-0">
-      <Sparkles className="w-5 h-5 text-white" />
+    <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-sm border border-blue-100/60 shrink-0 bg-[#0F265C]">
+      <Image
+        src="/images/logo.png"
+        alt="MindNova AI"
+        width={36}
+        height={36}
+        className="w-full h-full object-cover"
+        priority
+      />
     </div>
   );
 }

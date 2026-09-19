@@ -30,6 +30,11 @@ export const metadata: Metadata = {
  description:
  "MindNova AI - Nền tảng trí tuệ nhân tạo tiên tiến giúp bạn học tập dễ dàng và hiệu quả.",
  keywords: ["AI", "learning", "education", "personalized", "study plan"],
+ icons: {
+ icon: "/images/logo.png",
+ shortcut: "/images/logo.png",
+ apple: "/images/logo.png",
+ },
 };
 
 export default function RootLayout({

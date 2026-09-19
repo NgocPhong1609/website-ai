@@ -2,23 +2,23 @@
 // Minimal topbar for the course-creation flow (no sidebar).
 
 import Link from "next/link";
+import Image from "next/image";
 import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { HelpCircleIcon, BellIcon } from "./icons";
 
 function LogoMark() {
- return (
- <div className="w-8 h-8 rounded-lg bg-[#3B82F6] flex items-center justify-center shadow-[0_3px_10px_rgba(59,130,246,0.45)] shrink-0">
- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
- <circle cx="12" cy="12" r="2.5" fill="white" />
- <path
- d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"
- stroke="white"
- strokeWidth="2"
- strokeLinecap="round"
- />
- </svg>
- </div>
- );
+  return (
+    <div className="relative w-8 h-8 rounded-lg overflow-hidden shadow-sm border border-blue-100/60 bg-[#0F265C] shrink-0">
+      <Image
+        src="/images/logo.png"
+        alt="MindNova AI"
+        width={32}
+        height={32}
+        className="w-full h-full object-cover"
+        priority
+      />
+    </div>
+  );
 }
 
 export function CreateCourseTopbar() {

@@ -120,7 +120,14 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  return (
  <div className="flex flex-col w-full h-full px-8 sm:px-10 py-6">
  {/* Header — bám sát phía trên */}
- <div className="mb-auto"></div>
+ <div className="mb-auto">
+ <Link href="/" className="inline-flex items-center gap-2.5 group" aria-label="Trang chủ MindNova AI">
+ <LogoMark size={36} />
+ <span className="text-[16px] font-bold tracking-tight text-[#0F172A] group-hover:text-blue-600 transition-colors">
+ MindNova AI
+ </span>
+ </Link>
+ </div>
 
  {/* Content — căn giữa dọc */}
  <div className="flex flex-col justify-center w-full max-w-[380px] mx-auto py-6">

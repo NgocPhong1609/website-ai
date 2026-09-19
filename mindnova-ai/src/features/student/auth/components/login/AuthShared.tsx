@@ -78,10 +78,25 @@ export const getRedirectPath = (input: any): string => {
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
-import { User, Mail, Lock, Eye, EyeOff, Sparkles, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 
-export function LogoMark() {
-  return <Sparkles size={24} className="text-[#3B82F6]" />;
+export function LogoMark({ size = 32 }: { size?: number }) {
+  return (
+    <div
+      className="relative shrink-0 rounded-xl overflow-hidden shadow-sm border border-blue-100/60 bg-[#0F265C] inline-flex items-center justify-center"
+      style={{ width: size, height: size }}
+    >
+      <Image
+        src="/images/logo.png"
+        alt="MindNova AI"
+        width={size}
+        height={size}
+        className="w-full h-full object-cover"
+        priority
+      />
+    </div>
+  );
 }
 
 export function UserIcon() {

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ComponentType } from "react";
 import {
@@ -81,8 +82,15 @@ export function AdminSidebar() {
     <aside className="flex h-full w-[260px] xl:w-[280px] shrink-0 flex-col overflow-hidden border-r border-[#E2E8F0] bg-white text-[#0F172A]">
       <div className="shrink-0 border-b border-[#E2E8F0] px-4 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] text-white shadow-md">
-            <Sparkles className="h-5 w-5" aria-hidden />
+          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl overflow-hidden shadow-md border border-blue-100/60 bg-[#0F265C]">
+            <Image
+              src="/images/logo.png"
+              alt="MindNova AI"
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+              priority
+            />
           </div>
           <div className="leading-none">
             <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-[#3B82F6]">
