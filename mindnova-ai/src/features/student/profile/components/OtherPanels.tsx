@@ -30,6 +30,25 @@ function ActiveSessionsBox() {
   );
 }
 
+export function validatePassword(password: string, fieldName: string = "Mật khẩu"): { isValid: boolean; error?: string } {
+  if (!password) {
+    return { isValid: false, error: `Vui lòng nhập ${fieldName.toLowerCase()}.` };
+  }
+  if (password.length < 8) {
+    return { isValid: false, error: `${fieldName} phải có tối thiểu 8 ký tự.` };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { isValid: false, error: `${fieldName} phải chứa ít nhất 1 chữ hoa (A-Z).` };
+  }
+  if (!/[0-9]/.test(password)) {
+    return { isValid: false, error: `${fieldName} phải chứa ít nhất 1 chữ số (0-9).` };
+  }
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    return { isValid: false, error: `${fieldName} phải chứa ít nhất 1 ký tự đặc biệt (ví dụ: !@#$%^&*).` };
+  }
+  return { isValid: true };
+}
+
 export function SecurityPanel() {
   const [currentPw, setCurrentPw] = useState("");
   const [newPw, setNewPw] = useState("");
@@ -37,7 +56,9 @@ export function SecurityPanel() {
   const [updated, setUpdated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const canSave = currentPw.length > 0 && newPw.length >= 6 && newPw === confirmPw;
+  const currentPwValidation = validatePassword(currentPw, "Mật khẩu hiện tại");
+  const newPwValidation = validatePassword(newPw, "Mật khẩu mới");
+  const canSave = currentPwValidation.isValid && newPwValidation.isValid && newPw === confirmPw;
 
   async function handleUpdate() {
     if (!canSave) return;
@@ -59,7 +80,11 @@ export function SecurityPanel() {
         setConfirmPw("");
       }, 2500);
     } catch (error: any) {
-      const message = error?.response?.data?.message || error?.response?.data?.errors?.new_password?.[0] || "Không thể đổi mật khẩu. Vui lòng thử lại.";
+      const message =
+        error?.response?.data?.errors?.current_password?.[0] ||
+        error?.response?.data?.errors?.new_password?.[0] ||
+        error?.response?.data?.message ||
+        "Không thể đổi mật khẩu. Vui lòng thử lại.";
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -83,10 +108,31 @@ export function SecurityPanel() {
 
       <div className="flex-1 max-w-xl flex flex-col gap-5">
         {[
-          { id: "current-pw", label: "Mật khẩu hiện tại", value: currentPw, set: setCurrentPw, placeholder: "Nhập mật khẩu đang sử dụng..." },
-          { id: "new-pw", label: "Mật khẩu mới", value: newPw, set: setNewPw, placeholder: "Tối thiểu 6 ký tự..." },
-          { id: "confirm-pw", label: "Xác nhận mật khẩu mới", value: confirmPw, set: setConfirmPw, placeholder: "Nhập lại mật khẩu mới vừa đặt..." },
-        ].map(({ id, label, value, set, placeholder }) => (
+          {
+            id: "current-pw",
+            label: "Mật khẩu hiện tại",
+            value: currentPw,
+            set: setCurrentPw,
+            placeholder: "Tối thiểu 8 ký tự (1 hoa, 1 số, 1 ký tự đặc biệt)...",
+            validation: currentPwValidation,
+          },
+          {
+            id: "new-pw",
+            label: "Mật khẩu mới",
+            value: newPw,
+            set: setNewPw,
+            placeholder: "Tối thiểu 8 ký tự (1 hoa, 1 số, 1 ký tự đặc biệt)...",
+            validation: newPwValidation,
+          },
+          {
+            id: "confirm-pw",
+            label: "Xác nhận mật khẩu mới",
+            value: confirmPw,
+            set: setConfirmPw,
+            placeholder: "Nhập lại mật khẩu mới vừa đặt...",
+            validation: null,
+          },
+        ].map(({ id, label, value, set, placeholder, validation }) => (
           <div key={id}>
             <label htmlFor={id} className="block text-sm font-semibold text-slate-700 mb-1.5">
               {label}
@@ -99,10 +145,15 @@ export function SecurityPanel() {
               placeholder={placeholder}
               className="w-full px-4 py-2.5 rounded-xl text-sm text-slate-900 bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
             />
+            {value.length > 0 && validation && !validation.isValid && (
+              <p className="text-xs font-medium text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-lg mt-1.5">
+                {validation.error}
+              </p>
+            )}
           </div>
         ))}
 
-        {newPw.length > 0 && newPw !== confirmPw && (
+        {newPw.length > 0 && confirmPw.length > 0 && newPw !== confirmPw && (
           <p className="text-xs font-medium text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-lg mt-1">
             Mật khẩu xác nhận chưa trùng khớp.
           </p>
