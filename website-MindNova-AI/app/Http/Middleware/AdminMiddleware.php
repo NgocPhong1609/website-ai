@@ -15,11 +15,6 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $adminSecret = env('ADMIN_SECRET', 'admin-secret');
-        if ($request->header('x-admin-secret') === $adminSecret) {
-            return $next($request);
-        }
-
         $user = $request->user();
         if ($user?->isAdmin()) {
             return $next($request);

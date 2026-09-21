@@ -94,6 +94,7 @@ function TabButton({ id, label, isActive, onClick }: TabButtonProps) {
     <button
       type="button"
       onClick={onClick}
+      aria-current={isActive ? "page" : undefined}
       className={twMerge(
         "group relative w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer outline-none",
         isActive
@@ -112,7 +113,7 @@ function TabButton({ id, label, isActive, onClick }: TabButtonProps) {
         <Icon />
       </span>
       <span className="flex-1 text-left truncate">{label}</span>
-      {isActive && <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />}
+      {isActive && <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />}
     </button>
   );
 }
@@ -193,7 +194,7 @@ export function ProfileSidebar({
       <hr className="border-slate-100" />
 
       {/* Tabs */}
-      <nav className="flex flex-col gap-1.5">
+      <nav aria-label="Profile navigation" className="flex flex-col gap-1.5">
         {PROFILE_TABS.map((tab) => (
           <TabButton
             key={tab.id}

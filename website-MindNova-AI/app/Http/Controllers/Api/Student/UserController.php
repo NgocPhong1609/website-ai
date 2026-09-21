@@ -81,7 +81,7 @@ class UserController extends Controller
                     if (!preg_match('/[0-9]/', $value)) {
                         $fail("{$fieldLabel} phải chứa ít nhất 1 chữ số (0-9).");
                     }
-                    if (!preg_match('/[^A-Za-z0-9]/', $value)) {
+                    if (!preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\\\|,.<>\/?`~]/', $value)) {
                         $fail("{$fieldLabel} phải chứa ít nhất 1 ký tự đặc biệt (ví dụ: !@#$%^&*).");
                     }
                 },

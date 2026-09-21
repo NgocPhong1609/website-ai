@@ -4,6 +4,96 @@ Tất cả các thay đổi có ý nghĩa đối với dự án MindNova AI sẽ
 
 ---
 
+## 2026-09-21 — Khắc phục các lỗ hổng bảo mật và cải thiện chất lượng code từ đợt kiểm toán Claude Skills
+
+### Changed
+- **Bảo mật Backend (Admin Backdoor):** Loại bỏ hoàn toàn header bypass `x-admin-secret` trong `AdminMiddleware.php`, ngăn chặn truy cập trái phép cấp cao nhất vào hệ thống quản trị.
+- **Bảo mật API Routes (Student Privacy):** Di chuyển các route học tập cá nhân của học sinh (`study-plan`, `practice/overview`, `progress/overview`, `history/overview`, `analyze-lesson`, `self-assessment`) từ public vào bên trong nhóm middleware `auth:sanctum` trong `routes/api.php`.
+- **OAuth Callback Dynamic URL:** Thay thế URL cứng `http://localhost:3000` bằng `env('FRONTEND_URL')` trong `AuthController.php`.
+- **AI Prompt Injection Guardrails:** Sanitize biến đầu vào (`topic`, `title`, `custom_prompt`) bằng `strip_tags()` và `Str::limit()`, bổ sung rule bảo vệ hệ thống trong `AiQuizGeneratorController.php`.
+- **Mật khẩu an toàn:** Cập nhật regex kiểm tra ký tự đặc biệt trong `UserController.php` để từ chối ký tự khoảng trắng (space).
+- **Kiến trúc Realtime Chat:** Bổ sung tracking trạng thái kết nối (`isConnected`, `connectionState`), hàm `reconnect`, và hủy kết nối instance cũ khi token thay đổi trong `useRealtimeChat.ts`.
+- **TanStack Query & State Synchronization:** Tạo custom hook `useChatConversations` trong `src/features/chat/api/useChatConversations.ts`, refactor `ChatLayout.tsx` loại bỏ waterfall fetch `useEffect` và tích hợp `invalidateUnreadCount()`.
+- **Accessibility & Contrast:** Khôi phục `aria-current="page"` trên tab đang hoạt động, thêm `aria-label="Profile navigation"` cho thẻ `<nav>`, và nâng độ tương phản màu checkmark thành `text-blue-600` trong `ProfileSidebar.tsx`.
+- **Ranh giới bảo mật Frontend:** Ghi nhận cảnh báo kiến trúc tại `middleware.ts` xác định rõ middleware phía client là UX Guard, quyền hạn bảo mật thực tế được bảo vệ bởi Laravel Sanctum.
+
+### Files / Modules
+- `website-MindNova-AI/app/Http/Middleware/AdminMiddleware.php`
+- `website-MindNova-AI/routes/api.php`
+- `website-MindNova-AI/app/Http/Controllers/Api/Auth/AuthController.php`
+- `website-MindNova-AI/app/Http/Controllers/Api/Student/AiQuizGeneratorController.php`
+- `website-MindNova-AI/app/Http/Controllers/Api/Student/UserController.php`
+- `mindnova-ai/middleware.ts`
+- `mindnova-ai/src/hooks/useRealtimeChat.ts`
+- `mindnova-ai/src/features/chat/api/useChatConversations.ts`
+- `mindnova-ai/src/features/chat/components/ChatLayout.tsx`
+- `mindnova-ai/src/features/student/profile/components/ProfileSidebar.tsx`
+- `project_knowledge_base.md`
+- `CHANGELOG.md`
+
+### Reason
+- Khắc phục triệt để các lỗ hổng bảo mật nghiêm trọng (CRITICAL/HIGH/MEDIUM) và nợ kỹ thuật phát hiện bởi 4 Claude Skills (Skill Tester, Code Review, Security Review, Review Loop).
+
+### Verification
+- Kiểm tra cú pháp PHP và Next.js / TypeScript.
+- `git diff` xác minh tất cả 10 vấn đề được khắc phục chính xác tại các dòng mục tiêu, không làm gãy các dependency và module liên quan.
+- Xác minh routes cấu hình Sanctum chính xác, không còn endpoint cá nhân lộ ra ngoài public.
+
+### Notes
+- Token Google OAuth chuyển sang dùng `FRONTEND_URL` từ file môi trường.
+- Middleware Next.js chỉ nên được xem là điều hướng trải nghiệm người dùng; toàn bộ logic bảo vệ tài nguyên thực tế đều nằm ở Sanctum token và middleware role ở backend.
+
+### Remaining
+- Thêm unique composite key cho bảng `enrollments` và `chat_conversation_members` qua database migration mới khi có lịch bảo trì DB.
+- Refactor tách nhỏ component `LessonWorkspace.tsx` (1067 dòng).
+
+---
+
+## 2026-09-21 — Kiểm tra toàn diện dự án bằng 4 Claude Skills (Skill Tester, Code Review, Security Review, Review Loop)
+
+### Changed
+- Chạy Claude Skill Tester: Lint 35 SKILL.md files — tất cả PASSED (0 errors, 0 warnings).
+- Thực hiện Claude Code Review (Two-Phase): Standards & Specification review trên 36 file thay đổi trong 5 commit gần nhất. Phát hiện 1 P1, 2 P2, 2 P3.
+- Thực hiện Claude Security Review (OWASP): Audit bảo mật toàn bộ codebase. Phát hiện 2 CRITICAL, 2 HIGH, 2 MEDIUM, 1 LOW.
+- Thực hiện Claude Review Loop (Multi-agent 4 perspectives): Diff Auditor, Architecture, Tech-Stack, UX/A11y. Phát hiện 6 Action Required, 4 Consideration, 2 Praise.
+- Tổng hợp 18 findings qua script `synthesize_review.py`.
+- Cập nhật `project_knowledge_base.md` mục 9 (Tech Debt) với chi tiết 16 vấn đề phân loại theo mức nghiêm trọng.
+- Xác nhận `AiQuizGeneratorController` fallback `userId = 201` đã được sửa trong code hiện tại.
+
+### Files / Modules
+- `reviews/code-review-report.md` (Tạo mới — báo cáo code review)
+- `reviews/security-audit-report.md` (Tạo mới — báo cáo bảo mật)
+- `reviews/review-consolidated.md` (Tạo mới — báo cáo multi-agent review)
+- `reviews/review-synthesized-final.md` (Tạo mới — tổng hợp 18 findings)
+- `project_knowledge_base.md` (Cập nhật mục 9 Known Tech Debt)
+- `CHANGELOG.md` (Cập nhật entry này)
+
+### Reason
+- Người dùng yêu cầu sử dụng các Claude Skills (Skill Tester, Code Review, Security Review, Review Loop) để kiểm tra dự án toàn diện trước khi tiếp tục phát triển.
+
+### Verification
+- Claude Skill Tester: `python3.12 test_skill.py` exit code 0, 35/35 PASSED.
+- Claude Code Review: Subagent đọc toàn bộ 36 file changed, phân tích hai pha (Standards + Spec).
+- Claude Security Review: Subagent đọc routes/api.php, controllers, middleware, auth, payment, AI services. Xác nhận 6/7 known issues từ AGENTS.md, 1 đã sửa.
+- Claude Review Loop: Subagent phân tích từ 4 góc nhìn chuyên biệt (Diff, Architecture, Tech-Stack, UX/A11y).
+- Script `synthesize_review.py`: Exit code 0, merged 18 findings.
+
+### Notes
+- Đây là task kiểm tra/audit — không có thay đổi code chức năng. Chỉ tạo báo cáo review và cập nhật documentation.
+- 2 lỗ hổng CRITICAL (admin backdoor + cookie forgery) cần được xử lý ưu tiên cao nhất trước khi deploy production.
+- `broadcasting.php` đã được tạo chính thức trong commit gần đây — cập nhật mục 8 trong knowledge base tương ứng.
+
+### Remaining
+- Sửa 2 lỗ hổng CRITICAL: `AdminMiddleware.php` backdoor và `middleware.ts` cookie forgery.
+- Di chuyển student routes thiếu auth vào `auth:sanctum` group.
+- Sửa Google OAuth redirect dùng `env('FRONTEND_URL')`.
+- Thêm WebSocket reconnection cho `useRealtimeChat.ts`.
+- Refactor `ChatLayout.tsx` sang TanStack Query.
+- Khôi phục ARIA attributes cho `ProfileSidebar.tsx`.
+- Thêm unique constraints DB cho `enrollments` và `chat_conversation_members`.
+
+---
+
 ## 2026-09-21 — Thiết lập hệ thống tài liệu chuẩn hóa: Project Knowledge Base & Changelog
 
 ### Changed

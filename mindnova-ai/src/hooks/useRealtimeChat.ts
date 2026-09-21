@@ -4,9 +4,18 @@ import Pusher from 'pusher-js';
 
 // Setup Laravel Echo instance
 let echoInstance: any = null;
+let currentEchoToken: string | null = null;
 
 export const getEchoInstance = (token: string) => {
-    if (!echoInstance) {
+    if (!echoInstance || currentEchoToken !== token) {
+        if (echoInstance) {
+            try {
+                echoInstance.disconnect();
+            } catch (err) {
+                console.warn("[Echo] Disconnect previous instance error:", err);
+            }
+        }
+        currentEchoToken = token;
         (window as any).Pusher = Pusher;
         Pusher.logToConsole = process.env.NEXT_PUBLIC_ENABLE_PUSHER_LOGS === 'true';
         const port = Number(process.env.NEXT_PUBLIC_REVERB_PORT || 8080);
@@ -31,6 +40,8 @@ export const getEchoInstance = (token: string) => {
 
 export const useRealtimeChat = (conversationId: number, token: string | null) => {
     const [messages, setMessages] = useState<any[]>([]);
+    const [isConnected, setIsConnected] = useState<boolean>(true);
+    const [connectionState, setConnectionState] = useState<string>('connected');
 
     useEffect(() => {
         if (!token || !conversationId) return;
@@ -39,6 +50,22 @@ export const useRealtimeChat = (conversationId: number, token: string | null) =>
         const channelName = `chat.conversation.${conversationId}`;
         
         const channel = echo.private(channelName);
+
+        // Connection state tracking
+        const pusher = echo.connector?.pusher;
+        const handleStateChange = (states: { previous: string; current: string }) => {
+            setConnectionState(states.current);
+            setIsConnected(states.current === 'connected');
+            if (states.current === 'disconnected' || states.current === 'unavailable' || states.current === 'failed') {
+                console.warn(`[RealtimeChat] WebSocket state changed: ${states.previous} -> ${states.current}`);
+            }
+        };
+
+        if (pusher?.connection) {
+            setIsConnected(pusher.connection.state === 'connected');
+            setConnectionState(pusher.connection.state);
+            pusher.connection.bind('state_change', handleStateChange);
+        }
 
         const onMessageSent = (e: any) => {
             // Check if message is already in state (e.g. from optimistic UI)
@@ -61,6 +88,9 @@ export const useRealtimeChat = (conversationId: number, token: string | null) =>
         return () => {
             channel.stopListening('ChatMessageSent', onMessageSent);
             channel.stopListening('ChatMessageRecalled', onMessageRecalled);
+            if (pusher?.connection) {
+                pusher.connection.unbind('state_change', handleStateChange);
+            }
             // Do not call echo.leave(channelName) here because ChatLayout is also listening to this channel for unread updates!
         };
     }, [conversationId, token]);
@@ -90,8 +120,18 @@ export const useRealtimeChat = (conversationId: number, token: string | null) =>
         setMessages(prev => prev.map(m => m.id === messageId ? { ...m, is_recalled: true } : m));
     };
 
+    const reconnect = () => {
+        if (token) {
+            const echo = getEchoInstance(token);
+            echo.connector?.pusher?.connect();
+        }
+    };
+
     return {
         messages,
+        isConnected,
+        connectionState,
+        reconnect,
         addOptimisticMessage,
         replaceTempMessage,
         loadInitialMessages,

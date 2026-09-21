@@ -219,10 +219,30 @@ Laravel (:8000)
 
 ## 9. Vấn đề kỹ thuật tồn đọng & Nợ kỹ thuật đã biết (Known Tech Debt)
 
-1. **Thiếu ràng buộc Unique ở tầng cơ sở dữ liệu:**
+### 9.1 Lỗ hổng & rủi ro bảo mật còn tồn đọng (Cần tiếp tục cải tiến)
+
+1. **Thiếu `role:student` middleware (CWE-285, CVSS 5.3):** Nhóm `/api/student/*` bên trong `auth:sanctum` chưa áp dụng middleware `role:student` nghiêm ngặt — hiện tại giáo viên/admin đăng nhập vẫn có thể gọi các API cá nhân của học sinh nếu controller không kiểm tra role riêng.
+2. **Ký số Cookie Role trên Frontend (Khuyến nghị nâng cấp tương lai):** Dù `middleware.ts` đã được gắn cảnh báo bảo mật và hệ thống thực sự bảo vệ tài nguyên qua backend Sanctum, Next.js frontend nên chuyển sang dùng signed cookie/HMAC hoặc session token để hoàn toàn ngăn chặn việc đổi cookie phía client để xem giao diện admin giả lập.
+
+### 9.2 Nợ kỹ thuật kiến trúc & hạ tầng
+
+3. **Thiếu ràng buộc Unique ở tầng cơ sở dữ liệu:**
    - `enrollments`: Chưa có unique key cho cặp `(user_id, course_id)`.
    - `chat_conversation_members`: Chưa có unique key cho cặp `(conversation_id, user_id)`.
-2. **Cấu hình phát sóng Realtime:** File `config/broadcasting.php` hiện chỉ có bản sao lưu `.bak`, file `.env.example` mặc định `BROADCAST_CONNECTION=log`. Cần cấu hình chính thức để Reverb chạy mượt mà trên môi trường production.
-3. **Lệnh tự động mở khóa doanh thu:** Command `revenue:unlock-pending` đã được viết trong Service nhưng chưa được đăng ký trong Scheduler của `routes/console.php`.
-4. **Bảo mật một số route Student:** Các endpoint xem lộ trình học tổng quan, danh mục chủ đề và làm bài trắc nghiệm tự luyện đang ở trạng thái public; cần theo dõi tránh lạm dụng hạn mức tài nguyên AI.
-5. **Next.js TypeScript Build Errors:** Cấu hình `next.config.ts` đang bật `ignoreBuildErrors: true`. Cần chuẩn hóa dứt điểm các lỗi type còn sót lại giữa các component.
+4. **Cấu hình phát sóng Realtime:** File `config/broadcasting.php` đã được tạo chính thức (không còn chỉ có `.bak`). Tuy nhiên `.env.example` mặc định `BROADCAST_CONNECTION=log` — cần đảm bảo cấu hình Reverb đúng trên production.
+5. **Lệnh tự động mở khóa doanh thu:** Command `revenue:unlock-pending` đã được viết trong Service nhưng chưa được đăng ký trong Scheduler của `routes/console.php`.
+6. **Next.js TypeScript Build Errors:** Cấu hình `next.config.ts` đang bật `ignoreBuildErrors: true`. Cần chuẩn hóa dứt điểm các lỗi type còn sót lại giữa các component.
+7. **`LessonWorkspace.tsx` quá lớn (1067 dòng):** Vi phạm Single Responsibility Principle — nên tách thành `<VideoWorkspace />`, `<QuizWorkspace />`, `<DiscussionPanel />`.
+
+### 9.3 Các vấn đề và lỗ hổng đã được khắc phục hoàn toàn (Resolved on 2026-09-21)
+
+- **[CRITICAL] Xóa Admin Backdoor `x-admin-secret` (CWE-798, CVSS 9.8):** Đã loại bỏ hoàn toàn việc bypass bằng header bí mật trong `AdminMiddleware.php`. Chỉ tài khoản có `$user->isAdmin()` mới được cấp quyền.
+- **[CRITICAL] Ranh giới bảo mật Frontend Middleware (CWE-807):** Bổ sung tài liệu cảnh báo kiến trúc tại `middleware.ts`, xác định rõ middleware frontend chỉ đóng vai trò UX Guard, toàn bộ bảo mật kiểm soát truy cập phân quyền thuộc trách nhiệm backend Laravel Sanctum và middleware `role:*`.
+- **[HIGH] Bảo vệ các Route cá nhân của Học sinh (CWE-306, CVSS 7.5):** Di chuyển các route học tập cá nhân (`/study-plan`, `/practice/overview`, `/progress/overview`, `/history/overview`, `/analyze-lesson`, `/courses/{courseId}/self-assessment/generate`, `/self-assessment/submit`) từ public vào bên trong nhóm middleware `auth:sanctum`. Chỉ giữ public danh mục khóa học và onboarding sơ bộ.
+- **[HIGH] Google OAuth Dynamic Redirect:** Thay thế URL cứng `http://localhost:3000` bằng `env('FRONTEND_URL')` trong `AuthController.php`.
+- **[MEDIUM] Prompt Injection AI Quiz:** Đã sanitize đầu vào `topic`, `title`, `custom_prompt` bằng `strip_tags()` và `Str::limit()`, đồng thời bổ sung chỉ dẫn guardrail nghiêm cấm ghi đè cấu hình trong system prompt của `AiQuizGeneratorController.php`.
+- **[P1] WebSocket Reconnection Strategy:** Nâng cấp `useRealtimeChat.ts` và `getEchoInstance`: bổ sung tracking trạng thái kết nối (`isConnected`, `connectionState`), hàm `reconnect`, và tự động hủy kết nối instance cũ khi token thay đổi để tránh stale auth token.
+- **[ACTION REQUIRED] Password Validation Regex:** Khắc phục regex kiểm tra ký tự đặc biệt trong `UserController.php`, chuyển sang danh sách ký tự cụ thể `[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]` để từ chối ký tự khoảng trắng (space).
+- **[ACTION REQUIRED] ChatLayout TanStack Query Refactor:** Tạo custom hook `useChatConversations` sử dụng `@tanstack/react-query` thay thế cho manual fetch trong `useEffect`, tích hợp cơ chế invalidation cho unread count.
+- **[ACTION REQUIRED] ProfileSidebar Accessibility & Design Fix:** Khôi phục `aria-current="page"` trên tab đang hoạt động, thêm `aria-label="Profile navigation"` cho `<nav>`, nâng mức tương phản màu biểu tượng kiểm tra thành `text-blue-600` đạt chuẩn WCAG.
+- **`AiQuizGeneratorController` fallback `userId = 201`:** Đã xác minh giải quyết dứt điểm — controller hiện tại lấy user ID qua authentication, không còn hardcoded fallback.

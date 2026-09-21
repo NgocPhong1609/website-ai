@@ -92,18 +92,11 @@ Route::post('/student/payment/momo-ipn', [OrderController::class, 'momoIpn']);
 // -- Nhóm AI Quiz Generator & Review --
 // -- API Student Public Routes --
 Route::prefix('student')->group(function () {
-    Route::get('/study-plan', [StudentStudyPlanController::class, 'overview']);
-    Route::get('/practice/overview', [StudentPracticeController::class, 'overview']);
-    Route::get('/progress/overview', [StudentProgressController::class, 'overview']);
-    Route::get('/history/overview', [StudentHistoryController::class, 'overview']);
     Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
     Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
     Route::get('/courses/{course}/reviews', [StudentReviewController::class, 'index']);
     Route::post('/onboarding', [OnboardingController::class, 'store']);
     Route::get('/available-topics', [OnboardingController::class, 'getAvailableTopics']);
-    Route::post('/analyze-lesson', [AnalyzeLessonController::class, 'analyze']);
-    Route::post('/courses/{courseId}/self-assessment/generate', [SelfAssessmentController::class, 'generate']);
-    Route::post('/self-assessment/submit', [SelfAssessmentController::class, 'submit']);
 });
 
 // ==========================================
@@ -152,6 +145,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // 3. NHÓM API HỌC SINH (Student Authenticated Actions)
     // ==========================================
     Route::prefix('student')->group(function () {
+        Route::get('/study-plan', [StudentStudyPlanController::class, 'overview']);
+        Route::get('/practice/overview', [StudentPracticeController::class, 'overview']);
+        Route::get('/progress/overview', [StudentProgressController::class, 'overview']);
+        Route::get('/history/overview', [StudentHistoryController::class, 'overview']);
+        Route::post('/analyze-lesson', [AnalyzeLessonController::class, 'analyze']);
+        Route::post('/courses/{courseId}/self-assessment/generate', [SelfAssessmentController::class, 'generate']);
+        Route::post('/self-assessment/submit', [SelfAssessmentController::class, 'submit']);
+
         Route::post('/study-plan/chat', [StudentStudyPlanController::class, 'chat'])
             ->middleware('throttle:10,1');
 

@@ -4,6 +4,7 @@ import { ChatSidebar } from './ChatSidebar';
 import { ChatArea } from './ChatArea';
 import { axiosClient } from '@/src/shared/lib/axios';
 import { getEchoInstance } from '@/src/hooks/useRealtimeChat';
+import { useChatConversations, useInvalidateChat } from '../api/useChatConversations';
 
 interface ChatLayoutProps {
   token: string;
@@ -14,15 +15,42 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<number | null>(null);
   const activeIdRef = React.useRef<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+
+  // TanStack Query hook for caching & state management
+  const { data: queriedConversations, isLoading } = useChatConversations(token);
+  const { invalidateUnreadCount } = useInvalidateChat();
+
+  // Sync queried conversations into local state for realtime mutation
+  useEffect(() => {
+    if (queriedConversations && queriedConversations.length > 0) {
+      if (!activeIdRef.current) {
+        const firstId = queriedConversations[0].id;
+        setActiveId(firstId);
+        activeIdRef.current = firstId;
+        window.localStorage.setItem('activeChatConversationId', firstId.toString());
+        setConversations(queriedConversations.map(c => c.id === firstId ? { ...c, unread_count: 0 } : c));
+        invalidateUnreadCount();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('chat-messages-read'));
+        }
+      } else {
+        setConversations(queriedConversations);
+      }
+    } else if (queriedConversations) {
+      setConversations([]);
+    }
+  }, [queriedConversations]);
 
   const handleSelectConversation = (id: number) => {
     setActiveId(id);
     activeIdRef.current = id;
     window.localStorage.setItem('activeChatConversationId', id.toString());
     setConversations(prev => prev.map(c => c.id === id ? { ...c, unread_count: 0 } : c));
-    // Trigger global unread update when marked as read
-    window.dispatchEvent(new Event('chat-messages-read'));
+    // Trigger unread count update via TanStack Query invalidation and custom event
+    invalidateUnreadCount();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('chat-messages-read'));
+    }
   };
 
   const handleUpdateLastMessage = useCallback((conversationId: number, lastMessage: any) => {
@@ -42,33 +70,6 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
       });
     });
   }, []);
-
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const res = await axiosClient.get('/api/chat/conversations');
-        if (res.data?.data?.length > 0) {
-          const firstId = res.data.data[0].id;
-          setActiveId(firstId);
-          activeIdRef.current = firstId;
-          window.localStorage.setItem('activeChatConversationId', firstId.toString());
-          // Also clear its unread count since it's immediately opened
-          setConversations(res.data.data.map((c: any) => c.id === firstId ? { ...c, unread_count: 0 } : c));
-          window.dispatchEvent(new Event('chat-messages-read'));
-        } else {
-          setConversations(res.data?.data || []);
-        }
-      } catch (error) {
-        console.error("Failed to fetch conversations", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (token) {
-      fetchConversations();
-    }
-  }, [token]);
 
   // Global listener for all conversations to update sidebar realtime
   useEffect(() => {

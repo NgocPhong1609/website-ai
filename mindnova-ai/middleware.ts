@@ -1,4 +1,14 @@
 // src/middleware.ts
+//
+// ⚠️ SECURITY BOUNDARY WARNING:
+// This middleware is a UX GUARD ONLY — it controls frontend page routing for a better user experience.
+// The `userRole` cookie is a PLAINTEXT value set by the client and CAN BE FORGED by an attacker.
+// DO NOT rely on this middleware for security decisions.
+// The REAL security boundary is enforced by the backend:
+//   - Laravel Sanctum (auth:sanctum) validates the Bearer token
+//   - CheckRole middleware (role:admin, role:teacher) validates the user's role from the database
+// Any sensitive data or mutation is protected server-side regardless of what this middleware does.
+//
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 

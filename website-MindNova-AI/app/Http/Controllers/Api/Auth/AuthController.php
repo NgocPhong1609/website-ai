@@ -282,7 +282,8 @@ DB::table('user_streaks')->insert([
             DB::commit();
 
             $token = $user->createToken('auth_token')->plainTextToken;
-            return redirect()->away('http://localhost:3000/login-success?token=' . $token);
+            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/');
+            return redirect()->away($frontendUrl . '/login-success?token=' . $token);
 
         } catch (\Exception $e) {
             DB::rollBack();
