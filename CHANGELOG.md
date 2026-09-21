@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-21 — Local setup and skill-assisted verification
+
+- Installed locked frontend/backend dependencies; configured ignored local env,
+  dedicated app/test MariaDB databases, generated app key and storage link,
+  applied 109 migrations and default demo seed. Built Next.js and legacy Vite assets.
+- Added `scripts/start-local.sh`, `scripts/smoke-local.mjs`, `docs/local-setup.md`
+  and `reviews/local-setup-test-report.md`; updated knowledge base.
+- Verified build/lint/TypeScript and actual browser/API login. Frontend serial
+  tests: 104 passed / 2 failed; backend: 204 passed / 7 failures / 68 errors.
+- Recorded remaining seed/fixture/route/integration issues; existing business
+  logic and tests were not changed. No external AI/payment service was exercised.
+
+
 Tất cả các thay đổi có ý nghĩa đối với dự án MindNova AI sẽ được ghi nhận chi tiết tại file này theo quy chuẩn bắt buộc của dự án. Không được xóa hoặc ghi đè lịch sử cũ.
 
 ---

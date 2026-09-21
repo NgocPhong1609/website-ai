@@ -8,6 +8,18 @@
 
 ## 1. Tổng quan dự án (Project Overview)
 
+### Local verification — 2026-09-21
+
+Clone `313caaa` đã setup trên Ubuntu 24.04 với Node 22, PHP 8.3 và MariaDB 10.11.
+Database local `website_ai_local` tách biệt test DB `website_ai_testing`; env files
+không được track. 109 migrations và demo seed hoàn tất. Next.js build/lint/tsc
+đều pass; kiểm thử frontend tuần tự 104/106 pass, backend 204/279 pass (7 failures,
+68 errors). Đăng nhập học viên/giảng viên và API smoke pass. Seed còn thiếu role
+cho ba tài khoản scenario, thiếu chat initialization và phần lớn lesson versions.
+Hướng dẫn: `docs/local-setup.md`; bằng chứng và giới hạn: `reviews/local-setup-test-report.md`.
+Khởi động local: `bash scripts/start-local.sh`; smoke: `node scripts/smoke-local.mjs`.
+
+
 - **Tên sản phẩm:** MindNova AI
 - **Loại hệ thống:** Nền tảng học trực tuyến (e-learning) tiếng Việt tích hợp gia sư AI thông minh (AI Tutor), tạo lộ trình học cá nhân hóa (AI Study Plan) và hệ thống tạo/chấm bài tập tự động (AI Quiz Generator).
 - **Mô hình người dùng (3 vai trò chính):**
