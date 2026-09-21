@@ -640,3 +640,23 @@ Các mục sau **không khẳng định** cho đến khi đọc thêm hoặc ch�
 ## 11. Việc không làm khi “chỉ sửa docs”
 
 Task tạo file này không được sửa business logic, UI, API, database. Chỉ cập nhật `AGENTS.md`.
+
+---
+
+## 12. PROJECT DOCUMENTATION & CHANGE HISTORY — MANDATORY RULES
+
+Mọi task làm việc trên codebase đều phải tuân thủ nghiêm ngặt quy chuẩn tài liệu bắt buộc:
+
+1. **Duy trì `project_knowledge_base.md`:** Là nguồn thông tin phản ánh **TRẠNG THÁI HIỆN TẠI** (Current State) của dự án. Cập nhật khi có thay đổi về kiến trúc, API, schema, luồng xử lý hoặc cấu hình.
+2. **Duy trì `CHANGELOG.md`:** Là nguồn ghi nhận toàn bộ **LỊCH SỬ THAY ĐỔI** theo thời gian. Mỗi task hoàn thành phải thêm 1 entry mới, tuyệt đối không xóa hoặc ghi đè lịch sử cũ.
+3. **Không được kết thúc task nếu bỏ qua tài liệu:** "DOCUMENTATION IS PART OF THE IMPLEMENTATION". Chỉ khi hoàn tất kiểm tra code, chạy verify/test và cập nhật cả 2 file tài liệu mới được xem là hoàn thành task.
+4. **Chu trình bắt buộc sau mỗi task:**
+   ```text
+   IMPLEMENT
+   → TEST / VERIFY
+   → DOCUMENT CURRENT STATE (project_knowledge_base.md)
+   → RECORD CHANGE HISTORY (CHANGELOG.md)
+   → VERIFY DOCUMENTATION
+   → COMPLETE
+   ```
+
