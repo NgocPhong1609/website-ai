@@ -39,10 +39,10 @@ export async function AdminInvoicesPage({ filters }: AdminInvoicesPageProps) {
  const data = await getAdminInvoicesPageData(filters);
 
  return (
- <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+ <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-sans)]">
  <section className="mn-stagger rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(125deg,#0d1d3f_0%,#17386d_48%,#2563EB_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
  <p className="text-[10px] uppercase tracking-[0.35em] text-[#F8FAFC]/70">Hóa đơn</p>
- <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Danh sách hóa đơn</h1>
+ <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-sans)]">Danh sách hóa đơn</h1>
  <p className="mt-1 text-xs text-slate-200/90">Theo dõi tình trạng hóa đơn, phương thức thanh toán và tổng tiền đơn hàng.</p>
  </section>
 
@@ -98,7 +98,7 @@ export async function AdminInvoicesPage({ filters }: AdminInvoicesPageProps) {
 
  <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
  <div className="mb-4 flex items-center justify-between">
- <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Hóa đơn gần đây</h2>
+ <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-sans)]">Hóa đơn gần đây</h2>
  <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#3B82F6] ring-1 ring-blue-100">
  {data.rows.length} hóa đơn
  </span>

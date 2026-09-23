@@ -88,7 +88,7 @@ export function AdminSidebar() {
             <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-[#3B82F6]">
               MindNova
             </p>
-            <h2 className="mt-0.5 text-xl font-semibold text-[#0F172A] [font-family:var(--font-admin-head)]">
+            <h2 className="mt-0.5 text-xl font-semibold text-[#0F172A] [font-family:var(--font-sans)]">
               Admin
             </h2>
           </div>

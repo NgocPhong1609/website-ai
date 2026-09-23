@@ -119,10 +119,10 @@ export function AdminUsersManagementPage() {
  };
 
  return (
- <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+ <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-sans)]">
  <section className="rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(120deg,#0b1d40_0%,#1D4ED8_45%,#134e4a_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.8)]">
  <p className="text-[10px] uppercase tracking-[0.34em] text-[#F8FAFC]/70">User Management</p>
- <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý người dùng và phân quyền</h1>
+ <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-sans)]">Quản lý người dùng và phân quyền</h1>
  <p className="mt-1 max-w-3xl text-xs text-slate-100/90">Cấp quyền, khóa/xóa tài khoản Teacher, Student, Guest; theo dõi đăng nhập, thời gian học và lịch sử thao tác.</p>
  </section>
 
@@ -153,7 +153,7 @@ export function AdminUsersManagementPage() {
  </section>
 
  <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
- <h2 className="mb-3 text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Danh sách tài khoản</h2>
+ <h2 className="mb-3 text-lg font-semibold text-slate-900 [font-family:var(--font-sans)]">Danh sách tài khoản</h2>
  <div className="overflow-x-auto">
  <table className="min-w-full text-sm">
  <thead className="bg-slate-50 text-slate-600">
@@ -197,7 +197,7 @@ export function AdminUsersManagementPage() {
 
  <section className="grid gap-4">
  <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
- <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Theo dõi hoạt động người dùng</h3>
+ <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-sans)]">Theo dõi hoạt động người dùng</h3>
  {!activity && <p className="mt-3 text-sm text-slate-500">Chọn &quot;Lịch sử&quot; ở bảng bên trái để xem chi tiết.</p>}
 
  {activity && (
@@ -234,7 +234,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
  return (
  <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_14px_32px_-25px_rgba(10,18,40,0.4)]">
  <p className="text-sm text-slate-500">{label}</p>
- <p className="mt-2 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{value.toLocaleString()}</p>
+ <p className="mt-2 text-3xl font-semibold text-slate-900 [font-family:var(--font-sans)]">{value.toLocaleString()}</p>
  </div>
  );
 }

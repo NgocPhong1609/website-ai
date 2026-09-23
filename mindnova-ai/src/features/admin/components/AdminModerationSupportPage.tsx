@@ -95,16 +95,16 @@ export function AdminModerationSupportPage() {
  };
 
  return (
- <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+ <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-sans)]">
  <section className="rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(120deg,#1f2937_0%,#2563EB_46%,#1D4ED8_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.85)]">
  <p className="text-[10px] uppercase tracking-[0.34em] text-[#F8FAFC]/70">Moderation & Support</p>
- <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Kiểm duyệt nội dung và xử lý khiếu nại</h1>
+ <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-sans)]">Kiểm duyệt nội dung và xử lý khiếu nại</h1>
  <p className="mt-1 text-xs text-slate-100/90">Flag nội dung AI độc hại để admin xử lý thủ công, và tiếp nhận/phản hồi ticket lỗi hệ thống, tranh chấp chấm điểm.</p>
  </section>
 
  <section className="grid gap-4 xl:grid-cols-2">
  <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
- <h2 className="mb-3 text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Flag nội dung độc hại</h2>
+ <h2 className="mb-3 text-lg font-semibold text-slate-900 [font-family:var(--font-sans)]">Flag nội dung độc hại</h2>
  <div className="space-y-2">
  {flags.map((flag) => (
  <div key={flag.id} className="rounded-lg border border-slate-200 p-3">
@@ -122,7 +122,7 @@ export function AdminModerationSupportPage() {
  </div>
 
  <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
- <h2 className="mb-3 text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Tiếp nhận khiếu nại/báo lỗi</h2>
+ <h2 className="mb-3 text-lg font-semibold text-slate-900 [font-family:var(--font-sans)]">Tiếp nhận khiếu nại/báo lỗi</h2>
  <div className="grid gap-2">
  <select value={ticketForm.type} onChange={(e) => setTicketForm((s) => ({ ...s, type: e.target.value }))} className="rounded-xl border border-slate-200 px-3 py-2 text-sm">
  <option value="system_error">Lỗi hệ thống</option>

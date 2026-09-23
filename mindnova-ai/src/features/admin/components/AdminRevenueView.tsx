@@ -196,11 +196,11 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
   };
 
   return (
-    <div className="space-y-6 px-5 lg:px-6 pt-2.5 pb-8 [font-family:var(--font-admin-body)]">
+    <div className="space-y-6 px-5 lg:px-6 pt-2.5 pb-8 [font-family:var(--font-sans)]">
       {/* Header Banner */}
       <section className="rounded-2xl border border-white/20 bg-[linear-gradient(125deg,#0b1636_0%,#0d224a_50%,#115e83_100%)] py-4 px-6 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
         <p className="text-[10px] uppercase tracking-[0.35em] text-white/65">Revenue Analytics & Audit</p>
-        <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Doanh thu &amp; Lịch sử Hoàn tiền Cấn trừ</h1>
+        <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-sans)]">Doanh thu &amp; Lịch sử Hoàn tiền Cấn trừ</h1>
         <p className="mt-1 max-w-3xl text-xs text-slate-200/90 leading-relaxed">
           Quản lý tổng doanh thu, phí nền tảng Admin thực nhận, thu nhập giảng viên và đối soát chi tiết từng lệnh **Hoàn tiền / Cấn trừ thu nhập**.
         </p>
@@ -250,7 +250,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
           <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Doanh thu Admin (Thực nhận)</p>
-          <p className="mt-2 text-2xl font-black text-blue-700 [font-family:var(--font-admin-head)]">
+          <p className="mt-2 text-2xl font-black text-blue-700 [font-family:var(--font-sans)]">
             {formatMoney(totalAdmin)}
           </p>
           <p className="mt-1 text-[11px] text-slate-400 font-medium">Theo ảnh chụp phân bổ của từng giao dịch</p>
@@ -258,7 +258,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
 
         <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
           <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Thu nhập Giảng viên</p>
-          <p className="mt-2 text-2xl font-black text-emerald-600 [font-family:var(--font-admin-head)]">
+          <p className="mt-2 text-2xl font-black text-emerald-600 [font-family:var(--font-sans)]">
             {formatMoney(totalTeacher)}
           </p>
           <p className="mt-1 text-[11px] text-slate-400 font-medium">Theo ảnh chụp phân bổ của từng giao dịch</p>
@@ -266,7 +266,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
 
         <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
           <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tổng giá trị Học phí</p>
-          <p className="mt-2 text-2xl font-black text-slate-900 [font-family:var(--font-admin-head)]">
+          <p className="mt-2 text-2xl font-black text-slate-900 [font-family:var(--font-sans)]">
             {formatMoney(data.totalRevenue)}
           </p>
           <p className="mt-1 text-[11px] text-slate-400 font-medium">{data.courseCount} khóa học có doanh thu</p>
@@ -274,7 +274,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
 
         <div className="rounded-2xl border border-rose-200/80 bg-rose-50/50 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
           <p className="text-xs font-bold text-rose-700 uppercase tracking-wider">Tổng Hoàn tiền Học viên</p>
-          <p className="mt-2 text-2xl font-black text-rose-700 [font-family:var(--font-admin-head)]">
+          <p className="mt-2 text-2xl font-black text-rose-700 [font-family:var(--font-sans)]">
             -{formatMoney(totalRefundedToStudents)}
           </p>
           <p className="mt-1 text-[11px] text-rose-600 font-medium">
@@ -300,7 +300,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
         <div className="p-4 border-b border-slate-100 space-y-3 bg-slate-50/70">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-base font-bold text-slate-900 [font-family:var(--font-admin-head)] flex items-center gap-2">
+              <h2 className="text-base font-bold text-slate-900 [font-family:var(--font-sans)] flex items-center gap-2">
                 <Receipt className="h-4 w-4 text-[#2563EB]" aria-hidden />
                 <span>Lịch Sử Mua Hàng &amp; Nhật Ký Cấn Trừ Hoàn Tiền</span>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-800">
@@ -691,7 +691,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
       {/* SECTION 2: Course Summary Table */}
       <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-          <h2 className="text-base font-bold text-slate-900 [font-family:var(--font-admin-head)]">Tổng hợp Doanh thu &amp; Phân chia theo Khóa học</h2>
+          <h2 className="text-base font-bold text-slate-900 [font-family:var(--font-sans)]">Tổng hợp Doanh thu &amp; Phân chia theo Khóa học</h2>
           <span className="text-xs text-slate-500 font-medium">Đã cập nhật theo thời gian thực</span>
         </div>
 

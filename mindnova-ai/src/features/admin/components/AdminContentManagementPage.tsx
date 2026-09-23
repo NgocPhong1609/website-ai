@@ -259,10 +259,10 @@ export function AdminContentManagementPage() {
  };
 
  return (
- <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+ <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-sans)]">
  <section className="rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(120deg,#0f172a_0%,#1D4ED8_50%,#2563EB_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(7,18,45,0.8)]">
  <p className="text-[10px] uppercase tracking-[0.34em] text-[#F8FAFC]/70">Content Management</p>
- <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Quản lý khóa học</h1>
+ <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-sans)]">Quản lý khóa học</h1>
  <p className="mt-1 text-xs text-slate-100/90">Duyệt/gỡ bài giảng, quản lý kho tài liệu mẫu, và phân loại ngân hàng câu hỏi cho AI tạo đề.</p>
  </section>
 
@@ -274,7 +274,7 @@ export function AdminContentManagementPage() {
 
  <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
- <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Quản lý khóa học</h2>
+ <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-sans)]">Quản lý khóa học</h2>
  <div className="inline-flex rounded-xl bg-slate-100 p-1 text-sm">
  <button
  type="button"
@@ -464,7 +464,7 @@ export function AdminContentManagementPage() {
 
  <section className="grid gap-4 xl:grid-cols-2">
  <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
- <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Kho tài liệu mẫu</h3>
+ <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-sans)]">Kho tài liệu mẫu</h3>
  <div className="mt-3 grid gap-2">
  <input placeholder="Tiêu đề" value={resourceForm.title} onChange={(e) => setResourceForm((s) => ({ ...s, title: e.target.value }))} className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
  <select value={resourceForm.type} onChange={(e) => setResourceForm((s) => ({ ...s, type: e.target.value }))} className="rounded-xl border border-slate-200 px-3 py-2 text-sm">
@@ -489,7 +489,7 @@ export function AdminContentManagementPage() {
  </div>
 
  <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
- <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Ngân hàng câu hỏi</h3>
+ <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-sans)]">Ngân hàng câu hỏi</h3>
  <div className="mt-3 space-y-2">
  {questions.slice(0, 12).map((question) => (
  <div key={question.id} className="rounded-lg border border-slate-200 p-3">
@@ -516,7 +516,7 @@ function SmallCard({ label, value }: { label: string; value: number }) {
  return (
  <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
  <p className="text-sm text-slate-500">{label}</p>
- <p className="mt-2 text-2xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{value}</p>
+ <p className="mt-2 text-2xl font-semibold text-slate-900 [font-family:var(--font-sans)]">{value}</p>
  </div>
  );
 }

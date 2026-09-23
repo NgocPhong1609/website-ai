@@ -22,7 +22,7 @@ export function AdminStatsGrid({ stats }: AdminStatsGridProps) {
  </div>
 
  <div className="mt-5 flex items-end justify-between gap-3">
- <div className="text-[30px] font-semibold leading-none text-slate-900 [font-family:var(--font-admin-head)]">
+ <div className="text-[30px] font-semibold leading-none text-slate-900 [font-family:var(--font-sans)]">
  {item.value}
  </div>
  <div className="flex h-10 w-16 items-end gap-1 rounded-xl bg-slate-100 p-2">

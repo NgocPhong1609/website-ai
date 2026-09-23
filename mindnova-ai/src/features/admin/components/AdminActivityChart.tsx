@@ -25,7 +25,7 @@ export function AdminActivityChart({ activities }: AdminActivityChartProps) {
     <article className="rounded-[28px] border border-slate-200 bg-white/90 p-5 shadow-[0_24px_48px_-30px_rgba(15,23,42,0.5)]">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">
+          <h2 className="text-xl font-semibold text-slate-900 [font-family:var(--font-sans)]">
             Biểu đồ hoạt động
           </h2>
           <p className="text-sm text-slate-500">Tổng quan theo 7 ngày gần nhất</p>
