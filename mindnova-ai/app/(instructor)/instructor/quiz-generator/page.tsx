@@ -271,22 +271,22 @@ export default function InstructorQuizListPage() {
       )}
 
       {/* Top Banner */}
-      <div className="p-8 rounded-3xl bg-gradient-to-r from-[#1E233E] via-[#2B2D62] to-[#121626] text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl border border-white/10">
+      <div className="p-8 rounded-xl bg-white text-gray-900 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm border border-gray-200">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3">
-            <span className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#3B82F6] to-[#F368E0] flex items-center justify-center text-2xl font-black shadow-md">
+            <span className="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#3B82F6] to-[#F368E0] flex items-center justify-center text-2xl font-black shadow-md text-white">
               🪄
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-black text-white">Trợ Lý Tạo Bài Kiểm Tra AI</h1>
+                <h1 className="text-2xl font-black text-gray-900">Trợ Lý Tạo Bài Kiểm Tra AI</h1>
                 {courseIdNum && (
-                  <span className="px-2.5 py-0.5 rounded-md bg-blue-500/30 text-blue-200 border border-blue-400/30 text-[10px] font-mono font-black">
+                  <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-mono font-black">
                     Course #{courseIdNum}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-gray-300 font-semibold mt-0.5">
+              <p className="text-xs text-gray-500 font-semibold mt-0.5">
                 Quản lý và tổng hợp tất cả các bài kiểm tra trắc nghiệm &amp; tự luận của bạn
               </p>
             </div>
@@ -294,13 +294,13 @@ export default function InstructorQuizListPage() {
 
           {courseIdNum && (
             <div className="mt-2 flex items-center gap-2">
-              <span className="px-3 py-1 rounded-xl bg-blue-500/20 text-blue-100 text-xs font-extrabold border border-blue-400/30 flex items-center gap-1.5">
+              <span className="px-3 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-extrabold border border-blue-200 flex items-center gap-1.5">
                 <span>🎓</span>
                 <span>Khóa học: {courseTitle || `ID #${courseIdNum}`}</span>
               </span>
               <Link
                 href="/instructor/quiz-generator"
-                className="px-2.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-gray-200 transition-all"
+                className="px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-bold text-gray-700 transition-all"
               >
                 ✕ Hủy lọc
               </Link>
@@ -311,13 +311,13 @@ export default function InstructorQuizListPage() {
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
             href={createAiUrl}
-            className="px-6 py-3.5 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-105 transition-all text-center flex items-center justify-center gap-2"
+            className="px-6 py-3.5 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-black text-xs rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all text-center flex items-center justify-center gap-2"
           >
             <span>✨ Tạo bằng AI</span>
           </Link>
           <Link
             href={createManualUrl}
-            className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white font-black text-xs rounded-2xl shadow-xl hover:scale-105 transition-all text-center flex items-center justify-center gap-2 border border-white/20"
+            className="px-6 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-black text-xs rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all text-center flex items-center justify-center gap-2 border border-gray-200"
           >
             <span>📝 Tạo thủ công</span>
           </Link>
@@ -325,7 +325,7 @@ export default function InstructorQuizListPage() {
       </div>
 
       {/* Filter Controls & Search Section */}
-      <div className="bg-white rounded-3xl p-6 border border-[#EAEAF4] shadow-sm flex flex-col gap-5">
+      <div className="bg-white rounded-xl p-6 border border-[#EAEAF4] shadow-sm flex flex-col gap-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
           <h2 className="text-base font-black text-[#0F172A] flex items-center gap-2">
             <span>📋</span>
@@ -433,7 +433,7 @@ export default function InstructorQuizListPage() {
           </div>
         ) : quizzes.length === 0 ? (
           /* Empty State 1: Instructor has 0 quizzes total */
-          <div className="py-16 text-center rounded-2xl bg-gray-50 border border-gray-200 flex flex-col items-center justify-center gap-4 text-gray-500">
+          <div className="py-16 text-center rounded-xl bg-gray-50 border border-gray-200 flex flex-col items-center justify-center gap-4 text-gray-500">
             <span className="text-5xl">📋</span>
             <div className="flex flex-col gap-1 max-w-md">
               <p className="text-sm font-extrabold text-[#0F172A]">Chưa có đề kiểm tra nào.</p>
@@ -458,7 +458,7 @@ export default function InstructorQuizListPage() {
           </div>
         ) : filteredQuizzes.length === 0 ? (
           /* Empty State 2: Active filters returned 0 results */
-          <div className="py-16 text-center rounded-2xl bg-amber-50/50 border border-amber-200 flex flex-col items-center justify-center gap-3 text-amber-900">
+          <div className="py-16 text-center rounded-xl bg-amber-50/50 border border-amber-200 flex flex-col items-center justify-center gap-3 text-amber-900">
             <span className="text-4xl">🔍</span>
             <div className="flex flex-col gap-1">
               <p className="text-sm font-extrabold">Không tìm thấy Quiz nào phù hợp với bộ lọc.</p>
@@ -487,7 +487,7 @@ export default function InstructorQuizListPage() {
                 return (
                   <div
                     key={q.id}
-                    className="p-4 rounded-2xl bg-white border border-[#EAEAF4] hover:border-emerald-500/50 shadow-2xs hover:shadow-md transition-all flex items-start gap-4 group"
+                    className="p-4 rounded-xl bg-white border border-[#EAEAF4] hover:border-emerald-500/50 shadow-2xs hover:shadow-md transition-all flex items-start gap-4 group"
                   >
                     <QuizThumbnail title={q.title} src={q.thumbnail_url} />
                     <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 self-stretch">
