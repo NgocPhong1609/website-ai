@@ -24,7 +24,7 @@ class ChatController extends Controller
         $conversations = ChatConversation::whereHas('members', function ($query) use ($userId) {
             $query->where('user_id', $userId);
         })
-        ->with(['course:id,title,thumbnail'])
+        ->with(['course:id,title,thumbnail', 'lastMessage'])
         ->withCount(['messages as unread_count' => function ($query) use ($userId) {
             $query->where('id', '>', function ($subQuery) use ($userId) {
                 $subQuery->selectRaw('COALESCE(last_read_message_id, 0)')
@@ -36,9 +36,8 @@ class ChatController extends Controller
         }])
         ->get()
         ->map(function ($conversation) {
-            // Get the last message manually or via relation
-            $lastMessage = $conversation->messages()->latest()->first();
-            $conversation->last_message = $lastMessage;
+            $conversation->last_message = $conversation->lastMessage;
+            unset($conversation->lastMessage);
             return $conversation;
         });
 
@@ -68,7 +67,7 @@ class ChatController extends Controller
         $limit = $request->get('limit', 30);
         $cursor = $request->get('cursor');
 
-        $query = ChatMessage::with(['sender:id,name,avatar_url,role', 'attachments'])
+        $query = ChatMessage::with(['sender:id,name,avatar_url', 'attachments'])
             ->where('chat_conversation_id', $conversationId)
             ->orderBy('id', 'desc');
 
@@ -141,7 +140,7 @@ class ChatController extends Controller
             return response()->json(['message' => 'Failed to send message.', 'error' => $e->getMessage()], 500);
         }
 
-        $message->load(['sender:id,name,avatar_url,role', 'attachments']);
+        $message->load(['sender:id,name,avatar_url', 'attachments']);
 
         // Broadcast the event safely so failure to reach Reverb/Pusher does not fail message sending
         try {
@@ -204,7 +203,7 @@ class ChatController extends Controller
 
         $message->update(['is_recalled' => true]);
         
-        $message->load(['sender:id,name,avatar_url,role', 'attachments']);
+        $message->load(['sender:id,name,avatar_url', 'attachments']);
 
         try {
             broadcast(new \App\Events\ChatMessageRecalled($message))->toOthers();
@@ -221,24 +220,10 @@ class ChatController extends Controller
     {
         $userId = $request->user()->id;
 
-        $conversations = ChatConversation::whereHas('members', function ($query) use ($userId) {
-            $query->where('user_id', $userId);
-        })->get();
-
-        $totalUnread = 0;
-
-        foreach ($conversations as $conversation) {
-            $lastReadMessageId = DB::table('chat_conversation_members')
-                ->where('chat_conversation_id', $conversation->id)
-                ->where('user_id', $userId)
-                ->value('last_read_message_id');
-
-            $unreadInConv = ChatMessage::where('chat_conversation_id', $conversation->id)
-                ->where('id', '>', $lastReadMessageId ?? 0)
-                ->count();
-                
-            $totalUnread += $unreadInConv;
-        }
+        $totalUnread = ChatMessage::join('chat_conversation_members', 'chat_messages.chat_conversation_id', '=', 'chat_conversation_members.chat_conversation_id')
+            ->where('chat_conversation_members.user_id', $userId)
+            ->whereRaw('chat_messages.id > COALESCE(chat_conversation_members.last_read_message_id, 0)')
+            ->count();
 
         return response()->json([
             'status' => 'success',

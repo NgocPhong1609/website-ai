@@ -18,7 +18,7 @@ export const getEchoInstance = (token: string) => {
             wssPort: port,
             forceTLS: (process.env.NEXT_PUBLIC_REVERB_SCHEME ?? 'http') === 'https',
             enabledTransports: ['ws', 'wss'],
-            authEndpoint: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/broadcasting/auth`,
+            authEndpoint: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/broadcasting/auth`,
             auth: {
                 headers: {
                     Authorization: `Bearer ${token}`

@@ -65,15 +65,6 @@ export function FilteredCoursesView() {
  }, [uniqueCourses, debouncedTab, debouncedQuery]);
 
 
- if (isLoading) {
- return (
- <div className="flex flex-col items-center justify-center py-20 min-h-[400px]">
- 
- <p className="mt-4 text-slate-500 font-medium">Đang tải khoá học...</p>
- </div>
- );
- }
-
  if (isError) {
  return (
  <div className="flex flex-col items-center justify-center py-20 min-h-[400px]">
@@ -94,7 +85,23 @@ export function FilteredCoursesView() {
 
  {/* Courses Grid with 3-column layout from lg screen width */}
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
- {filteredCourses.length > 0 ? (
+ {isLoading ? (
+   [...Array(6)].map((_, i) => (
+     <div key={i} className="bg-white border border-slate-100 rounded-xl flex flex-col h-[380px] overflow-hidden animate-pulse">
+       <div className="h-44 w-full bg-slate-200 shrink-0" />
+       <div className="flex flex-col p-5 pt-6 flex-1">
+         <div className="w-20 h-5 bg-slate-200 rounded-md mb-3" />
+         <div className="w-full h-5 bg-slate-200 rounded-md mb-2" />
+         <div className="w-2/3 h-5 bg-slate-200 rounded-md mb-6" />
+         <div className="w-full h-2 bg-slate-200 rounded-full mt-auto mb-3" />
+         <div className="flex justify-between items-center mt-3">
+           <div className="w-32 h-4 bg-slate-200 rounded-md" />
+           <div className="w-12 h-4 bg-slate-200 rounded-md" />
+         </div>
+       </div>
+     </div>
+   ))
+ ) : filteredCourses.length > 0 ? (
  filteredCourses.map((course, idx) => (
  <MyCourseCard key={`${course.id}-${idx}`} course={course} />
  ))

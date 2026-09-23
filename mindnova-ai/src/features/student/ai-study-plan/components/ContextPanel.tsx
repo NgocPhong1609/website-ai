@@ -95,7 +95,7 @@ interface ContextPanelProps {
  </span>
  )}
  </div>
- <p className="text-xs text-slate-500 leading-relaxed font-normal pl-4 border-l-2 border-slate-200 group-hover:border-blue-300 transition-colors">
+ <p className="text-xs text-slate-500 leading-relaxed font-normal ml-[3px] pl-[11px] border-l-2 border-slate-200 group-hover:border-blue-300 transition-colors">
  {formatStudyDuration(concept.description)}
  </p>
  {isExpanded && (

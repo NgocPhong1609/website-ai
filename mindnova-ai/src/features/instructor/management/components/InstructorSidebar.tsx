@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 import { axiosClient } from "@/src/shared/lib/axios";
@@ -16,13 +17,20 @@ import {
  QuizNavIcon,
 } from "./icons";
 
-import { Plus, Sparkles } from "lucide-react";
+import { Plus } from "lucide-react";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 
 function LogoMark() {
   return (
-    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] text-white shadow-md">
-      <Sparkles className="h-[18px] w-[18px]" aria-hidden />
+    <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl overflow-hidden shadow-sm border border-blue-100/60 bg-[#0F265C]">
+      <Image
+        src="/images/logo.png"
+        alt="MindNova AI"
+        width={36}
+        height={36}
+        className="w-full h-full object-cover"
+        priority
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useId } from "react";
+import Link from "next/link";
 import {
  LogoMark,
  UserIcon,
@@ -36,6 +37,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  const [showPassword, setShowPassword] = useState(false);
  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
  const [isLoading, setIsLoading] = useState(false);
+ const [isSwitchingRole, setIsSwitchingRole] = useState(false);
  const [statusMessage, setStatusMessage] = useState<string | null>(null);
  const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -133,12 +135,25 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  const togglePassword = useCallback(() => setShowPassword((v) => !v), []);
  const toggleConfirmPassword = useCallback(() => setShowConfirmPassword((v) => !v), []);
 
+ const handleRoleChange = useCallback((newRole: string) => {
+ if (values.role === newRole) return;
+ setIsSwitchingRole(true);
+ setTimeout(() => {
+ setValues((prev) => ({ ...prev, role: newRole }));
+ setIsSwitchingRole(false);
+ }, 400);
+ }, [values.role]);
+
  return (
  <div className="flex flex-col w-full h-full px-8 sm:px-10 py-6">
  {/* Header — bám sát phía trên */}
- <div className="flex items-center gap-2.5 mb-auto">
- <LogoMark />
- <span className="text-[14px] font-bold tracking-tight text-[#0F172A]">MindNova AI</span>
+ <div className="mb-auto">
+ <Link href="/" className="inline-flex items-center gap-2.5 group" aria-label="Trang chủ MindNova AI">
+ <LogoMark size={36} />
+ <span className="text-[16px] font-bold tracking-tight text-[#0F172A] group-hover:text-blue-600 transition-colors">
+ MindNova AI
+ </span>
+ </Link>
  </div>
 
  {/* Content — căn giữa dọc */}
@@ -147,10 +162,6 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  <h1 className="text-[26px] font-bold text-[#0F172A] leading-tight tracking-tight">
  Create Account
  </h1>
- <p className="mt-1.5 text-[13px] text-[#64748B] leading-relaxed">
- Start your personalized learning journey with{" "}
- <span className="text-[#3B82F6] font-medium">AI-driven</span> insights.
- </p>
  </div>
 
  {statusMessage && (
@@ -166,33 +177,70 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  )}
 
  <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
- {/* Role Selection */}
- <div className="flex p-1 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
- <button
- type="button"
- onClick={() => setValues(prev => ({ ...prev, role: "student" }))}
- className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all duration-200 ${
- values.role === "student"
- ? "bg-white text-[#3B82F6] shadow-sm"
- : "text-[#64748B] hover:text-[#2563EB]"
- }`}
- >
- Student
- </button>
- <button
- type="button"
- onClick={() => setValues(prev => ({ ...prev, role: "teacher" }))}
- className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all duration-200 ${
- values.role === "teacher"
- ? "bg-white text-[#3B82F6] shadow-sm"
- : "text-[#64748B] hover:text-[#2563EB]"
- }`}
- >
- Teacher
- </button>
- </div>
+  {/* Role Selection */}
+  <div className="flex p-1 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+  <button
+  type="button"
+  onClick={() => handleRoleChange("student")}
+  className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all duration-200 ${
+  values.role === "student"
+  ? "bg-white text-[#3B82F6] shadow-sm"
+  : "text-[#64748B] hover:text-[#2563EB]"
+  }`}
+  >
+  Student
+  </button>
+  <button
+  type="button"
+  onClick={() => handleRoleChange("teacher")}
+  className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all duration-200 ${
+  values.role === "teacher"
+  ? "bg-white text-[#3B82F6] shadow-sm"
+  : "text-[#64748B] hover:text-[#2563EB]"
+  }`}
+  >
+  Teacher
+  </button>
+  </div>
 
- <FormField
+  {isSwitchingRole ? (
+  <div className="relative w-full">
+  <div className="flex flex-col gap-3 animate-pulse w-full opacity-50">
+  {/* Full Name Skeleton */}
+  <div className="space-y-1.5">
+  <div className="h-[18px] bg-[#E2E8F0] rounded w-24"></div>
+  <div className="h-[52px] bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"></div>
+  </div>
+  
+  {/* Email Skeleton */}
+  <div className="space-y-1.5">
+  <div className="h-[18px] bg-[#E2E8F0] rounded w-28"></div>
+  <div className="h-[52px] bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"></div>
+  </div>
+  
+  {/* Password Grid Skeleton */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+  <div className="space-y-1.5">
+  <div className="h-[18px] bg-[#E2E8F0] rounded w-20"></div>
+  <div className="h-[52px] bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"></div>
+  </div>
+  <div className="space-y-1.5">
+  <div className="h-[18px] bg-[#E2E8F0] rounded w-32"></div>
+  <div className="h-[52px] bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"></div>
+  </div>
+  </div>
+  
+  {/* Submit Button Skeleton */}
+  <div className="mt-1 h-[48px] bg-[#E2E8F0] rounded-xl"></div>
+  </div>
+
+  <div className="absolute inset-0 flex items-center justify-center">
+  <div className="w-8 h-8 border-4 border-[#E2E8F0] border-t-[#3B82F6] rounded-full animate-spin"></div>
+  </div>
+  </div>
+  ) : (
+  <>
+  <FormField
  id={nameId}
  label="Full Name"
  type="text"
@@ -265,6 +313,8 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  >
  {isLoading ? "Creating account..." : <>Sign Up <ArrowRightIcon /></>}
  </button>
+ </>
+ )}
  </form>
 
  <p className="mt-5 text-center text-[13px] text-[#64748B]">

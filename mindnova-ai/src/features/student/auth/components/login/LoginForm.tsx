@@ -120,9 +120,13 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  return (
  <div className="flex flex-col w-full h-full px-8 sm:px-10 py-6">
  {/* Header — bám sát phía trên */}
- <div className="flex items-center gap-2.5 mb-auto">
- <LogoMark />
- <span className="text-[14px] font-bold tracking-tight text-[#0F172A]">MindNova AI</span>
+ <div className="mb-auto">
+ <Link href="/" className="inline-flex items-center gap-2.5 group" aria-label="Trang chủ MindNova AI">
+ <LogoMark size={36} />
+ <span className="text-[16px] font-bold tracking-tight text-[#0F172A] group-hover:text-blue-600 transition-colors">
+ MindNova AI
+ </span>
+ </Link>
  </div>
 
  {/* Content — căn giữa dọc */}
@@ -187,28 +191,6 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  </button>
  }
  />
- <label
- htmlFor={rememberMeId}
- className="flex items-center gap-2.5 cursor-pointer w-fit group"
- >
- <div className="relative">
- <input
- id={rememberMeId}
- type="checkbox"
- checked={values.rememberMe}
- onChange={handleChange("rememberMe")}
- className="sr-only peer"
- />
- <div className="w-[18px] h-[18px] rounded-[5px] border-2 border-[#D0D0E8] bg-white peer-checked:bg-[#F8FAFC] peer-checked:border-[#E2E8F0] transition-all duration-200 flex items-center justify-center shadow-sm group-hover:border-[#E2E8F0]">
- {values.rememberMe && (
- <></>
- )}
- </div>
- </div>
- <span className="text-[13px] text-[#64748B] group-hover:text-[#0F172A] transition-colors">
- Remember me for 30 days
- </span>
- </label>
  <button
  type="submit"
  disabled={isLoading || !canSubmit}

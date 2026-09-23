@@ -69,9 +69,37 @@ class UserController extends Controller
     // 3. Đổi mật khẩu
     public function changePassword(Request $request)
     {
+        $passwordValidationRules = function (string $fieldName, string $fieldLabel) {
+            return [
+                'required',
+                'string',
+                'min:8',
+                function ($attribute, $value, $fail) use ($fieldLabel) {
+                    if (!preg_match('/[A-Z]/', $value)) {
+                        $fail("{$fieldLabel} phải chứa ít nhất 1 chữ hoa (A-Z).");
+                    }
+                    if (!preg_match('/[0-9]/', $value)) {
+                        $fail("{$fieldLabel} phải chứa ít nhất 1 chữ số (0-9).");
+                    }
+                    if (!preg_match('/[^A-Za-z0-9]/', $value)) {
+                        $fail("{$fieldLabel} phải chứa ít nhất 1 ký tự đặc biệt (ví dụ: !@#$%^&*).");
+                    }
+                },
+            ];
+        };
+
         $validator = Validator::make($request->all(), [
-            'current_password' => 'required',
-            'new_password' => 'required|min:6|confirmed', // Yêu cầu biến new_password_confirmation
+            'current_password' => $passwordValidationRules('current_password', 'Mật khẩu hiện tại'),
+            'new_password' => array_merge(
+                $passwordValidationRules('new_password', 'Mật khẩu mới'),
+                ['confirmed']
+            ),
+        ], [
+            'current_password.required' => 'Vui lòng nhập mật khẩu hiện tại.',
+            'current_password.min' => 'Mật khẩu hiện tại phải có tối thiểu 8 ký tự.',
+            'new_password.required' => 'Vui lòng nhập mật khẩu mới.',
+            'new_password.min' => 'Mật khẩu mới phải có tối thiểu 8 ký tự.',
+            'new_password.confirmed' => 'Mật khẩu xác nhận không trùng khớp.',
         ]);
 
         if ($validator->fails()) {

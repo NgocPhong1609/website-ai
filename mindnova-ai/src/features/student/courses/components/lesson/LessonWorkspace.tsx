@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
-import { CheckCircle2, AlertTriangle, Lightbulb, Bot, Target, MessageSquare, ClipboardList, Eye, GraduationCap, X, FileEdit, Check, Lock, Flag, Trophy, PartyPopper, ChevronsUpDown, ArrowLeft, ChevronRight, BookOpen } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Lightbulb, Bot, Target, MessageSquare, ClipboardList, Eye, GraduationCap, X, FileEdit, Check, Lock, Flag, Trophy, PartyPopper, ChevronsUpDown, ArrowLeft, ChevronRight, BookOpen, Sparkles } from "lucide-react";
 import { LessonStatusIcon, lessonDisplayTitle } from "../LessonStatusIcon";
 import Link from "next/link";
 import Image from "next/image";
@@ -1110,43 +1110,27 @@ function LessonWorkspaceContent() {
  );
  }
 
- if (!activeLesson) {
- return <div className="p-12 text-center text-[#64748B]">Không tìm thấy bài học nào cho khóa này.</div>;
- }
-
- // Course title from API
- const courseTitle = apiDetail?.header_info?.title || "Khóa học";
-
- // Render check for enrollment
- if (apiDetail && !apiDetail.header_info?.is_enrolled && !isPreview) {
+ if (isLoading || !activeLesson) {
  return (
- <div className="w-full h-screen flex flex-col items-center justify-center bg-[#F8FAFC] p-6">
- <div className="bg-white p-8 rounded-3xl shadow-sm max-w-md w-full text-center border border-[#E2E8F0]">
- 
- <h2 className="text-xl font-bold text-[#0F172A] mb-2">Bạn chưa đăng ký khóa học này</h2>
- <p className="text-sm text-[#64748B] mb-6">Hãy đăng ký khóa học để bắt đầu học và trải nghiệm toàn bộ nội dung.</p>
- <Link
- href={`/courses/detail?courseId=${parsedCourseId}`}
- className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold transition-all shadow-sm"
- >
- Xem khóa học
- </Link>
- </div>
+ <div className="w-full h-screen flex flex-col items-center justify-center bg-[#F8FAFC]">
+ <div className="w-12 h-12 border-4 border-[#3B82F6] border-t-transparent rounded-full animate-spin mb-4"></div>
+ <p className="text-[#64748B] font-semibold text-sm">Đang tải dữ liệu bài học...</p>
  </div>
  );
  }
 
- return (
-    <div className="flex flex-col min-h-screen bg-white pb-24 relative">
+  return (
+    <div className="flex flex-col min-h-screen bg-slate-50/50 relative font-sans">
+      <style>{`main { padding-bottom: 0 !important; }`}</style>
       {/* ─── Instructor Preview Mode Sticky Banner ─── */}
       {isPreview && (
-        <div className="sticky top-0 z-50 bg-[#0F172A] text-white px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md border-b border-black animate-fadeIn">
+        <div className="sticky top-0 z-50 bg-slate-900 text-white px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md animate-fadeIn">
           <div className="flex items-center gap-3">
-            <span className="px-2.5 py-0.5 rounded bg-[#3B82F6] text-white text-[10px] font-black uppercase tracking-wider shadow-xs">
-              <Eye size={12} className="inline mr-1 text-[#3B82F6]" /> CHẾ ĐỘ XEM TRƯỚC
+            <span className="px-2.5 py-1 rounded-md bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider shadow-sm">
+              <Eye size={14} className="inline mr-1" /> XEM TRƯỚC
             </span>
-            <span className="text-xs font-bold text-gray-200">
-              <GraduationCap size={14} className="inline mr-1 text-[#0F172A]" /> Giao diện Học viên - Giảng viên trải nghiệm Video, Bài đọc &amp; Thi thử Quiz (Dữ liệu tiến độ &amp; bài thi không lưu vào hệ thống)
+            <span className="text-xs font-semibold text-slate-200">
+              <GraduationCap size={14} className="inline mr-1 text-slate-400" /> Giao diện Học viên - Giảng viên trải nghiệm Video, Bài đọc & Thi thử Quiz (Dữ liệu tiến độ không lưu vào hệ thống)
             </span>
           </div>
           <button
@@ -1157,561 +1141,526 @@ function LessonWorkspaceContent() {
               }
               window.location.href = `/instructor/courses/${parsedCourseId}/edit`;
             }}
-            className="px-3.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-xs transition-all cursor-pointer border border-white/20 shrink-0 flex items-center gap-1.5 shadow-2xs"
+            className="px-4 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 backdrop-blur-sm"
           >
-            <X size={20} />
-            <span>Thoát xem trước</span>
+            <X size={16} />
+            <span>Thoát</span>
           </button>
         </div>
       )}
 
       {/* ─── Top Header & Breadcrumb ─── */}
-      <header className="w-full bg-white border-b border-[#E2E8F0] px-6 py-4 sticky top-0 z-30 shadow-2xs">
- <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
- <div className="flex items-center gap-3 min-w-0">
- <Link
- href={`/courses/detail?courseId=${parsedCourseId}`}
- className="w-9 h-9 rounded-xl bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] flex items-center justify-center text-[#64748B] hover:text-[#0F172A] transition-colors shrink-0 text-decoration-none shadow-2xs"
- title="Quay lại chi tiết Khóa học"
- aria-label="Quay lại chi tiết Khóa học"
- >
- <ArrowLeft size={18} strokeWidth={2} />
- </Link>
- <div className="min-w-0">
- <nav className="flex items-center gap-2 text-[13px] font-medium text-[#64748B] mb-0.5 truncate">
- <Link href="/courses" className="hover:text-[#0F172A] transition-colors text-decoration-none">Khoá học</Link>
- <ChevronRight size={12} className="text-[#94A3B8] shrink-0" aria-hidden />
- <span className="text-[#0F172A] font-semibold truncate">{courseTitle}</span>
- </nav>
- <h1 className="text-base sm:text-lg font-bold text-[#0F172A] truncate">{activeLesson.title}</h1>
- </div>
- </div>
+      <header className="w-full bg-white border-b border-slate-200 px-6 py-3.5 sticky top-0 z-30 transition-all">
+        <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <Link
+              href={`/courses/detail?courseId=${parsedCourseId}`}
+              className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-all shrink-0 shadow-sm"
+              title="Quay lại chi tiết Khóa học"
+              aria-label="Quay lại chi tiết Khóa học"
+            >
+              <ArrowLeft size={18} strokeWidth={2.5} />
+            </Link>
+            <div className="min-w-0">
+              <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1 truncate">
+                <Link href="/courses" className="hover:text-slate-900 transition-colors">Khoá học</Link>
+                <ChevronRight size={12} className="text-slate-300 shrink-0" aria-hidden />
+                <span className="text-slate-700 truncate">{apiDetail?.header_info?.title || (apiDetail as any)?.title || "Khóa học"}</span>
+              </nav>
+              <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 truncate tracking-tight">{activeLesson.title}</h1>
+            </div>
+          </div>
 
- <div className="flex items-center gap-3 shrink-0">
- <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#F1F5F9] text-[#0F172A]">
- <span className="w-2 h-2 rounded-full bg-[#3B82F6]" />
- <span>Tiến độ: {computedProgressPercentage}% ({completedCount}/{totalLessonCount} bài)</span>
- </div>
- </div>
- </div>
- </header>
+          <div className="flex items-center shrink-0">
+            <div className="inline-flex flex-col items-end gap-1">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tiến độ khoá học</span>
+              <div className="flex items-center gap-3">
+                <div className="w-32 h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/50">
+                  <div className="h-full bg-blue-600 rounded-full transition-all duration-700" style={{ width: `${computedProgressPercentage}%` }} />
+                </div>
+                <span className="text-sm font-bold text-slate-900">{computedProgressPercentage}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
 
- {/* ─── Main Content Grid ─── */}
- <div className="max-w-[1400px] w-full mx-auto p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* ─── Main Content Grid ─── */}
+      <div className="max-w-[1400px] w-full mx-auto p-4 sm:p-6 lg:p-8 pb-28 lg:pb-32 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
- {/* ─── Left Column (8 cols): Lesson Content ─── */}
- <main className="lg:col-span-8 flex flex-col gap-6 w-full min-w-0">
+        {/* ─── Left Column (8 cols): Lesson Content ─── */}
+        <main className="lg:col-span-8 flex flex-col gap-6 w-full min-w-0">
 
- {/* AI Notice */}
- <div className="w-full p-4 rounded-xl bg-[#F1F5F9] border border-[#C7D2FE] flex items-center justify-between gap-3 text-[#0F172A]">
- <div className="flex items-center gap-2.5 min-w-0">
- <span className="w-2 h-2 rounded-full bg-[#3B82F6] shrink-0" />
- <span className="text-[#0F172A] font-bold text-xs sm:text-sm shrink-0">Gia sư AI Nova:</span>
- <span className="text-xs sm:text-sm text-[#64748B] truncate">
- {activeLesson.type === 'video' ? "Video bài giảng nhúng trực tiếp. Hãy theo dõi thực hành mã nguồn ở các thẻ Tab phía dưới!" :
- activeLesson.type === 'article' ? "Đọc kỹ nội dung bài học. Thời gian đọc sẽ được ghi nhận tự động." :
- "Hãy hoàn thành bài kiểm tra để đánh giá kiến thức của bạn!"}
- </span>
- </div>
- <span className="hidden sm:inline-block px-2.5 py-1 rounded text-[10px] font-bold bg-[#3B82F6] text-white tracking-wider uppercase shrink-0">
- {activeLesson.type === 'video' ? '4K STREAM' : activeLesson.type === 'article' ? 'VĂN BẢN' : 'KIỂM TRA'}
- </span>
- </div>
+          {/* AI Notice */}
+          <div className="w-full px-5 py-4 rounded-3xl bg-gradient-to-r from-indigo-50 via-blue-50 to-sky-50 border border-indigo-100/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
+            {/* Decorative background glow */}
+            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-400/10 blur-2xl rounded-full pointer-events-none" />
+            
+            <div className="flex items-center gap-4 min-w-0 relative z-10">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(79,70,229,0.3)]">
+                <Sparkles size={22} className="animate-pulse" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[14px] font-black text-slate-900 mb-0.5 tracking-tight flex items-center gap-2">
+                  MindNova AI
+                </p>
+                <p className="text-[13px] text-slate-600 leading-relaxed font-medium truncate" title={activeLesson.type === 'video' ? "Video bài giảng nhúng trực tiếp. Bạn có thể sử dụng khu vực Thảo luận bên dưới để đặt câu hỏi trực tiếp cho AI trong quá trình xem." : activeLesson.type === 'article' ? "Đọc kỹ nội dung bài học. AI sẽ theo dõi thời gian và tự động đánh dấu hoàn thành khi bạn nắm vững." : "Bạn đã sẵn sàng? Hãy vận dụng những kiến thức vừa học để vượt qua bài kiểm tra năng lực này!"}>
+                  {activeLesson.type === 'video' ? "Video bài giảng nhúng trực tiếp. Bạn có thể sử dụng khu vực Thảo luận bên dưới để đặt câu hỏi trực tiếp cho AI trong quá trình xem." :
+                  activeLesson.type === 'article' ? "Đọc kỹ nội dung bài học. AI sẽ theo dõi thời gian và tự động đánh dấu hoàn thành khi bạn nắm vững." :
+                  "Bạn đã sẵn sàng? Hãy vận dụng những kiến thức vừa học để vượt qua bài kiểm tra năng lực này!"}
+                </p>
+              </div>
+            </div>
+          </div>
 
- {/* ─── Content by Type ─── */}
- {activeLesson.type === 'video' && (
- <CustomVideoPlayer lesson={activeLesson} onComplete={handleLessonComplete} />
- )}
+          {/* ─── Content by Type ─── */}
+          <div className="rounded-[24px] overflow-hidden border border-slate-200/80 bg-black shadow-sm ring-4 ring-slate-50/50">
+            {activeLesson.type === 'video' && (
+              <CustomVideoPlayer lesson={activeLesson} onComplete={handleLessonComplete} />
+            )}
 
- {activeLesson.type === 'article' && (
- <ArticleRenderer lesson={activeLesson} onComplete={handleLessonComplete} />
- )}
+            {activeLesson.type === 'article' && (
+              <div className="bg-white"><ArticleRenderer lesson={activeLesson} onComplete={handleLessonComplete} /></div>
+            )}
 
- {(activeLesson.type === 'quiz_module' || activeLesson.type === 'quiz') && (
- <QuizRenderer lesson={activeLesson} onComplete={handleLessonComplete} />
- )}
+            {(activeLesson.type === 'quiz_module' || activeLesson.type === 'quiz') && (
+              <div className="bg-white"><QuizRenderer lesson={activeLesson} onComplete={handleLessonComplete} /></div>
+            )}
 
- {/* Fallback for unknown type — show as video */}
- {!['video', 'article', 'quiz_module', 'quiz'].includes(activeLesson.type) && (
- <CustomVideoPlayer lesson={activeLesson} onComplete={handleLessonComplete} />
- )}
+            {/* Fallback for unknown type — show as video */}
+            {!['video', 'article', 'quiz_module', 'quiz'].includes(activeLesson.type) && (
+              <CustomVideoPlayer lesson={activeLesson} onComplete={handleLessonComplete} />
+            )}
+          </div>
 
- {/* ─── Tabs: Content Info / AI / Discussion ─── */}
- <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
- <div className="flex items-center border-b border-[#E2E8F0] px-6 gap-6 bg-white overflow-x-auto">
- <button
- onClick={() => setActiveTab("content")}
- className={twMerge(
- "py-3.5 font-semibold text-xs sm:text-sm border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 focus:outline-none",
- activeTab === "content" ? "border-[#3B82F6] text-[#0F172A]" : "border-transparent text-[#64748B] hover:text-[#0F172A]"
- )}
- >
- <span>Nội dung & Mã nguồn</span>
- </button>
- <button
- onClick={() => setActiveTab("ai_tips")}
- className={twMerge(
- "py-3.5 font-semibold text-xs sm:text-sm border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 focus:outline-none",
- activeTab === "ai_tips" ? "border-[#3B82F6] text-[#0F172A]" : "border-transparent text-[#64748B] hover:text-[#0F172A]"
- )}
- >
- <span>Cố vấn AI Nova</span>
- <span className="px-2 py-0.5 rounded-full bg-[#F1F5F9] text-[#0F172A] text-[10px] font-bold">0</span>
- </button>
- <button
- onClick={() => setActiveTab("discussion")}
- className={twMerge(
- "py-3.5 font-semibold text-xs sm:text-sm border-b-2 transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 focus:outline-none",
- activeTab === "discussion" ? "border-[#3B82F6] text-[#0F172A]" : "border-transparent text-[#64748B] hover:text-[#0F172A]"
- )}
- >
- <span>Thảo luận & Ghi chú</span>
- <span className="px-2 py-0.5 rounded-full bg-[#F1F5F9] text-[#64748B] text-[10px] font-bold">{apiDiscussions?.length || 0}</span>
- </button>
- </div>
+  {/* ─── Tabs: Content Info / AI / Discussion ─── */}
+  <div className="bg-white rounded-3xl border border-slate-200 shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex flex-col">
+    <div className="p-4 bg-slate-50 border-b border-slate-200">
+      <div className="flex items-center gap-1.5 p-1.5 bg-slate-200/70 rounded-xl overflow-x-auto">
+        <button
+          onClick={() => setActiveTab("content")}
+          className={twMerge(
+            "px-5 py-2.5 font-bold text-[13px] rounded-lg transition-all cursor-pointer whitespace-nowrap focus:outline-none flex-1 text-center",
+            activeTab === "content" ? "bg-white text-blue-700 shadow-sm ring-1 ring-black/5" : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+          )}
+        >
+          Nội dung học
+        </button>
+        <button
+          onClick={() => setActiveTab("ai_tips")}
+          className={twMerge(
+            "px-5 py-2.5 font-bold text-[13px] rounded-lg transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2 focus:outline-none flex-1",
+            activeTab === "ai_tips" ? "bg-white text-blue-700 shadow-sm ring-1 ring-black/5" : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+          )}
+        >
+          <span>Cố vấn AI Nova</span>
+          <span className={twMerge("px-2 py-0.5 rounded-md text-[10px] font-black", activeTab === "ai_tips" ? "bg-blue-100 text-blue-700" : "bg-slate-300 text-slate-600")}>0</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("discussion")}
+          className={twMerge(
+            "px-5 py-2.5 font-bold text-[13px] rounded-lg transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2 focus:outline-none flex-1",
+            activeTab === "discussion" ? "bg-white text-blue-700 shadow-sm ring-1 ring-black/5" : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+          )}
+        >
+          <span>Thảo luận & Ghi chú</span>
+          <span className={twMerge("px-2 py-0.5 rounded-md text-[10px] font-black", activeTab === "discussion" ? "bg-blue-100 text-blue-700" : "bg-slate-300 text-slate-600")}>{apiDiscussions?.length || 0}</span>
+        </button>
+      </div>
+    </div>
 
- <div className="p-6 sm:p-8">
- {/* Tab 1: Content Info */}
- {activeTab === "content" && (
- <div className="flex flex-col gap-6">
- <div className="flex flex-wrap items-center gap-2">
- <span className={twMerge("inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold", getLessonTypeColor(activeLesson.type))}>
- {getLessonTypeLabel(activeLesson.type)}
- </span>
- <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#F1F5F9] text-[#64748B]">
- <span>Thời lượng:</span> {activeLesson.duration}
- </span>
- {activeLesson.completed ? (
- <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-[#F8FAFC] text-[#065F46]">
- HOÀN THÀNH
- </span>
- ) : (
- <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-[#F1F5F9] text-[#0F172A]">
- Đang học
- </span>
- )}
- </div>
- </div>
- )}
+    <div className="p-6 sm:p-8 bg-white min-h-[300px]">
+      {/* Tab 1: Content Info */}
+      {activeTab === "content" && (
+        <div className="flex flex-col gap-6 animate-fadeIn">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={twMerge("inline-flex items-center px-3 py-1 rounded-md text-[11px] font-black tracking-wide uppercase shadow-sm", getLessonTypeColor(activeLesson.type))}>
+              {getLessonTypeLabel(activeLesson.type)}
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-bold bg-slate-100 text-slate-600 shadow-sm">
+              <span>Thời lượng:</span> {activeLesson.duration}
+            </span>
+            {activeLesson.completed ? (
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-md text-[11px] font-black bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-sm uppercase tracking-wide">
+                <CheckCircle2 size={12} strokeWidth={3} /> HOÀN THÀNH
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-md text-[11px] font-black bg-slate-100 text-slate-700 shadow-sm uppercase tracking-wide">
+                Đang học
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
- {/* Tab 2: AI Tips */}
- {activeTab === "ai_tips" && (
- <div className="flex flex-col gap-5">
- <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center gap-4">
- <span className="text-2xl"></span>
- <div>
- <h3 className="font-bold text-[#0F172A] text-sm sm:text-base">Phân tích chuyên sâu từ MindNova Co-Pilot</h3>
- <p className="text-xs sm:text-sm text-[#64748B]">Các lưu ý chuyên môn được đúc kết từ thực tiễn.</p>
- </div>
- </div>
- </div>
- )}
+      {/* Tab 2: AI Tips */}
+      {activeTab === "ai_tips" && (
+        <div className="flex flex-col gap-5 animate-fadeIn">
+          <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 flex items-start gap-4">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <Lightbulb size={20} />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-slate-900 text-sm mb-1">Phân tích chuyên sâu từ MindNova Co-Pilot</h3>
+              <p className="text-[13px] text-slate-600 leading-relaxed">Các lưu ý chuyên môn được đúc kết từ thực tiễn. Tính năng đang trong quá trình thử nghiệm và sớm ra mắt.</p>
+            </div>
+          </div>
+        </div>
+      )}
 
- {/* Tab 3: Discussion */}
- {activeTab === "discussion" && (
- <div className="flex flex-col gap-6">
- <form onSubmit={handlePostComment} className="flex flex-col gap-3 p-5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
- <h4 className="font-semibold text-sm text-[#0F172A]">Gửi câu hỏi cho Gia sư AI hoặc thảo luận cùng lớp học</h4>
- <textarea
- rows={3}
- value={newCommentText}
- onChange={(e) => setNewCommentText(e.target.value)}
- placeholder="Nhập câu hỏi hoặc ghi chú học tập cá nhân..."
- className="w-full p-3.5 rounded-xl border border-[#E2E8F0] bg-white text-[#0F172A] text-sm placeholder:text-[#64748B] focus:outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 transition-all resize-none"
- />
- <div className="flex justify-end">
- <button disabled={isSubmittingDiscussion} type="submit" className="px-5 py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-sm">
- {isSubmittingDiscussion ? "Đang gửi..." : "Gửi thảo luận"}
- </button>
- </div>
- </form>
+      {/* Tab 3: Discussion */}
+      {activeTab === "discussion" && (
+        <div className="flex flex-col gap-6 animate-fadeIn">
+          {/* Discussion Input */}
+          <form onSubmit={handlePostComment} className="flex flex-col gap-3 p-5 rounded-3xl bg-slate-50 border border-slate-200 shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all focus-within:bg-white focus-within:border-blue-300 focus-within:shadow-[0_4px_20px_rgb(37,99,235,0.08)]">
+            <h4 className="font-extrabold text-[14px] text-slate-900 flex items-center gap-2">
+              <MessageSquare size={16} className="text-blue-600" />
+              Gửi câu hỏi hoặc ghi chú học tập
+            </h4>
+            <textarea
+              rows={3}
+              value={newCommentText}
+              onChange={(e) => setNewCommentText(e.target.value)}
+              placeholder="Bạn có thắc mắc gì về bài học này không? Nhập nội dung vào đây..."
+              className="w-full p-4 rounded-2xl border border-slate-200 bg-white text-[13px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none shadow-sm"
+            />
+            <div className="flex justify-end mt-1">
+              <button disabled={isSubmittingDiscussion} type="submit" className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-[13px] font-bold transition-all disabled:opacity-50 cursor-pointer shadow-sm flex items-center gap-2">
+                <MessageSquare size={16} />
+                {isSubmittingDiscussion ? "Đang gửi..." : "Gửi thảo luận"}
+              </button>
+            </div>
+          </form>
 
- <div className="flex flex-col gap-4">
- {isDiscussionsLoading ? (
- <div className="p-8 text-center text-[#64748B]">Đang tải thảo luận...</div>
- ) : apiDiscussions?.length === 0 ? (
- <div className="py-6">
- <NoDataAvailable
- icon={MessageSquare}
- title="Chưa có thảo luận"
- description="Chưa có thảo luận nào cho bài học này. Hãy để lại câu hỏi để tương tác cùng AI hoặc giảng viên!"
- variant="compact"
- />
- </div>
- ) : (
- apiDiscussions?.map((item) => (
- <div key={item.id} className="flex flex-col gap-3">
- {/* Student Question */}
- {editingDiscussionId === item.id ? (
- <form onSubmit={(e) => handleEditDiscussionSubmit(e, item.id)} className="p-4 sm:p-5 rounded-xl border border-[#E2E8F0] bg-white flex flex-col gap-3">
- <textarea
- value={editDiscussionText}
- onChange={(e) => setEditDiscussionText(e.target.value)}
- rows={3}
- className="w-full resize-none rounded-xl border border-[var(--border-color)] bg-white px-4 py-3 text-sm text-[#0F172A] outline-none focus:border-[var(--primary-color)]"
- />
- <div className="flex justify-end gap-2">
- <button
- type="button"
- onClick={() => setEditingDiscussionId(null)}
- className="rounded-xl border border-[var(--border-color)] px-4 py-2 text-xs font-semibold text-[#64748B] hover:bg-[#F8FAFC]"
- >
- Hủy
- </button>
- <button
- type="submit"
- disabled={isUpdatingDiscussion}
- className="rounded-xl bg-[var(--primary-color)] px-4 py-2 text-xs font-semibold text-white hover:bg-[var(--primary-hover)] disabled:opacity-60"
- >
- {isUpdatingDiscussion ? "Đang lưu..." : "Lưu"}
- </button>
- </div>
- </form>
- ) : (
- <div className="p-4 sm:p-5 rounded-xl border transition-all flex items-start gap-3.5 bg-white border-[var(--border-color)]">
- <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--bg-light)] text-[var(--primary-color)] font-bold shrink-0 border border-[var(--bg-light)]">
- {item.student.name.slice(0, 2).toUpperCase()}
- </div>
- <div className="flex-1 min-w-0">
- <div className="flex items-center justify-between gap-2 mb-1">
- <span className="font-bold text-sm text-[#0F172A]">{item.student.name}</span>
- <div className="flex items-center gap-2">
- <span className="text-xs text-[#64748B]">{new Date(item.created_at).toLocaleString('vi-VN')}</span>
- <button
- onClick={() => handleEditDiscussion(item.id, item.content)}
- className="text-xs font-semibold text-[#0F172A] hover:text-[var(--primary-hover)] transition-colors"
- >
- Sửa
- </button>
- <button
- onClick={() => handleDeleteDiscussion(item.id)}
- disabled={isDeletingDiscussion}
- className="text-xs font-semibold text-[var(--primary-color)] hover:text-[var(--primary-hover)] transition-colors disabled:opacity-60"
- >
- Xóa
- </button>
- </div>
- </div>
- <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">{item.content}</p>
- </div>
- </div>
- )}
- 
- {/* Teacher Replies */}
- {item.replies.map((reply) => (
- <div key={reply.id} className="ml-8 p-4 sm:p-5 rounded-xl border transition-all flex items-start gap-3.5 bg-[var(--bg-light)]/50 border-[var(--border-color)]">
- <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--primary-color)] text-white font-bold shrink-0 border border-[var(--primary-color)]">
- GV
- </div>
- <div className="flex-1 min-w-0">
- <div className="flex items-center justify-between gap-2 mb-1">
- <span className="font-bold text-sm text-[#0F172A] flex items-center gap-1.5">
- <span>{reply.user.name}</span>
- <VerifiedTeacherBadge isVerified={(reply.user as any).is_verified ?? true} size="xs" />
- <span className="px-2 py-0.5 rounded text-[10px] font-bold text-white bg-[var(--primary-color)] uppercase tracking-wider">Giảng viên</span>
- </span>
- <span className="text-xs text-[#64748B]">{new Date(reply.created_at).toLocaleString('vi-VN')}</span>
- </div>
- <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">{reply.content}</p>
- </div>
- </div>
- ))}
- </div>
- ))
- )}
- </div>
- </div>
- )}
- </div>
- </div>
+          {/* Discussion List */}
+          <div className="flex flex-col gap-6">
+            {isDiscussionsLoading ? (
+              <div className="py-12 flex flex-col items-center justify-center gap-3">
+                <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-blue-600 animate-spin" />
+                <span className="text-[13px] font-semibold text-slate-500">Đang tải thảo luận...</span>
+              </div>
+            ) : apiDiscussions?.length === 0 ? (
+              <div className="py-8">
+                <NoDataAvailable
+                  icon={MessageSquare}
+                  title="Chưa có thảo luận"
+                  description="Chưa có thảo luận nào cho bài học này. Hãy để lại câu hỏi để tương tác cùng AI hoặc giảng viên!"
+                  variant="compact"
+                />
+              </div>
+            ) : (
+              apiDiscussions?.map((item) => (
+                <div key={item.id} className="flex flex-col gap-4">
+                  {/* Student Question */}
+                  {editingDiscussionId === item.id ? (
+                    <form onSubmit={(e) => handleEditDiscussionSubmit(e, item.id)} className="p-5 rounded-2xl border border-blue-200 bg-blue-50/50 flex flex-col gap-3 shadow-sm">
+                      <textarea
+                        value={editDiscussionText}
+                        onChange={(e) => setEditDiscussionText(e.target.value)}
+                        rows={3}
+                        className="w-full resize-none rounded-xl border border-slate-200 bg-white p-4 text-[13px] text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 shadow-sm"
+                      />
+                      <div className="flex justify-end gap-2 mt-1">
+                        <button
+                          type="button"
+                          onClick={() => setEditingDiscussionId(null)}
+                          className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 shadow-sm"
+                        >
+                          Hủy
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={isUpdatingDiscussion}
+                          className="rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white hover:bg-blue-700 shadow-sm disabled:opacity-60"
+                        >
+                          {isUpdatingDiscussion ? "Đang lưu..." : "Lưu thay đổi"}
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className="p-5 rounded-2xl border border-slate-200/60 bg-white shadow-sm hover:shadow-md transition-shadow flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 text-slate-600 font-black shrink-0 shadow-sm text-sm">
+                        {item.student.name.slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                          <span className="font-extrabold text-[13px] text-slate-900">{item.student.name}</span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-[11px] font-semibold text-slate-400">{new Date(item.created_at).toLocaleString('vi-VN')}</span>
+                            <div className="flex items-center gap-2 border-l border-slate-200 pl-3">
+                              <button
+                                onClick={() => handleEditDiscussion(item.id, item.content)}
+                                className="text-[11px] font-bold text-slate-500 hover:text-blue-600 transition-colors"
+                              >
+                                Sửa
+                              </button>
+                              <button
+                                onClick={() => handleDeleteDiscussion(item.id)}
+                                disabled={isDeletingDiscussion}
+                                className="text-[11px] font-bold text-rose-500 hover:text-rose-600 transition-colors disabled:opacity-60"
+                              >
+                                Xóa
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-[13px] text-slate-600 leading-relaxed whitespace-pre-wrap">{item.content}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Teacher Replies */}
+                  {item.replies.map((reply) => (
+                    <div key={reply.id} className="ml-10 p-5 rounded-2xl border border-slate-200/60 bg-slate-50/80 shadow-sm flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-emerald-600 text-white font-black shrink-0 shadow-sm text-sm">
+                        GV
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                          <span className="font-extrabold text-[13px] text-slate-900 flex items-center gap-1.5">
+                            <span>{reply.user.name}</span>
+                            <VerifiedTeacherBadge isVerified={(reply.user as any).is_verified ?? true} size="xs" />
+                            <span className="px-2 py-0.5 rounded-md text-[9px] font-black text-emerald-700 bg-emerald-100 uppercase tracking-wider">Giảng viên</span>
+                          </span>
+                          <span className="text-[11px] font-semibold text-slate-400">{new Date(reply.created_at).toLocaleString('vi-VN')}</span>
+                        </div>
+                        <p className="text-[13px] text-slate-600 leading-relaxed whitespace-pre-wrap">{reply.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
  </main>
 
- {/* ─── Right Column (4 cols): Sidebar ─── */}
- <aside className="lg:col-span-4 w-full flex flex-col gap-5 sticky top-24 max-h-[calc(100vh-100px)] overflow-y-auto pr-1">
+  {/* ─── Right Column (4 cols): Sidebar ─── */}
+  <aside className="lg:col-span-4 w-full flex flex-col gap-6 sticky top-24 max-h-[calc(100vh-100px)] overflow-y-auto pr-1">
 
- {/* Progress Header */}
- <div className="bg-white rounded-2xl border border-[var(--border-color)] shadow-sm p-5 flex flex-col gap-3.5 shrink-0">
- <div className="flex items-center justify-between">
- <div>
- <h2 className="text-[17px] font-extrabold text-[#0F172A] flex items-center gap-2">
- <span>Lộ trình Học tập</span>
- </h2>
- <p className="text-[12px] font-medium text-[#64748B] mt-0.5">Tiến trình hoàn thành toàn khóa</p>
- </div>
- <span className="text-xs font-bold text-[#0F172A] bg-[var(--bg-light)] border border-[var(--primary-light)]/60 px-3 py-1.5 rounded-full shrink-0 shadow-2xs">
- {completedCount}/{totalLessonCount} Bài học
- </span>
- </div>
- <div className="w-full h-2.5 bg-[var(--bg-light)] rounded-full overflow-hidden p-0.5 border border-[var(--border-color)]">
- <div className="h-full bg-[var(--primary-color)] rounded-full transition-all duration-700 shadow-[0_0_8px_rgba(37, 99, 235,0.35)]" style={{ width: `${computedProgressPercentage}%` }} />
- </div>
- </div>
-
- {/* Module Accordion */}
- <div className="flex flex-col gap-4">
- {curriculum.map((mod, moduleIndex) => {
- const isExpanded = expandedModules[mod.id] ?? true;
- const modCompletedCount = mod.lessons.filter((l) => l.completed).length;
- const isModuleCompleted = mod.lessons.length > 0 && modCompletedCount === mod.lessons.length;
- const isModuleCurrent = mod.lessons.some((l) => l.id === activeLessonId);
-
- return (
- <div
- key={mod.id}
- className={twMerge(
- "rounded-2xl border transition-all duration-200 overflow-hidden shadow-sm",
- isModuleCurrent ? "bg-[#F8FAFC] border-[var(--primary-light)]" : "bg-white border-[var(--border-color)]"
- )}
- >
- {/* Module Header */}
- <div
- onClick={() => toggleModule(mod.id)}
- className="flex items-start justify-between p-4.5 cursor-pointer hover:bg-[#F8FAFC]/70 transition-colors group select-none"
- >
- <div className="flex items-start gap-3.5 min-w-0 pr-2">
- <div className={twMerge(
- "w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shrink-0 mt-0.5 transition-all shadow-2xs",
- isModuleCompleted ? "bg-[var(--primary-color)] text-white" :
- isModuleCurrent ? "bg-white border-2 border-[var(--primary-color)] text-[#0F172A]" :
- "bg-gray-100 text-[#64748B]"
- )}>
- {isModuleCompleted ? <Check size={14} strokeWidth={2.5} aria-hidden /> : moduleIndex + 1}
- </div>
- <div className="min-w-0 flex-1">
- <p className="text-[11px] font-bold uppercase tracking-wider text-[#0F172A] truncate">{mod.title}</p>
- <h3 className="text-[15px] font-bold text-[#0F172A] mt-1 leading-snug">Nhiều bài học</h3>
- <div className="flex items-center gap-2 mt-2">
- <span className="text-[12px] font-semibold text-[#64748B]">
- {modCompletedCount}/{mod.lessons.length} bài đã học
- </span>
- {isModuleCurrent && <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary-color)]" />}
- </div>
- </div>
- </div>
- <button className="text-[#64748B] group-hover:text-[#0F172A] transition-colors p-1 shrink-0" type="button" aria-label="Thu gọn hoặc mở rộng học phần">
- <ChevronsUpDown size={16} strokeWidth={2} />
- </button>
- </div>
-
- {/* Lessons */}
- {isExpanded && (
- <div className="flex flex-col border-t border-[var(--border-color)] pt-2.5 pb-3 px-3 gap-2 bg-white/60">
- {mod.lessons.map((lesson) => {
- const isCurrent = lesson.id === activeLessonId;
- const isCompleted = lesson.completed;
-
- return (
- <div
- key={lesson.id}
- onClick={() => handleSelectLesson(lesson.id)}
- className={twMerge(
- "flex items-center justify-between py-3 px-3.5 rounded-xl relative cursor-pointer transition-all duration-150 border",
- isCurrent ? "bg-[var(--bg-light)] border-[var(--primary-light)] shadow-xs" : "bg-white border-[var(--border-color)]/60 hover:border-[var(--border-color)] hover:bg-[#F8FAFC]"
- )}
- >
- {isCurrent && <div className="absolute left-0 top-2 bottom-2 w-[3.5px] bg-[var(--primary-color)] rounded-r-full" />}
-
- <div className="flex items-center gap-3 min-w-0 pr-2">
- <div className={twMerge(
- "w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all",
- isCompleted ? "bg-[#3B82F6] text-white shadow-2xs" :
- isCurrent ? "bg-white border-2 border-[#3B82F6] text-[#0F172A]" :
- "border-2 border-[#CBD5E1] text-[#64748B] bg-white"
- )}>
- <LessonStatusIcon
- lesson={{
- type: lesson.type,
- title: lesson.title,
- status: isCompleted ? "completed" : isCurrent ? "current" : undefined,
- completed: isCompleted,
- }}
- />
- </div>
-
- <div className="min-w-0 flex-1">
- <h4 className={twMerge(
- "text-[13.5px] sm:text-[14px] leading-snug truncate",
- isCurrent ? "text-[#0F172A] font-extrabold" : "text-[#0F172A] font-bold"
- )}>
- {lessonDisplayTitle(lesson.title)}
- </h4>
- <div className="flex items-center gap-2 mt-1 flex-wrap">
- {/* Lesson Type Label */}
- <span className={twMerge(
- "inline-flex items-center px-1.5 py-0.5 rounded text-[9.5px] font-bold",
- getLessonTypeColor(lesson.type)
- )}>
- {getLessonTypeLabel(lesson.type)}
- </span>
- <span className="text-[11px] font-medium text-[#64748B]"> {lesson.duration}</span>
- {/* Status Badge */}
- {isCurrent && !isCompleted && (
- <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-black text-[#0F172A] bg-white border border-[#A5B4FC] uppercase tracking-wider shadow-2xs">
- <span className="w-1.5 h-1.5 rounded-full bg-[#0F172A] animate-pulse" />
- ĐANG HỌC
- </span>
- )}
- {isCompleted && (
- <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-black text-[#0F172A] bg-[#F8FAFC] border border-[#6EE7B7] uppercase tracking-wider">
- HOÀN THÀNH
- </span>
- )}
- </div>
- </div>
- </div>
-
- <div className="shrink-0 text-[#64748B]">
- {isCurrent ? (
- <span className="w-2.5 h-2.5 rounded-full bg-[#3B82F6] inline-block animate-ping" />
- ) : (
- <ChevronRight size={16} className="text-[#94A3B8]" aria-hidden />
- )}
- </div>
- </div>
- );
- })}
- </div>
- )}
- </div>
- );
- })}
- </div>
- </aside>
- </div>
-
- {/* ─── Sticky Bottom Toolbar ─── */}
- <footer className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#E2E8F0] px-6 py-3.5 z-40 shadow-sm">
- <div className="max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-4">
- <button
- onClick={handleGoPrevious}
- disabled={!hasPrevious}
- className="flex items-center gap-2 px-5 py-2 rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#64748B] font-semibold text-xs sm:text-sm transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm"
- >
- <ArrowLeft size={16} strokeWidth={2} aria-hidden />
- <span>Bài trước</span>
- </button>
-
- {/* Completion status indicator — no manual "Mark Complete" */}
- {activeLesson.completed ? (
- <div className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#F8FAFC] text-[#065F46] font-semibold text-xs sm:text-sm border border-[#6EE7B7]">
- <CheckCircle2 size={16} aria-hidden />
- <span>Đã hoàn thành</span>
- </div>
- ) : (
- <div className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#F1F5F9] text-[#0F172A] font-semibold text-xs sm:text-sm border border-[#C7D2FE]">
- <span className="w-2 h-2 rounded-full bg-[#3B82F6] animate-pulse" />
- <span>Đang học — hoàn thành tự động</span>
- </div>
- )}
-
-  <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
-    {/* General Quiz Button */}
-    <button
-      type="button"
-      onClick={() => {
-        if (assessmentStatus?.general_quiz?.is_setup) {
-          if (assessmentStatus.general_quiz.is_passed) {
-            const scoreVal = assessmentStatus.general_quiz.best_score != null ? assessmentStatus.general_quiz.best_score : "";
-            const confirmRetake = confirm(
-              `✨ BÀI THI ĐÃ ĐẠT (Điểm số: ${scoreVal}/10)\n` +
-              `Bạn đã hoàn thành và vượt qua bài kiểm tra tổng quát này.\n\n` +
-              `Bạn có chắc chắn muốn làm lại bài kiểm tra không?`
-            );
-            if (!confirmRetake) return;
-          }
-          window.location.href = `/practice/quiz/question?courseId=${parsedCourseId}&quizType=general&quizId=${assessmentStatus.general_quiz.quiz_id}`;
-        } else if (isPreview) {
-          toast.error("Khóa học này chưa có bài kiểm tra tổng quát.");
-        } else {
-          toast.error("Bài kiểm tra tổng quát hiện chưa được giáo viên thiết lập cho khóa học này.");
-        }
-      }}
-      className="flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-[#0F172A] bg-[#F8FAFC] border border-[#E2E8F0] hover:bg-[#F1F5F9] transition-all cursor-pointer shadow-2xs"
-      title={
-        assessmentStatus?.general_quiz?.is_passed
-          ? `Đã đạt (${assessmentStatus.general_quiz.best_score}/10) - Bấm để làm lại`
-          : assessmentStatus?.general_quiz?.is_setup
-          ? "Bắt đầu làm bài kiểm tra tổng quát"
-          : "Chưa thiết lập đề thi tổng quát"
-      }
-    >
-      <span><FileEdit size={16} className="inline mr-1.5" /> Kiểm tra tổng quát</span>
-      {assessmentStatus?.general_quiz?.is_passed && (
-        <span className="text-[10px] bg-[#E8F8F0] text-[#27AE60] font-extrabold px-2 py-0.5 rounded-md border border-[#27AE60]/30 flex items-center gap-1">
-          <span className="flex items-center gap-1"><Check size={14} /> Đã đạt</span>
-          <span className="bg-[#27AE60] text-white px-1 rounded text-[9px]">
-            {assessmentStatus.general_quiz.best_score}/10
-          </span>
-        </span>
-      )}
-    </button>
-
-    {/* Final Quiz Button (<Flag size={16} className="inline mr-1.5" /> Làm bài kiểm tra cuối khóa) */}
-    {(() => {
-      const isUnlocked = assessmentStatus?.can_take_final_quiz === true;
-      const isPassed = assessmentStatus?.final_quiz?.is_passed === true;
-      const bestScore = assessmentStatus?.final_quiz?.best_score;
-      const lockReason = assessmentStatus?.final_quiz_lock_reason || <span className="flex items-center justify-center gap-1.5"><Lock size={14} /> Hoàn thành 100% khóa học & qua bài kiểm tra tổng quát</span>;
-
-      return (
-        <div className="relative group">
-          <button
-            type="button"
-            disabled={!isUnlocked}
-            onClick={() => {
-              if (isUnlocked && assessmentStatus?.final_quiz?.quiz_id) {
-                if (isPassed) {
-                  const scoreVal = bestScore != null ? bestScore : "";
-                  const confirmRetake = confirm(
-                    `🏆 BÀI THI CUỐI KHÓA ĐÃ ĐẠT (Điểm số: ${scoreVal}/10)\n` +
-                    `Bạn đã hoàn thành xuất sắc bài kiểm tra cuối khóa này.\n\n` +
-                    `Bạn có chắc chắn muốn làm lại không?`
-                  );
-                  if (!confirmRetake) return;
-                }
-                window.location.href = `/practice/quiz/question?courseId=${parsedCourseId}&quizType=final&quizId=${assessmentStatus.final_quiz.quiz_id}`;
-              } else {
-                toast(lockReason);
-              }
-            }}
-            className={twMerge(
-              "flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-2xs",
-              isUnlocked
-                ? "bg-[#065F46] hover:bg-[#044E39] text-white border border-[#065F46] cursor-pointer"
-                : "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60 pointer-events-none"
-            )}
-            title={isPassed ? `Đã đạt (${bestScore}/10) - Bấm để làm lại` : (typeof lockReason === 'string' ? lockReason : "Hoàn thành 100% khóa học & qua bài kiểm tra tổng quát")}
-          >
-            <span><Flag size={16} className="inline mr-1.5" /> Làm bài kiểm tra cuối khóa</span>
-            {isPassed ? (
-              <span className="text-[10px] bg-[#E8F8F0] text-[#27AE60] font-extrabold px-2 py-0.5 rounded-md border border-[#27AE60]/30 flex items-center gap-1">
-                <span className="flex items-center gap-1"><Check size={14} /> Đã đạt</span>
-                <span className="bg-[#27AE60] text-white px-1 rounded text-[9px]">{bestScore}/10</span>
-              </span>
-            ) : isUnlocked ? (
-              <span className="text-[10px] bg-[#27AE60] text-white font-black px-1.5 py-0.5 rounded-md uppercase">MỞ KHÓA</span>
-            ) : (
-              <span className="text-[10px] bg-gray-200 text-gray-600 font-bold px-1.5 py-0.5 rounded-md">ĐANG KHÓA</span>
-            )}
-          </button>
+    {/* Progress Header */}
+    <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm p-6 flex flex-col gap-4 shrink-0">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-[17px] font-extrabold text-slate-900 flex items-center gap-2">
+            <span>Lộ trình Học tập</span>
+          </h2>
+          <p className="text-xs font-semibold text-slate-500 mt-1">Tiến trình hoàn thành toàn khóa</p>
         </div>
-      );
-    })()}
+        <span className="text-xs font-black text-slate-700 bg-slate-100 border border-slate-200 px-3.5 py-1.5 rounded-xl shrink-0 shadow-sm">
+          {completedCount}/{totalLessonCount} Bài học
+        </span>
+      </div>
+      <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden p-[2px] border border-slate-200/50">
+        <div className="h-full bg-blue-600 rounded-full transition-all duration-700 shadow-sm" style={{ width: `${computedProgressPercentage}%` }} />
+      </div>
+    </div>
+
+    {/* Module Accordion */}
+    <div className="flex flex-col gap-4">
+      {curriculum.map((mod, moduleIndex) => {
+        const isExpanded = expandedModules[mod.id] ?? true;
+        const modCompletedCount = mod.lessons.filter((l) => l.completed).length;
+        const isModuleCompleted = mod.lessons.length > 0 && modCompletedCount === mod.lessons.length;
+        const isModuleCurrent = mod.lessons.some((l) => l.id === activeLessonId);
+
+        return (
+          <div
+            key={mod.id}
+            className={twMerge(
+              "rounded-2xl border transition-all duration-200 overflow-hidden shadow-sm",
+              isModuleCurrent ? "bg-white border-blue-200 ring-4 ring-blue-50/50" : "bg-white border-slate-200/60 hover:border-slate-300"
+            )}
+          >
+            {/* Module Header */}
+            <div
+              onClick={() => toggleModule(mod.id)}
+              className="flex items-start justify-between p-5 cursor-pointer hover:bg-slate-50/80 transition-colors group select-none"
+            >
+              <div className="flex items-start gap-4 min-w-0 pr-2">
+                <div className={twMerge(
+                  "w-8 h-8 rounded-full flex items-center justify-center font-black text-[13px] shrink-0 mt-0.5 transition-all shadow-sm",
+                  isModuleCompleted ? "bg-emerald-500 text-white border border-emerald-600" :
+                  isModuleCurrent ? "bg-blue-50 border-2 border-blue-500 text-blue-700" :
+                  "bg-slate-100 text-slate-500 border border-slate-200"
+                )}>
+                  {isModuleCompleted ? <Check size={14} strokeWidth={3} aria-hidden /> : moduleIndex + 1}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] font-black uppercase tracking-wider text-slate-500 truncate">{mod.title}</p>
+                  <h3 className="text-[15px] font-extrabold text-slate-900 mt-1 leading-snug">Nhiều bài học</h3>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-xs font-semibold text-slate-500">
+                      {modCompletedCount}/{mod.lessons.length} bài đã học
+                    </span>
+                    {isModuleCurrent && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-sm" />}
+                  </div>
+                </div>
+              </div>
+              <button className="text-slate-400 group-hover:text-slate-700 transition-colors p-1 shrink-0 bg-slate-50 rounded-lg group-hover:bg-slate-200/50" type="button" aria-label="Thu gọn hoặc mở rộng học phần">
+                <ChevronsUpDown size={16} strokeWidth={2.5} />
+              </button>
+            </div>
+
+            {/* Lessons */}
+            {isExpanded && (
+              <div className="flex flex-col border-t border-slate-200/60 p-2 gap-1.5 bg-slate-50/50">
+                {mod.lessons.map((lesson) => {
+                  const isCurrent = lesson.id === activeLessonId;
+                  const isCompleted = lesson.completed;
+
+                  return (
+                    <div
+                      key={lesson.id}
+                      onClick={() => handleSelectLesson(lesson.id)}
+                      className={twMerge(
+                        "flex items-center justify-between py-3 px-3.5 rounded-xl relative cursor-pointer transition-all duration-200 border",
+                        isCurrent ? "bg-white border-blue-200 shadow-sm ring-1 ring-blue-100" : "bg-transparent border-transparent hover:border-slate-200/60 hover:bg-white hover:shadow-sm"
+                      )}
+                    >
+                      {isCurrent && <div className="absolute left-0 top-3 bottom-3 w-[4px] bg-blue-600 rounded-r-full shadow-sm" />}
+
+                      <div className="flex items-center gap-3 min-w-0 pl-1 pr-2">
+                        <div className={twMerge(
+                          "w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all shadow-sm",
+                          isCompleted ? "bg-emerald-50 text-emerald-600 border border-emerald-200" :
+                          isCurrent ? "bg-blue-50 border-2 border-blue-500 text-blue-700" :
+                          "border border-slate-200 text-slate-400 bg-white"
+                        )}>
+                          <LessonStatusIcon
+                            lesson={{
+                              type: lesson.type,
+                              title: lesson.title,
+                              status: isCompleted ? "completed" : isCurrent ? "current" : undefined,
+                              completed: isCompleted,
+                            }}
+                          />
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <h4 className={twMerge(
+                            "text-[13px] leading-snug truncate",
+                            isCurrent ? "text-slate-900 font-extrabold" : "text-slate-700 font-bold"
+                          )}>
+                            {lessonDisplayTitle(lesson.title)}
+                          </h4>
+                          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                            {/* Lesson Type Label */}
+                            <span className={twMerge(
+                              "inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-sm",
+                              getLessonTypeColor(lesson.type)
+                            )}>
+                              {getLessonTypeLabel(lesson.type)}
+                            </span>
+                            <span className="text-[11px] font-bold text-slate-400"> {lesson.duration}</span>
+                            {/* Status Badge */}
+                            {isCurrent && !isCompleted && (
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[9px] font-black text-blue-700 bg-blue-50 border border-blue-200 uppercase tracking-wider shadow-sm">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                                ĐANG HỌC
+                              </span>
+                            )}
+                            {isCompleted && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 uppercase tracking-wider shadow-sm">
+                                HOÀN THÀNH
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="shrink-0 text-slate-400">
+                        <ChevronRight size={16} className={isCurrent ? "text-blue-600" : "text-slate-300"} aria-hidden />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  </aside>
+ </div>
+
+  {/* ─── Bottom Toolbar ─── */}
+  <footer className="w-full bg-white border-t border-slate-200 px-4 md:px-8 py-3.5 mt-auto sticky bottom-0 z-40 shadow-[0_-4px_20px_rgb(0,0,0,0.02)]">
+    <div className="max-w-[1400px] mx-auto w-full grid grid-cols-3 items-center gap-4">
+      {/* Left: Previous Button */}
+      <div className="flex justify-start">
+        <button
+          onClick={handleGoPrevious}
+          disabled={!hasPrevious}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-[13px] transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm hover:shadow"
+        >
+          <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
+          <span className="hidden sm:inline">Bài trước</span>
+        </button>
+      </div>
+
+      {/* Center: Status & Tests */}
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        {/* Completion status indicator */}
+        {activeLesson.completed ? (
+          <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-700 font-black text-[12px] border border-emerald-200 uppercase tracking-wider shadow-sm">
+            <CheckCircle2 size={16} strokeWidth={2.5} aria-hidden />
+            <span className="hidden md:inline">Hoàn thành</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold text-[12px] border border-slate-200/60 shadow-sm">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse shadow-[0_0_8px_rgba(37,99,235,0.6)]" />
+            <span className="hidden md:inline">Đang học tự động ghi nhận</span>
+          </div>
+        )}
+
+        {/* General Quiz Button */}
+        <button
+          type="button"
+          onClick={() => {
+            if (assessmentStatus?.general_quiz?.is_setup) {
+              if (assessmentStatus.general_quiz.is_passed) {
+                const scoreVal = assessmentStatus.general_quiz.best_score != null ? assessmentStatus.general_quiz.best_score : "";
+                const confirmRetake = confirm(
+                  `✨ BÀI THI ĐÃ ĐẠT (Điểm số: ${scoreVal}/10)\nBạn đã hoàn thành và vượt qua bài kiểm tra tổng quát này.\nBạn có chắc chắn muốn làm lại không?`
+                );
+                if (!confirmRetake) return;
+              }
+              window.location.href = `/practice/quiz/question?courseId=${parsedCourseId}&quizType=general&quizId=${assessmentStatus.general_quiz.quiz_id}`;
+            } else if (isPreview) {
+              toast.error("Khóa học này chưa có bài kiểm tra tổng quát.");
+            } else {
+              toast.error("Bài kiểm tra tổng quát hiện chưa được giáo viên thiết lập cho khóa học này.");
+            }
+          }}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-extrabold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-all cursor-pointer shadow-sm"
+          title={assessmentStatus?.general_quiz?.is_passed ? `Đã đạt (${assessmentStatus.general_quiz.best_score}/10) - Bấm để làm lại` : "Bài kiểm tra tổng quát"}
+        >
+          <FileEdit size={16} className="text-blue-600" />
+          <span className="hidden lg:inline">KT. Tổng quát</span>
+        </button>
 
 
-  <button
-    onClick={handleGoNext}
-    disabled={!hasNext}
-    className="flex items-center gap-2 px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm"
-  >
-    <span>Bài tiếp theo</span>
-    <ChevronRight size={16} strokeWidth={2} aria-hidden />
-  </button>
- </div>
- </div>
- </footer>
- </div>
- );
+      </div>
+
+      {/* Right: Next Button */}
+      <div className="flex justify-end">
+        <button
+          onClick={handleGoNext}
+          disabled={!hasNext}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-black text-white bg-blue-600 hover:bg-blue-700 transition-all disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-[0_4px_12px_rgba(37,99,235,0.25)] hover:shadow-[0_4px_16px_rgba(37,99,235,0.35)] uppercase tracking-wide"
+        >
+          <span>Bài tiếp theo</span>
+          <ChevronRight size={16} strokeWidth={3} aria-hidden />
+        </button>
+      </div>
+    </div>
+  </footer>
+  </div>
+  );
 }
 
 // ─── Exported Master Component ────────────────────────────────────────────────

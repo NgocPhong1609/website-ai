@@ -3,10 +3,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
-import { Sparkles, Star, Check, Clipboard, Zap, Send, Bot, CornerDownLeft, ArrowUpRight, CircleStop } from "lucide-react";
+import { Sparkles, Star, Check, Clipboard, Zap, Send, Bot, CornerDownLeft, ArrowUpRight, CircleStop, Lightbulb } from "lucide-react";
 import toast from "react-hot-toast";
 import type { AiChatMessage, AiQuotaMeta } from "../types";
 import { AiQuotaError, sendAiChatMessage } from "../services/ai-chat.client-service";
+import { Avatar } from "@/src/shared/components/ui/Avatar";
+import { readStoredUser } from "@/src/shared/lib/userStorage";
 
 interface ChatPanelProps {
   initialMessages?: AiChatMessage[];
@@ -153,6 +155,12 @@ export function ChatPanel({
   const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
   const [pinnedIds, setPinnedIds] = useState<string[]>([]);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  
+  useEffect(() => {
+    setUser(readStoredUser());
+  }, []);
+
   const [quota, setQuota] = useState<AiQuotaMeta | null>(null);
   const [quotaResetReached, setQuotaResetReached] = useState(false);
   const chatBoxRef = useRef<HTMLDivElement | null>(null);
@@ -335,7 +343,7 @@ export function ChatPanel({
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-base font-bold tracking-tight text-foreground">
-                Nova Neural AI
+                MindNova AI
               </h2>
             </div>
             <p className="text-xs font-medium text-muted-foreground">Hỗ trợ bài học: {syllabusTitle}</p>
@@ -393,13 +401,13 @@ export function ChatPanel({
           return isAi ? (
             /* Nova AI Message */
             <div key={msg.id} className="flex items-start gap-4 max-w-[92%] sm:max-w-[85%] group">
-              <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-                <Bot className="w-5 h-5 text-white" />
+              <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                <Sparkles className="w-5 h-5 text-blue-500" />
               </div>
               <div className="flex flex-col gap-2 flex-1 min-w-0">
                 <div className="flex items-center justify-between ml-1">
                   <div className="flex items-center gap-2.5">
-                    <span className="text-xs font-bold text-stone-700">Nova AI</span>
+                    <span className="text-xs font-bold text-stone-700">MindNova AI</span>
                     <span className="text-[11px] font-normal text-stone-400">{msg.timestamp}</span>
                     {isPinned && <span className="text-[11px] font-medium bg-secondary text-muted-foreground px-2.5 py-0.5 rounded-full border border-border"><Star size={12} fill="currentColor" className="mr-1 inline" /> Đã lưu</span>}
                   </div>
@@ -447,8 +455,9 @@ export function ChatPanel({
                     type="button"
                     onClick={() => handleSend("Hãy giải thích lại ý trên một cách đơn giản, dễ hiểu hơn kèm ví dụ thực tế nhé!")}
                     disabled={chatMutation.isPending || isQuotaBlocked}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium text-[#0F172A] hover:text-[#097268] bg-[#F5F0E8] hover:bg-[#D3F3EC] border border-[#0F172A]/25 transition-all cursor-pointer shadow-2xs disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium text-slate-700 hover:text-blue-600 bg-white hover:bg-slate-50 border border-slate-200 transition-all cursor-pointer shadow-sm disabled:opacity-50"
                   >
+                    <span><Lightbulb size={12} className="text-amber-500" /></span>
                     <span>Giải thích dễ hiểu hơn</span>
                   </button>
                 </div>
@@ -458,13 +467,14 @@ export function ChatPanel({
             /* User Message */
             <div key={msg.id} className="flex items-start gap-3 max-w-[85%] sm:max-w-[75%] self-end flex-row-reverse group">
               <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 mt-0.5 border border-border shadow-sm">
-                <Image
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=250&auto=format&fit=crop"
-                  width={36}
-                  height={36}
-                  sizes="36px"
-                  alt="You"
-                  className="object-cover w-full h-full"
+                <Avatar
+                  src={user?.avatar_url || user?.avatar || null}
+                  fallback={
+                    user?.name
+                      ? user.name.trim().split(" ").slice(-2).map((n: string) => n[0]).join("").toUpperCase()
+                      : "U"
+                  }
+                  className="w-full h-full text-xs font-semibold"
                 />
               </div>
               <div className="flex flex-col gap-1 items-end flex-1 min-w-0">
@@ -504,13 +514,12 @@ export function ChatPanel({
 
         {/* ─── Interactive Quick-Prompts ─── */}
         <div className="mt-6 pt-5 border-t border-border flex flex-col gap-3.5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-muted-foreground flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-slate-300" />
-              <span>Gợi ý câu hỏi</span>
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-semibold text-muted-foreground">
+              Gợi ý câu hỏi
             </span>
             <span className="text-[11px] font-medium text-muted-foreground bg-secondary px-2.5 py-0.5 rounded-full border border-border flex items-center">
-              <Zap size={12} fill="currentColor" className="mr-1" /> Nhấp để hỏi ngay
+              <Zap size={12} fill="currentColor" className="mr-1 text-amber-500" /> Nhấp để hỏi ngay
             </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

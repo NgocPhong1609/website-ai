@@ -19,16 +19,16 @@ function LessonItemRow({ lesson, courseId }: { lesson: CourseDetailLessonItem; c
  <div className={twMerge(
  "flex items-center justify-between py-3.5 px-5 rounded-lg border transition-all duration-200 text-decoration-none group/lesson",
  isCurrent 
- ? "bg-white border-[#0F172A]" 
+ ? "bg-[#EFF6FF] border-[#3B82F6]" 
  : isCompleted
  ? "bg-[#F8FAFC] border-[#E2E8F0] hover:bg-[#F8FAFC] hover:border-[#94A3B8]"
  : "bg-[#F1F5F9] border-[#E2E8F0] hover:bg-[#E2E8F0] opacity-80"
  )}>
  <div className="flex items-center gap-3.5 min-w-0">
  <div className={twMerge(
- "w-8 h-8 rounded border flex items-center justify-center shrink-0 transition-transform font-bold text-xs",
+ "w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 transition-transform font-bold text-xs",
  isCompleted ? "bg-[#0F172A] border-[#0F172A] text-white" :
- isCurrent ? "bg-[#0F172A] border-[#0F172A] text-white" :
+ isCurrent ? "bg-[#3B82F6] border-[#3B82F6] text-white" :
  "bg-white border-[#E2E8F0] text-[#64748B]"
  )}>
  <LessonStatusIcon lesson={lesson} />
@@ -42,7 +42,7 @@ function LessonItemRow({ lesson, courseId }: { lesson: CourseDetailLessonItem; c
  {lessonDisplayTitle(lesson.title)}
  </span>
  {isCurrent && (
- <span className="text-[10px] font-bold text-[#3B82F6] uppercase tracking-wider block mt-1">
+ <span className="text-[10px] font-semibold text-[#3B82F6] uppercase tracking-wider block mt-1">
  Đang học
  </span>
  )}
@@ -61,9 +61,9 @@ function LessonItemRow({ lesson, courseId }: { lesson: CourseDetailLessonItem; c
  </span>
  )}
  <span className={twMerge(
- "text-xs font-bold px-2.5 py-1 rounded border",
+ "text-xs font-bold px-2.5 py-1 rounded-md border",
  isCurrent 
- ? "text-[#0F172A] bg-white border-[#0F172A]" 
+ ? "text-[#1D4ED8] bg-[#DBEAFE] border-transparent" 
  : "text-[#64748B] bg-white border-[#E2E8F0]"
  )}>
  {lesson.duration}
@@ -120,18 +120,18 @@ export function CurriculumAccordion({ modules = [], courseId = 1 }: { modules?: 
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-[#E2E8F0]">
  <div>
  <div className="flex items-center gap-2 mb-2">
- <span className="text-xs font-bold text-[#64748B] uppercase tracking-wider">
+ <span className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">
  Giáo trình & Học phần
  </span>
  </div>
- <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] font-serif">
+ <h2 className="text-xl sm:text-2xl font-semibold text-[#0F172A]">
  Nội dung chương trình đào tạo
  </h2>
  </div>
 
  <div className="flex items-center gap-3 shrink-0">
- <div className="px-3.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] text-xs font-bold text-[#64748B]">
- {modules.length} Modules • <strong className="text-[#0F172A]">{totalLessons} Bài giảng</strong>
+ <div className="px-3.5 py-1.5 rounded-lg bg-[#EFF6FF] text-xs font-medium text-[#2563EB]">
+ {modules.length} Modules • <strong className="font-semibold">{totalLessons} Bài giảng</strong>
  </div>
 
  <button
@@ -144,7 +144,7 @@ export function CurriculumAccordion({ modules = [], courseId = 1 }: { modules?: 
  });
  setExpandedMap(newMap);
  }}
- className="text-xs font-bold text-[#64748B] hover:text-[#0F172A] px-2.5 py-1.5 rounded bg-white border border-[#E2E8F0] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+ className="text-xs font-medium text-[#64748B] hover:text-[#0F172A] px-2.5 py-1.5 rounded-lg bg-transparent hover:bg-[#F1F5F9] transition-colors cursor-pointer"
  >
  {Object.values(expandedMap).every(Boolean) ? "Thu nhỏ tất cả" : "Mở rộng tất cả"}
  </button>
@@ -174,11 +174,11 @@ export function CurriculumAccordion({ modules = [], courseId = 1 }: { modules?: 
  className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-4 bg-transparent hover:bg-[#F8FAFC] transition-colors cursor-pointer focus:outline-none"
  >
  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
- <div className="w-10 h-10 rounded border border-[#E2E8F0] bg-white text-[#0F172A] font-bold text-xs sm:text-sm flex items-center justify-center shrink-0 font-serif">
+ <div className="w-10 h-10 rounded-xl bg-[#F1F5F9] text-[#64748B] font-bold text-xs sm:text-sm flex items-center justify-center shrink-0">
  {String(modIdx + 1).padStart(2, "0")}
  </div>
  <div className="min-w-0">
- <h3 className="text-sm sm:text-base font-bold text-[#0F172A] truncate group-hover:text-[#2563EB]">
+ <h3 className="text-sm sm:text-base font-semibold text-[#0F172A] truncate group-hover:text-[#2563EB]">
  {module.title}
  </h3>
  <div className="flex items-center gap-2 mt-1 text-xs font-bold text-[#64748B]">
@@ -190,15 +190,15 @@ export function CurriculumAccordion({ modules = [], courseId = 1 }: { modules?: 
  </div>
 
  <div className="flex items-center gap-4 shrink-0">
- <span className={`text-[11px] font-bold px-2.5 py-1 rounded border hidden sm:inline-block ${
+ <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-md hidden sm:inline-block ${
  completedInMod === totalInMod && totalInMod > 0
- ? "bg-[#E8F6F3] text-[#0F172A] border-[#0F172A]/20"
- : "bg-white text-[#64748B] border-[#E2E8F0]"
+ ? "bg-[#ECFDF5] text-[#10B981] border-none"
+ : "bg-[#F1F5F9] text-[#64748B] border-none"
  }`}>
  {completedInMod}/{totalInMod} Đã học
  </span>
- <div className="w-8 h-8 rounded border border-[#E2E8F0] bg-white text-[#0F172A] flex items-center justify-center shrink-0">
- {isExpanded ? <ChevronUp size={16} strokeWidth={2} aria-hidden /> : <ChevronDown size={16} strokeWidth={2} aria-hidden />}
+ <div className="w-8 h-8 rounded-lg bg-transparent text-[#94A3B8] flex items-center justify-center shrink-0">
+ {isExpanded ? <ChevronUp size={18} strokeWidth={2} aria-hidden /> : <ChevronDown size={18} strokeWidth={2} aria-hidden />}
  </div>
  </div>
  </button>

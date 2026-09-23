@@ -213,7 +213,6 @@ class InstructorSeeder extends Seeder
         Enrollment::updateOrCreate(
             ['user_id' => $student1->id, 'course_id' => $course1->id],
             [
-                'course_class_id' => $class1->id,
                 'progress_percentage' => 75,
                 'status' => 'enrolled',
                 'enrolled_at' => now()->subDays(10),
@@ -223,7 +222,6 @@ class InstructorSeeder extends Seeder
         Enrollment::updateOrCreate(
             ['user_id' => $student2->id, 'course_id' => $course1->id],
             [
-                'course_class_id' => $class1->id,
                 'progress_percentage' => 40,
                 'status' => 'enrolled',
                 'enrolled_at' => now()->subDays(5),
@@ -233,7 +231,6 @@ class InstructorSeeder extends Seeder
         Enrollment::updateOrCreate(
             ['user_id' => $student3->id, 'course_id' => $course2->id],
             [
-                'course_class_id' => $class2->id,
                 'progress_percentage' => 90,
                 'status' => 'completed',
                 'enrolled_at' => now()->subDays(20),

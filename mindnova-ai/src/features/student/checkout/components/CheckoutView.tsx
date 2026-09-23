@@ -10,7 +10,7 @@ import { Ticket, AlertTriangle, Gift, PartyPopper, Sparkles } from "lucide-react
 import { Loader } from "@/src/shared/components/ui/Loader";
 import toast from "react-hot-toast";
 
-export function CheckoutView({ courseId }: { courseId: number }) {
+export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?: () => void }) {
   const router = useRouter();
   const { data, isLoading, isError } = useGetCourseDetail(courseId);
   const [paymentMethod, setPaymentMethod] = useState<string>("vnpay");
@@ -150,11 +150,11 @@ export function CheckoutView({ courseId }: { courseId: number }) {
   };
 
   return (
-    <div className="w-full flex flex-col lg:flex-row gap-8">
+    <div className="w-full flex flex-col lg:flex-row lg:divide-x divide-[#E2E8F0]">
       {/* Cột trái: Tóm tắt hóa đơn & Nhập mã giảm giá */}
-      <div className="flex-1 space-y-6">
-        <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-[#0F172A] mb-6 border-b border-[#F0F0F8] pb-4">
+      <div className="flex-1 p-6 lg:p-8 space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold text-[#0F172A] mb-6 border-b border-[#E2E8F0] pb-4">
             Tóm tắt Đơn hàng
           </h2>
           
@@ -170,22 +170,22 @@ export function CheckoutView({ courseId }: { courseId: number }) {
               <h3 className="text-base font-bold text-[#0F172A] leading-snug mb-1">
                 {header_info.title}
               </h3>
-              <span className="inline-block px-2.5 py-1 bg-[#F8FAFC] text-[#3B82F6] text-xs font-bold rounded-lg border border-[#E2E8F0]">
+              <span className="inline-block px-2.5 py-1 bg-[#EFF6FF] text-[#2563EB] text-xs font-medium rounded-md capitalize">
                 {header_info.level}
               </span>
             </div>
           </div>
 
           {/* Ô nhập mã giảm giá (Coupon input) */}
-          <div className="border-t border-[#F0F0F8] pt-5 mb-6">
-            <label className="text-xs font-black uppercase text-[#0F172A] tracking-wider flex items-center gap-1.5 mb-2">
+          <div className="border-t border-[#E2E8F0] pt-5 mb-6">
+            <label className="text-xs font-semibold uppercase text-[#64748B] tracking-wider flex items-center gap-1.5 mb-2">
               <Ticket size={16} /> Mã giảm giá / Khuyến mãi
             </label>
 
             {appliedCoupon ? (
-              <div className="p-4 rounded-2xl bg-[#E8F8F0] border border-[#27AE60]/20 flex items-center justify-between gap-3 shadow-2xs">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#0F172A]">
-                  <span className="px-2.5 py-1 rounded-lg bg-[#27AE60] text-white font-mono text-xs font-black uppercase shadow-2xs">
+              <div className="p-4 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] flex items-center justify-between gap-3 shadow-sm">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#2563EB]">
+                  <span className="px-2.5 py-1 rounded-md bg-[#3B82F6] text-white font-mono text-xs font-medium uppercase shadow-sm">
                     {appliedCoupon.code}
                   </span>
                   <span>
@@ -197,7 +197,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
                 <button
                   type="button"
                   onClick={handleRemoveCoupon}
-                  className="text-xs font-extrabold text-[#3B82F6] hover:text-[#2563EB] underline cursor-pointer"
+                  className="text-xs font-semibold text-[#3B82F6] hover:text-[#2563EB] underline cursor-pointer"
                 >
                   Hủy bỏ mã
                 </button>
@@ -212,14 +212,14 @@ export function CheckoutView({ courseId }: { courseId: number }) {
                     if (couponError) setCouponError(null);
                   }}
                   placeholder="Nhập mã giảm giá (VD: TEST)..."
-                  className="flex-1 px-4 py-2.5 rounded-xl text-xs font-bold border border-[#E2E8F0] focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none uppercase text-[#0F172A]"
+                  className="flex-1 px-4 py-2.5 rounded-md text-xs font-medium border border-[#E2E8F0] focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none uppercase text-[#0F172A]"
                 />
                 <button
                   type="submit"
                   disabled={isApplyingCoupon || !couponCodeInput.trim()}
-                  className="px-5 py-2.5 rounded-xl text-xs font-black text-white bg-[#3B82F6] hover:bg-[#2563EB] disabled:opacity-50 transition-all cursor-pointer shrink-0 shadow-2xs"
+                  className="px-5 py-2.5 rounded-md text-xs font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] disabled:opacity-50 transition-all cursor-pointer shrink-0 shadow-sm"
                 >
-                  {isApplyingCoupon ? "Đang kiểm tra..." : "Áp dụng"}
+                  {isApplyingCoupon ? "Đang xử lý..." : "Áp dụng"}
                 </button>
               </form>
             )}
@@ -232,20 +232,20 @@ export function CheckoutView({ courseId }: { courseId: number }) {
           </div>
 
           {/* Chi tiết chi phí */}
-          <div className="space-y-3 border-t border-[#F0F0F8] pt-4">
+          <div className="space-y-3 border-t border-[#E2E8F0] pt-4">
             <div className="flex justify-between text-sm text-[#64748B]">
               <span>Giá khóa học gốc</span>
-              <span className="font-semibold">{originalPrice === 0 ? "Miễn phí" : `${originalPrice.toLocaleString()} VND`}</span>
+              <span className="font-medium">{originalPrice === 0 ? "Miễn phí" : `${originalPrice.toLocaleString()} VND`}</span>
             </div>
 
             {appliedCoupon && (
-              <div className="flex justify-between text-sm text-[#27AE60] font-bold">
+              <div className="flex justify-between text-sm text-[#3B82F6] font-semibold">
                 <span>Khuyến mãi ({appliedCoupon.code})</span>
                 <span>- {discountAmount.toLocaleString()} VND</span>
               </div>
             )}
 
-            <div className="flex justify-between text-lg font-bold text-[#0F172A] pt-2 border-t border-[#E2E8F0]">
+            <div className="flex justify-between text-lg font-semibold text-[#0F172A] pt-2 border-t border-[#E2E8F0]">
               <span>Tổng thanh toán</span>
               <span className="text-[#3B82F6]">
                 {isEffectiveFree ? "0 VND (Miễn phí)" : `${finalTotal.toLocaleString()} VND`}
@@ -256,15 +256,15 @@ export function CheckoutView({ courseId }: { courseId: number }) {
       </div>
 
       {/* Cột phải: Phương thức thanh toán hoặc nhận khóa học */}
-      <div className="w-full lg:w-[400px] shrink-0 space-y-6">
-        <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
+      <div className="w-full lg:w-[420px] shrink-0 p-6 lg:p-8 bg-[#F8FAFC]">
+        <div>
           {isEffectiveFree ? (
             <>
-              <h2 className="text-lg font-bold text-[#0F172A] mb-4 border-b border-[#F0F0F8] pb-4 flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-[#0F172A] mb-4 border-b border-[#E2E8F0] pb-4 flex items-center gap-2">
                 <Gift size={20} className="text-[#3B82F6]" /> Nhận khóa học Miễn phí
               </h2>
-              <div className="mb-6 space-y-2.5 p-4 rounded-xl bg-[#E8F8F0] border border-[#27AE60]/20">
-                <p className="text-[#27AE60] text-xs font-bold leading-relaxed flex items-start gap-1.5">
+              <div className="mb-6 space-y-2.5 p-4 rounded-md bg-[#EFF6FF] border border-[#BFDBFE]">
+                <p className="text-[#2563EB] text-xs font-semibold leading-relaxed flex items-start gap-1.5">
                   {appliedCoupon ? (
                     <>
                       <PartyPopper size={14} className="shrink-0 mt-0.5" />
@@ -283,14 +283,14 @@ export function CheckoutView({ courseId }: { courseId: number }) {
                 type="button"
                 onClick={handleCheckout}
                 disabled={isProcessing}
-                className="w-full py-3.5 rounded-xl text-sm font-black text-white bg-[#27AE60] hover:bg-[#1f8749] shadow-md hover:shadow-lg disabled:opacity-60 transition-all flex justify-center items-center gap-2 cursor-pointer"
+                className="w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-sm hover:shadow-md disabled:opacity-60 transition-all flex justify-center items-center gap-2 cursor-pointer"
               >
                 {isProcessing ? "Đang xử lý..." : <><Sparkles size={16} /> Xác nhận Nhận khóa học ngay</>}
               </button>
             </>
           ) : (
             <>
-              <h2 className="text-lg font-bold text-[#0F172A] mb-6 border-b border-[#F0F0F8] pb-4">
+              <h2 className="text-lg font-semibold text-[#0F172A] mb-6 border-b border-[#E2E8F0] pb-4">
                 Phương thức thanh toán
               </h2>
               
@@ -298,10 +298,10 @@ export function CheckoutView({ courseId }: { courseId: number }) {
                 {savedMethods.length > 0 ? (
                   <>
                     {savedMethods.map((method) => (
-                      <label key={method.id} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${savedMethodId === method.id ? "border-[#3B82F6] bg-[#F8FAFC] ring-1 ring-[#3B82F6]/30" : "border-[#E2E8F0] hover:bg-[#F8FAFC]"}`}>
+                      <label key={method.id} className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${savedMethodId === method.id ? "border-[#3B82F6] bg-white ring-1 ring-[#3B82F6]/30 shadow-sm" : "border-[#E2E8F0] bg-white hover:bg-slate-50"}`}>
                         <input type="radio" name="savedMethod" checked={savedMethodId === method.id} onChange={() => { setSavedMethodId(method.id); setConfirmAccount(false); }} className="w-4 h-4 text-[#3B82F6]" />
                         <div>
-                          <div className="font-semibold text-sm text-[#0F172A]">{method.label}</div>
+                          <div className="font-medium text-sm text-[#0F172A]">{method.label}</div>
                           <div className="text-xs text-[#64748B]">{method.provider.toUpperCase()}</div>
                         </div>
                       </label>
@@ -313,17 +313,17 @@ export function CheckoutView({ courseId }: { courseId: number }) {
                   </>
                 ) : (
                   <>
-                <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'vnpay' ? 'border-[#3B82F6] bg-[#F8FAFC] ring-1 ring-[#3B82F6]/30' : 'border-[#E2E8F0] hover:bg-[#F8FAFC]'}`}>
+                <label className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${paymentMethod === 'vnpay' ? 'border-[#3B82F6] bg-white ring-1 ring-[#3B82F6]/30 shadow-sm' : 'border-[#E2E8F0] bg-white hover:bg-slate-50'}`}>
                   <input type="radio" name="paymentMethod" value="vnpay" checked={paymentMethod === 'vnpay'} onChange={() => setPaymentMethod('vnpay')} className="w-4 h-4 text-[#3B82F6]" />
-                  <div className="font-semibold text-sm text-[#0F172A]">Thanh toán qua VNPay</div>
+                  <div className="font-medium text-sm text-[#0F172A]">Thanh toán qua VNPay</div>
                 </label>
-                <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'momo' ? 'border-[#3B82F6] bg-[#F8FAFC] ring-1 ring-[#3B82F6]/30' : 'border-[#E2E8F0] hover:bg-[#F8FAFC]'}`}>
+                <label className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${paymentMethod === 'momo' ? 'border-[#3B82F6] bg-white ring-1 ring-[#3B82F6]/30 shadow-sm' : 'border-[#E2E8F0] bg-white hover:bg-slate-50'}`}>
                   <input type="radio" name="paymentMethod" value="momo" checked={paymentMethod === 'momo'} onChange={() => setPaymentMethod('momo')} className="w-4 h-4 text-[#3B82F6]" />
-                  <div className="font-semibold text-sm text-[#0F172A]">Ví điện tử Momo</div>
+                  <div className="font-medium text-sm text-[#0F172A]">Ví điện tử Momo</div>
                 </label>
-                <label className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'banking' ? 'border-[#3B82F6] bg-[#F8FAFC] ring-1 ring-[#3B82F6]/30' : 'border-[#E2E8F0] hover:bg-[#F8FAFC]'}`}>
+                <label className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${paymentMethod === 'banking' ? 'border-[#3B82F6] bg-white ring-1 ring-[#3B82F6]/30 shadow-sm' : 'border-[#E2E8F0] bg-white hover:bg-slate-50'}`}>
                   <input type="radio" name="paymentMethod" value="banking" checked={paymentMethod === 'banking'} onChange={() => setPaymentMethod('banking')} className="w-4 h-4 text-[#3B82F6]" />
-                  <div className="font-semibold text-sm text-[#0F172A]">Chuyển khoản Ngân hàng</div>
+                  <div className="font-medium text-sm text-[#0F172A]">Chuyển khoản Ngân hàng</div>
                 </label>
                   </>
                 )}
@@ -333,7 +333,7 @@ export function CheckoutView({ courseId }: { courseId: number }) {
                 type="button"
                 onClick={handleCheckout}
                 disabled={isProcessing}
-                className="w-full py-3.5 rounded-xl text-sm font-bold text-white bg-[#3B82F6] shadow-md hover:shadow-lg disabled:opacity-60 transition-all flex justify-center items-center gap-2 cursor-pointer"
+                className="w-full py-3.5 rounded-md text-sm font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-sm hover:shadow-md disabled:opacity-60 transition-all flex justify-center items-center gap-2 cursor-pointer"
               >
                 {isProcessing ? "Đang xử lý..." : "Xác nhận Thanh toán"}
               </button>
@@ -342,9 +342,9 @@ export function CheckoutView({ courseId }: { courseId: number }) {
 
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => { if (onClose) onClose(); else router.back(); }}
             disabled={isProcessing}
-            className="w-full mt-3 py-3 rounded-xl text-sm font-semibold text-[#64748B] bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-all cursor-pointer"
+            className="w-full mt-3 py-3 rounded-md text-sm font-medium text-[#64748B] bg-white border border-[#E2E8F0] hover:bg-slate-50 transition-all cursor-pointer"
           >
             Quay lại
           </button>

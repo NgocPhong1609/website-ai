@@ -36,9 +36,7 @@ export function CoursesHeader({
  <section className="relative overflow-hidden rounded-2xl bg-white border border-slate-100 p-6 sm:p-7 transition-all duration-300 w-full shadow-sm">
  <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 w-full">
  <div className="space-y-3 max-w-xl">
- <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-xs font-semibold text-blue-600">
- Danh mục Đào tạo • AI Co-Pilot
- </div>
+
 
  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 leading-tight">
  Khóa học của bạn
