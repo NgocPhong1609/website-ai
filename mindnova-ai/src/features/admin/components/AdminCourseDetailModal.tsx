@@ -153,7 +153,7 @@ export function AdminCourseDetailModal({
   const endOfCourseQuiz = course.course_level_quizzes?.end_of_course;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-fadeIn [font-family:var(--font-admin-body)]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-fadeIn [font-family:var(--font-sans)]">
       <div className="flex flex-col w-full max-w-5xl max-h-[90vh] bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
         
         {/* Modal Header */}

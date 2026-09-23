@@ -4,10 +4,10 @@ export async function AdminModerationPage() {
  const data = await getAdminModerationData();
 
  return (
- <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+ <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-sans)]">
  <section className="rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(125deg,#0b1636_0%,#0d224a_50%,#115e83_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
  <p className="text-[10px] uppercase tracking-[0.35em] text-[#F8FAFC]/65">Moderation & support</p>
- <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Kiểm duyệt & hỗ trợ</h1>
+ <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-sans)]">Kiểm duyệt & hỗ trợ</h1>
  <p className="mt-1 max-w-2xl text-xs text-slate-200/90">
  Theo dõi báo cáo vi phạm, yêu cầu hỗ trợ và xử lý sự cố nội dung trước khi ảnh hưởng đến người dùng.
  </p>
