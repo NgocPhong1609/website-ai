@@ -40,7 +40,8 @@ export async function getDashboardOverview(): Promise<DashboardOverview> {
  advanced_recommendations: (response.data.advanced_recommendations || []).map(normalizeRecommendation),
  };
  }
- } catch (error) {
+ } catch (error: any) {
+  if (error?.message?.includes("401") || error?.message?.includes("Unauthorized")) throw error;
  console.warn("[DashboardService] Unable to reach backend /student/dashboard API:", error);
  }
 

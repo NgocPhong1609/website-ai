@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useId, useEffect } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import {
  LogoMark,
  EmailIcon,
@@ -47,7 +48,10 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  document.cookie = `accessToken=${encodeURIComponent(token)}; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
  document.cookie = `userRole=${roleStr}; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
 
- window.location.assign(getRedirectPath(user));
+ toast.success('Đăng nhập thành công!');
+  setTimeout(() => {
+  window.location.assign(getRedirectPath(user));
+  }, 1000);
  } catch {
  window.localStorage.clear();
  document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
@@ -119,26 +123,15 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
 
  return (
  <div className="flex flex-col w-full h-full px-8 sm:px-10 py-6">
- {/* Header — bám sát phía trên */}
- <div className="mb-auto">
- <Link href="/" className="inline-flex items-center gap-2.5 group" aria-label="Trang chủ MindNova AI">
- <LogoMark size={36} />
- <span className="text-[16px] font-bold tracking-tight text-[#0F172A] group-hover:text-blue-600 transition-colors">
- MindNova AI
- </span>
- </Link>
- </div>
+
 
  {/* Content — căn giữa dọc */}
- <div className="flex flex-col justify-center w-full max-w-[380px] mx-auto py-6">
+ <div className="flex flex-col justify-center w-full max-w-[380px] mx-auto py-6 my-auto">
  <div className="mb-5">
  <h1 className="text-[26px] font-bold text-[#0F172A] leading-tight tracking-tight">
  Welcome back
  </h1>
- <p className="mt-1.5 text-[13px] text-[#64748B] leading-relaxed">
- Continue your personalized learning journey with{" "}
- <span className="text-[#3B82F6] font-medium">AI-driven</span> insights.
- </p>
+
  </div>
 
  {statusMessage && (
@@ -158,21 +151,21 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  id={emailId}
  label="Email Address"
  type="email"
- placeholder="name@example.com"
+
  autoComplete="email"
  value={values.email}
  onChange={handleChange("email")}
- leftIcon={<EmailIcon />}
+
  />
  <FormField
  id={passwordId}
  label="Password"
  type={showPassword ? "text" : "password"}
- placeholder="••••••••"
+
  autoComplete="current-password"
  value={values.password}
  onChange={handleChange("password")}
- leftIcon={<LockIcon />}
+
  labelRight={
  <Link
  href="/forgot-password"
@@ -194,7 +187,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  <button
  type="submit"
  disabled={isLoading || !canSubmit}
- className="mt-1 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#3B82F6]/30"
+ className="mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#3B82F6]/30"
  >
  {isLoading ? "Signing in..." : <>Login <ArrowRightIcon /></>}
  </button>
@@ -221,3 +214,4 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  </div>
  );
 }
+

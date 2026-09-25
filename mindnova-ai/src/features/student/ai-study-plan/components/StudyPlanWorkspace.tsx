@@ -28,8 +28,8 @@ export function StudyPlanWorkspace({
  setExternalPrompt(query);
  };
 
- return (
- <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+return (
+  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
  {/* Primary Interactive Chat Area (8 cols) */}
  <div className="lg:col-span-8 w-full">
  <ChatPanel

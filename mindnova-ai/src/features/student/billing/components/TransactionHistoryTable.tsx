@@ -112,70 +112,62 @@ function FilterDropdown({ value, onChange }: FilterDropdownProps) {
 // ─── Transaction Row ──────────────────────────────────────────────────────────
 
 function TransactionRow({ tx, onRefundClick }: { tx: Transaction; onRefundClick?: (tx: Transaction) => void }) {
- return (
- <tr className="group hover:bg-[#F8FAFC]/80 transition-colors duration-150 border-b border-[#F4F5FB] last:border-b-0">
- {/* Invoice ID */}
- <td className="pl-6 pr-4 py-4 whitespace-nowrap">
- <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#F4F5FD] text-[#2563eb] font-semibold text-xs border border-[#e2e8f0] select-all">
- {tx.invoiceId}
- </span>
- </td>
+  return (
+    <tr className="group hover:bg-[#F8FAFC]/80 transition-colors duration-150 border-b border-[#F4F5FB] last:border-b-0">
+      {/* Invoice ID */}
+      <td className="pl-6 pr-4 py-4 whitespace-nowrap">
+        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#F4F5FD] text-[#2563eb] font-semibold text-xs border border-[#e2e8f0] select-all">
+          {tx.invoiceId}
+        </span>
+      </td>
 
- {/* Date */}
- <td className="px-4 py-4 text-xs font-normal text-[#64748b] whitespace-nowrap">
- {tx.date}
- </td>
+      {/* Date */}
+      <td className="px-4 py-4 text-xs font-normal text-[#64748b] whitespace-nowrap">
+        {tx.date}
+      </td>
 
- {/* Service & Details */}
- <td className="px-4 py-4 min-w-[240px]">
- <div className="flex items-center gap-3">
- <ServiceIcon icon={tx.serviceIcon} />
- <div className="space-y-0.5">
- <p className="text-xs sm:text-sm font-semibold text-[#0f172a] leading-snug group-hover:text-[#2563eb] transition-colors">
- {tx.service}
- </p>
- <p className="text-[11px] font-normal text-[#64748b]">
- Thanh toán thành công qua thẻ trực tuyến
- </p>
- </div>
- </div>
- </td>
+      {/* Service & Details */}
+      <td className="px-4 py-4 min-w-[240px]">
+        <div className="flex items-center gap-3">
+          <ServiceIcon icon={tx.serviceIcon} />
+          <div className="space-y-0.5">
+            <p className="text-xs sm:text-sm font-semibold text-[#0f172a] leading-snug group-hover:text-[#2563eb] transition-colors">
+              {tx.service}
+            </p>
+            <p className="text-[11px] font-normal text-[#64748b]">
+              Thanh toán thành công qua thẻ trực tuyến
+            </p>
+          </div>
+        </div>
+      </td>
 
- {/* Amount */}
- <td className="px-4 py-4 text-xs sm:text-sm font-semibold text-[#0f172a] whitespace-nowrap">
- {tx.amount}
- </td>
+      {/* Amount */}
+      <td className="px-4 py-4 text-xs sm:text-sm font-semibold text-[#0f172a] whitespace-nowrap">
+        {tx.amount}
+      </td>
 
- {/* Status */}
- <td className="px-4 py-4 whitespace-nowrap">
- <StatusBadge status={tx.status} />
- </td>
+      {/* Status */}
+      <td className="px-4 py-4 whitespace-nowrap">
+        <StatusBadge status={tx.status} />
+      </td>
 
- {/* Actions */}
- <td className="pr-6 pl-4 py-4 whitespace-nowrap text-right">
- <div className="flex items-center justify-end gap-2">
- {tx.status === "Paid" && (
- <button
- type="button"
- onClick={() => onRefundClick?.(tx)}
- className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#2563eb] bg-[#eff6ff] hover:bg-[#eff6ff]/80 border border-[#2563eb]/20 transition-all duration-150 cursor-pointer shadow-2xs"
- title="Yêu cầu hoàn tiền khóa học nếu tiến độ ≤ 10% hoặc chưa học quá 5 bài"
- >
- <span className="flex items-center gap-1.5"><Banknote size={14} /> Hoàn tiền</span>
- </button>
- )}
- <button
- type="button"
- onClick={() => toast(`Yêu cầu hỗ trợ giao dịch ${tx.invoiceId} đã được ghi nhận. Chuyên viên chăm sóc học viên sẽ kết nối qua khung Chat!`)}
- className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#2563eb] bg-[#f8fafc] hover:bg-[#f8fafc] hover:text-[#2563eb] border border-[#2563eb]/20 hover:border-[#2563eb]/40 transition-all duration-150 cursor-pointer shadow-2xs"
- title="Yêu cầu hỗ trợ về khoản học phí này"
- >
- <span> Hỗ trợ</span>
- </button>
- </div>
- </td>
- </tr>
- );
+      {/* Actions */}
+      <td className="pr-6 pl-4 py-4 whitespace-nowrap text-right">
+        <div className="flex items-center justify-end gap-2">
+          {tx.status === "Paid" && (
+            <button
+              type="button"
+              onClick={() => onRefundClick?.(tx)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#2563eb] bg-[#eff6ff] hover:bg-[#eff6ff]/80 border border-[#2563eb]/20 transition-all duration-150 cursor-pointer shadow-2xs"
+              title="Yêu cầu hoàn tiền khóa học nếu tiến độ ≤ 10% hoặc chưa học quá 5 bài"
+            >
+              <span className="flex items-center gap-1.5"><Banknote size={14} /> Hoàn tiền</span>
+            </button>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
 }
 
 // ─── Transaction History Table ────────────────────────────────────────────────

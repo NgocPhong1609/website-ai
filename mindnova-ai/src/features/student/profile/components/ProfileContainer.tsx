@@ -121,43 +121,55 @@ export default function ProfileContainer() {
     <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-6">
       
       {/* ── Hero Banner ── */}
-      <section className="rounded-2xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-xl">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 leading-tight">
-              Quản lý Tài khoản <span className="text-slate-500 font-normal">&amp; Bảo mật</span>
+      <section className="relative overflow-hidden rounded-[32px] bg-white border border-[#EAEAF4] p-8 sm:p-10 shadow-sm">
+        {/* Subtle background glow/gradient */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-[#eff6ff] to-[#f3e8ff] rounded-full blur-3xl opacity-60 -translate-y-1/2 translate-x-1/3"></div>
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+          <div className="space-y-4 max-w-xl">
+            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-[#0f172a] leading-tight flex items-center gap-3">
+              <span className="bg-[#eff6ff] text-[#2563eb] p-2.5 rounded-xl shadow-xs border border-[#2563eb]/10">
+                 <Sparkles size={28} />
+              </span>
+              Hồ sơ của bạn
             </h1>
-            <p className="text-sm text-slate-500 leading-relaxed font-normal">
-              Cập nhật thông tin nhận dạng cá nhân, thiết lập danh tính, và tùy chỉnh cấu hình bảo mật. Dữ liệu của bạn được AI đồng bộ an toàn.
+            <p className="text-[15px] text-[#64748b] leading-relaxed font-medium">
+              Cập nhật thông tin cá nhân, thiết lập danh tính và tùy chỉnh bảo mật. 
+              Trải nghiệm học tập sẽ được cá nhân hóa hoàn toàn dựa trên hồ sơ của bạn.
             </p>
           </div>
 
           {/* Mastery/Completion Card */}
-          <div className="shrink-0 flex items-center gap-5 bg-slate-50 rounded-xl p-4 border border-slate-200 min-w-[280px]">
-            <div className="relative w-14 h-14 shrink-0">
-              <svg className="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
-                <circle cx="28" cy="28" r="24" fill="none" stroke="#e2e8f0" strokeWidth="4" />
+          <div className="shrink-0 flex items-center gap-5 bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-[#EAEAF4] shadow-sm min-w-[300px] transition-all hover:shadow-md hover:border-[#2563eb]/20 cursor-default">
+            <div className="relative w-16 h-16 shrink-0">
+              <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="28" fill="none" stroke="#F1F5F9" strokeWidth="5" />
                 <circle
-                  cx="28" cy="28" r="24" fill="none"
-                  stroke="#3b82f6" strokeWidth="4" strokeLinecap="round"
-                  strokeDasharray={`${2 * Math.PI * 24}`}
-                  strokeDashoffset={`${2 * Math.PI * 24 * (1 - profile.completionPercent / 100)}`}
+                  cx="32" cy="32" r="28" fill="none"
+                  stroke="url(#blue-gradient)" strokeWidth="5" strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 28}`}
+                  strokeDashoffset={`${2 * Math.PI * 28 * (1 - profile.completionPercent / 100)}`}
                   className="transition-all duration-1000 ease-out"
                 />
+                <defs>
+                  <linearGradient id="blue-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#3b82f6" />
+                    <stop offset="100%" stopColor="#1d4ed8" />
+                  </linearGradient>
+                </defs>
               </svg>
-              <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-blue-600">
+              <span className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-[#1d4ed8]">
                 {profile.completionPercent}%
               </span>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-slate-900">Hoàn thiện hồ sơ</span>
-                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                <span className="text-sm font-semibold text-[#0f172a]">Mức độ hoàn thiện</span>
+                <span className="text-[10px] font-medium text-white bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] px-2 py-0.5 rounded-full shadow-sm">
                   Cấp độ A+
                 </span>
               </div>
-              <p className="text-xs text-slate-500">
-                Hãy hoàn tất các mục còn thiếu
+              <p className="text-xs font-medium text-[#64748b]">
+                {profile.completionPercent === 100 ? "Tuyệt vời! Hồ sơ đã hoàn chỉnh." : "Hãy hoàn tất các mục còn thiếu."}
               </p>
             </div>
           </div>
@@ -179,7 +191,7 @@ export default function ProfileContainer() {
         </div>
 
         {/* Active Panel Content */}
-        <div className="flex-1 min-w-0 w-full rounded-2xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
+        <div className="flex-1 min-w-0 w-full rounded-[24px] bg-white border border-[#EAEAF4] p-8 sm:p-10 shadow-sm">
           <ActivePanel tab={activeTab} profile={profile} />
         </div>
       </div>

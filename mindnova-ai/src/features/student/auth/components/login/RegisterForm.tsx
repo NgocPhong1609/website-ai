@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useState, useCallback, useId } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import {
  LogoMark,
  UserIcon,
@@ -103,9 +104,9 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  apiErrors[key] = payload.errors[key][0];
  });
  setErrors(apiErrors);
- throw new Error("Vui lòng kiểm tra lại thông tin.");
+ throw new Error("Vui lÃ²ng kiá»ƒm tra láº¡i thÃ´ng tin.");
  }
- const detailError = payload?.error || payload?.message || "Đăng ký thất bại.";
+ const detailError = payload?.error || payload?.message || "ÄÄƒng kÃ½ tháº¥t báº¡i.";
  throw new Error(detailError);
  }
  
@@ -123,7 +124,10 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  document.cookie = `userRole=${roleStr}; path=/; max-age=${maxAge}; samesite=lax`;
 
  setStatusMessage("Đăng ký thành công...");
- window.location.assign(getRedirectPath(user));
+  toast.success('Đăng ký thành công!');
+  setTimeout(() => {
+  window.location.assign(getRedirectPath(user));
+  }, 1000);
  }
  } catch (error) {
  setStatusMessage(error instanceof Error ? error.message : "Đăng ký thất bại.");
@@ -146,18 +150,10 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
 
  return (
  <div className="flex flex-col w-full h-full px-8 sm:px-10 py-6">
- {/* Header — bám sát phía trên */}
- <div className="mb-auto">
- <Link href="/" className="inline-flex items-center gap-2.5 group" aria-label="Trang chủ MindNova AI">
- <LogoMark size={36} />
- <span className="text-[16px] font-bold tracking-tight text-[#0F172A] group-hover:text-blue-600 transition-colors">
- MindNova AI
- </span>
- </Link>
- </div>
 
- {/* Content — căn giữa dọc */}
- <div className="flex flex-col justify-center w-full max-w-[480px] mx-auto py-6">
+
+ {/* Content â€” cÄƒn giá»¯a dá»c */}
+ <div className="flex flex-col justify-center w-full max-w-[480px] mx-auto py-6 my-auto">
  <div className="mb-5">
  <h1 className="text-[26px] font-bold text-[#0F172A] leading-tight tracking-tight">
  Create Account
@@ -167,7 +163,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  {statusMessage && (
  <div
  className={`mb-3 p-3 rounded-xl text-xs font-medium border ${
-  statusMessage.includes("thành công")
+  statusMessage.includes("thÃ nh cÃ´ng")
   ? "bg-[#E8F8F0] text-[#27AE60] border-[#27AE60]/20"
   : "bg-[#EFF6FF] text-[#3B82F6] border-[#3B82F6]/30"
  }`}
@@ -233,10 +229,6 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
   {/* Submit Button Skeleton */}
   <div className="mt-1 h-[48px] bg-[#E2E8F0] rounded-xl"></div>
   </div>
-
-  <div className="absolute inset-0 flex items-center justify-center">
-  <div className="w-8 h-8 border-4 border-[#E2E8F0] border-t-[#3B82F6] rounded-full animate-spin"></div>
-  </div>
   </div>
   ) : (
   <>
@@ -244,22 +236,21 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  id={nameId}
  label="Full Name"
  type="text"
- placeholder="John Doe"
  autoComplete="name"
  value={values.name}
  onChange={handleChange("name")}
- leftIcon={<UserIcon />}
+
  error={errors.name}
  />
  <FormField
  id={emailId}
  label="Email Address"
  type="email"
- placeholder="name@example.com"
+
  autoComplete="email"
  value={values.email}
  onChange={handleChange("email")}
- leftIcon={<EmailIcon />}
+
  error={errors.email}
  />
 
@@ -268,11 +259,11 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  id={passwordId}
  label="Password"
  type={showPassword ? "text" : "password"}
- placeholder="••••••••"
+
  autoComplete="new-password"
  value={values.password}
  onChange={handleChange("password")}
- leftIcon={<LockIcon />}
+
  error={errors.password}
  rightElement={
  <button
@@ -288,11 +279,11 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  id={confirmPasswordId}
  label="Confirm Password"
  type={showConfirmPassword ? "text" : "password"}
- placeholder="••••••••"
+
  autoComplete="new-password"
  value={values.password_confirmation}
  onChange={handleChange("password_confirmation")}
- leftIcon={<LockIcon />}
+
  error={errors.password_confirmation}
  rightElement={
  <button
@@ -309,12 +300,13 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  <button
  type="submit"
  disabled={isLoading || !canSubmit}
- className="mt-1 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#3B82F6]/30"
+ className="mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#3B82F6]/30"
  >
  {isLoading ? "Creating account..." : <>Sign Up <ArrowRightIcon /></>}
  </button>
  </>
- )}
+  )}
+
  </form>
 
  <p className="mt-5 text-center text-[13px] text-[#64748B]">
@@ -329,12 +321,15 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  </p>
  </div>
 
- {/* Footer — bám sát phía dưới */}
+ {/* Footer â€” bÃ¡m sÃ¡t phÃ­a dÆ°á»›i */}
  <div className="mt-auto text-center">
  <p className="text-[11px] text-[#94A3B8] leading-relaxed">
- © 2024 MindNova AI. Empowering global learners through intelligence.
+ Â© 2024 MindNova AI. Empowering global learners through intelligence.
  </p>
  </div>
  </div>
  );
 }
+
+
+

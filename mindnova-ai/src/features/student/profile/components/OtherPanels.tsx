@@ -8,21 +8,21 @@ import toast from "react-hot-toast";
 
 function ActiveSessionsBox() {
   return (
-    <div className="mt-8 p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="mt-8 p-5 rounded-2xl bg-[#F8FAFC] border border-[#EAEAF4] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-[#3b82f6]/30 hover:bg-white hover:shadow-sm">
       <div className="flex items-start gap-4">
-        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white border border-slate-200 text-slate-700 shrink-0 shadow-sm">
+        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white border border-[#EAEAF4] text-[#64748b] shrink-0 shadow-sm">
           <Smartphone className="w-6 h-6" />
         </div>
-        <div className="space-y-1">
-          <p className="text-sm font-bold text-slate-900">Quản lý Thiết bị &amp; Phiên Đăng nhập</p>
-          <p className="text-sm text-slate-500">Phát hiện 2 trình duyệt/thiết bị đang duy trì kết nối an toàn với tài khoản này.</p>
+        <div className="space-y-1 mt-0.5">
+          <p className="text-sm font-semibold text-[#0f172a]">Quản lý thiết bị &amp; phiên đăng nhập</p>
+          <p className="text-sm font-medium text-[#64748b]">Hệ thống bảo vệ đang duy trì kết nối an toàn trên 2 thiết bị.</p>
         </div>
       </div>
       
       <button
         type="button"
         onClick={() => toast("Hệ thống an ninh ghi nhận: Không có truy cập bất thường nào từ các thiết bị lạ.", { icon: '🛡️' })}
-        className="shrink-0 px-4 py-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-sm font-semibold text-slate-700 transition-all cursor-pointer shadow-sm"
+        className="shrink-0 px-4 py-2.5 rounded-xl bg-white border border-[#EAEAF4] hover:bg-[#F8FAFC] hover:text-[#0f172a] text-sm font-semibold text-[#64748b] transition-all cursor-pointer shadow-sm"
       >
         Kiểm tra nhật ký
       </button>
@@ -94,15 +94,12 @@ export function SecurityPanel() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="mb-6 flex items-start justify-between gap-4">
+      <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900">Bảo mật &amp; Mật khẩu</h2>
-          <p className="text-sm text-slate-500 mt-1">
+          <h2 className="text-2xl font-semibold text-[#0f172a] tracking-tight">Bảo mật &amp; Mật khẩu</h2>
+          <p className="text-[15px] font-medium text-[#64748b] mt-2">
             Quản lý khóa bảo vệ riêng tư và theo dõi các phiên kết nối thiết bị của bạn.
           </p>
-        </div>
-        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
-          <Shield className="w-3.5 h-3.5" /> Chuẩn SSL 256-bit
         </div>
       </div>
 
@@ -134,7 +131,7 @@ export function SecurityPanel() {
           },
         ].map(({ id, label, value, set, placeholder, validation }) => (
           <div key={id}>
-            <label htmlFor={id} className="block text-sm font-semibold text-slate-700 mb-1.5">
+            <label htmlFor={id} className="block text-sm font-medium text-[#1e293b] mb-1.5">
               {label}
             </label>
             <input
@@ -143,7 +140,7 @@ export function SecurityPanel() {
               value={value}
               onChange={(e) => set(e.target.value)}
               placeholder={placeholder}
-              className="w-full px-4 py-2.5 rounded-xl text-sm text-slate-900 bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+              className="w-full px-4 py-3 rounded-xl text-sm text-[#0f172a] bg-[#F8FAFC] border border-[#EAEAF4] focus:border-[#3b82f6] focus:bg-white focus:ring-4 focus:ring-[#3b82f6]/10 outline-none transition-all placeholder:text-[#94a3b8]"
             />
             {value.length > 0 && validation && !validation.isValid && (
               <p className="text-xs font-medium text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-lg mt-1.5">
@@ -164,7 +161,7 @@ export function SecurityPanel() {
             type="button"
             onClick={handleUpdate}
             disabled={!canSave || isLoading || updated}
-            className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
+            className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] hover:opacity-95 shadow-md shadow-blue-500/20 disabled:from-[#94a3b8] disabled:to-[#cbd5e1] disabled:shadow-none disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             {isLoading ? (
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -210,36 +207,41 @@ export function SettingsPanel() {
     loadSettings();
   }, []);
 
-  const saveSetting = async (key: string, value: boolean) => {
+  const saveSetting = async (key: string, value: boolean, revertFn: () => void) => {
     setIsSaving(true);
     try {
       await axiosClient.post("/api/profile/settings", {
         [key]: value,
       });
+      toast.success("Cập nhật cài đặt thành công!");
     } catch (error) {
       console.error("Failed to save setting:", error);
       toast.error("Không thể lưu cài đặt. Vui lòng thử lại.");
+      revertFn();
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleNotificationToggle = () => {
+    if (isSaving) return;
     const newValue = !notifications;
     setNotifications(newValue);
-    saveSetting("notification_email", newValue);
+    saveSetting("notification_email", newValue, () => setNotifications(!newValue));
   };
 
   const handleWeeklyReportToggle = () => {
+    if (isSaving) return;
     const newValue = !weeklyReport;
     setWeeklyReport(newValue);
-    saveSetting("weekly_report", newValue);
+    saveSetting("weekly_report", newValue, () => setWeeklyReport(!newValue));
   };
 
   const handleAiSuggestionsToggle = () => {
+    if (isSaving) return;
     const newValue = !aiSuggestions;
     setAiSuggestions(newValue);
-    saveSetting("ai_suggestions", newValue);
+    saveSetting("ai_suggestions", newValue, () => setAiSuggestions(!newValue));
   };
 
   const toggles = [
@@ -269,9 +271,9 @@ export function SettingsPanel() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full">
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-slate-900">Cài đặt Thông báo &amp; Hệ thống</h2>
-          <p className="text-sm text-slate-500 mt-1">
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold text-[#0f172a] tracking-tight">Cài đặt hệ thống</h2>
+          <p className="text-[15px] font-medium text-[#64748b] mt-2">
             Tùy biến trải nghiệm rèn luyện trực tuyến và các kênh tương tác của hệ thống.
           </p>
         </div>
@@ -286,9 +288,9 @@ export function SettingsPanel() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-slate-900">Cài đặt Thông báo &amp; Hệ thống</h2>
-        <p className="text-sm text-slate-500 mt-1">
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold text-[#0f172a] tracking-tight">Cài đặt hệ thống</h2>
+        <p className="text-[15px] font-medium text-[#64748b] mt-2">
           Tùy biến trải nghiệm rèn luyện trực tuyến và các kênh tương tác của hệ thống.
         </p>
       </div>
@@ -297,12 +299,14 @@ export function SettingsPanel() {
         {toggles.map(({ id, label, description, value, handler }) => (
           <div
             key={id}
-            onClick={handler}
-            className={`group flex items-center justify-between gap-4 p-5 rounded-2xl border border-slate-200 hover:border-blue-300 hover:shadow-sm transition-all ${isSaving ? "opacity-75 cursor-not-allowed" : "cursor-pointer bg-white hover:bg-slate-50"}`}
+            onClick={() => {
+              if (!isSaving) handler();
+            }}
+            className={`group flex items-center justify-between gap-4 p-5 rounded-2xl border border-[#EAEAF4] transition-all ${isSaving ? "opacity-70 cursor-not-allowed bg-slate-50" : "cursor-pointer bg-white hover:bg-[#F8FAFC] hover:border-[#3b82f6]/40 hover:shadow-sm"}`}
           >
             <div className="space-y-1">
-              <p className="text-sm font-bold text-slate-900">{label}</p>
-              <p className="text-sm text-slate-500 leading-relaxed">{description}</p>
+              <p className="text-sm font-semibold text-[#0f172a]">{label}</p>
+              <p className="text-sm font-medium text-[#64748b] leading-relaxed">{description}</p>
             </div>
             
             {/* Custom Toggle Switch */}
@@ -312,15 +316,14 @@ export function SettingsPanel() {
               aria-checked={value}
               onClick={(e) => {
                 e.stopPropagation();
-                handler();
+                if (!isSaving) handler();
               }}
-              disabled={isSaving}
-              className={`relative w-12 h-6.5 rounded-full transition-colors duration-200 outline-none shrink-0 ${isSaving ? "cursor-not-allowed" : "cursor-pointer"} ${
-                value ? "bg-blue-600" : "bg-slate-200"
+              className={`relative w-[46px] h-6 rounded-full transition-colors duration-300 outline-none shrink-0 ${isSaving ? "cursor-not-allowed" : "cursor-pointer"} ${
+                value ? "bg-[#3b82f6]" : "bg-[#cbd5e1]"
               }`}
             >
               <span
-                className={`absolute top-[3px] left-[3px] w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                className={`absolute top-[2px] left-[2px] w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
                   value ? "translate-x-[22px]" : "translate-x-0"
                 }`}
               />

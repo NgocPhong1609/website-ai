@@ -14,7 +14,7 @@ function OverallProgressCard({ data }: { data: OverallProgress }) {
  return (
  <Link 
  href="/progress" 
- className="h-full group bg-white rounded-xl p-5 border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-300 flex flex-col justify-between gap-4 text-decoration-none focus:outline-none"
+ className="h-full group bg-white rounded-xl p-5 border border-slate-100 hover:border-blue-500 hover:shadow-md transition-all duration-300 flex flex-col justify-between gap-4 text-decoration-none focus:outline-none focus:border-blue-500"
  >
  <div className="space-y-3">
  <div className="flex items-center justify-between">

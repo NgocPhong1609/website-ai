@@ -141,6 +141,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/change-password/request-otp', [UserController::class, 'requestChangePasswordOtp']);
         Route::post('/change-password', [UserController::class, 'changePassword']);
         Route::post('/avatar', [UserController::class, 'uploadAvatar']);
+        Route::post('/settings', [UserController::class, 'saveSettings']);
     });
 
     // -- Nhóm API Đơn hàng (Orders) & Mã giảm giá (Coupons) --

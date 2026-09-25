@@ -9,7 +9,7 @@ interface AiSuggestionCardProps {
 
 export function AiSuggestionCard({ suggestion = AI_SUGGESTION }: AiSuggestionCardProps) {
  return (
- <div className="group relative overflow-hidden rounded-xl bg-white border border-slate-100 p-5 hover:border-slate-200 hover:shadow-sm transition-all duration-300 w-full">
+ <div className="group relative overflow-hidden rounded-xl bg-white border border-slate-100 p-5 hover:border-blue-500 hover:shadow-md transition-all duration-300 w-full focus:outline-none focus:border-blue-500">
  <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
  <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-blue-500 text-white flex items-center justify-center shrink-0 shadow-sm">
  <Sparkles size={20} />
@@ -29,7 +29,7 @@ export function AiSuggestionCard({ suggestion = AI_SUGGESTION }: AiSuggestionCar
  </div>
 
  {/* Message Content */}
- <p className="text-sm sm:text-base font-semibold text-slate-900 tracking-tight leading-snug group-hover:text-blue-600 transition-colors duration-200">
+ <p className="text-sm sm:text-base font-semibold text-slate-900 tracking-tight leading-snug transition-colors duration-200">
  {suggestion?.message || "Chúng tôi nhận thấy bạn vừa dành 20 phút xử lý vướng mắc về Hydration errors. Hãy thử ôn tập chuyên sâu học phần Server vs Client Leaf Node Components nhé!"}
  </p>
 
@@ -51,7 +51,7 @@ export function AiSuggestionCard({ suggestion = AI_SUGGESTION }: AiSuggestionCar
  href="/study-plan"
  className="py-2.5 px-4 rounded-lg text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all text-decoration-none shadow-sm"
  >
- Cấu hình mục tiêu AI
+ Nhờ AI hỗ trợ
  </Link>
  </div>
  </div>

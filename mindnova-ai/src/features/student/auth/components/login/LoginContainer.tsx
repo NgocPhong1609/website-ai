@@ -33,11 +33,10 @@ export default function LoginContainer() {
 
  return (
  <main
- className="w-full bg-white"
- style={{ minHeight: "100dvh", height: "100dvh" }}
+ className="flex items-center justify-center w-full min-h-[100dvh] bg-slate-50 p-4"
  >
  <div
- className="relative w-full h-full max-w-[640px] mx-auto"
+ className="relative w-full max-w-[480px] h-[640px] bg-white rounded-2xl shadow-2xl overflow-hidden"
  style={{ perspective: "1200px" }}
  >
  <div

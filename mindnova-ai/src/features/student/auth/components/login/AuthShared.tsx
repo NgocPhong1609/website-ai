@@ -139,7 +139,7 @@ export function ArrowRightIcon() {
 export interface StyledInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
  id: string;
  label: string;
- leftIcon: React.ReactNode;
+ leftIcon?: React.ReactNode;
  rightElement?: React.ReactNode;
  labelRight?: React.ReactNode;
  error?: string;
@@ -155,12 +155,14 @@ export function FormField({ id, label, leftIcon, rightElement, labelRight, error
  {labelRight}
  </div>
  <div className="relative group">
+ {leftIcon && (
  <div className={`pointer-events-none absolute inset-y-0 left-4 flex items-center transition-colors duration-200 ${error ? "text-[#60A5FA] group-focus-within:text-[#2563EB]" : "text-[#94A3B8] group-focus-within:text-[#3B82F6]"}`}>
  {leftIcon}
  </div>
+ )}
  <input
  id={id}
- className={`w-full pl-11 pr-11 py-3.5 rounded-xl text-sm text-[#0F172A] placeholder-[#C0C0D8] bg-[#F8F8FC] border transition-all duration-200 focus:outline-none focus:bg-white ${error ? "border-[#93C5FD] focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 hover:border-[#60A5FA]" : "border-[#E4E4EF] focus:border-[#E2E8F0] focus:ring-4 focus:ring-[#3B82F6]/10 hover:border-[#C8C8E0]"}`}
+ className={`w-full ${leftIcon ? "pl-11" : "pl-4"} ${rightElement ? "pr-11" : "pr-4"} py-3.5 rounded-xl text-sm text-[#0F172A] placeholder-[#C0C0D8] bg-[#F8F8FC] border transition-all duration-200 focus:outline-none focus:bg-white ${error ? "border-[#93C5FD] focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 hover:border-[#60A5FA]" : "border-[#E4E4EF] focus:border-[#E2E8F0] focus:ring-4 focus:ring-[#3B82F6]/10 hover:border-[#C8C8E0]"}`}
  {...inputProps}
  />
  {rightElement && (
