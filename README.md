@@ -212,3 +212,15 @@ Xem [hướng dẫn cấu hình kết nối](docs/environment-urls.md) cho front
 Vercel, callback đăng nhập/thanh toán và WebSocket.
 
 Thông báo lỗi frontend dùng bộ xử lý chung; xem [quy ước và kiểm thử thông báo lỗi](docs/user-error-messages.md).
+
+### OTP email on Railway via Resend
+
+The backend includes `resend/resend-php` for Laravel's built-in HTTPS mail transport.
+In the Railway backend service, configure `MAIL_MAILER=resend`, `RESEND_API_KEY`
+(secret), `MAIL_FROM_ADDRESS=no-reply@mail.halong.website`, and
+`MAIL_FROM_NAME="MindNova AI"`. The sender domain must be verified in Resend.
+Deploy the SDK before switching the running mailer; rebuild cached configuration
+on deployment. SMTP variables are unused with this mailer. Never commit API keys.
+Existing OTP expiry, verification, and password reset behavior is unchanged.
+Validate transport with Resend's `delivered@resend.dev` test recipient, then confirm
+receipt using an owned inbox; API acceptance alone does not establish inbox delivery.
