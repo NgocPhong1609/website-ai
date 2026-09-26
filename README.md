@@ -250,3 +250,8 @@ attempt is capped by the remaining deadline (and the existing 90-second cap).
 Exhaustion returns the normal JSON error instead of PHP terminating at its default
 30 seconds. Validate deployment over authenticated HTTP; CLI execution does not
 exercise PHP's web execution limit.
+
+In the create-course draft, dragging a lesson's grip onto another lesson moves it
+to that position. Cross-chapter moves preserve the original lesson ID, media and
+quiz data, renumber both lesson lists, and persist the updated draft to session
+storage. Dropping a lesson onto itself leaves its position unchanged.
