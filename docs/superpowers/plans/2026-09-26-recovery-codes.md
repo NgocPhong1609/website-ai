@@ -38,3 +38,14 @@
 - Interface check: reset form, code panel, admin panel and support form match endpoint paths and request/response fields; no shared implementation file edits.
 - Frontend red: 4 recovery tests failed on old OTP UI, while 3 login/register tests passed. Panel red: 3 tests failed on absent recovery functionality. Green: recovery form 7/7 and panels 3/3.
 - Ruling: new reset passwords match existing password-change complexity rules, because weaker reset passwords cannot pass unchanged current-password validation later.
+
+## Final verification and review
+- Frontend focused: 40 tests passed (authentication errors/recovery, security panel, admin recovery and error helpers).
+- TypeScript `tsc --noEmit`: passed. Next production build: passed.
+- Browser smoke: Chromium, 390px viewport, fragment consumption/reset/support with mocked API; passed without horizontal overflow.
+- Full frontend: 32 files passed, 5 files failed (160 tests passed / 3 failed, plus two suite import failures). Every failing file reproduced on clean base 854f1a0: LearningHistory loading text, ChatMessageBubble styling, two quiz @shared import failures, environment-urls websocket config. These are unchanged and outside the requested scope.
+- Backend full legacy auth suite cannot bootstrap all migrations on SQLite because of pre-existing MySQL-specific ALTER syntax. Isolated integration harness covers actual auth/recovery routes instead.
+- Independent review identified an API-login/reset race. Fixed by serializing password validation and token issuance under the same user-row transaction.
+- Independent MySQL8.4 concurrency probe: separate processes/connections, observed actual LOCK WAIT; fixed login returns401 with zero surviving tokens. Counterproof original login returns200 with a surviving token. 1 test / 8 assertions passed.
+- Production read-only evidence showed SESSION_DRIVER=file. Added nullable per-account recovery version, captured on successful web Login and validated by web middleware; stale session rejection returns immediately. No global session invalidation. Added old/new/unrelated file-session tests.
+- Independent reviewer approved latest recovery/session implementation after testing; final commit and deployment tracked in handoff/status.

@@ -1,6 +1,6 @@
 # Password recovery API and operations
 
-Apply the `2026_09_26_000000_create_password_recovery_codes_table` migration before enabling this flow. Existing accounts have no saved codes until the owner signs in and generates them. Owners who have lost access and have no saved codes need administrator support.
+Apply the `2026_09_26_000000_create_password_recovery_codes_table` and `2026_09_26_000001_add_password_recovery_version_to_users_table` migrations before enabling this flow. Existing accounts have no saved codes until the owner signs in and generates them. Owners who have lost access and have no saved codes need administrator support.
 
 Authenticated users of every role can call `GET /api/profile/recovery-codes` for `{ "remaining": number }` and `POST /api/profile/recovery-codes` with `{ "current_password": "..." }`. The POST returns eight codes once as `{ "codes": [...] }`; generating a new set invalidates the previous set. The server stores only SHA-256 digests. Users must save the returned codes somewhere they can access without logging in.
 
@@ -24,3 +24,5 @@ Legacy `POST /api/forgot-password`, `POST /api/forgot-password/verify-otp`, and 
 - Administrator accounts cannot be recovered by another admin through this endpoint. They should generate and retain their own codes; loss of all credentials requires the platform operator's established recovery process.
 
 Existing accounts do not receive codes automatically. They must generate them while signed in. Codes are not sent by email, stored in browser localStorage, or shown again later. A successful reset invalidates the entire old set; generate a new set after logging in. Ordinary password changes, login, registration and non-authentication features retain their existing behavior.
+
+Session revocation also covers file-backed Laravel web sessions: recovery rotates an account-specific version; successful web login records it; stale web sessions are rejected before protected handlers. Accounts that have not recovered retain their existing sessions. API password login and recovery serialize on the same user row, preventing an in-flight login with the old password from issuing a surviving token.
