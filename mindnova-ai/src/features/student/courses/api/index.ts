@@ -11,6 +11,10 @@ export function useGetCourseDetail(courseId: string | number = 0) {
  },
  staleTime: 5 * 60 * 1000,
  enabled: !!courseId && Number(courseId) > 0,
+ retry: (failureCount, error: any) => {
+ if (error?.response?.status === 404) return false;
+ return failureCount < 3;
+ },
  });
 }
 

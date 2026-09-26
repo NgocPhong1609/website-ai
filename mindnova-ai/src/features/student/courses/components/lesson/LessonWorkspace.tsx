@@ -1105,7 +1105,7 @@ function LessonWorkspaceContent() {
  if (hasNext) handleSelectLesson(allLessons[currentIndex + 1].id);
  };
 
- if (!parsedCourseId || parsedCourseId <= 0) {
+ if (!parsedCourseId || parsedCourseId <= 0 || (error && (error as any).response?.status === 404)) {
  return (
  <div className="w-full h-screen flex flex-col items-center justify-center bg-blue-50/50 p-6">
  <div className="bg-white p-8 rounded-xl shadow-sm max-w-md w-full text-center border border-blue-100">
