@@ -3,6 +3,11 @@ import type { NextConfig } from "next";
 import { backendApiUrl } from "./src/shared/lib/backend-url";
 
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_REVERB_HOST: 'eloquent-clarity-production-bbdd.up.railway.app',
+    NEXT_PUBLIC_REVERB_PORT: '443',
+    NEXT_PUBLIC_REVERB_SCHEME: 'https',
+  },
   images: {
     remotePatterns: [
       {
