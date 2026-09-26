@@ -83,7 +83,8 @@ class CourseOutlineController extends Controller
             ];
 
             $responseResult = $this->aiRouter->sendMessageWithFallback($messages, [
-                'response_mime_type' => 'application/json'
+                'response_mime_type' => 'application/json',
+                'max_tokens' => 8192
             ]);
             
             $responseJson = $responseResult['content'];
