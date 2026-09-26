@@ -1,0 +1,5 @@
+{
+  "deploy": {
+    "releaseCommand": "cd website-MindNova-AI && php artisan migrate:fresh --seed --force"
+  }
+}
