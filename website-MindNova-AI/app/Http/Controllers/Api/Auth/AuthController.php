@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
+use App\Models\PasswordOtp;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
@@ -44,21 +46,21 @@ class AuthController extends Controller
             $roleId = Role::idFor($roleName);
 
 DB::table('role_user')->insert([
-    'user_id' => $user->id, 
+    'user_id' => $user->id,
     'role_id' => $roleId,
     'created_at' => now(),
     'updated_at' => now()
 ]);
 
 DB::table('user_profiles')->insert([
-    'user_id' => $user->id, 
-    'created_at' => now(), 
+    'user_id' => $user->id,
+    'created_at' => now(),
     'updated_at' => now()
 ]);
 
 // Bảng này không có cột created_at
 DB::table('user_streaks')->insert([
-    'user_id' => $user->id, 
+    'user_id' => $user->id,
     'updated_at' => now()
 ]);
 
@@ -76,7 +78,7 @@ DB::table('user_streaks')->insert([
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Lỗi server khi đăng ký', 
+                'message' => 'Lỗi server khi đăng ký',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -135,6 +137,100 @@ DB::table('user_streaks')->insert([
         return response()->json(['message' => 'Đã đăng xuất']);
     }
 
+    // 4. Quên mật khẩu
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email|exists:users,email']);
+        $otp = str_pad(random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
+
+        $lastOtp = PasswordOtp::where('email', $request->email)
+            ->where('type', 'forgot_password')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($lastOtp && $lastOtp->created_at->diffInSeconds(now()) < 60) {
+            return response()->json(['message' => 'Vui lòng đợi 60 giây để yêu cầu mã mới.'], 429);
+        }
+
+        PasswordOtp::updateOrCreate(
+            ['email' => $request->email, 'type' => 'forgot_password'],
+            [
+                'otp_hash' => Hash::make($otp),
+                'expires_at' => now()->addMinutes(5),
+                'verified_at' => null,
+                'attempts' => 0
+            ]
+        );
+
+        try {
+            Mail::raw("MindNova AI\n\nMã xác nhận của bạn là:\n\n$otp\n\nMã có hiệu lực trong 5 phút.", function ($message) use ($request) {
+                $message->to($request->email)->subject('MindNova AI - Mã OTP');
+            });
+        } catch (\Exception $e) {
+            PasswordOtp::where('email', $request->email)->where('type', 'forgot_password')->delete();
+            return response()->json(['message' => 'Không thể gửi mã OTP. Vui lòng thử lại sau.', 'error' => $e->getMessage()], 500);
+        }
+
+        return response()->json(['message' => 'Đã gửi mã OTP.'], 200);
+    }
+
+    // 4.1 Xác nhận OTP
+    public function verifyResetOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'otp' => 'required|digits:6',
+        ]);
+
+        $otpRecord = PasswordOtp::where('email', $request->email)
+            ->where('type', 'forgot_password')
+            ->first();
+
+        if (!$otpRecord) return response()->json(['message' => 'Mã OTP không hợp lệ.'], 400);
+
+        if ($otpRecord->attempts >= 5) {
+            $otpRecord->delete();
+            return response()->json(['message' => 'Quá số lần thử. Vui lòng yêu cầu mã mới.'], 400);
+        }
+
+        if (now()->greaterThan($otpRecord->expires_at)) {
+            return response()->json(['message' => 'Mã xác nhận đã hết hạn.'], 400);
+        }
+
+        if (!Hash::check($request->otp, $otpRecord->otp_hash)) {
+            $otpRecord->increment('attempts');
+            return response()->json(['message' => 'Mã xác nhận không chính xác.'], 400);
+        }
+
+        $otpRecord->update(['verified_at' => now()]);
+
+        return response()->json(['message' => 'Mã OTP hợp lệ.'], 200);
+    }
+
+    // 5. Đặt lại mật khẩu
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'otp' => 'required|digits:6',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $otpRecord = PasswordOtp::where('email', $request->email)
+            ->where('type', 'forgot_password')
+            ->first();
+
+        if (!$otpRecord || !Hash::check($request->otp, $otpRecord->otp_hash) || !$otpRecord->verified_at) {
+            return response()->json(['message' => 'Yêu cầu không hợp lệ. Vui lòng xác thực lại OTP.'], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        $user->update(['password' => Hash::make($request->password)]);
+        $otpRecord->delete();
+
+        return response()->json(['message' => 'Mật khẩu đã được thay đổi thành công.'], 200);
+    }
+
     // 6. Google Redirect
     public function redirectToGoogle()
     {
@@ -146,7 +242,7 @@ DB::table('user_streaks')->insert([
     {
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
-            
+
             DB::beginTransaction();
 
             $user = User::where('email', $googleUser->getEmail())->first();

@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Route;
 
 // Nhóm Auth
 use App\Http\Controllers\Api\Auth\AuthController;
-use App\Http\Controllers\Api\Auth\PasswordRecoveryController;
 
 // Nhóm Student (Học sinh)
 use App\Http\Controllers\Api\Student\UserController;
@@ -77,10 +76,9 @@ use App\Http\Controllers\Api\Instructor\CategoryController as InstructorCategory
 Route::middleware('throttle:30,1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/forgot-password', [PasswordRecoveryController::class, 'gone']);
-    Route::post('/forgot-password/verify-otp', [PasswordRecoveryController::class, 'gone']);
-    Route::post('/reset-password', [PasswordRecoveryController::class, 'reset'])->middleware('throttle:recovery-reset');
-    Route::post('/password-recovery/support', [PasswordRecoveryController::class, 'support'])->middleware('throttle:recovery-support');
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/forgot-password/verify-otp', [AuthController::class, 'verifyResetOtp']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 });
@@ -140,9 +138,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('profile')->group(function () {
         Route::get('/', [UserController::class, 'getProfile']);
         Route::post('/update', [UserController::class, 'updateProfile']);
-        Route::post('/change-password/request-otp', [PasswordRecoveryController::class, 'gone']);
-        Route::get('/recovery-codes', [PasswordRecoveryController::class, 'remaining']);
-        Route::post('/recovery-codes', [PasswordRecoveryController::class, 'generate'])->middleware('throttle:recovery-generate');
+        Route::post('/change-password/request-otp', [UserController::class, 'requestChangePasswordOtp']);
         Route::post('/change-password', [UserController::class, 'changePassword']);
         Route::post('/avatar', [UserController::class, 'uploadAvatar']);
         Route::post('/settings', [UserController::class, 'saveSettings']);
@@ -355,7 +351,6 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
 // 5. NHÓM API QUẢN TRỊ (Dành riêng cho Admin)
 // ==========================================
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
-    Route::post('/users/{user}/password-recovery', [PasswordRecoveryController::class, 'issueAdmin'])->middleware('throttle:recovery-admin');
     Route::get('/overview', [AdminDashboardController::class, 'overview']);
 
     // 1) User management & Teacher Verification Review

@@ -1,8 +1,5 @@
 "use client";
 
-import { RecoveryCodesPanel } from "@/src/shared/components/RecoveryCodesPanel";
-import { AdminPasswordRecovery } from "./AdminPasswordRecovery";
-
 import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useEffect, useState } from "react";
 import { adminApi } from "@/src/features/admin/lib/admin-api";
@@ -42,7 +39,6 @@ type UserActivityResponse = {
 };
 
 export function AdminUsersManagementPage() {
- const [recoveryUser, setRecoveryUser] = useState<UserRow | null>(null);
  const [users, setUsers] = useState<UserRow[]>([]);
  const [summary, setSummary] = useState<UserListResponse["summary"]>({
  teachers: 0,
@@ -131,7 +127,6 @@ export function AdminUsersManagementPage() {
  <p className="mt-1 max-w-3xl text-xs text-slate-100/90">Cấp quyền, khóa/xóa tài khoản Teacher, Student, Guest; theo dõi đăng nhập, thời gian học và lịch sử thao tác.</p>
  </section>
 
- {recoveryUser && <AdminPasswordRecovery key={recoveryUser.id} user={recoveryUser} onClose={() => setRecoveryUser(null)} />}
  <section className="grid gap-4 md:grid-cols-4">
  <StatCard label="Teacher" value={summary.teachers} />
  <StatCard label="Student" value={summary.students} />
@@ -183,7 +178,6 @@ export function AdminUsersManagementPage() {
  <td className="px-3 py-2">{user.last_login_at ?? "-"}</td>
  <td className="px-3 py-2">
  <div className="flex flex-wrap gap-2">
- {user.role !== "admin" && !user.is_locked && <button onClick={() => setRecoveryUser(user)} className="rounded-lg bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">Khôi phục mật khẩu</button>}
  <button onClick={() => void lockToggle(user)} className="rounded-lg bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">{user.is_locked ? "Mở khóa" : "Khóa"}</button>
  <button onClick={() => void viewActivity(user.id)} className="rounded-lg bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">Lịch sử</button>
  <button onClick={() => void removeUser(user.id)} className="rounded-lg bg-rose-100 px-2 py-1 text-xs font-semibold text-rose-800">Xóa</button>
@@ -232,7 +226,6 @@ export function AdminUsersManagementPage() {
  </div>
  </section>
 
- <RecoveryCodesPanel />
  {message && <p className="rounded-xl bg-slate-100 px-3 py-2 text-sm text-slate-700">{message}</p>}
  </div>
  );

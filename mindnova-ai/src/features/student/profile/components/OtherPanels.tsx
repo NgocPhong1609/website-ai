@@ -1,6 +1,5 @@
 "use client";
 
-import { RecoveryCodesPanel } from "@/src/shared/components/RecoveryCodesPanel";
 import { getErrorMessage } from "@/src/shared/lib/user-error";
 
 
@@ -175,7 +174,6 @@ export function SecurityPanel() {
         </div>
       </div>
 
-      <RecoveryCodesPanel />
       <ActiveSessionsBox />
     </div>
   );
