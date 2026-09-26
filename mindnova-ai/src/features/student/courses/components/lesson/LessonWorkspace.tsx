@@ -10,7 +10,7 @@ import { useSearchParams } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 import { useQueryClient } from "@tanstack/react-query";
 import { axiosClient } from "@/src/shared/lib/axios";
-import { useGetCourseDetail, useGetCourseAssessmentStatus, useInvalidateCourseDetail, completeLesson, fetchQuiz, checkQuizAnswer, submitQuiz, useGetDiscussions, useCreateDiscussion, useUpdateDiscussion, useDeleteDiscussion } from "../../api";
+import { useGetCourseDetail, useGetInstructorCoursePreview, useInvalidateCourseDetail, completeLesson, fetchQuiz, checkQuizAnswer, submitQuiz, useGetDiscussions, useCreateDiscussion, useUpdateDiscussion, useDeleteDiscussion } from "../../api";
 import type { CourseDetailLessonItem, CourseDetailData } from "../../types";
 import { CustomVideoPlayer } from "./CustomVideoPlayer";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
@@ -203,10 +203,13 @@ function ArticleRenderer({
 function QuizRenderer({
  lesson,
  onComplete,
+ isPreview = false,
 }: {
  lesson: LessonData;
  onComplete: () => void;
+ isPreview?: boolean;
 }) {
+  const [previewFinished, setPreviewFinished] = useState(false);
   const [quizData, setQuizData] = useState<QuizData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -264,6 +267,7 @@ function QuizRenderer({
   // Load quiz
   useEffect(() => {
     setLoading(true);
+    setPreviewFinished(false);
     setError("");
     setCurrentIndex(0);
     setSelectedAnswer("");
@@ -274,7 +278,7 @@ function QuizRenderer({
     setAllAnswers({});
 
     // Restore saved quiz result if student already completed this quiz
-    if (typeof window !== "undefined") {
+    if (!isPreview && typeof window !== "undefined") {
       const savedRes = window.localStorage.getItem(`student_quiz_result_${lesson.id}`);
       if (savedRes) {
         try {
@@ -302,7 +306,7 @@ function QuizRenderer({
 
     const loadQuizData = async () => {
       // 0. Check localStorage for instructor edited quiz
-      if (typeof window !== "undefined") {
+      if (!isPreview && typeof window !== "undefined") {
         const stored = window.localStorage.getItem(`instructor_quiz_${lesson.id}`);
         if (stored) {
           try {
@@ -383,10 +387,16 @@ function QuizRenderer({
     };
 
     loadQuizData();
-  }, [lesson, normalizeQuestions]);
+  }, [lesson, normalizeQuestions, isPreview]);
 
   const handleFinishQuiz = useCallback(async (currentAnswers: Record<string, string>) => {
     if (!quizData) return;
+    if (isPreview) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      setTimeLeft(null);
+      setPreviewFinished(true);
+      return;
+    }
     setSubmittingFinal(true);
     if (timerRef.current) clearInterval(timerRef.current);
     try {
@@ -410,7 +420,7 @@ function QuizRenderer({
       setError("Lỗi khi nộp bài. Vui lòng tải lại trang.");
     }
     setSubmittingFinal(false);
-  }, [quizData, lesson.id, timeLeft, onComplete]);
+  }, [quizData, lesson.id, timeLeft, onComplete, isPreview]);
 
  // Timer
  useEffect(() => {
@@ -452,6 +462,12 @@ function QuizRenderer({
 
     if (isEssayQ) {
       if (!essayText.trim()) return;
+      if (isPreview) {
+        setAnswered(true);
+        setAnswerResult(true);
+        setAllAnswers((prev) => ({ ...prev, [currentQ.id]: essayText }));
+        return;
+      }
       setSubmitting(true);
       setAllAnswers((prev) => ({ ...prev, [currentQ.id]: essayText }));
 
@@ -560,6 +576,10 @@ function QuizRenderer({
       setTimeLeft(quizData.time_limit_minutes * 60);
     }
   };
+
+ if (previewFinished) {
+ return <p className="p-8 text-center text-slate-700">Đã hoàn thành lượt xem thử. Kết quả và tiến độ không được lưu.</p>;
+ }
 
  if (loading) {
  return (
@@ -748,8 +768,8 @@ function QuizRenderer({
   </div>
   ) : (
   <div className="p-3 rounded-xl bg-[#E8F8F0] border border-[#27AE60]/20 text-[#27AE60] text-xs font-bold flex items-center justify-between">
-    <span><CheckCircle2 size={14} className="inline mr-1 text-[#27AE60]" /> Đã nộp bài tự luận - Thang điểm: <strong>{(question as any).points || 2.5} điểm</strong></span>
-    <span className="px-2.5 py-0.5 rounded bg-[#27AE60] text-white text-[10px] uppercase font-bold">Đã ghi nhận</span>
+    <span><CheckCircle2 size={14} className="inline mr-1 text-[#27AE60]" /> {isPreview ? "Xem thử tự luận — đối chiếu đáp án và tiêu chí bên dưới." : <>Đã nộp bài tự luận - Thang điểm: <strong>{(question as any).points || 2.5} điểm</strong></>}</span>
+    <span className="px-2.5 py-0.5 rounded bg-[#27AE60] text-white text-[10px] uppercase font-bold">{isPreview ? "Không lưu" : "Đã ghi nhận"}</span>
   </div>
   )}
 
@@ -864,28 +884,12 @@ function LessonWorkspaceContent() {
   const isPreview = searchParams ? searchParams.get("preview") === "true" : false;
 
   const parsedCourseId = courseIdParam ? Number(courseIdParam) : 0;
-  const { data: apiDetail, isLoading, error } = useGetCourseDetail(parsedCourseId);
-  const { data: assessmentStatus } = useGetCourseAssessmentStatus(parsedCourseId);
+  const studentDetail = useGetCourseDetail(parsedCourseId, !isPreview);
+  const previewDetail = useGetInstructorCoursePreview(parsedCourseId, isPreview);
+  const apiDetail = studentDetail.data;
+  const { isLoading, error } = isPreview ? previewDetail : studentDetail;
   const invalidateCourseDetail = useInvalidateCourseDetail();
-
   const queryClient = useQueryClient();
-
-  const [instructorModules, setInstructorModules] = useState<any[] | null>(null);
-
-  useEffect(() => {
-    if (isPreview) {
-      axiosClient
-        .get(`/api/instructor/courses/${parsedCourseId}/modules`)
-        .then((res) => {
-          if (res.data && (res.data.data || res.data)) {
-            setInstructorModules(res.data.data || res.data);
-          }
-        })
-        .catch((e) => {
-          console.warn("Failed to fetch instructor preview modules:", e);
-        });
-    }
-  }, [isPreview, parsedCourseId]);
 
   useEffect(() => {
     if (error && (error as any).response?.status === 403 && !isPreview) {
@@ -898,7 +902,7 @@ function LessonWorkspaceContent() {
 
   // Compute curriculum directly from API response or instructor preview fallback
   const curriculum: ModuleData[] = React.useMemo(() => {
-    const modulesSource = isPreview ? (instructorModules || apiDetail?.modules) : (apiDetail?.modules || instructorModules);
+    const modulesSource = isPreview ? previewDetail.data?.modules : apiDetail?.modules;
     if (!modulesSource || !Array.isArray(modulesSource)) return [];
 
     return modulesSource.map((mod: any) => ({
@@ -921,7 +925,7 @@ function LessonWorkspaceContent() {
         attachments: l.attachments || [],
       })),
     }));
-  }, [apiDetail, instructorModules]);
+  }, [apiDetail, previewDetail.data, isPreview]);
 
  const hasInitialized = useRef(false);
  useEffect(() => {
@@ -953,7 +957,7 @@ function LessonWorkspaceContent() {
 
  // Tab & comment states
  const [activeTab, setActiveTab] = useState<"content" | "ai_tips" | "discussion">("content");
- const { data: apiDiscussions, isLoading: isDiscussionsLoading } = useGetDiscussions(activeLessonId);
+ const { data: apiDiscussions, isLoading: isDiscussionsLoading } = useGetDiscussions(isPreview ? "" : activeLessonId);
  const { mutate: submitDiscussion, isPending: isSubmittingDiscussion } = useCreateDiscussion();
  const { mutate: updateDiscussion, isPending: isUpdatingDiscussion } = useUpdateDiscussion();
  const { mutate: deleteDiscussion, isPending: isDeletingDiscussion } = useDeleteDiscussion();
@@ -977,7 +981,7 @@ function LessonWorkspaceContent() {
 
  // Handle lesson completion
  const handleLessonComplete = useCallback(async () => {
- if (!activeLesson || activeLesson.completed) return;
+ if (isPreview || !activeLesson || activeLesson.completed) return;
 
  // Instant UI Update: Modify the TanStack Query Cache directly!
  queryClient.setQueryData(["student", "courses", "detail", String(parsedCourseId)], (oldData: CourseDetailData | undefined) => {
@@ -993,16 +997,12 @@ function LessonWorkspaceContent() {
  })),
  progress_card: oldData.progress_card ? {
  ...oldData.progress_card,
- progress_percentage: (typeof window !== 'undefined' && (window as any).isPreview) ? oldData.progress_card.progress_percentage : oldData.progress_card.progress_percentage, // Simplified placeholder for logic consistency
+ progress_percentage: oldData.progress_card.progress_percentage,
  completed_lessons_count: oldData.progress_card.completed_lessons_count,
  total_lessons_count: oldData.progress_card.total_lessons_count,
  } : undefined
  };
  });
-
- if (typeof window !== 'undefined' && (window as any).isPreview) {
- return;
- }
 
  const payload: { playback_position?: number; time_spent_seconds?: number } = {};
  if (activeLesson.type === 'video') {
@@ -1041,14 +1041,14 @@ function LessonWorkspaceContent() {
  } catch (err) {
  console.warn("Completion API error:", err);
  }
- }, [activeLesson, invalidateCourseDetail, parsedCourseId]);
+ }, [activeLesson, invalidateCourseDetail, parsedCourseId, isPreview, queryClient]);
 
  // Post comment
  const [confirmDeleteId, setConfirmDeleteId] = useState<string | number | null>(null);
 
  const handlePostComment = (e: React.FormEvent) => {
  e.preventDefault();
- if (!newCommentText.trim() || isSubmittingDiscussion) return;
+ if (isPreview || !newCommentText.trim() || isSubmittingDiscussion) return;
  submitDiscussion(
  { lessonId: activeLessonId, content: newCommentText.trim() },
  {
@@ -1119,6 +1119,19 @@ function LessonWorkspaceContent() {
  );
  }
 
+ if (isPreview && (error || (!isLoading && !activeLesson))) {
+ const status = (error as any)?.response?.status;
+ const message = status === 403 ? "Bạn không có quyền xem trước khóa học này."
+ : error ? "Không thể tải bản xem trước. Vui lòng thử lại."
+ : "Khóa học chưa có bài học để xem trước.";
+ return (
+ <div className="w-full min-h-screen flex flex-col items-center justify-center gap-4 bg-blue-50/50 p-6">
+ <p role="alert" className="font-semibold text-slate-700">{message}</p>
+ <Link href={`/instructor/courses/${parsedCourseId}/edit`} className="text-blue-600 underline">Quay lại chỉnh sửa khóa học</Link>
+ </div>
+ );
+ }
+
  if (isLoading || !activeLesson) {
  return (
  <div className="w-full h-screen flex flex-col items-center justify-center bg-blue-50/50">
@@ -1163,7 +1176,7 @@ function LessonWorkspaceContent() {
         <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4 min-w-0">
             <Link
-              href={`/courses/detail?courseId=${parsedCourseId}`}
+              href={isPreview ? `/instructor/courses/${parsedCourseId}/edit` : `/courses/detail?courseId=${parsedCourseId}`}
               className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-all shrink-0 shadow-sm"
               title="Quay lại chi tiết Khóa học"
               aria-label="Quay lại chi tiết Khóa học"
@@ -1174,7 +1187,7 @@ function LessonWorkspaceContent() {
               <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1 truncate">
                 <Link href="/courses" className="hover:text-slate-900 transition-colors">Khoá học</Link>
                 <ChevronRight size={12} className="text-slate-300 shrink-0" aria-hidden />
-                <span className="text-slate-700 truncate">{apiDetail?.header_info?.title || (apiDetail as any)?.title || "Khóa học"}</span>
+                <span className="text-slate-700 truncate">{(isPreview ? previewDetail.data?.title : apiDetail?.header_info?.title) || "Khóa học"}</span>
               </nav>
               <h1 className="text-lg sm:text-xl font-semibold text-slate-900 truncate tracking-tight">{activeLesson.title}</h1>
             </div>
@@ -1220,7 +1233,7 @@ function LessonWorkspaceContent() {
           {/* ─── Content by Type ─── */}
           <div className="rounded-[24px] overflow-hidden border border-slate-200/80 bg-black shadow-sm ring-4 ring-slate-50/50">
             {activeLesson.type === 'video' && (
-              <CustomVideoPlayer lesson={activeLesson} onComplete={handleLessonComplete} />
+              <CustomVideoPlayer lesson={activeLesson} onComplete={handleLessonComplete} isPreview={isPreview} />
             )}
 
             {activeLesson.type === 'article' && (
@@ -1228,12 +1241,12 @@ function LessonWorkspaceContent() {
             )}
 
             {(activeLesson.type === 'quiz_module' || activeLesson.type === 'quiz') && (
-              <div className="bg-white"><QuizRenderer lesson={activeLesson} onComplete={handleLessonComplete} /></div>
+              <div className="bg-white"><QuizRenderer lesson={activeLesson} onComplete={handleLessonComplete} isPreview={isPreview} /></div>
             )}
 
             {/* Fallback for unknown type — show as video */}
             {!['video', 'article', 'quiz_module', 'quiz'].includes(activeLesson.type) && (
-              <CustomVideoPlayer lesson={activeLesson} onComplete={handleLessonComplete} />
+              <CustomVideoPlayer lesson={activeLesson} onComplete={handleLessonComplete} isPreview={isPreview} />
             )}
           </div>
 
@@ -1262,6 +1275,8 @@ function LessonWorkspaceContent() {
         </button>
         <button
           onClick={() => setActiveTab("discussion")}
+          disabled={isPreview}
+          title={isPreview ? "Thảo luận không khả dụng trong chế độ xem trước" : undefined}
           className={twMerge(
             "px-5 py-2.5 font-bold text-[13px] rounded-lg transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2 focus:outline-none flex-1",
             activeTab === "discussion" ? "bg-white text-blue-700 shadow-sm ring-1 ring-black/5" : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
