@@ -21,6 +21,7 @@ class AiQuizGeneratorService
      */
     public function generateQuiz(User $instructor, array $data): array
     {
+        $deadline = microtime(true) + 180;
         $sourceType = $data['source_type'] ?? 'topic';
         $content = $data['content'] ?? '';
         $topic = $data['topic'] ?? '';
@@ -192,6 +193,8 @@ YÊU CẦU BẮT BUỘC KHÔNG ĐƯỢC VI PHẠM:
             $aiResult = $this->aiRouter->sendMessageWithFallback($messages, [
                 'response_mime_type' => 'application/json',
                 'max_tokens' => 8192,
+                'deadline' => $deadline,
+                'max_retries' => 1,
                 'user_id' => $instructor->id,
                 'feature' => 'ai_quiz_generator'
             ]);

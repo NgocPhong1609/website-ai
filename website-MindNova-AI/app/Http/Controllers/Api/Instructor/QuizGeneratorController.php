@@ -32,7 +32,8 @@ class QuizGeneratorController extends Controller
      */
     public function generate(GenerateAiQuizRequest $request)
     {
-        set_time_limit(180);
+        // Allow the bounded AI fallback chain to finish before PHP terminates the request.
+        set_time_limit(210);
         $user = $request->user();
         $payload = $request->validated();
 

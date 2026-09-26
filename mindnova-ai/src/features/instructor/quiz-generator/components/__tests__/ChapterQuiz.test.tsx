@@ -40,7 +40,7 @@ it('keeps chapter scope on generation, single regeneration and save', async () =
   const { result } = renderHook(() => useAiQuizWizard());
   act(() => result.current.updateConfig({ source_type: 'course', course_id: 10, module_id: 11 } as any));
   await act(async () => { await result.current.handleGenerate(); });
-  expect(axiosClient.post).toHaveBeenCalledWith('/api/instructor/ai-quiz/generate', expect.objectContaining({ course_id: 10, module_id: 11 }), expect.anything());
+  expect(axiosClient.post).toHaveBeenCalledWith('/api/instructor/ai-quiz/generate', expect.objectContaining({ course_id: 10, module_id: 11 }), expect.objectContaining({ timeout: 210000 }));
   await act(async () => { await result.current.regenerateSingleQuestion('q1', 'multiple_choice', 'easy'); });
   expect(axiosClient.post).toHaveBeenCalledWith('/api/instructor/ai-quiz/regenerate-question', expect.objectContaining({ course_id: 10, module_id: 11 }), expect.anything());
   await act(async () => { await result.current.handleSaveQuiz(); });

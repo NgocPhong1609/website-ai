@@ -266,3 +266,5 @@ Trong **Tạo bài kiểm tra → Tạo bằng AI**, chọn khóa học rồi ch
 Sau khi duyệt câu hỏi và lưu, quiz theo chương được gắn vào cuối chương đã chọn trong cùng giao dịch lưu. Tạo lại một câu hỏi vẫn dùng nội dung chương đó; sửa quiz đã lưu không đổi vị trí gắn.
 
 API instructor `ai-quiz/generate`, `ai-quiz/regenerate-question` và `ai-quiz/store` nhận thêm `module_id` tùy chọn kèm `course_id`. Máy chủ kiểm tra chương thuộc đúng khóa học và quyền sở hữu. Bỏ `module_id` để dùng hành vi hiện có. Không cần migration.
+
+Thời gian tạo quiz AI: các lượt gọi mô hình dùng chung giới hạn 180 giây; giao diện chờ tối đa 210 giây để nhận kết quả hoặc lỗi từ máy chủ. Riêng tạo quiz, mỗi mô hình thử một lần rồi chuyển dự phòng khi gặp lỗi tạm thời. Các tính năng AI khác giữ số lần thử mặc định.

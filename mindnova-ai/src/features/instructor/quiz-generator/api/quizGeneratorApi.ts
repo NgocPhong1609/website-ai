@@ -30,7 +30,8 @@ export const quizGeneratorApi = {
  };
 
  const res = await axiosClient.post("/api/instructor/ai-quiz/generate", payload, {
- timeout: 120000,
+ // Leave 30 seconds for transport/serialization after the server's 180-second AI budget.
+ timeout: 210000,
  });
  return res.data;
  },
