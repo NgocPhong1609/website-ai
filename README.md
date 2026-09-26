@@ -212,3 +212,7 @@ Xem [hướng dẫn cấu hình kết nối](docs/environment-urls.md) cho front
 Vercel, callback đăng nhập/thanh toán và WebSocket.
 
 Thông báo lỗi frontend dùng bộ xử lý chung; xem [quy ước và kiểm thử thông báo lỗi](docs/user-error-messages.md).
+
+### Khôi phục tài khoản không dùng OTP
+
+Luồng quên mật khẩu sử dụng mã khôi phục lưu sẵn và quản trị viên hỗ trợ dự phòng. Tài khoản hiện có cần tạo mã trong phần bảo mật khi còn đăng nhập được. Xem [hướng dẫn khôi phục và vận hành](website-MindNova-AI/docs/password-recovery.md).

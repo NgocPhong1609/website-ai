@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function ForgotPasswordPage() {
  return (
- <div className="flex w-full h-screen bg-[#F7F7FB]">
+ <div className="flex w-full min-h-screen py-8 bg-[#F7F7FB]">
  <div className="w-full flex items-center justify-center">
  <div className="bg-white shadow-xl rounded-2xl w-full max-w-md overflow-hidden">
  <ForgotPasswordFlow />

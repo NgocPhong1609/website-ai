@@ -1,256 +1,113 @@
 "use client";
 
-import { useState, useCallback, useId, useEffect } from "react";
+import { useEffect, useId, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { getErrorMessage, readApiResponse } from "@/src/shared/lib/user-error";
-import {
- LogoMark,
- EmailIcon,
- LockIcon,
- ArrowRightIcon,
- FormField,
- EyeOpenIcon,
- EyeClosedIcon
-} from "../login/AuthShared";
+import { LogoMark } from "../login/AuthShared";
 
-type Step = "REQUEST_OTP" | "VERIFY_OTP" | "RESET_PASSWORD" | "SUCCESS";
+const inputClass = "w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-blue-500 focus:outline-none";
+const buttonClass = "w-full rounded-xl bg-[#3B82F6] px-4 py-3 text-sm font-semibold text-white hover:bg-[#2563EB] disabled:opacity-50";
 
 export function ForgotPasswordFlow() {
- const router = useRouter();
- const [step, setStep] = useState<Step>("REQUEST_OTP");
- 
- const [email, setEmail] = useState("");
- const [otp, setOtp] = useState("");
- const [newPassword, setNewPassword] = useState("");
- const [confirmPassword, setConfirmPassword] = useState("");
- 
- const [showPassword, setShowPassword] = useState(false);
- const [showConfirmPassword, setShowConfirmPassword] = useState(false);
- 
- const [isLoading, setIsLoading] = useState(false);
- const [errorMsg, setErrorMsg] = useState<string | null>(null);
- const [countdown, setCountdown] = useState(0);
+  const id = useId();
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmation, setConfirmation] = useState("");
+  const [contact, setContact] = useState("");
+  const [description, setDescription] = useState("");
+  const [support, setSupport] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
- const emailId = useId();
- const otpId = useId();
- const passwordId = useId();
- const confirmPasswordId = useId();
+  useEffect(() => {
+    const fragment = new URLSearchParams(window.location.hash.slice(1));
+    if (fragment.has("recovery_code")) {
+      setEmail(fragment.get("email") ?? "");
+      setCode(fragment.get("recovery_code") ?? "");
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }, []);
 
- // Handle countdown timer for OTP resend
- useEffect(() => {
- if (countdown > 0) {
- const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
- return () => clearTimeout(timer);
- }
- }, [countdown]);
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    if (!support && password !== confirmation) {
+      setError("Mật khẩu xác nhận không khớp.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const response = await fetch(support ? "/api/password-recovery/support" : "/api/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(support
+          ? { email: email.trim(), contact: contact.trim(), description: description.trim() }
+          : { email: email.trim(), recovery_code: code.trim(), password, password_confirmation: confirmation }),
+      });
+      await readApiResponse(response, "Không thể hoàn tất yêu cầu. Vui lòng thử lại.");
+      if (support) {
+        setSubmitted(true);
+        setContact("");
+        setDescription("");
+      } else {
+        setCode("");
+        setPassword("");
+        setConfirmation("");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userInfo");
+        document.cookie = "accessToken=; path=/; max-age=0; samesite=lax";
+        document.cookie = "userRole=; path=/; max-age=0; samesite=lax";
+        setSuccess(true);
+      }
+    } catch (failure) {
+      setError(getErrorMessage(failure, "Không thể hoàn tất yêu cầu. Vui lòng thử lại."));
+    } finally {
+      setBusy(false);
+    }
+  }
 
- const requestOtp = async (e?: React.FormEvent) => {
- if (e) e.preventDefault();
- setIsLoading(true);
- setErrorMsg(null);
- try {
- const res = await fetch("/api/forgot-password", {
- method: "POST",
- headers: { "Content-Type": "application/json", Accept: "application/json" },
- body: JSON.stringify({ email }),
- });
- await readApiResponse(res, "Không thể gửi mã xác nhận. Vui lòng thử lại.");
- setStep("VERIFY_OTP");
- setCountdown(60);
- } catch (err) {
- setErrorMsg(getErrorMessage(err, "Không thể gửi mã xác nhận. Vui lòng thử lại."));
- } finally {
- setIsLoading(false);
- }
- };
-
- const verifyOtp = async (e: React.FormEvent) => {
- e.preventDefault();
- setIsLoading(true);
- setErrorMsg(null);
- try {
- const res = await fetch("/api/forgot-password/verify-otp", {
- method: "POST",
- headers: { "Content-Type": "application/json", Accept: "application/json" },
- body: JSON.stringify({ email, otp }),
- });
- await readApiResponse(res, "Không thể xác nhận mã OTP. Vui lòng thử lại.");
- setStep("RESET_PASSWORD");
- } catch (err) {
- setErrorMsg(getErrorMessage(err, "Không thể xác nhận mã OTP. Vui lòng thử lại."));
- } finally {
- setIsLoading(false);
- }
- };
-
- const resetPassword = async (e: React.FormEvent) => {
- e.preventDefault();
- if (newPassword !== confirmPassword) {
- setErrorMsg("Mật khẩu xác nhận không khớp.");
- return;
- }
- setIsLoading(true);
- setErrorMsg(null);
- try {
- const res = await fetch("/api/reset-password", {
- method: "POST",
- headers: { "Content-Type": "application/json", Accept: "application/json" },
- body: JSON.stringify({ email, otp, password: newPassword, password_confirmation: confirmPassword }),
- });
- await readApiResponse(res, "Không thể đặt lại mật khẩu. Vui lòng thử lại.");
- setStep("SUCCESS");
- } catch (err) {
- setErrorMsg(getErrorMessage(err, "Không thể đặt lại mật khẩu. Vui lòng thử lại."));
- } finally {
- setIsLoading(false);
- }
- };
-
- const renderStep = () => {
- switch (step) {
- case "REQUEST_OTP":
- return (
- <form onSubmit={requestOtp} className="flex flex-col gap-3">
- <FormField
- id={emailId}
- label="Email Address"
- type="email"
- placeholder="Nhập email của bạn"
- value={email}
- onChange={(e) => setEmail(e.target.value)}
- leftIcon={<EmailIcon />}
- />
- <button
- type="submit"
- disabled={isLoading || !email}
- className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-colors disabled:opacity-50"
- >
- {isLoading ? "Đang xử lý..." : "Gửi mã xác nhận"}
- </button>
- </form>
- );
- 
- case "VERIFY_OTP":
- return (
- <form onSubmit={verifyOtp} className="flex flex-col gap-3">
- <div className="text-sm text-[#64748B] mb-2 text-center">
- Mã xác nhận gồm 6 chữ số đã được gửi đến <br /> <b>{email}</b>
- </div>
- <FormField
- id={otpId}
- label="Mã OTP"
- type="text"
- placeholder="123456"
- value={otp}
- onChange={(e) => setOtp(e.target.value)}
- leftIcon={<LockIcon />}
- />
- <button
- type="submit"
- disabled={isLoading || otp.length < 6}
- className="mt-2 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-colors disabled:opacity-50"
- >
- {isLoading ? "Đang xử lý..." : "Xác nhận OTP"}
- </button>
- <div className="text-center mt-3 text-xs">
- {countdown > 0 ? (
- <span className="text-[#64748B]">Gửi lại mã sau {countdown}s</span>
- ) : (
- <button type="button" onClick={requestOtp} className="text-[#3B82F6] hover:underline font-semibold">Gửi lại mã</button>
- )}
- </div>
- </form>
- );
-
- case "RESET_PASSWORD":
- return (
- <form onSubmit={resetPassword} className="flex flex-col gap-3">
- <FormField
- id={passwordId}
- label="Mật khẩu mới"
- type={showPassword ? "text" : "password"}
- placeholder="••••••••"
- value={newPassword}
- onChange={(e) => setNewPassword(e.target.value)}
- leftIcon={<LockIcon />}
- rightElement={
- <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[#94A3B8] hover:text-[#2563EB]">
- {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
- </button>
- }
- />
- <FormField
- id={confirmPasswordId}
- label="Xác nhận mật khẩu"
- type={showConfirmPassword ? "text" : "password"}
- placeholder="••••••••"
- value={confirmPassword}
- onChange={(e) => setConfirmPassword(e.target.value)}
- leftIcon={<LockIcon />}
- rightElement={
- <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="text-[#94A3B8] hover:text-[#2563EB]">
- {showConfirmPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
- </button>
- }
- />
- <button
- type="submit"
- disabled={isLoading || newPassword.length < 6}
- className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-colors disabled:opacity-50"
- >
- {isLoading ? "Đang xử lý..." : "Đổi mật khẩu"}
- </button>
- </form>
- );
-
- case "SUCCESS":
- return (
- <div className="flex flex-col items-center justify-center text-center py-6">
- 
- <h2 className="text-xl font-bold text-[#0F172A] mb-2">Thành công!</h2>
- <p className="text-sm text-[#64748B] mb-6">Mật khẩu của bạn đã được cập nhật.</p>
- <Link href="/login" className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#0F172A] shadow-md hover:-translate-y-0.5 transition-all">
- Đăng nhập ngay
- </Link>
- </div>
- );
- }
- };
-
- return (
- <div className="flex flex-col w-full h-full px-8 sm:px-10 py-8">
- <div className="flex items-center gap-2.5 mb-6">
- <LogoMark />
- <span className="text-[14px] font-bold tracking-tight text-[#0F172A]">MindNova AI</span>
- </div>
-
- <div className="mb-6">
- <h1 className="text-[26px] font-bold text-[#0F172A] leading-tight tracking-tight mb-2">
- {step === "REQUEST_OTP" ? "Quên mật khẩu" : step === "VERIFY_OTP" ? "Nhập mã OTP" : step === "RESET_PASSWORD" ? "Đặt lại mật khẩu" : "Hoàn tất"}
- </h1>
- {step === "REQUEST_OTP" && (
- <p className="text-[13px] text-[#64748B] leading-relaxed">
- Nhập email của bạn để nhận mã khôi phục.
- </p>
- )}
- </div>
-
- {errorMsg && (
- <div role="alert" className="mb-4 p-3 rounded-xl text-xs font-medium bg-primary-muted text-primary border border-[#DBEAFE]">
- {errorMsg}
- </div>
- )}
-
- {renderStep()}
-
- {step !== "SUCCESS" && (
- <div className="mt-6 text-center">
- <Link href="/login" className="text-[13px] font-semibold text-[#3B82F6] hover:text-[#2563EB] hover:underline transition-colors">
- Quay lại đăng nhập
- </Link>
- </div>
- )}
- </div>
- );
+  return (
+    <div className="flex h-full w-full flex-col px-8 py-8 sm:px-10">
+      <div className="mb-6 flex items-center gap-2.5"><LogoMark /><span className="text-sm font-bold text-slate-900">MindNova AI</span></div>
+      <h1 className="mb-2 text-2xl font-bold text-slate-900">{success ? "Thành công!" : support ? "Hỗ trợ khôi phục tài khoản" : "Quên mật khẩu"}</h1>
+      {success ? (
+        <div className="space-y-5 text-sm text-slate-600">
+          <p>Mật khẩu đã được cập nhật. Các phiên đăng nhập và mã khôi phục cũ đã bị vô hiệu hóa. Sau khi đăng nhập, hãy tạo bộ mã mới trong phần bảo mật.</p>
+          <Link href="/login" className={`${buttonClass} block text-center`}>Đăng nhập ngay</Link>
+        </div>
+      ) : (
+        <>
+          <p className="mb-5 text-sm text-slate-600">{support
+            ? "Quản trị viên sẽ xem xét yêu cầu và cần xác minh bạn là chủ tài khoản trước khi hỗ trợ. Không gửi mật khẩu hoặc mã khôi phục trong nội dung yêu cầu."
+            : "Nhập một mã khôi phục bạn đã lưu trong phần bảo mật, hoặc dùng liên kết do quản trị viên cấp. Mã chỉ dùng một lần; sau khi đặt lại mật khẩu, toàn bộ bộ mã cũ sẽ hết hiệu lực."}</p>
+          {error && <p role="alert" className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">{error}</p>}
+          {submitted && support ? (
+            <p role="status" className="rounded-xl bg-blue-50 p-4 text-sm text-blue-800">Đã tiếp nhận yêu cầu hỗ trợ. Nếu thông tin phù hợp, quản trị viên sẽ liên hệ để xác minh. Việc gửi yêu cầu chưa thay đổi mật khẩu của bạn.</p>
+          ) : (
+            <form onSubmit={submit} className="space-y-4">
+              <div><label htmlFor={`${id}-email`} className="mb-1 block text-sm">Email</label><input id={`${id}-email`} type="email" autoComplete="email" required maxLength={255} value={email} onChange={e => setEmail(e.target.value)} className={inputClass} /></div>
+              {support ? (
+                <>
+                  <div><label htmlFor={`${id}-contact`} className="mb-1 block text-sm">Kênh liên hệ</label><input id={`${id}-contact`} required maxLength={255} value={contact} onChange={e => setContact(e.target.value)} placeholder="Số điện thoại hoặc tài khoản liên hệ" className={inputClass} /></div>
+                  <div><label htmlFor={`${id}-description`} className="mb-1 block text-sm">Thông tin hỗ trợ xác minh</label><textarea id={`${id}-description`} required minLength={20} maxLength={2000} rows={3} value={description} onChange={e => setDescription(e.target.value)} placeholder="Mô tả vấn đề và thông tin giúp quản trị viên xác minh tài khoản" className={inputClass} /></div>
+                </>
+              ) : (
+                <>
+                  <div><label htmlFor={`${id}-code`} className="mb-1 block text-sm">Mã khôi phục</label><input id={`${id}-code`} type="password" autoComplete="off" required maxLength={100} value={code} onChange={e => setCode(e.target.value)} className={inputClass} /></div>
+                  <div><label htmlFor={`${id}-password`} className="mb-1 block text-sm">Mật khẩu mới</label><input id={`${id}-password`} type="password" autoComplete="new-password" required minLength={8} maxLength={128} value={password} onChange={e => setPassword(e.target.value)} className={inputClass} /><p className="mt-1 text-xs text-slate-500">Ít nhất 8 ký tự, gồm chữ hoa, chữ số và ký tự đặc biệt.</p></div>
+                  <div><label htmlFor={`${id}-confirm`} className="mb-1 block text-sm">Xác nhận mật khẩu</label><input id={`${id}-confirm`} type="password" autoComplete="new-password" required value={confirmation} onChange={e => setConfirmation(e.target.value)} className={inputClass} /></div>
+                </>
+              )}
+              <button type="submit" disabled={busy} className={buttonClass}>{busy ? "Đang xử lý…" : support ? "Gửi yêu cầu hỗ trợ" : "Đặt lại mật khẩu"}</button>
+            </form>
+          )}
+          <button type="button" disabled={busy} onClick={() => { setSupport(!support); setError(null); setCode(""); setPassword(""); setConfirmation(""); }} className="mt-5 text-sm font-semibold text-blue-600 hover:underline">{support ? "Tôi có mã khôi phục" : "Tôi không có mã khôi phục"}</button>
+          <Link href="/login" className="mt-4 text-center text-sm text-slate-600 hover:underline">Quay lại đăng nhập</Link>
+        </>
+      )}
+    </div>
+  );
 }

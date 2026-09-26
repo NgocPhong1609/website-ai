@@ -141,7 +141,7 @@ export function AdminModerationSupportPage() {
  <div key={ticket.id} className="rounded-lg border border-slate-200 p-3">
  <p className="text-sm font-medium text-slate-900">#{ticket.id} · {ticket.title}</p>
  <p className="text-xs text-slate-600">{ticket.type} · {ticket.status}</p>
- <p className="mt-1 text-xs text-slate-500">{ticket.description.slice(0, 160)}</p>
+ <p className="mt-1 max-h-48 overflow-y-auto whitespace-pre-wrap break-words text-xs text-slate-500">{ticket.description}</p>
  <div className="mt-2 flex gap-2">
  <button onClick={() => void resolveTicket(ticket.id, "in_progress")} className="rounded-lg bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">Đang xử lý</button>
  <button onClick={() => void resolveTicket(ticket.id, "resolved")} className="rounded-lg bg-[#F8FAFC] px-2 py-1 text-xs font-semibold text-[#0F172A]">Đã xong</button>

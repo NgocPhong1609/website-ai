@@ -34,6 +34,7 @@ const FIELD_LABELS: Record<string, string> = {
   email: 'Email', password: 'Mật khẩu', password_confirmation: 'Mật khẩu xác nhận',
   new_password: 'Mật khẩu mới', new_password_confirmation: 'Mật khẩu mới xác nhận',
   current_password: 'Mật khẩu hiện tại', name: 'Họ tên', full_name: 'Họ tên', otp: 'Mã xác nhận',
+  recovery_code: 'Mã khôi phục', contact: 'Kênh liên hệ', verification_note: 'Cách xác minh chủ tài khoản',
   title: 'Tiêu đề', description: 'Mô tả', price: 'Giá', file: 'Tệp', image: 'Ảnh',
   thumbnail: 'Ảnh bìa', content: 'Nội dung', phone: 'Số điện thoại', phone_number: 'Số điện thoại',
 };

@@ -254,9 +254,10 @@ Chi tiết đầy đủ: `website-MindNova-AI/routes/api.php`. Dưới đây là
 |---|---|---|---|---|
 | POST | `/api/register` | none | `Api\Auth\AuthController@register` | Đăng ký, trả token |
 | POST | `/api/login` | none | `login` | Token Sanctum |
-| POST | `/api/forgot-password` | none | `forgotPassword` | OTP email, 60s cooldown, 5 phút |
-| POST | `/api/forgot-password/verify-otp` | none | `verifyResetOtp` | |
-| POST | `/api/reset-password` | none | `resetPassword` | |
+| POST | `/api/forgot-password` | none | `PasswordRecoveryController@gone` | HTTP 410; OTP đã ngừng |
+| POST | `/api/forgot-password/verify-otp` | none | `PasswordRecoveryController@gone` | HTTP 410 |
+| POST | `/api/reset-password` | none | `PasswordRecoveryController@reset` | Email + mã khôi phục lưu sẵn hoặc mã do admin cấp |
+| POST | `/api/password-recovery/support` | none | `PasswordRecoveryController@support` | Tạo ticket hỗ trợ; không tự xác minh tài khoản |
 | GET | `/api/auth/google` | none | `redirectToGoogle` | Socialite |
 | GET | `/api/auth/google/callback` | none | `handleGoogleCallback` | Redirect FE (`config(app.frontend_url)` từ `FRONTEND_URL`) |
 
@@ -284,7 +285,7 @@ Chi tiết đầy đủ: `website-MindNova-AI/routes/api.php`. Dưới đây là
 | POST | `/api/ai-chat` | AiTutorController | Tutor |
 | POST | `/api/realtime/send` | RealtimeController | |
 | GET/POST | `/api/chat/...` | ChatController | conversations, messages, recall, read, unread-count |
-| GET/POST | `/api/profile*` | Student\UserController | profile, password OTP, avatar |
+| GET/POST | `/api/profile*` | Student\UserController | profile, recovery codes, change password, avatar |
 | GET/POST | `/api/orders` | OrderController | list / checkout |
 | POST | `/api/coupons/apply` | Student\CouponController | |
 | GET | `/api/student/dashboard` | DashboardController | |
@@ -357,7 +358,8 @@ Không SoftDeletes trên model. `users.deleted_at` có thể tồn tại trên D
 - `roles` / `permissions` / `role_user` / `permission_role` — permission **gần như không enforce** ở middleware
 - Seed names: `admin`, `teacher`, `student`
 - `user_profiles` 1:1
-- `password_otps`
+- `password_otps` (legacy, không dùng cho API khôi phục mới)
+- `password_recovery_codes`: chỉ lưu SHA-256 của mã ngẫu nhiên, saved/admin; admin hết hạn sau 30 phút
 
 ### Catalog
 
@@ -640,3 +642,7 @@ Các mục sau **không khẳng định** cho đến khi đọc thêm hoặc ch�
 ## 11. Việc không làm khi “chỉ sửa docs”
 
 Task tạo file này không được sửa business logic, UI, API, database. Chỉ cập nhật `AGENTS.md`.
+
+### Khôi phục mật khẩu không email (2026-09-26)
+
+`GET/POST /api/profile/recovery-codes` dành cho mọi vai trò đã đăng nhập; tạo mã cần mật khẩu hiện tại. Admin cấp liên kết qua `POST /api/admin/users/{user}/password-recovery`, yêu cầu mật khẩu admin và ghi chú xác minh; không cấp cho tài khoản admin hoặc bị khóa. Đặt lại mật khẩu thu hồi toàn bộ mã, token và database session cũ. Xem `website-MindNova-AI/docs/password-recovery.md`.
