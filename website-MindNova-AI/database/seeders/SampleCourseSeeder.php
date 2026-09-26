@@ -26,9 +26,23 @@ class SampleCourseSeeder extends Seeder
             $categoryId = $category->id;
         }
 
+        $thumbnails = [
+            'https://images.unsplash.com/photo-1517694712202-14dd9538aa97',
+            'https://images.unsplash.com/photo-1555066931-4365d14bab8c',
+            'https://images.unsplash.com/photo-1504639725590-34d0984388bd',
+            'https://images.unsplash.com/photo-1498050108023-c5249f4df085',
+            'https://images.unsplash.com/photo-1551288049-bebda4e38f71',
+            'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5',
+            'https://images.unsplash.com/photo-1518770660439-4636190af475',
+            'https://images.unsplash.com/photo-1531297172867-4f54131b79bd',
+            'https://images.unsplash.com/photo-1519389950473-47ba0277781c',
+            'https://images.unsplash.com/photo-1451187580459-43490279c0fa',
+        ];
+
         for ($i = 1; $i <= 10; $i++) {
             $slug = 'ai-sample-course-' . $i;
             $title = 'AI Sample Course ' . $i;
+            $thumb = $thumbnails[$i - 1];
             
             $course = DB::table('courses')->where('slug', $slug)->first();
             if (! $course) {
@@ -58,7 +72,7 @@ class SampleCourseSeeder extends Seeder
                     'title' => $title,
                     'slug' => $slug,
                     'description' => 'Khóa học AI mẫu số ' . $i . ' cho kiểm tra UI.',
-                    'thumbnail' => '/images/sample-ai-course.jpg',
+                    'thumbnail' => $thumb,
                     'price' => rand(100000, 500000),
                     'level' => 'beginner',
                     'status' => 'published',

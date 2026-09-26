@@ -33,6 +33,19 @@ class InstructorSeeder extends Seeder
             ['display_name' => 'Học sinh', 'description' => 'Người tham gia học tập và làm quiz']
         );
 
+        $avatars = [
+            'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+            'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=150',
+            'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+            'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+            'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150',
+            'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150',
+            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+            'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+            'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150',
+        ];
+
         // 2. Tạo Tài khoản Giảng viên (Teacher)
         $teacher = User::updateOrCreate(
             ['email' => 'teacher@mindnova.ai'],
@@ -40,22 +53,25 @@ class InstructorSeeder extends Seeder
                 'name' => 'Alex Rivera',
                 'password' => Hash::make('password'),
                 'status' => 'active',
+                'avatar_url' => $avatars[0],
                 'email_verified_at' => now(),
             ]
         );
         $teacher->roles()->syncWithoutDetaching([$teacherRole->id]);
 
-        // Tạo thêm 1 Giảng viên phụ
-        $teacher2 = User::updateOrCreate(
-            ['email' => 'alex.teacher@mindnova.ai'],
-            [
-                'name' => 'Dr. Alex Rivera',
-                'password' => Hash::make('password'),
-                'status' => 'active',
-                'email_verified_at' => now(),
-            ]
-        );
-        $teacher2->roles()->syncWithoutDetaching([$teacherRole->id]);
+        for ($i = 1; $i <= 9; $i++) {
+            $t = User::updateOrCreate(
+                ['email' => 'teacher' . $i . '@mindnova.ai'],
+                [
+                    'name' => 'Instructor ' . $i,
+                    'password' => Hash::make('password'),
+                    'status' => 'active',
+                    'avatar_url' => $avatars[$i],
+                    'email_verified_at' => now(),
+                ]
+            );
+            $t->roles()->syncWithoutDetaching([$teacherRole->id]);
+        }
 
         // 3. Tạo Các Tài khoản Học viên (Students)
         $student1 = User::updateOrCreate(
@@ -64,32 +80,25 @@ class InstructorSeeder extends Seeder
                 'name' => 'Hiếu Nguyễn',
                 'password' => Hash::make('password'),
                 'status' => 'active',
+                'avatar_url' => $avatars[9],
                 'email_verified_at' => now(),
             ]
         );
         $student1->roles()->syncWithoutDetaching([$studentRole->id]);
 
-        $student2 = User::updateOrCreate(
-            ['email' => 'long.student@mindnova.ai'],
-            [
-                'name' => 'Trần Hoàng Long',
-                'password' => Hash::make('password'),
-                'status' => 'active',
-                'email_verified_at' => now(),
-            ]
-        );
-        $student2->roles()->syncWithoutDetaching([$studentRole->id]);
-
-        $student3 = User::updateOrCreate(
-            ['email' => 'anh.student@mindnova.ai'],
-            [
-                'name' => 'Lê Minh Anh',
-                'password' => Hash::make('password'),
-                'status' => 'active',
-                'email_verified_at' => now(),
-            ]
-        );
-        $student3->roles()->syncWithoutDetaching([$studentRole->id]);
+        for ($i = 1; $i <= 9; $i++) {
+            $s = User::updateOrCreate(
+                ['email' => 'student' . $i . '@mindnova.ai'],
+                [
+                    'name' => 'Student ' . $i,
+                    'password' => Hash::make('password'),
+                    'status' => 'active',
+                    'avatar_url' => $avatars[$i - 1],
+                    'email_verified_at' => now(),
+                ]
+            );
+            $s->roles()->syncWithoutDetaching([$studentRole->id]);
+        }
 
         // 4. Tạo Danh mục khóa học (Categories)
         $catWeb = Category::firstOrCreate(
