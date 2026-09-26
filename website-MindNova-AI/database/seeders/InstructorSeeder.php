@@ -217,6 +217,8 @@ class InstructorSeeder extends Seeder
                 'status' => 'published',
             ]
         );
+        $student2 = User::where('email', 'student2@mindnova.ai')->first();
+        $student3 = User::where('email', 'student3@mindnova.ai')->first();
 
         // 9. Tạo Đăng ký học viên (Enrollments)
         Enrollment::updateOrCreate(
