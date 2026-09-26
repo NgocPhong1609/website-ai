@@ -235,3 +235,11 @@ existing retry policy; a long chain can increase latency. Usage records retain t
 actual model and shared request ID. The existing backup provider (Groq in production)
 is tried after the Gemini chain is exhausted. Keep credentials in private environment
 variables, never in tracked files.
+
+Course outline generation reserves up to 32,768 output tokens for full lesson content.
+Before returning success it requires 4–6 chapters, each containing three nonempty
+document lessons followed by one quiz with three questions, four answers per
+question, and exactly one correct answer. Incomplete model responses are recorded
+as `invalid_response` and use the existing retry/fallback policy. Other AI features
+retain their own response handling and token limits. This validates structure, not
+pedagogical quality or a precise document word count.

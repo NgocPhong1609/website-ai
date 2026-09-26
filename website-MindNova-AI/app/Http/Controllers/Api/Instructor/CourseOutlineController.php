@@ -11,6 +11,7 @@ use Exception;
 use App\Models\Course;
 use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Services\Instructor\CourseOutlineValidator;
 
 class CourseOutlineController extends Controller
 {
@@ -84,19 +85,16 @@ class CourseOutlineController extends Controller
 
             $responseResult = $this->aiRouter->sendMessageWithFallback($messages, [
                 'response_mime_type' => 'application/json',
-                'max_tokens' => 8192
+                'max_tokens' => 32768,
+                'validate_response' => fn (string $content) => CourseOutlineValidator::decode($content) !== null
             ]);
             
             $responseJson = $responseResult['content'];
             $meta = $responseResult['meta'];
 
-            // Parse response
-            // AI might return with markdown ```json ... ```, so we should clean it if needed
-            $cleanJson = preg_replace('/```json|```/', '', $responseJson);
-            $outline = json_decode(trim($cleanJson), true);
-
-            if (!$outline || !isset($outline['chapters'])) {
-                throw new Exception("AI trả về dữ liệu không hợp lệ. Vui lòng thử lại.");
+            $outline = CourseOutlineValidator::decode($responseJson);
+            if ($outline === null) {
+                throw new Exception('AI chưa tạo đủ chương, bài học và câu hỏi. Vui lòng thử lại.');
             }
 
             return response()->json([

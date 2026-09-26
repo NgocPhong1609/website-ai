@@ -116,6 +116,15 @@ class BackupAiService extends AbstractAiService
                     throw new AiTransientException('Backup returned an empty response');
                 }
 
+                if (isset($options['validate_response']) && ! $options['validate_response']($content)) {
+                    $this->recordAttempt($options, $model, $startedAt, 'failed', 'invalid_response',
+                        $inputTokens, $outputTokens, $providerRequestId ?: null);
+                    if ($attempt < $maxRetries) {
+                        continue;
+                    }
+                    throw new AiTransientException('Backup returned an incomplete response');
+                }
+
                 $this->recordAttempt($options, $model, $startedAt, 'success', null,
                     $inputTokens, $outputTokens, $providerRequestId ?: null);
 
