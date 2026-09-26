@@ -268,3 +268,5 @@ Sau khi duyệt câu hỏi và lưu, quiz theo chương được gắn vào cu�
 API instructor `ai-quiz/generate`, `ai-quiz/regenerate-question` và `ai-quiz/store` nhận thêm `module_id` tùy chọn kèm `course_id`. Máy chủ kiểm tra chương thuộc đúng khóa học và quyền sở hữu. Bỏ `module_id` để dùng hành vi hiện có. Không cần migration.
 
 Thời gian tạo quiz AI: các lượt gọi mô hình dùng chung giới hạn 180 giây; giao diện chờ tối đa 210 giây để nhận kết quả hoặc lỗi từ máy chủ. Riêng tạo quiz, mỗi mô hình thử một lần rồi chuyển dự phòng khi gặp lỗi tạm thời. Các tính năng AI khác giữ số lần thử mặc định.
+
+Điều kiện gửi duyệt và phát hành khóa học: phải chọn chính thức cả **Bài kiểm tra tổng quát** (`capability_assessment`) và **Bài kiểm tra cuối khóa học** (`end_of_course`), mỗi bài có ít nhất một câu hỏi. Đề chưa chọn, đề rỗng và quiz trong chương không thay thế hai bài này. Course Health báo lỗi khi thiếu; máy chủ kiểm tra lúc gửi duyệt và kiểm tra lại lúc quản trị viên phát hành, kể cả hồ sơ đã gửi trước khi áp dụng điều kiện này.
