@@ -3,6 +3,11 @@ import type { NextConfig } from "next";
 const BACKEND_URL = process.env.BACKEND_URL || "http://127.0.0.1:8000";
 
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_REVERB_HOST: 'website-ai-production-086a.up.railway.app',
+    NEXT_PUBLIC_REVERB_PORT: '443',
+    NEXT_PUBLIC_REVERB_SCHEME: 'https',
+  },
   images: {
     remotePatterns: [
       {
