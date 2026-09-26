@@ -6,7 +6,7 @@ export function useGetCourseDetail(courseId: string | number = 0) {
  return useQuery({
  queryKey: ["student", "courses", "detail", courseId],
  queryFn: async (): Promise<CourseDetailData> => {
- const { data } = await axiosClient.get(`/api/courses/detail/${courseId}`);
+ const { data } = await axiosClient.get(`/api/student/courses/detail/${courseId}`);
  return data.data;
  },
  staleTime: 5 * 60 * 1000,
