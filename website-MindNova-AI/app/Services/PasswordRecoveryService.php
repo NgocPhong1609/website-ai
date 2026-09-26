@@ -106,7 +106,11 @@ class PasswordRecoveryService
             if (! $credential) {
                 return false;
             }
-            $user->forceFill(['password' => Hash::make($password), 'remember_token' => Str::random(60)])->save();
+            $user->forceFill([
+                'password' => Hash::make($password),
+                'remember_token' => Str::random(60),
+                'password_recovery_version' => Str::random(40),
+            ])->save();
             PasswordRecoveryCode::where('user_id', $user->id)->delete();
             $user->tokens()->delete();
             DB::table('sessions')->where('user_id', $user->id)->delete();

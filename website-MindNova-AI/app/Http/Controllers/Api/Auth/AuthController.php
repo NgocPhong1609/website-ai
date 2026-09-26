@@ -94,46 +94,38 @@ DB::table('user_streaks')->insert([
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $email = trim($request->email);
-        $user = User::where('email', $email)->first();
+        return DB::transaction(function () use ($request) {
+            $user = User::where('email', trim($request->email))->lockForUpdate()->first();
 
-        // 1. Kiểm tra sự tồn tại của user
-        if (!$user) {
-            return response()->json(['message' => 'Email hoặc mật khẩu không chính xác!'], 401);
-        }
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return response()->json(['message' => 'Email hoặc mật khẩu không chính xác!'], 401);
+            }
 
-        // 2. Kiểm tra mật khẩu
-        if (!Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Email hoặc mật khẩu không chính xác!'], 401);
-        }
+            if ($user->is_locked == 1) {
+                return response()->json(['message' => 'Tài khoản của bạn hiện đang bị khóa!'], 403);
+            }
 
-        // 3. Kiểm tra trạng thái khóa tài khoản
-        if ($user->is_locked == 1) {
-            return response()->json(['message' => 'Tài khoản của bạn hiện đang bị khóa!'], 403);
-        }
+            $user->update(['last_login_at' => now()]);
 
-        // 4. Cập nhật đăng nhập & Log
-        $user->update(['last_login_at' => now()]);
+            ActivityLog::create([
+                'user_id' => $user->id,
+                'action' => 'login',
+                'subject_type' => User::class,
+                'subject_id' => $user->id,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'metadata' => ['guard' => 'web'],
+            ]);
 
-        ActivityLog::create([
-            'user_id' => $user->id,
-            'action' => 'login',
-            'subject_type' => User::class,
-            'subject_id' => $user->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'metadata' => ['guard' => 'web'],
-        ]);
+            $token = $user->createToken('auth_token')->plainTextToken;
 
-        // 5. Tạo Sanctum Token
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'Đăng nhập thành công',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user->load('roles')
-        ], 200);
+            return response()->json([
+                'message' => 'Đăng nhập thành công',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => $user->load('roles')
+            ], 200);
+        });
     }
 
     // 3. API Đăng xuất

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Http\Middleware\EnsureRecoverySessionCurrent;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\PasswordRecoveryService;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
+use Laravel\Sanctum\PersonalAccessToken;
 use Tests\TestCase;
 
 class RecoveryCodesApiTest extends TestCase
@@ -67,6 +69,7 @@ class RecoveryCodesApiTest extends TestCase
         foreach (glob(database_path('migrations/*_create_password_recovery_codes_table.php')) as $file) {
             (require $file)->up();
         }
+        (require database_path('migrations/2026_09_26_000001_add_password_recovery_version_to_users_table.php'))->up();
     }
 
     protected function tearDown(): void
@@ -277,5 +280,78 @@ class RecoveryCodesApiTest extends TestCase
         $code = $this->postJson('/api/profile/recovery-codes', ['current_password' => 'OldPassword1!'], $this->auth($user))->json('codes.0');
         $this->postJson('/api/reset-password', ['email' => $user->email, 'recovery_code' => $code, 'password' => 'NewPassword1!', 'password_confirmation' => 'NewPassword1!'])->assertOk();
         $this->assertNull($provider->retrieveByToken($user->id, $oldToken));
+    }
+
+    public function test_recovery_rejects_old_file_web_session_and_new_login_can_use_new_password(): void
+    {
+        $user = $this->user();
+        $sessionPath = sys_get_temp_dir().'/mindnova-recovery-sessions-'.uniqid();
+        mkdir($sessionPath);
+        config(['session.driver' => 'file', 'session.files' => $sessionPath, 'app.key' => 'base64:'.base64_encode(random_bytes(32))]);
+        app('session')->forgetDrivers();
+        app()->forgetInstance('session.store');
+        app('auth')->forgetGuards();
+        $this->withoutVite();
+        $this->assertContains(EnsureRecoverySessionCurrent::class, app('router')->getMiddlewareGroups()['web']);
+
+        $login = $this->post('/login', ['email' => $user->email, 'password' => 'OldPassword1!'])->assertRedirect();
+        $sessionCookie = collect($login->headers->getCookies())->first(fn ($cookie) => $cookie->getName() === config('session.cookie'));
+        $this->assertNotNull($sessionCookie);
+        $this->assertNotEmpty(glob($sessionPath.'/*'));
+        app('auth')->forgetGuards();
+        $this->withUnencryptedCookie($sessionCookie->getName(), $sessionCookie->getValue())->get('/profile')->assertOk();
+
+        $code = $this->postJson('/api/profile/recovery-codes', ['current_password' => 'OldPassword1!'], $this->auth($user))->json('codes.0');
+        $this->postJson('/api/reset-password', ['email' => $user->email, 'recovery_code' => $code, 'password' => 'NewPassword1!', 'password_confirmation' => 'NewPassword1!'])->assertOk();
+        $this->assertNotNull($user->fresh()->password_recovery_version);
+        $rememberAfterReset = $user->fresh()->remember_token;
+        app('auth')->forgetGuards();
+        app('auth')->shouldUse('web');
+        $this->withUnencryptedCookie($sessionCookie->getName(), $sessionCookie->getValue())->get('/profile')->assertRedirect('/login');
+        $this->assertSame($rememberAfterReset, $user->fresh()->remember_token);
+
+        app('auth')->shouldUse('web');
+        $newLogin = $this->post('/login', ['email' => $user->email, 'password' => 'NewPassword1!'])->assertRedirect();
+        $this->assertSame($user->fresh()->password_recovery_version, session()->get('password_recovery_version'));
+        $newCookie = collect($newLogin->headers->getCookies())->first(fn ($cookie) => $cookie->getName() === config('session.cookie'));
+        $this->assertNotNull($newCookie);
+        app('auth')->forgetGuards();
+        $this->withUnencryptedCookie($newCookie->getName(), $newCookie->getValue())->get('/profile')->assertOk();
+    }
+
+    public function test_api_login_holds_transaction_through_password_check_and_token_creation(): void
+    {
+        $user = $this->user();
+        $writeTransactionLevels = [];
+        User::updating(function (User $updating) use (&$writeTransactionLevels): void {
+            if ($updating->isDirty('last_login_at')) {
+                $writeTransactionLevels[] = DB::transactionLevel();
+            }
+        });
+        PersonalAccessToken::creating(function () use (&$writeTransactionLevels): void {
+            $writeTransactionLevels[] = DB::transactionLevel();
+        });
+        $this->postJson('/api/login', ['email' => $user->email, 'password' => 'OldPassword1!'])->assertOk();
+        $this->assertSame([1, 1], $writeTransactionLevels);
+    }
+
+    public function test_recovery_of_another_account_keeps_unrelated_file_web_session(): void
+    {
+        $signedIn = $this->user('student', 'signed-in@example.test');
+        $recovering = $this->user('student', 'recovering@example.test');
+        $code = app(PasswordRecoveryService::class)->rotateSaved($recovering, 'OldPassword1!')[0];
+        $sessionPath = sys_get_temp_dir().'/mindnova-recovery-sessions-'.uniqid();
+        mkdir($sessionPath);
+        config(['session.driver' => 'file', 'session.files' => $sessionPath, 'app.key' => 'base64:'.base64_encode(random_bytes(32))]);
+        app('session')->forgetDrivers();
+        app()->forgetInstance('session.store');
+        app('auth')->forgetGuards();
+        $this->withoutVite();
+
+        $this->post('/login', ['email' => $signedIn->email, 'password' => 'OldPassword1!'])->assertRedirect();
+        $this->get('/profile')->assertOk();
+        $this->postJson('/api/reset-password', ['email' => $recovering->email, 'recovery_code' => $code, 'password' => 'NewPassword1!', 'password_confirmation' => 'NewPassword1!'])->assertOk();
+        app('auth')->forgetGuards();
+        $this->get('/profile')->assertOk();
     }
 }
