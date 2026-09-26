@@ -36,3 +36,24 @@ pnpm build
 Test mô phỏng 400/401/403/404/409/413/422/429/5xx, timeout/mất kết nối, JSON/HTML,
 validation, thử lại OTP và onboarding. Các lỗi test tồn tại trước đó ở quiz aliases, lịch sử học và màu tin nhắn
 được báo riêng; không đổi logic sản phẩm để che lỗi test.
+
+## Khôi phục mật khẩu: JSON validation (26/09/2026)
+
+Cả ba POST `/api/forgot-password`, `/api/forgot-password/verify-otp`, `/api/reset-password`
+gửi `Accept: application/json` cùng `Content-Type: application/json`. Khi validation thất bại,
+Laravel trả JSON 422 để giao diện giữ người dùng ở bước hiện tại và hiển thị lỗi có thể sửa,
+thay vì chuyển hướng sang HTML rồi báo `INVALID_RESPONSE`.
+
+Lỗi trường email `The selected email is invalid.` được dịch thành email chưa được đăng ký,
+kèm hướng dẫn dùng email đã đăng ký tài khoản. Lỗi email sai định dạng được giữ riêng.
+Không thay đổi điều kiện xác thực, gửi mail hay cập nhật mật khẩu ở backend.
+
+Regression: 5 test mới kiểm tra JSON negotiation ở từng bước, thông báo email chưa đăng ký,
+và phân biệt lỗi email/field khác; thất bại trước sửa, đạt sau sửa. Bộ auth/error liên quan: 40 test đạt.
+
+## Lưu ảnh tài liệu và SMTP Railway (26/09/2026)
+
+- Migration `2026_09_26_170000_allow_unassigned_lesson_media` cho phép `lesson_media.lesson_id` null trước khi tạo bài; giữ foreign key và cascade khi đã gắn bài. Rollback từ chối chạy nếu còn media chưa gắn, tránh mất dữ liệu.
+- Upload/move R2 trả false phải báo thất bại. Khi gắn nhiều ảnh, lưu URL đã chuyển thành công trước khi xử lý ảnh tiếp theo; lỗi một ảnh không làm hỏng URL ảnh trước, có thể thử lại trên bài hiện tại.
+- Test `TemporaryLessonMediaTest`: tải ảnh, lưu/gắn bài, đọc lại URL lâu dài, cascade; thất bại lưu R2; thất bại move; lỗi giữa nhiều ảnh và retry.
+- Backend Railway hiện dùng Hobby, Gmail SMTP 587; kiểm tra TCP từ container cho cả 587/465 đều timeout. Railway chỉ cho SMTP từ Pro: cần email HTTPS API hoặc nâng gói, không coi thay đổi thông báo/tăng timeout là sửa gửi mail. Chưa thay nhà cung cấp hoặc nâng gói.

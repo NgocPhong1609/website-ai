@@ -39,6 +39,12 @@ describe('user-facing error messages', () => {
     expect(getValidationErrors(error)).toMatchObject({ email: expect.stringMatching(/email/i), password: expect.stringMatching(/8/), otp: 'Mã xác nhận không đúng.' });
     expect(getErrorMessage(error)).not.toMatch(/The given|SQLSTATE|secret/);
   });
+  it('distinguishes an unregistered email from malformed email and other invalid selections', () => {
+    expect(getValidationErrors({ errors: { email: ['The selected email is invalid.'] } }).email).toMatch(/chưa.*đăng ký/i);
+    expect(getValidationErrors({ errors: { email: ['The email field must be a valid email address.'] } }).email).toMatch(/định dạng/i);
+    expect(getValidationErrors({ errors: { category_id: ['The selected category id is invalid.'] } }).category_id).not.toMatch(/đăng ký/i);
+  });
+
   it('keeps a safe explanation for a failed operation and adds recovery advice', () => {
     expect(getErrorMessage({ response: { status: 500, data: { message: 'Không thể lưu tỷ lệ' } } })).toBe('Không thể lưu tỷ lệ. Vui lòng thử lại sau ít phút.');
   });

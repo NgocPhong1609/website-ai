@@ -52,7 +52,7 @@ export function ForgotPasswordFlow() {
  try {
  const res = await fetch("/api/forgot-password", {
  method: "POST",
- headers: { "Content-Type": "application/json" },
+ headers: { "Content-Type": "application/json", Accept: "application/json" },
  body: JSON.stringify({ email }),
  });
  await readApiResponse(res, "Không thể gửi mã xác nhận. Vui lòng thử lại.");
@@ -72,7 +72,7 @@ export function ForgotPasswordFlow() {
  try {
  const res = await fetch("/api/forgot-password/verify-otp", {
  method: "POST",
- headers: { "Content-Type": "application/json" },
+ headers: { "Content-Type": "application/json", Accept: "application/json" },
  body: JSON.stringify({ email, otp }),
  });
  await readApiResponse(res, "Không thể xác nhận mã OTP. Vui lòng thử lại.");
@@ -95,7 +95,7 @@ export function ForgotPasswordFlow() {
  try {
  const res = await fetch("/api/reset-password", {
  method: "POST",
- headers: { "Content-Type": "application/json" },
+ headers: { "Content-Type": "application/json", Accept: "application/json" },
  body: JSON.stringify({ email, otp, password: newPassword, password_confirmation: confirmPassword }),
  });
  await readApiResponse(res, "Không thể đặt lại mật khẩu. Vui lòng thử lại.");
