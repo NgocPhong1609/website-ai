@@ -1,5 +1,0 @@
-{
-  "deploy": {
-    "releaseCommand": "php artisan migrate:fresh --seed --force"
-  }
-}
