@@ -320,7 +320,9 @@ class LessonService
 
         $filename = "temp/{$subfolder}/{$uuid}.{$extension}";
 
-        Storage::disk('r2')->putFileAs("temp/{$subfolder}", $file, "{$uuid}.{$extension}");
+        if (!Storage::disk('r2')->putFileAs("temp/{$subfolder}", $file, "{$uuid}.{$extension}")) {
+            throw new \RuntimeException('Không thể tải ảnh hoặc video lên. Vui lòng thử lại.');
+        }
 
         $media = LessonMedia::create([
             'lesson_id' => null,
@@ -355,6 +357,32 @@ class LessonService
         $content = $lesson->content ?? '';
         $videoUrl = $lesson->video_url ?? '';
 
+        // A retry can submit the editor's original temporary URLs after some images
+        // have already moved. Reconcile only media attached to this same lesson.
+        if (!empty($mediaIds)) {
+            $attached = LessonMedia::whereIn('id', $mediaIds)
+                ->where('lesson_id', $lesson->id)->where('is_temp', false)->get();
+            foreach ($attached as $media) {
+                $folder = $media->media_type === 'video' ? 'videos' : 'images';
+                $oldUrl = Storage::disk('r2')->url("temp/{$folder}/" . basename($media->r2_key));
+                $newUrl = Storage::disk('r2')->url($media->r2_key);
+                if (str_contains($content, $oldUrl)) {
+                    $content = str_replace($oldUrl, $newUrl, $content);
+                    $contentChanged = true;
+                }
+                if ($videoUrl === $oldUrl) {
+                    $videoUrl = $newUrl;
+                    $contentChanged = true;
+                }
+            }
+            if ($contentChanged) {
+                $lesson->content = $content;
+                $lesson->video_url = $videoUrl;
+                $lesson->save();
+                $contentChanged = false;
+            }
+        }
+
         // 1. Move and update new media from temp folder
         if (!empty($mediaIds)) {
             $mediaList = LessonMedia::whereIn('id', $mediaIds)
@@ -371,9 +399,12 @@ class LessonService
 
                 // Move the file in Cloudflare R2
                 try {
-                    Storage::disk('r2')->move($media->r2_key, $newKey);
+                    if (!Storage::disk('r2')->move($media->r2_key, $newKey)) {
+                        throw new \RuntimeException('Không thể lưu ảnh hoặc video vào bài học. Vui lòng thử lại.');
+                    }
                 } catch (\Exception $e) {
                     \Log::error("Failed to move temp media: " . $e->getMessage());
+                    throw new \RuntimeException('Không thể lưu ảnh hoặc video vào bài học. Vui lòng thử lại.', 0, $e);
                 }
 
                 $media->update([
@@ -397,6 +428,14 @@ class LessonService
                 if ($lesson->type === 'video' && $media->media_type === 'video' && $media->duration_seconds > 0) {
                     $lesson->duration_seconds = $media->duration_seconds;
                     $contentChanged = true;
+                }
+
+                // Keep completed URLs durable even if a later media move fails.
+                if ($contentChanged || $lesson->isDirty()) {
+                    $lesson->content = $content;
+                    $lesson->video_url = $videoUrl;
+                    $lesson->save();
+                    $contentChanged = false;
                 }
             }
         }
