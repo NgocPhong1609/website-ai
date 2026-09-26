@@ -9,10 +9,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 interface Step5SaveAndAttachModalProps {
   quiz: QuizSummary;
   onClose: () => void;
+  attachedModuleTitle?: string;
   onSuccessComplete?: (savedQuiz?: any) => void;
 }
 
-export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: Step5SaveAndAttachModalProps) {
+export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, attachedModuleTitle }: Step5SaveAndAttachModalProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const paramModuleId = searchParams ? (searchParams.get("module_id") || searchParams.get("moduleId")) : null;
@@ -28,7 +29,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: St
   const [selectedModuleId, setSelectedModuleId] = useState<number | null>(paramModuleId ? Number(paramModuleId) : null);
   const [selectedLessonId, setSelectedLessonId] = useState<number | null>(paramAfterLessonId ? Number(paramAfterLessonId) : null);
   const [isAttaching, setIsAttaching] = useState(false);
-  const [attachedSuccess, setAttachedSuccess] = useState(false);
+  const [attachedSuccess, setAttachedSuccess] = useState(Boolean(attachedModuleTitle));
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
   const [isLoadingCourseDetails, setIsLoadingCourseDetails] = useState(false);
   const [errorInfo, setErrorInfo] = useState<{ message: string; errorCode: string } | null>(null);
@@ -186,7 +187,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: St
             <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Lưu Thành Công</span>
             <h2 className="text-xl font-black text-[#0F172A]">{quiz.title}</h2>
             <p className="text-xs text-[#64748B] font-medium mt-0.5">
-              Đề kiểm tra đã được lưu vào thư viện. Vui lòng chọn Khóa học và Vị trí xuất hiện bên dưới.
+              {attachedModuleTitle ? `Đề kiểm tra đã được lưu và đặt ở cuối chương: ${attachedModuleTitle}.` : "Đề kiểm tra đã được lưu vào thư viện. Vui lòng chọn Khóa học và Vị trí xuất hiện bên dưới."}
             </p>
           </div>
         </div>

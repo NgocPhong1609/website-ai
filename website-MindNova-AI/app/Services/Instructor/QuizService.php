@@ -68,11 +68,19 @@ class QuizService
             ]);
 
             if (!empty($data['course_id'])) {
-                QuizCourseAttachment::create([
-                    'quiz_id' => $quiz->id,
-                    'course_id' => $data['course_id'],
-                    'position' => 'end_of_course',
-                ]);
+                if (!empty($data['module_id'])) {
+                    $this->attachQuizToCourse($quiz, [
+                        'course_id' => $data['course_id'],
+                        'module_id' => $data['module_id'],
+                        'position' => 'in_module',
+                    ]);
+                } else {
+                    QuizCourseAttachment::create([
+                        'quiz_id' => $quiz->id,
+                        'course_id' => $data['course_id'],
+                        'position' => 'end_of_course',
+                    ]);
+                }
             }
 
             $this->saveQuestionsAndAnswers($quiz, $questionsData);
@@ -130,13 +138,14 @@ class QuizService
             ]);
 
             if (!empty($data['course_id'])) {
-                QuizCourseAttachment::updateOrCreate(
-                    ['quiz_id' => $quiz->id],
-                    [
+                // Editing questions must not move an existing chapter quiz to the end of the course.
+                if (!empty($data['module_id']) || !$quiz->attachments()->where('course_id', $data['course_id'])->exists()) {
+                    $this->attachQuizToCourse($quiz, [
                         'course_id' => $data['course_id'],
-                        'position' => 'end_of_course',
-                    ]
-                );
+                        'module_id' => $data['module_id'] ?? null,
+                        'position' => !empty($data['module_id']) ? 'in_module' : 'end_of_course',
+                    ]);
+                }
             }
 
             // Re-create questions

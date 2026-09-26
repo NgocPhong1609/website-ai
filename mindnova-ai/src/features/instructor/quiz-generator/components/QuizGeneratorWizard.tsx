@@ -194,6 +194,7 @@ export function QuizGeneratorWizard({
       {!embeddedMode && step === 5 && savedQuiz && (
         <Step5SaveAndAttachModal
           quiz={savedQuiz}
+          attachedModuleTitle={config.module_id && savedQuiz.attachments?.some((attachment) => attachment.position === "in_module" && Number(attachment.module_id) === config.module_id) ? (config.module_title || `Chương #${config.module_id}`) : undefined}
           onClose={() => setStep(4)}
           onSuccessComplete={onSuccessComplete}
         />

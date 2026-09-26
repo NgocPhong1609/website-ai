@@ -95,12 +95,16 @@ class QuizGeneratorController extends Controller
             'type' => 'required|string|in:multiple_choice,essay',
             'difficulty' => 'nullable|string|in:easy,medium,hard',
             'context' => 'nullable|string',
+            'course_id' => 'required_with:module_id|nullable|integer|exists:courses,id',
+            'module_id' => ['nullable', 'integer', \Illuminate\Validation\Rule::exists('course_modules', 'id')->where('course_id', $request->input('course_id'))],
         ]);
 
         try {
             $question = $this->aiQuizGeneratorService->regenerateSingleQuestion($request->user(), $validated);
 
             return $this->successResponse($question, 'Single question regenerated successfully.');
+        } catch (\App\Exceptions\AiQuizGeneratorException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage(), 'error_code' => $e->getErrorCode()], $e->getStatusCode());
         } catch (Exception $e) {
             return $this->errorResponse('Failed to regenerate single question: ' . $e->getMessage(), 500);
         }

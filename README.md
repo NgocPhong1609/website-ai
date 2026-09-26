@@ -255,3 +255,14 @@ In the create-course draft, dragging a lesson's grip onto another lesson moves i
 to that position. Cross-chapter moves preserve the original lesson ID, media and
 quiz data, renumber both lesson lists, and persist the updated draft to session
 storage. Dropping a lesson onto itself leaves its position unchanged.
+
+## Tạo quiz AI theo chương
+
+Trong **Tạo bài kiểm tra → Tạo bằng AI**, chọn khóa học rồi chọn **Phạm vi nội dung**:
+
+- **Toàn khóa học**: giữ luồng tạo quiz tổng hợp hiện tại.
+- **Một chương cụ thể**: chỉ dùng nội dung văn bản của bài học trong chương; bỏ qua quiz có sẵn và bài chưa có văn bản. Chương không có nội dung phù hợp sẽ được báo để bổ sung, không tự chuyển sang đọc toàn khóa.
+
+Sau khi duyệt câu hỏi và lưu, quiz theo chương được gắn vào cuối chương đã chọn trong cùng giao dịch lưu. Tạo lại một câu hỏi vẫn dùng nội dung chương đó; sửa quiz đã lưu không đổi vị trí gắn.
+
+API instructor `ai-quiz/generate`, `ai-quiz/regenerate-question` và `ai-quiz/store` nhận thêm `module_id` tùy chọn kèm `course_id`. Máy chủ kiểm tra chương thuộc đúng khóa học và quyền sở hữu. Bỏ `module_id` để dùng hành vi hiện có. Không cần migration.

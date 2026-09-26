@@ -38,6 +38,8 @@ export interface QuizConfig {
  topic: string;
  course_id?: number | null;
  course_title?: string | null;
+ module_id?: number | null;
+ module_title?: string | null;
  difficulty: DifficultyType;
  total_questions: number;
  multiple_choice_count: number;

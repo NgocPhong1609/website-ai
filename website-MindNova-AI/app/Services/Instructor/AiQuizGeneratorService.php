@@ -25,6 +25,8 @@ class AiQuizGeneratorService
         $content = $data['content'] ?? '';
         $topic = $data['topic'] ?? '';
         $courseId = $data['course_id'] ?? null;
+        $moduleId = $data['module_id'] ?? null;
+        $moduleTitle = null;
         $difficulty = $data['difficulty'] ?? 'mixed';
         $total = (int) $data['total_questions'];
         $mcCount = (int) $data['multiple_choice_count'];
@@ -44,7 +46,12 @@ class AiQuizGeneratorService
         $moduleCount = 0;
         $lessonCount = 0;
 
-        if (($sourceType === 'course' || !empty($courseId)) && $courseId) {
+        if ($moduleId) {
+            $source = $this->chapterSource($instructor, (int) $courseId, (int) $moduleId);
+            $courseTitle = $source['course_title'];
+            $moduleTitle = $source['module_title'];
+            $sourceDescription = $source['content'];
+        } elseif (($sourceType === 'course' || !empty($courseId)) && $courseId) {
             $courseQuery = \App\Models\Course::with(['modules.lessons']);
             if (\Illuminate\Support\Facades\Schema::hasColumn('lessons', 'course_id')) {
                 $courseQuery->with('lessons');
@@ -365,6 +372,8 @@ YÊU CẦU BẮT BUỘC KHÔNG ĐƯỢC VI PHẠM:
                 'source_content' => $sourceType === 'course' ? $courseTitle : ($sourceType === 'content' ? $content : $topic),
                 'course_id' => $courseId ? (int) $courseId : null,
                 'course_title' => $courseTitle,
+                'module_id' => $moduleId ? (int) $moduleId : null,
+                'module_title' => $moduleTitle,
                 'difficulty' => $difficulty,
                 'total_questions' => count($questions),
                 'mc_questions_count' => count(array_filter($questions, fn($q) => $q['type'] === 'multiple_choice')),
@@ -410,6 +419,9 @@ YÊU CẦU BẮT BUỘC KHÔNG ĐƯỢC VI PHẠM:
         $type = $data['type'] ?? 'multiple_choice';
         $difficulty = $data['difficulty'] ?? 'medium';
         $context = $data['context'] ?? '';
+        if (!empty($data['module_id'])) {
+            $context = $this->chapterSource($instructor, (int) ($data['course_id'] ?? 0), (int) $data['module_id'])['content'];
+        }
 
         $prompt = "Bạn là chuyên gia thiết kế đề thi. Hãy tạo MỘT CÂU HỎI MỚI dạng '{$type}' ở độ khó '{$difficulty}'.
 Ngữ cảnh chủ đề: {$context}.
@@ -472,6 +484,39 @@ Trả về CHỈ JSON theo định dạng:
             'rubric' => $type === 'essay' ? ($parsed['rubric'] ?? '') : '',
             'points' => (float) ($parsed['points'] ?? ($type === 'essay' ? 5.0 : 1.0)),
             'reviewStatus' => 'pending'
+        ];
+    }
+
+    /** Read only the selected chapter; never fall back to other course content. */
+    private function chapterSource(User $instructor, int $courseId, int $moduleId): array
+    {
+        $course = \App\Models\Course::find($courseId);
+        if (!$course || ((int) $course->teacher_id !== (int) $instructor->id && !$instructor->hasRole('admin'))) {
+            throw new AiQuizGeneratorException('Bạn không có quyền quản lý khóa học này.', 'UNAUTHORIZED_COURSE_ACCESS', 403);
+        }
+        $module = $course->modules()->with('lessons')->find($moduleId);
+        if (!$module) {
+            throw new AiQuizGeneratorException('Chương không thuộc khóa học được chọn.', 'INVALID_MODULE', 422);
+        }
+
+        $parts = [];
+        foreach ($module->lessons as $lesson) {
+            if (in_array($lesson->type, ['quiz', 'quiz_module'], true)) {
+                continue;
+            }
+            $text = trim(str_replace("\xc2\xa0", ' ', html_entity_decode(strip_tags($lesson->content ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+            if ($text !== '') {
+                $parts[] = "--- Bài học: {$lesson->title} ---\n{$text}";
+            }
+        }
+        if (!$parts) {
+            throw new AiQuizGeneratorException('Chương này chưa có nội dung bài học dạng văn bản để tạo quiz. Hãy bổ sung nội dung hoặc chọn chương khác.', 'EMPTY_MODULE_CONTENT', 422);
+        }
+
+        return [
+            'course_title' => $course->title,
+            'module_title' => $module->title,
+            'content' => "Chỉ tạo câu hỏi dựa trên nội dung chương '{$module->title}' sau đây, không sử dụng chương khác.\n\n" . implode("\n\n", $parts),
         ];
     }
 
