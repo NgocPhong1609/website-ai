@@ -14,7 +14,7 @@ Route::get('/dashboard', function () {
     $user = Auth::user();
 
     if ($user instanceof User && $user->isAdmin()) {
-        $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/');
+        $frontendUrl = rtrim(config('app.frontend_url'), '/');
 
         return redirect()->away($frontendUrl . '/admin');
     }

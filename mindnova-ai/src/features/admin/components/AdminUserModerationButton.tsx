@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+import { clientApiUrl } from "@/src/shared/lib/api-url";
+
+const API_BASE_URL = clientApiUrl();
 
 function readStoredToken(): string {
  const cookieValue = document.cookie

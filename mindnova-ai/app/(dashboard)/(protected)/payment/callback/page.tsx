@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { backendApiUrl } from "@/src/shared/lib/backend-url";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,7 @@ export default async function PaymentCallbackPage({ searchParams }: Props) {
 
  if (transactionId) {
  try {
- const apiUrl = process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api` : "http://127.0.0.1:8000/api";
+ const apiUrl = backendApiUrl();
  const cookieStore = await cookies();
  // Quét tất cả các tên cookie khả dụng trong hệ thống
  const token = 

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { clientApiUrl } from "./api-url";
 
 // Hàm helper để đọc cookie ở phía client
 function getCookie(name: string) {
@@ -10,7 +11,7 @@ function getCookie(name: string) {
 }
 
 export const axiosClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000",
+  baseURL: clientApiUrl(),
   headers: {
     "Content-Type": "application/json",
     "Accept": "application/json",
@@ -21,8 +22,8 @@ export const axiosClient = axios.create({
 axiosClient.interceptors.request.use(
   (config) => {
     // Tự động loại bỏ tiền tố /api bị lặp khi baseURL trong .env đã chứa sẵn /api
-    if (config.url && config.url.startsWith("/api") && config.baseURL && config.baseURL.replace(/\/+$/, "").endsWith("/api")) {
-      config.url = config.url.slice(4) || "/";
+    if (config.url && /^\/?api(?=\/|[?#]|$)/.test(config.url) && config.baseURL && config.baseURL.replace(/\/+$/, "").endsWith("/api")) {
+      config.url = config.url.replace(/^\/?api(?=\/|[?#]|$)/, "") || "/";
     }
 
     // Nếu data là FormData, xóa Content-Type để Axios tự động thêm multipart/form-data kèm boundary

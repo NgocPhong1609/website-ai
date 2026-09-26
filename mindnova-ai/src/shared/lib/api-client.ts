@@ -1,26 +1,12 @@
 import { cookies } from "next/headers";
 
-const API_BASE_URL = process.env.BACKEND_URL || "http://127.0.0.1:8000";
+import { backendApiUrl } from "./backend-url";
 
 export async function apiClient<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  if (!API_BASE_URL) {
-    throw new Error(
-      "[apiClient] BACKEND_URL is not set. Check your .env file."
-    );
-  }
-
-  // Ensure base URL correctly targets the Laravel /api prefix without duplicating /api/api
-  const baseUrl = API_BASE_URL.replace(/\/+$/, "");
-  let cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  if (baseUrl.endsWith("/api") && cleanEndpoint.startsWith("/api")) {
-    cleanEndpoint = cleanEndpoint.slice(4);
-  }
-  const apiPrefix = baseUrl.endsWith("/api") || cleanEndpoint.startsWith("/api") ? "" : "/api";
-
-  const url = `${baseUrl}${apiPrefix}${cleanEndpoint}`;
+  const url = backendApiUrl(endpoint);
 
   // Attach auth token from cookies (server-side only)
   const cookieStore = await cookies();

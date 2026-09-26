@@ -109,7 +109,7 @@ NEXT_PUBLIC_REVERB_SCHEME=http
 
 Mở http://localhost:3000
 
-`next.config.ts` rewrite `/api/:path*` → Laravel. Callback thanh toán RSC đọc `BACKEND_URL`. Axios browser đọc `NEXT_PUBLIC_API_URL`. Để trống thì code fallback `http://127.0.0.1:8000`.
+`next.config.ts` rewrite `/api/:path*` → Laravel. Callback thanh toán RSC đọc `BACKEND_URL`. Axios browser đọc `NEXT_PUBLIC_API_URL`; để trống sẽ dùng proxy cùng origin. `BACKEND_URL` mặc định local là `http://127.0.0.1:8000`.
 
 Đăng ký nằm ở `/login?mode=register` (không có page `/register`).
 
@@ -144,9 +144,9 @@ Seeder **không tạo tài khoản admin**. Role `admin` có trong bảng `roles
 - Thanh toán sandbox: `VNPAY_TMN_CODE`, `VNPAY_HASH_SECRET`, `MOMO_PARTNER_CODE`, `MOMO_ACCESS_KEY`, `MOMO_SECRET_KEY`
 - Video/media cloud: `CLOUDFLARE_R2_*` — default `FILESYSTEM_DISK=local`
 - Mail OTP quên mật khẩu: `MAIL_*` (`.env.example` đang trỏ SMTP Gmail)
-- Google login: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` — callback hiện hardcode `http://localhost:3000/login-success`
+- Google login: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` — callback quay về `${FRONTEND_URL}/login-success`
 
-Return URL VNPay/MoMo trên `main` hardcode `http://localhost:3000/payment/callback`. Local phải để FE đúng port 3000.
+Return URL VNPay/MoMo dùng `${FRONTEND_URL}/payment/callback`; cấu hình domain/cổng bằng env backend.
 
 ## Realtime chat
 
@@ -203,3 +203,10 @@ git merge main
 ```
 
 Không commit file `.env`, `.env.local`, hay service-account JSON.
+
+
+## Cấu hình local và deploy
+
+Các URL ứng dụng nằm trong biến môi trường; không sửa domain trong source để chuyển môi trường.
+Xem [hướng dẫn cấu hình kết nối](docs/environment-urls.md) cho frontend local dùng backend Railway,
+Vercel, callback đăng nhập/thanh toán và WebSocket.

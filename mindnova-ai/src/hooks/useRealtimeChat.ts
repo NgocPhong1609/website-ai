@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
+import { clientApiUrl } from '../shared/lib/api-url';
 
 // Setup Laravel Echo instance
 let echoInstance: any = null;
@@ -18,7 +19,7 @@ export const getEchoInstance = (token: string) => {
             wssPort: port,
             forceTLS: (process.env.NEXT_PUBLIC_REVERB_SCHEME ?? 'http') === 'https',
             enabledTransports: ['ws', 'wss'],
-            authEndpoint: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/broadcasting/auth`,
+            authEndpoint: clientApiUrl('broadcasting/auth'),
             auth: {
                 headers: {
                     Authorization: `Bearer ${token}`

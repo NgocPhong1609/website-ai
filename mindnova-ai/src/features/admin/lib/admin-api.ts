@@ -1,14 +1,6 @@
 "use client";
 
-const DEFAULT_API_BASE_URL = "http://127.0.0.1:8000";
-const RAW_BASE_URL = process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_BASE_URL;
-const API_BASE = RAW_BASE_URL.replace(/\/$/, "").replace(/\/api$/i, "");
-
-function resolveApiUrl(path: string): string {
- const normalized = path.startsWith("/") ? path : `/${path}`;
- const withApiPrefix = normalized.startsWith("/api/") ? normalized : `/api${normalized}`;
- return `${API_BASE}${withApiPrefix}`;
-}
+import { clientApiUrl } from "@/src/shared/lib/api-url";
 
 function readToken(): string {
  const cookieValue = document.cookie
@@ -35,7 +27,7 @@ export async function adminApi<T>(path: string, options: RequestInit = {}): Prom
  headers.set("Authorization", `Bearer ${token}`);
  }
 
- const response = await fetch(resolveApiUrl(path), {
+ const response = await fetch(clientApiUrl(path), {
  ...options,
  headers,
  credentials: "include",

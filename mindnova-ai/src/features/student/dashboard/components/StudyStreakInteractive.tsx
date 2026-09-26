@@ -9,7 +9,7 @@ import { vi } from "date-fns/locale";
 import { Flame, Snowflake, X } from "lucide-react";
 import type { StudyStreak } from "../types";
 import { DayOfWeek } from "./DashboardStatsPanel";
-import axios from "axios";
+import { axiosClient } from "@/src/shared/lib/axios";
 import toast from "react-hot-toast";
 
 interface StudyStreakInteractiveProps {
@@ -112,7 +112,7 @@ export function StudyStreakInteractive({
       }
 
       // Gói thẳng xuống Laravel Backend kèm theo Bearer Token
-      const response = await axios.post('http://localhost:8000/api/student/check-in', {}, {
+      const response = await axiosClient.post('/api/student/check-in', {}, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json"

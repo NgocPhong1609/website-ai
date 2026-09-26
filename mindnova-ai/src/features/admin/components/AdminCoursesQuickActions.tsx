@@ -7,7 +7,9 @@ import { NoData } from "@/src/shared/components/ui/NoData";
 
 import type { AdminCourseRow } from "@/src/features/admin/types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+import { clientApiUrl } from "@/src/shared/lib/api-url";
+
+const API_BASE_URL = clientApiUrl();
 
 type CategoryOption = {
  id: number;

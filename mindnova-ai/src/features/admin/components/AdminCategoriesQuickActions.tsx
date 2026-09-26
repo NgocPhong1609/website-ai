@@ -6,8 +6,9 @@ import { NoData } from "@/src/shared/components/ui/NoData";
 
 import type { AdminCategoryRow } from "@/src/features/admin/types";
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000").replace(/\/+$/, "");
-const CATEGORIES_API = `${API_BASE_URL}/api/admin/categories`;
+import { clientApiUrl } from "@/src/shared/lib/api-url";
+
+const CATEGORIES_API = clientApiUrl("admin/categories");
 
 type CategoryStatus = "pending" | "active" | "inactive";
 
