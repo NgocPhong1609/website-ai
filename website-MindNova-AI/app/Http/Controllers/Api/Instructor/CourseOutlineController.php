@@ -32,6 +32,11 @@ class CourseOutlineController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
+        // Web PHP defaults to 30s, shorter than AI generation/retries.
+        // Keep a finite request budget and leave time to return a JSON error.
+        set_time_limit(210);
+        $deadline = microtime(true) + 180;
+
         $topic = $request->input('topic');
         $targetAudience = $request->input('targetAudience', 'Beginner');
         $skillLevel = $request->input('skillLevel', 'Beginner');
@@ -86,6 +91,7 @@ class CourseOutlineController extends Controller
             $responseResult = $this->aiRouter->sendMessageWithFallback($messages, [
                 'response_mime_type' => 'application/json',
                 'max_tokens' => 32768,
+                'deadline' => $deadline,
                 'validate_response' => fn (string $content) => CourseOutlineValidator::decode($content) !== null
             ]);
             

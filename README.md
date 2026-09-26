@@ -243,3 +243,10 @@ question, and exactly one correct answer. Incomplete model responses are recorde
 as `invalid_response` and use the existing retry/fallback policy. Other AI features
 retain their own response handling and token limits. This validates structure, not
 pedagogical quality or a precise document word count.
+
+Outline generation uses a 180-second total AI deadline across all retries/models,
+with PHP's execution limit raised to 210 seconds only for this endpoint. Each HTTP
+attempt is capped by the remaining deadline (and the existing 90-second cap).
+Exhaustion returns the normal JSON error instead of PHP terminating at its default
+30 seconds. Validate deployment over authenticated HTTP; CLI execution does not
+exercise PHP's web execution limit.

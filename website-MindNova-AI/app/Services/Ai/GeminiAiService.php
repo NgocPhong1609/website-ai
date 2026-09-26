@@ -110,13 +110,14 @@ class GeminiAiService extends AbstractAiService
         $options['request_id'] ??= (string) Str::uuid();
 
         for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            $timeout = $this->requestTimeout($options);
             $startedAt = microtime(true);
             try {
                 if (config('services.gemini.force_failure', false)) {
                     throw new AiTransientException('Gemini temporarily unavailable');
                 }
                 $response = Http::withHeaders(['Content-Type' => 'application/json'])
-                    ->timeout(90)->post($url, $payload);
+                    ->timeout($timeout)->post($url, $payload);
             } catch (ConnectionException $exception) {
                 $this->recordAttempt($options, $model, $startedAt, 'failed', 'connection_error');
                 if ($attempt < $maxRetries) {

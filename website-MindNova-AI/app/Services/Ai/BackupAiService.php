@@ -84,9 +84,10 @@ class BackupAiService extends AbstractAiService
             : 'https://api.openai.com/v1/chat/completions';
 
         for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            $timeout = $this->requestTimeout($options);
             $startedAt = microtime(true);
             try {
-                $response = Http::withToken($apiKey)->timeout(90)->post($baseUrl, $payload);
+                $response = Http::withToken($apiKey)->timeout($timeout)->post($baseUrl, $payload);
             } catch (ConnectionException $exception) {
                 $this->recordAttempt($options, $model, $startedAt, 'failed', 'connection_error');
                 if ($attempt < $maxRetries) {
