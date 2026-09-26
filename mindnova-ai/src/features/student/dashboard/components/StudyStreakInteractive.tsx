@@ -112,7 +112,7 @@ export function StudyStreakInteractive({
       }
 
       // Gói thẳng xuống Laravel Backend kèm theo Bearer Token
-      const response = await axios.post('http://localhost:8000/api/student/check-in', {}, {
+      const response = await axios.post('/api/student/check-in', {}, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json"
