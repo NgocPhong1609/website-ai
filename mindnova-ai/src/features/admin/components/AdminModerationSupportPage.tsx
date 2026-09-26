@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useEffect, useState } from "react";
 import { adminApi } from "@/src/features/admin/lib/admin-api";
 
@@ -39,7 +40,7 @@ export function AdminModerationSupportPage() {
  setFlags(flagsRes.data);
  setTickets(ticketsRes.data);
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Không thể tải moderation/support.");
+ setMessage(getErrorMessage(error, "Không thể tải nội dung kiểm duyệt và yêu cầu hỗ trợ."));
  }
  };
 
@@ -64,7 +65,7 @@ export function AdminModerationSupportPage() {
  });
  await loadData();
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Kiểm duyệt flag thất bại.");
+ setMessage(getErrorMessage(error, "Không thể xử lý báo cáo vi phạm. Vui lòng thử lại."));
  }
  };
 
@@ -78,7 +79,7 @@ export function AdminModerationSupportPage() {
  setMessage("Đã tiếp nhận ticket.");
  await loadData();
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Tạo ticket thất bại.");
+ setMessage(getErrorMessage(error, "Không thể tạo yêu cầu hỗ trợ. Vui lòng thử lại."));
  }
  };
 
@@ -90,7 +91,7 @@ export function AdminModerationSupportPage() {
  });
  await loadData();
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Cập nhật ticket thất bại.");
+ setMessage(getErrorMessage(error, "Không thể cập nhật yêu cầu hỗ trợ. Vui lòng thử lại."));
  }
  };
 

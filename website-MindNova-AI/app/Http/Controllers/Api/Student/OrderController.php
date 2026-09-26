@@ -204,7 +204,7 @@ class OrderController extends Controller
     {
         $transactionId = $order->transaction_id;
         $courseId = $courses ? $courses->first()->id : '';
-        $returnUrl = "http://localhost:3000/payment/callback" . ($courseId ? "?course_id=" . $courseId : "");
+        $returnUrl = rtrim(config('app.frontend_url'), '/') . '/payment/callback' . ($courseId ? "?course_id=" . $courseId : "");
 
         if ($order->payment_method === 'vnpay') {
             $inputData = [
@@ -229,7 +229,7 @@ class OrderController extends Controller
             $secretKey = env('MOMO_SECRET_KEY', 'secret_key');
             $endpoint = env('MOMO_ENDPOINT', 'https://test-payment.momo.vn/v2/gateway/api/create');
             $redirectUrl = $returnUrl;
-            $ipnUrl = env('APP_URL', 'http://localhost:8000') . "/api/student/payment/momo-ipn";
+            $ipnUrl = rtrim(config('app.url'), '/') . "/api/student/payment/momo-ipn";
             $amount = (string)$totalAmount;
             $orderInfo = "Thanh toan don hang " . $transactionId;
             $requestId = time() . "";

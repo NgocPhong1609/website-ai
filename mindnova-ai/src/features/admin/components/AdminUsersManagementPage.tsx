@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useEffect, useState } from "react";
 import { adminApi } from "@/src/features/admin/lib/admin-api";
 
@@ -67,7 +68,7 @@ export function AdminUsersManagementPage() {
  setUsers(usersRes.data);
  setSummary(usersRes.summary);
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Không thể tải dữ liệu.");
+ setMessage(getErrorMessage(error, "Không thể tải dữ liệu."));
  } finally {
  setLoading(false);
  }
@@ -93,7 +94,7 @@ export function AdminUsersManagementPage() {
  await loadAll();
  setMessage(user.is_locked ? "Đã mở khóa tài khoản." : "Đã khóa tài khoản.");
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Cập nhật trạng thái thất bại.");
+ setMessage(getErrorMessage(error, "Cập nhật trạng thái thất bại."));
  }
  };
 
@@ -105,7 +106,7 @@ export function AdminUsersManagementPage() {
  await loadAll();
  setMessage("Đã xóa tài khoản.");
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Xóa tài khoản thất bại.");
+ setMessage(getErrorMessage(error, "Xóa tài khoản thất bại."));
  }
  };
 
@@ -114,7 +115,7 @@ export function AdminUsersManagementPage() {
  const payload = await adminApi<UserActivityResponse>(`/admin/users/${userId}/activity`);
  setActivity(payload);
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Không thể tải lịch sử người dùng.");
+ setMessage(getErrorMessage(error, "Không thể tải lịch sử người dùng."));
  }
  };
 

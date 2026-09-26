@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage, isUnauthorizedError } from "@/src/shared/lib/user-error";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -12,7 +13,7 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
  const router = useRouter();
 
  useEffect(() => {
- if (error.message.includes("Unauthorized (401)")) {
+ if (isUnauthorizedError(error)) {
  window.localStorage.removeItem("accessToken");
  document.cookie = "accessToken=; Max-Age=0; path=/";
  router.replace("/login");
@@ -22,7 +23,7 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
  return (
  <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-6 text-center">
  <h2 className="text-xl font-semibold text-slate-900">Không thể tải dữ liệu quản trị</h2>
- <p className="max-w-xl text-sm text-slate-600">{error.message}</p>
+ <p className="max-w-xl text-sm text-slate-600">{getErrorMessage(error, "Không thể tải dữ liệu quản trị. Vui lòng thử lại.")}</p>
  <div className="flex items-center gap-3">
  <button
  type="button"

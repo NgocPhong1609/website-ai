@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -167,7 +168,7 @@ export default function QuizDetailPage() {
  setTimeout(() => setSavePointsSuccess(null), 4000);
  } catch (err: any) {
  console.error("Save points error:", err);
- const apiMsg = err.response?.data?.message || err.message;
+ const apiMsg = getErrorMessage(err, "Không thể cập nhật bài kiểm tra. Vui lòng thử lại.");
  if (apiMsg && typeof apiMsg === "string") {
  setSavePointsError(apiMsg);
  } else {
@@ -187,7 +188,7 @@ export default function QuizDetailPage() {
  router.push("/instructor/quiz-generator");
  } catch (err: any) {
  console.error("Delete quiz error:", err);
- const apiMsg = err.response?.data?.message || err.message;
+ const apiMsg = getErrorMessage(err, "Không thể cập nhật bài kiểm tra. Vui lòng thử lại.");
  if (apiMsg && typeof apiMsg === "string") {
  setDeleteError(apiMsg);
  } else {

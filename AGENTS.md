@@ -258,7 +258,7 @@ Chi tiết đầy đủ: `website-MindNova-AI/routes/api.php`. Dưới đây là
 | POST | `/api/forgot-password/verify-otp` | none | `verifyResetOtp` | |
 | POST | `/api/reset-password` | none | `resetPassword` | |
 | GET | `/api/auth/google` | none | `redirectToGoogle` | Socialite |
-| GET | `/api/auth/google/callback` | none | `handleGoogleCallback` | Redirect FE (URL hardcoded localhost — xem limitations) |
+| GET | `/api/auth/google/callback` | none | `handleGoogleCallback` | Redirect FE (`config(app.frontend_url)` từ `FRONTEND_URL`) |
 
 ### Payment IPN — public
 
@@ -494,13 +494,13 @@ Dùng trong code nhưng **thiếu** trên example: `FRONTEND_URL`, `ADMIN_SECRET
 
 ### Frontend
 
-Không có `.env.example`. Cần:
+Có `mindnova-ai/.env.example`. Cần:
 
 - `BACKEND_URL` — RSC apiClient, payment callback
 - `NEXT_PUBLIC_API_URL` — axios, rewrite, Echo, adminApi
 - `NEXT_PUBLIC_REVERB_*`, `NEXT_PUBLIC_ENABLE_PUSHER_LOGS`
 
-Rewrite: `/api/:path*` → `${NEXT_PUBLIC_API_URL}/api/:path*`. Nếu `NEXT_PUBLIC_API_URL` đã có `/api` thì dễ double-prefix — interceptor/axios và apiClient có logic cắt `/api` lặp.
+Rewrite và request server dùng `BACKEND_URL`; request browser dùng `NEXT_PUBLIC_API_URL` hoặc proxy cùng origin nếu để trống. `src/shared/lib/api-url.ts` chuẩn hóa đúng một `/api`. Reverb host/cổng/scheme đọc env, không bị `next.config.ts` ghi đè. Xem `docs/environment-urls.md`.
 
 ### Commands
 
@@ -630,7 +630,7 @@ Các mục sau **không khẳng định** cho đến khi đọc thêm hoặc ch�
 - `config/broadcasting.php` có được publish lúc deploy không.
 - Certificate: student claim khi enrollment `completed` hoặc `progress_percentage >= 100`; chưa generate PDF (`certificate_url` có thể null).
 - Admin overview stats lấy từ `GET /api/admin/overview`; hero UI dùng 3 stat đầu.
-- Google OAuth redirect production (code callback có hardcoded `http://localhost:3000/login-success?token=`).
+- Google OAuth redirect production phụ thuộc `FRONTEND_URL` trong cấu hình Railway; chưa xác minh giá trị thật.
 - ZaloPay có dùng ở môi trường nào không (không có route).
 - Coverage test Pest hiện tại pass/fail trên máy này — chưa chạy trong task này.
 - `database.sql` có được team nào còn import không — không nên.

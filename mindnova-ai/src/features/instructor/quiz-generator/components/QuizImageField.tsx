@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useEffect, useRef, useState } from "react";
 import { quizGeneratorApi } from "../api/quizGeneratorApi";
 import type { QuizImageValue } from "../types/quizGenerator.types";
@@ -48,7 +49,7 @@ export function QuizImageField({ label, purpose, value, onChange }: QuizImageFie
       const uploaded = await quizGeneratorApi.uploadMedia(file, purpose);
       onChange({ url: uploaded.url, r2_key: uploaded.r2_key });
     } catch (uploadError: any) {
-      setError(uploadError?.response?.data?.message || "Không thể tải ảnh lên. Vui lòng thử lại.");
+      setError(getErrorMessage(uploadError, "Không thể tải ảnh lên. Vui lòng thử lại."));
     } finally {
       setIsUploading(false);
       resetFileInput();

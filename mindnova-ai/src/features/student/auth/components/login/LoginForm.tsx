@@ -3,6 +3,7 @@
 import { useState, useCallback, useId, useEffect } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { getErrorMessage, readApiResponse } from "@/src/shared/lib/user-error";
 import {
  LogoMark,
  EmailIcon,
@@ -90,11 +91,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  }),
  });
 
- const payload = await response.json().catch(() => null);
-
- if (!response.ok) {
- throw new Error(payload?.message ?? "Đăng nhập thất bại.");
- }
+ const payload = await readApiResponse(response, "Không thể đăng nhập. Vui lòng thử lại.");
 
  const token = payload?.access_token;
  const user = payload?.user; 
@@ -112,7 +109,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  window.location.assign(getRedirectPath(user));
  }
  } catch (error) {
- setStatusMessage(error instanceof Error ? error.message : "Đăng nhập thất bại.");
+ setStatusMessage(getErrorMessage(error, "Không thể đăng nhập. Vui lòng thử lại."));
  } finally {
  setIsLoading(false);
  }
@@ -136,6 +133,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
 
  {statusMessage && (
  <div
+ role={statusMessage.includes("thành công") ? "status" : "alert"}
  className={`mb-3 p-3 rounded-xl text-xs font-medium border ${
  statusMessage.includes("thành công")
  ? "bg-[#E8F8F0] text-[#27AE60] border-[#27AE60]/20"

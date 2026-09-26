@@ -3,6 +3,7 @@
 import { useState, useCallback, useId, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { getErrorMessage, readApiResponse } from "@/src/shared/lib/user-error";
 import {
  LogoMark,
  EmailIcon,
@@ -54,12 +55,11 @@ export function ForgotPasswordFlow() {
  headers: { "Content-Type": "application/json" },
  body: JSON.stringify({ email }),
  });
- const data = await res.json();
- if (!res.ok) throw new Error(data.message || "Không thể gửi OTP.");
+ await readApiResponse(res, "Không thể gửi mã xác nhận. Vui lòng thử lại.");
  setStep("VERIFY_OTP");
  setCountdown(60);
- } catch (err: any) {
- setErrorMsg(err.message);
+ } catch (err) {
+ setErrorMsg(getErrorMessage(err, "Không thể gửi mã xác nhận. Vui lòng thử lại."));
  } finally {
  setIsLoading(false);
  }
@@ -75,11 +75,10 @@ export function ForgotPasswordFlow() {
  headers: { "Content-Type": "application/json" },
  body: JSON.stringify({ email, otp }),
  });
- const data = await res.json();
- if (!res.ok) throw new Error(data.message || "Mã OTP không hợp lệ.");
+ await readApiResponse(res, "Không thể xác nhận mã OTP. Vui lòng thử lại.");
  setStep("RESET_PASSWORD");
- } catch (err: any) {
- setErrorMsg(err.message);
+ } catch (err) {
+ setErrorMsg(getErrorMessage(err, "Không thể xác nhận mã OTP. Vui lòng thử lại."));
  } finally {
  setIsLoading(false);
  }
@@ -99,11 +98,10 @@ export function ForgotPasswordFlow() {
  headers: { "Content-Type": "application/json" },
  body: JSON.stringify({ email, otp, password: newPassword, password_confirmation: confirmPassword }),
  });
- const data = await res.json();
- if (!res.ok) throw new Error(data.message || "Không thể đặt lại mật khẩu.");
+ await readApiResponse(res, "Không thể đặt lại mật khẩu. Vui lòng thử lại.");
  setStep("SUCCESS");
- } catch (err: any) {
- setErrorMsg(err.message);
+ } catch (err) {
+ setErrorMsg(getErrorMessage(err, "Không thể đặt lại mật khẩu. Vui lòng thử lại."));
  } finally {
  setIsLoading(false);
  }
@@ -239,7 +237,7 @@ export function ForgotPasswordFlow() {
  </div>
 
  {errorMsg && (
- <div className="mb-4 p-3 rounded-xl text-xs font-medium bg-primary-muted text-primary border border-[#DBEAFE]">
+ <div role="alert" className="mb-4 p-3 rounded-xl text-xs font-medium bg-primary-muted text-primary border border-[#DBEAFE]">
  {errorMsg}
  </div>
  )}

@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+
 import React, { useState } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 
@@ -78,7 +80,7 @@ export function SelfAssessmentModal({
  }
  } catch (err: any) {
  console.error("Generate self-assessment error:", err);
- setErrorMsg(err.response?.data?.message || err.message || "Không thể khởi tạo bài đánh giá năng lực.");
+ setErrorMsg(getErrorMessage(err, "Không thể khởi tạo bài đánh giá năng lực."));
  setStep("intro");
  }
  };
@@ -111,7 +113,7 @@ export function SelfAssessmentModal({
  }
  } catch (err: any) {
  console.error("Submit self-assessment error:", err);
- setErrorMsg(err.response?.data?.message || err.message || "Không thể chấm điểm bài làm.");
+ setErrorMsg(getErrorMessage(err, "Không thể chấm điểm bài làm."));
  setStep("testing");
  }
  };

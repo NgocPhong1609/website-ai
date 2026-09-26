@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+
 import { useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import type { ProfileTab } from "../types";
@@ -157,7 +159,7 @@ export function ProfileSidebar({
       setLocalPreview(null);
     } catch (error: any) {
       console.error("Avatar upload failed:", error);
-      toast.error(error?.response?.data?.message || "Không thể cập nhật ảnh đại diện. Vui lòng thử lại.");
+      toast.error(getErrorMessage(error, "Không thể cập nhật ảnh đại diện. Vui lòng thử lại."));
       setLocalPreview(null);
     } finally {
       URL.revokeObjectURL(previewUrl);

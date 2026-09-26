@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, readApiResponse } from "@/src/shared/lib/user-error";
+
 import { useState, useEffect } from "react";
 import { Button } from "@shared/components/ui";
 import toast from "react-hot-toast";
@@ -26,6 +28,7 @@ interface ILessonDetails {
 }
 
 export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: LessonModalProps) {
+ const [error, setError] = useState<string | null>(null);
  const [loading, setLoading] = useState(false);
  const [details, setDetails] = useState<ILessonDetails | null>(null);
 
@@ -34,6 +37,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  if (isOpen && lessonTitle) {
  const fetchLessonDetails = async () => {
  setLoading(true);
+ setError(null);
  setDetails(null); // Reset dữ liệu cũ ngay lập tức để hiện vòng tròn loading
  try {
  const res = await fetch("/api/student/analyze-lesson", {
@@ -43,12 +47,15 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  },
  body: JSON.stringify({ lesson_title: lessonTitle, goal }),
  });
- const json = await res.json();
+ const json = await readApiResponse(res, "Không thể tải nội dung bài học. Vui lòng thử lại.");
  if (json.status === "success") {
  setDetails(json.data);
+ } else {
+ throw new Error(getErrorMessage(json, "Không thể tải nội dung bài học. Vui lòng thử lại."));
  }
  } catch (err) {
  console.error(err);
+ setError(getErrorMessage(err, "Không thể tải nội dung bài học. Vui lòng đóng và mở lại bài học để thử lại."));
  } finally {
  setLoading(false);
  }
@@ -78,7 +85,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  </button>
  </div>
 
- {loading || !details ? (
+ {error ? <p role="alert" className="text-sm text-rose-700">{error}</p> : loading || !details ? (
  <div className="py-20 flex flex-col items-center justify-center gap-3">
  <div className="w-10 h-10 border-4 border-[#E2E8F0] border-t-transparent rounded-full animate-spin" />
  <p className="text-sm text-[#64748B] font-medium">AI is analyzing & generating specific insights for &quot;{lessonTitle}&quot;...</p>

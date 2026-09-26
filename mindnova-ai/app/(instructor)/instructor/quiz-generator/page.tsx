@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -120,7 +121,7 @@ export default function InstructorQuizListPage() {
       setTimeout(() => setToastMessage(null), 4000);
     } catch (err: any) {
       console.error("Delete quiz error:", err);
-      const apiMsg = err.response?.data?.message || err.message;
+      const apiMsg = getErrorMessage(err, "Không thể cập nhật bài kiểm tra. Vui lòng thử lại.");
       setDeleteError(typeof apiMsg === "string" ? apiMsg : "Không thể xóa đề kiểm tra. Vui lòng thử lại.");
     } finally {
       setIsDeleting(false);

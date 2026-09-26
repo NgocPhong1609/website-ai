@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+
 import { useState, useEffect } from "react";
 import { useUpdateProfile } from "../api";
 import { Save, RefreshCcw } from "lucide-react";
@@ -82,7 +84,7 @@ export function PersonalInfoPanel({
     } catch (error: any) {
       console.error("Failed to save profile", error);
       const err = error?.response?.data;
-      const message = err?.message || (err?.errors ? Object.values(err.errors).flat().join(', ') : null) || "Không thể lưu thông tin hồ sơ. Vui lòng thử lại.";
+      const message = getErrorMessage(err, "Không thể lưu thông tin hồ sơ. Vui lòng thử lại.");
       toast.error(message);
     }
   }

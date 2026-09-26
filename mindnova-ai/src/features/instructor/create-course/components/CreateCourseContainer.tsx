@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useEffect, useCallback, useState } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
@@ -260,13 +261,7 @@ export function CreateCourseContainer() {
  window.location.href = "/instructor/courses";
  } catch (error: any) {
  console.error("Publish failed:", error);
- let errorMsg = "Có lỗi xảy ra khi tạo khóa học. Vui lòng thử lại.";
- if (error.response?.data?.message) {
- errorMsg = `Lỗi: ${error.response.data.message}`;
- } else if (error.message) {
- errorMsg = error.message;
- }
- setPublishError(errorMsg);
+ setPublishError(getErrorMessage(error, "Không thể tạo khóa học. Vui lòng thử lại."));
  } finally {
  setIsPublishing(false);
  }

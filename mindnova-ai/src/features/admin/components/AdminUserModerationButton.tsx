@@ -1,8 +1,11 @@
 "use client";
 
+import { getErrorMessage, readApiResponse } from "@/src/shared/lib/user-error";
 import { useState } from "react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+import { clientApiUrl } from "@/src/shared/lib/api-url";
+
+const API_BASE_URL = clientApiUrl();
 
 function readStoredToken(): string {
  const cookieValue = document.cookie
@@ -46,16 +49,12 @@ export function AdminUserModerationButton({ userId, initialStatus }: AdminUserMo
  credentials: "include",
  });
 
- const payload = await response.json().catch(() => null);
-
- if (!response.ok) {
- throw new Error(payload?.message ?? "Không thể cập nhật trạng thái.");
- }
+ const payload = await readApiResponse(response, "Không thể cập nhật trạng thái.");
 
  const nextStatus = String(payload?.data?.status ?? payload?.user?.status ?? status);
  setStatus(nextStatus);
- } catch {
- // Keep current status when call fails.
+ } catch (error) {
+ window.alert(getErrorMessage(error, "Không thể cập nhật trạng thái tài khoản. Vui lòng thử lại."));
  } finally {
  setIsLoading(false);
  }

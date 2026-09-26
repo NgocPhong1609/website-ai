@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useState, useCallback, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { QuizConfig, GeneratedQuestion, QuizSummary } from "../types/quizGenerator.types";
@@ -121,10 +122,7 @@ export function useAiQuizWizard(options?: {
  const apiData = err.response?.data;
  const errorCode = apiData?.error_code || apiData?.errorCode || "AI_GENERATION_FAILED";
 
- let msg = apiData?.message || err.message;
- if (!msg || typeof msg !== "string" || msg.includes("status code 500") || msg.includes("AxiosError")) {
- msg = "Hệ thống AI đang gặp lỗi khi tạo câu hỏi. Vui lòng thử lại.";
- }
+ const msg = getErrorMessage(err, "Hệ thống AI chưa thể tạo câu hỏi. Vui lòng thử lại.");
 
  setErrorInfo({
  message: msg,
@@ -172,7 +170,7 @@ export function useAiQuizWizard(options?: {
  setQuestions((prev) => prev.map((q) => (q.id === id ? { ...newQ, id } : q)));
  }
  } catch (err: any) {
- alert("Không thể sinh lại câu hỏi: " + (err.message || "Lỗi AI"));
+ alert(getErrorMessage(err, "Không thể sinh lại câu hỏi. Vui lòng thử lại."));
  }
  }, [config]);
 
@@ -242,7 +240,7 @@ export function useAiQuizWizard(options?: {
  throw new Error(response.message || "Lưu bài kiểm tra thất bại");
  }
  } catch (err: any) {
- setError(err.response?.data?.message || err.message || "Lỗi khi lưu bài kiểm tra");
+ setError(getErrorMessage(err, "Lỗi khi lưu bài kiểm tra"));
  } finally {
  setIsSaving(false);
  }

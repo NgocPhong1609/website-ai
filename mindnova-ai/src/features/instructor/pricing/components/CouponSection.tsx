@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { NoData } from "@/src/shared/components/ui/NoData";
@@ -92,7 +93,7 @@ function CreateCouponDialog({
       onClose();
     } catch (err) {
       console.error(err);
-      alert("Lỗi khi tạo mã: " + err);
+      alert(getErrorMessage(err, "Không thể tạo mã giảm giá. Vui lòng kiểm tra thông tin và thử lại."));
     } finally {
       setIsSubmitting(false);
     }

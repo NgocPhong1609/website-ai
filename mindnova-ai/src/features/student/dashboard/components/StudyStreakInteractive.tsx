@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { twMerge } from "tailwind-merge";
@@ -9,7 +11,7 @@ import { vi } from "date-fns/locale";
 import { Flame, Snowflake, X } from "lucide-react";
 import type { StudyStreak } from "../types";
 import { DayOfWeek } from "./DashboardStatsPanel";
-import axios from "axios";
+import { axiosClient } from "@/src/shared/lib/axios";
 import toast from "react-hot-toast";
 
 interface StudyStreakInteractiveProps {
@@ -106,13 +108,13 @@ export function StudyStreakInteractive({
       const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
 
       if (!token) {
-        toast.error("Không tìm thấy thông tin đăng nhập (Token). Vui lòng đăng nhập lại!");
+        toast.error("Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
         setIsLoading(false);
         return;
       }
 
       // Gói thẳng xuống Laravel Backend kèm theo Bearer Token
-      const response = await axios.post('/api/student/check-in', {}, {
+      const response = await axiosClient.post('/api/student/check-in', {}, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json"
@@ -129,7 +131,7 @@ export function StudyStreakInteractive({
 
     } catch (error: any) {
       console.error("Lỗi đồng bộ hệ thống:", error);
-      toast.error(error.response?.data?.message || "Lỗi điểm danh! Hãy thử lại.");
+      toast.error(getErrorMessage(error, "Lỗi điểm danh! Hãy thử lại."));
     } finally {
       setIsLoading(false);
     }

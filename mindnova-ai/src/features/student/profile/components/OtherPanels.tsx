@@ -1,5 +1,8 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+
+
 import { useState, useEffect } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { MonitorIcon } from "./icons";
@@ -80,11 +83,7 @@ export function SecurityPanel() {
         setConfirmPw("");
       }, 2500);
     } catch (error: any) {
-      const message =
-        error?.response?.data?.errors?.current_password?.[0] ||
-        error?.response?.data?.errors?.new_password?.[0] ||
-        error?.response?.data?.message ||
-        "Không thể đổi mật khẩu. Vui lòng thử lại.";
+      const message = getErrorMessage(error, "Không thể đổi mật khẩu. Vui lòng thử lại.");
       toast.error(message);
     } finally {
       setIsLoading(false);

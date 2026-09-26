@@ -30,7 +30,6 @@ export function QuizResultContent() {
  const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
  const [selectedFilter, setSelectedFilter] = useState<"all" | "mc" | "essay">("all");
 
- const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/api\/?$/, "");
 
  // 1. Tải kết quả bài thi AI nếu có aiQuizId
  useEffect(() => {
@@ -51,7 +50,7 @@ export function QuizResultContent() {
  };
 
  fetchAiQuizResult();
- }, [aiQuizId, baseUrl]);
+ }, [aiQuizId]);
 
  // 2. Ưu tiên dữ liệu từ Database theo attemptId, nếu không có mới dùng localStorage
  useEffect(() => {

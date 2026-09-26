@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -128,7 +129,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  setTimeout(() => setSaveSuccess(false), 3000);
  } catch (error) {
  console.error(error);
- alert("Lỗi khi lưu thông tin");
+ alert(getErrorMessage(error, "Không thể lưu thông tin khóa học. Vui lòng thử lại."));
  }
  };
 
@@ -140,7 +141,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  router.push("/instructor/courses");
  } catch (error: any) {
  console.error(error);
- alert(error?.response?.data?.message || "Lỗi khi xóa khóa học");
+ alert(getErrorMessage(error, "Lỗi khi xóa khóa học"));
  }
  }
  };
@@ -152,7 +153,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  alert("Khóa học đã được gửi xét duyệt thành công!");
  router.refresh();
  } catch (error: any) {
- alert(error?.response?.data?.message || "Gửi xét duyệt thất bại!");
+ alert(getErrorMessage(error, "Gửi xét duyệt thất bại!"));
  }
  };
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
@@ -288,7 +289,7 @@ export function AIAssistCard({ courseId, onSuggestChapter }: {
   try {
    await onSuggestChapter();
   } catch (cause) {
-   setSuggestionError(cause instanceof Error ? cause.message : "Không thể mở trình soạn thảo");
+   setSuggestionError(getErrorMessage(cause, "Không thể mở trình soạn thảo"));
   } finally {
    setIsSuggesting(false);
   }

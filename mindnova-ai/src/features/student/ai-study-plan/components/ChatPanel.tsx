@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
@@ -247,9 +249,7 @@ export function ChatPanel({
     onError: (error) => {
       console.error("[ChatPanel] AI Tutor response failed:", error);
       if (error instanceof AiQuotaError && error.quota) updateQuota(error.quota);
-      const friendlyText = error instanceof Error && (error.message.includes("Gia sư") || error.message.includes(""))
-        ? error.message
-        : " **Gia sư Nova hiện đang bận xíu hoặc hệ thống đang chịu tải cao, bạn vui lòng chờ khoảng 1 phút rồi quay lại trò chuyện với mình nhé!** ";
+      const friendlyText = getErrorMessage(error, "Chưa thể nhận phản hồi từ gia sư AI. Vui lòng thử lại sau.");
       const errorMessage: AiChatMessage = {
         id: `msg-${Date.now()}-error`,
         sender: "ai",

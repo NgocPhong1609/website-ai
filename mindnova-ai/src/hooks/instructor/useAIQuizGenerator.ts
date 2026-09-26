@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useState, useCallback } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 
@@ -61,10 +62,10 @@ export function useAIQuizGenerator(): UseAIQuizGeneratorReturn {
         }));
         setQuestions(generated);
       } else {
-        throw new Error(response.data?.message || "Failed to generate quiz");
+        throw new Error(response.data?.message || "Không thể tạo bài kiểm tra bằng AI. Vui lòng thử lại.");
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || "An unexpected error occurred");
+      setError(getErrorMessage(err, "Đã xảy ra lỗi. Vui lòng thử lại."));
     } finally {
       setIsGenerating(false);
     }

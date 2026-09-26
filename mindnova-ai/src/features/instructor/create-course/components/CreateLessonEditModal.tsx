@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { RichTextEditor } from "../../shared/components/RichTextEditor";
 import { QuizEditor } from "./QuizEditor";
@@ -82,7 +83,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
         });
         return { url: result.url, media_id: result.media_id };
       }
-      throw new Error("Upload failed");
+      throw new Error("Không thể tải tệp lên. Vui lòng thử lại.");
     } finally {
       setIsUploadingVideo(false);
     }
@@ -109,7 +110,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
       setVideoUrl(url);
     } catch (error: any) {
       if (error.name !== 'CanceledError') {
-        alert("Có lỗi xảy ra khi tải video. Vui lòng thử lại.");
+        alert(getErrorMessage(error, "Không thể tải video lên. Vui lòng thử lại."));
         console.error(error);
       }
     } finally {
@@ -129,7 +130,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
         });
         return result.url;
       }
-      throw new Error("Upload failed");
+      throw new Error("Không thể tải tệp lên. Vui lòng thử lại.");
     } finally {
       setActiveImageUploads(prev => Math.max(0, prev - 1));
     }
@@ -248,9 +249,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
       setTempMediaMap(new Map());
     } catch (error: any) {
       setSaveError(
-        error?.response?.data?.message
-        || error?.message
-        || "Không thể lưu thay đổi. Vui lòng thử lại.",
+        getErrorMessage(error, "Không thể lưu thay đổi. Vui lòng thử lại."),
       );
     } finally {
       setIsSaving(false);

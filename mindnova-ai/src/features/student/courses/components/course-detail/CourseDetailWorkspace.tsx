@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+
 import React from "react";
 import { Loader } from "@/src/shared/components/ui/Loader";
 import { NoDataAvailable } from "@/src/shared/components/ui";
@@ -44,7 +46,7 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  setComment("");
  setRating(5);
  } catch (error: any) {
- const message = error?.response?.data?.message || "Không thể gửi nhận xét. Vui lòng thử lại.";
+ const message = getErrorMessage(error, "Không thể gửi nhận xét. Vui lòng thử lại.");
  setSubmitError(message);
  }
  };
@@ -68,7 +70,7 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  });
  setEditingReviewId(null);
  } catch (error: any) {
- toast.error(error?.response?.data?.message || "Không thể cập nhật nhận xét.");
+ toast.error(getErrorMessage(error, "Không thể cập nhật nhận xét."));
  }
  };
 
@@ -81,7 +83,7 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  reviewId,
  });
  } catch (error: any) {
- toast.error(error?.response?.data?.message || "Không thể xóa nhận xét.");
+ toast.error(getErrorMessage(error, "Không thể xóa nhận xét."));
  }
  };
 

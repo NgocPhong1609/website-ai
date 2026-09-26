@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
   Calendar,
@@ -189,7 +190,7 @@ export function AdminRevenueView({ data }: { data: AdminRevenueData }) {
       });
       setTierSaveMessage("Đã lưu tỷ lệ hoa hồng.");
     } catch (error) {
-      setTierSaveError(error instanceof Error ? error.message : "Không thể lưu tỷ lệ hoa hồng.");
+      setTierSaveError(getErrorMessage(error, "Không thể lưu tỷ lệ hoa hồng."));
     } finally {
       setIsSavingTiers(false);
     }

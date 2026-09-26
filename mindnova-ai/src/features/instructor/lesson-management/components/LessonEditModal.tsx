@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { RichTextEditor } from "@/src/features/instructor/shared/components/RichTextEditor";
@@ -144,7 +145,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  });
  return { url: result.url, media_id: result.media_id };
  }
- throw new Error("Upload failed");
+ throw new Error("Không thể tải tệp lên. Vui lòng thử lại.");
  };
 
  const handleVideoFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,7 +161,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  // User cancelled upload
  } else {
  console.error(err);
- alert("Đã xảy ra lỗi khi tải video.");
+ alert(getErrorMessage(err, "Không thể tải video lên. Vui lòng thử lại."));
  }
  } finally {
  setIsUploadingVideo(false);
@@ -180,7 +181,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  });
  return result.url;
  }
- throw new Error("Upload failed");
+ throw new Error("Không thể tải tệp lên. Vui lòng thử lại.");
  } finally {
  setActiveImageUploads(prev => Math.max(0, prev - 1));
  }
@@ -229,7 +230,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
       setTempMediaMap(new Map());
     } catch (e) {
       console.error("Lỗi khi lưu bài học:", e);
-      alert("Đã xảy ra lỗi khi lưu bài học. Vui lòng thử lại.");
+      alert(getErrorMessage(e, "Không thể lưu bài học. Vui lòng thử lại."));
     } finally {
       setIsSaving(false);
     }

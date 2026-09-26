@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -86,7 +87,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
     },
     onError: (err: any) => {
       setIsErrorMsg(true);
-      setStatusMessage(`Lỗi lưu tài khoản: ${err.response?.data?.message || err.message}`);
+      setStatusMessage(getErrorMessage(err, "Không thể lưu tài khoản. Vui lòng thử lại."));
     }
   });
 
@@ -106,7 +107,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
     },
     onError: (err: any) => {
       setIsErrorMsg(true);
-      setStatusMessage(`Lỗi rút tiền: ${err.response?.data?.message || err.message}`);
+      setStatusMessage(getErrorMessage(err, "Không thể rút tiền. Vui lòng thử lại."));
     }
   });
 

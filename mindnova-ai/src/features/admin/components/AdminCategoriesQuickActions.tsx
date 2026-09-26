@@ -1,13 +1,15 @@
 "use client";
 
+import { getErrorMessage, readApiResponse } from "@/src/shared/lib/user-error";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { NoData } from "@/src/shared/components/ui/NoData";
 
 import type { AdminCategoryRow } from "@/src/features/admin/types";
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000").replace(/\/+$/, "");
-const CATEGORIES_API = `${API_BASE_URL}/api/admin/categories`;
+import { clientApiUrl } from "@/src/shared/lib/api-url";
+
+const CATEGORIES_API = clientApiUrl("admin/categories");
 
 type CategoryStatus = "pending" | "active" | "inactive";
 
@@ -105,8 +107,8 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  };
 
  const handleApiError = async (response: Response, fallbackMessage: string): Promise<never> => {
- const payload = await response.json().catch(() => null);
- throw new Error(payload?.message ?? fallbackMessage);
+ await readApiResponse(response, fallbackMessage);
+ throw new Error(fallbackMessage);
  };
 
  const handleCreate = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -122,18 +124,14 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  body: JSON.stringify(form),
  });
 
- const payload = await response.json().catch(() => null);
-
- if (!response.ok) {
- throw new Error(payload?.message ?? "Tạo danh mục thất bại.");
- }
+ await readApiResponse(response, "Tạo danh mục thất bại.");
 
  setStatus("Tạo danh mục thành công.");
  setForm({ name: "", description: "" });
  setIsOpen(false);
  router.refresh();
  } catch (error) {
- setStatus(error instanceof Error ? error.message : "Tạo danh mục thất bại.");
+ setStatus(getErrorMessage(error, "Tạo danh mục thất bại."));
  } finally {
  setIsSubmitting(false);
  }
@@ -166,7 +164,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  setEditingCategoryId(null);
  router.refresh();
  } catch (error) {
- setStatus(error instanceof Error ? error.message : "Cập nhật danh mục thất bại.");
+ setStatus(getErrorMessage(error, "Cập nhật danh mục thất bại."));
  } finally {
  setIsUpdating(null);
  }
@@ -194,7 +192,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  setStatus("Xóa danh mục thành công.");
  router.refresh();
  } catch (error) {
- setStatus(error instanceof Error ? error.message : "Xóa danh mục thất bại.");
+ setStatus(getErrorMessage(error, "Xóa danh mục thất bại."));
  } finally {
  setIsDeleting(null);
  }
@@ -219,7 +217,7 @@ export function AdminCategoriesQuickActions({ rows }: AdminCategoriesQuickAction
  setStatus(message);
  router.refresh();
  } catch (error) {
- setStatus(error instanceof Error ? error.message : "Cập nhật kiểm duyệt thất bại.");
+ setStatus(getErrorMessage(error, "Cập nhật kiểm duyệt thất bại."));
  } finally {
  setIsUpdating(null);
  }

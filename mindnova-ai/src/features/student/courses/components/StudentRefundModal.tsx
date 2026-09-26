@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+
 import React, { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -78,7 +80,7 @@ export function StudentRefundModal({
     },
     onError: (err: any) => {
       setIsError(true);
-      setStatusMsg(err.response?.data?.message || err.message || "Đã xảy ra lỗi khi hoàn tiền.");
+      setStatusMsg(getErrorMessage(err, "Đã xảy ra lỗi khi hoàn tiền."));
     },
   });
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+
 import { useState } from "react";
 import { ProfileSidebar } from "./ProfileSidebar";
 import { PersonalInfoPanel } from "./PersonalInfoPanel";
@@ -102,9 +104,7 @@ export default function ProfileContainer() {
         </div>
         <h3 className="text-lg font-bold text-slate-900">Không thể tải thông tin</h3>
         <p className="text-sm text-slate-500 max-w-sm leading-relaxed">
-          {error instanceof Error && error.message.includes("401")
-            ? "Phiên đăng nhập đã hết hạn. Đang chuyển hướng..."
-            : "Vui lòng kiểm tra kết nối mạng và thử lại."}
+          {getErrorMessage(error, "Không thể tải thông tin cá nhân. Vui lòng thử lại.")}
         </p>
         <button
           type="button"
