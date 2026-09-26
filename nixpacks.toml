@@ -1,0 +1,2 @@
+[phases.release]
+cmds = ["cd website-MindNova-AI && php artisan migrate:fresh --seed --force"]
