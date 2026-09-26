@@ -49,6 +49,7 @@ export function getValidationErrors(errorOrPayload: unknown): Record<string, str
     const label = FIELD_LABELS[field.split('.')[0]] || 'Thông tin';
     const text = typeof first === 'string' ? first : '';
     if (/required/i.test(text)) result[field] = `Vui lòng nhập ${label.toLowerCase()}.`;
+    else if (field === 'email' && /^The selected email is invalid\.$/i.test(text.trim())) result[field] = 'Email này chưa được đăng ký. Vui lòng kiểm tra lại hoặc dùng email đã đăng ký tài khoản.';
     else if (/valid email/i.test(text)) result[field] = 'Địa chỉ email chưa đúng định dạng. Vui lòng kiểm tra lại.';
     else if (/already been taken|already exists/i.test(text)) result[field] = `${label} đã được sử dụng. Vui lòng kiểm tra lại.`;
     else if (/confirmation.*match|confirmed/i.test(text)) result[field] = `${label} xác nhận không khớp. Vui lòng nhập lại.`;

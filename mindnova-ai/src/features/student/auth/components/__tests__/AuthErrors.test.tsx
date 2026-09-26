@@ -38,6 +38,52 @@ describe('friendly auth errors', () => {
     expect(screen.getByText('Gửi lại mã sau 60s')).toBeInTheDocument();
   });
 
+  it('requests JSON and explains an unregistered email without leaving the request step', async () => {
+    fetchMock.mockImplementation(async (_url: string, options: RequestInit) => {
+      if (new Headers(options.headers).get('Accept') !== 'application/json') {
+        return new Response('<html>Redirected validation page</html>');
+      }
+      return json({ message: 'The selected email is invalid.', errors: {
+        email: ['The selected email is invalid.'],
+      } }, 422);
+    });
+    render(<ForgotPasswordFlow />);
+    fill('Email Address', 'missing@example.com');
+    fireEvent.click(screen.getByRole('button', { name: 'Gửi mã xác nhận' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/email.*chưa.*đăng ký/i);
+    expect(screen.getByRole('heading', { name: 'Quên mật khẩu' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Gửi mã xác nhận' })).toBeEnabled();
+    expect(screen.getByLabelText('Email Address')).toHaveValue('missing@example.com');
+  });
+
+  it.each(['/api/forgot-password', '/api/forgot-password/verify-otp', '/api/reset-password'])(
+    'negotiates JSON at %s so validation stays readable', async (failingUrl) => {
+      fetchMock.mockImplementation(async (url: string, options: RequestInit) => {
+        if (url !== failingUrl) return json({ message: 'Thành công.' });
+        if (new Headers(options.headers).get('Accept') !== 'application/json') {
+          return new Response('<html>Redirected validation page</html>');
+        }
+        return json({ errors: { email: ['The email field is required.'] } }, 422);
+      });
+      render(<ForgotPasswordFlow />);
+      fill('Email Address', 'student@example.com');
+      fireEvent.click(screen.getByRole('button', { name: 'Gửi mã xác nhận' }));
+      if (failingUrl !== '/api/forgot-password') {
+        await screen.findByRole('heading', { name: 'Nhập mã OTP' });
+        fill('Mã OTP', '123456');
+        fireEvent.click(screen.getByRole('button', { name: 'Xác nhận OTP' }));
+      }
+      if (failingUrl === '/api/reset-password') {
+        await screen.findByRole('heading', { name: 'Đặt lại mật khẩu' });
+        fill('Mật khẩu mới', 'newpassword');
+        fill('Xác nhận mật khẩu', 'newpassword');
+        fireEvent.click(screen.getByRole('button', { name: 'Đổi mật khẩu' }));
+      }
+      expect(await screen.findByRole('alert')).toHaveTextContent(/vui lòng nhập email/i);
+      expect(screen.queryByRole('heading', { name: 'Thành công!' })).not.toBeInTheDocument();
+    },
+  );
+
   it('explains network loss during login and keeps the form ready to retry', async () => {
     fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
     render(<LoginForm onFlipToRegister={() => {}} />);

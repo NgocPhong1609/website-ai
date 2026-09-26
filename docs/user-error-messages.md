@@ -36,3 +36,17 @@ pnpm build
 Test mô phỏng 400/401/403/404/409/413/422/429/5xx, timeout/mất kết nối, JSON/HTML,
 validation, thử lại OTP và onboarding. Các lỗi test tồn tại trước đó ở quiz aliases, lịch sử học và màu tin nhắn
 được báo riêng; không đổi logic sản phẩm để che lỗi test.
+
+## Khôi phục mật khẩu: JSON validation (26/09/2026)
+
+Cả ba POST `/api/forgot-password`, `/api/forgot-password/verify-otp`, `/api/reset-password`
+gửi `Accept: application/json` cùng `Content-Type: application/json`. Khi validation thất bại,
+Laravel trả JSON 422 để giao diện giữ người dùng ở bước hiện tại và hiển thị lỗi có thể sửa,
+thay vì chuyển hướng sang HTML rồi báo `INVALID_RESPONSE`.
+
+Lỗi trường email `The selected email is invalid.` được dịch thành email chưa được đăng ký,
+kèm hướng dẫn dùng email đã đăng ký tài khoản. Lỗi email sai định dạng được giữ riêng.
+Không thay đổi điều kiện xác thực, gửi mail hay cập nhật mật khẩu ở backend.
+
+Regression: 5 test mới kiểm tra JSON negotiation ở từng bước, thông báo email chưa đăng ký,
+và phân biệt lỗi email/field khác; thất bại trước sửa, đạt sau sửa. Bộ auth/error liên quan: 40 test đạt.
