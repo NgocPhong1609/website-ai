@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useEffect, useState } from "react";
 import { QuizSummary } from "../types/quizGenerator.types";
 import { quizGeneratorApi } from "../api/quizGeneratorApi";
@@ -163,7 +164,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: St
       setAttachedSuccess(true);
     } catch (err: any) {
       const resp = err.response?.data;
-      const msg = resp?.message || err.message || "Không thể gắn bài kiểm tra vào khóa học.";
+      const msg = getErrorMessage(err, "Không thể gắn bài kiểm tra vào khóa học.");
       const code = resp?.error_code || resp?.errorCode || "ATTACH_QUIZ_FAILED";
       setErrorInfo({ message: msg, errorCode: code });
     } finally {
@@ -197,9 +198,6 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete }: St
               <div>
                 <h4 className="text-xs font-bold text-rose-800">Không thể gắn bài kiểm tra vào khóa học</h4>
                 <p className="text-xs font-medium text-rose-700 mt-0.5">{errorInfo.message}</p>
-                <span className="inline-block mt-1 px-2 py-0.5 bg-rose-100 text-rose-800 font-mono font-bold text-[10px] rounded-md">
-                  Mã lỗi: {errorInfo.errorCode}
-                </span>
               </div>
             </div>
             <button

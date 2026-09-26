@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 
+import { readApiResponse } from "./user-error";
 import { backendApiUrl } from "./backend-url";
 
 export async function apiClient<T>(
@@ -29,43 +30,5 @@ export async function apiClient<T>(
     headers,
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    const compactBody = errorText.replace(/\s+/g, " ").slice(0, 220);
-
-    if (response.status === 401) {
-      throw new Error("[apiClient] Unauthorized (401). Token may have expired.");
-    }
-
-    throw new Error(
-      `[apiClient] HTTP ${response.status} ${response.statusText} — ${url} | body: ${compactBody}`
-    );
-  }
-
-  // Handle empty responses (e.g., 204 No Content)
-  const text = await response.text();
-
-  if (!text) {
-    return {} as T;
-  }
-
-  const contentType = response.headers.get("content-type") ?? "";
-  const isJson = contentType.includes("application/json");
-
-  if (!isJson) {
-    const compactBody = text.replace(/\s+/g, " ").slice(0, 220);
-    throw new Error(
-      `[apiClient] Expected JSON but got '${contentType || "unknown"}' from ${url}. ` +
-        `Check NEXT_PUBLIC_API_URL and API auth. body: ${compactBody}`
-    );
-  }
-
-  try {
-    return JSON.parse(text) as T;
-  } catch {
-    const compactBody = text.replace(/\s+/g, " ").slice(0, 220);
-    throw new Error(
-      `[apiClient] Invalid JSON response from ${url}. body: ${compactBody}`
-    );
-  }
+  return readApiResponse<T>(response, "Không thể tải dữ liệu. Vui lòng thử lại.");
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useEffect, useState } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
@@ -88,7 +89,7 @@ export function TeacherProfileContainer() {
  fetchProfile();
  } catch (err: any) {
  console.error("Avatar upload error", err);
- setMsg({ type: "error", text: err.response?.data?.message || "Không thể tải lên ảnh đại diện." });
+ setMsg({ type: "error", text: getErrorMessage(err, "Không thể tải lên ảnh đại diện.") });
  } finally {
  setIsUploadingAvatar(false);
  }
@@ -106,7 +107,7 @@ export function TeacherProfileContainer() {
  fetchProfile();
  } catch (err: any) {
  console.error("Profile save error", err);
- setMsg({ type: "error", text: err.response?.data?.message || "Không thể lưu thông tin." });
+ setMsg({ type: "error", text: getErrorMessage(err, "Không thể lưu thông tin.") });
  } finally {
  setIsSaving(false);
  }
@@ -118,7 +119,7 @@ export function TeacherProfileContainer() {
  await axiosClient.delete(`/api/instructor/certificates/${certId}`);
  fetchProfile();
  } catch (err: any) {
- alert("Xóa bằng cấp thất bại.");
+ alert(getErrorMessage(err, "Không thể xóa bằng cấp. Vui lòng thử lại."));
  }
  };
 

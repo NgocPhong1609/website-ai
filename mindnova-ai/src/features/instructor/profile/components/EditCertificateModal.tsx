@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useState, useEffect } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 
@@ -111,7 +112,7 @@ export function EditCertificateModal({
       onClose();
     } catch (err: any) {
       console.error("Certificate update failed", err);
-      setErrorMsg(err.response?.data?.message || "Đã xảy ra lỗi khi cập nhật bằng cấp. Vui lòng thử lại.");
+      setErrorMsg(getErrorMessage(err, "Đã xảy ra lỗi khi cập nhật bằng cấp. Vui lòng thử lại."));
     } finally {
       setIsSubmitting(false);
     }

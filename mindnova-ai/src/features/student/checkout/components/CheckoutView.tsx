@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -75,7 +77,7 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
       setAppliedCoupon(res.data);
       setCouponCodeInput("");
     } else {
-      setCouponError(res.message || "Mã giảm giá không hợp lệ.");
+      setCouponError(getErrorMessage(res, "Mã giảm giá không hợp lệ. Vui lòng kiểm tra lại."));
     }
     setIsApplyingCoupon(false);
   };
@@ -130,7 +132,7 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
             return;
           } catch (e) {
             console.error("Mock payment failed:", e);
-            toast.error("Lỗi Dev mock payment");
+            toast.error("Chưa thể hoàn tất giao dịch thử nghiệm. Vui lòng thử lại sau.");
             setIsProcessing(false);
             return;
           }
@@ -140,7 +142,7 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
         return;
       }
 
-      toast.error(res.message || "Có lỗi xảy ra khi tạo thanh toán.");
+      toast.error(getErrorMessage(res, "Không thể tạo thanh toán. Vui lòng kiểm tra trạng thái đơn hàng trước khi thử lại."));
       setIsProcessing(false);
     } catch (err) {
       console.error(err);

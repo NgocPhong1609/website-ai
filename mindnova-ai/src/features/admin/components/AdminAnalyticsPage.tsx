@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { adminApi } from "@/src/features/admin/lib/admin-api";
@@ -52,7 +53,7 @@ export function AdminAnalyticsPage() {
  const payload = await adminApi<AnalyticsResponse>(`/admin/analytics/dashboard?period=${nextPeriod}`);
  setData(payload);
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Không thể tải thống kê.");
+ setMessage(getErrorMessage(error, "Không thể tải thống kê."));
  }
  };
 

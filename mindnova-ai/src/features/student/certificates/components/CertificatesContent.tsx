@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+
 import React from "react";
 import {
   ShareIcon,
@@ -24,7 +26,7 @@ export function CertificatesContent() {
       await claimMutation.mutateAsync(courseId);
       toast.success("Đã nhận chứng chỉ.");
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Không thể nhận chứng chỉ.");
+      toast.error(getErrorMessage(error, "Không thể nhận chứng chỉ."));
     }
   };
 

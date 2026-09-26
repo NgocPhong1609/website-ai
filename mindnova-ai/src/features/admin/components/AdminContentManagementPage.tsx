@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { adminApi } from "@/src/features/admin/lib/admin-api";
 import { AdminCourseDetailModal, type FullAdminCourseDetail } from "./AdminCourseDetailModal";
@@ -99,7 +100,7 @@ export function AdminContentManagementPage() {
  setInstructors(coursesRes.filters.instructors);
  } catch (error) {
  if (requestId !== courseRequestIdRef.current) return;
- setMessage(error instanceof Error ? error.message : "Không thể tải dữ liệu nội dung.");
+ setMessage(getErrorMessage(error, "Không thể tải dữ liệu nội dung."));
  } finally {
  if (requestId !== courseRequestIdRef.current) return;
  setIsLoadingCourses(false);
@@ -117,7 +118,7 @@ export function AdminContentManagementPage() {
  setResources(resourcesRes.data);
  setQuestions(questionsRes.data);
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Không thể tải kho tài liệu hoặc ngân hàng câu hỏi.");
+ setMessage(getErrorMessage(error, "Không thể tải kho tài liệu hoặc ngân hàng câu hỏi."));
  }
  }, []);
 
@@ -158,7 +159,7 @@ export function AdminContentManagementPage() {
  try {
  await fetchCourseDetail(courseId);
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Không thể tải chi tiết khóa học.");
+ setMessage(getErrorMessage(error, "Không thể tải chi tiết khóa học."));
  } finally {
  setPendingAction(null);
  }
@@ -179,7 +180,7 @@ export function AdminContentManagementPage() {
  await fetchCourseDetail(courseId);
  }
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Cập nhật trạng thái khóa học thất bại.");
+ setMessage(getErrorMessage(error, "Cập nhật trạng thái khóa học thất bại."));
  } finally {
  setPendingAction(null);
  }
@@ -203,7 +204,7 @@ export function AdminContentManagementPage() {
  }
  await latestLoadCoursesRef.current();
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Gỡ bỏ khóa học thất bại.");
+ setMessage(getErrorMessage(error, "Gỡ bỏ khóa học thất bại."));
  } finally {
  setPendingAction(null);
  }
@@ -226,7 +227,7 @@ export function AdminContentManagementPage() {
 
  await latestLoadCoursesRef.current();
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Khôi phục khóa học thất bại.");
+ setMessage(getErrorMessage(error, "Khôi phục khóa học thất bại."));
  } finally {
  setPendingAction(null);
  }
@@ -242,7 +243,7 @@ export function AdminContentManagementPage() {
  setMessage("Đã thêm tài liệu mẫu.");
  await loadAncillaryData();
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Thêm tài liệu thất bại.");
+ setMessage(getErrorMessage(error, "Thêm tài liệu thất bại."));
  }
  };
 
@@ -254,7 +255,7 @@ export function AdminContentManagementPage() {
  });
  await loadAncillaryData();
  } catch (error) {
- setMessage(error instanceof Error ? error.message : "Phân loại câu hỏi thất bại.");
+ setMessage(getErrorMessage(error, "Phân loại câu hỏi thất bại."));
  }
  };
 

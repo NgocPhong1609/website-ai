@@ -210,3 +210,5 @@ Không commit file `.env`, `.env.local`, hay service-account JSON.
 Các URL ứng dụng nằm trong biến môi trường; không sửa domain trong source để chuyển môi trường.
 Xem [hướng dẫn cấu hình kết nối](docs/environment-urls.md) cho frontend local dùng backend Railway,
 Vercel, callback đăng nhập/thanh toán và WebSocket.
+
+Thông báo lỗi frontend dùng bộ xử lý chung; xem [quy ước và kiểm thử thông báo lỗi](docs/user-error-messages.md).

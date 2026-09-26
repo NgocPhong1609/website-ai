@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+
 import React, { useState } from "react";
 import { NoDataAvailable } from "@/src/shared/components/ui";
 import { PlusIcon } from "./icons";
@@ -44,7 +46,7 @@ export function PaymentMethodsCard() {
       setAccountNumber("");
       setBankName("");
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Không thể lưu tài khoản.");
+      toast.error(getErrorMessage(error, "Không thể lưu tài khoản."));
     }
   }
 

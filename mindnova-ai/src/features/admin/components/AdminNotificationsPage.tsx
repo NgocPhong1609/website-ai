@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage, readApiResponse } from "@/src/shared/lib/user-error";
 import { useMemo, useState } from "react";
 
 import { clientApiUrl } from "@/src/shared/lib/api-url";
@@ -101,15 +102,7 @@ export function AdminNotificationsPage() {
  }),
  });
 
- const payload = await response.json().catch(() => null);
-
- if (!response.ok) {
- if (response.status === 401 || response.status === 403) {
- throw new Error("Bạn không có quyền admin hoặc phiên đăng nhập đã hết hạn.");
- }
-
- throw new Error(payload?.message ?? "Gửi email thất bại.");
- }
+ const payload = await readApiResponse(response, "Gửi email thất bại.");
 
  setResult({
  message: payload?.message ?? "Email đã được đưa vào hàng đợi.",
@@ -119,7 +112,7 @@ export function AdminNotificationsPage() {
  });
  } catch (error) {
  setResult({
- message: error instanceof Error ? error.message : "Gửi email thất bại.",
+ message: getErrorMessage(error, "Gửi email thất bại."),
  isError: true,
  });
  } finally {

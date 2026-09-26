@@ -1,3 +1,4 @@
+import { isUnauthorizedError } from "@/src/shared/lib/user-error";
 import { apiClient } from "@/src/shared/lib/api-client";
 import type { DashboardOverview, DashboardApiResponse, DashboardCourse, AdvancedRecommendation } from "../types";
 
@@ -41,7 +42,7 @@ export async function getDashboardOverview(): Promise<DashboardOverview> {
  };
  }
  } catch (error: any) {
-  if (error?.message?.includes("401") || error?.message?.includes("Unauthorized")) throw error;
+  if (isUnauthorizedError(error)) throw error;
  console.warn("[DashboardService] Unable to reach backend /student/dashboard API:", error);
  }
 

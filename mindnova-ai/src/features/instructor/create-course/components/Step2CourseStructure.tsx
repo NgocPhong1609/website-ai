@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useState, useCallback, useEffect, useMemo, type DragEvent } from "react";
 import { useRouter } from "next/navigation";
 import { twMerge } from "tailwind-merge";
@@ -331,7 +332,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         refetchCourseQuizzes();
       }
     } catch (err: any) {
-      alert("Không thể gỡ bài kiểm tra: " + (err?.response?.data?.message || err.message));
+      alert(getErrorMessage(err, "Không thể gỡ bài kiểm tra. Vui lòng thử lại."));
     }
   };
 
@@ -342,7 +343,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
       refetchCourseQuizzes();
       refetchModules();
     } catch (err: any) {
-      alert("Không thể chọn bài thi chính: " + (err?.message || "Lỗi máy chủ"));
+      alert(getErrorMessage(err, "Không thể chọn bài thi chính. Vui lòng thử lại."));
     }
   };
 
@@ -380,7 +381,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         });
         await refetchModules();
       } catch (err: any) {
-        alert("Không thể tạo chuyên đề: " + (err?.message || "Lỗi máy chủ"));
+        alert(getErrorMessage(err, "Không thể tạo chuyên đề. Vui lòng thử lại."));
       }
     } else {
       addDraftChapter(title);
@@ -445,7 +446,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         await deleteModuleMutation.mutateAsync({ courseId, moduleId: chapterId });
         await refetchModules();
       } catch (err: any) {
-        alert("Không thể xóa chuyên đề: " + (err?.message || "Lỗi máy chủ"));
+        alert(getErrorMessage(err, "Không thể xóa chuyên đề. Vui lòng thử lại."));
       }
     } else {
       deleteDraftChapter(chapterId);
@@ -468,7 +469,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         await refetchModules();
         setEditingLesson({ chapterId, lesson: { ...created, type: "video" } });
       } catch (err: any) {
-        alert("Không thể thêm bài học video: " + (err?.message || "Lỗi máy chủ"));
+        alert(getErrorMessage(err, "Không thể thêm bài học video. Vui lòng thử lại."));
       }
     } else {
       addDraftLesson(chapterId, `Bài học ${currentCount + 1}: Video bài giảng mới`, "video");
@@ -508,7 +509,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         await refetchModules();
         setEditingLesson({ chapterId, lesson: { ...created, type: "document" } });
       } catch (err: any) {
-        alert("Không thể thêm tài liệu: " + (err?.message || "Lỗi máy chủ"));
+        alert(getErrorMessage(err, "Không thể thêm tài liệu. Vui lòng thử lại."));
       }
     } else {
       addDraftLesson(chapterId, `Tài liệu đọc #${currentCount + 1}`, "document");
@@ -531,7 +532,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         await deleteLessonMutation.mutateAsync({ courseId, lessonId });
         await refetchModules();
       } catch (err: any) {
-        alert("Không thể xóa bài học: " + (err?.message || "Lỗi máy chủ"));
+        alert(getErrorMessage(err, "Không thể xóa bài học. Vui lòng thử lại."));
       }
     } else {
       deleteDraftLesson(chapterId, lessonId);
@@ -564,7 +565,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         refetchCourseQuizzes();
         setEditingLesson(null);
       } catch (err: any) {
-        alert("Có lỗi xảy ra khi lưu: " + (err?.response?.data?.message || err?.message || "Vui lòng thử lại"));
+        alert(getErrorMessage(err, "Không thể lưu thay đổi. Vui lòng thử lại."));
       }
     } else if (editingLesson) {
       updateDraftLesson(editingLesson.chapterId, lessonId, updates);
@@ -619,7 +620,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                 refetchModules();
               })
               .catch((err: any) => {
-                alert("Không thể cập nhật thứ tự mới: " + (err?.message || "Lỗi máy chủ"));
+                alert(getErrorMessage(err, "Không thể cập nhật thứ tự mới. Vui lòng thử lại."));
                 refetchModules();
               });
 

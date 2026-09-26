@@ -1,5 +1,6 @@
 "use client";
 
+import { readApiResponse } from "@/src/shared/lib/user-error";
 import { clientApiUrl } from "@/src/shared/lib/api-url";
 
 function readToken(): string {
@@ -33,11 +34,5 @@ export async function adminApi<T>(path: string, options: RequestInit = {}): Prom
  credentials: "include",
  });
 
- const payload = await response.json().catch(() => null);
-
- if (!response.ok) {
- throw new Error(payload?.message ?? `Request failed: ${response.status}`);
- }
-
- return payload as T;
+ return readApiResponse<T>(response, "Không thể hoàn tất yêu cầu. Vui lòng thử lại.");
 }

@@ -1,4 +1,5 @@
 "use client";
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { Avatar } from "@/src/shared/components/ui/Avatar";
 
 import { useEffect, useRef, useState } from "react";
@@ -132,7 +133,7 @@ export function AdminTopbar({ onOpenNav }: { onOpenNav?: () => void }) {
  exportResult[key] = result.value;
  } else {
  exportResult[key] = {
- error: result.reason instanceof Error ? result.reason.message : "Không thể tải dữ liệu.",
+ error: getErrorMessage(result.reason, "Không thể tải dữ liệu."),
  };
  }
  });
@@ -163,7 +164,7 @@ export function AdminTopbar({ onOpenNav }: { onOpenNav?: () => void }) {
 
  setStatusMessage("Đã xuất dữ liệu thành công.");
  } catch (error) {
- setStatusMessage(error instanceof Error ? error.message : "Xuất dữ liệu thất bại.");
+ setStatusMessage(getErrorMessage(error, "Xuất dữ liệu thất bại."));
  } finally {
  setIsExporting(false);
  }

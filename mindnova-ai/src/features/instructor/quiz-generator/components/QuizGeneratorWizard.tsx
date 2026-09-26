@@ -126,9 +126,6 @@ export function QuizGeneratorWizard({
                 <span className="text-gray-700 font-medium">{error}</span>
                 {errorInfo?.errorCode && (
                   <div className="mt-1.5 flex items-center gap-2 flex-wrap">
-                    <span className="px-2.5 py-0.5 rounded-md bg-rose-100 border border-rose-200 text-rose-800 font-mono text-[11px] font-black">
-                      Mã lỗi: {errorInfo.errorCode}
-                    </span>
                     <button
                       type="button"
                       onClick={() => {

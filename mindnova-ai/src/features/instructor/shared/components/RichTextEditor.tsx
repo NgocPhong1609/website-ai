@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
 import { Loader } from "@/src/shared/components/ui/Loader";
@@ -323,8 +324,7 @@ export function RichTextEditor({
  }
  } catch (error: any) {
  console.error("Video upload failed:", error);
- const serverError = error.response?.data?.message || error.response?.data?.error || error.message || "Unknown error";
- alert(`Tải video lên thất bại.\nChi tiết: ${serverError}\nVui lòng kiểm tra Console.`);
+ alert(getErrorMessage(error, "Không thể tải video lên. Vui lòng thử lại."));
  } finally {
  setIsUploading(false);
  setIsReplacing(false);

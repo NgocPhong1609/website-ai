@@ -1,6 +1,7 @@
 // @ts-nocheck
 "use client";
 
+import { getErrorMessage, readApiResponse } from "@/src/shared/lib/user-error";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { NoData } from "@/src/shared/components/ui/NoData";
@@ -78,8 +79,12 @@ function statusPillClass(status: string): string {
 }
 
 async function readErrorMessage(response: Response, fallback: string): Promise<string> {
- const payload = await response.json().catch(() => null);
- return payload?.message ?? fallback;
+ try {
+ await readApiResponse(response, fallback);
+ return fallback;
+ } catch (error) {
+ return getErrorMessage(error, fallback);
+ }
 }
 
 export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQuickActionsProps) {
@@ -140,15 +145,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  }),
  });
 
- const payload = await response.json().catch(() => null);
-
- if (!response.ok) {
- if (response.status === 401 || response.status === 403 || response.redirected) {
- throw new Error("Bạn chưa đăng nhập hoặc không có quyền admin để tạo khóa học.");
- }
-
- throw new Error(payload?.message ?? "Không thể tạo khóa học.");
- }
+ await readApiResponse(response, "Không thể tạo khóa học.");
 
  setStatus("Tạo khóa học thành công.");
  setIsFormOpen(false);
@@ -162,7 +159,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  });
  router.refresh();
  } catch (error) {
- setStatus(error instanceof Error ? error.message : "Tạo khóa học thất bại.");
+ setStatus(getErrorMessage(error, "Tạo khóa học thất bại."));
  } finally {
  setIsSubmitting(false);
  }
@@ -200,7 +197,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  setEditingCourseId(null);
  router.refresh();
  } catch (error) {
- setStatus(error instanceof Error ? error.message : "Cập nhật khóa học thất bại.");
+ setStatus(getErrorMessage(error, "Cập nhật khóa học thất bại."));
  } finally {
  setIsUpdating(null);
  }
@@ -229,7 +226,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  setStatus("Xóa khóa học thành công.");
  router.refresh();
  } catch (error) {
- setStatus(error instanceof Error ? error.message : "Xóa khóa học thất bại.");
+ setStatus(getErrorMessage(error, "Xóa khóa học thất bại."));
  } finally {
  setIsDeleting(null);
  }
@@ -255,7 +252,7 @@ export function AdminCoursesQuickActions({ categories, courses }: AdminCoursesQu
  setStatus(message);
  router.refresh();
  } catch (error) {
- setStatus(error instanceof Error ? error.message : "Cập nhật kiểm duyệt khóa học thất bại.");
+ setStatus(getErrorMessage(error, "Cập nhật kiểm duyệt khóa học thất bại."));
  } finally {
  setIsUpdating(null);
  }

@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useState, useCallback, useEffect } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 
@@ -43,7 +44,7 @@ export function useCoupons(courseId?: string | number) {
         setStats(response.data.stats || { total_codes: filtered.length, used_count: 0, discount_amount: 0 });
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || "Failed to fetch coupons");
+      setError(getErrorMessage(err, "Không thể tải mã giảm giá. Vui lòng thử lại."));
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +56,7 @@ export function useCoupons(courseId?: string | number) {
         await axiosClient.post("/api/instructor/coupons", data);
         await fetchCoupons();
       } catch (err: any) {
-        throw new Error(err.response?.data?.message || "Failed to create coupon");
+        throw new Error(getErrorMessage(err, "Không thể tạo mã giảm giá. Vui lòng thử lại."));
       }
     },
     [fetchCoupons]
@@ -67,7 +68,7 @@ export function useCoupons(courseId?: string | number) {
         await axiosClient.put(`/api/instructor/coupons/${id}`, data);
         await fetchCoupons();
       } catch (err: any) {
-        throw new Error(err.response?.data?.message || "Failed to update coupon");
+        throw new Error(getErrorMessage(err, "Không thể cập nhật mã giảm giá. Vui lòng thử lại."));
       }
     },
     [fetchCoupons]
@@ -79,7 +80,7 @@ export function useCoupons(courseId?: string | number) {
         await axiosClient.delete(`/api/instructor/coupons/${id}`);
         await fetchCoupons();
       } catch (err: any) {
-        throw new Error(err.response?.data?.message || "Failed to delete coupon");
+        throw new Error(getErrorMessage(err, "Không thể xóa mã giảm giá. Vui lòng thử lại."));
       }
     },
     [fetchCoupons]
@@ -91,7 +92,7 @@ export function useCoupons(courseId?: string | number) {
         await axiosClient.patch(`/api/instructor/coupons/${id}/toggle`, { status });
         await fetchCoupons();
       } catch (err: any) {
-        throw new Error(err.response?.data?.message || "Failed to toggle status");
+        throw new Error(getErrorMessage(err, "Không thể cập nhật trạng thái mã giảm giá. Vui lòng thử lại."));
       }
     },
     [fetchCoupons]

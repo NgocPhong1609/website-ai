@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useState, useCallback } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 
@@ -50,7 +51,7 @@ export function useGenerateOutline() {
  }
  } catch (err: any) {
  const status = err.response?.status;
- const serverMsg = err.response?.data?.message;
+ const serverMsg = getErrorMessage(err, "Hiện tại AI chưa thể tạo đề cương. Vui lòng thử lại sau ít phút.");
 
  let vietnameseError: string;
  if (status === 401 || status === 403) {

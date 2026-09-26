@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage, isUnauthorizedError } from "@/src/shared/lib/user-error";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { XCircle } from "lucide-react";
@@ -28,7 +29,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
   console.error("[GlobalError]:", error);
  }, [error]);
 
- const isUnauthorized = error.message?.includes("401") || error.message?.includes("Unauthorized");
+ const isUnauthorized = isUnauthorizedError(error);
 
  if (isUnauthorized) {
   return (
@@ -65,13 +66,12 @@ export default function GlobalError({ error, reset }: ErrorProps) {
    </h2>
 
    <p className="mt-3 max-w-md text-sm text-gray-500">
-    Hệ thống gặp sự cố không mong muốn trong quá trình xử lý dữ liệu. Vui
-    lòng thử tải lại trang hoặc quay lại sau.
+    {getErrorMessage(error, "Không thể hiển thị trang này. Vui lòng tải lại trang hoặc thử lại sau.")}
    </p>
 
    {error.digest && (
     <code className="mt-4 rounded bg-gray-100 px-2 py-1 text-xs font-mono text-gray-600">
-     Error ID: {error.digest}
+     Mã hỗ trợ: {error.digest}
     </code>
    )}
 

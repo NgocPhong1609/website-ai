@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { axiosClient } from "@/src/shared/lib/axios";
@@ -91,10 +93,10 @@ export function QuizStartContent() {
         setGeneratedQuiz(json.data);
         fetchMyHistory();
       } else {
-        toast.error(json.message || "Tạo đề thi thất bại, vui lòng thử lại!");
+        toast.error(getErrorMessage(json, "Không thể tạo đề thi. Vui lòng thử lại."));
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Đã xảy ra lỗi kết nối đến máy chủ.");
+      toast.error(getErrorMessage(err, "Đã xảy ra lỗi kết nối đến máy chủ."));
     } finally {
       setIsGenerating(false);
     }

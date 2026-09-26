@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useState } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 
@@ -89,7 +90,7 @@ export function VerificationRequestModal({
  onClose();
  } catch (err: any) {
  console.error("Verification submit failed", err);
- setErrorMsg(err.response?.data?.message || "Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại.");
+ setErrorMsg(getErrorMessage(err, "Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại."));
  } finally {
  setIsSubmitting(false);
  }

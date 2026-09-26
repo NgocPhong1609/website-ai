@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { axiosClient } from "@/src/shared/lib/axios";
 import type { OrderResponse } from "../types";
 
@@ -24,7 +25,7 @@ export const checkoutService = {
       });
       return data;
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Không thể áp dụng mã giảm giá.";
+      const backendMessage = getErrorMessage(error, "Không thể áp dụng mã giảm giá.");
       return {
         success: false,
         message: backendMessage,
@@ -42,16 +43,7 @@ export const checkoutService = {
       });
       return data;
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Không thể tạo đơn hàng. Vui lòng thử lại.";
-      const status = error?.response?.status;
-
-      if (status === 401 || status === 403) {
-        return {
-          success: false,
-          message: "Bạn cần đăng nhập trước khi thanh toán hoặc nhận khóa học miễn phí.",
-        };
-      }
-
+      const backendMessage = getErrorMessage(error, "Không thể tạo đơn hàng. Vui lòng thử lại.");
       return {
         success: false,
         message: backendMessage,

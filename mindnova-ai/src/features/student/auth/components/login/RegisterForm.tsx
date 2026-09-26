@@ -3,6 +3,7 @@
 import { useState, useCallback, useId } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { getErrorMessage, getValidationErrors, readApiResponse } from "@/src/shared/lib/user-error";
 import {
  LogoMark,
  UserIcon,
@@ -95,21 +96,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  body: JSON.stringify(values),
  });
 
- const payload = await response.json().catch(() => null);
-
- if (!response.ok) {
- if (payload?.errors) {
- const apiErrors: Record<string, string> = {};
- Object.keys(payload.errors).forEach((key) => {
- apiErrors[key] = payload.errors[key][0];
- });
- setErrors(apiErrors);
- throw new Error("Vui lÃ²ng kiá»ƒm tra láº¡i thÃ´ng tin.");
- }
- const detailError = payload?.error || payload?.message || "ÄÄƒng kÃ½ tháº¥t báº¡i.";
- throw new Error(detailError);
- }
- 
+ const payload = await readApiResponse(response, "Không thể đăng ký. Vui lòng thử lại.");
 
  const token = payload?.access_token;
  const user = payload?.user;
@@ -130,7 +117,11 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
   }, 1000);
  }
  } catch (error) {
- setStatusMessage(error instanceof Error ? error.message : "Đăng ký thất bại.");
+ const apiErrors = getValidationErrors(error);
+ setErrors(apiErrors);
+ setStatusMessage(Object.keys(apiErrors).length > 0
+ ? "Vui lòng kiểm tra lại thông tin."
+ : getErrorMessage(error, "Không thể đăng ký. Vui lòng thử lại."));
  } finally {
  setIsLoading(false);
  }
@@ -162,8 +153,9 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
 
  {statusMessage && (
  <div
+ role={statusMessage.includes("thành công") ? "status" : "alert"}
  className={`mb-3 p-3 rounded-xl text-xs font-medium border ${
-  statusMessage.includes("thÃ nh cÃ´ng")
+  statusMessage.includes("thành công")
   ? "bg-[#E8F8F0] text-[#27AE60] border-[#27AE60]/20"
   : "bg-[#EFF6FF] text-[#3B82F6] border-[#3B82F6]/30"
  }`}

@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useMemo, useState } from "react";
 import type { AdminTeacherApprovalRow, AdminTeacherCertificateItem } from "@/src/features/admin/types";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
@@ -120,7 +121,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  setReasonInput("");
  } catch (err: any) {
  console.error("Failed teacher decision", err);
- const serverMsg = err.response?.data?.message || err.message || "Thao tác thất bại. Vui lòng thử lại.";
+ const serverMsg = getErrorMessage(err, "Thao tác thất bại. Vui lòng thử lại.");
  setActionError(serverMsg);
  alert(`[LỖI]: ${serverMsg}`);
  } finally {
@@ -162,7 +163,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  setReasonInput("");
  } catch (err: any) {
  console.error("Failed cert decision", err);
- const serverMsg = err.response?.data?.message || err.message || "Thao tác thất bại.";
+ const serverMsg = getErrorMessage(err, "Thao tác thất bại.");
  setActionError(serverMsg);
  alert(`[LỖI]: ${serverMsg}`);
  } finally {
@@ -182,7 +183,7 @@ export function TeacherApprovalTable({ rows }: TeacherApprovalTableProps) {
  });
  }
  } catch (err: any) {
- alert(err.response?.data?.message || "Không thể tải tài liệu minh chứng.");
+ alert(getErrorMessage(err, "Không thể tải tài liệu minh chứng."));
  }
  };
 

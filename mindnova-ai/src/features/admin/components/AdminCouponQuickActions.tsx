@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage, readApiResponse } from "@/src/shared/lib/user-error";
 import { useEffect, useState } from "react";
 
 import { clientApiUrl } from "@/src/shared/lib/api-url";
@@ -60,7 +61,7 @@ export function AdminCouponQuickActions() {
  credentials: "include",
  });
 
- const payload = await response.json().catch(() => null);
+ const payload = await readApiResponse(response, "Không thể tải danh sách khóa học. Vui lòng thử lại.");
 
  if (!response.ok) {
  return;
@@ -73,7 +74,8 @@ export function AdminCouponQuickActions() {
  title: String(course.title ?? "Khóa học"),
  }))
  );
- } catch {
+ } catch (error) {
+ setStatus(getErrorMessage(error, "Không thể tải danh sách khóa học. Vui lòng thử lại."));
  setCourses([]);
  }
  };
@@ -103,11 +105,7 @@ export function AdminCouponQuickActions() {
  }),
  });
 
- const payload = await response.json().catch(() => null);
-
- if (!response.ok) {
- throw new Error(payload?.message ?? "Tạo mã giảm giá thất bại.");
- }
+ await readApiResponse(response, "Tạo mã giảm giá thất bại.");
 
  setStatus("Tạo mã giảm giá thành công. Hãy tải lại trang để thấy dữ liệu mới.");
  setForm({
@@ -124,7 +122,7 @@ export function AdminCouponQuickActions() {
  });
  setIsOpen(false);
  } catch (error) {
- setStatus(error instanceof Error ? error.message : "Tạo mã giảm giá thất bại.");
+ setStatus(getErrorMessage(error, "Tạo mã giảm giá thất bại."));
  } finally {
  setIsSubmitting(false);
  }

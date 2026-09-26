@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { getErrorMessage, readApiResponse } from "@/src/shared/lib/user-error";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useOnboardingStore } from "@/src/features/student/onboarding/stores/onboardingStore"; 
 
@@ -21,12 +22,15 @@ interface IOnboardingStoreExtended {
 
 export default function GeneratingContainer() {
  const router = useRouter();
+ const [error, setError] = useState<string | null>(null);
+ const [attempt, setAttempt] = useState(0);
  
  // Ép kiểu tường minh bằng interface thay vì dùng any để tránh bị TypeScript gạch đỏ
  const { formData, setGeneratedPlan } = useOnboardingStore() as unknown as IOnboardingStoreExtended;
 
  useEffect(() => {
  const generateLearningPath = async () => {
+ setError(null);
  try {
  const token = localStorage.getItem("accessToken") || "";
 
@@ -48,7 +52,7 @@ export default function GeneratingContainer() {
 
  const [response] = await Promise.all([fetchPromise, delayPromise]);
  const apiResponse = response as Response;
- const result = await apiResponse.json();
+ const result = await readApiResponse(apiResponse, "Không thể tạo lộ trình học. Vui lòng thử lại.");
 
  if (apiResponse.ok && result) {
  // Lưu kết quả AI vào store để trang Plan hiển thị
@@ -58,17 +62,25 @@ export default function GeneratingContainer() {
 
  router.push("/onboarding/plan");
  } else {
- console.error("Lỗi từ Backend:", result);
- router.push("/");
+ setError(getErrorMessage(result, "Không thể tạo lộ trình học. Vui lòng thử lại."));
  }
  } catch (error) {
  console.error("Lỗi mạng hoặc hệ thống:", error);
- router.push("/");
+ setError(getErrorMessage(error, "Không thể tạo lộ trình học. Vui lòng thử lại."));
  }
  };
 
  generateLearningPath();
- }, [formData, router, setGeneratedPlan]);
+ }, [formData, router, setGeneratedPlan, attempt]);
+
+ if (error) return (
+   <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
+     <h1 className="text-xl font-semibold">Chưa thể tạo lộ trình học</h1>
+     <p role="alert" className="max-w-md text-sm text-rose-700">{error}</p>
+     <button type="button" className="rounded-lg bg-blue-600 px-5 py-2 text-white" onClick={() => setAttempt(value => value + 1)}>Thử lại</button>
+     <button type="button" className="text-sm underline" onClick={() => router.back()}>Quay lại</button>
+   </div>
+ );
 
  return (
  <div className="relative w-full min-h-screen flex flex-col items-center justify-center px-6 py-12 overflow-hidden">
