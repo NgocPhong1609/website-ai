@@ -224,3 +224,14 @@ on deployment. SMTP variables are unused with this mailer. Never commit API keys
 Existing OTP expiry, verification, and password reset behavior is unchanged.
 Validate transport with Resend's `delivered@resend.dev` test recipient, then confirm
 receipt using an owned inbox; API acceptance alone does not establish inbox delivery.
+
+### Gemini model fallback
+
+Set `GEMINI_MODEL=gemini-3.8-flash` and
+`GEMINI_FALLBACK_MODELS=gemini-3.7-flash,gemini-3.5-flash,gemini-3.1-flash-lite,gemini-2.5-flash-lite`
+to try the configured Gemini models in order after transient failures. Authentication
+and other permanent errors retain the existing behavior. Each model retains the
+existing retry policy; a long chain can increase latency. Usage records retain the
+actual model and shared request ID. The existing backup provider (Groq in production)
+is tried after the Gemini chain is exhausted. Keep credentials in private environment
+variables, never in tracked files.

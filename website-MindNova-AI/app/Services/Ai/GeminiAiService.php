@@ -30,8 +30,28 @@ class GeminiAiService extends AbstractAiService
 
     public function sendMessage(array $messages, array $options = []): string
     {
+        $models = array_values(array_unique(array_filter(array_merge(
+            [config('services.gemini.model', 'gemini-3.8-flash')],
+            config('services.gemini.fallback_models', []),
+        ))));
+        $options['request_id'] ??= (string) Str::uuid();
+
+        foreach ($models as $index => $model) {
+            try {
+                return $this->sendToModel($messages, $options, $model);
+            } catch (AiTransientException $exception) {
+                if ($index === count($models) - 1) {
+                    throw $exception;
+                }
+            }
+        }
+
+        throw new Exception('No Gemini model configured');
+    }
+
+    private function sendToModel(array $messages, array $options, string $model): string
+    {
         $apiKey = $this->resolveApiKey();
-        $model = config('services.gemini.model', 'gemini-3.6-flash');
         if ($apiKey === null) {
             $this->recordAttempt($options, $model, microtime(true), 'failed', 'missing_api_key');
             throw new Exception('Chưa cấu hình API key cho Gemini.');
