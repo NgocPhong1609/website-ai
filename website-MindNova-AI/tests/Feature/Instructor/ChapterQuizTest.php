@@ -123,3 +123,15 @@ test('whole course save then attach keeps the final quiz active', function () {
     expect($attachment->is_active)->toBeTrue();
     expect($attachment->module_id)->toBeNull();
 });
+
+test('new chapter quiz sorts after all lessons in instructor course editor', function () {
+    $this->chapter->lessons()->where('order', 2)->update(['order' => 120]);
+    $response = $this->postJson('/api/instructor/ai-quiz/store', $this->storePayload)->assertCreated();
+    $structure = $this->getJson("/api/instructor/courses/{$this->course->id}/modules")->assertOk()->json('data');
+    $items = collect($structure)->firstWhere('id', $this->chapter->id)['items'];
+    expect(array_column($items, 'id'))->toBe([
+        $this->chapter->lessons()->first()->id,
+        $this->chapter->lessons()->where('order', 120)->first()->id,
+        'quiz-'.$response->json('data.id'),
+    ]);
+});

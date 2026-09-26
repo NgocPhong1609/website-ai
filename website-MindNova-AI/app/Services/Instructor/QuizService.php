@@ -239,6 +239,9 @@ class QuizService
         $order = $attachData['order'] ?? null;
         if ($order === null || $order === 0) {
             $maxOrder = QuizCourseAttachment::where('course_id', $attachData['course_id'])->max('order') ?? 0;
+            if ($position === 'in_module' && !empty($attachData['module_id'])) {
+                $maxOrder = max($maxOrder, (int) Lesson::where('module_id', $attachData['module_id'])->max('order'));
+            }
             $order = $maxOrder + 1;
         }
 
