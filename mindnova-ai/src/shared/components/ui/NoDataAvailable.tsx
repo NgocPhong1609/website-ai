@@ -26,16 +26,16 @@ export const NoDataAvailable: React.FC<NoDataAvailableProps> = ({
   return (
     <div
       className={twMerge(
-        "flex flex-col items-center justify-center w-full bg-white dark:bg-slate-900",
+        "flex flex-col items-center justify-center w-full bg-white",
         isCompact ? "p-4 sm:p-6" : "p-8 sm:p-12",
-        "rounded-2xl border border-slate-100 dark:border-slate-800",
+        "rounded-2xl border border-slate-100",
         "shadow-sm transition-all duration-300 hover:shadow-md",
         className
       )}
     >
       <div className="relative flex items-center justify-center mb-5">
         {/* Decorative background blur */}
-        <div className="absolute inset-0 bg-blue-100/50 dark:bg-blue-900/20 blur-2xl rounded-full transform scale-150" />
+        <div className="absolute inset-0 bg-blue-100/50 blur-2xl rounded-full transform scale-150" />
         
         {image ? (
           <img 
@@ -50,7 +50,7 @@ export const NoDataAvailable: React.FC<NoDataAvailableProps> = ({
         ) : (
           <div className={twMerge(
             "relative z-10 flex items-center justify-center rounded-full",
-            "bg-blue-50 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400",
+            "bg-blue-50 text-blue-500",
             isCompact ? "w-16 h-16" : "w-24 h-24"
           )}>
             <Icon 
@@ -63,14 +63,14 @@ export const NoDataAvailable: React.FC<NoDataAvailableProps> = ({
 
       <div className="text-center z-10 flex flex-col items-center max-w-md">
         <h3 className={twMerge(
-          "font-semibold text-slate-900 dark:text-white tracking-tight mb-2",
+          "font-semibold text-slate-900 tracking-tight mb-2",
           isCompact ? "text-base" : "text-xl sm:text-2xl"
         )}>
           {title}
         </h3>
         
         <div className={twMerge(
-          "text-slate-500 dark:text-slate-400",
+          "text-slate-500",
           isCompact ? "text-xs sm:text-sm" : "text-sm sm:text-base",
           action ? "mb-6" : "mb-0"
         )}>
