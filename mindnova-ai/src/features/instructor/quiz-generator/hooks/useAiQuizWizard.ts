@@ -124,7 +124,7 @@ export function useAiQuizWizard(options?: {
  const apiData = err.response?.data;
  const errorCode = apiData?.error_code || apiData?.errorCode || "AI_GENERATION_FAILED";
 
- const msg = getErrorMessage(err, "Hệ thống AI chưa thể tạo câu hỏi. Vui lòng thử lại.");
+ const msg = getErrorMessage(err, "Hệ thống AI chưa thể tạo câu hỏi. Vui lòng thử lại.", "Quá thời gian chờ tạo quiz bằng AI. Hệ thống chưa nhận được kết quả. Vui lòng thử lại sau ít phút.");
 
  setErrorInfo({
  message: msg,
@@ -172,7 +172,7 @@ export function useAiQuizWizard(options?: {
  setQuestions((prev) => prev.map((q) => (q.id === id ? { ...newQ, id } : q)));
  }
  } catch (err: any) {
- alert(getErrorMessage(err, "Không thể sinh lại câu hỏi. Vui lòng thử lại."));
+ alert(getErrorMessage(err, "Không thể sinh lại câu hỏi. Vui lòng thử lại.", "Quá thời gian chờ AI tạo lại câu hỏi. Vui lòng thử lại sau ít phút."));
  }
  }, [config]);
 
@@ -243,7 +243,7 @@ export function useAiQuizWizard(options?: {
  throw new Error(response.message || "Lưu bài kiểm tra thất bại");
  }
  } catch (err: any) {
- setError(getErrorMessage(err, "Lỗi khi lưu bài kiểm tra"));
+ setError(getErrorMessage(err, "Lỗi khi lưu bài kiểm tra", "Quá thời gian chờ lưu quiz. Hãy kiểm tra danh sách bài kiểm tra trước khi lưu lại để tránh tạo trùng."));
  } finally {
  setIsSaving(false);
  }

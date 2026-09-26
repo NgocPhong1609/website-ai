@@ -65,11 +65,11 @@ export function isUnauthorizedError(error: unknown): boolean {
   return status === 401 || source.name === 'AuthenticationError' || (typeof source.message === 'string' && /Unauthorized|\b401\b/.test(source.message));
 }
 
-export function getErrorMessage(error: unknown, fallback = DEFAULT_MESSAGE): string {
+export function getErrorMessage(error: unknown, fallback = DEFAULT_MESSAGE, timeoutMessage?: string): string {
   const { source, response, payload, status } = details(error);
   const message = typeof source.message === 'string' ? source.message : typeof error === 'string' ? error : '';
   if (status === 504 || status === 408 || source.code === 'ETIMEDOUT' || source.code === 'ECONNABORTED' || source.name === 'TimeoutError' || /timeout|timed out/i.test(message)) {
-    return 'Hệ thống phản hồi quá lâu. Vui lòng thử lại sau ít phút. Nếu đang thanh toán, hãy kiểm tra trạng thái đơn hàng trước khi thử lại.';
+    return timeoutMessage || 'Hệ thống phản hồi quá lâu. Vui lòng thử lại sau ít phút. Nếu đang thanh toán, hãy kiểm tra trạng thái đơn hàng trước khi thử lại.';
   }
   if (status && status >= 500) {
     const explanation = status === 500 ? readableMessage(payload.message) : undefined;
