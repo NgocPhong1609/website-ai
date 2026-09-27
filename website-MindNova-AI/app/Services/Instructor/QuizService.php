@@ -68,11 +68,19 @@ class QuizService
             ]);
 
             if (!empty($data['course_id'])) {
-                QuizCourseAttachment::create([
-                    'quiz_id' => $quiz->id,
-                    'course_id' => $data['course_id'],
-                    'position' => 'end_of_course',
-                ]);
+                if (!empty($data['module_id'])) {
+                    $this->attachQuizToCourse($quiz, [
+                        'course_id' => $data['course_id'],
+                        'module_id' => $data['module_id'],
+                        'position' => 'in_module',
+                    ]);
+                } else {
+                    QuizCourseAttachment::create([
+                        'quiz_id' => $quiz->id,
+                        'course_id' => $data['course_id'],
+                        'position' => 'end_of_course',
+                    ]);
+                }
             }
 
             $this->saveQuestionsAndAnswers($quiz, $questionsData);
@@ -130,13 +138,14 @@ class QuizService
             ]);
 
             if (!empty($data['course_id'])) {
-                QuizCourseAttachment::updateOrCreate(
-                    ['quiz_id' => $quiz->id],
-                    [
+                // Editing questions must not move an existing chapter quiz to the end of the course.
+                if (!empty($data['module_id']) || !$quiz->attachments()->where('course_id', $data['course_id'])->exists()) {
+                    $this->attachQuizToCourse($quiz, [
                         'course_id' => $data['course_id'],
-                        'position' => 'end_of_course',
-                    ]
-                );
+                        'module_id' => $data['module_id'] ?? null,
+                        'position' => !empty($data['module_id']) ? 'in_module' : 'end_of_course',
+                    ]);
+                }
             }
 
             // Re-create questions
@@ -230,6 +239,9 @@ class QuizService
         $order = $attachData['order'] ?? null;
         if ($order === null || $order === 0) {
             $maxOrder = QuizCourseAttachment::where('course_id', $attachData['course_id'])->max('order') ?? 0;
+            if ($position === 'in_module' && !empty($attachData['module_id'])) {
+                $maxOrder = max($maxOrder, (int) Lesson::where('module_id', $attachData['module_id'])->max('order'));
+            }
             $order = $maxOrder + 1;
         }
 

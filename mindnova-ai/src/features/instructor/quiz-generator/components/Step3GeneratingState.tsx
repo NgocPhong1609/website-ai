@@ -36,7 +36,7 @@ export function Step3GeneratingState() {
  <div className="flex flex-col gap-2 max-w-md">
  <h3 className="text-xl font-black text-[#0F172A]">AI Đang Phân Tích & Sinh Đề Kiểm Tra...</h3>
  <p className="text-xs text-[#64748B] font-semibold leading-relaxed">
- Hệ thống AI đang đọc hiểu toàn bộ thông tin và tạo ma trận câu hỏi phù hợp nhất với cấu hình của bạn.
+ AI đang tạo câu hỏi từ nội dung bạn đã chọn. Quá trình có thể mất đến 3 phút; vui lòng giữ trang này mở.
  </p>
  </div>
 

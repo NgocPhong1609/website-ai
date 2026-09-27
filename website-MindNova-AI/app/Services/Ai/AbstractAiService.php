@@ -4,6 +4,7 @@ namespace App\Services\Ai;
 
 use App\Contracts\ConfiguredAiProviderInterface;
 use App\DTOs\AiMessageDto;
+use App\Exceptions\AiTransientException;
 use App\Models\AiUsageLog;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -16,6 +17,20 @@ abstract class AbstractAiService implements ConfiguredAiProviderInterface
      * @param  array<AiMessageDto>  $messages
      */
     abstract public function sendMessage(array $messages, array $options = []): string;
+
+    protected function requestTimeout(array $options): float
+    {
+        if (! isset($options['deadline'])) {
+            return 90;
+        }
+        $remaining = (float) $options['deadline'] - microtime(true);
+        // cURL converts seconds to integer milliseconds; zero disables timeout.
+        if ($remaining < 0.001) {
+            throw new AiTransientException('AI request deadline exceeded');
+        }
+
+        return min(90, $remaining);
+    }
 
     /**
      * Log usage metrics to database

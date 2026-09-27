@@ -15,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
             \App\Contracts\AiProviderInterface::class,
             \App\Services\Ai\GeminiAiService::class
         );
-        
+
         $this->app->bind(\App\Services\Ai\AiRouterService::class, function ($app) {
             return new \App\Services\Ai\AiRouterService(
                 $app->make(\App\Services\Ai\GeminiAiService::class),
@@ -29,6 +29,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Login::class, function ($event): void {
+            if ($event->guard === 'web') {
+                session()->put('password_recovery_version', $event->user->password_recovery_version);
+            }
+        });
     }
 }

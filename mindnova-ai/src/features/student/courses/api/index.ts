@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosClient } from "../../../../shared/lib/axios";
-import type { CourseDetailData, MyCourse } from "../types";
+import type { CourseDetailData, CourseDetailModuleItem, MyCourse } from "../types";
 
-export function useGetCourseDetail(courseId: string | number = 0) {
+export function useGetCourseDetail(courseId: string | number = 0, enabled = true) {
  return useQuery({
  queryKey: ["student", "courses", "detail", courseId],
  queryFn: async (): Promise<CourseDetailData> => {
@@ -10,11 +10,29 @@ export function useGetCourseDetail(courseId: string | number = 0) {
  return data.data;
  },
  staleTime: 5 * 60 * 1000,
- enabled: !!courseId && Number(courseId) > 0,
+ enabled: enabled && !!courseId && Number(courseId) > 0,
  retry: (failureCount, error: any) => {
  if (error?.response?.status === 404) return false;
  return failureCount < 3;
  },
+ });
+}
+
+export function useGetInstructorCoursePreview(courseId: number, enabled: boolean) {
+ return useQuery({
+ queryKey: ["instructor", "course", String(courseId), "preview"],
+ queryFn: async () => {
+ const [course, structure] = await Promise.all([
+ axiosClient.get(`/api/instructor/courses/${courseId}`),
+ axiosClient.get(`/api/instructor/courses/${courseId}/modules`),
+ ]);
+ return {
+ title: course.data.data.title as string,
+ modules: structure.data.data as CourseDetailModuleItem[],
+ };
+ },
+ enabled: enabled && Number.isFinite(courseId) && courseId > 0,
+ retry: false,
  });
 }
 
@@ -32,13 +50,14 @@ export function useGetMyCourses() {
 // ─── Lesson APIs ──────────────────────────────────────────────────────────────
 
 /** Get signed video URL for a lesson */
-export async function fetchVideoUrl(lessonId: number | string): Promise<{
+export async function fetchVideoUrl(lessonId: number | string, isPreview = false): Promise<{
  signed_url: string;
  source: 'uploaded' | 'external';
  duration_seconds: number;
 }> {
- const { data } = await axiosClient.get(`/api/student/lessons/${lessonId}/video-url`);
- return data.data;
+ const audience = isPreview ? "instructor" : "student";
+ const { data } = await axiosClient.get(`/api/${audience}/lessons/${lessonId}/video-url`);
+ return isPreview ? { ...data.data, source: 'uploaded', duration_seconds: 0 } : data.data;
 }
 
 /** Mark a lesson as completed */

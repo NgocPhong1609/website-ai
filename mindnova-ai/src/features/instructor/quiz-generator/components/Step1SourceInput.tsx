@@ -44,23 +44,26 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
 
   // Fetch selected course modules & lessons whenever course_id changes
   useEffect(() => {
+    let cancelled = false;
+    setSelectedCourseDetails(null);
     if (config.course_id) {
       setIsLoadingDetails(true);
       quizGeneratorApi
         .getCourseDetails(config.course_id)
         .then((res) => {
           const detail = res?.data || res;
-          setSelectedCourseDetails(detail);
+          if (!cancelled) setSelectedCourseDetails(detail);
         })
         .catch(() => {
-          setSelectedCourseDetails(null);
+          if (!cancelled) setSelectedCourseDetails(null);
         })
         .finally(() => {
-          setIsLoadingDetails(false);
+          if (!cancelled) setIsLoadingDetails(false);
         });
     } else {
       setSelectedCourseDetails(null);
     }
+    return () => { cancelled = true; };
   }, [config.course_id]);
 
   const handleSelectCourse = (course: any) => {
@@ -69,6 +72,8 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
       source_type: "course",
       course_id: course.id,
       course_title: course.title,
+      module_id: undefined,
+      module_title: undefined,
       title: `Đề kiểm tra: ${course.title}`,
     });
   };
@@ -78,6 +83,8 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
       source_type: "course",
       course_id: undefined,
       course_title: undefined,
+      module_id: undefined,
+      module_title: undefined,
       title: "Kiểm tra kiến thức",
     });
     setSelectedCourseDetails(null);
@@ -92,19 +99,23 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
   const rawModules = selectedCourseDetails?.modules;
   const rawLessons = selectedCourseDetails?.lessons || selectedCourseDetails?.direct_lessons;
   const modulesList = Array.isArray(rawModules) ? rawModules : [];
+  const selectedModule = modulesList.find((m: any) => Number(m.id) === config.module_id);
+  const sourceModules = config.module_id ? (selectedModule ? [selectedModule] : []) : modulesList;
   const lessonsList: any[] = [];
 
   if (modulesList.length > 0) {
-    modulesList.forEach((m: any) => {
+    sourceModules.forEach((m: any) => {
       if (Array.isArray(m.lessons)) {
         m.lessons.forEach((l: any) => {
-          lessonsList.push({ ...l, module_title: m.title });
+          if (!config.module_id || (!["quiz", "quiz_module"].includes(l.type) && String(l.content || "").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim())) {
+            lessonsList.push({ ...l, module_title: m.title });
+          }
         });
       }
     });
   }
 
-  if (lessonsList.length === 0 && Array.isArray(rawLessons)) {
+  if (!config.module_id && lessonsList.length === 0 && Array.isArray(rawLessons)) {
     rawLessons.forEach((l: any) => {
       lessonsList.push(l);
     });
@@ -227,21 +238,47 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
             </button>
           </div>
 
+          <div className="flex flex-col gap-2">
+            <label htmlFor="quiz-source-module" className="text-xs font-bold text-[#0F172A]">Phạm vi nội dung</label>
+            <select
+              id="quiz-source-module"
+              value={config.module_id ?? ""}
+              disabled={isLoadingDetails || !selectedCourseDetails}
+              onChange={(event) => {
+                const module = modulesList.find((m: any) => Number(m.id) === Number(event.target.value));
+                onChangeConfig({
+                  module_id: module ? Number(module.id) : undefined,
+                  module_title: module?.title,
+                  title: `Đề kiểm tra: ${module?.title || config.course_title || selectedCourseDetails?.title}`,
+                });
+              }}
+              className="w-full rounded-xl border border-[#E2E8F0] bg-white p-3 text-sm text-[#0F172A] focus:border-[#3B82F6]"
+            >
+              <option value="">Toàn khóa học</option>
+              {modulesList.map((module: any) => <option key={module.id} value={module.id}>{module.title}</option>)}
+            </select>
+            <p className="text-xs text-[#64748B]">
+              {config.module_id
+                ? "AI chỉ đọc nội dung bài học trong chương đã chọn. Sau khi bạn duyệt và lưu, quiz sẽ được đặt ở cuối chương này."
+                : "AI sử dụng nội dung toàn khóa học. Bạn có thể chọn một chương để tạo quiz riêng."}
+            </p>
+          </div>
+
           {/* Selected Course Modules & Lessons Preview Card */}
           <div className="p-5 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-xs font-black text-[#0F172A]">
-                  Chi tiết nội dung khóa học được trích xuất
+                  Nội dung được dùng để tạo quiz
                 </h4>
                 <p className="text-[11px] font-bold text-[#64748B] mt-0.5">
-                  AI sẽ sử dụng dữ liệu thực tế từ bài học trong khóa này để sinh bộ câu hỏi.
+                  {config.module_id ? `Chương: ${selectedModule?.title || config.module_title || "Đang tải"}` : "AI sẽ sử dụng dữ liệu thực tế từ bài học trong khóa này để sinh bộ câu hỏi."}
                 </p>
               </div>
 
               <div className="flex items-center gap-2 text-xs font-bold shrink-0">
                 <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-[#3B82F6] border border-blue-100">
-                  {modulesList.length} Modules
+                  {sourceModules.length} Modules
                 </span>
                 <span className="px-2.5 py-1 rounded-lg bg-purple-50 text-purple-800 border border-purple-100">
                   {lessonsList.length} Lessons
@@ -272,7 +309,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
               </div>
             ) : (
               <div className="text-[11px] font-bold text-gray-400 pt-2 border-t border-gray-100">
-                Khóa học hiện chưa có bài học nào. AI sẽ sử dụng thông tin tổng quan của khóa học để thiết kế câu hỏi.
+                {config.module_id ? "Chương này chưa có nội dung bài học dạng văn bản để tạo quiz. Hãy bổ sung nội dung hoặc chọn chương khác." : "Khóa học hiện chưa có bài học nào. AI sẽ sử dụng thông tin tổng quan của khóa học để thiết kế câu hỏi."}
               </div>
             )}
           </div>
@@ -298,7 +335,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
             }
             onNext();
           }}
-          disabled={!config.course_id}
+          disabled={!config.course_id || isLoadingDetails || !selectedCourseDetails || Boolean(config.module_id && lessonsList.length === 0)}
           className="px-8 py-3 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-black text-xs rounded-2xl shadow-lg hover:scale-[1.02] transition-all disabled:opacity-40 disabled:hover:scale-100 cursor-pointer disabled:cursor-not-allowed"
         >
           Tiếp theo: Cấu hình Quiz ➡️

@@ -58,7 +58,7 @@ export function Step2ConfigForm({
                 <span className="text-base">🎓</span>
                 <div>
                   <span className="text-[10px] font-black text-[#3B82F6] uppercase tracking-wider block">Khóa học được chọn</span>
-                  <span className="text-xs font-black text-[#0F172A]">{config.course_title}</span>
+                  <span className="text-xs font-black text-[#0F172A]">{config.course_title}{config.module_id ? ` — ${config.module_title || `Chương #${config.module_id}`}` : ""}</span>
                 </div>
               </div>
               <span className="px-2.5 py-1 bg-white text-[#3B82F6] text-[11px] font-extrabold rounded-lg border border-blue-100 shadow-2xs">

@@ -18,6 +18,7 @@ export const quizGeneratorApi = {
  const payload = {
  source_type: config.source_type,
  course_id: config.course_id ? Number(config.course_id) : undefined,
+ module_id: config.source_type === "course" ? config.module_id : undefined,
  content: config.source_type === "content" ? config.source_content : undefined,
  topic: config.source_type === "topic" ? config.topic : undefined,
  difficulty: config.difficulty,
@@ -29,17 +30,19 @@ export const quizGeneratorApi = {
  };
 
  const res = await axiosClient.post("/api/instructor/ai-quiz/generate", payload, {
- timeout: 120000,
+ // Leave 30 seconds for transport/serialization after the server's 180-second AI budget.
+ timeout: 210000,
  });
  return res.data;
  },
 
  // Regenerate a single question
- regenerateSingleQuestion: async (type: "multiple_choice" | "essay", difficulty: string, context: string) => {
+ regenerateSingleQuestion: async (type: "multiple_choice" | "essay", difficulty: string, context: string, source?: Pick<QuizConfig, "course_id" | "module_id">) => {
  const res = await axiosClient.post("/api/instructor/ai-quiz/regenerate-question", {
  type,
  difficulty,
  context,
+ ...(source?.module_id ? { course_id: source.course_id, module_id: source.module_id } : {}),
  }, {
  timeout: 60000,
  });
@@ -110,6 +113,7 @@ export const quizGeneratorApi = {
  source_type: string;
  source_content: string;
  course_id?: number | null;
+ module_id?: number | null;
  difficulty: string;
  time_limit_minutes: number;
  passing_score: number;

@@ -84,9 +84,10 @@ class BackupAiService extends AbstractAiService
             : 'https://api.openai.com/v1/chat/completions';
 
         for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            $timeout = $this->requestTimeout($options);
             $startedAt = microtime(true);
             try {
-                $response = Http::withToken($apiKey)->timeout(90)->post($baseUrl, $payload);
+                $response = Http::withToken($apiKey)->timeout($timeout)->post($baseUrl, $payload);
             } catch (ConnectionException $exception) {
                 $this->recordAttempt($options, $model, $startedAt, 'failed', 'connection_error');
                 if ($attempt < $maxRetries) {
@@ -114,6 +115,15 @@ class BackupAiService extends AbstractAiService
                         continue;
                     }
                     throw new AiTransientException('Backup returned an empty response');
+                }
+
+                if (isset($options['validate_response']) && ! $options['validate_response']($content)) {
+                    $this->recordAttempt($options, $model, $startedAt, 'failed', 'invalid_response',
+                        $inputTokens, $outputTokens, $providerRequestId ?: null);
+                    if ($attempt < $maxRetries) {
+                        continue;
+                    }
+                    throw new AiTransientException('Backup returned an incomplete response');
                 }
 
                 $this->recordAttempt($options, $model, $startedAt, 'success', null,

@@ -36,9 +36,11 @@ function formatTime(seconds: number): string {
 export function CustomVideoPlayer({
  lesson,
  onComplete,
+ isPreview = false,
 }: {
  lesson: LessonData;
  onComplete: () => void;
+ isPreview?: boolean;
 }) {
  const containerRef = useRef<HTMLDivElement>(null);
  const videoRef = useRef<HTMLVideoElement>(null);
@@ -71,6 +73,7 @@ export function CustomVideoPlayer({
  setError("");
  setLoading(true);
  setIsPlaying(false);
+ setIsExternal(false);
  setCurrentTime(0);
  setDuration(0);
 
@@ -87,8 +90,8 @@ export function CustomVideoPlayer({
  return;
  }
 
- if (lesson.hasUploadedVideo) {
- fetchVideoUrl(lesson.id)
+ if (lesson.hasUploadedVideo || isPreview) {
+ fetchVideoUrl(lesson.id, isPreview)
  .then((result) => {
  if (result.source === "external") setIsExternal(true);
  setSignedUrl(result.signed_url);
@@ -111,7 +114,7 @@ export function CustomVideoPlayer({
  setError("Video chưa được tải lên.");
  setLoading(false);
  }
- }, [lesson.id, lesson.videoUrl, lesson.hasUploadedVideo]);
+ }, [lesson.id, lesson.videoUrl, lesson.hasUploadedVideo, isPreview]);
 
  // --- Auto Hide Controls Logic ---
  const resetControlsTimeout = useCallback(() => {

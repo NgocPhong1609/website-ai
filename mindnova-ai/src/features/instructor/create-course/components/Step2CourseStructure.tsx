@@ -574,6 +574,8 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   };
 
   const handleDragStart = useCallback((e: DragEvent, chapterId: string, lessonId: string) => {
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", lessonId);
     setDragSource({ chapterId, lessonId });
   }, []);
 
@@ -583,6 +585,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
       if (!dragSource) return;
       const { chapterId: sourceChapterId, lessonId: sourceLessonId } = dragSource;
       setDragSource(null);
+      if (sourceChapterId === targetChapterId && sourceLessonId === targetLessonId) return;
 
       if (courseId) {
         if (sourceChapterId !== targetChapterId) return;
@@ -631,7 +634,10 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
           });
         });
       } else {
-        moveDraftLesson(sourceChapterId, targetChapterId, sourceLessonId);
+        const targetChapter = useCreateCourseStore.getState().modules.find((chapter) => chapter.id === targetChapterId);
+        const targetIndex = targetChapter?.lessons.findIndex((lesson) => lesson.id === targetLessonId) ?? -1;
+        if (targetIndex < 0) return;
+        moveDraftLesson(sourceChapterId, targetChapterId, sourceLessonId, targetIndex);
       }
     },
     [dragSource, courseId, moveDraftLesson, reorderModuleItemsMutation, refetchModules]

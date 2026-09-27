@@ -36,7 +36,7 @@ class AiRouterService
     {
         $requestId = (string) Str::uuid();
         $startTime = microtime(true);
-        $primaryOptions = array_merge($options, ['max_retries' => 2, 'request_id' => $requestId, 'fallback_used' => false]); // Total 2 attempts
+        $primaryOptions = array_merge($options, ['max_retries' => max(1, (int) ($options['max_retries'] ?? 2)), 'request_id' => $requestId, 'fallback_used' => false]); // Default 2 attempts; latency-sensitive callers may request fewer.
         $backupOptions = array_merge($options, ['max_retries' => 1, 'request_id' => $requestId, 'fallback_used' => true]); // Total 1 attempt
 
         try {

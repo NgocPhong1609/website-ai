@@ -19,15 +19,15 @@ type Step = "REQUEST_OTP" | "VERIFY_OTP" | "RESET_PASSWORD" | "SUCCESS";
 export function ForgotPasswordFlow() {
  const router = useRouter();
  const [step, setStep] = useState<Step>("REQUEST_OTP");
- 
+
  const [email, setEmail] = useState("");
  const [otp, setOtp] = useState("");
  const [newPassword, setNewPassword] = useState("");
  const [confirmPassword, setConfirmPassword] = useState("");
- 
+
  const [showPassword, setShowPassword] = useState(false);
  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
- 
+
  const [isLoading, setIsLoading] = useState(false);
  const [errorMsg, setErrorMsg] = useState<string | null>(null);
  const [countdown, setCountdown] = useState(0);
@@ -130,7 +130,7 @@ export function ForgotPasswordFlow() {
  </button>
  </form>
  );
- 
+
  case "VERIFY_OTP":
  return (
  <form onSubmit={verifyOtp} className="flex flex-col gap-3">
@@ -207,7 +207,7 @@ export function ForgotPasswordFlow() {
  case "SUCCESS":
  return (
  <div className="flex flex-col items-center justify-center text-center py-6">
- 
+
  <h2 className="text-xl font-bold text-[#0F172A] mb-2">Thành công!</h2>
  <p className="text-sm text-[#64748B] mb-6">Mật khẩu của bạn đã được cập nhật.</p>
  <Link href="/login" className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#0F172A] shadow-md hover:-translate-y-0.5 transition-all">

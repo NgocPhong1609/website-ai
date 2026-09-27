@@ -44,30 +44,7 @@ class CourseHealthService
 
         $this->require($issues, $lessonCount > 0, 'course.lessons', 'Khóa học cần có ít nhất một bài học.');
 
-        // Course-level Quizzes Check (A. Kiểm tra tổng quát & B. Kiểm tra cuối khóa học)
-        $quizAttachments = $course->quizAttachments ?? collect();
-
-        $hasCapabilityQuiz = $quizAttachments->where('position', 'capability_assessment')
-            ->contains(fn ($att) => $att->quiz !== null && $att->quiz->questions !== null && $att->quiz->questions->isNotEmpty());
-
-        if (!$hasCapabilityQuiz) {
-            $this->warning(
-                $issues,
-                'course.capability_assessment',
-                'Khóa học chưa có Bài kiểm tra tổng quát (🏆 A. KIỂM TRA TỔNG QUÁT - Đánh giá năng lực cấp khóa học).'
-            );
-        }
-
-        $hasEndOfCourseQuiz = $quizAttachments->where('position', 'end_of_course')
-            ->contains(fn ($att) => $att->quiz !== null && $att->quiz->questions !== null && $att->quiz->questions->isNotEmpty());
-
-        if (!$hasEndOfCourseQuiz) {
-            $this->warning(
-                $issues,
-                'course.end_of_course',
-                'Khóa học chưa có Bài kiểm tra cuối khóa học (🏁 B. KIỂM TRA CUỐI KHÓA HỌC - Đánh giá hoàn thành toàn bộ khóa học).'
-            );
-        }
+        $issues = array_merge($issues, $this->courseQuizIssues($course));
 
         $errorCount = count(array_filter($issues, fn (array $issue): bool => $issue['severity'] === 'error'));
         $warningCount = count(array_filter($issues, fn (array $issue): bool => $issue['severity'] === 'warning'));
@@ -78,6 +55,32 @@ class CourseHealthService
             'can_submit' => $errorCount === 0,
             'issues' => $issues,
         ];
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    public function courseQuizIssues(Course $course): array
+    {
+        $course->loadMissing('quizAttachments.quiz.questions');
+        $issues = [];
+
+        foreach ([
+            'capability_assessment' => 'Bài kiểm tra tổng quát',
+            'end_of_course' => 'Bài kiểm tra cuối khóa học',
+        ] as $position => $label) {
+            $hasQuiz = $course->quizAttachments
+                ->where('position', $position)
+                ->where('is_active', true)
+                ->contains(fn ($attachment) => $attachment->quiz !== null && $attachment->quiz->questions->isNotEmpty());
+
+            $this->require(
+                $issues,
+                $hasQuiz,
+                "course.{$position}",
+                "Khóa học cần chọn {$label} có ít nhất một câu hỏi trước khi gửi duyệt và phát hành."
+            );
+        }
+
+        return $issues;
     }
 
     /** @param array<int, array<string, mixed>> $issues */
