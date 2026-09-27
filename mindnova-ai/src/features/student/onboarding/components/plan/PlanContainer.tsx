@@ -85,7 +85,7 @@ function StepBadge() {
 
 function CelebrationBanner({ goal }: { goal: string }) {
  return (
- <div className="relative w-full max-w-4xl bg-[#3B82F6] via-[#818cf8]/6 border border-[#E2E8F0] rounded-2xl px-6 py-4 overflow-hidden">
+ <div className="relative w-full max-w-4xl bg-[#3B82F6] via-[#818cf8]/6 border border-[#E2E8F0] rounded-xl px-6 py-4 overflow-hidden">
  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_50%,rgba(59, 130, 246,0.12)_0%,transparent_60%)]" aria-hidden="true" />
  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_100%_50%,rgba(76,215,246,0.10)_0%,transparent_60%)]" aria-hidden="true" />
 
@@ -148,7 +148,7 @@ export default function PlanContainer() {
  onClick={handleBack}
  size="unstyled"
  variant="unstyled"
- className="px-6 py-4 rounded-2xl text-sm font-semibold text-[#64748B] border border-[#E2E2EA] bg-white hover:border-[#E2E8F0] hover:text-[#2563EB] transition-all duration-200 cursor-pointer"
+ className="px-6 py-4 rounded-xl text-sm font-semibold text-[#64748B] border border-[#E2E2EA] bg-white hover:border-[#E2E8F0] hover:text-[#2563EB] transition-all duration-200 cursor-pointer"
  >
  ← Back
  </Button>
@@ -158,7 +158,7 @@ export default function PlanContainer() {
  size="unstyled"
  variant="unstyled"
  className={[
- "relative px-14 py-4 rounded-2xl text-sm font-bold tracking-wide",
+ "relative px-14 py-4 rounded-xl text-sm font-bold tracking-wide",
  "text-white cursor-pointer",
  " bg-[#3B82F6] ",
  "shadow-[0_6px_24px_rgba(59, 130, 246,0.45)]",

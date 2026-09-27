@@ -113,7 +113,7 @@ function TypewriterText({
     const timer = setInterval(() => {
       if (isStoppedRef.current) {
         clearInterval(timer);
-        setDisplayedText((prev) => prev + "  *(Đã bị tạm dừng)*");
+        setDisplayedText((prev) => prev + " *(Đã bị tạm dừng)*");
         onTypingRef.current?.(false);
         return;
       }
@@ -328,7 +328,7 @@ export function ChatPanel({
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full min-h-[700px] h-[calc(100vh-7.5rem)] bg-white rounded-2xl border border-border shadow-sm relative overflow-hidden transition-all duration-200">
+    <div className="flex-1 flex flex-col w-full min-h-[700px] h-[calc(100vh-7.5rem)] bg-white rounded-xl border border-border shadow-sm relative overflow-hidden transition-all duration-200">
       
       {/* ─── Synchronized Chat Header ─── */}
       <header className="shrink-0 bg-white border-b border-border flex flex-wrap items-center justify-between px-6 py-4 gap-4">
@@ -408,7 +408,7 @@ export function ChatPanel({
                     {isPinned && <span className="text-[11px] font-medium bg-secondary text-muted-foreground px-2.5 py-0.5 rounded-full border border-border"><Star size={12} fill="currentColor" className="mr-1 inline" /> Đã lưu</span>}
                   </div>
                 </div>
-                <div className="bg-white text-[#0F172A] px-5 py-4 rounded-2xl rounded-tl-sm border border-border shadow-sm text-sm sm:text-[14.5px] leading-relaxed font-normal transition-all break-words">
+                <div className="bg-white text-[#0F172A] px-5 py-4 rounded-xl rounded-tl-sm border border-border shadow-sm text-sm sm:text-[14.5px] leading-relaxed font-normal transition-all break-words">
                   {msg.animate ? (
                     <TypewriterText
                       id={msg.id}
@@ -478,7 +478,7 @@ export function ChatPanel({
                   <span className="text-[11px] font-normal text-stone-400">{msg.timestamp}</span>
                   <span className="text-xs font-semibold text-stone-700">Bạn</span>
                 </div>
-                <div className="bg-blue-600 text-white px-5 py-3.5 rounded-2xl rounded-tr-sm text-sm leading-relaxed shadow-sm font-normal whitespace-pre-line border border-blue-700">
+                <div className="bg-blue-600 text-white px-5 py-3.5 rounded-xl rounded-tr-sm text-sm leading-relaxed shadow-sm font-normal whitespace-pre-line border border-blue-700">
                   {msg.text}
                 </div>
               </div>
@@ -492,7 +492,7 @@ export function ChatPanel({
             <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm animate-pulse">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <div className="bg-white border border-border px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm flex flex-col gap-2 w-fit">
+            <div className="bg-white border border-border px-5 py-4 rounded-xl rounded-tl-sm shadow-sm flex flex-col gap-2 w-fit">
               <div className="flex items-center gap-2.5">
                 <span className="w-2 h-2 rounded-full bg-success-bg0 animate-ping" />
                 <span className="text-xs font-semibold text-muted-foreground">Nova đang tổng hợp câu trả lời...</span>
@@ -525,7 +525,7 @@ export function ChatPanel({
                 type="button"
                 onClick={() => handleSend(prompt.query)}
                 disabled={isGenerating || isQuotaBlocked}
-                className="group relative text-left p-3.5 rounded-xl bg-white hover:bg-[#F8FAFC] disabled:opacity-50 border border-[#E2E8F0] hover:border-[#3B82F6]/50 shadow-2xs hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 focus:outline-none cursor-pointer flex flex-col justify-between gap-2.5"
+                className="group relative text-left p-3.5 rounded-xl bg-white hover:bg-[#F8FAFC] disabled:opacity-50 border border-[#E2E8F0] hover:border-[#3B82F6]/50 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 focus:outline-none cursor-pointer flex flex-col justify-between gap-2.5"
               >
                 <div className="flex items-center justify-between">
                   <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-md border ${prompt.color}`}>

@@ -418,7 +418,7 @@ export function QuizStartContent() {
               </button>
             </div>
           ) : (
-            <div className="overflow-hidden border border-border rounded-2xl bg-white shadow-sm">
+            <div className="overflow-hidden border border-border rounded-xl bg-white shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm whitespace-nowrap">
                   <thead className="bg-muted border-b border-border">
@@ -536,7 +536,7 @@ export function QuizStartContent() {
                 const isEssayOrFill = type === "essay" || type === "fill_blank" || (!q.options || q.options.length === 0);
 
                 return (
-                  <div key={q.id || idx} className="p-6 rounded-2xl bg-white border border-border shadow-sm space-y-5">
+                  <div key={q.id || idx} className="p-6 rounded-xl bg-white border border-border shadow-sm space-y-5">
                     <div className="flex items-start justify-between gap-4">
                       <h4 className="text-base font-bold text-foreground leading-relaxed">
                         <span className="text-stone-400 font-medium">Câu {idx + 1}.</span> {q.question}

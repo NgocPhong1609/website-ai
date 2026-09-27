@@ -11,21 +11,21 @@ import toast from "react-hot-toast";
 
 function ActiveSessionsBox() {
   return (
-    <div className="mt-8 p-5 rounded-2xl bg-[#F8FAFC] border border-[#EAEAF4] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-[#3b82f6]/30 hover:bg-white hover:shadow-sm">
+    <div className="mt-8 p-5 rounded-xl bg-[#F8FAFC] border border-[#EAEAF4] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-[#3b82f6]/30 hover:bg-white hover:shadow-md">
       <div className="flex items-start gap-4">
-        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white border border-[#EAEAF4] text-[#64748b] shrink-0 shadow-sm">
+        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white border border-[#EAEAF4] text-slate-500 shrink-0 shadow-sm">
           <Smartphone className="w-6 h-6" />
         </div>
         <div className="space-y-1 mt-0.5">
-          <p className="text-sm font-semibold text-[#0f172a]">Quản lý thiết bị &amp; phiên đăng nhập</p>
-          <p className="text-sm font-medium text-[#64748b]">Hệ thống bảo vệ đang duy trì kết nối an toàn trên 2 thiết bị.</p>
+          <p className="text-sm font-semibold text-slate-900">Quản lý thiết bị &amp; phiên đăng nhập</p>
+          <p className="text-sm font-medium text-slate-500">Hệ thống bảo vệ đang duy trì kết nối an toàn trên 2 thiết bị.</p>
         </div>
       </div>
       
       <button
         type="button"
         onClick={() => toast("Hệ thống an ninh ghi nhận: Không có truy cập bất thường nào từ các thiết bị lạ.", { icon: '🛡️' })}
-        className="shrink-0 px-4 py-2.5 rounded-xl bg-white border border-[#EAEAF4] hover:bg-[#F8FAFC] hover:text-[#0f172a] text-sm font-semibold text-[#64748b] transition-all cursor-pointer shadow-sm"
+        className="shrink-0 px-4 py-2.5 rounded-xl bg-white border border-[#EAEAF4] hover:bg-[#F8FAFC] hover:text-slate-900 text-sm font-semibold text-slate-500 transition-all cursor-pointer shadow-sm"
       >
         Kiểm tra nhật ký
       </button>
@@ -95,8 +95,8 @@ export function SecurityPanel() {
       {/* Header */}
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-[#0f172a] tracking-tight">Bảo mật &amp; Mật khẩu</h2>
-          <p className="text-[15px] font-medium text-[#64748b] mt-2">
+          <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Bảo mật &amp; Mật khẩu</h2>
+          <p className="text-[15px] font-medium text-slate-500 mt-2">
             Quản lý khóa bảo vệ riêng tư và theo dõi các phiên kết nối thiết bị của bạn.
           </p>
         </div>
@@ -139,7 +139,7 @@ export function SecurityPanel() {
               value={value}
               onChange={(e) => set(e.target.value)}
               placeholder={placeholder}
-              className="w-full px-4 py-3 rounded-xl text-sm text-[#0f172a] bg-[#F8FAFC] border border-[#EAEAF4] focus:border-[#3b82f6] focus:bg-white focus:ring-4 focus:ring-[#3b82f6]/10 outline-none transition-all placeholder:text-[#94a3b8]"
+              className="w-full px-4 py-3 rounded-xl text-sm text-slate-900 bg-[#F8FAFC] border border-[#EAEAF4] focus:border-[#3b82f6] focus:bg-white focus:ring-4 focus:ring-[#3b82f6]/10 outline-none transition-all placeholder:text-[#94a3b8]"
             />
             {value.length > 0 && validation && !validation.isValid && (
               <p className="text-xs font-medium text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-lg mt-1.5">
@@ -271,8 +271,8 @@ export function SettingsPanel() {
     return (
       <div className="flex flex-col h-full">
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-[#0f172a] tracking-tight">Cài đặt hệ thống</h2>
-          <p className="text-[15px] font-medium text-[#64748b] mt-2">
+          <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Cài đặt hệ thống</h2>
+          <p className="text-[15px] font-medium text-slate-500 mt-2">
             Tùy biến trải nghiệm rèn luyện trực tuyến và các kênh tương tác của hệ thống.
           </p>
         </div>
@@ -288,8 +288,8 @@ export function SettingsPanel() {
   return (
     <div className="flex flex-col h-full">
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-[#0f172a] tracking-tight">Cài đặt hệ thống</h2>
-        <p className="text-[15px] font-medium text-[#64748b] mt-2">
+        <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Cài đặt hệ thống</h2>
+        <p className="text-[15px] font-medium text-slate-500 mt-2">
           Tùy biến trải nghiệm rèn luyện trực tuyến và các kênh tương tác của hệ thống.
         </p>
       </div>
@@ -301,11 +301,11 @@ export function SettingsPanel() {
             onClick={() => {
               if (!isSaving) handler();
             }}
-            className={`group flex items-center justify-between gap-4 p-5 rounded-2xl border border-[#EAEAF4] transition-all ${isSaving ? "opacity-70 cursor-not-allowed bg-slate-50" : "cursor-pointer bg-white hover:bg-[#F8FAFC] hover:border-[#3b82f6]/40 hover:shadow-sm"}`}
+            className={`group flex items-center justify-between gap-4 p-5 rounded-xl border border-[#EAEAF4] transition-all ${isSaving ? "opacity-70 cursor-not-allowed bg-slate-50" : "cursor-pointer bg-white hover:bg-[#F8FAFC] hover:border-[#3b82f6]/40 hover:shadow-md"}`}
           >
             <div className="space-y-1">
-              <p className="text-sm font-semibold text-[#0f172a]">{label}</p>
-              <p className="text-sm font-medium text-[#64748b] leading-relaxed">{description}</p>
+              <p className="text-sm font-semibold text-slate-900">{label}</p>
+              <p className="text-sm font-medium text-slate-500 leading-relaxed">{description}</p>
             </div>
             
             {/* Custom Toggle Switch */}

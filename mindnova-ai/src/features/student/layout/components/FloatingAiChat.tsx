@@ -530,7 +530,7 @@ export function FloatingAiChat() {
 
       {/* Expanded Floating Modal Window - 5% Larger Dimensions (340px x 445px) with Draggable Header */}
       <div
-        className={`w-[calc(100vw-2rem)] sm:w-[340px] h-[445px] max-h-[80vh] bg-white rounded-2xl shadow-[0_16px_48px_rgba(26,26,46,0.22)] border border-[#E4E6F0] flex-col overflow-hidden transition-transform duration-250 animate-in fade-in zoom-in-95 origin-bottom-right ${
+        className={`w-[calc(100vw-2rem)] sm:w-[340px] h-[445px] max-h-[80vh] bg-white rounded-xl shadow-[0_16px_48px_rgba(26,26,46,0.22)] border border-[#E4E6F0] flex-col overflow-hidden transition-transform duration-250 animate-in fade-in zoom-in-95 origin-bottom-right ${
           isDragging ? "ring-2 ring-blue-600/50 shadow-2xl scale-[1.01]" : ""
         } ${isOpen ? "flex" : "hidden"}`}
       >
@@ -722,17 +722,17 @@ export function FloatingAiChat() {
           
           {/* Custom Confirm Delete Modal */}
           {showConfirmDelete && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#0f172a]/20 backdrop-blur-sm rounded-2xl">
-              <div className="bg-white p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] w-[85%] max-w-[280px] border border-[#e2e8f0] transform transition-all">
-                <h3 className="text-sm font-bold text-[#0f172a] mb-2">Xóa lịch sử trò chuyện?</h3>
-                <p className="text-xs text-[#64748b] mb-5 leading-relaxed">
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#0f172a]/20 backdrop-blur-sm rounded-xl">
+              <div className="bg-white p-5 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] w-[85%] max-w-[280px] border border-[#e2e8f0] transform transition-all">
+                <h3 className="text-sm font-bold text-slate-900 mb-2">Xóa lịch sử trò chuyện?</h3>
+                <p className="text-xs text-slate-500 mb-5 leading-relaxed">
                   Bạn có chắc chắn muốn xóa toàn bộ tin nhắn và bắt đầu hội thoại mới không?
                 </p>
                 <div className="flex gap-2 justify-end">
                   <button
                     type="button"
                     onClick={() => setShowConfirmDelete(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-[#64748b] bg-[#f8fafc] hover:bg-[#f1f5f9] hover:text-[#0f172a] transition-all cursor-pointer focus:outline-none"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 bg-[#f8fafc] hover:bg-[#f1f5f9] hover:text-slate-900 transition-all cursor-pointer focus:outline-none"
                   >
                     Hủy
                   </button>

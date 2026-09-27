@@ -123,7 +123,7 @@ export function DashboardTopbar() {
  <a
  href="/messages"
  aria-label="Messages"
- className="group/chat relative w-9 h-9 rounded-md flex items-center justify-center text-[#64748b] hover:text-[#2563eb] hover:bg-[#f8fafc] transition-all duration-200 focus:outline-none"
+ className="group/chat relative w-9 h-9 rounded-md flex items-center justify-center text-slate-500 hover:text-[#2563eb] hover:bg-[#f8fafc] transition-all duration-200 focus:outline-none"
  >
  <div className="group-hover/chat:scale-105 transition-transform duration-200">
  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -141,7 +141,7 @@ export function DashboardTopbar() {
  type="button"
  onClick={() => setShowNotif(!showNotif)}
  aria-label="Notifications"
- className="group/bell relative w-9 h-9 rounded-md flex items-center justify-center text-[#64748b] hover:text-[#2563eb] hover:bg-[#f8fafc] transition-all duration-200 focus:outline-none"
+ className="group/bell relative w-9 h-9 rounded-md flex items-center justify-center text-slate-500 hover:text-[#2563eb] hover:bg-[#f8fafc] transition-all duration-200 focus:outline-none"
  >
  <div className="group-hover/bell:rotate-6 transition-transform duration-200">
  <BellIcon />
@@ -155,7 +155,7 @@ export function DashboardTopbar() {
  {showNotif && (
  <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-[#e2e8f0] overflow-hidden z-50">
  <div className="px-4 py-3 border-b border-[#f1f5f9] flex items-center justify-between bg-[#f8fafc]">
- <h3 className="text-sm font-semibold text-[#0f172a]">
+ <h3 className="text-sm font-semibold text-slate-900">
  Thông báo ({notifications.length}/50)
  </h3>
  {unreadCount > 0 && (
@@ -208,7 +208,7 @@ export function DashboardTopbar() {
  <span
  className={twMerge(
  "absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[2.5px] border-white shadow-sm",
- !notif.is_read ? "bg-[#2563eb]" : "bg-[#10b981]"
+ !notif.is_read ? "bg-blue-600" : "bg-[#10b981]"
  )}
  />
  </div>
@@ -216,13 +216,13 @@ export function DashboardTopbar() {
  <div className="flex-1 min-w-0">
  <p
  className={twMerge(
- "text-[14px] text-[#0f172a] leading-tight mb-1",
+ "text-[14px] text-slate-900 leading-tight mb-1",
  !notif.is_read ? "font-bold" : "font-semibold"
  )}
  >
  {notif.title || "Thông báo mới"}
  </p>
- <p className="text-[13px] text-[#64748b] line-clamp-2 leading-relaxed mb-1.5">
+ <p className="text-[13px] text-slate-500 line-clamp-2 leading-relaxed mb-1.5">
  {notif.content}
  </p>
  <p className="text-[11px] text-[#94a3b8] font-medium">
@@ -254,7 +254,7 @@ export function DashboardTopbar() {
  <button
  type="button"
  aria-label="Settings"
- className="group/settings w-9 h-9 rounded-md flex items-center justify-center text-[#64748b] hover:text-[#2563eb] hover:bg-[#f8fafc] transition-all duration-200 focus:outline-none"
+ className="group/settings w-9 h-9 rounded-md flex items-center justify-center text-slate-500 hover:text-[#2563eb] hover:bg-[#f8fafc] transition-all duration-200 focus:outline-none"
  >
  <div className="group-hover/settings:rotate-30 transition-transform duration-300">
  <SettingsIcon />

@@ -35,7 +35,7 @@ const LEVEL_BADGE_CLASS: Record<string, string> = {
 function NeuralMap() {
  return (
  <div
- className="relative w-full h-28 rounded-2xl overflow-hidden"
+ className="relative w-full h-28 rounded-xl overflow-hidden"
  aria-hidden="true"
  >
  {/* Dark space background */}
@@ -151,7 +151,7 @@ export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSumm
  </div>
 
  {/* Main card */}
- <div className="bg-white border border-[#E8E8F0] rounded-2xl p-4 shadow-[0_2px_12px_rgba(59, 130, 246,0.06)]">
+ <div className="bg-white border border-[#E8E8F0] rounded-xl p-4 shadow-[0_2px_12px_rgba(59, 130, 246,0.06)]">
  {/* Goal */}
  <SummaryRow
  icon={<TargetIcon />}

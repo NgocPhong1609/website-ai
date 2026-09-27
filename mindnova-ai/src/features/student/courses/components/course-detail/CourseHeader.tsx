@@ -52,7 +52,7 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
   return (
     <div className="mb-8">
       {/* ─── Editorial Hero Banner ─── */}
-      <section className="relative overflow-hidden rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] p-6 sm:p-8 transition-all duration-300">
+      <section className="relative overflow-hidden rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-6 sm:p-8 transition-all duration-300">
         <div className="relative z-10 flex flex-col gap-6">
           {/* Breadcrumb & Pill tag */}
           <div className="flex flex-wrap items-center justify-between gap-3">

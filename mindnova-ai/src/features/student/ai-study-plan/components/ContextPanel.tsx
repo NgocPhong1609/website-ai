@@ -30,7 +30,7 @@ interface ContextPanelProps {
  const [expandedId, setExpandedId] = useState<string | null>("concept-1");
 
  return (
- <div aria-label="AI Study Plan Context Inspector" className="w-full bg-white rounded-2xl border border-border shadow-sm p-6 sm:p-7 flex flex-col gap-8">
+ <div aria-label="AI Study Plan Context Inspector" className="w-full bg-white rounded-xl border border-border shadow-sm p-6 sm:p-7 flex flex-col gap-8">
  
  {/* ─── Inspector Top Header ─── */}
  <div className="flex items-center justify-between pb-4 border-b border-border">
@@ -99,7 +99,7 @@ interface ContextPanelProps {
  {formatStudyDuration(concept.description)}
  </p>
  {isExpanded && (
- <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col gap-3">
+ <div className="mt-4 pt-3 border-t border-slate-200 flex flex-col gap-3">
  <div className="flex items-center justify-between text-[11px] font-medium text-blue-600">
  <span>Đang tích hợp trong bộ nhớ AI</span>
  <span className="flex items-center gap-1 hover:underline cursor-pointer">

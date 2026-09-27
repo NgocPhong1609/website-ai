@@ -5,10 +5,10 @@ import toast from "react-hot-toast";
 
 export function BillingFooter() {
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-3 py-4 rounded-2xl bg-[#F8FAFC]/80 border border-[#e2e8f0] mt-2 text-xs text-[#64748b]">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-3 py-4 rounded-xl bg-[#F8FAFC]/80 border border-[#e2e8f0] mt-2 text-xs text-slate-500">
       {/* Security badges with gentle typography */}
       <div className="flex items-center gap-6">
-        <div className="flex items-center gap-2 text-[#64748b]">
+        <div className="flex items-center gap-2 text-slate-500">
           <ShieldIcon size={14} />
           <span className="font-medium">
             Thanh toán An toàn &amp; Bảo mật

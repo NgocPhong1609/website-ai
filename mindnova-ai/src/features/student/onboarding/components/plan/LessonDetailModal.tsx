@@ -99,7 +99,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  <h4 className="text-sm font-bold text-[#0F172A] mb-1.5 flex items-center gap-2">
  <span></span> Overview & Objective
  </h4>
- <p className="text-xs text-[#64748B] leading-relaxed bg-[#F8FAFC] p-3.5 rounded-2xl border border-gray-100">
+ <p className="text-xs text-[#64748B] leading-relaxed bg-[#F8FAFC] p-3.5 rounded-xl border border-gray-100">
  {details.overview}
  </p>
  </div>
@@ -126,7 +126,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  </h4>
 
  {details.recommended_courses?.map((course, idx) => (
- <div key={idx} className="bg-white border border-[#E2E8F0] rounded-2xl p-4 flex flex-col gap-2.5 hover:shadow-md transition-all hover:border-[#94A3B8]">
+ <div key={idx} className="bg-white border border-[#E2E8F0] rounded-xl p-4 flex flex-col gap-2.5 hover:shadow-md transition-all hover:border-[#94A3B8]">
  <div className="flex justify-between items-center">
  <span className="text-[10px] font-bold px-2 py-0.5 bg-[#D4A574] text-white rounded-full">
  {course.badge || "Featured"}

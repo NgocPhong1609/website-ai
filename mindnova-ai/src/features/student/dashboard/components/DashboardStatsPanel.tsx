@@ -42,7 +42,7 @@ function OverallProgressCard({ data }: { data: OverallProgress }) {
  </p>
  </div>
 
- <div className="pt-3 border-t border-slate-100 space-y-2">
+ <div className="pt-3 border-t border-slate-200 space-y-2">
  <div className="flex items-center justify-between text-xs font-medium text-slate-500">
  <span>Hoàn tất lộ trình</span>
  <span className="text-slate-900 font-semibold">Đạt tiến độ chuẩn</span>
@@ -73,7 +73,7 @@ function FocusAreaRow({ area }: { area: FocusAreaType }) {
  const targetHref = area.action === "review" ? "/practice" : "/practice/quiz";
 
  return (
- <div className="group/row flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+ <div className="group/row flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-blue-500">
  <div className="flex-1 min-w-0">
  <p className="text-xs sm:text-sm font-semibold text-slate-900 truncate group-hover/row:text-blue-600 transition-colors" title={area.topic}>
  {area.topic}
@@ -112,7 +112,7 @@ function FocusAreasCard({ areas }: { areas: FocusAreaType[] }) {
  AI Focus
  </span>
  </div>
- <p className="text-xs font-normal text-slate-500 pb-3 border-b border-slate-100">
+ <p className="text-xs font-normal text-slate-500 pb-3 border-b border-slate-200">
  Cá nhân hóa từ phân tích chẩn đoán thực chiến
  </p>
  </div>

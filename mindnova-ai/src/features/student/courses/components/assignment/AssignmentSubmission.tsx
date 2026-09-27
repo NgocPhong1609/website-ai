@@ -55,7 +55,7 @@ export function AssignmentSubmission() {
  <div className="flex-1 flex flex-col gap-6 w-full">
  
  {/* Assignment Instructions */}
- <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 shadow-sm">
+ <div className="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-sm">
  <div className="flex items-center gap-3 mb-4">
  <FileTextIcon className="w-5 h-5 text-[#3B82F6]" />
  <h2 className="text-[16px] font-bold text-[#0F172A]">Assignment Instructions</h2>
@@ -78,7 +78,7 @@ export function AssignmentSubmission() {
  </div>
 
  {/* Editor Card */}
- <div className="bg-white border border-[#E2E8F0] rounded-2xl flex flex-col shadow-sm overflow-hidden">
+ <div className="bg-white border border-[#E2E8F0] rounded-xl flex flex-col shadow-sm overflow-hidden">
  <div className="bg-[#FBFBFC] border-b border-[#E2E8F0] px-4 py-3 flex items-center justify-between">
  <div className="flex items-center gap-1.5">
  <button className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#EAEAF4] transition-colors"><BoldIcon className="w-4 h-4" /></button>
@@ -103,8 +103,8 @@ export function AssignmentSubmission() {
  </div>
 
  {/* File Upload Card */}
- <div className="bg-white border-2 border-dashed border-[#D0D0E0] rounded-2xl p-10 flex flex-col items-center justify-center text-center shadow-sm hover:border-[#E2E8F0] transition-colors bg-[#FBFBFC]">
- <div className="w-12 h-12 rounded-2xl bg-[#F0F0FF] text-[#3B82F6] flex items-center justify-center mb-4">
+ <div className="bg-white border-2 border-dashed border-[#D0D0E0] rounded-xl p-10 flex flex-col items-center justify-center text-center shadow-sm hover:border-[#E2E8F0] transition-colors bg-[#FBFBFC]">
+ <div className="w-12 h-12 rounded-xl bg-[#F0F0FF] text-[#3B82F6] flex items-center justify-center mb-4">
  <UploadCloudIcon className="w-6 h-6" />
  </div>
  <h3 className="text-[16px] font-bold text-[#0F172A] mb-2">Drag &amp; Drop Supplementary Files</h3>
@@ -122,9 +122,9 @@ export function AssignmentSubmission() {
  <div className="w-full lg:w-[320px] shrink-0 flex flex-col gap-6">
  
  {/* AI Pre-Check Card */}
- <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 shadow-sm">
+ <div className="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-sm">
  <div className="flex items-center gap-4 mb-6">
- <div className="w-12 h-12 rounded-2xl bg-[#3B82F6] text-white flex items-center justify-center shrink-0 shadow-md">
+ <div className="w-12 h-12 rounded-xl bg-[#3B82F6] text-white flex items-center justify-center shrink-0 shadow-md">
  <SparklesIcon className="w-6 h-6" />
  </div>
  <div>
@@ -173,7 +173,7 @@ export function AssignmentSubmission() {
  </div>
 
  {/* Submission Details Card */}
- <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 shadow-sm">
+ <div className="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-sm">
  <div className="flex items-center justify-between py-3 border-b border-[#E2E8F0]">
  <span className="text-[13px] font-semibold text-[#64748B]">Character Count</span>
  <span className="text-[13px] font-bold text-[#0F172A]">0/8,000</span>
@@ -196,7 +196,7 @@ export function AssignmentSubmission() {
  </div>
 
  {/* Promo Card */}
- <div className=" from-[#0F172A] to-[#2B1B8A] rounded-2xl p-6 text-white overflow-hidden relative shadow-md">
+ <div className=" from-[#0F172A] to-[#2B1B8A] rounded-xl p-6 text-white overflow-hidden relative shadow-md">
  {/* Abstract Graphic Background */}
  <div className="absolute top-0 right-0 w-32 h-32 bg-[#F8FAFC] rounded-full blur-[60px] opacity-40 mix-blend-screen transform translate-x-1/2 -translate-y-1/2" />
  <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#00D2FF] rounded-full blur-[50px] opacity-30 mix-blend-screen transform -translate-x-1/2 translate-y-1/2" />

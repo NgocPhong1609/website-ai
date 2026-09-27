@@ -7,7 +7,7 @@ function LearningVelocityCard() {
  const bars = [28, 40, 32, 52, 44, 60, 68, 55, 74, 88];
 
  return (
- <div className="bg-white rounded-2xl p-5 shadow-[0_4px_24px_rgba(70,72,212,0.1)] border border-white/80">
+ <div className="bg-white rounded-xl p-5 shadow-[0_4px_24px_rgba(70,72,212,0.1)] border border-white/80">
  <div className="flex items-start justify-between mb-4">
  <div>
  <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-[0.12em] mb-1">
@@ -42,7 +42,7 @@ function LearningVelocityCard() {
 
 function AiTutorCard() {
  return (
- <div className="bg-white rounded-2xl p-4 shadow-[0_4px_24px_rgba(70,72,212,0.08)] border border-white/80">
+ <div className="bg-white rounded-xl p-4 shadow-[0_4px_24px_rgba(70,72,212,0.08)] border border-white/80">
  <div className="flex items-center gap-2 mb-3">
  
  <span className="text-[10px] font-black text-[#3B82F6] uppercase tracking-[0.15em]">
@@ -59,7 +59,7 @@ function AiTutorCard() {
 
 function UserStreakCard() {
  return (
- <div className="bg-white rounded-2xl p-4 shadow-[0_4px_24px_rgba(70,72,212,0.08)] border border-white/80 flex items-center gap-3">
+ <div className="bg-white rounded-xl p-4 shadow-[0_4px_24px_rgba(70,72,212,0.08)] border border-white/80 flex items-center gap-3">
  {/* Avatar */}
  <div className="relative shrink-0">
  
@@ -84,7 +84,7 @@ function UserStreakCard() {
 
 function NextSessionCard() {
  return (
- <div className="bg-white rounded-2xl p-4 shadow-[0_4px_24px_rgba(70,72,212,0.08)] border border-white/80 space-y-2.5">
+ <div className="bg-white rounded-xl p-4 shadow-[0_4px_24px_rgba(70,72,212,0.08)] border border-white/80 space-y-2.5">
  <p className="text-[9px] font-black text-[#94A3B8] uppercase tracking-[0.2em]">
  Recommended Focus
  </p>

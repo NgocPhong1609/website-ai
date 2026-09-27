@@ -33,7 +33,7 @@ export function AiSuggestionCard({ suggestion = AI_SUGGESTION }: AiSuggestionCar
  {suggestion?.message || "Chúng tôi nhận thấy bạn vừa dành 20 phút xử lý vướng mắc về Hydration errors. Hãy thử ôn tập chuyên sâu học phần Server vs Client Leaf Node Components nhé!"}
  </p>
 
- <div className="flex items-center gap-2 text-xs text-slate-500 font-normal bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
+ <div className="flex items-center gap-2 text-xs text-slate-500 font-normal bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
  <span className="text-blue-600 font-semibold">Lý do đề xuất:</span>
  <span>{suggestion?.reason || "Điểm kiểm tra kỹ năng State & Client Components lần trước là 58%."}</span>
  </div>

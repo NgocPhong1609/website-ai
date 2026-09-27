@@ -19,7 +19,7 @@ export function CourseCatalogSkeleton() {
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}
-            className="flex flex-col bg-white rounded-xl border border-slate-100 overflow-hidden shadow-sm h-full"
+            className="flex flex-col bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm h-full"
           >
             {/* Thumbnail */}
             <div className="h-44 w-full bg-slate-200 animate-pulse shrink-0" />

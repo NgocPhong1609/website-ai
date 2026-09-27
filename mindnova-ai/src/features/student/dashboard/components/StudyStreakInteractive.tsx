@@ -166,7 +166,7 @@ export function StudyStreakInteractive({
           </div>
         </div>
         
-        <div className="grid grid-cols-7 gap-1.5 pt-4 border-t border-slate-100 mt-auto">
+        <div className="grid grid-cols-7 gap-1.5 pt-4 border-t border-slate-200 mt-auto">
           {weekDays.map((d) => (
              <div key={d} className="flex flex-col items-center gap-1.5">
                <span className="text-[10px] font-medium text-slate-500 uppercase">{d}</span>
@@ -187,14 +187,14 @@ export function StudyStreakInteractive({
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-md" onClick={() => setShowModal(false)}>
           <div 
-            className="bg-white w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl relative flex flex-col lg:flex-row border border-slate-200" 
+            className="bg-white w-full max-w-4xl rounded-xl overflow-hidden shadow-2xl relative flex flex-col lg:flex-row border border-slate-200" 
             onClick={(e) => e.stopPropagation()}
           >
             <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 z-20 text-slate-500 hover:bg-slate-100 p-2.5 rounded-full transition-colors bg-white shadow-sm">
               <X size={18} />
             </button>
 
-            <div className="w-full lg:w-7/12 p-6 sm:p-10 bg-white border-r border-slate-100 flex items-center justify-center">
+            <div className="w-full lg:w-7/12 p-6 sm:p-10 bg-white border-r border-slate-200 flex items-center justify-center">
               <style dangerouslySetInnerHTML={{__html: `
                 .rdp-root {
                   --rdp-cell-size: 46px;
@@ -301,14 +301,14 @@ export function StudyStreakInteractive({
               {(!isCheckedIn && viewMonthDate.getMonth() === today.getMonth() && viewMonthDate.getFullYear() === today.getFullYear()) && (
                 <button 
                   onClick={handleCheckIn}
-                  className="w-full py-4 mb-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl font-medium text-sm shadow-sm hover:-translate-y-1 transition-all active:scale-95"
+                  className="w-full py-4 mb-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium text-sm shadow-sm transition-all active:scale-95"
                 >
                   {isLoading ? "Đang xử lý..." : "Xác nhận điểm danh hôm nay"}
                 </button>
               )}
 
               {aiInsight?.message ? (
-              <div className="mt-auto bg-white rounded-2xl p-5 border border-slate-100 relative shadow-sm">
+              <div className="mt-auto bg-white rounded-xl p-5 border border-slate-200 relative shadow-sm">
                  <div className="absolute -top-3 left-4 bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-semibold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" /> AI LỊCH TRÌNH
                  </div>

@@ -28,7 +28,7 @@ export default async function DashboardPage() {
  <div className="flex flex-col gap-8 p-6 md:p-8 max-w-[1400px] w-full mx-auto min-h-[calc(100vh-4rem)]">
  
  {/* ─── Synchronized Universal Welcome Hero Banner ─── */}
- <section className="relative overflow-hidden rounded-2xl bg-white border border-slate-100 p-6 sm:p-7 shadow-sm transition-all w-full">
+ <section className="relative overflow-hidden rounded-xl bg-white border border-slate-200 p-6 sm:p-7 shadow-sm transition-all w-full">
  <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 w-full">
  <div className="space-y-4 max-w-xl">
  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-blue-50 border border-blue-100 text-xs font-medium text-blue-600">
@@ -48,7 +48,7 @@ export default async function DashboardPage() {
 
  {/* Universal Wide Mastery Card */}
  {dashboardData.user ? (
- <Link href="/study-plan" className="group block shrink-0 bg-slate-50 rounded-xl p-5 border border-slate-100 flex flex-col justify-center min-w-[320px] sm:min-w-[380px] hover:border-slate-200 hover:shadow-sm transition-all text-decoration-none focus:outline-none">
+ <Link href="/study-plan" className="group block shrink-0 bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-center min-w-[320px] sm:min-w-[380px] hover:border-blue-500 hover:shadow-md transition-all text-decoration-none focus:outline-none">
  <div className="w-full flex items-center justify-between gap-4 mb-3">
  <span className="text-xs font-semibold text-slate-500 group-hover:text-blue-600 transition-colors">Mục tiêu trong ngày ↗</span>
  <span className="text-[11px] font-medium text-slate-700 bg-white px-2.5 py-0.5 rounded-full border border-slate-200 shadow-sm">
@@ -79,7 +79,7 @@ export default async function DashboardPage() {
  </p>
  </Link>
  ) : (
- <div className="group block shrink-0 bg-slate-50 rounded-xl p-6 border border-slate-100 flex flex-col justify-center min-w-[320px] sm:min-w-[380px] text-center">
+ <div className="group block shrink-0 bg-slate-50 rounded-xl p-6 border border-slate-200 flex flex-col justify-center min-w-[320px] sm:min-w-[380px] text-center">
  <h3 className="text-sm font-semibold text-slate-900 mb-1">Dữ liệu được bảo mật</h3>
  <p className="text-xs text-slate-500 mb-4">Đăng nhập để xem thông tin học tập của bạn.</p>
  <Link href="/login" className="inline-flex justify-center items-center py-2 px-4 rounded-lg text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">
@@ -109,12 +109,12 @@ export default async function DashboardPage() {
  <ContinueLearning courses={dashboardData.courses} />
 
  {/* ─── Advanced Recommendations Section ─── */}
- <div className="w-full flex flex-col gap-8 border-t border-slate-100 pt-8">
+ <div className="w-full flex flex-col gap-8 border-t border-slate-200 pt-8">
  <AdvancedRecommendationsSection recommendations={dashboardData.advanced_recommendations} />
  </div>
  </>
  ) : (
- <div className="flex flex-col items-center justify-center py-20 px-4 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
+ <div className="flex flex-col items-center justify-center py-20 px-4 text-center border border-dashed border-slate-200 rounded-xl bg-white">
  <h2 className="text-xl font-semibold text-slate-900 mb-2">Bạn chưa bắt đầu khóa học nào</h2>
  <p className="text-sm text-slate-500 max-w-md mb-6">
  Khám phá hàng trăm khóa học chất lượng từ chuyên gia và xây dựng lộ trình học tập của riêng bạn ngay hôm nay.

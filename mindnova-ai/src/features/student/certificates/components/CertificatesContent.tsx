@@ -63,7 +63,7 @@ export function CertificatesContent() {
       )}
 
       {firstClaimable && (
-        <div className="bg-white border border-[#64748B]/20 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+        <div className="bg-white border border-[#64748B]/20 rounded-xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
           <div className="flex items-center gap-5 w-full md:w-auto">
             <div className="w-16 h-16 rounded-full bg-[#EAEAF4] flex items-center justify-center shrink-0">
               <PartyPopperIcon className="w-8 h-8 text-[#3B82F6]" />
@@ -88,7 +88,7 @@ export function CertificatesContent() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {issued.map((certificate) => (
-          <div key={certificate.id} className="bg-white border border-[#EAEAF4] rounded-2xl p-5 shadow-sm flex flex-col">
+          <div key={certificate.id} className="bg-white border border-[#EAEAF4] rounded-xl p-5 shadow-sm flex flex-col">
             <div className="w-full h-[180px] rounded-xl mb-5 bg-[#F8F9FB] border border-[#EAEAF4] flex flex-col items-center justify-center p-4 text-center">
               <div className="text-[10px] font-bold tracking-[0.2em] text-[#3B82F6] uppercase mb-2">MindNova</div>
               <div className="text-[14px] font-serif text-[#0F172A]">{certificate.student_name}</div>
@@ -118,8 +118,8 @@ export function CertificatesContent() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 flex items-center gap-5">
-          <div className="w-14 h-14 rounded-2xl bg-[#F0F0FF] text-[#64748B] flex items-center justify-center shrink-0">
+        <div className="bg-white border border-[#EAEAF4] rounded-xl p-6 flex items-center gap-5">
+          <div className="w-14 h-14 rounded-xl bg-[#F0F0FF] text-[#64748B] flex items-center justify-center shrink-0">
             <GraduationCapIcon className="w-6 h-6" />
           </div>
           <div>
@@ -127,8 +127,8 @@ export function CertificatesContent() {
             <p className="text-2xl font-bold text-[#0F172A]">{data?.stats.total_certificates ?? 0}</p>
           </div>
         </div>
-        <div className="bg-white border border-[#EAEAF4] rounded-2xl p-6 flex items-center gap-5">
-          <div className="w-14 h-14 rounded-2xl bg-[#F0F0FF] text-[#64748B] flex items-center justify-center shrink-0">
+        <div className="bg-white border border-[#EAEAF4] rounded-xl p-6 flex items-center gap-5">
+          <div className="w-14 h-14 rounded-xl bg-[#F0F0FF] text-[#64748B] flex items-center justify-center shrink-0">
             <MedalIcon className="w-6 h-6" />
           </div>
           <div>

@@ -4,7 +4,7 @@ export function ExploreMoreCard() {
  return (
  <Link
  href="/explore"
- className="border border-dashed border-slate-300 bg-slate-50 rounded-2xl flex flex-col items-center justify-center p-6 text-center h-full hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-300 text-decoration-none focus:outline-none"
+ className="border border-dashed border-slate-300 bg-slate-50 rounded-xl flex flex-col items-center justify-center p-6 text-center h-full hover:border-blue-500 hover:bg-blue-50/50 hover:shadow-md transition-all duration-300 text-decoration-none focus:outline-none"
  >
  <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center mb-4 hover:bg-blue-600 hover:text-white hover:shadow-md transition-all duration-300 font-bold text-2xl">
  +

@@ -1537,7 +1537,7 @@ function LessonWorkspaceContent() {
                       onClick={() => handleSelectLesson(lesson.id)}
                       className={twMerge(
                         "flex items-center justify-between py-3 px-3.5 rounded-xl relative cursor-pointer transition-all duration-200 border",
-                        isCurrent ? "bg-white border-blue-200 shadow-sm ring-1 ring-blue-100" : "bg-transparent border-transparent hover:border-slate-200/60 hover:bg-white hover:shadow-sm"
+                        isCurrent ? "bg-white border-blue-200 shadow-sm ring-1 ring-blue-100" : "bg-transparent border-transparent hover:border-blue-500/60 hover:bg-white hover:shadow-md"
                       )}
                     >
                       {isCurrent && <div className="absolute left-0 top-3 bottom-3 w-[4px] bg-blue-600 rounded-r-full shadow-sm" />}

@@ -15,14 +15,14 @@ export function MyCourseCard({ course }: { course: MyCourse }) {
 
  const buttonStyle = isCompleted
  ? "bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200"
- : "bg-blue-500 text-white hover:bg-blue-600 border border-transparent shadow-sm";
+ : "bg-blue-600 text-white hover:bg-blue-700 border border-transparent shadow-sm";
 
  const buttonText = isCompleted ? "Ôn tập khoá học" : isNotStarted ? "Bắt đầu học ngay" : "Vào học tiếp";
  
  const labelText = isCompleted ? "Trạng thái" : isNotStarted ? "Bài học mở đầu" : "Bài học tiếp theo";
 
  return (
- <div className="group/card bg-white border border-slate-100 rounded-xl flex flex-col justify-between h-full hover:border-slate-200 hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-500 hover:-translate-y-1 overflow-hidden">
+ <div className="group/card bg-white border border-slate-200 rounded-xl flex flex-col justify-between h-full hover:border-blue-500 hover:shadow-md transition-all duration-300 overflow-hidden">
  {/* Thumbnail Header */}
  <div className="relative h-44 w-full bg-slate-900 overflow-hidden shrink-0">
  {course.thumbnailUrl ? (
@@ -63,7 +63,7 @@ export function MyCourseCard({ course }: { course: MyCourse }) {
  </div>
 
  {/* Progress Bar */}
- <div className="w-full bg-slate-100 h-1.5 overflow-hidden border-b border-slate-100">
+ <div className="w-full bg-slate-100 h-1.5 overflow-hidden border-b border-slate-200">
  <div
  className="h-full transition-all duration-700 bg-blue-500"
  style={{ width: `${course.progress}%` }}
@@ -84,8 +84,8 @@ export function MyCourseCard({ course }: { course: MyCourse }) {
  </Link>
 
  {/* Next Lesson Tile */}
- <div className="mt-3 bg-slate-50/80 rounded-xl p-3 flex items-center gap-3 border border-slate-100/50 group-hover/card:border-slate-200 transition-all duration-300">
- <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 shadow-sm text-slate-500 flex items-center justify-center shrink-0 group-hover/card:bg-blue-50 group-hover/card:text-blue-600 group-hover/card:border-blue-100 transition-all duration-300 text-xs font-bold">
+ <div className="mt-3 bg-slate-50/80 rounded-xl p-3 flex items-center gap-3 border border-slate-200/50 group-hover/card:border-slate-200 transition-all duration-300">
+ <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm text-slate-500 flex items-center justify-center shrink-0 group-hover/card:bg-blue-50 group-hover/card:text-blue-600 group-hover/card:border-blue-100 transition-all duration-300 text-xs font-bold">
  {isCompleted ? "C" : "N"}
  </div>
  <div className="min-w-0 flex-1">

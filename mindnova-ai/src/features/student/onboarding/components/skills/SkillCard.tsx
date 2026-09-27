@@ -31,9 +31,9 @@ export default function SkillCard({
  onKeyDown={(e) => e.key === "Enter" && onClick?.()}
  aria-pressed={isActive}
  className={twMerge(
- "w-full bg-white rounded-2xl p-8 flex flex-col items-center text-center cursor-pointer transition-all duration-300",
+ "w-full bg-white rounded-xl p-8 flex flex-col items-center text-center cursor-pointer transition-all duration-300",
  "border border-transparent shadow-[0_4px_24px_rgba(0,0,0,0.02)]",
- "hover:-translate-y-1 hover:shadow-md",
+ " hover:shadow-md",
  isActive && "border-[#E2E8F0] ring-1 ring-[#3B82F6] bg-[#F8F9FE]",
  )}
  >

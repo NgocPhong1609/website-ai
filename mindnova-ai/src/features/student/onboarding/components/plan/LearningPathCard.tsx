@@ -13,9 +13,9 @@ const STATUS_CONFIG: Record<
   PlanItemStatus,
   { dotClass: string; labelClass: string; label: string }
 > = {
-  ready:    { dotClass: "bg-[#3B82F6]",        labelClass: "text-[#3B82F6] font-semibold",  label: "Ready"    },
-  upcoming: { dotClass: "bg-[#00A896]",        labelClass: "text-[#00A896] font-semibold",  label: "Up Next"  },
-  locked:   { dotClass: "bg-[#C7C4D7]",        labelClass: "text-[#94A3B8]",                label: "Locked"   },
+  ready: { dotClass: "bg-[#3B82F6]", labelClass: "text-[#3B82F6] font-semibold", label: "Ready" },
+  upcoming: { dotClass: "bg-[#00A896]", labelClass: "text-[#00A896] font-semibold", label: "Up Next" },
+  locked: { dotClass: "bg-[#C7C4D7]", labelClass: "text-[#94A3B8]", label: "Locked" },
 };
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -39,7 +39,7 @@ function LockIcon() {
 }
 
 function PhaseIcon({ status }: { status: PlanItemStatus }) {
-  if (status === "ready")    return <CheckIcon />;
+  if (status === "ready") return <CheckIcon />;
   if (status === "upcoming") return <ArrowIcon />;
   return <LockIcon />;
 }
@@ -126,7 +126,7 @@ interface PhaseBlockProps {
 
 function PhaseBlock({ phase, phaseIndex, onLessonClick }: PhaseBlockProps) {
   return (
-    <div className="rounded-2xl border p-4 transition-all duration-300 bg-white border-[#E8E8F0] shadow-[0_2px_12px_rgba(59, 130, 246,0.06)]">
+    <div className="rounded-xl border p-4 transition-all duration-300 bg-white border-[#E8E8F0] shadow-[0_2px_12px_rgba(59, 130, 246,0.06)]">
       <PhaseHeader phase={phase} phaseIndex={phaseIndex} />
       <p className="text-xs text-[#64748B] mb-3 leading-relaxed">{phase.description}</p>
       <div className="pl-1 space-y-0.5">

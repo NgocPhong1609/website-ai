@@ -17,18 +17,18 @@ export default function BillingContainer() {
  <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-8">
  
  {/* ─── Synchronized Universal Hero Banner matching /courses & /study-plan ─── */}
- <section className="relative overflow-hidden rounded-2xl bg-white border border-[#e2e8f0] p-6 sm:p-7 transition-all duration-300 w-full">
+ <section className="relative overflow-hidden rounded-xl bg-white border border-[#e2e8f0] p-6 sm:p-7 transition-all duration-300 w-full">
  <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 w-full">
  <div className="space-y-4 max-w-xl">
  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-[#e2e8f0] text-xs font-semibold text-[#2563eb] shadow-sm">
  Quản Trị Học Phí &amp; Gói Học • Tự Động Hóa AI
  </div>
 
- <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0f172a] leading-tight">
+ <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 leading-tight">
  Quản Lý &amp; <span className="text-[#2563eb] font-bold drop-shadow-2xs">Thanh Toán Trực Tuyến </span>
  </h1>
 
- <p className="text-xs sm:text-sm text-[#64748b] leading-relaxed font-normal">
+ <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">
  Quản lý lịch sử giao dịch học phí, thiết lập phương thức thanh toán an toàn và theo dõi quyền lợi gói học AI Pro. Dữ liệu của bạn được mã hóa bảo mật chuẩn SSL 256-bit.
  </p>
 
@@ -36,20 +36,20 @@ export default function BillingContainer() {
  </div>
 
  {/* Universal Wide Mastery Card representing Active Subscription (No automatic renewal / gia hạn messaging) */}
- <div className="group shrink-0 bg-white/95 backdrop-blur-md rounded-2xl p-5 sm:p-6 border border-[#e2e8f0] flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm hover:border-[#e2e8f0] hover:-translate-y-0.5 transition-all duration-300">
- <div className="text-2xl sm:text-3xl font-bold text-[#0f172a] my-1 flex items-baseline justify-between gap-4">
+ <div className="group shrink-0 bg-white/95 backdrop-blur-md rounded-xl p-5 sm:p-6 border border-[#e2e8f0] flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm hover:border-[#e2e8f0] hover:-translate-y-0.5 transition-all duration-300">
+ <div className="text-2xl sm:text-3xl font-bold text-slate-900 my-1 flex items-baseline justify-between gap-4">
  <div>
  <span className="text-[#2563eb] font-bold">{isLoading ? "..." : amountLabel}</span>
- <span className="text-xs font-medium text-[#64748b] ml-1.5">gần nhất</span>
+ <span className="text-xs font-medium text-slate-500 ml-1.5">gần nhất</span>
  </div>
- <span className="text-xs font-semibold text-[#64748b]">
+ <span className="text-xs font-semibold text-slate-500">
  {latestPaid ? "Đã thanh toán" : "Chưa có giao dịch"}
  </span>
  </div>
 
  <div className="w-full h-2 bg-[#e2e8f0] rounded-full mt-2.5 overflow-hidden p-0.5 border border-[#e2e8f0]">
  <div
- className="h-full bg-[#2563eb] rounded-full shadow-[0_0_8px_rgba(59, 130, 246,0.4)] transition-all duration-1000 group-hover:brightness-110"
+ className="h-full bg-blue-600 rounded-full shadow-[0_0_8px_rgba(59, 130, 246,0.4)] transition-all duration-1000 group-hover:brightness-110"
  style={{ width: "100%" }}
  />
  </div>

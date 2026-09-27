@@ -335,7 +335,7 @@ export function SelfAssessmentModal({
  {step === "results" && results && (
  <div className="space-y-6">
  {/* Score Header Card */}
- <div className="p-6 rounded-2xl from-[#EFF6FF] via-[#F6F6FB] to-[#EAF8F5] border border-[#3B82F6]/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+ <div className="p-6 rounded-xl from-[#EFF6FF] via-[#F6F6FB] to-[#EAF8F5] border border-[#3B82F6]/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
  <div>
  <span className="text-xs font-bold text-[#0F172A] bg-white px-3 py-1 rounded-full border border-[#0F172A]/20 shadow-2xs inline-block mb-1.5">
  Kết quả tự đánh giá bằng AI
@@ -348,14 +348,14 @@ export function SelfAssessmentModal({
  </p>
  </div>
 
- <div className="shrink-0 w-20 h-20 rounded-2xl bg-white border border-[#3B82F6]/30 flex flex-col items-center justify-center shadow-sm">
+ <div className="shrink-0 w-20 h-20 rounded-xl bg-white border border-[#3B82F6]/30 flex flex-col items-center justify-center shadow-sm">
  <span className="text-2xl font-bold text-[#3B82F6]">{results.score_percentage}%</span>
  <span className="text-[10px] text-gray-400 font-semibold uppercase">{results.passed ? "Đạt Chuẩn" : "Cần Ôn Tập"}</span>
  </div>
  </div>
 
  {/* AI Tutor Insight */}
- <div className="p-4.5 rounded-2xl bg-[#F8FAFC] border border-[#C7D2FE] space-y-2">
+ <div className="p-4.5 rounded-xl bg-[#F8FAFC] border border-[#C7D2FE] space-y-2">
  <div className="flex items-center gap-2 text-xs font-bold text-[#3B82F6]">
  <span> Lời khuyên từ Gia sư AI Nova:</span>
  </div>
@@ -366,7 +366,7 @@ export function SelfAssessmentModal({
 
  {/* Lessons to Review */}
  {results.review_lessons && results.review_lessons.length > 0 && (
- <div className="p-4.5 rounded-2xl bg-[#FFF8EB] border border-[#FDE68A] space-y-2">
+ <div className="p-4.5 rounded-xl bg-[#FFF8EB] border border-[#FDE68A] space-y-2">
  <span className="text-xs font-bold text-[#D97706] block">
  Bài học bạn nên đọc lại:
  </span>

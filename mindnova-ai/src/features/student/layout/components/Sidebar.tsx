@@ -68,7 +68,7 @@ export default function Sidebar() {
  )}>
  {/* Brand & Toggle */}
  <div className={twMerge(
- "py-[18px] border-b border-slate-100 flex items-center transition-all",
+ "py-[18px] border-b border-slate-200 flex items-center transition-all",
  isCollapsed ? "px-2 flex-col justify-center gap-4" : "px-4 justify-between"
  )}>
  <SidebarBrand isCollapsed={isCollapsed} />
@@ -85,7 +85,7 @@ export default function Sidebar() {
  <SidebarNav isCollapsed={isCollapsed} />
 
  {/* Bottom section */}
- <div className={twMerge("py-5 border-t border-slate-100 flex flex-col gap-3", isCollapsed ? "px-2 items-center" : "px-4")}>
+ <div className={twMerge("py-5 border-t border-slate-200 flex flex-col gap-3", isCollapsed ? "px-2 items-center" : "px-4")}>
  
  
 

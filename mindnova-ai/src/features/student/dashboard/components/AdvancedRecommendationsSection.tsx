@@ -44,7 +44,7 @@ export function AdvancedRecommendationsSection({ recommendations = [] }: Advance
  return (
  <div
  key={rec.id}
- className="group bg-white border border-slate-100 rounded-xl flex flex-col justify-between w-full h-full hover:border-slate-200 hover:shadow-sm transition-all duration-300 overflow-hidden"
+ className="group bg-white border border-slate-200 rounded-xl flex flex-col justify-between w-full h-full hover:border-blue-500 hover:shadow-md transition-all duration-300 overflow-hidden"
  >
  <div className="flex flex-col flex-1">
  {/* Thumbnail Header */}
@@ -97,7 +97,7 @@ export function AdvancedRecommendationsSection({ recommendations = [] }: Advance
  </Link>
 
  {/* Instructor & Rating */}
- <div className="flex items-center justify-between gap-2 text-xs text-slate-500 mt-3 pb-3 border-b border-slate-100">
+ <div className="flex items-center justify-between gap-2 text-xs text-slate-500 mt-3 pb-3 border-b border-slate-200">
  <span className="truncate font-medium text-slate-500 flex items-center gap-1.5">
  <span>{rec.instructor.split("•")[0]}</span>
  <VerifiedTeacherBadge isVerified={true} size="xs" />

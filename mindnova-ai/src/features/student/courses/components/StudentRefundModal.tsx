@@ -90,7 +90,7 @@ export function StudentRefundModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fadeIn font-sans">
-      <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-scaleIn">
+      <div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col animate-scaleIn">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[#EAEAF4] bg-white">
           <div className="flex items-center gap-3">
@@ -98,15 +98,15 @@ export function StudentRefundModal({
               <Banknote size={20} strokeWidth={2.5} />
             </div>
             <div>
-              <h3 className="text-[17px] font-semibold text-[#0f172a]">Yêu cầu hoàn tiền</h3>
-              <p className="text-[13px] font-medium text-[#64748b]">Chính sách bảo vệ quyền lợi học viên MindNova AI</p>
+              <h3 className="text-[17px] font-semibold text-slate-900">Yêu cầu hoàn tiền</h3>
+              <p className="text-[13px] font-medium text-slate-500">Chính sách bảo vệ quyền lợi học viên MindNova AI</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Đóng"
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[#94a3b8] hover:text-[#0f172a] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[#94a3b8] hover:text-slate-900 hover:bg-[#F8FAFC] transition-colors cursor-pointer"
           >
             <X size={18} strokeWidth={2.5} />
           </button>
@@ -117,7 +117,7 @@ export function StudentRefundModal({
           {/* Course Summary Box */}
           <div className="p-5 rounded-xl bg-white border border-[#EAEAF4] shadow-sm">
             <span className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wider">Khóa học yêu cầu hoàn</span>
-            <h4 className="text-[15px] font-semibold text-[#0f172a] mt-1.5">{eligibility?.course_title || courseTitle || "Khóa học của bạn"}</h4>
+            <h4 className="text-[15px] font-semibold text-slate-900 mt-1.5">{eligibility?.course_title || courseTitle || "Khóa học của bạn"}</h4>
             {eligibility?.amount && (
               <p className="text-sm font-semibold text-[#3B82F6] mt-2">
                 Số tiền hoàn lại: {Number(eligibility.amount).toLocaleString("vi-VN")} VNĐ
@@ -127,10 +127,10 @@ export function StudentRefundModal({
 
           {/* Refund Rules Checklist */}
           <div className="flex flex-col gap-4 p-5 rounded-xl bg-white border border-[#EAEAF4] shadow-sm">
-            <h5 className="text-[13px] font-semibold text-[#0f172a]">Kiểm tra điều kiện hoàn tiền</h5>
+            <h5 className="text-[13px] font-semibold text-slate-900">Kiểm tra điều kiện hoàn tiền</h5>
 
             {isLoading ? (
-              <p className="text-[13px] font-medium text-[#64748b] text-center py-4">Đang kiểm tra dữ liệu học tập...</p>
+              <p className="text-[13px] font-medium text-slate-500 text-center py-4">Đang kiểm tra dữ liệu học tập...</p>
             ) : (
               <div className="flex flex-col gap-4">
                 {/* Rule 1: Within 30 days */}
@@ -139,8 +139,8 @@ export function StudentRefundModal({
                     {eligibility?.within_30_days ? <Check size={12} strokeWidth={3.5} /> : <X size={12} strokeWidth={3.5} />}
                   </span>
                   <div className="flex flex-col">
-                    <span className="text-[13px] font-semibold text-[#0f172a]">Thời hạn bảo hộ 30 ngày</span>
-                    <span className="text-[13px] font-medium text-[#64748b] mt-0.5">
+                    <span className="text-[13px] font-semibold text-slate-900">Thời hạn bảo hộ 30 ngày</span>
+                    <span className="text-[13px] font-medium text-slate-500 mt-0.5">
                       {eligibility?.days_since_purchase !== undefined
                         ? `Đã mua ${eligibility.days_since_purchase} ngày trước`
                         : "Trong thời hạn 30 ngày"}
@@ -154,8 +154,8 @@ export function StudentRefundModal({
                     {eligibility?.progress_eligible ? <Check size={12} strokeWidth={3.5} /> : <X size={12} strokeWidth={3.5} />}
                   </span>
                   <div className="flex flex-col">
-                    <span className="text-[13px] font-semibold text-[#0f172a]">Điều kiện tiến độ học tập</span>
-                    <span className="text-[13px] font-medium text-[#64748b] mt-0.5">
+                    <span className="text-[13px] font-semibold text-slate-900">Điều kiện tiến độ học tập</span>
+                    <span className="text-[13px] font-medium text-slate-500 mt-0.5">
                       Đã hoàn thành {eligibility?.progress_percentage ?? 0}% ({eligibility?.completed_lessons ?? 0} bài học)
                     </span>
                   </div>
@@ -196,7 +196,7 @@ export function StudentRefundModal({
           {/* Account Selection */}
           {isEligible && savedMethods.length > 0 && (
             <div className="flex flex-col gap-4 p-5 rounded-xl bg-white border border-[#EAEAF4] shadow-sm">
-              <label className="text-[13px] font-semibold text-[#0f172a]">Tài khoản nhận tiền</label>
+              <label className="text-[13px] font-semibold text-slate-900">Tài khoản nhận tiền</label>
               <div className="flex flex-col gap-3">
                 {savedMethods.map((method) => (
                   <label key={method.id} className="flex items-center gap-3 cursor-pointer group">
@@ -209,7 +209,7 @@ export function StudentRefundModal({
                       checked={savedMethodId === method.id}
                       onChange={() => { setSavedMethodId(method.id); setConfirmAccount(false); }}
                     />
-                    <span className="text-[13px] font-medium text-[#334155] group-hover:text-[#0f172a] transition-colors">{method.label}</span>
+                    <span className="text-[13px] font-medium text-[#334155] group-hover:text-slate-900 transition-colors">{method.label}</span>
                   </label>
                 ))}
               </div>
@@ -219,7 +219,7 @@ export function StudentRefundModal({
                   {confirmAccount && <Check size={12} strokeWidth={4} className="text-white" />}
                 </div>
                 <input type="checkbox" className="hidden" checked={confirmAccount} onChange={(e) => setConfirmAccount(e.target.checked)} />
-                <span className="text-[13px] font-medium text-[#334155] group-hover:text-[#0f172a] transition-colors">Tôi xác nhận hoàn tiền về tài khoản này</span>
+                <span className="text-[13px] font-medium text-[#334155] group-hover:text-slate-900 transition-colors">Tôi xác nhận hoàn tiền về tài khoản này</span>
               </label>
             </div>
           )}
@@ -230,11 +230,11 @@ export function StudentRefundModal({
           {/* Reason Select */}
           {isEligible && (
             <div className="flex flex-col gap-2 p-5 rounded-xl bg-white border border-[#EAEAF4] shadow-sm">
-              <label className="text-[13px] font-semibold text-[#0f172a]">Lý do hoàn tiền (Tùy chọn)</label>
+              <label className="text-[13px] font-semibold text-slate-900">Lý do hoàn tiền (Tùy chọn)</label>
               <select
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="w-full h-11 px-4 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC] text-[13px] font-medium text-[#0f172a] focus:outline-none focus:border-[#3B82F6] focus:bg-white transition-all cursor-pointer"
+                className="w-full h-11 px-4 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC] text-[13px] font-medium text-slate-900 focus:outline-none focus:border-[#3B82F6] focus:bg-white transition-all cursor-pointer"
               >
                 <option value="Nội dung không phù hợp với nhu cầu">Nội dung không phù hợp với nhu cầu</option>
                 <option value="Mua nhầm khóa học">Mua nhầm khóa học</option>
@@ -256,7 +256,7 @@ export function StudentRefundModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-[#64748b] hover:bg-[#F8FAFC] hover:text-[#0f172a] transition-all cursor-pointer"
+            className="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-500 hover:bg-[#F8FAFC] hover:text-slate-900 transition-all cursor-pointer"
           >
             Hủy bỏ
           </button>

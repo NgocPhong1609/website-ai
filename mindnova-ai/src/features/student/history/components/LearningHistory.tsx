@@ -62,7 +62,7 @@ export function LearningHistory() {
     {/* Metrics Skeleton */}
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       {[...Array(4)].map((_, i) => (
-        <div key={i} className="bg-white border border-slate-200 rounded-2xl p-5 h-28 flex flex-col justify-between">
+        <div key={i} className="bg-white border border-slate-200 rounded-xl p-5 h-28 flex flex-col justify-between">
           <div className="flex justify-between items-start">
             <div className="h-4 w-1/2 bg-slate-200 rounded"></div>
             <div className="w-10 h-10 bg-slate-200 rounded-xl"></div>
@@ -78,7 +78,7 @@ export function LearningHistory() {
       
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+          <div key={i} className="bg-white border border-slate-200 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
             <div className="flex items-center gap-4">
               <div className="w-11 h-11 rounded-xl bg-slate-200 shrink-0"></div>
               <div className="space-y-2 flex-1">
@@ -102,17 +102,17 @@ export function LearningHistory() {
  if (isError || !data) {
  return (
  <div className="p-6 md:p-12 max-w-[1400px] mx-auto min-h-[60vh] flex flex-col items-center justify-center text-center gap-3">
- <div className="w-16 h-16 rounded-2xl bg-[#EFF6FF] text-[#2563eb] flex items-center justify-center text-2xl mb-1 shadow-sm border border-[#DBEAFE]/40">
+ <div className="w-16 h-16 rounded-xl bg-[#EFF6FF] text-[#2563eb] flex items-center justify-center text-2xl mb-1 shadow-sm border border-[#DBEAFE]/40">
  ️
  </div>
- <h3 className="text-lg font-bold text-[#0f172a]">Không thể tải dữ liệu lịch sử học tập</h3>
- <p className="text-xs text-[#64748b] max-w-md leading-relaxed">
+ <h3 className="text-lg font-bold text-slate-900">Không thể tải dữ liệu lịch sử học tập</h3>
+ <p className="text-xs text-slate-500 max-w-md leading-relaxed">
  Đã xảy ra sự cố khi kết nối tới hệ thống lưu trữ nhật ký MindNova AI. Vui lòng kiểm tra kết nối mạng và thử lại sau ít phút.
  </p>
  <button 
  type="button"
  onClick={() => refetch()} 
- className="mt-2 px-6 py-2.5 bg-[#2563eb] text-white text-xs font-semibold rounded-xl hover:bg-[#2563eb] transition-all cursor-pointer shadow-sm"
+ className="mt-2 px-6 py-2.5 bg-blue-600 text-white text-xs font-semibold rounded-xl hover:bg-blue-600 transition-all cursor-pointer shadow-sm"
  >
  Thử tải lại ngay
  </button>
@@ -126,7 +126,7 @@ export function LearningHistory() {
  const renderDetailedItem = (item: HistoryTimelineItem, idx: number) => {
  if (item.type === "quiz" || (item.score_text && !item.shareable)) {
  return (
- <div key={item.id || idx} className="bg-white border border-[#e2e8f0] rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-sm transition-all duration-200 hover:border-[#e2e8f0] group">
+ <div key={item.id || idx} className="bg-white border border-[#e2e8f0] rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-md transition-all duration-200 hover:border-[#e2e8f0] group">
  <div className="flex items-center gap-4">
  <div className="w-11 h-11 rounded-xl bg-[#f8fafc] text-[#2563eb] flex items-center justify-center shrink-0 border border-[#2563eb]/15">
  <BookIcon className="w-5 h-5" />
@@ -135,21 +135,21 @@ export function LearningHistory() {
  <div className="flex items-center gap-2">
  <span className="text-xs font-medium text-[#2563eb] bg-[#f8fafc] px-2 py-0.5 rounded-md border border-[#2563eb]/15">{item.badge_text || "Bài đánh giá"}</span>
  <span className="w-1 h-1 rounded-full bg-[#D0D0E0]" />
- <span className="text-xs font-normal text-[#64748b]">{item.time_text || "10:45 AM"}</span>
+ <span className="text-xs font-normal text-slate-500">{item.time_text || "10:45 AM"}</span>
  </div>
- <h4 className="text-sm sm:text-base font-semibold text-[#0f172a] group-hover:text-[#2563eb] transition-colors">{item.title}</h4>
- <p className="text-xs font-normal text-[#64748b]">{item.subtitle}</p>
+ <h4 className="text-sm sm:text-base font-semibold text-slate-900 group-hover:text-[#2563eb] transition-colors">{item.title}</h4>
+ <p className="text-xs font-normal text-slate-500">{item.subtitle}</p>
  </div>
  </div>
 
  <div className="flex items-center gap-5 justify-between sm:justify-end pt-3 sm:pt-0 border-t sm:border-0 border-[#F0F0F8]">
  {item.score_text && (
  <div className="text-right">
- <div className="text-base font-semibold text-[#0f172a]">
+ <div className="text-base font-semibold text-slate-900">
  {item.score_text}
  </div>
  {item.score_status && (
- <div className="text-[11px] font-medium text-[#0f172a] bg-[#EAF8F5] px-2 py-0.5 rounded-full inline-block border border-[#0f172a]/15 mt-0.5">
+ <div className="text-[11px] font-medium text-slate-900 bg-[#EAF8F5] px-2 py-0.5 rounded-full inline-block border border-[#0f172a]/15 mt-0.5">
  {item.score_status}
  </div>
  )}
@@ -168,7 +168,7 @@ export function LearningHistory() {
 
  if (item.type === "milestone" && item.shareable) {
  return (
- <div key={item.id || idx} className=" from-white via-[#FFF9ED]/40 to-[#FFF3DF]/50 border border-[#F59E0B]/25 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-sm transition-all duration-200 group">
+ <div key={item.id || idx} className=" from-white via-[#FFF9ED]/40 to-[#FFF3DF]/50 border border-[#F59E0B]/25 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-md transition-all duration-200 group">
  <div className="flex items-center gap-4">
  <div className="w-11 h-11 rounded-xl bg-[#FFF3DF] text-[#D97706] flex items-center justify-center shrink-0 border border-[#F59E0B]/25">
  <TrophyIcon className="w-5 h-5" />
@@ -177,10 +177,10 @@ export function LearningHistory() {
  <div className="flex items-center gap-2">
  <span className="text-xs font-medium text-[#D97706] bg-[#FFF3DF] px-2 py-0.5 rounded-md border border-[#D97706]/15">{item.badge_text || "Cột mốc mới"}</span>
  <span className="w-1 h-1 rounded-full bg-[#D0D0E0]" />
- <span className="text-xs font-normal text-[#64748b]">{item.time_text || "09:15 AM"}</span>
+ <span className="text-xs font-normal text-slate-500">{item.time_text || "09:15 AM"}</span>
  </div>
- <h4 className="text-sm sm:text-base font-semibold text-[#0f172a] group-hover:text-[#D97706] transition-colors">{item.title}</h4>
- <p className="text-xs font-normal text-[#64748b]">{item.subtitle}</p>
+ <h4 className="text-sm sm:text-base font-semibold text-slate-900 group-hover:text-[#D97706] transition-colors">{item.title}</h4>
+ <p className="text-xs font-normal text-slate-500">{item.subtitle}</p>
  </div>
  </div>
 
@@ -199,7 +199,7 @@ export function LearningHistory() {
 
  if (item.type === "milestone" || item.duration_tag) {
  return (
- <div key={item.id || idx} className="bg-white border border-[#e2e8f0] rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-sm transition-all duration-200 hover:border-[#2563eb]/30 group">
+ <div key={item.id || idx} className="bg-white border border-[#e2e8f0] rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-md transition-all duration-200 hover:border-[#2563eb]/30 group">
  <div className="flex items-center gap-4">
  <div className="w-11 h-11 rounded-xl bg-[#f8fafc] text-[#2563eb] flex items-center justify-center shrink-0 border border-[#2563eb]/20">
  <GraduationCapIcon className="w-5 h-5" />
@@ -208,16 +208,16 @@ export function LearningHistory() {
  <div className="flex items-center gap-2">
  <span className="text-xs font-medium text-[#2563eb] bg-[#f8fafc] px-2 py-0.5 rounded-md border border-[#2563eb]/15">{item.badge_text || "Đăng ký khoá mới"}</span>
  <span className="w-1 h-1 rounded-full bg-[#D0D0E0]" />
- <span className="text-xs font-normal text-[#64748b]">{item.time_text || "11:00 AM"}</span>
+ <span className="text-xs font-normal text-slate-500">{item.time_text || "11:00 AM"}</span>
  </div>
- <h4 className="text-sm sm:text-base font-semibold text-[#0f172a] group-hover:text-[#2563eb] transition-colors">{item.title}</h4>
- <p className="text-xs font-normal text-[#64748b]">{item.subtitle}</p>
+ <h4 className="text-sm sm:text-base font-semibold text-slate-900 group-hover:text-[#2563eb] transition-colors">{item.title}</h4>
+ <p className="text-xs font-normal text-slate-500">{item.subtitle}</p>
  </div>
  </div>
 
  <div className="shrink-0 flex items-center justify-between sm:justify-end gap-3 pt-3 sm:pt-0 border-t sm:border-0 border-[#F0F0F8]">
  {item.duration_tag && (
- <span className="flex items-center gap-1.5 text-xs font-normal text-[#64748b] bg-[#F8FAFC] px-3 py-1.5 rounded-xl border border-[#e2e8f0]">
+ <span className="flex items-center gap-1.5 text-xs font-normal text-slate-500 bg-[#F8FAFC] px-3 py-1.5 rounded-xl border border-[#e2e8f0]">
  <ClockIcon className="w-4 h-4 text-[#2563eb]" />
  <span>{item.duration_tag}</span>
  </span>
@@ -234,26 +234,26 @@ export function LearningHistory() {
 
  // Default lesson progress card
  return (
- <div key={item.id || idx} className="bg-white border border-[#e2e8f0] rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-sm transition-all duration-200 hover:border-[#0f172a]/30 group">
+ <div key={item.id || idx} className="bg-white border border-[#e2e8f0] rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-md transition-all duration-200 hover:border-[#0f172a]/30 group">
  <div className="flex items-center gap-4">
- <div className="w-11 h-11 rounded-xl bg-[#EAF8F5] text-[#0f172a] flex items-center justify-center shrink-0 border border-[#0f172a]/20">
+ <div className="w-11 h-11 rounded-xl bg-[#EAF8F5] text-slate-900 flex items-center justify-center shrink-0 border border-[#0f172a]/20">
  <PlayCircleIcon className="w-5 h-5" />
  </div>
  <div className="space-y-1">
  <div className="flex items-center gap-2">
- <span className="text-xs font-medium text-[#0f172a] bg-[#EAF8F5] px-2 py-0.5 rounded-md border border-[#0f172a]/15">{item.badge_text || "Bài học hoàn tất"}</span>
+ <span className="text-xs font-medium text-slate-900 bg-[#EAF8F5] px-2 py-0.5 rounded-md border border-[#0f172a]/15">{item.badge_text || "Bài học hoàn tất"}</span>
  <span className="w-1 h-1 rounded-full bg-[#D0D0E0]" />
- <span className="text-xs font-normal text-[#64748b]">{item.time_text || "16:20 PM"}</span>
+ <span className="text-xs font-normal text-slate-500">{item.time_text || "16:20 PM"}</span>
  </div>
- <h4 className="text-sm sm:text-base font-semibold text-[#0f172a] group-hover:text-[#0f172a] transition-colors">{item.title}</h4>
- <p className="text-xs font-normal text-[#64748b]">{item.subtitle}</p>
+ <h4 className="text-sm sm:text-base font-semibold text-slate-900 group-hover:text-slate-900 transition-colors">{item.title}</h4>
+ <p className="text-xs font-normal text-slate-500">{item.subtitle}</p>
  </div>
  </div>
 
  <div className="shrink-0 sm:w-44 flex flex-col sm:items-end gap-1.5 pt-3 sm:pt-0 border-t sm:border-0 border-[#F0F0F8]">
  <div className="flex items-center justify-between w-full text-xs">
- <span className="text-[#64748b] font-normal">Tiến độ học:</span>
- <span className="text-[#0f172a] font-medium">{item.progress_label || "100% Hoàn thành"}</span>
+ <span className="text-slate-500 font-normal">Tiến độ học:</span>
+ <span className="text-slate-900 font-medium">{item.progress_label || "100% Hoàn thành"}</span>
  </div>
  <div className="w-full h-2 bg-[#F4F5FC] rounded-full overflow-hidden p-0.5 border border-[#e2e8f0]">
  <div 
@@ -270,19 +270,19 @@ export function LearningHistory() {
  <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-7">
  
  {/* ─── Synchronized Hero Banner matching /courses, /study-plan, /practice & /progress ─── */}
- <section className="relative overflow-hidden rounded-2xl bg-white border border-[#e2e8f0] p-6 sm:p-8 transition-all duration-300 hover:shadow-[0_12px_36px_rgba(37,99,235,0.12)]">
+ <section className="relative overflow-hidden rounded-xl bg-white border border-[#e2e8f0] p-6 sm:p-8 transition-all duration-300 hover:shadow-[0_12px_36px_rgba(37,99,235,0.12)]">
  
  
 
  <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
  <div className="space-y-3 max-w-2xl">
  {/* Breadcrumbs */}
- <div className="flex items-center gap-2 text-xs font-normal text-[#64748b]">
+ <div className="flex items-center gap-2 text-xs font-normal text-slate-500">
  <Link href="/courses" className="hover:text-[#2563eb] transition-colors text-decoration-none font-medium">
  Khoá học của tôi
  </Link>
- <ChevronRightIcon className="w-3.5 h-3.5 text-[#64748b]" />
- <span className="text-[#0f172a] font-medium bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#0f172a]/20">
+ <ChevronRightIcon className="w-3.5 h-3.5 text-slate-500" />
+ <span className="text-slate-900 font-medium bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#0f172a]/20">
  Lịch sử học tập
  </span>
  </div>
@@ -291,41 +291,41 @@ export function LearningHistory() {
  Nhật ký hoạt động hệ thống AI • 24/7
  </div>
 
- <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0f172a] leading-tight">
+ <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 leading-tight">
  Lịch sử học tập: {" "}
  <span className="text-[#2563eb] drop-shadow-2xs font-bold">
  Hành trình Trí tuệ AI 
  </span>
  </h1>
 
- <p className="text-xs sm:text-sm text-[#64748b] leading-relaxed font-normal">
+ <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">
  Theo dõi trọn vẹn các mốc học tập, kết quả kiểm tra và thành tích trên hành trình rèn luyện kỹ năng công nghệ cùng <span className="text-[#2563eb] font-medium">Gia sư Nova</span>.
  </p>
  </div>
 
  {/* Interactive Activity Mastery Widget */}
- <div className="group shrink-0 bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-[#e2e8f0] flex flex-col justify-center min-w-[320px] sm:min-w-[370px] shadow-2xs hover:border-[#e2e8f0] transition-all duration-300">
+ <div className="group shrink-0 bg-white/95 backdrop-blur-md rounded-xl p-5 border border-[#e2e8f0] flex flex-col justify-center min-w-[320px] sm:min-w-[370px] shadow-2xs hover:border-[#e2e8f0] transition-all duration-300">
  <div className="w-full flex items-center justify-between gap-4 mb-2">
- <span className="text-xs font-medium text-[#64748b] group-hover:text-[#2563eb] transition-colors">Tổng quan hoạt động </span>
- <span className="text-[11px] font-medium text-[#0f172a] bg-[#f8fafc]/70 px-2.5 py-0.5 rounded-full border border-[#0f172a]">
+ <span className="text-xs font-medium text-slate-500 group-hover:text-[#2563eb] transition-colors">Tổng quan hoạt động </span>
+ <span className="text-[11px] font-medium text-slate-900 bg-[#f8fafc]/70 px-2.5 py-0.5 rounded-full border border-[#0f172a]">
  {overview_card?.status_badge || "Tích cực 100%"}
  </span>
  </div>
 
- <div className="text-2xl font-semibold text-[#0f172a] my-1 flex items-baseline justify-between gap-6">
+ <div className="text-2xl font-semibold text-slate-900 my-1 flex items-baseline justify-between gap-6">
  <div>
  <span className="text-[#2563eb] font-semibold text-2xl sm:text-3xl">
  {overview_card?.total_activities || total_activities_count || 142}
  </span>
- <span className="text-xs font-normal text-[#64748b] ml-1.5">lượt tương tác</span>
+ <span className="text-xs font-normal text-slate-500 ml-1.5">lượt tương tác</span>
  </div>
- <span className="text-xs font-medium text-[#0f172a] bg-[#EAF8F5] px-2.5 py-0.5 rounded-md border border-[#0f172a]">
+ <span className="text-xs font-medium text-slate-900 bg-[#EAF8F5] px-2.5 py-0.5 rounded-md border border-[#0f172a]">
  {overview_card?.status_tag || "Active"}
  </span>
  </div>
 
  <div className="w-full h-2 bg-[#e2e8f0] rounded-full mt-2.5 overflow-hidden p-0.5 border border-[#e2e8f0]">
- <div className="h-full bg-[#2563eb] rounded-full shadow-[0_0_8px_rgba(37,99,235,0.3)] transition-all duration-1000 w-full group-hover:brightness-105" />
+ <div className="h-full bg-blue-600 rounded-full shadow-[0_0_8px_rgba(37,99,235,0.3)] transition-all duration-1000 w-full group-hover:brightness-105" />
  </div>
 
  <p className="text-xs font-medium text-[#2563eb] mt-3 flex items-center justify-between">
@@ -340,33 +340,33 @@ export function LearningHistory() {
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
  
  {/* Total Lessons */}
- <div className="bg-white border border-[#e2e8f0] rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-all duration-300 flex flex-col justify-between gap-3.5 group hover:border-[#2563eb]/30">
+ <div className="bg-white border border-[#e2e8f0] rounded-xl p-5 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between gap-3.5 group hover:border-[#2563eb]/30">
  <div className="flex items-center justify-between">
- <span className="text-xs font-medium text-[#64748b]">Tổng số bài học</span>
+ <span className="text-xs font-medium text-slate-500">Tổng số bài học</span>
  <div className="w-9 h-9 rounded-xl bg-[#f8fafc] text-[#2563eb] flex items-center justify-center shrink-0 border border-[#2563eb]/15 shadow-2xs">
  <BookIcon className="w-4.5 h-4.5" />
  </div>
  </div>
  <div className="flex items-baseline justify-between gap-2">
- <span className="text-2xl font-semibold text-[#0f172a] tracking-normal">
- {metrics_row?.total_lessons?.value || 142} <span className="text-xs font-normal text-[#64748b] ml-0.5">{metrics_row?.total_lessons?.unit || "bài"}</span>
+ <span className="text-2xl font-semibold text-slate-900 tracking-normal">
+ {metrics_row?.total_lessons?.value || 142} <span className="text-xs font-normal text-slate-500 ml-0.5">{metrics_row?.total_lessons?.unit || "bài"}</span>
  </span>
- <span className="text-[11px] font-medium text-[#0f172a] bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#059669]/15">
+ <span className="text-[11px] font-medium text-slate-900 bg-[#EAF8F5] px-2.5 py-0.5 rounded-full border border-[#059669]/15">
  {metrics_row?.total_lessons?.change_tag || "+12% tháng này"}
  </span>
  </div>
  </div>
 
  {/* Avg Quiz Score */}
- <div className="bg-white border border-[#e2e8f0] rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-all duration-300 flex flex-col justify-between gap-3.5 group hover:border-[#0f172a]/30">
+ <div className="bg-white border border-[#e2e8f0] rounded-xl p-5 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between gap-3.5 group hover:border-[#0f172a]/30">
  <div className="flex items-center justify-between">
- <span className="text-xs font-medium text-[#64748b]">Điểm Quiz trung bình</span>
- <div className="w-9 h-9 rounded-xl bg-[#EAF8F5] text-[#0f172a] flex items-center justify-center shrink-0 border border-[#0f172a]/15 shadow-2xs">
+ <span className="text-xs font-medium text-slate-500">Điểm Quiz trung bình</span>
+ <div className="w-9 h-9 rounded-xl bg-[#EAF8F5] text-slate-900 flex items-center justify-center shrink-0 border border-[#0f172a]/15 shadow-2xs">
  <TrophyIcon className="w-4.5 h-4.5" />
  </div>
  </div>
  <div className="flex items-baseline justify-between gap-2">
- <span className="text-2xl font-semibold text-[#0f172a] tracking-normal">
+ <span className="text-2xl font-semibold text-slate-900 tracking-normal">
  {metrics_row?.quiz_average?.value || "88%"}
  </span>
  <span className="text-[11px] font-medium text-[#0284C7] bg-white px-2.5 py-0.5 rounded-full border border-[#0284C7]/15 flex items-center gap-1">
@@ -377,27 +377,27 @@ export function LearningHistory() {
  </div>
 
  {/* Study Hours */}
- <div className="bg-white border border-[#e2e8f0] rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-all duration-300 flex flex-col justify-between gap-3.5 group hover:border-[#0284C7]/30">
+ <div className="bg-white border border-[#e2e8f0] rounded-xl p-5 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between gap-3.5 group hover:border-[#0284C7]/30">
  <div className="flex items-center justify-between">
- <span className="text-xs font-medium text-[#64748b]">Thời gian rèn luyện</span>
+ <span className="text-xs font-medium text-slate-500">Thời gian rèn luyện</span>
  <div className="w-9 h-9 rounded-xl bg-white text-[#0284C7] flex items-center justify-center shrink-0 border border-[#0284C7]/15 shadow-2xs">
  <ClockIcon className="w-4.5 h-4.5" />
  </div>
  </div>
  <div className="flex items-baseline justify-between gap-2">
- <span className="text-2xl font-semibold text-[#0f172a] whitespace-nowrap tracking-normal">
- {metrics_row?.study_hours?.value || "48.5"} <span className="text-sm font-normal text-[#64748b]">{metrics_row?.study_hours?.unit || "giờ"}</span>
+ <span className="text-2xl font-semibold text-slate-900 whitespace-nowrap tracking-normal">
+ {metrics_row?.study_hours?.value || "48.5"} <span className="text-sm font-normal text-slate-500">{metrics_row?.study_hours?.unit || "giờ"}</span>
  </span>
- <span className="text-[11px] font-normal text-[#64748b] bg-[#F8FAFC] px-2.5 py-0.5 rounded-lg border border-[#e2e8f0] whitespace-nowrap">
+ <span className="text-[11px] font-normal text-slate-500 bg-[#F8FAFC] px-2.5 py-0.5 rounded-lg border border-[#e2e8f0] whitespace-nowrap">
  {metrics_row?.study_hours?.tag || "Chuyên cần cao"}
  </span>
  </div>
  </div>
 
  {/* AI Proficiency */}
- <div className="bg-white border border-[#e2e8f0] rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-all duration-300 flex flex-col justify-between gap-3.5 group hover:border-[#9333EA]/30">
+ <div className="bg-white border border-[#e2e8f0] rounded-xl p-5 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between gap-3.5 group hover:border-[#9333EA]/30">
  <div className="flex items-center justify-between">
- <span className="text-xs font-medium text-[#64748b]">Thành thạo công nghệ AI</span>
+ <span className="text-xs font-medium text-slate-500">Thành thạo công nghệ AI</span>
  <span className="text-[11px] font-medium text-[#9333EA] bg-[#F3E8FF]/80 px-2.5 py-0.5 rounded-full border border-[#9333EA]/15">
  {metrics_row?.ai_proficiency?.ranking_tag || " Top 10%"}
  </span>
@@ -405,11 +405,11 @@ export function LearningHistory() {
  <div className="space-y-2 pt-0.5">
  <div className="flex items-center justify-between text-sm font-semibold text-[#2563eb]">
  <span>{metrics_row?.ai_proficiency?.level_label || "Level 8"}</span>
- <span className="text-xs font-normal text-[#64748b]">{metrics_row?.ai_proficiency?.xp_text || "80 / 100 XP"}</span>
+ <span className="text-xs font-normal text-slate-500">{metrics_row?.ai_proficiency?.xp_text || "80 / 100 XP"}</span>
  </div>
  <div className="w-full h-2 bg-[#F4F5FC] rounded-full overflow-hidden p-0.5 border border-[#e2e8f0]">
  <div 
- className="h-full bg-[#2563eb] to-[#9333EA] rounded-full shadow-2xs" 
+ className="h-full bg-blue-600 to-[#9333EA] rounded-full shadow-2xs" 
  style={{ width: `${metrics_row?.ai_proficiency?.percentage || 80}%` }}
  />
  </div>
@@ -419,9 +419,9 @@ export function LearningHistory() {
  </div>
 
  {/* ─── Interactive Filter Bar & Export Actions ─── */}
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:px-6 sm:py-4 rounded-2xl border border-[#e2e8f0] shadow-2xs">
+ <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:px-6 sm:py-4 rounded-xl border border-[#e2e8f0] shadow-2xs">
  <div className="flex flex-wrap items-center gap-2">
- <span className="text-xs font-medium text-[#64748b] mr-1.5 flex items-center gap-1.5">
+ <span className="text-xs font-medium text-slate-500 mr-1.5 flex items-center gap-1.5">
  <HistoryIcon className="w-4 h-4 text-[#2563eb]" />
  <span>Lọc theo hoạt động:</span>
  </span>
@@ -431,8 +431,8 @@ export function LearningHistory() {
  onClick={() => setFilterType("all")}
  className={`px-3.5 py-1.5 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
  filterType === "all"
- ? "bg-[#2563eb] text-white font-medium shadow-2xs"
- : "bg-[#F8FAFC] text-[#64748b] border border-[#e2e8f0] hover:text-[#0f172a] hover:bg-white font-normal"
+ ? "bg-blue-600 text-white font-medium shadow-2xs"
+ : "bg-[#F8FAFC] text-slate-500 border border-[#e2e8f0] hover:text-slate-900 hover:bg-white font-normal"
  }`}
  >
  Tất cả
@@ -443,8 +443,8 @@ export function LearningHistory() {
  onClick={() => setFilterType("quiz")}
  className={`px-3.5 py-1.5 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
  filterType === "quiz"
- ? "bg-[#2563eb] text-white font-medium shadow-2xs"
- : "bg-[#F8FAFC] text-[#64748b] border border-[#e2e8f0] hover:text-[#0f172a] hover:bg-white font-normal"
+ ? "bg-blue-600 text-white font-medium shadow-2xs"
+ : "bg-[#F8FAFC] text-slate-500 border border-[#e2e8f0] hover:text-slate-900 hover:bg-white font-normal"
  }`}
  >
  Bài đánh giá (Quiz)
@@ -455,8 +455,8 @@ export function LearningHistory() {
  onClick={() => setFilterType("milestone")}
  className={`px-3.5 py-1.5 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
  filterType === "milestone"
- ? "bg-[#2563eb] text-white font-medium shadow-2xs"
- : "bg-[#F8FAFC] text-[#64748b] border border-[#e2e8f0] hover:text-[#0f172a] hover:bg-white font-normal"
+ ? "bg-blue-600 text-white font-medium shadow-2xs"
+ : "bg-[#F8FAFC] text-slate-500 border border-[#e2e8f0] hover:text-slate-900 hover:bg-white font-normal"
  }`}
  >
  Cột mốc thành tựu
@@ -467,8 +467,8 @@ export function LearningHistory() {
  onClick={() => setFilterType("lesson")}
  className={`px-3.5 py-1.5 rounded-xl text-xs transition-all duration-150 cursor-pointer ${
  filterType === "lesson"
- ? "bg-[#2563eb] text-white font-medium shadow-2xs"
- : "bg-[#F8FAFC] text-[#64748b] border border-[#e2e8f0] hover:text-[#0f172a] hover:bg-white font-normal"
+ ? "bg-blue-600 text-white font-medium shadow-2xs"
+ : "bg-[#F8FAFC] text-slate-500 border border-[#e2e8f0] hover:text-slate-900 hover:bg-white font-normal"
  }`}
  >
  Bài học hoàn tất
@@ -505,14 +505,14 @@ export function LearningHistory() {
  <div className="flex items-center gap-3 pl-1">
  <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-2xs ${
  group.icon_type === "calendar" ? "bg-[#f8fafc] text-[#2563eb] border border-[#2563eb]/15" :
- group.icon_type === "calendar_light" ? "border border-[#e2e8f0] bg-[#F8FAFC] text-[#64748b]" :
- "border border-[#e2e8f0] bg-[#F8FAFC] text-[#64748b]"
+ group.icon_type === "calendar_light" ? "border border-[#e2e8f0] bg-[#F8FAFC] text-slate-500" :
+ "border border-[#e2e8f0] bg-[#F8FAFC] text-slate-500"
  }`}>
- {group.icon_type === "history" ? <HistoryIcon className="w-4 h-4 text-[#64748b]" /> : <CalendarIcon className="w-4 h-4" />}
+ {group.icon_type === "history" ? <HistoryIcon className="w-4 h-4 text-slate-500" /> : <CalendarIcon className="w-4 h-4" />}
  </div>
  <div>
- <h2 className="text-sm sm:text-base font-semibold text-[#0f172a]">{group.section_title}</h2>
- <p className="text-xs font-normal text-[#64748b]">{group.subtitle}</p>
+ <h2 className="text-sm sm:text-base font-semibold text-slate-900">{group.section_title}</h2>
+ <p className="text-xs font-normal text-slate-500">{group.subtitle}</p>
  </div>
  </div>
 
@@ -520,18 +520,18 @@ export function LearningHistory() {
  {group.is_compact ? (
  // Render compact items (weekly activities / reading logs)
  filteredItems.map((item, itemIdx) => (
- <div key={item.id || itemIdx} className="bg-white/90 border border-[#e2e8f0] rounded-2xl p-4 flex items-center justify-between gap-4 hover:bg-white transition-all duration-150 shadow-2xs hover:border-[#e2e8f0]">
+ <div key={item.id || itemIdx} className="bg-white/90 border border-[#e2e8f0] rounded-xl p-4 flex items-center justify-between gap-4 hover:bg-white transition-all duration-150 shadow-2xs hover:border-[#e2e8f0]">
  <div className="flex items-center gap-3.5 min-w-0">
- <div className="w-10 h-10 rounded-xl bg-[#F8FAFC] border border-[#e2e8f0] text-[#64748b] flex items-center justify-center shrink-0 shadow-2xs">
+ <div className="w-10 h-10 rounded-xl bg-[#F8FAFC] border border-[#e2e8f0] text-slate-500 flex items-center justify-center shrink-0 shadow-2xs">
  {item.icon_type === "comment" ? <MessageSquareIcon className="w-4.5 h-4.5" /> : <FileTextIcon className="w-4.5 h-4.5" />}
  </div>
  <div className="min-w-0">
- <h4 className="text-xs sm:text-sm font-medium text-[#0f172a] truncate hover:text-[#2563eb] transition-colors">{item.title}</h4>
- <p className="text-[11px] font-normal text-[#64748b]">{item.date_time_text || "Trong tuần"}</p>
+ <h4 className="text-xs sm:text-sm font-medium text-slate-900 truncate hover:text-[#2563eb] transition-colors">{item.title}</h4>
+ <p className="text-[11px] font-normal text-slate-500">{item.date_time_text || "Trong tuần"}</p>
  </div>
  </div>
  <span className={`text-[11px] font-medium px-2.5 py-1 rounded-lg shrink-0 border ${
- item.badge_color === "indigo" ? "text-[#2563eb] bg-[#f8fafc] border-[#2563eb]/15" : "text-[#0f172a] bg-[#EAF8F5] border-[#0f172a]/15"
+ item.badge_color === "indigo" ? "text-[#2563eb] bg-[#f8fafc] border-[#2563eb]/15" : "text-slate-900 bg-[#EAF8F5] border-[#0f172a]/15"
  }`}>
  {item.status_badge || "Đã lưu trữ"}
  </span>
@@ -567,7 +567,7 @@ export function LearningHistory() {
  onClick={() => goToPage(pageNum)}
  className={`w-9 h-9 rounded-xl text-xs font-medium transition-all cursor-pointer ${
  pageNum === page
- ? "bg-[#2563eb] text-white shadow-2xs"
+ ? "bg-blue-600 text-white shadow-2xs"
  : "bg-white border border-[#e2e8f0] text-[#2563eb] hover:bg-[#f8fafc] hover:border-[#2563eb]/30"
  }`}
  >
@@ -586,7 +586,7 @@ export function LearningHistory() {
  </button>
  </div>
 
- <p className="text-[11px] font-normal text-[#64748b]">
+ <p className="text-[11px] font-normal text-slate-500">
  Trang {page} / {totalPages} • Tổng {pagination?.total_items ?? total_activities_count} hoạt động
  </p>
  </div>
@@ -594,7 +594,7 @@ export function LearningHistory() {
 
  {totalPages <= 1 && (
  <div className="pt-2 flex flex-col items-center justify-center pb-6 gap-2">
- <p className="text-[11px] font-normal text-[#64748b]">
+ <p className="text-[11px] font-normal text-slate-500">
  Đã hiển thị tất cả {total_activities_count} hoạt động rèn luyện
  </p>
  </div>

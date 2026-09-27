@@ -67,7 +67,7 @@ export function NotificationModal({ isOpen, onClose, notification }: Notificatio
  <div
  role="dialog"
  aria-modal
- className="pointer-events-auto relative w-full max-w-[600px] bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col animate-in zoom-in-95 fade-in duration-200 border border-[#E2E8F0]"
+ className="pointer-events-auto relative w-full max-w-[600px] bg-white rounded-xl shadow-xl overflow-hidden flex flex-col animate-in zoom-in-95 fade-in duration-200 border border-[#E2E8F0]"
  >
  {/* Header */}
  <div className="flex items-center px-6 py-4 border-b border-[#E2E8F0] relative bg-[#F8FAFC]">

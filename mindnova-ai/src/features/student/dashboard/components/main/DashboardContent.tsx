@@ -20,7 +20,7 @@ export function DashboardContent() {
  <div className="max-w-[1100px] mx-auto p-6 lg:p-8 pb-20">
  
  {/* ─── Banner ────────────────────────────────────────────────────────────── */}
- <div className="bg-[#F8FAFC] rounded-2xl p-8 lg:p-10 flex flex-col md:flex-row justify-between items-start md:items-center relative overflow-hidden border border-[#E2E8F0]">
+ <div className="bg-[#F8FAFC] rounded-xl p-8 lg:p-10 flex flex-col md:flex-row justify-between items-start md:items-center relative overflow-hidden border border-[#E2E8F0]">
  <div className="relative z-10">
  <h1 className="text-[28px] md:text-[32px] font-bold text-[#0F172A] leading-tight tracking-tight font-serif">
  Tuyệt vời quá, {user?.name || "Học viên"}!
@@ -44,7 +44,7 @@ export function DashboardContent() {
  <div className="lg:col-span-2 flex flex-col gap-6">
  
  {/* Smart Next Step */}
- <div className="bg-white rounded-2xl p-6 lg:p-8 relative border border-[#E2E8F0]">
+ <div className="bg-white rounded-xl p-6 lg:p-8 relative border border-[#E2E8F0]">
  
  <div className="absolute top-6 right-6 bg-[#EFF6FF] text-[#3B82F6] px-3.5 py-1.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
  MindNova AI Suggestion
@@ -71,7 +71,7 @@ export function DashboardContent() {
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  
  {/* Overall Progress */}
- <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] flex flex-col justify-between">
+ <div className="bg-white rounded-xl p-6 border border-[#E2E8F0] flex flex-col justify-between">
  <div className="flex justify-between items-start">
  <h4 className="text-[11px] font-bold text-[#94A3B8] tracking-wider uppercase">Tiến độ chung</h4>
  <span className="text-[#3B82F6] font-bold text-[14px]">{progressDelta}</span>
@@ -93,7 +93,7 @@ export function DashboardContent() {
  </div>
 
  {/* Recent Activity */}
- <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0]">
+ <div className="bg-white rounded-xl p-6 border border-[#E2E8F0]">
  <h4 className="text-[11px] font-bold text-[#94A3B8] tracking-wider uppercase mb-6">Recent Activity</h4>
  
  <div className="flex flex-col gap-6">
@@ -131,7 +131,7 @@ export function DashboardContent() {
  <div className="lg:col-span-1 flex flex-col gap-6">
  
  {/* Focus Areas */}
- <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0]">
+ <div className="bg-white rounded-xl p-6 border border-[#E2E8F0]">
  <div className="flex items-center gap-2 mb-2">
  <h3 className="font-bold text-[18px] text-[#0F172A] font-serif">Focus Areas</h3>
  </div>
@@ -173,7 +173,7 @@ export function DashboardContent() {
  </div>
 
  {/* Badges Earned */}
- <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0]">
+ <div className="bg-white rounded-xl p-6 border border-[#E2E8F0]">
  <h4 className="text-[11px] font-bold text-[#94A3B8] tracking-wider uppercase mb-5">Badges Earned</h4>
  
  <div className="flex gap-4">

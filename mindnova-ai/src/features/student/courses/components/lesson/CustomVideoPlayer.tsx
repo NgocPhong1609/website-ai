@@ -278,7 +278,7 @@ export function CustomVideoPlayer({
  // --- Rendering Load/Error ---
  if (loading) {
  return (
- <div className="relative w-full aspect-video bg-[#0f172a] rounded-2xl overflow-hidden flex items-center justify-center border border-[#E2E8F0]">
+ <div className="relative w-full aspect-video bg-[#0f172a] rounded-xl overflow-hidden flex items-center justify-center border border-[#E2E8F0]">
  <div className="flex flex-col items-center gap-3">
  <div className="w-10 h-10 border-3 border-[#3B82F6] border-t-transparent rounded-full animate-spin" />
  <span className="text-sm text-[#64748B] font-medium">Đang tải video...</span>
@@ -289,7 +289,7 @@ export function CustomVideoPlayer({
 
  if (error) {
  return (
- <div className="relative w-full aspect-video bg-[#F8FAFC] rounded-2xl overflow-hidden flex items-center justify-center border border-[#E2E8F0]">
+ <div className="relative w-full aspect-video bg-[#F8FAFC] rounded-xl overflow-hidden flex items-center justify-center border border-[#E2E8F0]">
  <div className="flex flex-col items-center gap-3 text-[#64748B]">
  <AlertTriangle size={28} strokeWidth={1.75} aria-hidden />
  <span className="text-sm font-medium">{error}</span>
@@ -316,7 +316,7 @@ export function CustomVideoPlayer({
  }
 
  return (
- <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-sm border border-[#E2E8F0]">
+ <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-sm border border-[#E2E8F0]">
  <iframe
  src={embedUrl}
  title={lesson.title}
@@ -336,7 +336,7 @@ export function CustomVideoPlayer({
  ref={containerRef}
  className={twMerge(
  "relative w-full aspect-video bg-black overflow-hidden shadow-sm flex items-center justify-center group select-none",
- isFullscreen ? "rounded-none fixed inset-0 z-[9999]" : "rounded-2xl border border-[#E2E8F0]"
+ isFullscreen ? "rounded-none fixed inset-0 z-[9999]" : "rounded-xl border border-[#E2E8F0]"
  )}
  onMouseMove={resetControlsTimeout}
  onMouseLeave={() => isPlaying && setShowControls(false)}

@@ -46,7 +46,7 @@ function FormInput({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full px-4 py-3 rounded-xl text-sm text-[#0f172a] bg-[#F8FAFC] border border-[#EAEAF4] focus:border-[#3b82f6] focus:bg-white focus:ring-4 focus:ring-[#3b82f6]/10 outline-none transition-all placeholder:text-[#94a3b8]"
+      className="w-full px-4 py-3 rounded-xl text-sm text-slate-900 bg-[#F8FAFC] border border-[#EAEAF4] focus:border-[#3b82f6] focus:bg-white focus:ring-4 focus:ring-[#3b82f6]/10 outline-none transition-all placeholder:text-[#94a3b8]"
     />
   );
 }
@@ -100,8 +100,8 @@ export function PersonalInfoPanel({
       
       {/* Header */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-[#0f172a] tracking-tight">Thông tin cá nhân</h2>
-        <p className="text-[15px] font-medium text-[#64748b] mt-2">
+        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Thông tin cá nhân</h2>
+        <p className="text-[15px] font-medium text-slate-500 mt-2">
           Cập nhật định danh cá nhân và địa chỉ email chính thức sử dụng cho lộ trình rèn luyện AI.
         </p>
       </div>
@@ -139,7 +139,7 @@ export function PersonalInfoPanel({
             onChange={(e) => setBio(e.target.value)}
             rows={5}
             placeholder="Hãy chia sẻ ngắn gọn về sở trường, năng lực kỹ thuật và những mục tiêu bạn muốn Trợ lý Nova đồng hành..."
-            className="w-full px-4 py-3 rounded-xl text-sm text-[#0f172a] bg-[#F8FAFC] border border-[#EAEAF4] focus:border-[#3b82f6] focus:bg-white focus:ring-4 focus:ring-[#3b82f6]/10 outline-none transition-all resize-none placeholder:text-[#94a3b8] leading-relaxed"
+            className="w-full px-4 py-3 rounded-xl text-sm text-slate-900 bg-[#F8FAFC] border border-[#EAEAF4] focus:border-[#3b82f6] focus:bg-white focus:ring-4 focus:ring-[#3b82f6]/10 outline-none transition-all resize-none placeholder:text-[#94a3b8] leading-relaxed"
           />
         </div>
       </div>
@@ -150,7 +150,7 @@ export function PersonalInfoPanel({
           type="button"
           onClick={handleDiscard}
           disabled={!isDirty || updateProfileMutation.isPending}
-          className="px-6 py-2.5 rounded-xl text-sm font-semibold text-[#64748b] bg-white border border-[#EAEAF4] hover:bg-[#F8FAFC] hover:text-[#0f172a] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+          className="px-6 py-2.5 rounded-xl text-sm font-semibold text-slate-500 bg-white border border-[#EAEAF4] hover:bg-[#F8FAFC] hover:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
         >
           <RefreshCcw size={16} /> Khôi phục
         </button>

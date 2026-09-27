@@ -312,15 +312,15 @@ export function QuizQuestionScreen({
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#F8F9FC] flex flex-col justify-between p-6">
-        <div className="h-16 bg-white rounded-2xl animate-pulse border border-[#EAEAF4]" />
+        <div className="h-16 bg-white rounded-xl animate-pulse border border-[#EAEAF4]" />
         <div className="max-w-[820px] w-full mx-auto space-y-6 my-12 animate-pulse">
-          <div className="h-24 bg-white rounded-2xl border border-[#EAEAF4]" />
+          <div className="h-24 bg-white rounded-xl border border-[#EAEAF4]" />
           <div className="space-y-4">
             <div className="h-16 bg-white rounded-xl border border-[#EAEAF4]" />
             <div className="h-16 bg-white rounded-xl border border-[#EAEAF4]" />
           </div>
         </div>
-        <div className="h-20 bg-white rounded-2xl animate-pulse border border-[#EAEAF4]" />
+        <div className="h-20 bg-white rounded-xl animate-pulse border border-[#EAEAF4]" />
       </div>
     );
   }
@@ -328,13 +328,13 @@ export function QuizQuestionScreen({
   if (isError || !quiz || !quiz.questions || quiz.questions.length === 0) {
     return (
       <div className="min-h-screen bg-[#F8F9FC] flex items-center justify-center p-6">
-        <div className="bg-white p-8 rounded-2xl border border-[#EAEAF4] text-center max-w-md shadow-sm space-y-4">
+        <div className="bg-white p-8 rounded-xl border border-[#EAEAF4] text-center max-w-md shadow-sm space-y-4">
           <div className="w-12 h-12 rounded-full bg-[#eff6ff] text-[#2563eb] flex items-center justify-center mx-auto font-bold">
             <X size={24} />
           </div>
-          <h3 className="text-base font-bold text-[#0f172a]">Không thể tải bộ câu hỏi</h3>
-          <p className="text-xs text-[#64748b]">Hệ thống không tìm thấy nội dung bài kiểm tra hoặc bài thi đã được nộp.</p>
-          <Link href="/practice" className="inline-block px-5 py-2.5 rounded-xl bg-[#1d4ed8] text-white text-xs font-bold hover:bg-[#2563eb]">
+          <h3 className="text-base font-bold text-slate-900">Không thể tải bộ câu hỏi</h3>
+          <p className="text-xs text-slate-500">Hệ thống không tìm thấy nội dung bài kiểm tra hoặc bài thi đã được nộp.</p>
+          <Link href="/practice" className="inline-block px-5 py-2.5 rounded-xl bg-[#1d4ed8] text-white text-xs font-bold hover:bg-blue-600">
             Quay lại
           </Link>
         </div>
@@ -357,7 +357,7 @@ export function QuizQuestionScreen({
             type="button"
             onClick={handleExitQuiz} 
             title="Thoát và nộp bài ngay"
-            className="w-10 h-10 flex items-center justify-center bg-[#F8FAFC] hover:bg-[#FEE2E2] hover:text-[#EF4444] rounded-full transition-all text-[#64748b] cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center bg-[#F8FAFC] hover:bg-[#FEE2E2] hover:text-[#EF4444] rounded-full transition-all text-slate-500 cursor-pointer"
           >
             <X size={20} strokeWidth={2.5} />
           </button>
@@ -365,10 +365,10 @@ export function QuizQuestionScreen({
           <div className="h-8 w-[1.5px] bg-gradient-to-b from-transparent via-[#EAEAF4] to-transparent"></div>
           
           <div className="flex flex-col">
-            <h1 className="text-[#0f172a] font-medium text-lg sm:text-xl md:text-2xl leading-tight tracking-tight flex items-center gap-2">
+            <h1 className="text-slate-900 font-medium text-lg sm:text-xl md:text-2xl leading-tight tracking-tight flex items-center gap-2">
               {quiz.title}
             </h1>
-            <span className="text-[#64748b] text-xs font-medium leading-tight mt-1.5 flex items-center gap-1.5">
+            <span className="text-slate-500 text-xs font-medium leading-tight mt-1.5 flex items-center gap-1.5">
               {aiQuizId ? (
                 <>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
@@ -383,7 +383,7 @@ export function QuizQuestionScreen({
 
         <div className="flex items-center gap-4">
           <div className="hidden md:flex flex-col items-end mr-2">
-            <span className="text-[10px] font-medium text-[#64748b] uppercase tracking-widest mb-1">Tiến độ</span>
+            <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest mb-1">Tiến độ</span>
             <div className="flex items-center gap-2.5">
               <div className="w-24 h-1.5 bg-[#E2E8F0] rounded-full overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-[#10B981] to-[#059669] rounded-full transition-all duration-500" style={{ width: `${(answeredCount / quiz.questions.length) * 100}%` }}></div>
@@ -394,9 +394,9 @@ export function QuizQuestionScreen({
 
           <div className="h-8 w-[1.5px] bg-gradient-to-b from-transparent via-[#EAEAF4] to-transparent hidden md:block"></div>
 
-          <div className={`flex items-center gap-2.5 px-4 py-2 rounded-xl shadow-xs border transition-all ${timeRemaining < 60 ? "bg-[#FEF2F2] text-[#EF4444] border-[#EF4444]/30 animate-pulse" : "bg-white text-[#0f172a] border-[#EAEAF4]"}`}>
+          <div className={`flex items-center gap-2.5 px-4 py-2 rounded-xl shadow-xs border transition-all ${timeRemaining < 60 ? "bg-[#FEF2F2] text-[#EF4444] border-[#EF4444]/30 animate-pulse" : "bg-white text-slate-900 border-[#EAEAF4]"}`}>
             <Clock size={18} className={timeRemaining < 60 ? "text-[#EF4444]" : "text-[#3b82f6]"} strokeWidth={2.5} />
-            <span className={`text-sm sm:text-base font-semibold tracking-wide ${timeRemaining < 60 ? "text-[#EF4444]" : "text-[#0f172a]"}`}>
+            <span className={`text-sm sm:text-base font-semibold tracking-wide ${timeRemaining < 60 ? "text-[#EF4444]" : "text-slate-900"}`}>
               {formatTime(timeRemaining)}
             </span>
           </div>
@@ -412,15 +412,15 @@ export function QuizQuestionScreen({
             </div>
           )}
 
-          <div className="mb-8 bg-white p-5 sm:p-6 rounded-2xl border border-[#EAEAF4] shadow-sm">
+          <div className="mb-8 bg-white p-5 sm:p-6 rounded-xl border border-[#EAEAF4] shadow-sm">
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full bg-[#eff6ff] flex items-center justify-center text-[#2563eb]">
                   <MapPin size={16} />
                 </div>
-                <span className="font-semibold text-[#0f172a] text-sm sm:text-base">Điều hướng nhanh</span>
+                <span className="font-semibold text-slate-900 text-sm sm:text-base">Điều hướng nhanh</span>
               </div>
-              <span className="text-xs font-medium text-[#64748b] bg-[#F8FAFC] px-3.5 py-1.5 rounded-lg border border-[#EAEAF4]">
+              <span className="text-xs font-medium text-slate-500 bg-[#F8FAFC] px-3.5 py-1.5 rounded-lg border border-[#EAEAF4]">
                 Đã làm: <span className="text-[#2563eb]">{answeredCount}</span> / {quiz.questions.length}
               </span>
             </div>
@@ -439,7 +439,7 @@ export function QuizQuestionScreen({
                         ? "bg-gradient-to-br from-[#3b82f6] to-[#1d4ed8] text-white shadow-md shadow-blue-500/30 scale-110 z-10 border-none"
                         : isAnswered
                         ? "bg-[#EAF8F5] text-[#27AE60] border border-[#27AE60]/40 hover:bg-[#d1f0e6] hover:scale-105"
-                        : "bg-[#F1F5F9] text-[#64748b] border border-transparent hover:bg-[#E2E8F0] hover:text-[#0f172a] hover:scale-105"
+                        : "bg-[#F1F5F9] text-slate-500 border border-transparent hover:bg-[#E2E8F0] hover:text-slate-900 hover:scale-105"
                     }`}
                     title={`Chuyển đến câu ${idx + 1}`}
                   >
@@ -460,22 +460,22 @@ export function QuizQuestionScreen({
               <span className="text-[#1d4ed8] text-[11px] font-semibold tracking-wider uppercase bg-[#eff6ff] px-3 py-1 rounded-full border border-[#1d4ed8]/20">
                 Câu hỏi số {currentIndex + 1} / {quiz.questions.length}
               </span>
-              <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-[#F1F5F9] text-[#64748b] flex items-center gap-1">
+              <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-[#F1F5F9] text-slate-500 flex items-center gap-1">
                 {isEssayType ? <><PenLine size={12} /> Tự luận / Điền từ</> : question?.type === "true_false" ? <><Scale size={12} /> Đúng / Sai</> : <><CircleDot size={12} /> Trắc nghiệm</>}
               </span>
             </div>
 
             <div className="flex items-end justify-between mt-3.5">
-              <h1 className="text-lg sm:text-xl font-medium text-[#0f172a] leading-relaxed max-w-[85%]">
+              <h1 className="text-lg sm:text-xl font-medium text-slate-900 leading-relaxed max-w-[85%]">
                 {question?.content}
               </h1>
-              <span className="text-xs font-medium text-[#64748b] mb-1 shrink-0 ml-4">Tiến độ: {progress}%</span>
+              <span className="text-xs font-medium text-slate-500 mb-1 shrink-0 ml-4">Tiến độ: {progress}%</span>
             </div>
             {question?.image_url && (
               <img
                 src={question.image_url}
                 alt={`Hình minh họa câu hỏi: ${question.content}`}
-                className="mt-4 max-h-80 w-full rounded-2xl border border-[#EAEAF4] bg-white object-contain"
+                className="mt-4 max-h-80 w-full rounded-xl border border-[#EAEAF4] bg-white object-contain"
               />
             )}
             
@@ -485,15 +485,15 @@ export function QuizQuestionScreen({
           </div>
 
           {isEssayType ? (
-            <div className="bg-white rounded-2xl border-2 border-[#1d4ed8]/30 p-6 shadow-sm space-y-4">
+            <div className="bg-white rounded-xl border-2 border-[#1d4ed8]/30 p-6 shadow-sm space-y-4">
               <div className="flex items-center justify-between border-b border-[#EAEAF4] pb-3">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-[#eff6ff] text-[#1d4ed8] flex items-center justify-center">
                     <PenLine size={16} />
                   </div>
                   <div>
-                    <h3 className="text-sm sm:text-base font-semibold text-[#0f172a]">Câu trả lời tự luận của bạn</h3>
-                    <p className="text-[11px] text-[#64748b]">Hãy trình bày các bước giải chi tiết để AI chấm điểm.</p>
+                    <h3 className="text-sm sm:text-base font-semibold text-slate-900">Câu trả lời tự luận của bạn</h3>
+                    <p className="text-[11px] text-slate-500">Hãy trình bày các bước giải chi tiết để AI chấm điểm.</p>
                   </div>
                 </div>
                 <span className="text-[11px] bg-[#EAF8F5] text-[#27AE60] px-2.5 py-1 rounded-full font-medium border border-[#27AE60]/20 flex items-center gap-1">
@@ -509,7 +509,7 @@ export function QuizQuestionScreen({
                 placeholder="Nhập câu trả lời hoặc các bước giải chi tiết của bạn tại đây..."
                 className="w-full p-4 rounded-xl border-2 border-[#EAEAF4] focus:border-[#1d4ed8] focus:ring-4 focus:ring-[#1d4ed8]/10 text-sm leading-relaxed bg-white shadow-xs focus:outline-none transition-all"
               />
-              <div className="flex justify-between items-center text-xs text-[#64748b]">
+              <div className="flex justify-between items-center text-xs text-slate-500">
                 <span>Ký tự: {typeof currentAnswerVal === "string" ? currentAnswerVal.length : 0}</span>
                 {typeof currentAnswerVal === "string" && currentAnswerVal.trim().length > 0 ? (
                   <span className="text-[#27AE60] font-semibold flex items-center gap-1"><Check size={12} /> Đã lưu nháp</span>
@@ -552,13 +552,13 @@ export function QuizQuestionScreen({
                     <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-medium text-sm shrink-0 transition-all ${
                       isSelected 
                         ? "bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] text-white shadow-sm scale-105" 
-                        : "bg-[#F0F2F8] text-[#64748b]"
+                        : "bg-[#F0F2F8] text-slate-500"
                     }`}>
                       {letter}
                     </div>
 
                     <span className={`ml-3.5 text-sm sm:text-base flex-1 leading-relaxed transition-colors ${
-                      isSelected ? "font-semibold text-[#0f172a]" : "font-normal text-[#64748b]"
+                      isSelected ? "font-semibold text-slate-900" : "font-normal text-slate-500"
                     }`}>
                       {answer.content}
                       {answer.image_url && (
@@ -586,7 +586,7 @@ export function QuizQuestionScreen({
           )}
 
           
-          <div className="mt-8 bg-gradient-to-r from-[#eff6ff]/80 via-[#F3F4FC] to-[#EAF8F5]/80 border border-[#1d4ed8]/20 rounded-2xl p-5 shadow-2xs flex gap-4 items-start">
+          <div className="mt-8 bg-gradient-to-r from-[#eff6ff]/80 via-[#F3F4FC] to-[#EAF8F5]/80 border border-[#1d4ed8]/20 rounded-xl p-5 shadow-2xs flex gap-4 items-start">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2563eb] via-[#1d4ed8] to-[#2563eb] text-white flex items-center justify-center shrink-0">
               <Sparkles size={20} />
             </div>
@@ -595,7 +595,7 @@ export function QuizQuestionScreen({
                 <h4 className="text-xs font-semibold text-[#1d4ed8] uppercase tracking-wider mb-1">Gia sư Nova AI</h4>
                 <span className="text-[10px] bg-white px-2 py-0.5 rounded-full text-[#27AE60] font-medium border border-[#27AE60]/20">AI Co-Pilot</span>
               </div>
-              <p className="text-xs sm:text-sm text-[#0f172a] leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-900 leading-relaxed">
                 Hệ thống tự động lưu bài làm liên tục. Rời khỏi phòng thi bằng nút Quay lại hoặc menu Sidebar sẽ kích hoạt tính năng tự động nộp bài ngay.
               </p>
             </div>
@@ -608,7 +608,7 @@ export function QuizQuestionScreen({
           <button 
             onClick={handlePrevious}
             disabled={currentIndex === 0}
-            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC] text-[#0f172a] font-semibold text-xs sm:text-sm hover:bg-[#EAEAF4]/60 disabled:opacity-30 cursor-pointer"
+            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC] text-slate-900 font-semibold text-xs sm:text-sm hover:bg-[#EAEAF4]/60 disabled:opacity-30 cursor-pointer"
           >
             <ArrowLeft size={16} /> Câu trước
           </button>
@@ -617,7 +617,7 @@ export function QuizQuestionScreen({
             <button 
               onClick={handleUserInitiatedSubmit}
               disabled={isSubmitting}
-              className="text-xs sm:text-sm font-medium text-[#64748b] hover:text-[#1d4ed8] hover:underline cursor-pointer disabled:opacity-50"
+              className="text-xs sm:text-sm font-medium text-slate-500 hover:text-[#1d4ed8] hover:underline cursor-pointer disabled:opacity-50"
             >
               Nộp bài sớm
             </button>
@@ -636,19 +636,19 @@ export function QuizQuestionScreen({
       {/* Custom Submit Confirm Modal */}
       {submitConfirmMode && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0f172a]/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="p-6">
               <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${submitConfirmMode === "complete" ? "bg-[#eff6ff] text-[#2563eb]" : submitConfirmMode === "empty" ? "bg-[#FEF2F2] text-[#EF4444]" : "bg-[#FFFBEB] text-[#F59E0B]"}`}>
                 {submitConfirmMode === "complete" ? <Sparkles size={24} /> : <AlertTriangle size={24} />}
               </div>
-              <h3 className="text-lg font-bold text-[#0f172a] mb-2">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">
                 {submitConfirmMode === "empty" 
                   ? "Chưa nhập câu trả lời nào!" 
                   : submitConfirmMode === "incomplete" 
                   ? "Chưa hoàn thành hết bài thi!" 
                   : "Hoàn tất bài thi!"}
               </h3>
-              <p className="text-[#64748b] text-sm leading-relaxed mb-6">
+              <p className="text-slate-500 text-sm leading-relaxed mb-6">
                 {submitConfirmMode === "empty" 
                   ? "Bạn chưa trả lời câu hỏi nào. Nếu nộp bài bây giờ, điểm của bạn sẽ là 0. Bạn có chắc chắn muốn nộp không?" 
                   : submitConfirmMode === "incomplete" 
@@ -659,7 +659,7 @@ export function QuizQuestionScreen({
               <div className="flex gap-3">
                 <button 
                   onClick={() => setSubmitConfirmMode(null)}
-                  className="flex-1 py-2.5 rounded-xl border border-[#EAEAF4] font-semibold text-[#0f172a] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl border border-[#EAEAF4] font-semibold text-slate-900 hover:bg-[#F8FAFC] transition-colors cursor-pointer"
                 >
                   Quay lại
                 </button>
@@ -668,7 +668,7 @@ export function QuizQuestionScreen({
                     setSubmitConfirmMode(null);
                     handleSubmit(answers);
                   }}
-                  className={`flex-1 py-2.5 rounded-xl text-white font-semibold shadow-sm transition-colors cursor-pointer ${submitConfirmMode === "complete" ? "bg-[#2563eb] hover:bg-[#1d4ed8]" : submitConfirmMode === "empty" ? "bg-[#EF4444] hover:bg-[#DC2626]" : "bg-[#F59E0B] hover:bg-[#D97706]"}`}
+                  className={`flex-1 py-2.5 rounded-xl text-white font-semibold shadow-sm transition-colors cursor-pointer ${submitConfirmMode === "complete" ? "bg-blue-600 hover:bg-blue-700" : submitConfirmMode === "empty" ? "bg-[#EF4444] hover:bg-[#DC2626]" : "bg-[#F59E0B] hover:bg-[#D97706]"}`}
                 >
                   Nộp bài ngay
                 </button>
@@ -681,15 +681,15 @@ export function QuizQuestionScreen({
       {/* Custom Exit Confirm Modal */}
       {exitConfirmData && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-[#0f172a]/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border border-[#F59E0B]/20">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border border-[#F59E0B]/20">
             <div className="p-6">
               <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 bg-[#FFFBEB] text-[#F59E0B]">
                 <AlertTriangle size={24} />
               </div>
-              <h3 className="text-lg font-bold text-[#0f172a] mb-2">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">
                 Cảnh báo rời phòng thi!
               </h3>
-              <p className="text-[#64748b] text-sm leading-relaxed mb-6">
+              <p className="text-slate-500 text-sm leading-relaxed mb-6">
                 {exitConfirmData.type === "back" && "Bạn vừa nhấn nút Quay lại (Back). "}
                 {exitConfirmData.type === "link" && "Bạn đang điều hướng sang một trang khác. "}
                 {exitConfirmData.type === "exit" && "Bạn đang yêu cầu thoát khỏi bài thi. "}
@@ -705,7 +705,7 @@ export function QuizQuestionScreen({
                       window.history.pushState(null, "", window.location.href);
                     }
                   }}
-                  className="flex-1 py-2.5 rounded-xl border border-[#EAEAF4] font-semibold text-[#0f172a] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl border border-[#EAEAF4] font-semibold text-slate-900 hover:bg-[#F8FAFC] transition-colors cursor-pointer"
                 >
                   Ở lại làm bài
                 </button>
