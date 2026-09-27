@@ -20,13 +20,13 @@ export default function SkillContainer() {
  return (
  <div className="max-w-5xl w-full flex flex-col items-center gap-4 px-8 py-32">
  <div className="w-full max-w-md pb-10">
- <Stepper currentStep={4} totalSteps={6} title="Profile Setup" />
+ <Stepper currentStep={4} totalSteps={6} title="Thiết lập hồ sơ" />
  </div>
 
  {/* Header */}
  <div className="w-full flex flex-col items-center gap-3">
  <h1 className="font-bold text-[32px] text-[#0F172A]">
- What is your current skill level?
+ Trình độ hiện tại của bạn?
  </h1>
  <p className="text-[16px] max-w-127.5 w-full text-center text-[#0F172A]">
  This helps our AI tailor the complexity of your study plan and

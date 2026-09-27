@@ -382,7 +382,7 @@ export function ChatPanel({
             )}
           </div>
           <div className="flex items-center gap-2 bg-blue-50 px-3.5 py-1.5 rounded-lg border border-blue-200 text-xs font-semibold text-blue-700 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5" /><span>AI Ready</span>
+            <Sparkles className="w-3.5 h-3.5" /><span>AI sẵn sàng</span>
           </div>
         </div>
       </header>
@@ -576,7 +576,7 @@ export function ChatPanel({
                 type="button"
                 onClick={() => handleSend()}
                 disabled={!inputText.trim() || isQuotaBlocked}
-                aria-label="Send message"
+                aria-label="Gửi tin nhắn"
                 className="shrink-0 w-11 h-11 flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:bg-stone-200 disabled:text-stone-400 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-sm cursor-pointer"
               >
                 <Send className="w-5 h-5 ml-0.5" />

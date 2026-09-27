@@ -126,7 +126,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  <div className="flex flex-col justify-center w-full max-w-[380px] mx-auto py-6 my-auto">
  <div className="mb-5">
  <h1 className="text-[26px] font-bold text-[#0F172A] leading-tight tracking-tight">
- Welcome back
+ Chào mừng trở lại
  </h1>
 
  </div>
@@ -147,7 +147,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
  <FormField
  id={emailId}
- label="Email Address"
+ label="Email"
  type="email"
 
  autoComplete="email"
@@ -157,7 +157,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  />
  <FormField
  id={passwordId}
- label="Password"
+ label="Mật khẩu"
  type={showPassword ? "text" : "password"}
 
  autoComplete="current-password"
@@ -169,7 +169,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  href="/forgot-password"
  className="text-xs font-semibold text-[#3B82F6] hover:text-[#2563EB] transition-colors"
  >
- Forgot password?
+ Quên mật khẩu?
  </Link>
  }
  rightElement={
@@ -187,18 +187,18 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  disabled={isLoading || !canSubmit}
  className="mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#3B82F6]/30"
  >
- {isLoading ? "Signing in..." : <>Login <ArrowRightIcon /></>}
+ {isLoading ? "Đang đăng nhập..." : <>Đăng nhập <ArrowRightIcon /></>}
  </button>
  </form>
 
  <p className="mt-5 text-center text-[13px] text-[#64748B]">
- Don&apos;t have an account?{" "}
+ Chưa có tài khoản?{" "}
  <button
  type="button"
  onClick={onFlipToRegister}
  className="font-semibold text-[#3B82F6] hover:text-[#2563EB] transition-colors hover:underline underline-offset-2 focus:outline-none"
  >
- Sign up
+ Đăng ký
  </button>
  </p>
  </div>
@@ -206,7 +206,7 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
  {/* Footer — bám sát phía dưới */}
  <div className="mt-auto text-center">
  <p className="text-[11px] text-[#94A3B8] leading-relaxed">
- © 2024 MindNova AI. Empowering global learners through intelligence.
+ © 2026 MindNova AI. Nền tảng học tập cá nhân hóa cùng AI.
  </p>
  </div>
  </div>

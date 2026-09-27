@@ -14,7 +14,7 @@ const STATUS_CONFIG: Record<
   { dotClass: string; labelClass: string; label: string }
 > = {
   ready: { dotClass: "bg-[#3B82F6]", labelClass: "text-[#3B82F6] font-semibold", label: "Ready" },
-  upcoming: { dotClass: "bg-[#00A896]", labelClass: "text-[#00A896] font-semibold", label: "Up Next" },
+  upcoming: { dotClass: "bg-[#00A896]", labelClass: "text-[#00A896] font-semibold", label: "Tiếp theo" },
   locked: { dotClass: "bg-[#C7C4D7]", labelClass: "text-[#94A3B8]", label: "Locked" },
 };
 
@@ -163,7 +163,7 @@ export function LearningPathCard({ phases }: LearningPathCardProps) {
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#64748B]" />
             </span>
             <span className="text-xs font-bold text-[#64748B] uppercase tracking-[0.12em]">
-              Your Learning Path
+              Lộ trình học tập của bạn
             </span>
           </div>
 
@@ -184,7 +184,7 @@ export function LearningPathCard({ phases }: LearningPathCardProps) {
           ))}
 
           <p className="text-[11px] text-[#94A3B8] text-center leading-relaxed mt-1">
-            Complete each phase to unlock the next — powered by adaptive AI. Click any lesson to view AI insights & recommended instructor courses.
+            Hoàn thành từng giai đoạn để mở giai đoạn tiếp theo. Bấm vào bài học để xem phân tích của AI và khóa học gợi ý.
           </p>
         </div>
       </div>
@@ -192,7 +192,7 @@ export function LearningPathCard({ phases }: LearningPathCardProps) {
       {/* Modal hiển thị phân tích AI & Gợi ý khóa học */}
       <LessonDetailModal
         lessonTitle={selectedLesson || ""}
-        goal={formData.goal || "General Learning"}
+        goal={formData.goal || "Học tập tổng quát"}
         isOpen={!!selectedLesson}
         onClose={() => setSelectedLesson(null)}
       />

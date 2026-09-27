@@ -114,7 +114,7 @@ export function ForgotPasswordFlow() {
  <form onSubmit={requestOtp} className="flex flex-col gap-3">
  <FormField
  id={emailId}
- label="Email Address"
+ label="Email"
  type="email"
  placeholder="Nhập email của bạn"
  value={email}

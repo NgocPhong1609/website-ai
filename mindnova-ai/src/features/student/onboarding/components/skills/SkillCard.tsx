@@ -62,7 +62,7 @@ export default function SkillCard({
  </p>
 
  {/* Level indicator bars */}
- <div className="flex gap-1.5 mt-auto" aria-label={`Level: ${level}`}>
+ <div className="flex gap-1.5 mt-auto" aria-label={`Cấp độ: ${level}`}>
  {[1, 2, 3].map((barIndex) => (
  <div
  key={barIndex}

@@ -3,4 +3,3 @@
 
 export { default as LoginContainer } from "./components/login/LoginContainer";
 export { LoginForm } from "./components/login/LoginForm";
-export { LoginPreviewPanel } from "./components/login/LoginPreviewPanel";

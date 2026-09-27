@@ -29,7 +29,7 @@ export function TopicsGrid({ selectedIds, onToggle }: TopicsGridProps) {
  <div className="flex items-center gap-2">
  <div className="w-2 h-2 rounded-full bg-[#F8FAFC] animate-pulse" />
  <span className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">
- Available Topics
+ Chủ đề có sẵn
  </span>
  </div>
  {selectedCount > 0 && (
@@ -56,7 +56,7 @@ export function TopicsGrid({ selectedIds, onToggle }: TopicsGridProps) {
 
  {/* Footer hint */}
  <p className="mt-4 text-[11px] text-[#94A3B8] leading-relaxed">
- Select all that apply — more selections create richer AI pathways.
+ Chọn tất cả chủ đề phù hợp. Càng nhiều lựa chọn, lộ trình càng chi tiết.
  </p>
  </div>
  </div>

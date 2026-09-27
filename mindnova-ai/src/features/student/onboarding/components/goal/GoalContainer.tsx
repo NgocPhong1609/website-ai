@@ -35,10 +35,10 @@ export default function GoalContainer() {
  </span>
  </div>
  <h1 className="text-[48px] font-bold text-[#0F172A]">
- What is your learning goal?
+ Mục tiêu học tập của bạn là gì?
  </h1>
  <p className="text-lg text-[#0F172A]">
- Choose one main goal to help MindNova AI personalize your experience.
+ Chọn một mục tiêu chính để MindNova AI cá nhân hóa trải nghiệm cho bạn.
  </p>
  </div>
 
@@ -73,7 +73,7 @@ export default function GoalContainer() {
  Continue
  </Button>
  <span className="text-[14px] text-[#0F172A]">
- You can always change your goal later in settings.
+ Bạn có thể đổi mục tiêu bất cứ lúc nào trong phần cài đặt.
  </span>
  </div>
  </div>

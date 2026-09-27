@@ -77,7 +77,7 @@ function StepBadge() {
  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#3B82F6] border border-[#E2E8F0] backdrop-blur-sm">
  <span className="text-[#3B82F6]"><SparkleIcon /></span>
  <span className="text-xs font-bold text-[#3B82F6] tracking-wider uppercase">
- Step 4 of 4 — Your Plan
+ Bước 4/4 — Lộ trình của bạn
  </span>
  </div>
  );
@@ -94,7 +94,7 @@ function CelebrationBanner({ goal }: { goal: string }) {
 
  <div className="flex flex-col gap-0.5">
  <span className="text-sm font-bold text-[#0F172A]">
- Your personalized learning path is ready! 
+ Lộ trình học tập cá nhân hóa đã sẵn sàng! 
  </span>
  <span className="text-xs text-[#64748B]">
  Crafted dynamically by AI based on your goal{goal ? ` — ${goal}` : ""}, skill level & selected topics.
@@ -122,11 +122,11 @@ export default function PlanContainer() {
  <h1 className="text-[44px] font-bold text-[#0F172A] leading-tight tracking-tight">
  Here&apos;s your{" "}
  <span className="text-transparent bg-clip-text bg-[#3B82F6] via-[#818cf8] ">
- AI-crafted path
+ Lộ trình do AI thiết kế
  </span>
  </h1>
  <p className="text-base text-[#64748B] leading-relaxed max-w-lg">
- Every phase is dynamically tailored to your unique goal and expertise — start when you&apos;re ready.
+ Mỗi giai đoạn được điều chỉnh theo mục tiêu và trình độ của bạn. Bắt đầu khi bạn sẵn sàng.
  </p>
  </div>
 
@@ -168,14 +168,14 @@ export default function PlanContainer() {
  ].join(" ")}
  rightIcon={<RocketIcon />}
  >
- Start My Learning Journey
+ Bắt đầu học ngay
  </Button>
  </div>
 
  <p className="flex items-center gap-1.5 text-[11px] text-[#94A3B8]">
  <ShieldCheckIcon />
  <span>
- AI-powered intelligent curriculum generation engine
+ Giáo trình được tạo bởi AI
  </span>
  </p>
  </div>

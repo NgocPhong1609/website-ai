@@ -3,13 +3,13 @@ import type { SidebarMenuItem } from "@/src/features/student/layout/types";
 // ─── Navigation Data ──────────────────────────────────────────────────────────
 
 export const SIDEBAR_MENU: SidebarMenuItem[] = [
- { label: "Dashboard", iconKey: "dashboard", href: "/" },
- { label: "Explore", iconKey: "explore", href: "/explore" },
- { label: "My Courses", iconKey: "courses", href: "/courses" },
- { label: "AI Study Plan", iconKey: "study-plan", href: "/study-plan" },
- { label: "Practice", iconKey: "practice", href: "/practice" },
- { label: "Progress", iconKey: "progress", href: "/progress" },
- { label: "History", iconKey: "history", href: "/history" },
- { label: "Profile", iconKey: "profile", href: "/profile" },
- { label: "Billing", iconKey: "billing", href: "/billing" },
+ { label: "Tổng quan", iconKey: "dashboard", href: "/" },
+ { label: "Khám phá", iconKey: "explore", href: "/explore" },
+ { label: "Khóa học của tôi", iconKey: "courses", href: "/courses" },
+ { label: "Lộ trình AI", iconKey: "study-plan", href: "/study-plan" },
+ { label: "Luyện tập", iconKey: "practice", href: "/practice" },
+ { label: "Tiến độ", iconKey: "progress", href: "/progress" },
+ { label: "Lịch sử", iconKey: "history", href: "/history" },
+ { label: "Hồ sơ", iconKey: "profile", href: "/profile" },
+ { label: "Thanh toán", iconKey: "billing", href: "/billing" },
 ];

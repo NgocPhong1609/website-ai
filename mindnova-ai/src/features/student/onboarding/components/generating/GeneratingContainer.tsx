@@ -108,7 +108,7 @@ export default function GeneratingContainer() {
  <p className="text-xs text-center text-[#64748B] leading-relaxed max-w-sm">
  MindNova AI uses GPT-4 and custom models to generate your curriculum.{" "}
  <br />
- This usually takes less than 30 seconds.
+ Quá trình này thường mất chưa tới 30 giây.
  </p>
  </div>
  </div>

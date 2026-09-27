@@ -74,7 +74,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  {/* Header */}
  <div className="flex justify-between items-start border-b pb-4">
  <div>
- <span className="text-xs font-bold text-[#3B82F6] uppercase tracking-wider">AI Curriculum Analyst</span>
+ <span className="text-xs font-bold text-[#3B82F6] uppercase tracking-wider">Phân tích giáo trình AI</span>
  <h2 className="text-2xl font-bold text-[#0F172A] mt-1">{lessonTitle}</h2>
  </div>
  <button 
@@ -97,7 +97,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  <div className="md:col-span-7 flex flex-col gap-5">
  <div>
  <h4 className="text-sm font-bold text-[#0F172A] mb-1.5 flex items-center gap-2">
- <span></span> Overview & Objective
+ <span></span> Tổng quan & mục tiêu
  </h4>
  <p className="text-xs text-[#64748B] leading-relaxed bg-[#F8FAFC] p-3.5 rounded-xl border border-gray-100">
  {details.overview}
@@ -106,7 +106,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
 
  <div>
  <h4 className="text-sm font-bold text-[#0F172A] mb-2.5 flex items-center gap-2">
- <span></span> Key Takeaways
+ <span></span> Kiến thức chính
  </h4>
  <ul className="flex flex-col gap-2">
  {details.key_takeaways?.map((point: string, idx: number) => (
@@ -122,7 +122,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  {/* Cột phải (5 phần): Danh sách khóa học liên quan */}
  <div className="md:col-span-5 flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-1">
  <h4 className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-1">
- Recommended Instructor Courses
+ Khóa học gợi ý từ giảng viên
  </h4>
 
  {details.recommended_courses?.map((course, idx) => (
@@ -148,7 +148,7 @@ export function LessonDetailModal({ lessonTitle, goal, isOpen, onClose }: Lesson
  onClick={() => toast(`Chuyển hướng mua khóa học: ${course.title}`)}
  className="w-full mt-1 py-2 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white text-[11px] font-bold shadow-sm transition-all cursor-pointer"
  >
- Course →
+ Khóa học →
  </Button>
  </div>
  </div>

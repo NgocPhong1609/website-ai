@@ -42,27 +42,36 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  const [isSwitchingRole, setIsSwitchingRole] = useState(false);
  const [statusMessage, setStatusMessage] = useState<string | null>(null);
  const [errors, setErrors] = useState<Record<string, string>>({});
+ const [touched, setTouched] = useState<Record<string, boolean>>({});
 
  const isNameValid = values.name.trim().length > 0;
  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email);
  const isPasswordValid = values.password.length >= 6;
  const isConfirmMatch = values.password === values.password_confirmation && values.password.length >= 6;
+ const liveErrors: Record<string, string> = {
+ name: isNameValid ? "" : "Vui lòng nhập họ và tên.",
+ email: !values.email.trim() ? "Vui lòng nhập email." : isEmailValid ? "" : "Email không đúng định dạng.",
+ password: isPasswordValid ? "" : "Mật khẩu cần ít nhất 6 ký tự.",
+ password_confirmation: values.password_confirmation && values.password !== values.password_confirmation ? "Mật khẩu xác nhận không khớp." : "",
+ };
+ const fieldError = (field: keyof typeof liveErrors) => errors[field] || (touched[field] ? liveErrors[field] : "");
+ const markTouched = (field: string) => () => setTouched((prev) => ({ ...prev, [field]: true }));
  const hasNoErrors = Object.values(errors).every((v) => !v);
  const canSubmit = isNameValid && isEmailValid && isPasswordValid && isConfirmMatch && hasNoErrors;
 
  const validate = () => {
  const newErrors: Record<string, string> = {};
- if (!values.name.trim()) newErrors.name = "Full name is required.";
+ if (!values.name.trim()) newErrors.name = "Vui lòng nhập họ và tên.";
  if (!values.email.trim()) {
- newErrors.email = "Email is required.";
+ newErrors.email = "Vui lòng nhập email.";
  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
- newErrors.email = "Invalid email format.";
+ newErrors.email = "Email không đúng định dạng.";
  }
  if (values.password.length < 6) {
- newErrors.password = "Password must be at least 6 characters.";
+ newErrors.password = "Mật khẩu cần ít nhất 6 ký tự.";
  }
  if (values.password !== values.password_confirmation) {
- newErrors.password_confirmation = "Passwords do not match.";
+ newErrors.password_confirmation = "Mật khẩu xác nhận không khớp.";
  }
  setErrors(newErrors);
  return Object.keys(newErrors).length === 0;
@@ -149,7 +158,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  <div className="flex flex-col justify-center w-full max-w-[480px] mx-auto py-6 my-auto">
  <div className="mb-5">
  <h1 className="text-[26px] font-bold text-[#0F172A] leading-tight tracking-tight">
- Create Account
+ Tạo tài khoản
  </h1>
  </div>
 
@@ -178,7 +187,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
   : "text-[#64748B] hover:text-[#2563EB]"
   }`}
   >
-  Student
+  Học viên
   </button>
   <button
   type="button"
@@ -189,7 +198,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
   : "text-[#64748B] hover:text-[#2563EB]"
   }`}
   >
-  Teacher
+  Giảng viên
   </button>
   </div>
 
@@ -228,37 +237,37 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
   <>
   <FormField
  id={nameId}
- label="Full Name"
+ label="Họ và tên"
  type="text"
  autoComplete="name"
  value={values.name}
  onChange={handleChange("name")}
-
- error={errors.name}
+ onBlur={markTouched("name")}
+ error={fieldError("name")}
  />
  <FormField
  id={emailId}
- label="Email Address"
+ label="Email"
  type="email"
 
  autoComplete="email"
  value={values.email}
  onChange={handleChange("email")}
-
- error={errors.email}
+ onBlur={markTouched("email")}
+ error={fieldError("email")}
  />
 
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
  <FormField
  id={passwordId}
- label="Password"
+ label="Mật khẩu"
  type={showPassword ? "text" : "password"}
 
  autoComplete="new-password"
  value={values.password}
  onChange={handleChange("password")}
-
- error={errors.password}
+ onBlur={markTouched("password")}
+ error={fieldError("password")}
  rightElement={
  <button
  type="button"
@@ -271,14 +280,14 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  />
  <FormField
  id={confirmPasswordId}
- label="Confirm Password"
+ label="Xác nhận mật khẩu"
  type={showConfirmPassword ? "text" : "password"}
 
  autoComplete="new-password"
  value={values.password_confirmation}
  onChange={handleChange("password_confirmation")}
-
- error={errors.password_confirmation}
+ onBlur={markTouched("password_confirmation")}
+ error={fieldError("password_confirmation")}
  rightElement={
  <button
  type="button"
@@ -296,7 +305,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  disabled={isLoading || !canSubmit}
  className="mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#3B82F6]/30"
  >
- {isLoading ? "Creating account..." : <>Sign Up <ArrowRightIcon /></>}
+ {isLoading ? "Đang tạo tài khoản..." : <>Đăng ký <ArrowRightIcon /></>}
  </button>
  </>
   )}
@@ -304,13 +313,13 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  </form>
 
  <p className="mt-5 text-center text-[13px] text-[#64748B]">
- Already have an account?{" "}
+ Đã có tài khoản?{" "}
  <button
  type="button"
  onClick={onFlipToLogin}
  className="font-semibold text-[#3B82F6] hover:text-[#2563EB] transition-colors hover:underline underline-offset-2 focus:outline-none"
  >
- Login
+ Đăng nhập
  </button>
  </p>
  </div>
@@ -318,7 +327,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  {/* Footer â€” bÃ¡m sÃ¡t phÃ­a dÆ°á»›i */}
  <div className="mt-auto text-center">
  <p className="text-[11px] text-[#94A3B8] leading-relaxed">
- Â© 2024 MindNova AI. Empowering global learners through intelligence.
+ © 2026 MindNova AI. Nền tảng học tập cá nhân hóa cùng AI.
  </p>
  </div>
  </div>

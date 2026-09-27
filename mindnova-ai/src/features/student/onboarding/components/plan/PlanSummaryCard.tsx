@@ -69,7 +69,7 @@ function NeuralMap() {
  {/* Bottom label row */}
  <div className="absolute inset-0 flex flex-col justify-end p-3 gap-1">
  <span className="text-[9px] font-mono tracking-[0.18em] text-[#3B82F6]/50 uppercase">
- AI Neural Map — Active
+ Bản đồ kiến thức AI
  </span>
  <div className="flex gap-1">
  {[3, 2, 1].map((flex, i) => (
@@ -147,7 +147,7 @@ export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSumm
  <div className="w-6 h-6 rounded-lg bg-[#3B82F6] flex items-center justify-center shadow-[0_2px_8px_rgba(59, 130, 246,0.4)]">
  <BoltIcon />
  </div>
- <h2 className="text-sm font-bold text-[#0F172A]">Your Profile</h2>
+ <h2 className="text-sm font-bold text-[#0F172A]">Hồ sơ của bạn</h2>
  </div>
 
  {/* Main card */}
@@ -188,7 +188,7 @@ export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSumm
  {/* Estimated time */}
  <SummaryRow
  icon={<ClockIcon />}
- label="Est. time"
+ label="Thời gian dự kiến"
  value={
  <span className="text-[#3B82F6] bg-[#F8FAFC] px-2 py-0.5 rounded-full">
  {estimatedTime}

@@ -43,10 +43,10 @@ export function CertificatesContent() {
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
         <div className="flex-1">
           <h3 className="text-[11px] font-bold tracking-widest text-[#64748B] uppercase mb-2">
-            Your Achievements
+            Thành tích của bạn
           </h3>
           <h1 className="text-3xl font-bold text-[#0F172A] leading-tight mb-3">
-            Certificates &amp; Credentials
+            Chứng chỉ &amp; Thành tích
           </h1>
           <p className="text-[14px] text-[#64748B] max-w-2xl leading-relaxed">
             Chứng chỉ khóa học bạn đã hoàn thành trên MindNova.
@@ -80,7 +80,7 @@ export function CertificatesContent() {
             onClick={() => handleClaim(firstClaimable.course_id)}
             className="w-full md:w-auto px-8 py-3.5 bg-[#3B82F6] text-white rounded-xl text-[15px] font-bold flex items-center justify-center gap-2 hover:bg-[#2563EB] shrink-0"
           >
-            Claim Your Certificate
+            Nhận chứng chỉ
             <ArrowRightIcon className="w-4 h-4" />
           </button>
         </div>
@@ -123,7 +123,7 @@ export function CertificatesContent() {
             <GraduationCapIcon className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[13px] font-semibold text-[#64748B] mb-0.5">Total Certificates</p>
+            <p className="text-[13px] font-semibold text-[#64748B] mb-0.5">Tổng số chứng chỉ</p>
             <p className="text-2xl font-bold text-[#0F172A]">{data?.stats.total_certificates ?? 0}</p>
           </div>
         </div>
@@ -132,7 +132,7 @@ export function CertificatesContent() {
             <MedalIcon className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[13px] font-semibold text-[#64748B] mb-0.5">Completed courses</p>
+            <p className="text-[13px] font-semibold text-[#64748B] mb-0.5">Khóa học đã hoàn thành</p>
             <p className="text-2xl font-bold text-[#0F172A]">{data?.stats.completed_courses ?? 0}</p>
           </div>
         </div>

@@ -33,7 +33,7 @@ const STATUS_ICON_MAP: Record<GeneratingStepStatus, React.FC> = {
 
 const STATUS_LABEL: Record<GeneratingStepStatus, string> = {
   completed: "Completed",
-  "in-progress": "In Progress",
+  "in-progress": "Đang xử lý",
   pending: "Pending",
 };
 

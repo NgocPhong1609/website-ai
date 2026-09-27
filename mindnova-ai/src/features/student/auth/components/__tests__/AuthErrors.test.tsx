@@ -26,7 +26,7 @@ describe('friendly auth errors', () => {
       : new Response('<html><title>Application failed to respond</title>Railway request_id=private-id</html>', { status: 502 }));
     fetchMock.mockResolvedValueOnce(json({ message: 'Đã gửi mã OTP.' }));
     render(<ForgotPasswordFlow />);
-    fill('Email Address', 'student@example.com');
+    fill('Email', 'student@example.com');
     fireEvent.click(screen.getByRole('button', { name: 'Gửi mã xác nhận' }));
     const alert = await screen.findByRole('alert');
     expect(alert).toHaveTextContent(/thử lại/i);
@@ -48,12 +48,12 @@ describe('friendly auth errors', () => {
       } }, 422);
     });
     render(<ForgotPasswordFlow />);
-    fill('Email Address', 'missing@example.com');
+    fill('Email', 'missing@example.com');
     fireEvent.click(screen.getByRole('button', { name: 'Gửi mã xác nhận' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(/email.*chưa.*đăng ký/i);
     expect(screen.getByRole('heading', { name: 'Quên mật khẩu' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Gửi mã xác nhận' })).toBeEnabled();
-    expect(screen.getByLabelText('Email Address')).toHaveValue('missing@example.com');
+    expect(screen.getByLabelText('Email')).toHaveValue('missing@example.com');
   });
 
   it.each(['/api/forgot-password', '/api/forgot-password/verify-otp', '/api/reset-password'])(
@@ -66,7 +66,7 @@ describe('friendly auth errors', () => {
         return json({ errors: { email: ['The email field is required.'] } }, 422);
       });
       render(<ForgotPasswordFlow />);
-      fill('Email Address', 'student@example.com');
+      fill('Email', 'student@example.com');
       fireEvent.click(screen.getByRole('button', { name: 'Gửi mã xác nhận' }));
       if (failingUrl !== '/api/forgot-password') {
         await screen.findByRole('heading', { name: 'Nhập mã OTP' });
@@ -87,36 +87,36 @@ describe('friendly auth errors', () => {
   it('explains network loss during login and keeps the form ready to retry', async () => {
     fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
     render(<LoginForm onFlipToRegister={() => {}} />);
-    fill('Email Address', 'student@example.com');
-    fill('Password', 'password123');
-    fireEvent.click(screen.getByRole('button', { name: 'Login' }));
+    fill('Email', 'student@example.com');
+    fill('Mật khẩu', 'password123');
+    fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(/kết nối|mạng/i);
     expect(screen.getByRole('alert')).not.toHaveTextContent('Failed to fetch');
-    expect(screen.getByRole('button', { name: 'Login' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Đăng nhập' })).toBeEnabled();
   });
 
   it('keeps actionable credential errors for login', async () => {
     fetchMock.mockResolvedValueOnce(json({ message: 'Email hoặc mật khẩu không chính xác!' }, 401));
     render(<LoginForm onFlipToRegister={() => {}} />);
-    fill('Email Address', 'student@example.com');
-    fill('Password', 'password123');
-    fireEvent.click(screen.getByRole('button', { name: 'Login' }));
+    fill('Email', 'student@example.com');
+    fill('Mật khẩu', 'password123');
+    fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(/Email hoặc mật khẩu không chính xác/i);
   });
 
   it('preserves registration field validation without raw server details and allows correction', async () => {
     fetchMock.mockResolvedValueOnce(json({ errors: { email: ['The email has already been taken.'] } }, 422));
     render(<RegisterForm onFlipToLogin={() => {}} />);
-    fill('Full Name', 'Student');
-    fill('Email Address', 'student@example.com');
-    fill('Password', 'password123');
-    fill('Confirm Password', 'password123');
-    fireEvent.click(screen.getByRole('button', { name: 'Sign Up' }));
+    fill('Họ và tên', 'Student');
+    fill('Email', 'student@example.com');
+    fill('Mật khẩu', 'password123');
+    fill('Xác nhận mật khẩu', 'password123');
+    fireEvent.click(screen.getByRole('button', { name: 'Đăng ký' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(/kiểm tra/i);
     expect(screen.getByText(/email.*(sử dụng|tồn tại|đăng ký)/i)).toBeInTheDocument();
     expect(screen.queryByText('The email has already been taken.')).not.toBeInTheDocument();
-    fill('Email Address', 'another@example.com');
-    expect(screen.getByRole('button', { name: 'Sign Up' })).toBeEnabled();
+    fill('Email', 'another@example.com');
+    expect(screen.getByRole('button', { name: 'Đăng ký' })).toBeEnabled();
   });
 
   it('keeps OTP errors, retries verification and reset failures, then completes the password reset', async () => {
@@ -126,7 +126,7 @@ describe('friendly auth errors', () => {
       .mockResolvedValueOnce(new Response('<html>SQLSTATE private backend failure</html>', { status: 500 }))
       .mockResolvedValueOnce(json({ message: 'Mật khẩu đã được thay đổi thành công.' }));
     render(<ForgotPasswordFlow />);
-    fill('Email Address', 'student@example.com');
+    fill('Email', 'student@example.com');
     fireEvent.click(screen.getByRole('button', { name: 'Gửi mã xác nhận' }));
     await screen.findByRole('heading', { name: 'Nhập mã OTP' });
     fill('Mã OTP', '123456');

@@ -11,10 +11,10 @@ export interface AiProjectionCardProps {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const AI_INSIGHT_PLACEHOLDER =
- "Select topics above to see your personalized complexity projection.";
+ "Chọn chủ đề ở trên để xem dự báo độ khó phù hợp với bạn.";
 
 const AI_INSIGHT_ACTIVE =
- "Selecting more topics allows the AI to find deeper cross-disciplinary connections.";
+ "Chọn thêm chủ đề giúp AI tìm được liên kết sâu hơn giữa các lĩnh vực.";
 
 /** Decorative neural network nodes rendered in the visualization banner. */
 const NEURAL_NODES = [
@@ -57,7 +57,7 @@ function ComplexityMeter({ label, percent, level }: ComplexityMeterProps) {
  <ComplexityIcon />
  <div className="min-w-0">
  <p className="text-xs font-bold text-[#0F172A] truncate">
- Skill Complexity
+ Độ phức tạp kỹ năng
  </p>
  <p className="text-[11px] text-[#64748B] truncate">{label}</p>
  </div>
@@ -84,7 +84,7 @@ function ComplexityMeter({ label, percent, level }: ComplexityMeterProps) {
  aria-valuenow={percent}
  aria-valuemin={0}
  aria-valuemax={100}
- aria-label={`Skill complexity: ${label}`}
+ aria-label={`Độ phức tạp: ${label}`}
  className="sr-only"
  />
  </div>
@@ -122,7 +122,7 @@ function NeuralNetworkVisualization() {
  {/* Label */}
  <div className="absolute inset-0 flex flex-col justify-end p-3">
  <span className="text-[9px] font-mono tracking-[0.2em] text-[#3B82F6]/50 uppercase">
- AI Neural Map
+ Bản đồ kiến thức AI
  </span>
  </div>
  </div>
@@ -142,7 +142,7 @@ const TIME_ESTIMATES: Record<number, string> = {
 function TimeEstimate({ level }: { level: number }) {
  return (
  <div className="flex items-center justify-between text-[11px]">
- <span className="text-[#94A3B8]">Est. time to proficiency</span>
+ <span className="text-[#94A3B8]">Thời gian dự kiến để thành thạo</span>
  <span className="font-semibold text-[#3B82F6]">
  {TIME_ESTIMATES[level] ?? "—"}
  </span>
@@ -161,7 +161,7 @@ export function AiProjectionCard({ selectedCount }: AiProjectionCardProps) {
  {/* Title */}
  <div className="flex items-center gap-2">
  
- <h2 className="text-sm font-bold text-[#0F172A]">AI Projection</h2>
+ <h2 className="text-sm font-bold text-[#0F172A]">Dự báo của AI</h2>
  </div>
 
  {/* Complexity card */}

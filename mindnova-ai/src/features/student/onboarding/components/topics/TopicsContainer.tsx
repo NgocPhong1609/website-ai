@@ -60,7 +60,7 @@ function StepBadge() {
  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F8FAFC] border border-[#E2E8F0]">
  <SparkleIcon />
  <span className="text-xs font-semibold text-[#3B82F6] tracking-wide">
- Step 3 of 4 — Personalization
+ Bước 3/4 — Cá nhân hóa
  </span>
  </div>
  );
@@ -148,7 +148,7 @@ export default function TopicsContainer() {
  ].join(" ")}
  rightIcon={<ArrowRightIcon />}
  >
- Generate My Learning Path
+ Tạo lộ trình học tập
  </Button>
 
  <p className="flex items-center gap-1.5 text-[11px] text-[#94A3B8]">

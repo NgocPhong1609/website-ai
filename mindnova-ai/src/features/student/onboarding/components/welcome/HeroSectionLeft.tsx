@@ -25,29 +25,28 @@ export default memo(function HeroSectionLeft({
  width={22}
  height={22}
  />
- <span className="text-xs text-primary">The Future of Learning</span>
+ <span className="text-xs text-primary">Học tập cùng AI</span>
  </div>
- <h1 className="text-[48px] font-bold min-w-127.5">
- Welcome to <span className="text-linear-brand-bright">MindNova AI</span>
+ <h1 className="text-3xl sm:text-[48px] font-bold leading-tight">
+ Chào mừng đến với <span className="text-[#3B82F6]">MindNova AI</span>
  </h1>
- <p className="text-lg max-w-120 text-[#0F172A]">
- Harness the power of generative intelligence to architect your
- personalized learning journey. Skills mastery, reimagined for the modern
- age.
+ <p className="text-base sm:text-lg max-w-120 text-[#475569]">
+ Trả lời vài câu hỏi ngắn để AI thiết kế lộ trình học tập phù hợp với mục tiêu
+ và trình độ của bạn.
  </p>
- <div className="mt-5 max-w-112.25 w-full flex gap-3">
+ <div className="mt-5 max-w-112.25 w-full flex flex-col sm:flex-row gap-3">
  <Button
  onClick={onGetStarted}
- className="max-w-60.5 w-full py-4 rounded-xl text-[20px] font-semibold bg-linear-brand"
+ className="sm:max-w-60.5 w-full py-4 rounded-xl text-lg font-semibold bg-[#3B82F6] hover:bg-[#2563EB] text-white"
  >
- Get Started
+ Bắt đầu
  </Button>
  <Button
  onClick={onExplore}
- className="max-w-47.75 w-full rounded-xl bg-white"
+ className="sm:max-w-47.75 w-full py-4 rounded-xl bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC]"
  >
  <div className="flex items-center gap-2">
- <span className="text-[14px] text-[#0F172A]">Explore Platform</span>
+ <span className="text-[14px] text-[#0F172A]">Khám phá nền tảng</span>
  <Image
  src="/icons/arrow.svg"
  alt=""
