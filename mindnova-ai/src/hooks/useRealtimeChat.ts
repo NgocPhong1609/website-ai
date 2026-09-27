@@ -1,47 +1,12 @@
-import { useEffect, useState } from 'react';
-import Echo from 'laravel-echo';
-import Pusher from 'pusher-js';
-import { clientApiUrl } from '../shared/lib/api-url';
+import { useEffect, useState, useSyncExternalStore } from 'react';
+import { getEcho, getRealtimeStatus, subscribeRealtimeStatus, type RealtimeStatus } from '../shared/lib/realtime';
 
-// Setup Laravel Echo instance
-let echoInstance: any = null;
+/** Echo client for this token, or null when realtime is disabled/unreachable (callers must poll). */
+export const getEchoInstance = (token: string) => getEcho(token);
 
-export const getEchoInstance = (token: string) => {
-    if (!echoInstance) {
-        (window as any).Pusher = Pusher;
-        Pusher.logToConsole = process.env.NEXT_PUBLIC_ENABLE_PUSHER_LOGS === 'true';
-        const isProd = process.env.NODE_ENV === 'production';
-        let defaultHost = '127.0.0.1';
-        try {
-            if (process.env.NEXT_PUBLIC_API_URL) {
-                // E.g. https://api.mindnova.com/api -> api.mindnova.com
-                defaultHost = new URL(process.env.NEXT_PUBLIC_API_URL).hostname;
-            } else if (isProd && typeof window !== 'undefined') {
-                defaultHost = window.location.hostname;
-            }
-        } catch (e) {}
-
-        const port = Number(process.env.NEXT_PUBLIC_REVERB_PORT || (isProd ? 443 : 8080));
-
-        echoInstance = new Echo({
-            broadcaster: 'reverb',
-            key: process.env.NEXT_PUBLIC_REVERB_APP_KEY || 'mindnova_chat_key',
-            wsHost: process.env.NEXT_PUBLIC_REVERB_HOST || defaultHost,
-            wsPort: port,
-            wssPort: port,
-            forceTLS: isProd || (process.env.NEXT_PUBLIC_REVERB_SCHEME === 'https'),
-            disableStats: true,
-            enabledTransports: (isProd || process.env.NEXT_PUBLIC_REVERB_SCHEME === 'https') ? ['ws', 'wss'] : ['ws'],
-            authEndpoint: clientApiUrl('broadcasting/auth'),
-            auth: {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        });
-    }
-    return echoInstance;
-};
+/** Current realtime connection state; anything but "connected" means callers should poll. */
+export const useRealtimeStatus = (): RealtimeStatus =>
+    useSyncExternalStore(subscribeRealtimeStatus, getRealtimeStatus, () => 'disabled');
 
 export const useRealtimeChat = (conversationId: number, token: string | null) => {
     const [messages, setMessages] = useState<any[]>([]);
@@ -50,6 +15,7 @@ export const useRealtimeChat = (conversationId: number, token: string | null) =>
         if (!token || !conversationId) return;
 
         const echo = getEchoInstance(token);
+        if (!echo) return;
         const channelName = `chat.conversation.${conversationId}`;
         
         const channel = echo.private(channelName);
@@ -100,6 +66,20 @@ export const useRealtimeChat = (conversationId: number, token: string | null) =>
         setMessages(initialMessages.map(m => ({ ...m, status: 'sent' })));
     };
 
+    /** Upsert messages fetched while polling; keeps unsent optimistic messages. */
+    const mergeServerMessages = (serverMessages: any[]) => {
+        setMessages(prev => {
+            const byId = new Map(prev.filter(m => m.status !== 'sending').map(m => [m.id, m]));
+            serverMessages.forEach(m => byId.set(m.id, { ...byId.get(m.id), ...m, status: 'sent' }));
+            const pending = prev.filter(m => m.status === 'sending' && !serverMessages.some(s => s.id === m.id));
+            const merged = [...byId.values()].sort((a, b) =>
+                new Date(a.created_at).getTime() - new Date(b.created_at).getTime() || Number(a.id) - Number(b.id));
+            const unchanged = merged.length + pending.length === prev.length
+                && merged.every((m, i) => prev[i] && prev[i].id === m.id && prev[i].is_recalled === m.is_recalled);
+            return unchanged ? prev : [...merged, ...pending];
+        });
+    };
+
     const recallMessageLocally = (messageId: number) => {
         setMessages(prev => prev.map(m => m.id === messageId ? { ...m, is_recalled: true } : m));
     };
@@ -110,6 +90,6 @@ export const useRealtimeChat = (conversationId: number, token: string | null) =>
         replaceTempMessage,
         loadInitialMessages,
         recallMessageLocally,
-
+        mergeServerMessages,
     };
 };
