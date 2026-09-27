@@ -30,8 +30,28 @@ class GeminiAiService extends AbstractAiService
 
     public function sendMessage(array $messages, array $options = []): string
     {
+        $models = array_values(array_unique(array_filter(array_merge(
+            [config('services.gemini.model', 'gemini-3.8-flash')],
+            config('services.gemini.fallback_models', []),
+        ))));
+        $options['request_id'] ??= (string) Str::uuid();
+
+        foreach ($models as $index => $model) {
+            try {
+                return $this->sendToModel($messages, $options, $model);
+            } catch (AiTransientException $exception) {
+                if ($index === count($models) - 1) {
+                    throw $exception;
+                }
+            }
+        }
+
+        throw new Exception('No Gemini model configured');
+    }
+
+    private function sendToModel(array $messages, array $options, string $model): string
+    {
         $apiKey = $this->resolveApiKey();
-        $model = config('services.gemini.model', 'gemini-3.6-flash');
         if ($apiKey === null) {
             $this->recordAttempt($options, $model, microtime(true), 'failed', 'missing_api_key');
             throw new Exception('Chưa cấu hình API key cho Gemini.');
@@ -109,13 +129,14 @@ class GeminiAiService extends AbstractAiService
         $options['request_id'] ??= (string) Str::uuid();
 
         for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            $timeout = $this->requestTimeout($options);
             $startedAt = microtime(true);
             try {
                 if (config('services.gemini.force_failure', false)) {
                     throw new AiTransientException('Gemini temporarily unavailable');
                 }
                 $response = Http::withHeaders(['Content-Type' => 'application/json'])
-                    ->timeout(90)->post($url, $payload);
+                    ->timeout($timeout)->post($url, $payload);
             } catch (ConnectionException $exception) {
                 $this->recordAttempt($options, $model, $startedAt, 'failed', 'connection_error');
                 if ($attempt < $maxRetries) {
@@ -152,6 +173,15 @@ class GeminiAiService extends AbstractAiService
                         continue;
                     }
                     throw new AiTransientException('Gemini returned an empty response');
+                }
+
+                if (isset($options['validate_response']) && ! $options['validate_response']($content)) {
+                    $this->recordAttempt($options, $model, $startedAt, 'failed', 'invalid_response',
+                        $inputTokens, $outputTokens, $providerRequestId ?: null);
+                    if ($attempt < $maxRetries) {
+                        continue;
+                    }
+                    throw new AiTransientException('Gemini returned an incomplete response');
                 }
 
                 $this->recordAttempt($options, $model, $startedAt, 'success', null,

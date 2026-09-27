@@ -1,7 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useState, useCallback, useId } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
+import { getErrorMessage, getValidationErrors, readApiResponse } from "@/src/shared/lib/user-error";
 import {
  LogoMark,
  UserIcon,
@@ -40,27 +42,36 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  const [isSwitchingRole, setIsSwitchingRole] = useState(false);
  const [statusMessage, setStatusMessage] = useState<string | null>(null);
  const [errors, setErrors] = useState<Record<string, string>>({});
+ const [touched, setTouched] = useState<Record<string, boolean>>({});
 
  const isNameValid = values.name.trim().length > 0;
  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email);
  const isPasswordValid = values.password.length >= 6;
  const isConfirmMatch = values.password === values.password_confirmation && values.password.length >= 6;
+ const liveErrors: Record<string, string> = {
+ name: isNameValid ? "" : "Vui lòng nhập họ và tên.",
+ email: !values.email.trim() ? "Vui lòng nhập email." : isEmailValid ? "" : "Email không đúng định dạng.",
+ password: isPasswordValid ? "" : "Mật khẩu cần ít nhất 6 ký tự.",
+ password_confirmation: values.password_confirmation && values.password !== values.password_confirmation ? "Mật khẩu xác nhận không khớp." : "",
+ };
+ const fieldError = (field: keyof typeof liveErrors) => errors[field] || (touched[field] ? liveErrors[field] : "");
+ const markTouched = (field: string) => () => setTouched((prev) => ({ ...prev, [field]: true }));
  const hasNoErrors = Object.values(errors).every((v) => !v);
  const canSubmit = isNameValid && isEmailValid && isPasswordValid && isConfirmMatch && hasNoErrors;
 
  const validate = () => {
  const newErrors: Record<string, string> = {};
- if (!values.name.trim()) newErrors.name = "Full name is required.";
+ if (!values.name.trim()) newErrors.name = "Vui lòng nhập họ và tên.";
  if (!values.email.trim()) {
- newErrors.email = "Email is required.";
+ newErrors.email = "Vui lòng nhập email.";
  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
- newErrors.email = "Invalid email format.";
+ newErrors.email = "Email không đúng định dạng.";
  }
  if (values.password.length < 6) {
- newErrors.password = "Password must be at least 6 characters.";
+ newErrors.password = "Mật khẩu cần ít nhất 6 ký tự.";
  }
  if (values.password !== values.password_confirmation) {
- newErrors.password_confirmation = "Passwords do not match.";
+ newErrors.password_confirmation = "Mật khẩu xác nhận không khớp.";
  }
  setErrors(newErrors);
  return Object.keys(newErrors).length === 0;
@@ -94,21 +105,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  body: JSON.stringify(values),
  });
 
- const payload = await response.json().catch(() => null);
-
- if (!response.ok) {
- if (payload?.errors) {
- const apiErrors: Record<string, string> = {};
- Object.keys(payload.errors).forEach((key) => {
- apiErrors[key] = payload.errors[key][0];
- });
- setErrors(apiErrors);
- throw new Error("Vui lòng kiểm tra lại thông tin.");
- }
- const detailError = payload?.error || payload?.message || "Đăng ký thất bại.";
- throw new Error(detailError);
- }
- 
+ const payload = await readApiResponse(response, "Không thể đăng ký. Vui lòng thử lại.");
 
  const token = payload?.access_token;
  const user = payload?.user;
@@ -123,10 +120,19 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  document.cookie = `userRole=${roleStr}; path=/; max-age=${maxAge}; samesite=lax`;
 
  setStatusMessage("Đăng ký thành công...");
- window.location.assign(getRedirectPath(user));
+  toast.success('Đăng ký thành công!');
+  setTimeout(() => {
+  // New learners set their goals first so the AI study plan has something to work with.
+  const target = getUserRoleStr(user) === "student" && !user?.is_onboarded ? "/onboarding" : getRedirectPath(user);
+  window.location.assign(target);
+  }, 1000);
  }
  } catch (error) {
- setStatusMessage(error instanceof Error ? error.message : "Đăng ký thất bại.");
+ const apiErrors = getValidationErrors(error);
+ setErrors(apiErrors);
+ setStatusMessage(Object.keys(apiErrors).length > 0
+ ? "Vui lòng kiểm tra lại thông tin."
+ : getErrorMessage(error, "Không thể đăng ký. Vui lòng thử lại."));
  } finally {
  setIsLoading(false);
  }
@@ -146,30 +152,23 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
 
  return (
  <div className="flex flex-col w-full h-full px-8 sm:px-10 py-6">
- {/* Header — bám sát phía trên */}
- <div className="mb-auto">
- <Link href="/" className="inline-flex items-center gap-2.5 group" aria-label="Trang chủ MindNova AI">
- <LogoMark size={36} />
- <span className="text-[16px] font-bold tracking-tight text-[#0F172A] group-hover:text-blue-600 transition-colors">
- MindNova AI
- </span>
- </Link>
- </div>
 
- {/* Content — căn giữa dọc */}
- <div className="flex flex-col justify-center w-full max-w-[480px] mx-auto py-6">
+
+ {/* Content â€” cÄƒn giá»¯a dá»c */}
+ <div className="flex flex-col justify-center w-full max-w-[480px] mx-auto py-6 my-auto">
  <div className="mb-5">
- <h1 className="text-[26px] font-bold text-[#0F172A] leading-tight tracking-tight">
- Create Account
+ <h1 className="text-[26px] font-bold text-slate-900 leading-tight tracking-tight">
+ Tạo tài khoản
  </h1>
  </div>
 
  {statusMessage && (
  <div
+ role={statusMessage.includes("thành công") ? "status" : "alert"}
  className={`mb-3 p-3 rounded-xl text-xs font-medium border ${
   statusMessage.includes("thành công")
-  ? "bg-[#E8F8F0] text-[#27AE60] border-[#27AE60]/20"
-  : "bg-[#EFF6FF] text-[#3B82F6] border-[#3B82F6]/30"
+  ? "bg-emerald-50 text-emerald-600 border-emerald-600/20"
+  : "bg-blue-50 text-blue-500 border-blue-500/30"
  }`}
  >
  {statusMessage}
@@ -178,28 +177,28 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
 
  <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
   {/* Role Selection */}
-  <div className="flex p-1 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+  <div className="flex p-1 bg-slate-50 rounded-xl border border-slate-200">
   <button
   type="button"
   onClick={() => handleRoleChange("student")}
   className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all duration-200 ${
   values.role === "student"
-  ? "bg-white text-[#3B82F6] shadow-sm"
-  : "text-[#64748B] hover:text-[#2563EB]"
+  ? "bg-white text-blue-500 shadow-sm"
+  : "text-slate-500 hover:text-blue-600"
   }`}
   >
-  Student
+  Học viên
   </button>
   <button
   type="button"
   onClick={() => handleRoleChange("teacher")}
   className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all duration-200 ${
   values.role === "teacher"
-  ? "bg-white text-[#3B82F6] shadow-sm"
-  : "text-[#64748B] hover:text-[#2563EB]"
+  ? "bg-white text-blue-500 shadow-sm"
+  : "text-slate-500 hover:text-blue-600"
   }`}
   >
-  Teacher
+  Giảng viên
   </button>
   </div>
 
@@ -208,77 +207,72 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
   <div className="flex flex-col gap-3 animate-pulse w-full opacity-50">
   {/* Full Name Skeleton */}
   <div className="space-y-1.5">
-  <div className="h-[18px] bg-[#E2E8F0] rounded w-24"></div>
-  <div className="h-[52px] bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"></div>
+  <div className="h-[18px] bg-slate-200 rounded w-24"></div>
+  <div className="h-[52px] bg-slate-50 rounded-xl border border-slate-200"></div>
   </div>
   
   {/* Email Skeleton */}
   <div className="space-y-1.5">
-  <div className="h-[18px] bg-[#E2E8F0] rounded w-28"></div>
-  <div className="h-[52px] bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"></div>
+  <div className="h-[18px] bg-slate-200 rounded w-28"></div>
+  <div className="h-[52px] bg-slate-50 rounded-xl border border-slate-200"></div>
   </div>
   
   {/* Password Grid Skeleton */}
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
   <div className="space-y-1.5">
-  <div className="h-[18px] bg-[#E2E8F0] rounded w-20"></div>
-  <div className="h-[52px] bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"></div>
+  <div className="h-[18px] bg-slate-200 rounded w-20"></div>
+  <div className="h-[52px] bg-slate-50 rounded-xl border border-slate-200"></div>
   </div>
   <div className="space-y-1.5">
-  <div className="h-[18px] bg-[#E2E8F0] rounded w-32"></div>
-  <div className="h-[52px] bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"></div>
+  <div className="h-[18px] bg-slate-200 rounded w-32"></div>
+  <div className="h-[52px] bg-slate-50 rounded-xl border border-slate-200"></div>
   </div>
   </div>
   
   {/* Submit Button Skeleton */}
-  <div className="mt-1 h-[48px] bg-[#E2E8F0] rounded-xl"></div>
-  </div>
-
-  <div className="absolute inset-0 flex items-center justify-center">
-  <div className="w-8 h-8 border-4 border-[#E2E8F0] border-t-[#3B82F6] rounded-full animate-spin"></div>
+  <div className="mt-1 h-[48px] bg-slate-200 rounded-xl"></div>
   </div>
   </div>
   ) : (
   <>
   <FormField
  id={nameId}
- label="Full Name"
+ label="Họ và tên"
  type="text"
- placeholder="John Doe"
  autoComplete="name"
  value={values.name}
  onChange={handleChange("name")}
- leftIcon={<UserIcon />}
- error={errors.name}
+ onBlur={markTouched("name")}
+ error={fieldError("name")}
  />
  <FormField
  id={emailId}
- label="Email Address"
+ label="Email"
  type="email"
- placeholder="name@example.com"
+
  autoComplete="email"
  value={values.email}
  onChange={handleChange("email")}
- leftIcon={<EmailIcon />}
- error={errors.email}
+ onBlur={markTouched("email")}
+ error={fieldError("email")}
  />
 
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
  <FormField
  id={passwordId}
- label="Password"
+ label="Mật khẩu"
  type={showPassword ? "text" : "password"}
- placeholder="••••••••"
+
  autoComplete="new-password"
  value={values.password}
  onChange={handleChange("password")}
- leftIcon={<LockIcon />}
- error={errors.password}
+ onBlur={markTouched("password")}
+ error={fieldError("password")}
  rightElement={
  <button
  type="button"
  onClick={togglePassword}
- className="text-[#94A3B8] hover:text-[#2563EB] transition-colors focus:outline-none"
+ className="text-slate-400 hover:text-blue-600 transition-colors focus:outline-none"
  >
  {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
  </button>
@@ -286,19 +280,19 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  />
  <FormField
  id={confirmPasswordId}
- label="Confirm Password"
+ label="Xác nhận mật khẩu"
  type={showConfirmPassword ? "text" : "password"}
- placeholder="••••••••"
+
  autoComplete="new-password"
  value={values.password_confirmation}
  onChange={handleChange("password_confirmation")}
- leftIcon={<LockIcon />}
- error={errors.password_confirmation}
+ onBlur={markTouched("password_confirmation")}
+ error={fieldError("password_confirmation")}
  rightElement={
  <button
  type="button"
  onClick={toggleConfirmPassword}
- className="text-[#94A3B8] hover:text-[#2563EB] transition-colors focus:outline-none"
+ className="text-slate-400 hover:text-blue-600 transition-colors focus:outline-none"
  >
  {showConfirmPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
  </button>
@@ -309,32 +303,36 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  <button
  type="submit"
  disabled={isLoading || !canSubmit}
- className="mt-1 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#3B82F6]/30"
+ className="mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-blue-500 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-blue-500/30"
  >
- {isLoading ? "Creating account..." : <>Sign Up <ArrowRightIcon /></>}
+ {isLoading ? "Đang tạo tài khoản..." : <>Đăng ký <ArrowRightIcon /></>}
  </button>
  </>
- )}
+  )}
+
  </form>
 
- <p className="mt-5 text-center text-[13px] text-[#64748B]">
- Already have an account?{" "}
+ <p className="mt-5 text-center text-[13px] text-slate-500">
+ Đã có tài khoản?{" "}
  <button
  type="button"
  onClick={onFlipToLogin}
- className="font-semibold text-[#3B82F6] hover:text-[#2563EB] transition-colors hover:underline underline-offset-2 focus:outline-none"
+ className="font-semibold text-blue-500 hover:text-blue-600 transition-colors hover:underline underline-offset-2 focus:outline-none"
  >
- Login
+ Đăng nhập
  </button>
  </p>
  </div>
 
- {/* Footer — bám sát phía dưới */}
+ {/* Footer â€” bÃ¡m sÃ¡t phÃ­a dÆ°á»›i */}
  <div className="mt-auto text-center">
- <p className="text-[11px] text-[#94A3B8] leading-relaxed">
- © 2024 MindNova AI. Empowering global learners through intelligence.
+ <p className="text-[11px] text-slate-400 leading-relaxed">
+ © 2026 MindNova AI. Nền tảng học tập cá nhân hóa cùng AI.
  </p>
  </div>
  </div>
  );
 }
+
+
+

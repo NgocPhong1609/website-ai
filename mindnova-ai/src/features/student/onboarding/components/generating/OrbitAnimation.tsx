@@ -18,13 +18,13 @@ export function OrbitAnimation() {
     >
       {/* Outer ring — slow breathe + slow orbit wrapper */}
       <div
-        className="absolute rounded-full border border-[#64748B]/25 animate-ring-breathe-slow"
+        className="absolute rounded-full border border-slate-500/25 animate-ring-breathe-slow"
         style={{ width: 268, height: 268 }}
       >
         {/* Orbiting dot 1 */}
         <div className="absolute inset-0 animate-orbit" style={{ animationDuration: "9s" }}>
           <div
-            className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#3B82F6]"
+            className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-blue-500"
             style={{ boxShadow: "0 0 6px #3B82F6" }}
           />
         </div>
@@ -34,20 +34,20 @@ export function OrbitAnimation() {
           style={{ animationDuration: "9s", animationDelay: "-4.5s" }}
         >
           <div
-            className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#64748B]/60"
+            className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-slate-500/60"
           />
         </div>
       </div>
 
       {/* Middle ring — breathe in sync */}
       <div
-        className="absolute rounded-full bg-[#F0F0FF]/60 border border-[#64748B]/20 animate-ring-breathe"
+        className="absolute rounded-full bg-slate-50/60 border border-slate-500/20 animate-ring-breathe"
         style={{ width: 196, height: 196 }}
       />
 
       {/* Inner filled circle */}
       <div
-        className="absolute rounded-full bg-[#EAEDFF] border border-[#64748B]/20"
+        className="absolute rounded-full bg-blue-50 border border-slate-500/20"
         style={{ width: 128, height: 128 }}
       />
 

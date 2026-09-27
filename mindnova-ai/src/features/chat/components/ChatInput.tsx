@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, KeyboardEvent } from 'react';
+import { Loader2, Paperclip, Send } from "lucide-react";
 
 interface ChatInputProps {
  onSendMessage: (content: string, file?: File | null) => void;
@@ -48,9 +49,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }
  <div className="flex-1 bg-slate-100/80 rounded-3xl flex items-end border border-transparent focus-within:border-blue-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10 transition-all shadow-sm">
  {/* Attachment button */}
  <button type="button" className="p-2.5 ml-1 text-slate-400 hover:text-blue-500 rounded-full transition-colors flex-shrink-0">
- <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
- </svg>
+ <Paperclip className="w-5 h-5" aria-hidden />
  </button>
  <textarea
  ref={textareaRef}
@@ -74,14 +73,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }
  className="w-9 h-9 bg-blue-600 text-white rounded-full hover:bg-blue-700 hover:shadow-md hover:shadow-blue-500/30 transition-all disabled:bg-blue-600/50 flex items-center justify-center cursor-pointer"
  >
  {isLoading ? (
- <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
- <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
- <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
- </svg>
+ <Loader2 className="w-4 h-4 animate-spin" aria-hidden />
  ) : (
- <svg className="w-4 h-4 -ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
- </svg>
+ <Send className="w-4 h-4" aria-hidden />
  )}
  </button>
  ) : (
@@ -89,9 +83,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }
  disabled={true}
  className="w-9 h-9 flex items-center justify-center bg-slate-200 text-slate-400 rounded-full transition-colors cursor-not-allowed"
  >
- <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
- </svg>
+ <Send className="w-4 h-4" aria-hidden />
  </button>
  )}
  </div>

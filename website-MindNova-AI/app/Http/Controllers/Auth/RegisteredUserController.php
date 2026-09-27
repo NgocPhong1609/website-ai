@@ -47,7 +47,7 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         if ($user->isAdmin()) {
-            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/');
+            $frontendUrl = rtrim(config('app.frontend_url'), '/');
 
             return redirect()->away($frontendUrl . '/admin');
         }

@@ -30,18 +30,18 @@ export function TopicChip({
         // Base
         "group relative flex items-center gap-2.5 px-4 py-2.5 rounded-xl border text-sm font-medium",
         "transition-all duration-200 ease-out cursor-pointer select-none",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64748B]/40 focus-visible:ring-offset-1",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500/40 focus-visible:ring-offset-1",
         // Hover scale effect
         "hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]",
         // State
         isSelected
           ? [
-              "border-[#64748B] bg-gradient-to-br from-[#3B82F6]/12 to-[#3B82F6]/8",
-              "text-[#3B82F6] shadow-[0_2px_12px_rgba(59, 130, 246,0.2)]",
+              "border-slate-500 bg-gradient-to-br from-blue-500/12 to-blue-500/8",
+              "text-blue-500 shadow-[0_2px_12px_rgba(59, 130, 246,0.2)]",
             ]
           : [
-              "border-[#E2E2EA] bg-white text-[#0F172A]",
-              "hover:border-[#64748B]/50 hover:bg-[#F8F9FE] hover:text-[#2563EB]",
+              "border-slate-200 bg-white text-slate-900",
+              "hover:border-slate-500/50 hover:bg-slate-50 hover:text-blue-600",
               "hover:shadow-[0_2px_8px_rgba(59, 130, 246,0.1)]",
             ],
       )}
@@ -51,8 +51,8 @@ export function TopicChip({
         className={twMerge(
           "flex items-center justify-center w-5 h-5 rounded-md transition-all duration-200",
           isSelected
-            ? "bg-[#64748B]/15 text-[#64748B]"
-            : "bg-[#F3F3F8] text-[#64748B] group-hover:bg-[#64748B]/10 group-hover:text-[#64748B]",
+            ? "bg-slate-500/15 text-slate-500"
+            : "bg-[#F3F3F8] text-slate-500 group-hover:bg-slate-500/10 group-hover:text-slate-500",
         )}
       >
         <Icon />
@@ -62,7 +62,7 @@ export function TopicChip({
 
       {/* Selected checkmark */}
       {isSelected && (
-        <span className="ml-auto flex items-center justify-center w-4 h-4 rounded-full bg-[#64748B] shrink-0">
+        <span className="ml-auto flex items-center justify-center w-4 h-4 rounded-full bg-slate-500 shrink-0">
           <></>
         </span>
       )}

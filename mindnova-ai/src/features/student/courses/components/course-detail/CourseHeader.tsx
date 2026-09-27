@@ -26,9 +26,10 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
   const title = info?.title || "Khóa học AI MindNova";
   const level = info?.level || "Beginner";
   const description = info?.description || "Chương trình đào tạo chất lượng cao cung cấp kiến thức nền tảng và nâng cao.";
-  const nextLesson = info?.next_lesson_title || "Bài giảng tiếp theo";
-  const nextLessonId = info?.next_lesson_id || "1";
-  const durationText = info?.duration_text || "0 Phút tổng cộng";
+  const nextLesson = info?.next_lesson_title;
+  const nextLessonId = info?.next_lesson_id;
+  const isCourseCompleted = !!info?.is_completed;
+  const durationText = info?.duration_text || "Chưa có thời lượng";
   const ratingText = info?.rating_text || "0.0 (0 Đánh giá)";
   const studentsText = info?.students_text || "0 Học viên tích cực";
   const categoryTag = info?.category_tag || "Khóa học AI";
@@ -52,25 +53,25 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
   return (
     <div className="mb-8">
       {/* ─── Editorial Hero Banner ─── */}
-      <section className="relative overflow-hidden rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] p-6 sm:p-8 transition-all duration-300">
+      <section className="relative overflow-hidden rounded-xl bg-slate-50 border border-slate-200 p-6 sm:p-8 transition-all duration-300">
         <div className="relative z-10 flex flex-col gap-6">
           {/* Breadcrumb & Pill tag */}
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <nav className="flex items-center gap-1.5 text-xs font-medium text-[#64748B]">
-              <Link href="/courses" className="hover:text-[#0F172A] transition-colors text-decoration-none">
-                Khóa học của tôi
+            <nav className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+              <Link href={isEnrolled ? "/courses" : "/explore"} className="hover:text-slate-900 transition-colors text-decoration-none">
+                {isEnrolled ? "Khóa học của tôi" : "Khám phá"}
               </Link>
-              <ChevronRight size={14} className="text-[#94A3B8]" />
-              <span className="text-[#0F172A] font-semibold">
+              <ChevronRight size={14} className="text-slate-400" />
+              <span className="text-slate-900 font-semibold">
                 Chi tiết học phần
               </span>
             </nav>
 
             <div className="flex items-center gap-2">
-              <span className="inline-block text-[11px] font-semibold text-[#2563EB] bg-[#EFF6FF] px-2.5 py-1 rounded-md border border-[#BFDBFE]">
+              <span className="inline-block text-[11px] font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200">
                 {categoryTag}
               </span>
-              <span className="inline-block text-[11px] font-medium text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-md border border-[#E2E8F0] capitalize">
+              <span className="inline-block text-[11px] font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200 capitalize">
                 {level}
               </span>
             </div>
@@ -78,22 +79,22 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
 
           {/* Title & Description */}
           <div className="space-y-3">
-            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-semibold tracking-tight text-[#0F172A] leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-semibold tracking-tight text-slate-900 leading-tight">
               {title}
             </h1>
-            <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed max-w-3xl">
+            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-3xl">
               {description}
             </p>
           </div>
 
           {/* Metadata Badges Row */}
-          <div className="flex flex-wrap items-center gap-3 text-xs pt-4 mt-2 border-t border-[#E2E8F0]/60">
-            <span className="inline-flex items-center gap-1.5 px-1 py-1.5 text-[#0F172A]">
-              <Clock size={14} className="text-[#64748B]" />
+          <div className="flex flex-wrap items-center gap-3 text-xs pt-4 mt-2 border-t border-slate-200/60">
+            <span className="inline-flex items-center gap-1.5 px-1 py-1.5 text-slate-900">
+              <Clock size={14} className="text-slate-500" />
               <span className="font-semibold">{durationText}</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 px-1 py-1.5 text-[#0F172A]">
-              <Star size={14} className="fill-[#EAB308] text-[#EAB308]" />
+            <span className="inline-flex items-center gap-1.5 px-1 py-1.5 text-slate-900">
+              <Star size={14} className="fill-yellow-500 text-yellow-500" />
               <span className="font-semibold">{ratingText}</span>
             </span>
           </div>
@@ -102,25 +103,26 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
           <div className="flex flex-wrap items-center gap-3 pt-2">
             {isEnrolled ? (
               <>
-                <Link
-                  href={`/courses/lesson?courseId=${info?.id || 1}&lessonId=${nextLessonId}`}
-                  className="text-decoration-none"
-                >
-                  <button
-                    type="button"
-                    className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-all cursor-pointer shadow-sm"
+                {nextLessonId ? (
+                  <Link
+                    href={`/courses/lesson?courseId=${info?.id}&lessonId=${nextLessonId}`}
+                    className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-white bg-blue-500 hover:bg-blue-600 transition-colors shadow-sm text-decoration-none"
                   >
-                    <span>Tiếp tục bài học: <strong className="font-normal underline decoration-white/50">{nextLesson}</strong></span>
-                  </button>
-                </Link>
+                    {isCourseCompleted || !nextLesson ? (
+                      <span>Ôn tập lại khóa học</span>
+                    ) : (
+                      <span>Tiếp tục bài học: <strong className="font-normal underline decoration-white/50">{nextLesson}</strong></span>
+                    )}
+                  </Link>
+                ) : null}
 
                 <button
                   type="button"
                   onClick={handleSaveToggle}
                   className={`flex items-center justify-center px-4 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                     isSaved
-                      ? "bg-[#EFF6FF] border-[#BFDBFE] text-[#2563EB] hover:bg-[#DBEAFE]"
-                      : "bg-white border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC]"
+                      ? "bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100"
+                      : "bg-white border-slate-200 text-slate-900 hover:bg-slate-50"
                   }`}
                 >
                   <span>{isSaved ? "Đã lưu vào danh mục" : "Lưu khóa học"}</span>
@@ -129,25 +131,13 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
               </>
             ) : (
               <>
-                <Link
-                  href={`/checkout?courseId=${info?.id || 1}`}
-                  className="text-decoration-none"
-                >
-                  <button
-                    type="button"
-                    className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-all cursor-pointer shadow-sm"
-                  >
-                    <span>Đăng ký học ngay — {(info?.price ? info.price.toLocaleString("vi-VN") + " VNĐ" : "Miễn phí")}</span>
-                  </button>
-                </Link>
-
                 <button
                   type="button"
                   onClick={handleSaveToggle}
                   className={`flex items-center justify-center px-4 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                     isSaved
-                      ? "bg-[#EFF6FF] border-[#BFDBFE] text-[#2563EB] hover:bg-[#DBEAFE]"
-                      : "bg-white border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC]"
+                      ? "bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100"
+                      : "bg-white border-slate-200 text-slate-900 hover:bg-slate-50"
                   }`}
                 >
                   <span>{isSaved ? "Đã lưu vào danh mục" : "Lưu khóa học"}</span>

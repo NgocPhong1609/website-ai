@@ -82,17 +82,29 @@ PROMPT;
 
         $userPrompt = "Soạn đề thi bài tập thực tế gồm chính xác {$targetCount} câu hỏi:\n"
             . "- Chủ đề: " . $validated['topic'] . "\n"
-            . ($validated['title'] ? "- Tiêu đề: " . $validated['title'] . "\n" : "")
+            . (!empty($validated['title']) ? "- Tiêu đề: " . $validated['title'] . "\n" : "")
             . "- Số lượng: ĐỦ {$targetCount} câu hỏi (id từ 1 đến {$targetCount})\n"
             . "- Mức độ: " . $validated['difficulty'] . "\n"
             . "- Các dạng bài bắt buộc: " . $typesString . "\n"
-            . ($validated['custom_prompt'] ? "- Yêu cầu thêm: " . $validated['custom_prompt'] . "\n" : "");
+            . (!empty($validated['custom_prompt']) ? "- Yêu cầu thêm: " . $validated['custom_prompt'] . "\n" : "");
 
         // Priority static model selection (avoids wasteful extra cURL request per user call)
-        $availableModels = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
+        $primaryModel = env('GROQ_MODEL', 'llama-3-70b-8192');
+        
+        // Try to fetch active models dynamically from Groq API
+        $dynamicModels = $this->fetchAvailableGroqModels($groqKey);
+
+        // Build available models: env first, then dynamic models, then fallback stable Groq models
+        $fallbackModels = ['llama3-70b-8192', 'llama3-8b-8192', 'mixtral-8x7b-32768', 'gemma2-9b-it'];
+        $availableModels = array_merge([$primaryModel], $dynamicModels, $fallbackModels);
+        
+        // Deduplicate
+        $availableModels = array_values(array_unique($availableModels));
+
+        Log::info('Quiz generation starting', ['models' => $availableModels]);
 
         $aiData = null;
-        $lastError = '';
+        $allErrors = [];
 
         foreach ($availableModels as $model) {
             $payload = [
@@ -126,7 +138,7 @@ PROMPT;
             curl_close($ch);
 
             if ($curlError) {
-                $lastError = 'Lỗi kết nối mạng cURL: ' . $curlError;
+                $allErrors[] = "'{$model}': Lỗi mạng cURL: " . $curlError;
                 continue;
             }
 
@@ -142,7 +154,7 @@ PROMPT;
                 $parsed = json_decode($clean, true);
                 if (is_array($parsed) && !isset($parsed['questions']) && isset($parsed[0]['question'])) {
                     $parsed = [
-                        'title' => $validated['title'] ?: 'Đề thi: ' . $validated['topic'],
+                        'title' => ($validated['title'] ?? null) ?: ('Đề thi: ' . $validated['topic']),
                         'questions' => $parsed
                     ];
                 }
@@ -153,13 +165,18 @@ PROMPT;
                 }
             } else {
                 $errRes = json_decode($responseBody, true);
-                $lastError = $errRes['error']['message'] ?? ("HTTP " . $httpCode);
-                Log::warning("Model {$model} failed: " . $lastError);
+                $modelError = $errRes['error']['message'] ?? ("HTTP " . $httpCode);
+                $allErrors[] = "'{$model}': " . $modelError;
+                Log::warning("Model {$model} failed: " . $modelError);
             }
         }
 
         if (!$aiData || !isset($aiData['questions']) || empty($aiData['questions'])) {
-            return response()->json(['message' => 'Lỗi từ Groq AI: ' . ($lastError ?: 'Không thể tạo đề thi lúc này.')], 500);
+            Log::error('All Groq models failed', ['errors' => $allErrors, 'primary' => $primaryModel]);
+            return response()->json([
+                'message' => 'Lỗi từ Groq AI. Tất cả model đều thất bại: ' . implode('; ', $allErrors),
+                'debug' => ['models_tried' => $availableModels, 'errors' => $allErrors]
+            ], 500);
         }
 
         $questions = $aiData['questions'];
@@ -171,7 +188,7 @@ PROMPT;
         try {
             $quiz = AiGeneratedQuiz::create([
                 'user_id' => $userId,
-                'title' => $validated['title'] ?: ($aiData['title'] ?? ('Đề thi: ' . $validated['topic'])),
+                'title' => ($validated['title'] ?? null) ?: ($aiData['title'] ?? null) ?: ('Đề thi: ' . $validated['topic']),
                 'topic' => $validated['topic'],
                 'difficulty' => $validated['difficulty'],
                 'questions_count' => count($questions),

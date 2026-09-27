@@ -167,7 +167,7 @@ Pattern: Request → middleware → Controller → Service → Model. Không có
 | Progress / history | `features/student/progress/`, `history/` | `ProgressController`, `HistoryController` |
 | Profile | `features/student/profile/` | `UserController` `/api/profile` |
 | Checkout / payment | `features/student/checkout/` | `OrderController`, `PaymentController`, `PaymentService` |
-| Billing / certificates | UI gần như **mock**, chưa nối đủ API | `Certificate` model tồn tại |
+| Billing / certificates | `features/student/billing/`, `certificates/` | `GET /api/orders`, refund eligibility theo `course_id` của đơn; `GET/POST /api/student/certificates` |
 | Streak check-in | dashboard | `POST /api/student/check-in` |
 | Reviews | course detail | `Student\ReviewController` |
 | Discussions | lesson workspace | `Student\DiscussionController` |
@@ -258,7 +258,7 @@ Chi tiết đầy đủ: `website-MindNova-AI/routes/api.php`. Dưới đây là
 | POST | `/api/forgot-password/verify-otp` | none | `verifyResetOtp` | |
 | POST | `/api/reset-password` | none | `resetPassword` | |
 | GET | `/api/auth/google` | none | `redirectToGoogle` | Socialite |
-| GET | `/api/auth/google/callback` | none | `handleGoogleCallback` | Redirect FE (URL hardcoded localhost — xem limitations) |
+| GET | `/api/auth/google/callback` | none | `handleGoogleCallback` | Redirect FE (`config(app.frontend_url)` từ `FRONTEND_URL`) |
 
 ### Payment IPN — public
 
@@ -293,7 +293,7 @@ Chi tiết đầy đủ: `website-MindNova-AI/routes/api.php`. Dưới đây là
 | POST | `/api/student/ai-tutor/chat` | streamChat | |
 | CUD | `/api/student/courses/{course}/reviews` | ReviewController | |
 | GET/POST | course/lesson quiz + grade-essay | StudentQuizController | |
-| GET/POST | lesson video-url, complete, check-answer | LessonController | |
+| GET/POST | lesson video-url, start, complete, check-answer | LessonController | `start` ghi thời điểm mở bài (cache); `complete` yêu cầu thời gian học thực ≥ ½ thời lượng video / ⅓ bài đọc |
 | GET/PATCH/DELETE | notifications | NotificationController | |
 | CRUD | lesson discussions | DiscussionController | |
 | POST | `/api/broadcasting/auth` | framework | Echo |
@@ -494,13 +494,13 @@ Dùng trong code nhưng **thiếu** trên example: `FRONTEND_URL`, `ADMIN_SECRET
 
 ### Frontend
 
-Không có `.env.example`. Cần:
+Có `mindnova-ai/.env.example`. Cần:
 
 - `BACKEND_URL` — RSC apiClient, payment callback
 - `NEXT_PUBLIC_API_URL` — axios, rewrite, Echo, adminApi
 - `NEXT_PUBLIC_REVERB_*`, `NEXT_PUBLIC_ENABLE_PUSHER_LOGS`
 
-Rewrite: `/api/:path*` → `${NEXT_PUBLIC_API_URL}/api/:path*`. Nếu `NEXT_PUBLIC_API_URL` đã có `/api` thì dễ double-prefix — interceptor/axios và apiClient có logic cắt `/api` lặp.
+Rewrite và request server dùng `BACKEND_URL`; request browser dùng `NEXT_PUBLIC_API_URL` hoặc proxy cùng origin nếu để trống. `src/shared/lib/api-url.ts` chuẩn hóa đúng một `/api`. Reverb host/cổng/scheme đọc env, không bị `next.config.ts` ghi đè. Xem `docs/environment-urls.md`.
 
 ### Commands
 
@@ -530,12 +530,12 @@ php artisan reverb:start     # Needs verification nếu config chưa publish
 php artisan storage:link
 ```
 
-Khác: `app:cleanup-temp-media` (scheduled), `revenue:unlock-pending`, `chat:fix-missing-members`, lệnh demo `demo:revenue3` / `mock:purchases` **phá data**.
+Khác: `app:cleanup-temp-media` (scheduled), `revenue:unlock-pending`, `chat:fix-missing-members`, `e2e:purge-users` (xóa tài khoản E2E, chỉ local/testing), lệnh demo `demo:revenue3` / `mock:purchases` **phá data**.
 
 `composer.json` script `dev`: serve + queue:listen + pail + vite (Blade), **không** thay Next.js.
 
 Tests BE: Pest, MySQL `du_an_testing` (`phpunit.xml`).  
-Tests FE: `palette.test.ts`, `LearningHistory.test.tsx`, `LessonContent.test.tsx` (placeholder). `next.config.ts` **`typescript.ignoreBuildErrors: true`**.
+Tests FE: Vitest (`pnpm test`) + Playwright E2E luồng student trong `mindnova-ai/e2e/` (`pnpm test:e2e`, cần BE + FE đang chạy). `next.config.ts` **`typescript.ignoreBuildErrors: true`**.
 
 Dependencies đặc biệt: `james-heinrich/getid3` (duration video), `openai-php/laravel`, `league/flysystem-aws-s3-v3`, CKEditor 5, laravel-echo, jspdf (admin export). FE `graphql` / `react-hook-form` / `zod` **installed unused**.
 
@@ -565,6 +565,8 @@ Dependencies đặc biệt: `james-heinrich/getid3` (duration video), `openai-ph
 - Role storage: chỉ `roles` + `role_user`. API vẫn trả field `role` từ accessor.
 - Register `role_id` 2/3 phụ thuộc thứ tự seed — fragile.
 - API student nhiều GET/AI **public** — đừng “fix” bằng cách giả định đã auth.
+- Course detail (`CourseService::getCourseDetail`) chỉ trả `video_url`, nội dung bài đọc, tài liệu và quiz cho user đã ghi danh; FE chặn trang lesson khi `is_enrolled=false`.
+- Hoàn thành bài học đo thời gian phía server (`POST lessons/{id}/start` → `complete`); không tin `playback_position` từ client.
 - `PaymentService` callback: nếu không resolve user thì fallback `User::first()` — nguy hiểm, đừng nhân rộng.
 - Enrollment/chat member không unique DB — race có thể duplicate (code dùng `firstOrCreate` member).
 - JSON response shape không thống nhất toàn API.
@@ -582,7 +584,6 @@ Dependencies đặc biệt: `james-heinrich/getid3` (duration video), `openai-ph
 - Không có TODO/FIXME đáng kể trong app PHP/TS.
 - HistoryService có placeholder stats khi thiếu data.
 - Student billing: `GET /api/orders` (auth). Certificates: `GET/POST /api/student/certificates` (auth, bảng `certificates`). Practice modules: `GET /api/student/practice/overview` field `modules_list`. AI quiz practice routes yêu cầu Sanctum, không fallback userId 201.
-- Billing + certificates student: UI tĩnh.
 - `/welcome`, `app/loading.tsx`, `app/not-found.tsx` stub.
 - `ads-hourly` không gắn.
 - Google icon trên login; **FE không có handler OAuth** (BE có).
@@ -593,7 +594,6 @@ Dependencies đặc biệt: `james-heinrich/getid3` (duration video), `openai-ph
 - `revenue:unlock-pending` phải chạy thủ công hoặc cron — chưa schedule.
 - Seed/demo commands có thể wipe quiz/order.
 - Admin analytics: README nói chưa nối đủ API.
-- Vitest `LessonContent` test không cover hành vi lesson thật.
 
 ### Điểm dễ regression
 
@@ -630,7 +630,7 @@ Các mục sau **không khẳng định** cho đến khi đọc thêm hoặc ch�
 - `config/broadcasting.php` có được publish lúc deploy không.
 - Certificate: student claim khi enrollment `completed` hoặc `progress_percentage >= 100`; chưa generate PDF (`certificate_url` có thể null).
 - Admin overview stats lấy từ `GET /api/admin/overview`; hero UI dùng 3 stat đầu.
-- Google OAuth redirect production (code callback có hardcoded `http://localhost:3000/login-success?token=`).
+- Google OAuth redirect production phụ thuộc `FRONTEND_URL` trong cấu hình Railway; chưa xác minh giá trị thật.
 - ZaloPay có dùng ở môi trường nào không (không có route).
 - Coverage test Pest hiện tại pass/fail trên máy này — chưa chạy trong task này.
 - `database.sql` có được team nào còn import không — không nên.

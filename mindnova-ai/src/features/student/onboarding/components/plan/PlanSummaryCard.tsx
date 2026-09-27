@@ -24,9 +24,9 @@ const NEURAL_NODES = [
 ] as const;
 
 const LEVEL_BADGE_CLASS: Record<string, string> = {
- Beginner: "bg-[#06B6D4]/10 text-[#06B6D4] border-[#06B6D4]/20",
- Intermediate: "bg-[#F8FAFC] text-[#3B82F6] border-[#E2E8F0]",
- Advanced: "bg-[#8B5CF6]/10 text-[#8B5CF6] border-[#8B5CF6]/20",
+ Beginner: "bg-cyan-500/10 text-cyan-500 border-cyan-500/20",
+ Intermediate: "bg-slate-50 text-blue-500 border-slate-200",
+ Advanced: "bg-sky-500/10 text-sky-500 border-sky-500/20",
 };
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -35,7 +35,7 @@ const LEVEL_BADGE_CLASS: Record<string, string> = {
 function NeuralMap() {
  return (
  <div
- className="relative w-full h-28 rounded-2xl overflow-hidden"
+ className="relative w-full h-28 rounded-xl overflow-hidden"
  aria-hidden="true"
  >
  {/* Dark space background */}
@@ -68,14 +68,14 @@ function NeuralMap() {
 
  {/* Bottom label row */}
  <div className="absolute inset-0 flex flex-col justify-end p-3 gap-1">
- <span className="text-[9px] font-mono tracking-[0.18em] text-[#3B82F6]/50 uppercase">
- AI Neural Map — Active
+ <span className="text-[9px] font-mono tracking-[0.18em] text-blue-500/50 uppercase">
+ Bản đồ kiến thức AI
  </span>
  <div className="flex gap-1">
  {[3, 2, 1].map((flex, i) => (
  <div
  key={i}
- className="h-0.5 rounded-full bg-[#3B82F6] "
+ className="h-0.5 rounded-full bg-blue-500 "
  style={{ flex, opacity: 0.65 }}
  />
  ))}
@@ -93,12 +93,12 @@ interface SummaryRowProps {
 
 function SummaryRow({ icon, label, value }: SummaryRowProps) {
  return (
- <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0F7] last:border-0">
- <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
+ <div className="flex items-center justify-between py-2.5 border-b border-slate-100 last:border-0">
+ <div className="flex items-center gap-2 text-[11px] text-slate-500">
  {icon}
  <span>{label}</span>
  </div>
- <div className="text-[11px] font-semibold text-[#0F172A]">{value}</div>
+ <div className="text-[11px] font-semibold text-slate-900">{value}</div>
  </div>
  );
 }
@@ -138,20 +138,20 @@ function BoltIcon() {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSummaryCardProps) {
- const levelClass = LEVEL_BADGE_CLASS[level] ?? "bg-[#F0F0F7] text-[#64748B] border-[#E2E2EA]";
+ const levelClass = LEVEL_BADGE_CLASS[level] ?? "bg-slate-100 text-slate-500 border-slate-200";
 
  return (
  <div className="w-[240px] shrink-0 flex flex-col gap-3">
  {/* Header label */}
  <div className="flex items-center gap-2">
- <div className="w-6 h-6 rounded-lg bg-[#3B82F6] flex items-center justify-center shadow-[0_2px_8px_rgba(59, 130, 246,0.4)]">
+ <div className="w-6 h-6 rounded-lg bg-blue-500 flex items-center justify-center shadow-[0_2px_8px_rgba(59, 130, 246,0.4)]">
  <BoltIcon />
  </div>
- <h2 className="text-sm font-bold text-[#0F172A]">Your Profile</h2>
+ <h2 className="text-sm font-bold text-slate-900">Hồ sơ của bạn</h2>
  </div>
 
  {/* Main card */}
- <div className="bg-white border border-[#E8E8F0] rounded-2xl p-4 shadow-[0_2px_12px_rgba(59, 130, 246,0.06)]">
+ <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-[0_2px_12px_rgba(59, 130, 246,0.06)]">
  {/* Goal */}
  <SummaryRow
  icon={<TargetIcon />}
@@ -179,7 +179,7 @@ export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSumm
  icon={<BookIcon />}
  label="Topics"
  value={
- <span className="bg-[#3B82F6] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+ <span className="bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
  {topics.length} selected
  </span>
  }
@@ -188,9 +188,9 @@ export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSumm
  {/* Estimated time */}
  <SummaryRow
  icon={<ClockIcon />}
- label="Est. time"
+ label="Thời gian dự kiến"
  value={
- <span className="text-[#3B82F6] bg-[#F8FAFC] px-2 py-0.5 rounded-full">
+ <span className="text-blue-500 bg-slate-50 px-2 py-0.5 rounded-full">
  {estimatedTime}
  </span>
  }
@@ -206,13 +206,13 @@ export function PlanSummaryCard({ goal, level, topics, estimatedTime }: PlanSumm
  {topics.slice(0, 4).map((t, i) => (
  <span
  key={i}
- className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-[#F8FAFC] text-[#3B82F6] border border-[#E2E8F0]"
+ className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-slate-50 text-blue-500 border border-slate-200"
  >
  {t}
  </span>
  ))}
  {topics.length > 4 && (
- <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-[#F0F0F7] text-[#64748B]">
+ <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500">
  +{topics.length - 4} more
  </span>
  )}

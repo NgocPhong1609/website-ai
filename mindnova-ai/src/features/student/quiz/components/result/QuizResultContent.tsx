@@ -6,6 +6,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useGetQuizAttemptResult } from "../../api";
 import type { QuizGradingResult, QuestionResultDetail } from "../../types";
 import toast from "react-hot-toast";
+import { axiosClient } from "@shared/lib/axios";
+import { Lightbulb, ArrowLeft } from "lucide-react";
+import { AiQuizResultView } from "./AiQuizResultView";
 
 export function QuizResultContent() {
  const router = useRouter();
@@ -29,7 +32,6 @@ export function QuizResultContent() {
  const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
  const [selectedFilter, setSelectedFilter] = useState<"all" | "mc" | "essay">("all");
 
- const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/api\/?$/, "");
 
  // 1. Tải kết quả bài thi AI nếu có aiQuizId
  useEffect(() => {
@@ -38,10 +40,9 @@ export function QuizResultContent() {
  const fetchAiQuizResult = async () => {
  setIsAiLoading(true);
  try {
- const res = await fetch(`${baseUrl}/api/student/practice/ai-quizzes/${aiQuizId}`);
- if (res.ok) {
- const json = await res.json();
- setAiQuiz(json.data);
+ const res = await axiosClient.get(`/api/student/practice/ai-quizzes/${aiQuizId}`);
+ if (res.data && res.data.data) {
+ setAiQuiz(res.data.data);
  }
  } catch (err) {
  console.error("Lỗi khi tải kết quả thi AI:", err);
@@ -51,7 +52,7 @@ export function QuizResultContent() {
  };
 
  fetchAiQuizResult();
- }, [aiQuizId, baseUrl]);
+ }, [aiQuizId]);
 
  // 2. Ưu tiên dữ liệu từ Database theo attemptId, nếu không có mới dùng localStorage
  useEffect(() => {
@@ -88,13 +89,7 @@ export function QuizResultContent() {
 
  setIsGeneratingSimilar(true);
  try {
- const res = await fetch(`${baseUrl}/api/student/practice/generate-ai-quiz`, {
- method: "POST",
- headers: {
- "Accept": "application/json",
- "Content-Type": "application/json",
- },
- body: JSON.stringify({
+ const res = await axiosClient.post(`/api/student/practice/generate-ai-quiz`, {
  topic: aiQuiz.topic,
  title: `Luyện tập chuyên sâu: ${aiQuiz.topic}`,
  question_count: 10,
@@ -102,12 +97,10 @@ export function QuizResultContent() {
  question_types: ["Trắc nghiệm", "Đúng / Sai"],
  time_limit_minutes: 15,
  custom_prompt: "Tạo các bài toán biến thể nâng cao tư duy dựa trên chủ đề này",
- }),
  });
 
- const json = await res.json();
- if (res.ok && json.data?.id) {
- router.push(`/practice/quiz/question?aiQuizId=${json.data.id}`);
+ if (res.data && res.data.data?.id) {
+ router.push(`/practice/quiz/question?aiQuizId=${res.data.data.id}`);
  } else {
  toast.error("Chưa tạo được bộ đề tương tự, vui lòng thử lại!");
  }
@@ -121,10 +114,40 @@ export function QuizResultContent() {
 
  if (isAiLoading || isStaticLoading) {
  return (
- <div className="flex-1 min-h-screen bg-[#F8F9FC] flex items-center justify-center p-6">
- <div className="flex flex-col items-center gap-3">
- 
- <span className="text-sm font-semibold text-[#64748b]">Đang tổng hợp báo cáo đánh giá năng lực từ AI...</span>
+ <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6">
+ <div className="max-w-[860px] mx-auto space-y-8 animate-pulse">
+ {/* Breadcrumb Skeleton */}
+ <div className="flex items-center justify-between">
+ <div className="h-4 bg-slate-200 rounded w-48"></div>
+ <div className="h-6 bg-slate-200 rounded-full w-24"></div>
+ </div>
+
+ {/* Score Banner Skeleton */}
+ <div className="h-48 sm:h-40 bg-white border border-slate-200 rounded-3xl shadow-sm"></div>
+
+ {/* Details Header Skeleton */}
+ <div className="flex items-center justify-between px-2 pt-2">
+ <div className="h-5 bg-slate-200 rounded w-40"></div>
+ <div className="h-6 bg-slate-200 rounded-full w-32"></div>
+ </div>
+
+ {/* Questions Skeleton */}
+ <div className="space-y-5">
+ {[1, 2, 3].map((i) => (
+ <div key={i} className="p-5 sm:p-6 rounded-xl bg-white border border-slate-200 shadow-xs space-y-4">
+ <div className="flex justify-between items-start gap-4">
+ <div className="h-5 bg-slate-200 rounded w-3/4"></div>
+ <div className="h-6 bg-slate-200 rounded-full w-20 shrink-0"></div>
+ </div>
+ <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+ <div className="h-12 bg-slate-50 rounded-xl border border-slate-200"></div>
+ <div className="h-12 bg-slate-50 rounded-xl border border-slate-200"></div>
+ <div className="h-12 bg-slate-50 rounded-xl border border-slate-200"></div>
+ <div className="h-12 bg-slate-50 rounded-xl border border-slate-200"></div>
+ </div>
+ </div>
+ ))}
+ </div>
  </div>
  </div>
  );
@@ -134,204 +157,15 @@ export function QuizResultContent() {
  // ─── GIAO DIỆN 1: BÀI THI AI (AI QUIZ RESULT VIEW) ──────────────────────────
  // ═════════════════════════════════════════════════════════════════════════════
  if (aiQuizId && aiQuiz) {
- const isPassed = (aiQuiz.score || 0) >= (aiQuiz.passing_percentage || 70);
-
  return (
- <div className="min-h-screen bg-[#F8F9FC] py-10 px-4 sm:px-6">
- <div className="max-w-[860px] mx-auto space-y-8">
-
- {/* Breadcrumb */}
- <div className="flex items-center justify-between text-xs text-[#64748b]">
- <div className="flex items-center gap-2">
- <Link href="/practice" className="hover:text-[#2563eb] transition-colors">Trung tâm thực chiến</Link>
- <span></span>
- <span className="text-[#0f172a] font-medium">Báo cáo kết quả bài thi AI</span>
- </div>
- <span className="px-3 py-1 rounded-full bg-[#f8fafc] text-[#2563eb] font-semibold border border-[#2563eb]/15">
- Mã đề: #{aiQuiz.id}
- </span>
- </div>
-
- {/* Score Banner */}
- <div className={`p-8 rounded-3xl border shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 ${
- isPassed 
- ? " from-[#ECFDF5] via-white to-[#F0FDFA] border-[#0f172a]/30" 
- : " from-[#FFF1F2] via-white to-[#EFF6FF] border-[#2563eb]/30"
- }`}>
- <div className="space-y-2 text-center md:text-left">
- <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block ${
- isPassed ? "bg-[#f8fafc] text-[#065F46]" : "bg-[#f8fafc] text-[#2563eb]"
- }`}>
- {isPassed ? " Đạt Chuẩn Đánh Giá" : " Cần Cố Gắng Thêm"}
- </span>
- <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0f172a]">{aiQuiz.title}</h1>
- <p className="text-xs sm:text-sm text-[#64748b]">
- Chủ đề: <strong className="text-[#2563eb]">{aiQuiz.topic}</strong> • Độ khó: <strong>{aiQuiz.difficulty}</strong>
- </p>
- </div>
-
- <div className="flex flex-col items-center">
- <div className={`text-5xl font-black ${isPassed ? "text-[#0f172a]" : "text-[#2563eb]"}`}>
- {aiQuiz.score}%
- </div>
- <span className="text-xs font-semibold text-[#64748b] mt-1">
- Đúng {aiQuiz.correct_count || 0}/{aiQuiz.questions_count} câu
- </span>
- </div>
- </div>
-
- {/* Chi tiết từng câu hỏi */}
- <div className="space-y-5">
- <div className="flex items-center justify-between px-1">
- <h2 className="text-base font-bold text-[#0f172a]"> Chi tiết bài làm &amp; Hướng dẫn giải</h2>
- <span className="text-xs text-[#64748b]">Tổng cộng {aiQuiz.questions_count} câu hỏi</span>
- </div>
-
- {aiQuiz.questions_data?.map((q: any, idx: number) => {
- const userAns = aiQuiz.user_answers?.[String(q.id)] || "";
- const rawCorrect = q.correct_answer || "";
- const type = q.type || (q.options && q.options.length > 0 ? "multiple_choice" : "essay");
-
- const cleanUser = userAns.trim().charAt(0).toUpperCase();
- const cleanCorrect = String(rawCorrect).trim().charAt(0).toUpperCase();
-
- let isCorrect = false;
- if (type === "multiple_choice" || type === "true_false") {
- isCorrect = cleanUser !== "" && cleanUser === cleanCorrect;
- } else if (type === "fill_blank") {
- const u = userAns.trim().toLowerCase();
- const c = String(rawCorrect).trim().toLowerCase();
- isCorrect = u !== "" && (u === c || c.includes(u));
- } else if (type === "essay") {
- isCorrect = userAns.trim().length >= 8;
- }
-
- const isExpanded = !!expandedExplanations[String(q.id || idx)];
- const isEssayOrFill = type === "essay" || type === "fill_blank" || (!q.options || q.options.length === 0);
-
- return (
- <div key={q.id || idx} className="p-6 rounded-2xl bg-white border border-[#e2e8f0] shadow-xs space-y-4">
- <div className="flex items-start justify-between gap-4">
- <h3 className="text-sm sm:text-base font-bold text-[#0f172a] leading-relaxed">
- Câu {idx + 1}: {q.question}
- </h3>
- <span className={`text-xs font-bold px-3 py-1 rounded-full shrink-0 ${
- isCorrect ? "bg-[#f8fafc] text-[#065F46]" : "bg-[#f8fafc] text-[#2563eb]"
- }`}>
- {isCorrect ? " Chính xác" : " Chưa đúng"}
- </span>
- </div>
-
- {isEssayOrFill ? (
- <div className="space-y-2 text-xs sm:text-sm">
- <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
- <span className="font-semibold text-[#64748b] block mb-1">️ Bài làm của bạn:</span>
- <p className="text-[#0f172a]">{userAns || <em className="text-[#64748b]">Bỏ trống</em>}</p>
- </div>
- <div className="p-3.5 rounded-xl bg-[#f8fafc]/40 border border-[#0f172a]/30">
- <span className="font-semibold text-[#065F46] block mb-1"> Đáp số / Gợi ý chuẩn:</span>
- <p className="text-[#065F46] font-medium">{rawCorrect}</p>
- </div>
- </div>
- ) : (
- <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
- {q.options?.map((opt: string, optIdx: number) => {
- const optKey = opt.trim().charAt(0).toUpperCase();
- const isChosen = cleanUser === optKey;
- const isRightKey = cleanCorrect === optKey;
-
- let style = "bg-[#F8FAFC] border-[#e2e8f0] text-[#0f172a]";
- if (isRightKey) {
- style = "bg-[#f8fafc]/70 border-[#0f172a] text-[#065F46] font-bold";
- } else if (isChosen && !isRightKey) {
- style = "bg-[#f8fafc]/70 border-[#2563eb] text-[#2563eb] font-bold";
- }
-
- return (
- <div key={optIdx} className={`p-3.5 rounded-xl border text-xs sm:text-sm flex items-center justify-between ${style}`}>
- <span>{opt}</span>
- {isChosen && (
- <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isRightKey ? "bg-[#0f172a] text-white" : "bg-[#2563eb] text-white"}`}>
- Bạn chọn
- </span>
- )}
- </div>
- );
- })}
- </div>
- )}
-
- <div className="pt-2">
- <div className="p-4 rounded-xl bg-[#f8fafc]/70 border border-[#2563eb]/20 space-y-2">
- <div className="flex items-center justify-between">
- <span className="text-xs font-bold text-[#2563eb] flex items-center gap-1.5">
- <span></span> Hướng dẫn giải từ AI:
- </span>
- <button
- type="button"
- onClick={() => toggleExplanation(q.id || idx)}
- className="text-xs font-bold text-[#2563eb] hover:underline cursor-pointer flex items-center gap-1"
- >
- {isExpanded ? "Thu gọn ▲" : "Xem chi tiết từng bước ▼"}
- </button>
- </div>
-
- <p className="text-xs sm:text-sm text-[#0f172a] leading-relaxed">
- {q.explanation || "Áp dụng định lý và công thức đặc trưng để tìm ra đáp số."}
- </p>
-
- {isExpanded && (
- <div className="mt-3 pt-3 border-t border-[#2563eb]/15 text-xs text-[#0f172a] space-y-1 bg-white/80 p-3 rounded-lg">
- <strong className="text-[#2563eb] block"> Phương pháp ghi nhớ:</strong>
- <p>• Xác định điều kiện xác định và áp dụng đúng công thức tổng quát trước khi thay số.</p>
- <p>• Thử các trường hợp đặc biệt để loại trừ nhanh các phương án sai.</p>
- </div>
- )}
- </div>
- </div>
- </div>
- );
- })}
- </div>
-
- {/* Action Footer */}
- <div className="p-6 rounded-3xl bg-white border border-[#e2e8f0] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
- <Link href="/practice" className="w-full sm:w-auto">
- <button type="button" className="w-full sm:w-auto px-6 py-3 rounded-xl border border-[#e2e8f0] text-xs sm:text-sm font-semibold text-[#0f172a] hover:bg-[#F8FAFC] cursor-pointer">
- ← Về Trung tâm Đánh giá
- </button>
- </Link>
-
- <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
- <Link href={`/practice/quiz/question?aiQuizId=${aiQuiz.id}`} className="w-full sm:w-auto">
- <button type="button" className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#f8fafc] text-[#2563eb] border border-[#2563eb]/30 text-xs sm:text-sm font-bold hover:bg-[#E0E7FF] transition-all flex items-center justify-center gap-2 cursor-pointer">
- <span></span>
- <span>Làm lại đề này</span>
- </button>
- </Link>
-
- <button
- type="button"
- disabled={isGeneratingSimilar}
- onClick={handleGenerateSimilar}
- className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#2563eb] text-white text-xs sm:text-sm font-bold shadow-md hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
- >
- {isGeneratingSimilar ? (
- <>
- 
- <span>AI đang soạn 10 câu mới...</span>
- </>
- ) : (
- <>
- <span></span>
- <span>Luyện tiếp: Tạo 10 câu tương tự</span>
- </>
- )}
- </button>
- </div>
- </div>
- </div>
- </div>
+ <AiQuizResultView
+ aiQuiz={aiQuiz}
+ aiQuizId={aiQuizId}
+ expandedExplanations={expandedExplanations}
+ toggleExplanation={toggleExplanation}
+ isGeneratingSimilar={isGeneratingSimilar}
+ handleGenerateSimilar={handleGenerateSimilar}
+ />
  );
  }
 
@@ -376,118 +210,118 @@ export function QuizResultContent() {
  });
 
  return (
- <div className="flex-1 overflow-y-auto bg-[#F8F9FC] min-h-screen relative">
+ <div className="flex-1 overflow-y-auto bg-slate-50 min-h-screen relative">
  
  {/* ─── Modal Soát bài thi tĩnh & tự luận Rubric ─── */}
  {isReviewModalOpen && (
  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 sm:p-6 animate-fadeIn">
- <div className="bg-white w-full max-w-4xl rounded-3xl border border-[#e2e8f0] shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-scaleUp">
+ <div className="bg-white w-full max-w-4xl rounded-3xl border border-slate-200 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-scaleUp">
  
- <div className="p-6 bg-gradient-to-r from-[#eff6ff] via-[#F3F4FC] to-[#EAF8F5] border-b border-[#e2e8f0] flex items-center justify-between shrink-0">
+ <div className="p-6 bg-gradient-to-r from-blue-50 via-slate-100 to-emerald-50 border-b border-slate-200 flex items-center justify-between shrink-0">
  <div className="space-y-1">
- <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-white text-xs font-semibold text-[#2563eb] border border-[#2563eb]/20">
+ <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-white text-xs font-semibold text-blue-600 border border-blue-600/20">
  <span> Soát Lỗi Chi Tiết từ Gia Sư AI Nova</span>
  </div>
- <h3 className="text-lg sm:text-xl font-bold text-[#0f172a]">Bảng Đối Chiếu Đáp Án, Bài Làm Tự Luận &amp; Nhận Xét Rubric</h3>
+ <h3 className="text-lg sm:text-xl font-bold text-slate-900">Bảng Đối Chiếu Đáp Án, Bài Làm Tự Luận &amp; Nhận Xét Rubric</h3>
  </div>
  <button 
  type="button"
  onClick={() => setIsReviewModalOpen(false)}
- className="w-10 h-10 rounded-xl bg-white text-[#64748b] hover:text-[#0f172a] hover:bg-[#F0F2F8] border border-[#e2e8f0] flex items-center justify-center font-semibold text-lg transition-colors cursor-pointer"
+ className="w-10 h-10 rounded-xl bg-white text-slate-500 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 flex items-center justify-center font-semibold text-lg transition-colors cursor-pointer"
  title="Đóng cửa sổ"
  >
  
  </button>
  </div>
 
- <div className="p-6 overflow-y-auto space-y-6 flex-1 bg-[#F8FAFC]">
- <div className="flex flex-wrap gap-2 pb-2 border-b border-[#e2e8f0]">
+ <div className="p-6 overflow-y-auto space-y-6 flex-1 bg-slate-50">
+ <div className="flex flex-wrap gap-2 pb-2 border-b border-slate-200">
  <button 
  onClick={() => setSelectedFilter("all")}
- className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${selectedFilter === "all" ? "bg-[#2563eb] text-white" : "bg-white text-[#64748b] border border-[#e2e8f0]"}`}
+ className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${selectedFilter === "all" ? "bg-blue-600 text-white" : "bg-white text-slate-500 border border-slate-200"}`}
  >
  Tất cả ({questionResultsList.length > 0 ? questionResultsList.length : 10} Câu)
  </button>
  <button 
  onClick={() => setSelectedFilter("mc")}
- className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${selectedFilter === "mc" ? "bg-[#0f172a] text-white" : "bg-white text-[#0f172a] border border-[#0f172a]/30"}`}
+ className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${selectedFilter === "mc" ? "bg-slate-900 text-white" : "bg-white text-slate-900 border border-slate-900/30"}`}
  >
  Trắc nghiệm ({mcCount > 0 ? mcCount : 8} Câu)
  </button>
  <button 
  onClick={() => setSelectedFilter("essay")}
- className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${selectedFilter === "essay" ? "bg-[#D97706] text-white" : "bg-white text-[#D97706] border border-[#D97706]/30"}`}
+ className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${selectedFilter === "essay" ? "bg-amber-600 text-white" : "bg-white text-amber-600 border border-amber-600/30"}`}
  >
- ️ Tự luận AI Chấm ({essayCount > 0 ? essayCount : 2} Câu)
+ Tự luận AI chấm ({essayCount} câu)
  </button>
  </div>
 
  <div className="space-y-5">
  {filteredQuestions.length > 0 ? (
  filteredQuestions.map((item) => (
- <div key={item.question_id} className="bg-white rounded-2xl p-5 border border-[#e2e8f0] shadow-2xs space-y-4 hover:border-[#2563eb]/30 transition-colors">
+ <div key={item.question_id} className="bg-white rounded-xl p-5 border border-slate-200 shadow-2xs space-y-4 hover:border-blue-600/30 transition-colors">
  <div className="flex items-center justify-between gap-3 flex-wrap">
- <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#f8fafc] text-[#2563eb] border border-[#2563eb]/15">
- Câu #{item.order} • {item.type === 'essay' ? '️ Tự luận AI' : ' Trắc nghiệm'}
+ <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-50 text-blue-600 border border-blue-600/15">
+ Câu #{item.order} • {item.type === 'essay' ? 'Tự luận AI' : 'Trắc nghiệm'}
  </span>
  
  <div className="flex items-center gap-2">
  <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${
  item.score >= (item.max_score * 0.8) 
- ? "bg-[#EAF8F5] text-[#0f172a] border-[#0f172a]/20" 
+ ? "bg-emerald-50 text-slate-900 border-slate-900/20" 
  : item.score > 0 
- ? "bg-[#F1F5F9] text-[#D97706] border-[#D97706]/30"
- : "bg-[#eff6ff] text-[#2563eb] border-[#2563EB]/20"
+ ? "bg-slate-100 text-amber-600 border-amber-600/30"
+ : "bg-blue-50 text-blue-600 border-blue-600/20"
  }`}>
  Điểm: {item.score} / {item.max_score} điểm
  </span>
  </div>
  </div>
 
- <h4 className="text-sm sm:text-base font-semibold text-[#0f172a] leading-relaxed">
+ <h4 className="text-sm sm:text-base font-semibold text-slate-900 leading-relaxed">
  {item.content}
  </h4>
  {item.image_url && (
  <img
  src={item.image_url}
  alt={`Hình minh họa câu hỏi: ${item.content}`}
- className="max-h-72 w-full rounded-xl border border-[#E2E8F0] bg-white object-contain"
+ className="max-h-72 w-full rounded-xl border border-slate-200 bg-white object-contain"
  />
  )}
 
  {item.type === 'essay' ? (
  <div className="space-y-3 pt-1">
- <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#e2e8f0] space-y-1">
- <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563eb]"> Bài làm tự luận của bạn:</span>
- <p className="text-xs sm:text-sm text-[#0f172a] whitespace-pre-line leading-relaxed font-normal">
+ <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+ <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600"> Bài làm tự luận của bạn:</span>
+ <p className="text-xs sm:text-sm text-slate-900 whitespace-pre-line leading-relaxed font-normal">
  {item.user_answer_text && item.user_answer_text.trim() !== "" 
  ? item.user_answer_text 
- : <span className="text-[#2563eb] italic">(Học viên chưa nhập câu trả lời)</span>
+ : <span className="text-blue-600 italic">(Học viên chưa nhập câu trả lời)</span>
  }
  </p>
  </div>
 
  {item.sample_answer && (
- <div className="p-4 rounded-xl bg-[#EAF8F5]/60 border border-[#0f172a]/20 space-y-1">
- <span className="text-[11px] font-bold uppercase tracking-wider text-[#0f172a]"> Đáp án tham khảo mẫu:</span>
- <p className="text-xs sm:text-sm text-[#065F46] whitespace-pre-line leading-relaxed font-normal">
+ <div className="p-4 rounded-xl bg-emerald-50/60 border border-slate-900/20 space-y-1">
+ <span className="text-[11px] font-bold uppercase tracking-wider text-slate-900"> Đáp án tham khảo mẫu:</span>
+ <p className="text-xs sm:text-sm text-emerald-800 whitespace-pre-line leading-relaxed font-normal">
  {item.sample_answer}
  </p>
  </div>
  )}
 
- <div className="p-4 rounded-xl bg-gradient-to-r from-[#eff6ff]/80 via-[#F3F4FC] to-[#EAF8F5]/80 border border-[#2563eb]/20 space-y-2">
- <span className="text-[11px] font-bold uppercase tracking-wider text-[#2563eb] flex items-center gap-1.5">
+ <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50/80 via-slate-100 to-emerald-50/80 border border-blue-600/20 space-y-2">
+ <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
  <span> Nhận xét đánh giá từ Gia sư AI MindNova:</span>
  </span>
- <p className="text-xs sm:text-sm text-[#0f172a] leading-relaxed">
+ <p className="text-xs sm:text-sm text-slate-900 leading-relaxed">
  {item.feedback || "Đã ghi nhận bài làm."}
  </p>
 
  {item.ai_analysis?.matched_points && item.ai_analysis.matched_points.length > 0 && (
- <div className="pt-2 border-t border-[#e2e8f0] space-y-1">
- <span className="text-[10px] font-bold text-[#0f172a] uppercase"> Ý đạt điểm (Matched Points):</span>
- <ul className="list-disc list-inside space-y-0.5 text-xs text-[#065F46]">
+ <div className="pt-2 border-t border-slate-200 space-y-1">
+ <span className="text-[10px] font-bold text-slate-900 uppercase"> Ý đạt điểm (Matched Points):</span>
+ <ul className="list-disc list-inside space-y-0.5 text-xs text-emerald-800">
  {item.ai_analysis.matched_points.map((pt, pIdx) => (
  <li key={pIdx}>{pt}</li>
  ))}
@@ -497,8 +331,8 @@ export function QuizResultContent() {
 
  {item.ai_analysis?.missing_points && item.ai_analysis.missing_points.length > 0 && (
  <div className="pt-1 space-y-1">
- <span className="text-[10px] font-bold text-[#D97706] uppercase">️ Ý cần bổ sung (Missing Points):</span>
- <ul className="list-disc list-inside space-y-0.5 text-xs text-[#92400E]">
+ <span className="text-[10px] font-bold text-amber-600 uppercase">Ý cần bổ sung:</span>
+ <ul className="list-disc list-inside space-y-0.5 text-xs text-amber-800">
  {item.ai_analysis.missing_points.map((pt, pIdx) => (
  <li key={pIdx}>{pt}</li>
  ))}
@@ -522,12 +356,12 @@ export function QuizResultContent() {
  ? 'missed-correct'
  : 'neutral';
  const style = state === 'selected-correct'
- ? 'bg-[#ECFDF5] border-[#10B981]/30 text-[#0F172A]'
+ ? 'bg-emerald-50 border-emerald-500/30 text-slate-900'
  : state === 'selected-incorrect'
  ? 'bg-rose-50 border-rose-200 text-rose-700'
  : state === 'missed-correct'
- ? 'bg-[#FFFBEB] border-[#F59E0B]/30 text-[#92400E]'
- : 'bg-[#F8FAFC] border-[#E2E8F0] text-[#94A3B8]';
+ ? 'bg-amber-50 border-amber-500/30 text-amber-800'
+ : 'bg-slate-50 border-slate-200 text-slate-400';
  const label = state === 'selected-correct'
  ? 'Đã chọn · đúng'
  : state === 'selected-incorrect'
@@ -557,8 +391,8 @@ export function QuizResultContent() {
  <>
  <div className={`p-3.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center gap-2 ${
  item.is_correct 
- ? "bg-[#EAF8F5] border-[#0f172a]/20 text-[#0f172a]" 
- : "bg-[#eff6ff] border-[#2563EB]/20 text-[#2563eb]"
+ ? "bg-emerald-50 border-slate-900/20 text-slate-900" 
+ : "bg-blue-50 border-blue-600/20 text-blue-600"
  }`}>
  <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 text-white font-bold" style={{ backgroundColor: item.is_correct ? '#0f172a' : '#2563EB' }}>
  {item.is_correct ? '' : ''}
@@ -567,7 +401,7 @@ export function QuizResultContent() {
  </div>
 
  {!item.is_correct && item.correct_answer && (
- <div className="p-3.5 rounded-xl bg-[#EAF8F5] border border-[#0f172a]/20 text-xs sm:text-sm font-semibold text-[#0f172a]">
+ <div className="p-3.5 rounded-xl bg-emerald-50 border border-slate-900/20 text-xs sm:text-sm font-semibold text-slate-900">
  <span>Đáp án chuẩn xác từ CSDL: {item.correct_answer}</span>
  </div>
  )}
@@ -580,17 +414,17 @@ export function QuizResultContent() {
  key={answer.id}
  src={answer.image_url || undefined}
  alt={`Hình minh họa đáp án: ${answer.content}`}
- className="max-h-40 w-full rounded-lg border border-[#E2E8F0] bg-white object-contain"
+ className="max-h-40 w-full rounded-lg border border-slate-200 bg-white object-contain"
  />
  ))}
  </>
  )}
 
- <div className="bg-[#F8FAFC] p-4 rounded-xl border border-[#e2e8f0] space-y-1.5">
- <p className="text-[11px] font-semibold tracking-wide text-[#2563eb] uppercase flex items-center gap-1.5">
+ <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1.5">
+ <p className="text-[11px] font-semibold tracking-wide text-blue-600 uppercase flex items-center gap-1.5">
  <span> Gia sư AI MindNova giải thích</span>
  </p>
- <p className="text-xs sm:text-sm text-[#0f172a] font-normal leading-relaxed">
+ <p className="text-xs sm:text-sm text-slate-900 font-normal leading-relaxed">
  {item.feedback || "Các yêu cầu trắc nghiệm được đánh giá theo dữ liệu chuẩn xác."}
  </p>
  </div>
@@ -599,18 +433,18 @@ export function QuizResultContent() {
  </div>
  ))
  ) : (
- <div className="text-center py-12 text-[#64748b] text-sm">
+ <div className="text-center py-12 text-slate-500 text-sm">
  Không có câu hỏi nào thuộc phân loại đã chọn.
  </div>
  )}
  </div>
  </div>
 
- <div className="p-4 bg-white border-t border-[#e2e8f0] flex items-center justify-end gap-3 shrink-0">
+ <div className="p-4 bg-white border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
  <button 
  type="button"
  onClick={() => setIsReviewModalOpen(false)}
- className="px-6 py-2.5 bg-[#2563eb] text-white rounded-xl font-semibold text-xs sm:text-sm hover:opacity-95 transition-all shadow-2xs cursor-pointer"
+ className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold text-xs sm:text-sm hover:opacity-95 transition-all shadow-2xs cursor-pointer"
  >
  Đã hiểu rõ &amp; Đóng bảng soát bài
  </button>
@@ -623,75 +457,75 @@ export function QuizResultContent() {
  
  {/* Header Breadcrumb */}
  <div className="flex items-center justify-between">
- <div className="flex items-center gap-2 text-xs text-[#64748b]">
- <Link href="/practice" className="hover:text-[#2563eb] transition-colors text-decoration-none">Trung tâm thực chiến</Link>
+ <div className="flex items-center gap-2 text-xs text-slate-500">
+ <Link href="/practice" className="hover:text-blue-600 transition-colors text-decoration-none">Trung tâm thực chiến</Link>
  <span></span>
- <span className="text-[#0f172a] font-medium">Báo cáo kiểm tra Năng lực AI</span>
+ <span className="text-slate-900 font-medium">Báo cáo kiểm tra Năng lực AI</span>
  </div>
- <span className="text-xs font-medium px-3 py-1 rounded-full bg-[#f8fafc] text-[#2563eb] border border-[#2563eb]/15">
+ <span className="text-xs font-medium px-3 py-1 rounded-full bg-slate-50 text-blue-600 border border-blue-600/15">
  Mã định danh lượt thi: #{displayData.attempt_id}
  </span>
  </div>
 
  {/* Top Score Card */}
  <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
- <div className="md:col-span-7 from-white via-[#FAFBFF] to-[#F3F4FC] rounded-2xl border border-[#e2e8f0] shadow-2xs relative overflow-hidden p-8 flex flex-col items-center justify-center text-center transition-all duration-300 hover:shadow-sm">
- <div className="absolute top-0 right-0 w-44 h-44 rounded-full bg-[#f8fafc] blur-2xl pointer-events-none" />
- <div className="absolute bottom-0 left-0 w-44 h-44 rounded-full bg-[#2563eb]/10 blur-2xl pointer-events-none" />
+ <div className="md:col-span-7 from-white via-[#FAFBFF] to-slate-100 rounded-xl border border-slate-200 shadow-2xs relative overflow-hidden p-8 flex flex-col items-center justify-center text-center transition-all duration-300 hover:shadow-md">
+ <div className="absolute top-0 right-0 w-44 h-44 rounded-full bg-slate-50 blur-2xl pointer-events-none" />
+ <div className="absolute bottom-0 left-0 w-44 h-44 rounded-full bg-blue-600/10 blur-2xl pointer-events-none" />
 
- <div className={`absolute top-5 right-5 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-2xs border ${displayData.passed ? "bg-[#EAF8F5] text-[#0f172a] border-[#0f172a]/20" : "bg-[#eff6ff] text-[#2563eb] border-[#2563EB]/20"}`}>
- <span className={`w-2 h-2 rounded-full ${displayData.passed ? "bg-[#0f172a]" : "bg-[#2563EB]"} animate-pulse`} />
+ <div className={`absolute top-5 right-5 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-2xs border ${displayData.passed ? "bg-emerald-50 text-slate-900 border-slate-900/20" : "bg-blue-50 text-blue-600 border-blue-600/20"}`}>
+ <span className={`w-2 h-2 rounded-full ${displayData.passed ? "bg-slate-900" : "bg-blue-600"} animate-pulse`} />
  {displayData.passed ? "Đạt Yêu Cầu (Passed)" : "Chưa Đạt (Need Practice)"}
  </div>
 
  <div className="relative z-10 mt-2 space-y-1">
- <p className="text-xs font-semibold tracking-wider text-[#64748b] uppercase">Điểm Thành Tích Chung (Thang Điểm 10)</p>
+ <p className="text-xs font-semibold tracking-wider text-slate-500 uppercase">Điểm Thành Tích Chung (Thang Điểm 10)</p>
  <div className="flex items-baseline justify-center gap-1.5 my-2">
- <span className="text-6xl sm:text-7xl font-bold bg-[#2563eb] bg-clip-text text-transparent tracking-tight">
+ <span className="text-6xl sm:text-7xl font-bold bg-blue-600 bg-clip-text text-transparent tracking-tight">
  {displayScore10}
  </span>
- <span className="text-2xl font-semibold text-[#64748b]">/10.0</span>
+ <span className="text-2xl font-semibold text-slate-500">/10.0</span>
  </div>
  </div>
 
- <p className="text-xs text-[#64748b] mt-1">Bài thi: <span className="font-medium text-[#0f172a]">{displayData.quiz_title || "Kiểm tra thực chiến"}</span></p>
+ <p className="text-xs text-slate-500 mt-1">Bài thi: <span className="font-medium text-slate-900">{displayData.quiz_title || "Kiểm tra thực chiến"}</span></p>
 
- <div className="relative z-10 grid grid-cols-2 gap-8 w-full max-w-xs mt-7 pt-5 border-t border-[#e2e8f0]">
+ <div className="relative z-10 grid grid-cols-2 gap-8 w-full max-w-xs mt-7 pt-5 border-t border-slate-200">
  <div>
- <p className="text-xs font-normal text-[#64748b] mb-1">Tỷ lệ chính xác</p>
- <p className="text-sm sm:text-base font-semibold text-[#0f172a] flex items-center justify-center gap-1">
- <span className="text-[#0f172a]"> {displayData.correct_count}</span> / {displayData.total_questions} Câu
+ <p className="text-xs font-normal text-slate-500 mb-1">Tỷ lệ chính xác</p>
+ <p className="text-sm sm:text-base font-semibold text-slate-900 flex items-center justify-center gap-1">
+ <span className="text-slate-900"> {displayData.correct_count}</span> / {displayData.total_questions} Câu
  </p>
  </div>
- <div className="border-l border-[#e2e8f0]">
- <p className="text-xs font-normal text-[#64748b] mb-1">Thời gian làm bài</p>
- <p className="text-sm sm:text-base font-semibold text-[#0f172a]">
+ <div className="border-l border-slate-200">
+ <p className="text-xs font-normal text-slate-500 mb-1">Thời gian làm bài</p>
+ <p className="text-sm sm:text-base font-semibold text-slate-900">
  {displayData.time_taken_formatted || `${displayData.time_taken_seconds || 180} giây`}
  </p>
  </div>
  </div>
  </div>
 
- <div className="md:col-span-5 bg-white rounded-2xl border border-[#e2e8f0] shadow-2xs p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-sm hover:border-[#2563eb]/30">
+ <div className="md:col-span-5 bg-white rounded-xl border border-slate-200 shadow-2xs p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:border-blue-600/30">
  <div className="space-y-4">
- <div className="flex items-center justify-between border-b border-[#F0F2F8] pb-3.5">
- <div className="flex items-center gap-2.5 text-[#2563eb]">
+ <div className="flex items-center justify-between border-b border-slate-100 pb-3.5">
+ <div className="flex items-center gap-2.5 text-blue-600">
  
- <h3 className="font-semibold text-base text-[#0f172a]">Nhận xét từ Gia sư AI</h3>
+ <h3 className="font-semibold text-base text-slate-900">Nhận xét từ Gia sư AI</h3>
  </div>
- <span className="text-[11px] bg-[#EAF8F5] text-[#0f172a] px-2.5 py-0.5 rounded-full font-medium border border-[#0f172a]/15">
+ <span className="text-[11px] bg-emerald-50 text-slate-900 px-2.5 py-0.5 rounded-full font-medium border border-slate-900/15">
  MindNova Co-Pilot
  </span>
  </div>
 
- <p className="text-xs sm:text-sm text-[#0f172a] leading-relaxed font-normal bg-[#F8FAFC] p-4 rounded-xl border border-[#e2e8f0]">
+ <p className="text-xs sm:text-sm text-slate-900 leading-relaxed font-normal bg-slate-50 p-4 rounded-xl border border-slate-200">
  &ldquo;{displayData.ai_insight || "Bạn đã nắm vững nền tảng kiến thức và trình bày bài làm rất ấn tượng!"}&rdquo;
  </p>
  </div>
  
- <div className="pt-4 border-t border-[#F0F2F8] mt-4 space-y-1.5">
- <p className="text-[11px] font-semibold tracking-wide text-[#64748b] uppercase"> Chiến thuật tiếp theo</p>
- <p className="text-xs sm:text-sm font-semibold text-[#2563eb] bg-[#f8fafc]/50 p-3 rounded-xl border border-[#2563eb]/15">
+ <div className="pt-4 border-t border-slate-100 mt-4 space-y-1.5">
+ <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase"> Chiến thuật tiếp theo</p>
+ <p className="text-xs sm:text-sm font-semibold text-blue-600 bg-slate-50/50 p-3 rounded-xl border border-blue-600/15">
  {displayData.ai_coach_suggestion || "Hãy mở Bảng soát bài chi tiết để đối chiếu nhận xét Rubric tự luận nhé."}
  </p>
  </div>
@@ -699,33 +533,33 @@ export function QuizResultContent() {
  </div>
 
  {/* Topic Performance */}
- <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-2xs p-6 sm:p-7 transition-all duration-300 hover:shadow-sm">
- <div className="flex items-center justify-between border-b border-[#F0F2F8] pb-4 mb-6">
+ <div className="bg-white rounded-xl border border-slate-200 shadow-2xs p-6 sm:p-7 transition-all duration-300 hover:shadow-md">
+ <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
  <div>
- <h3 className="text-base sm:text-lg font-semibold text-[#0f172a]">Phân tích độ thành thạo theo chủ đề (Topic Mastery)</h3>
- <p className="text-xs text-[#64748b] mt-0.5">Trí tuệ nhân tạo phân rã mức độ thông hiểu kỹ thuật từ bài thi của bạn</p>
+ <h3 className="text-base sm:text-lg font-semibold text-slate-900">Phân tích độ thành thạo theo chủ đề (Topic Mastery)</h3>
+ <p className="text-xs text-slate-500 mt-0.5">Trí tuệ nhân tạo phân rã mức độ thông hiểu kỹ thuật từ bài thi của bạn</p>
  </div>
- <span className="text-xs text-[#2563eb] bg-[#f8fafc]/60 px-3 py-1 rounded-full font-medium hidden sm:inline-block border border-[#2563eb]/15">
+ <span className="text-xs text-blue-600 bg-slate-50/60 px-3 py-1 rounded-full font-medium hidden sm:inline-block border border-blue-600/15">
  3 Chủ đề cốt lõi
  </span>
  </div>
  
  <div className="flex flex-col gap-6">
  {(displayData.topic_performance || []).map((t, idx) => (
- <div key={t.id || idx} className="p-4 rounded-xl bg-[#F8FAFC] border border-[#e2e8f0] hover:border-[#2563eb]/20 transition-colors space-y-2.5">
+ <div key={t.id || idx} className="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-600/20 transition-colors space-y-2.5">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
  <div>
- <h4 className="font-semibold text-sm sm:text-base text-[#0f172a]">{t.topic_title}</h4>
- <p className="text-xs text-[#64748b] mt-0.5">{t.sub_title}</p>
+ <h4 className="font-semibold text-sm sm:text-base text-slate-900">{t.topic_title}</h4>
+ <p className="text-xs text-slate-500 mt-0.5">{t.sub_title}</p>
  </div>
- <span className={`self-start sm:self-center px-3 py-1 rounded-full text-xs font-medium border ${t.score_percentage >= 80 ? "bg-[#EAF8F5] text-[#0f172a] border-[#0f172a]/20" : t.score_percentage >= 60 ? "bg-[#f8fafc] text-[#2563eb] border-[#2563eb]/20" : "bg-[#eff6ff] text-[#2563eb] border-[#2563EB]/20"}`}>
+ <span className={`self-start sm:self-center px-3 py-1 rounded-full text-xs font-medium border ${t.score_percentage >= 80 ? "bg-emerald-50 text-slate-900 border-slate-900/20" : t.score_percentage >= 60 ? "bg-slate-50 text-blue-600 border-blue-600/20" : "bg-blue-50 text-blue-600 border-blue-600/20"}`}>
  {t.status_label}
  </span>
  </div>
  
- <div className="h-2 w-full bg-[#EAEAF4] rounded-full overflow-hidden p-0.5">
+ <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden p-0.5">
  <div 
- className={`h-full rounded-full transition-all duration-700 ${t.score_percentage >= 80 ? " bg-[#0f172a] " : t.score_percentage >= 60 ? " bg-[#2563eb] " : " from-[#F43F5E] to-[#2563EB]"}`}
+ className={`h-full rounded-full transition-all duration-700 ${t.score_percentage >= 80 ? " bg-slate-900 " : t.score_percentage >= 60 ? " bg-blue-600 " : " from-[#F43F5E] to-blue-600"}`}
  style={{ width: `${t.score_percentage}%` }}
  />
  </div>
@@ -738,37 +572,37 @@ export function QuizResultContent() {
  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
  <div 
  onClick={() => setIsReviewModalOpen(true)}
- className="bg-white rounded-2xl p-6 border border-[#e2e8f0] shadow-2xs transition-all duration-300 hover:shadow-md hover:border-[#2563eb]/50 hover:-translate-y-0.5 flex flex-col justify-between group cursor-pointer"
+ className="bg-white rounded-xl p-6 border border-slate-200 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-blue-600/50 hover:-translate-y-0.5 flex flex-col justify-between group cursor-pointer"
  >
  <div>
  
- <h4 className="font-semibold text-base text-[#0f172a] mt-5 mb-2 group-hover:text-[#2563eb] transition-colors">
+ <h4 className="font-semibold text-base text-slate-900 mt-5 mb-2 group-hover:text-blue-600 transition-colors">
  Xem lại câu hỏi &amp; Bài làm tự luận
  </h4>
- <p className="text-xs sm:text-sm text-[#64748b] leading-relaxed font-normal">
+ <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">
  Soát lại từng chi tiết đáp án trắc nghiệm và bài làm tự luận kèm nhận xét AI và Rubric.
  </p>
  </div>
 
- <div className="mt-6 pt-3 border-t border-[#F0F2F8] flex items-center justify-between text-xs font-semibold text-[#2563eb] group-hover:text-[#2563eb]">
+ <div className="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600 group-hover:text-blue-600">
  <span>Bắt đầu soát bài</span>
  <span className="group-hover:translate-x-1.5 transition-transform duration-200"></span>
  </div>
  </div>
 
  <Link href={`/practice/quiz/question?lessonId=${targetModuleId}`} className="text-decoration-none block">
- <div className="h-full bg-white rounded-2xl p-6 border border-[#e2e8f0] shadow-2xs transition-all duration-300 hover:shadow-md hover:border-[#0f172a]/50 hover:-translate-y-0.5 flex flex-col justify-between group cursor-pointer">
+ <div className="h-full bg-white rounded-xl p-6 border border-slate-200 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-slate-900/50 hover:-translate-y-0.5 flex flex-col justify-between group cursor-pointer">
  <div>
  
- <h4 className="font-semibold text-base text-[#0f172a] mt-5 mb-2 group-hover:text-[#0f172a] transition-colors">
+ <h4 className="font-semibold text-base text-slate-900 mt-5 mb-2 group-hover:text-slate-900 transition-colors">
  Luyện tập lại bộ đề thi này
  </h4>
- <p className="text-xs sm:text-sm text-[#64748b] leading-relaxed font-normal">
+ <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">
  Vào lại chế độ thi kiểm nghiệm để thực hành kỹ năng làm bài tự luận và trắc nghiệm.
  </p>
  </div>
 
- <div className="mt-6 pt-3 border-t border-[#F0F2F8] flex items-center justify-between text-xs font-semibold text-[#0f172a] group-hover:text-[#0f172a]">
+ <div className="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-900 group-hover:text-slate-900">
  <span>Luyện tập thêm</span>
  <span className="group-hover:translate-x-1.5 transition-transform duration-200"></span>
  </div>
@@ -776,18 +610,18 @@ export function QuizResultContent() {
  </Link>
 
  <Link href="/practice" className="text-decoration-none block">
- <div className="h-full bg-white rounded-2xl p-6 border border-[#e2e8f0] shadow-2xs transition-all duration-300 hover:shadow-md hover:border-[#2563eb]/50 hover:-translate-y-0.5 flex flex-col justify-between group cursor-pointer">
+ <div className="h-full bg-white rounded-xl p-6 border border-slate-200 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-blue-600/50 hover:-translate-y-0.5 flex flex-col justify-between group cursor-pointer">
  <div>
  
- <h4 className="font-semibold text-base text-[#0f172a] mt-5 mb-2 group-hover:text-[#2563eb] transition-colors">
+ <h4 className="font-semibold text-base text-slate-900 mt-5 mb-2 group-hover:text-blue-600 transition-colors">
  Chuyển sang Module chủ đề khác
  </h4>
- <p className="text-xs sm:text-sm text-[#64748b] leading-relaxed font-normal">
+ <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">
  Quay về Trung tâm đánh giá để lựa chọn các chuyên đề khóa học khác.
  </p>
  </div>
 
- <div className="mt-6 pt-3 border-t border-[#F0F2F8] flex items-center justify-between text-xs font-semibold text-[#2563eb] group-hover:text-[#2563eb]">
+ <div className="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600 group-hover:text-blue-600">
  <span>Tiếp tục hành trình</span>
  <span className="group-hover:translate-x-1.5 transition-transform duration-200"></span>
  </div>
@@ -798,14 +632,14 @@ export function QuizResultContent() {
  {/* Footer Buttons */}
  <div className="flex flex-wrap justify-center items-center gap-4 pt-4">
  <Link href="/practice" className="text-decoration-none">
- <button type="button" className="px-7 py-3 bg-[#2563eb] hover:opacity-95 text-white rounded-xl font-semibold text-xs sm:text-sm shadow-[0_6px_20px_rgba(59, 130, 246,0.3)] hover:-translate-y-0.5 transition-all cursor-pointer flex items-center gap-2">
+ <button type="button" className="px-7 py-3 bg-blue-600 hover:opacity-95 text-white rounded-xl font-semibold text-xs sm:text-sm shadow-[0_6px_20px_rgba(59, 130, 246,0.3)] hover:-translate-y-0.5 transition-all cursor-pointer flex items-center gap-2">
  <span></span>
  <span>Quay lại Trung tâm đánh giá</span>
  </button>
  </Link>
 
  <Link href={`/practice/quiz/question?lessonId=${targetModuleId}`} className="text-decoration-none">
- <button type="button" className="px-7 py-3 bg-white border border-[#e2e8f0] hover:bg-[#F8FAFC] text-[#0f172a] rounded-xl font-medium text-xs sm:text-sm shadow-2xs hover:border-[#2563eb]/30 transition-all cursor-pointer flex items-center gap-2">
+ <button type="button" className="px-7 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 rounded-xl font-medium text-xs sm:text-sm shadow-2xs hover:border-blue-600/30 transition-all cursor-pointer flex items-center gap-2">
  <span></span>
  <span>Làm lại bài với đề mới</span>
  </button>

@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useGetStudentQuiz, useGetCourseQuiz, useSubmitQuiz } from "../../api";
 import type { QuizGradingResult } from "../../types";
-import { X, Sparkles, MapPin, Check, ArrowRight, ArrowLeft, Send, PenLine, AlertTriangle, CircleDot, Scale, Clock } from "lucide-react";
+import { X, Sparkle, Sparkles, MapPin, Check, ArrowRight, ArrowLeft, Send, PenLine, AlertTriangle, CircleDot, Scale, Clock } from "lucide-react";
+import { axiosClient } from "@shared/lib/axios";
 
 interface QuizQuestionScreenProps {
   lessonId?: string;
@@ -54,12 +55,12 @@ export function QuizQuestionScreen({
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [errorNotice, setErrorNotice] = useState<string | null>(null);
+  const [submitConfirmMode, setSubmitConfirmMode] = useState<"empty" | "incomplete" | "complete" | null>(null);
+  const [exitConfirmData, setExitConfirmData] = useState<{ type: "exit" | "link" | "back"; targetUrl?: string } | null>(null);
 
   const isFinishedRef = useRef(false);
   const answersRef = useRef<Record<string, AnswerValue>>({});
   answersRef.current = answers;
-
-  const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/api\/?$/, "");
 
   // 1. Tải đề thi
   useEffect(() => {
@@ -68,9 +69,8 @@ export function QuizQuestionScreen({
     const fetchAiQuiz = async () => {
       setIsAiLoading(true);
       try {
-        const res = await fetch(`${baseUrl}/api/student/practice/ai-quizzes/${aiQuizId}`);
-        if (!res.ok) throw new Error("Không thể tải đề AI");
-        const json = await res.json();
+        const res = await axiosClient.get(`/api/student/practice/ai-quizzes/${aiQuizId}`);
+        const json = res.data;
         
         const rawQuiz = json.data;
 
@@ -122,7 +122,7 @@ export function QuizQuestionScreen({
     };
 
     fetchAiQuiz();
-  }, [aiQuizId, baseUrl, quizStorageId, router]);
+  }, [aiQuizId, quizStorageId, router]);
 
   const quiz = aiQuizId ? aiQuizData : staticQuiz;
   const isLoading = aiQuizId ? isAiLoading : isStaticLoading;
@@ -162,16 +162,10 @@ export function QuizQuestionScreen({
     try {
       if (aiQuizId) {
         setIsSubmittingAi(true);
-        const res = await fetch(`${baseUrl}/api/student/practice/ai-quizzes/${aiQuizId}/submit`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-          },
-          body: JSON.stringify({ answers: finalAnswers }),
+        await axiosClient.post(`/api/student/practice/ai-quizzes/${aiQuizId}/submit`, {
+          answers: finalAnswers
         });
 
-        if (!res.ok) throw new Error("Chấm điểm AI thất bại");
         router.push(`/practice/quiz/result?aiQuizId=${aiQuizId}`);
       } else {
         const timeTaken = (quiz?.time_limit_minutes || 15) * 60 - timeRemaining;
@@ -199,7 +193,7 @@ export function QuizQuestionScreen({
     } finally {
       setIsSubmittingAi(false);
     }
-  }, [aiQuizId, baseUrl, quizStorageId, quiz, timeRemaining, submitStaticQuiz, activeLessonId, router]);
+  }, [aiQuizId, quizStorageId, quiz, timeRemaining, submitStaticQuiz, activeLessonId, router]);
 
   // 4. Chốt chặn thoát phòng thi
   useEffect(() => {
@@ -207,19 +201,9 @@ export function QuizQuestionScreen({
 
     window.history.pushState(null, "", window.location.href);
 
-    const handlePopState = async () => {
+    const handlePopState = () => {
       if (isFinishedRef.current) return;
-      const confirmExit = confirm(
-        "⚠️ CẢNH BÁO RỜI PHÒNG THI:\n" +
-        "Bạn vừa nhấn nút Quay lại (Back). Hệ thống sẽ TỰ ĐỘNG THU BÀI và CHẤM ĐIỂM ngay lập tức.\n\n" +
-        "Bạn có chắc chắn muốn nộp bài và thoát không?"
-      );
-
-      if (confirmExit) {
-        await handleSubmit(answersRef.current);
-      } else {
-        window.history.pushState(null, "", window.location.href);
-      }
+      setExitConfirmData({ type: "back" });
     };
 
     const handleGlobalLinkClick = (e: MouseEvent) => {
@@ -227,16 +211,7 @@ export function QuizQuestionScreen({
       const target = (e.target as HTMLElement).closest("a");
       if (target && target.href && !target.href.includes("/practice/quiz/")) {
         e.preventDefault();
-        const confirmExit = confirm(
-          "⚠️ CẢNH BÁO RỜI PHÒNG THI:\n" +
-          "Bạn đang chuyển sang trang khác. Hệ thống sẽ TỰ ĐỘNG THU BÀI và CHẤM ĐIỂM ngay bây giờ.\n\n" +
-          "Bạn có chắc chắn muốn nộp bài và chuyển trang?"
-        );
-        if (confirmExit) {
-          handleSubmit(answersRef.current).then(() => {
-            window.location.href = target.href;
-          });
-        }
+        setExitConfirmData({ type: "link", targetUrl: target.href });
       }
     };
 
@@ -302,17 +277,9 @@ export function QuizQuestionScreen({
     });
   };
 
-  const handleExitQuiz = async () => {
+  const handleExitQuiz = () => {
     if (!quiz) return;
-    const confirmExit = confirm(
-      "⚠️ CẢNH BÁO THOÁT BÀI THI:\n" +
-      "Hệ thống sẽ TỰ ĐỘNG THU BÀI và CHẤM ĐIỂM theo các câu bạn đã làm.\n\n" +
-      "Bạn có chắc chắn muốn nộp bài và thoát không?"
-    );
-
-    if (confirmExit) {
-      await handleSubmit(answersRef.current);
-    }
+    setExitConfirmData({ type: "exit" });
   };
 
   const handleUserInitiatedSubmit = () => {
@@ -320,13 +287,12 @@ export function QuizQuestionScreen({
     const currentAnswered = Object.keys(answers).filter((key) => hasAnswer(answers[key])).length;
 
     if (currentAnswered === 0) {
-      if (!confirm("⚠️ Bạn chưa nhập câu trả lời nào! Bạn có chắc muốn nộp bài sớm không?")) return;
+      setSubmitConfirmMode("empty");
     } else if (currentAnswered < quiz.questions.length) {
-      if (!confirm(`⚠️ Bạn đã hoàn thành ${currentAnswered}/${quiz.questions.length} câu. Bạn có chắc muốn nộp bài không?`)) return;
+      setSubmitConfirmMode("incomplete");
     } else {
-      if (!confirm("✨ Bạn đã hoàn tất tất cả câu hỏi! Nộp bài và chấm điểm ngay?")) return;
+      setSubmitConfirmMode("complete");
     }
-    handleSubmit(answers);
   };
 
   const handleNext = () => {
@@ -345,30 +311,30 @@ export function QuizQuestionScreen({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F8F9FC] flex flex-col justify-between p-6">
-        <div className="h-16 bg-white rounded-2xl animate-pulse border border-[#EAEAF4]" />
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-between p-6">
+        <div className="h-16 bg-white rounded-xl animate-pulse border border-slate-200" />
         <div className="max-w-[820px] w-full mx-auto space-y-6 my-12 animate-pulse">
-          <div className="h-24 bg-white rounded-2xl border border-[#EAEAF4]" />
+          <div className="h-24 bg-white rounded-xl border border-slate-200" />
           <div className="space-y-4">
-            <div className="h-16 bg-white rounded-xl border border-[#EAEAF4]" />
-            <div className="h-16 bg-white rounded-xl border border-[#EAEAF4]" />
+            <div className="h-16 bg-white rounded-xl border border-slate-200" />
+            <div className="h-16 bg-white rounded-xl border border-slate-200" />
           </div>
         </div>
-        <div className="h-20 bg-white rounded-2xl animate-pulse border border-[#EAEAF4]" />
+        <div className="h-20 bg-white rounded-xl animate-pulse border border-slate-200" />
       </div>
     );
   }
 
   if (isError || !quiz || !quiz.questions || quiz.questions.length === 0) {
     return (
-      <div className="min-h-screen bg-[#F8F9FC] flex items-center justify-center p-6">
-        <div className="bg-white p-8 rounded-2xl border border-[#EAEAF4] text-center max-w-md shadow-sm space-y-4">
-          <div className="w-12 h-12 rounded-full bg-[#eff6ff] text-[#2563eb] flex items-center justify-center mx-auto font-bold">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+        <div className="bg-white p-8 rounded-xl border border-slate-200 text-center max-w-md shadow-sm space-y-4">
+          <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto font-bold">
             <X size={24} />
           </div>
-          <h3 className="text-base font-bold text-[#0f172a]">Không thể tải bộ câu hỏi</h3>
-          <p className="text-xs text-[#64748b]">Hệ thống không tìm thấy nội dung bài kiểm tra hoặc bài thi đã được nộp.</p>
-          <Link href="/practice" className="inline-block px-5 py-2.5 rounded-xl bg-[#1d4ed8] text-white text-xs font-bold hover:bg-[#2563eb]">
+          <h3 className="text-base font-bold text-slate-900">Không thể tải bộ câu hỏi</h3>
+          <p className="text-xs text-slate-500">Hệ thống không tìm thấy nội dung bài kiểm tra hoặc bài thi đã được nộp.</p>
+          <Link href="/practice" className="inline-block px-5 py-2.5 rounded-xl bg-blue-700 text-white text-xs font-bold hover:bg-blue-600">
             Quay lại
           </Link>
         </div>
@@ -384,35 +350,55 @@ export function QuizQuestionScreen({
   const isEssayType = question?.type === "essay" || (!question?.answers || question?.answers.length === 0);
 
   return (
-    <div className="min-h-screen bg-[#F8F9FC] flex flex-col font-sans">
-      <header className="h-18 bg-white/95 backdrop-blur-md border-b border-[#EAEAF4] flex items-center justify-between px-6 shrink-0 sticky top-0 z-20 shadow-2xs">
-        <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+      <header className="h-20 bg-white/95 backdrop-blur-xl border-b border-slate-200 flex items-center justify-between px-6 shrink-0 sticky top-0 z-20 shadow-sm">
+        <div className="flex items-center gap-5">
           <button 
             type="button"
             onClick={handleExitQuiz} 
             title="Thoát và nộp bài ngay"
-            className="p-2 hover:bg-[#dbeafe] hover:text-[#2563eb] rounded-full transition-colors text-[#64748b] cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-[#FEE2E2] hover:text-rose-500 rounded-full transition-all text-slate-500 cursor-pointer"
           >
-            <X size={20} />
+            <X size={20} strokeWidth={2.5} />
           </button>
-          <div className="h-7 w-[1px] bg-[#EAEAF4]"></div>
+          
+          <div className="h-8 w-[1.5px] bg-gradient-to-b from-transparent via-slate-200 to-transparent"></div>
+          
           <div className="flex flex-col">
-            <span className="text-[#2563eb] font-bold text-base sm:text-lg leading-tight">{quiz.title}</span>
-            <span className="text-[#64748b] text-[11px] font-normal leading-tight mt-0.5 flex items-center gap-1">
-              {aiQuizId ? <><Sparkles size={12} className="text-[#F59E0B]" /> Khảo sát AI Đa Dạng Hình Thức</> : courseTitle}
+            <h1 className="text-slate-900 font-medium text-lg sm:text-xl md:text-2xl leading-tight tracking-tight flex items-center gap-2">
+              {quiz.title}
+            </h1>
+            <span className="text-slate-500 text-xs font-medium leading-tight mt-1.5 flex items-center gap-1.5">
+              {aiQuizId ? (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Khảo sát tự động (Powered by MindNova AI)
+                </>
+              ) : (
+                courseTitle
+              )}
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAF8F5] text-[#27AE60] text-xs font-semibold border border-[#27AE60]/20">
-            <Check size={14} />
-            <span>Đã làm: {answeredCount}/{quiz.questions.length} câu</span>
+        <div className="flex items-center gap-4">
+          <div className="hidden md:flex flex-col items-end mr-2">
+            <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest mb-1">Tiến độ</span>
+            <div className="flex items-center gap-2.5">
+              <div className="w-24 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full transition-all duration-500" style={{ width: `${(answeredCount / quiz.questions.length) * 100}%` }}></div>
+              </div>
+              <span className="text-xs font-medium text-emerald-500 w-9 text-right">{answeredCount}/{quiz.questions.length}</span>
+            </div>
           </div>
 
-          <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full shadow-2xs border transition-all ${timeRemaining < 60 ? "bg-[#eff6ff] text-[#2563eb] border-[#2563EB]/30 animate-pulse" : "bg-[#eff6ff] text-[#1d4ed8] border-[#1d4ed8]/20"}`}>
-            <Clock size={16} />
-            <span className="text-xs sm:text-sm font-semibold tracking-wide">{formatTime(timeRemaining)}</span>
+          <div className="h-8 w-[1.5px] bg-gradient-to-b from-transparent via-slate-200 to-transparent hidden md:block"></div>
+
+          <div className={`flex items-center gap-2.5 px-4 py-2 rounded-xl shadow-xs border transition-all ${timeRemaining < 60 ? "bg-rose-50 text-rose-500 border-rose-500/30 animate-pulse" : "bg-white text-slate-900 border-slate-200"}`}>
+            <Clock size={18} className={timeRemaining < 60 ? "text-rose-500" : "text-blue-500"} strokeWidth={2.5} />
+            <span className={`text-sm sm:text-base font-semibold tracking-wide ${timeRemaining < 60 ? "text-rose-500" : "text-slate-900"}`}>
+              {formatTime(timeRemaining)}
+            </span>
           </div>
         </div>
       </header>
@@ -420,37 +406,48 @@ export function QuizQuestionScreen({
       <main className="flex-1 overflow-y-auto pb-36">
         <div className="max-w-[820px] mx-auto px-6 pt-7 sm:pt-8">
           {errorNotice && (
-            <div className="mb-6 p-4 rounded-xl bg-[#eff6ff] border border-[#2563EB]/30 text-[#2563eb] text-xs flex items-center justify-between">
+            <div className="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-600/30 text-blue-600 text-xs flex items-center justify-between">
               <span className="flex items-center gap-2"><AlertTriangle size={14} /> {errorNotice}</span>
-              <button onClick={() => setErrorNotice(null)} className="font-semibold p-1 hover:bg-[#2563EB]/10 rounded-full transition-colors"><X size={14} /></button>
+              <button onClick={() => setErrorNotice(null)} className="font-semibold p-1 hover:bg-blue-600/10 rounded-full transition-colors"><X size={14} /></button>
             </div>
           )}
 
-          <div className="mb-7 bg-white p-4.5 rounded-2xl border border-[#EAEAF4] shadow-2xs">
-            <div className="flex items-center justify-between mb-3 text-xs">
-              <span className="font-semibold text-[#0f172a] flex items-center gap-1.5"><MapPin size={14} className="text-[#1d4ed8]" /> Bảng chọn nhanh câu hỏi:</span>
-              <span className="text-[#64748b]">Nhấp vào số để chuyển câu</span>
+          <div className="mb-8 bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                  <MapPin size={16} />
+                </div>
+                <span className="font-semibold text-slate-900 text-sm sm:text-base">Điều hướng nhanh</span>
+              </div>
+              <span className="text-xs font-medium text-slate-500 bg-slate-50 px-3.5 py-1.5 rounded-lg border border-slate-200">
+                Đã làm: <span className="text-blue-600">{answeredCount}</span> / {quiz.questions.length}
+              </span>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap justify-center gap-2.5 sm:gap-3">
               {quiz.questions.map((q: any, idx: number) => {
                 const isAnswered = hasAnswer(answers[String(q.id)]);
                 const isCurrent = currentIndex === idx;
+                
                 return (
                   <button
                     key={String(q.id)}
                     type="button"
                     onClick={() => setCurrentIndex(idx)}
-                    className={`w-9 h-9 rounded-xl text-xs font-semibold flex items-center justify-center transition-all cursor-pointer border relative ${
+                    className={`relative w-10 h-10 sm:w-11 sm:h-11 rounded-full text-sm font-medium flex items-center justify-center transition-all duration-300 cursor-pointer ${
                       isCurrent
-                        ? "ring-2 ring-[#1d4ed8] ring-offset-2 bg-[#1d4ed8] text-white border-[#1d4ed8]"
+                        ? "bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-md shadow-blue-500/30 scale-110 z-10 border-none"
                         : isAnswered
-                        ? "bg-[#eff6ff] text-[#1d4ed8] border-[#1d4ed8]/30"
-                        : "bg-[#F8FAFC] text-[#64748b] border-[#EAEAF4] hover:bg-white"
+                        ? "bg-emerald-50 text-emerald-600 border border-emerald-600/40 hover:bg-[#d1f0e6] hover:scale-105"
+                        : "bg-slate-100 text-slate-500 border border-transparent hover:bg-slate-200 hover:text-slate-900 hover:scale-105"
                     }`}
+                    title={`Chuyển đến câu ${idx + 1}`}
                   >
                     <span>{idx + 1}</span>
                     {isAnswered && !isCurrent && (
-                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#27AE60] rounded-full border-2 border-white flex items-center justify-center text-white font-bold"><Check size={8} strokeWidth={4} /></span>
+                      <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-600 rounded-full border-2 border-white flex items-center justify-center text-white shadow-sm">
+                        <Check size={10} strokeWidth={3} />
+                      </span>
                     )}
                   </button>
                 );
@@ -460,47 +457,47 @@ export function QuizQuestionScreen({
 
           <div className="mb-7">
             <div className="flex items-center gap-2">
-              <span className="text-[#1d4ed8] text-[11px] font-bold tracking-wider uppercase bg-[#eff6ff] px-3 py-1 rounded-full border border-[#1d4ed8]/20">
+              <span className="text-blue-700 text-[11px] font-semibold tracking-wider uppercase bg-blue-50 px-3 py-1 rounded-full border border-blue-700/20">
                 Câu hỏi số {currentIndex + 1} / {quiz.questions.length}
               </span>
-              <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#F1F5F9] text-[#64748b] flex items-center gap-1">
+              <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 flex items-center gap-1">
                 {isEssayType ? <><PenLine size={12} /> Tự luận / Điền từ</> : question?.type === "true_false" ? <><Scale size={12} /> Đúng / Sai</> : <><CircleDot size={12} /> Trắc nghiệm</>}
               </span>
             </div>
 
             <div className="flex items-end justify-between mt-3.5">
-              <h1 className="text-lg sm:text-xl font-bold text-[#0f172a] leading-relaxed max-w-[85%]">
+              <h1 className="text-lg sm:text-xl font-medium text-slate-900 leading-relaxed max-w-[85%]">
                 {question?.content}
               </h1>
-              <span className="text-xs font-medium text-[#64748b] mb-1 shrink-0 ml-4">Tiến độ: {progress}%</span>
+              <span className="text-xs font-medium text-slate-500 mb-1 shrink-0 ml-4">Tiến độ: {progress}%</span>
             </div>
             {question?.image_url && (
               <img
                 src={question.image_url}
                 alt={`Hình minh họa câu hỏi: ${question.content}`}
-                className="mt-4 max-h-80 w-full rounded-2xl border border-[#EAEAF4] bg-white object-contain"
+                className="mt-4 max-h-80 w-full rounded-xl border border-slate-200 bg-white object-contain"
               />
             )}
             
-            <div className="w-full h-1.5 bg-[#EAEAF4] rounded-full mt-4 overflow-hidden p-0.5">
-              <div className="h-full bg-gradient-to-r from-[#2563eb] via-[#1d4ed8] to-[#2563eb] rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
+            <div className="w-full h-1.5 bg-slate-200 rounded-full mt-4 overflow-hidden p-0.5">
+              <div className="h-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
             </div>
           </div>
 
           {isEssayType ? (
-            <div className="bg-white rounded-2xl border-2 border-[#1d4ed8]/30 p-6 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-[#EAEAF4] pb-3">
+            <div className="bg-white rounded-xl border-2 border-blue-700/30 p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-[#eff6ff] text-[#1d4ed8] flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center">
                     <PenLine size={16} />
                   </div>
                   <div>
-                    <h3 className="text-sm sm:text-base font-bold text-[#0f172a]">Câu trả lời tự luận của bạn</h3>
-                    <p className="text-[11px] text-[#64748b]">Hãy trình bày các bước giải chi tiết để AI chấm điểm.</p>
+                    <h3 className="text-sm sm:text-base font-semibold text-slate-900">Câu trả lời tự luận của bạn</h3>
+                    <p className="text-[11px] text-slate-500">Hãy trình bày các bước giải chi tiết để AI chấm điểm.</p>
                   </div>
                 </div>
-                <span className="text-[11px] bg-[#EAF8F5] text-[#27AE60] px-2.5 py-1 rounded-full font-medium border border-[#27AE60]/20 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#27AE60] animate-pulse"></span>
+                <span className="text-[11px] bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full font-medium border border-emerald-600/20 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
                   Tự động lưu nháp
                 </span>
               </div>
@@ -510,14 +507,14 @@ export function QuizQuestionScreen({
                 value={typeof currentAnswerVal === "string" ? currentAnswerVal : ""}
                 onChange={(e) => handleSelectAnswer(question.id, e.target.value)}
                 placeholder="Nhập câu trả lời hoặc các bước giải chi tiết của bạn tại đây..."
-                className="w-full p-4 rounded-xl border-2 border-[#EAEAF4] focus:border-[#1d4ed8] focus:ring-4 focus:ring-[#1d4ed8]/10 text-sm leading-relaxed bg-white shadow-xs focus:outline-none transition-all"
+                className="w-full p-4 rounded-xl border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/10 text-sm leading-relaxed bg-white shadow-xs focus:outline-none transition-all"
               />
-              <div className="flex justify-between items-center text-xs text-[#64748b]">
+              <div className="flex justify-between items-center text-xs text-slate-500">
                 <span>Ký tự: {typeof currentAnswerVal === "string" ? currentAnswerVal.length : 0}</span>
                 {typeof currentAnswerVal === "string" && currentAnswerVal.trim().length > 0 ? (
-                  <span className="text-[#27AE60] font-semibold flex items-center gap-1"><Check size={12} /> Đã lưu nháp</span>
+                  <span className="text-emerald-600 font-semibold flex items-center gap-1"><Check size={12} /> Đã lưu nháp</span>
                 ) : (
-                  <span className="text-[#F59E0B] flex items-center gap-1"><AlertTriangle size={12} /> Chưa nhập câu trả lời</span>
+                  <span className="text-amber-500 flex items-center gap-1"><AlertTriangle size={12} /> Chưa nhập câu trả lời</span>
                 )}
               </div>
             </div>
@@ -541,8 +538,8 @@ export function QuizQuestionScreen({
                       : handleSelectAnswer(question.id, answer.id ? String(answer.id) : letter)}
                     className={`group flex items-start sm:items-center p-4 sm:p-4.5 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                       isSelected 
-                        ? "border-[#1d4ed8] bg-[#eff6ff] shadow-[0_4px_18px_rgba(59, 130, 246,0.14)] -translate-y-0.5 z-10" 
-                        : "border-[#EAEAF4] bg-white hover:border-[#1d4ed8]/40 hover:bg-[#F8FAFC]"
+                        ? "border-blue-700 bg-blue-50 shadow-[0_4px_18px_rgba(59, 130, 246,0.14)] -translate-y-0.5 z-10" 
+                        : "border-slate-200 bg-white hover:border-blue-700/40 hover:bg-slate-50"
                     }`}
                   >
                     <input
@@ -552,29 +549,30 @@ export function QuizQuestionScreen({
                       readOnly
                       className="sr-only"
                     />
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 transition-all ${
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-medium text-sm shrink-0 transition-all ${
                       isSelected 
-                        ? "bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] text-white shadow-sm scale-105" 
-                        : "bg-[#F0F2F8] text-[#64748b]"
+                        ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-sm scale-105" 
+                        : "bg-slate-100 text-slate-500"
                     }`}>
                       {letter}
                     </div>
 
                     <span className={`ml-3.5 text-sm sm:text-base flex-1 leading-relaxed transition-colors ${
-                      isSelected ? "font-bold text-[#0f172a]" : "font-normal text-[#0f172a]"
+                      isSelected ? "font-semibold text-slate-900" : "font-normal text-slate-500"
                     }`}>
-                      {answer.content}
+                      {/* AI-generated options often already start with "A." — the letter badge shows it */}
+                      {String(answer.content ?? "").replace(/^\s*[A-Da-d][.):]\s*/, "")}
                       {answer.image_url && (
                         <img
                           src={answer.image_url}
                           alt={`Hình minh họa đáp án ${letter}: ${answer.content}`}
-                          className="mt-2 max-h-48 w-full rounded-xl border border-[#EAEAF4] bg-white object-contain"
+                          className="mt-2 max-h-48 w-full rounded-xl border border-slate-200 bg-white object-contain"
                         />
                       )}
                     </span>
 
                     {isSelected && (
-                      <div className="shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1d4ed8] text-white text-xs font-semibold ml-3 shadow-xs">
+                      <div className="shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-700 text-white text-xs font-medium ml-3 shadow-xs">
                         <span>Đã chọn</span>
                       </div>
                     )}
@@ -585,20 +583,20 @@ export function QuizQuestionScreen({
           )}
 
           {!isEssayType && isMultipleSelection && (
-            <p className="mt-3 text-xs font-semibold text-[#2563EB]">Có thể chọn nhiều đáp án.</p>
+            <p className="mt-3 text-xs font-medium text-blue-600">Có thể chọn nhiều đáp án.</p>
           )}
 
           
-          <div className="mt-8 bg-gradient-to-r from-[#eff6ff]/80 via-[#F3F4FC] to-[#EAF8F5]/80 border border-[#1d4ed8]/20 rounded-2xl p-5 shadow-2xs flex gap-4 items-start">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2563eb] via-[#1d4ed8] to-[#2563eb] text-white flex items-center justify-center shrink-0">
+          <div className="mt-8 bg-gradient-to-r from-blue-50/80 via-slate-100 to-emerald-50/80 border border-blue-700/20 rounded-xl p-5 shadow-2xs flex gap-4 items-start">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-blue-600 text-white flex items-center justify-center shrink-0">
               <Sparkles size={20} />
             </div>
             <div className="pt-0.5">
               <div className="flex items-center gap-2">
-                <h4 className="text-xs font-bold text-[#1d4ed8] uppercase tracking-wider mb-1">Gia sư Nova AI</h4>
-                <span className="text-[10px] bg-white px-2 py-0.5 rounded-full text-[#27AE60] font-medium border border-[#27AE60]/20">AI Co-Pilot</span>
+                <h4 className="text-xs font-semibold text-blue-700 uppercase tracking-wider mb-1">Gia sư Nova AI</h4>
+                <span className="text-[10px] bg-white px-2 py-0.5 rounded-full text-emerald-600 font-medium border border-emerald-600/20">AI Co-Pilot</span>
               </div>
-              <p className="text-xs sm:text-sm text-[#0f172a] leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-900 leading-relaxed">
                 Hệ thống tự động lưu bài làm liên tục. Rời khỏi phòng thi bằng nút Quay lại hoặc menu Sidebar sẽ kích hoạt tính năng tự động nộp bài ngay.
               </p>
             </div>
@@ -606,12 +604,12 @@ export function QuizQuestionScreen({
         </div>
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#EAEAF4] py-3.5 px-6 z-20 shadow-md">
+      <footer className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-3.5 px-6 z-20 shadow-md">
         <div className="max-w-[820px] mx-auto flex items-center justify-between">
           <button 
             onClick={handlePrevious}
             disabled={currentIndex === 0}
-            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC] text-[#0f172a] font-semibold text-xs sm:text-sm hover:bg-[#EAEAF4]/60 disabled:opacity-30 cursor-pointer"
+            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 font-semibold text-xs sm:text-sm hover:bg-slate-200/60 disabled:opacity-30 cursor-pointer"
           >
             <ArrowLeft size={16} /> Câu trước
           </button>
@@ -620,7 +618,7 @@ export function QuizQuestionScreen({
             <button 
               onClick={handleUserInitiatedSubmit}
               disabled={isSubmitting}
-              className="text-xs sm:text-sm font-medium text-[#64748b] hover:text-[#1d4ed8] hover:underline cursor-pointer disabled:opacity-50"
+              className="text-xs sm:text-sm font-medium text-slate-500 hover:text-blue-700 hover:underline cursor-pointer disabled:opacity-50"
             >
               Nộp bài sớm
             </button>
@@ -628,13 +626,110 @@ export function QuizQuestionScreen({
             <button 
               onClick={handleNext}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#2563eb] via-[#1d4ed8] to-[#2563eb] hover:opacity-95 text-white font-bold text-xs sm:text-sm shadow-md hover:-translate-y-0.5 transition-all cursor-pointer disabled:opacity-70"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 hover:opacity-95 text-white font-bold text-xs sm:text-sm shadow-md hover:-translate-y-0.5 transition-all cursor-pointer disabled:opacity-70"
             >
               {currentIndex === quiz.questions.length - 1 ? (isSubmitting ? "Đang chấm điểm..." : <><Send size={16} /> Nộp bài thi</>) : <>Câu tiếp theo <ArrowRight size={16} /></>}
             </button>
           </div>
         </div>
       </footer>
+
+      {/* Custom Submit Confirm Modal */}
+      {submitConfirmMode && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${submitConfirmMode === "complete" ? "bg-blue-50 text-blue-600" : submitConfirmMode === "empty" ? "bg-rose-50 text-rose-500" : "bg-amber-50 text-amber-500"}`}>
+                {submitConfirmMode === "complete" ? <Sparkles size={24} /> : <AlertTriangle size={24} />}
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">
+                {submitConfirmMode === "empty" 
+                  ? "Chưa nhập câu trả lời nào!" 
+                  : submitConfirmMode === "incomplete" 
+                  ? "Chưa hoàn thành hết bài thi!" 
+                  : "Hoàn tất bài thi!"}
+              </h3>
+              <p className="text-slate-500 text-sm leading-relaxed mb-6">
+                {submitConfirmMode === "empty" 
+                  ? "Bạn chưa trả lời câu hỏi nào. Nếu nộp bài bây giờ, điểm của bạn sẽ là 0. Bạn có chắc chắn muốn nộp không?" 
+                  : submitConfirmMode === "incomplete" 
+                  ? `Bạn mới hoàn thành ${answeredCount}/${quiz.questions.length} câu. Bạn có chắc chắn muốn nộp bài sớm không?` 
+                  : "Bạn đã trả lời đầy đủ tất cả câu hỏi. Nộp bài và chấm điểm ngay nhé?"}
+              </p>
+              
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setSubmitConfirmMode(null)}
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 font-semibold text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Quay lại
+                </button>
+                <button 
+                  onClick={() => {
+                    setSubmitConfirmMode(null);
+                    handleSubmit(answers);
+                  }}
+                  className={`flex-1 py-2.5 rounded-xl text-white font-semibold shadow-sm transition-colors cursor-pointer ${submitConfirmMode === "complete" ? "bg-blue-600 hover:bg-blue-700" : submitConfirmMode === "empty" ? "bg-rose-500 hover:bg-[#DC2626]" : "bg-amber-500 hover:bg-amber-600"}`}
+                >
+                  Nộp bài ngay
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Exit Confirm Modal */}
+      {exitConfirmData && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border border-amber-500/20">
+            <div className="p-6">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 bg-amber-50 text-amber-500">
+                <AlertTriangle size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">
+                Cảnh báo rời phòng thi!
+              </h3>
+              <p className="text-slate-500 text-sm leading-relaxed mb-6">
+                {exitConfirmData.type === "back" && "Bạn vừa nhấn nút Quay lại (Back). "}
+                {exitConfirmData.type === "link" && "Bạn đang điều hướng sang một trang khác. "}
+                {exitConfirmData.type === "exit" && "Bạn đang yêu cầu thoát khỏi bài thi. "}
+                Nếu rời đi, hệ thống sẽ <strong>TỰ ĐỘNG THU BÀI</strong> và chấm điểm các câu bạn đã làm ngay lập tức. Bạn có chắc chắn muốn thoát?
+              </p>
+              
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => {
+                    const type = exitConfirmData.type;
+                    setExitConfirmData(null);
+                    if (type === "back") {
+                      window.history.pushState(null, "", window.location.href);
+                    }
+                  }}
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 font-semibold text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Ở lại làm bài
+                </button>
+                <button 
+                  onClick={() => {
+                    const targetUrl = exitConfirmData.targetUrl;
+                    const type = exitConfirmData.type;
+                    setExitConfirmData(null);
+                    handleSubmit(answers).then(() => {
+                      if (type === "link" && targetUrl) {
+                        window.location.href = targetUrl;
+                      }
+                    });
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-amber-500 text-white font-semibold shadow-sm hover:bg-amber-600 transition-colors cursor-pointer"
+                >
+                  Thoát & Nộp bài
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

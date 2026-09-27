@@ -24,26 +24,26 @@ export function Step3GeneratingState() {
  }, [steps.length]);
 
  return (
- <div className="p-12 bg-white rounded-3xl border border-[#E2E8F0] shadow-sm flex flex-col items-center justify-center text-center gap-6 animate-fadeIn min-h-[420px]">
+ <div className="p-12 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center gap-6 animate-fadeIn min-h-[420px]">
  {/* Icon Spin & Glowing Orb */}
  <div className="relative flex items-center justify-center">
- <div className="w-24 h-24 rounded-full bg-[#3B82F6] text-[#3B82F6] blur-xl opacity-40 animate-pulse" />
- <div className="absolute w-20 h-20 rounded-2xl bg-[#3B82F6] text-white flex items-center justify-center shadow-2xl animate-bounce">
+ <div className="w-24 h-24 rounded-full bg-blue-500 blur-xl opacity-40 animate-pulse" />
+ <div className="absolute w-20 h-20 rounded-lg bg-blue-500 text-white flex items-center justify-center shadow-2xl animate-bounce">
  <Sparkles className="h-9 w-9" aria-hidden />
  </div>
  </div>
 
  <div className="flex flex-col gap-2 max-w-md">
- <h3 className="text-xl font-black text-[#0F172A]">AI Đang Phân Tích & Sinh Đề Kiểm Tra...</h3>
- <p className="text-xs text-[#64748B] font-semibold leading-relaxed">
- Hệ thống AI đang đọc hiểu toàn bộ thông tin và tạo ma trận câu hỏi phù hợp nhất với cấu hình của bạn.
+ <h3 className="text-xl font-bold text-slate-900">AI Đang Phân Tích & Sinh Đề Kiểm Tra...</h3>
+ <p className="text-xs text-slate-500 font-semibold leading-relaxed">
+ AI đang tạo câu hỏi từ nội dung bạn đã chọn. Quá trình có thể mất đến 3 phút; vui lòng giữ trang này mở.
  </p>
  </div>
 
  <div className="w-full max-w-md flex flex-col gap-3">
- <div className="p-4 rounded-2xl bg-[#FAF8FF] border-[#E2E8F0] flex items-center gap-3">
+ <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 flex items-center gap-3">
  <Loader size="sm" />
- <span className="text-xs font-extrabold text-[#3B82F6] animate-pulse">
+ <span className="text-xs font-semibold text-blue-500 animate-pulse">
  {steps[currentProgressStep]}
  </span>
  </div>
@@ -54,7 +54,7 @@ export function Step3GeneratingState() {
  <div
  key={idx}
  className={`h-2 flex-1 mx-1 rounded-full transition-all duration-500 ${
- idx <= currentProgressStep ? "bg-[#3B82F6]" : "bg-gray-200"
+ idx <= currentProgressStep ? "bg-blue-500" : "bg-slate-200"
  }`}
  />
  ))}

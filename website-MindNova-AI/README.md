@@ -106,3 +106,7 @@ php artisan test
 - `app/Models/`
 - `routes/api.php`
 - `database/migrations/`
+
+### Password recovery
+
+The website again uses email OTP for password recovery. Saved recovery-code and administrator-link flows are disabled. The already-applied recovery migrations remain for database history; no existing account data is dropped. The web-session version guard remains to prevent previously revoked sessions from becoming valid again. Actual OTP delivery still requires a working mail transport.

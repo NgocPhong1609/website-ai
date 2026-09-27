@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
-import { FOCUS_AREAS, OVERALL_PROGRESS, STUDY_STREAK } from "../constants";
 import { StudyStreakInteractive } from "./StudyStreakInteractive";
 
 import type { FocusActionKind, FocusArea as FocusAreaType, OverallProgress, StudyStreak } from "../types";
@@ -14,7 +13,7 @@ function OverallProgressCard({ data }: { data: OverallProgress }) {
  return (
  <Link 
  href="/progress" 
- className="h-full group bg-white rounded-xl p-5 border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-300 flex flex-col justify-between gap-4 text-decoration-none focus:outline-none"
+ className="group bg-white rounded-xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-md transition-all duration-300 flex flex-col justify-between h-full focus:outline-none focus:border-blue-500 text-decoration-none"
  >
  <div className="space-y-3">
  <div className="flex items-center justify-between">
@@ -28,24 +27,28 @@ function OverallProgressCard({ data }: { data: OverallProgress }) {
  <span className="text-2xl font-bold text-slate-900 tracking-tight">
  {percent ?? 0}%
  </span>
+ {/^[+-]?\d/.test(delta ?? "") && (
  <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md">
- +{delta}
+ {delta}
  </span>
+ )}
  </div>
+ {data.level != null && (
  <span className="text-[11px] font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">
- Level {data.level ?? 1}
+ Level {data.level}
  </span>
+ )}
  </div>
 
  <p className="text-xs text-slate-500 font-normal leading-relaxed line-clamp-1">
- {data.description || "Tối ưu hóa đều đặn qua từng học phần của khoá học."}
+ {data.description || ((percent ?? 0) > 0 ? "Trung bình tiến độ các khóa học bạn đang theo." : "Bạn chưa bắt đầu khóa học nào.")}
  </p>
  </div>
 
- <div className="pt-3 border-t border-slate-100 space-y-2">
+ <div className="pt-3 border-t border-slate-200 space-y-2">
  <div className="flex items-center justify-between text-xs font-medium text-slate-500">
  <span>Hoàn tất lộ trình</span>
- <span className="text-slate-900 font-semibold">Đạt tiến độ chuẩn</span>
+ <span className="text-slate-900 font-semibold">{percent ?? 0}%</span>
  </div>
  <div className="h-1.5 rounded-full bg-slate-200 overflow-hidden">
  <div
@@ -73,7 +76,7 @@ function FocusAreaRow({ area }: { area: FocusAreaType }) {
  const targetHref = area.action === "review" ? "/practice" : "/practice/quiz";
 
  return (
- <div className="group/row flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+ <div className="group/row flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-blue-500">
  <div className="flex-1 min-w-0">
  <p className="text-xs sm:text-sm font-semibold text-slate-900 truncate group-hover/row:text-blue-600 transition-colors" title={area.topic}>
  {area.topic}
@@ -102,7 +105,7 @@ function FocusAreasCard({ areas }: { areas: FocusAreaType[] }) {
  const displayAreas = areas.slice(0, 2);
 
  return (
- <div className="h-full bg-white rounded-xl p-5 border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-300 flex flex-col gap-4">
+ <div className="group bg-white rounded-xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-md transition-all duration-300 flex flex-col justify-between h-full">
  <div>
  <div className="flex items-center justify-between mb-2">
  <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
@@ -112,7 +115,7 @@ function FocusAreasCard({ areas }: { areas: FocusAreaType[] }) {
  AI Focus
  </span>
  </div>
- <p className="text-xs font-normal text-slate-500 pb-3 border-b border-slate-100">
+ <p className="text-xs font-normal text-slate-500 pb-3 border-b border-slate-200">
  Cá nhân hóa từ phân tích chẩn đoán thực chiến
  </p>
  </div>
@@ -145,9 +148,9 @@ interface DashboardStatsPanelProps {
 }
 
 export function DashboardStatsPanel({
- overallProgress = OVERALL_PROGRESS,
- studyStreak = STUDY_STREAK,
- focusAreas = FOCUS_AREAS,
+ overallProgress = { percent: 0, delta: "" },
+ studyStreak = { days: 0, message: "" },
+ focusAreas = [],
  weeklyActivity,
  todayKey,
  checkedInDates = [],

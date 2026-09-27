@@ -20,7 +20,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
           action={
             <Link
               href="/courses"
-              className="px-6 py-3 bg-[#2563eb] text-white rounded-xl font-medium text-sm transition-colors hover:bg-[#1d4ed8] shadow-sm"
+              className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium text-sm transition-colors hover:bg-blue-700 shadow-sm"
             >
               Quay lại khóa học của tôi
             </Link>
@@ -42,10 +42,10 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
  {/* Catalog Header */}
  <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
  <div className="space-y-2">
- <h1 className="text-2xl sm:text-3xl font-bold text-[#0f172a] tracking-tight">
- Khám phá <span className=" bg-[#2563eb] bg-clip-text text-transparent">Khóa học mới</span>
+ <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+ Khám phá <span className="text-blue-600">Khóa học mới</span>
  </h1>
- <p className="text-sm text-[#64748b] max-w-2xl leading-relaxed">
+ <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">
  Nâng tầm kỹ năng với các lộ trình đào tạo chuyên sâu được giảng dạy bởi các chuyên gia hàng đầu. Đăng ký ngay hôm nay để mở khóa Lộ trình AI cá nhân hóa.
  </p>
  </div>
@@ -60,7 +60,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
  return (
  <div
  key={course.id}
- className="group flex flex-col bg-white rounded-xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-slate-200/40 hover:border-slate-200 transition-all duration-500 hover:-translate-y-1 justify-between h-full"
+ className="group flex flex-col bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md hover:border-blue-500 transition-all duration-300 justify-between h-full"
  >
  {/* Thumbnail */}
  <div className="relative h-44 w-full bg-slate-900 overflow-hidden shrink-0">
@@ -99,7 +99,7 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
  </div>
  
  {/* Logic giá & thời gian đã được gộp mượt mà */}
- <div className="mt-5 bg-slate-50/80 rounded-xl p-3 flex items-center justify-between border border-slate-100/50">
+ <div className="mt-5 bg-slate-50/80 rounded-xl p-3 flex items-center justify-between border border-slate-200/50">
  <span className="flex items-center gap-1.5 text-xs font-medium text-slate-600">
  <Clock size={14} className="text-slate-400" />
  {course.duration_hours !== undefined ? `${course.duration_hours} giờ` : 'Đang cập nhật'}
@@ -130,14 +130,14 @@ export function CourseCatalogView({ courses }: CourseCatalogViewProps) {
  {course.is_enrolled ? (
  <Link
  href={`/courses/lesson?courseId=${course.id}`}
- className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-lg text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 border border-transparent shadow-sm transition-all cursor-pointer"
+ className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 border border-transparent shadow-sm transition-all duration-300 cursor-pointer"
  >
  <span>Đã đăng ký - Vào học</span>
  </Link>
  ) : (
  <Link
  href={`/courses/detail?courseId=${course.id}`}
- className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-lg text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 border border-transparent shadow-sm transition-all duration-300 hover:shadow-md cursor-pointer"
+ className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 border border-transparent shadow-sm transition-all duration-300 hover:shadow-md cursor-pointer"
  >
  <span>Xem chi tiết & Đăng ký</span>
  </Link>

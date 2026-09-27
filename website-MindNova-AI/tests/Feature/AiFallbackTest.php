@@ -29,6 +29,7 @@ class AiFallbackTest extends TestCase
         Config::set('services.backup_ai.api_key', 'fake-backup-key');
         Config::set('services.backup_ai.provider', 'openai');
         Config::set('services.gemini.force_failure', false);
+        Config::set('services.gemini.fallback_models', []);
         Http::preventStrayRequests();
     }
 

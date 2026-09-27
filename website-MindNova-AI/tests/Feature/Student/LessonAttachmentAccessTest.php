@@ -90,7 +90,7 @@ test('enrolled student can request a signed URL for a published lesson attachmen
     publishAttachmentLesson($lesson, $teacher);
     $studentRole = Role::firstOrCreate(['name' => 'student']);
     $student = User::factory()->create();
-    $student->roles()->attach($studentRole);
+    $student->roles()->syncWithoutDetaching([$studentRole->id]);
     Enrollment::create([
         'user_id' => $student->id,
         'course_id' => $lesson->course_id,
@@ -124,7 +124,7 @@ test('student attachment download requires enrollment and matching lesson', func
     publishAttachmentLesson($otherLesson, $teacher);
     $studentRole = Role::firstOrCreate(['name' => 'student']);
     $student = User::factory()->create();
-    $student->roles()->attach($studentRole);
+    $student->roles()->syncWithoutDetaching([$studentRole->id]);
     $attachment = $lesson->attachments()->create([
         'uploaded_by' => $teacher->id,
         'display_name' => 'Workbook',
@@ -186,7 +186,18 @@ test('student course detail includes attachment metadata for article lessons', f
         'r2_key' => "lessons/{$lesson->id}/attachments/workbook.xlsx",
     ]);
 
+    $outsider = User::factory()->create();
+    $guestView = app(\App\Services\Student\CourseService::class)->getCourseDetail($lesson->course_id, $outsider);
+    expect($guestView['modules'][0]['lessons'][0]['attachments'])->toBe([]);
+
     $student = User::factory()->create();
+    Enrollment::create([
+        'user_id' => $student->id,
+        'course_id' => $lesson->course_id,
+        'status' => 'enrolled',
+        'progress_percentage' => 0,
+        'enrolled_at' => now(),
+    ]);
     $detail = app(\App\Services\Student\CourseService::class)->getCourseDetail($lesson->course_id, $student);
 
     expect($detail['modules'][0]['lessons'][0]['attachments'][0])

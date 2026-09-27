@@ -13,11 +13,11 @@ export async function AdminCoursesPage({ filters }: AdminCoursesPageProps) {
  const data = await getAdminCoursesPageData(filters);
 
  return (
- <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+ <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-sans)]">
  <section className="mn-stagger rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(125deg,#0f1a3c_0%,#183067_45%,#0284c7_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
  <div>
  <p className="text-[10px] uppercase tracking-[0.35em] text-[#F8FAFC]/70">Quản lý khóa học</p>
- <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Kiểm duyệt khóa học</h1>
+ <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-sans)]">Kiểm duyệt khóa học</h1>
  <p className="mt-1 text-xs text-slate-200/90">
  Theo dõi tình trạng xuất bản và chất lượng nội dung khóa học theo quy trình kiểm duyệt.
  </p>
@@ -77,21 +77,21 @@ export async function AdminCoursesPage({ filters }: AdminCoursesPageProps) {
  <section className="grid gap-4 md:grid-cols-3">
  <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
  <p className="text-sm text-slate-500">Đã xuất bản</p>
- <p className="mt-3 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{data.summary.published}</p>
+ <p className="mt-3 text-3xl font-semibold text-slate-900 [font-family:var(--font-sans)]">{data.summary.published}</p>
  </div>
  <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
  <p className="text-sm text-slate-500">Bản nháp</p>
- <p className="mt-3 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{data.summary.draft}</p>
+ <p className="mt-3 text-3xl font-semibold text-slate-900 [font-family:var(--font-sans)]">{data.summary.draft}</p>
  </div>
  <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
  <p className="text-sm text-slate-500">Chờ duyệt</p>
- <p className="mt-3 text-3xl font-semibold text-slate-900 [font-family:var(--font-admin-head)]">{data.summary.pendingReview}</p>
+ <p className="mt-3 text-3xl font-semibold text-slate-900 [font-family:var(--font-sans)]">{data.summary.pendingReview}</p>
  </div>
  </section>
 
  <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]">
  <div className="mb-4 flex items-center justify-between">
- <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Tổng quan khóa học</h2>
+ <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-sans)]">Tổng quan khóa học</h2>
  <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#3B82F6] ring-1 ring-blue-100">
  {data.rows.length} khóa học
  </span>

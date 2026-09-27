@@ -126,51 +126,27 @@ export function useCourseStructure(initialStatus: CoursePublishStatus = "draft")
   }, [store]);
 
   const moveLesson = useCallback((fromChapterId: string, toChapterId: string, lessonId: string, targetIndex?: number) => {
-    // In our backend, moving lessons across modules might be complex.
-    // For this simple UI draft, we can implement it by directly manipulating the store's state if we wanted,
-    // but the store currently only supports `reorderLessons` inside a module.
-    // Let's implement a quick cross-module move.
     const state = useCreateCourseStore.getState();
-    const sourceChap = state.modules.find((c) => c.id === fromChapterId);
-    if (!sourceChap) return;
-    const lessonToMove = sourceChap.lessons.find((l) => l.id === lessonId);
-    if (!lessonToMove) return;
+    const source = state.modules.find((chapter) => chapter.id === fromChapterId);
+    const target = state.modules.find((chapter) => chapter.id === toChapterId);
+    const lesson = source?.lessons.find((item) => item.id === lessonId);
+    if (!source || !target || !lesson) return;
 
-    if (fromChapterId === toChapterId) {
-      const filtered = sourceChap.lessons.filter((l) => l.id !== lessonId);
-      const idx = targetIndex !== undefined ? targetIndex : filtered.length;
-      const updated = [...filtered];
-      updated.splice(idx, 0, lessonToMove);
-      store.reorderLessons(fromChapterId, updated);
-    } else {
-      // Need to add to target and remove from source.
-      // Since our store doesn't easily expose this, we can just delete from source and append to target.
-      // For exact index insertion, we would need to manually map and reorder the target.
-      // We'll update the target's lessons list via a custom Zustand action or a workaround:
-      store.deleteLesson(fromChapterId, lessonId);
-      store.addLesson(toChapterId, lessonToMove.type);
-      // Hacky way to set properties on the newly added lesson:
-      setTimeout(() => {
-        const newState = useCreateCourseStore.getState();
-        const targetChap = newState.modules.find((c) => c.id === toChapterId);
-        if (targetChap && targetChap.lessons.length > 0) {
-          const added = targetChap.lessons[targetChap.lessons.length - 1];
-          store.updateLesson(toChapterId, added.id, { title: lessonToMove.title, content: lessonToMove.content });
-          
-          // Reorder if targetIndex is provided
-          if (targetIndex !== undefined) {
-             const finalState = useCreateCourseStore.getState();
-             const tc = finalState.modules.find(c => c.id === toChapterId);
-             if (tc) {
-               const all = [...tc.lessons];
-               const last = all.pop()!;
-               all.splice(targetIndex, 0, last);
-               store.reorderLessons(toChapterId, all);
-             }
-          }
-        }
-      }, 0);
-    }
+    const targetLessons = target.lessons.filter((item) => item.id !== lessonId);
+    const index = Math.max(0, Math.min(targetIndex ?? targetLessons.length, targetLessons.length));
+    targetLessons.splice(index, 0, lesson);
+
+    // Update both chapters together, preserving the original lesson and all its media/quiz data.
+    state.setModules(state.modules.map((chapter) => {
+      if (chapter.id === toChapterId) {
+        return { ...chapter, lessons: targetLessons.map((item, i) => ({ ...item, order: i + 1 })) };
+      }
+      if (chapter.id === fromChapterId) {
+        return { ...chapter, lessons: chapter.lessons.filter((item) => item.id !== lessonId)
+          .map((item, i) => ({ ...item, order: i + 1 })) };
+      }
+      return chapter;
+    }));
   }, [store]);
 
   const handleSubmitForReview = useCallback((): boolean => {

@@ -42,10 +42,10 @@ class CourseHealthServiceTest extends TestCase
         $quiz2 = new \App\Models\Quiz(['id' => 102, 'title' => 'Quiz 2']);
         $quiz2->setRelation('questions', collect([new \App\Models\Question(['id' => 2])]));
 
-        $att1 = new \App\Models\QuizCourseAttachment(['position' => 'capability_assessment']);
+        $att1 = new \App\Models\QuizCourseAttachment(['position' => 'capability_assessment', 'is_active' => true]);
         $att1->setRelation('quiz', $quiz1);
 
-        $att2 = new \App\Models\QuizCourseAttachment(['position' => 'end_of_course']);
+        $att2 = new \App\Models\QuizCourseAttachment(['position' => 'end_of_course', 'is_active' => true]);
         $att2->setRelation('quiz', $quiz2);
 
         $course = new Course([

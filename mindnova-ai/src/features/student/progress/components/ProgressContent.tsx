@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import {
-  Sparkles, ArrowRight, ArrowUpRight, Zap, Lock,
+  Sparkles, ArrowRight, ArrowUpRight, Zap,
   BookOpen, MessageCircle, Crown, Award, Clock, BarChart3, Target,
   CheckCircle2, LayoutList, LayoutGrid, Flame,
 } from "lucide-react";
@@ -19,7 +19,7 @@ export function ProgressContent() {
     return (
       <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-6 animate-pulse">
         {/* Skeleton Hero Banner */}
-        <section className="rounded-2xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <section className="rounded-xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 flex-1">
             <div className="h-8 w-1/3 bg-slate-200 rounded-lg"></div>
             <div className="flex gap-2.5 mt-2">
@@ -48,7 +48,7 @@ export function ProgressContent() {
         {/* Skeleton Metrics Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white border border-slate-200 rounded-2xl p-5 h-32 flex flex-col justify-between">
+            <div key={i} className="bg-white border border-slate-200 rounded-xl p-5 h-32 flex flex-col justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-slate-200 rounded-xl"></div>
                 <div className="h-4 w-1/2 bg-slate-200 rounded"></div>
@@ -59,7 +59,7 @@ export function ProgressContent() {
         </div>
 
         {/* Skeleton Roadmap */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 min-h-[300px]">
+        <div className="bg-white border border-slate-200 rounded-xl p-6 min-h-[300px]">
           <div className="h-6 w-1/4 bg-slate-200 rounded mb-8"></div>
           <div className="space-y-8">
             {[...Array(3)].map((_, i) => (
@@ -80,7 +80,7 @@ export function ProgressContent() {
   if (isError || !data) {
     return (
       <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col items-center justify-center text-center gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100">
+        <div className="w-14 h-14 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100">
           <BarChart3 className="w-6 h-6" />
         </div>
         <h3 className="text-lg font-bold text-slate-900">Không thể tải dữ liệu</h3>
@@ -105,7 +105,7 @@ export function ProgressContent() {
     <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-6">
 
       {/* ── Hero Banner ── */}
-      <section className="rounded-2xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
+      <section className="rounded-xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
@@ -151,6 +151,23 @@ export function ProgressContent() {
       </section>
 
       {/* ── Tab + View Toggle ── */}
+      {(!roadmap_modules || roadmap_modules.length === 0) ? (
+        <div className="flex flex-col items-center justify-center bg-white border border-slate-200 rounded-xl py-20 px-6 text-center shadow-sm flex-1">
+          <div className="w-20 h-20 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mb-5">
+            <BookOpen className="w-10 h-10 text-slate-300" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">Chưa có dữ liệu học tập</h3>
+          <p className="text-sm text-slate-500 max-w-md mx-auto mb-8 leading-relaxed">
+            Bạn chưa đăng ký khóa học nào nên tiến trình học tập hiện đang trống. Hãy khám phá các khóa học phù hợp và bắt đầu rèn luyện kỹ năng ngay nhé.
+          </p>
+          <Link href="/explore">
+            <button className="px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-sm cursor-pointer flex items-center gap-2">
+              Khám phá khóa học <ArrowRight size={16} />
+            </button>
+          </Link>
+        </div>
+      ) : (
+        <>
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
           <button
@@ -250,16 +267,16 @@ export function ProgressContent() {
                             </button>
                           </Link>
                         ) : (
-                          <span className="flex items-center gap-1.5 text-xs font-medium text-slate-400 whitespace-nowrap">
-                            <Lock size={12} /> Chưa mở
-                          </span>
+                          <Link href={mod.action_link || "/courses"} className="text-xs font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap">
+                            Chưa bắt đầu
+                          </Link>
                         )}
                       </div>
                     </div>
 
                     {/* Progress bar for active module */}
                     {isActive && mod.progress_percentage !== undefined && (
-                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-4">
+                      <div className="mt-4 pt-3 border-t border-slate-200 flex items-center gap-4">
                         <span className="text-xs font-medium text-slate-500 shrink-0">Tiến độ</span>
                         <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                           <div className="h-full bg-blue-500 rounded-full transition-all duration-700" style={{ width: `${mod.progress_percentage}%` }} />
@@ -293,7 +310,6 @@ export function ProgressContent() {
                           {isCompleted ? <CheckCircle2 className="w-4 h-4" /> : (i + 1)}
                         </div>
                         {isActive && <Zap size={14} className="text-amber-500" />}
-                        {isLocked && <Lock size={14} className="text-slate-300" />}
                       </div>
                       <h3 className="text-base font-bold text-slate-900 leading-tight">{mod.title}</h3>
                       <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">{mod.subtitle}</p>
@@ -466,6 +482,8 @@ export function ProgressContent() {
             </div>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );

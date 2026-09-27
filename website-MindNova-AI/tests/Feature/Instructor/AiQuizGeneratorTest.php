@@ -14,13 +14,13 @@ beforeEach(function () {
     $this->studentRole = Role::firstOrCreate(['name' => 'student']);
 
     $this->teacher = User::factory()->create();
-    $this->teacher->roles()->attach($this->teacherRole);
+    $this->teacher->roles()->syncWithoutDetaching($this->teacherRole);
 
     $this->otherTeacher = User::factory()->create();
-    $this->otherTeacher->roles()->attach($this->teacherRole);
+    $this->otherTeacher->roles()->syncWithoutDetaching($this->teacherRole);
 
     $this->student = User::factory()->create();
-    $this->student->roles()->attach($this->studentRole);
+    $this->student->roles()->syncWithoutDetaching($this->studentRole);
 
     $this->quizPayload = fn (array $questionOverrides = []) => [
         'title' => 'Quiz selection mode',

@@ -15,7 +15,7 @@ function CourseCard({ course }: { course: DashboardCourse }) {
  <div className={`group/card bg-white border rounded-xl flex flex-col justify-between h-full transition-all duration-300 overflow-hidden relative ${
  isAiPlan 
  ? "border-blue-200 hover:border-blue-300"
- : "border-slate-100 hover:border-slate-200"
+ : "border-slate-200 hover:border-blue-500"
  }`}>
  {/* Compact Thumbnail Container */}
  <div className="relative h-44 w-full bg-slate-900 overflow-hidden shrink-0">
@@ -66,7 +66,7 @@ function CourseCard({ course }: { course: DashboardCourse }) {
  </Link>
 
  {/* Up Next tile */}
- <div className="mt-3 bg-slate-50 rounded-lg p-3 flex items-center gap-3 border border-slate-100 group-hover/card:border-slate-200 transition-all duration-200">
+ <div className="mt-3 bg-slate-50 rounded-lg p-3 flex items-center gap-3 border border-slate-200 group-hover/card:border-slate-200 transition-all duration-200">
  <div className="w-8 h-8 rounded-lg bg-slate-100 text-blue-600 flex items-center justify-center shrink-0 group-hover/card:bg-blue-600 group-hover/card:text-white transition-all duration-300 text-xs font-bold">
  N
  </div>

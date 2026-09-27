@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { axiosClient } from "@/src/shared/lib/axios";
 import type { AiChatApiResponse, AiChatMessage, AiChatResult, AiQuotaMeta } from "../types";
 
@@ -46,33 +47,12 @@ export async function sendAiChatMessage(
  return { message: result.data, quota: parseQuota(result.meta?.quota) };
  }
 
- throw new Error(
- result?.message || " **Gia sư Nova đang bận xíu, bạn vui lòng chờ khoảng 1 phút rồi gửi lại tin nhắn cho mình nhé!** "
- );
+ throw new Error(getErrorMessage(result, "Chưa thể nhận phản hồi từ gia sư AI. Vui lòng thử lại sau."));
  } catch (error: any) {
- if (error.response) {
- const status = error.response.status;
- if (status === 429) {
- const message = error.response.data?.message
-  || " **Gia sư Nova hiện đang bận xíu hoặc bạn đã gửi câu hỏi quá nhanh (> 5 câu/phút). Bạn vui lòng chờ khoảng 1 phút rồi thử đặt câu hỏi lại nhé!** ";
- throw new AiQuotaError(message, parseQuota(error.response.data?.meta?.quota));
+ const message = getErrorMessage(error, "Chưa thể nhận phản hồi từ gia sư AI. Vui lòng thử lại sau.");
+ if (error.response?.status === 429) {
+   throw new AiQuotaError(message, parseQuota(error.response.data?.meta?.quota));
  }
- if (status === 401) {
- throw new Error(" **Phiên đăng nhập đã hết hạn. Bạn vui lòng đăng nhập lại để trò chuyện với Gia sư Nova nhé!**");
- }
- if (status === 403) {
- throw new Error(" **Bạn chưa có quyền truy cập tính năng Gia sư AI này.**");
- }
- if (error.response.data && error.response.data.message) {
- throw new Error(error.response.data.message);
- }
- throw new Error(` **Gia sư Nova hiện đang bận xíu (lỗi máy chủ ${status}), bạn vui lòng chờ khoảng 1 phút rồi thử lại nhé!** `);
- }
-
- if (error.request) {
- throw new Error(" **Không thể kết nối đến máy chủ AI. Vui lòng kiểm tra kết nối mạng của bạn và thử lại.**");
- }
-
- throw error;
+ throw new Error(message);
  }
 }

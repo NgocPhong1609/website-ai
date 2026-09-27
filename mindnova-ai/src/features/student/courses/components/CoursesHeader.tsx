@@ -33,7 +33,7 @@ export function CoursesHeader({
  return (
  <div className="flex flex-col gap-8 mb-6">
  {/* ─── Editorial Hero Banner ─── */}
- <section className="relative overflow-hidden rounded-2xl bg-white border border-slate-100 p-6 sm:p-7 transition-all duration-300 w-full shadow-sm">
+ <section className="relative overflow-hidden rounded-xl bg-white border border-slate-200 p-6 sm:p-7 transition-all duration-300 w-full shadow-sm">
  <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 w-full">
  <div className="space-y-3 max-w-xl">
 
@@ -48,7 +48,7 @@ export function CoursesHeader({
  </div>
 
  {/* Editorial Mastery Card */}
- <div className="group shrink-0 bg-slate-50 rounded-2xl p-5 border border-slate-100 flex flex-col justify-center min-w-[320px] sm:min-w-[380px] hover:border-slate-200 hover:shadow-sm transition-all duration-300">
+ <div className="group shrink-0 bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-center min-w-[320px] sm:min-w-[380px] hover:border-blue-500 hover:shadow-md transition-all duration-300">
  <div className="w-full flex items-center justify-between gap-4 mb-2">
  <span className="text-xs font-semibold text-slate-500 group-hover:text-blue-600 transition-colors">Tiến độ tổng thể</span>
  <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100">
@@ -66,7 +66,7 @@ export function CoursesHeader({
  </span>
  </div>
 
- <div className="w-full h-1.5 bg-slate-200 rounded-full mt-2 overflow-hidden p-0 border border-slate-100">
+ <div className="w-full h-1.5 bg-slate-200 rounded-full mt-2 overflow-hidden p-0 border border-slate-200">
  <div
  className="h-full bg-blue-500 transition-all duration-1000"
  style={{ width: `${Math.max(completionPercentage, 12)}%` }}

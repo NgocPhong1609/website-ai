@@ -48,7 +48,7 @@ class StudyPlanService
         $activeSyllabus = null;
         $coreConcepts = [];
         $lessonResources = [];
-        $courseTitle = 'Chưa có khóa học';
+        $courseTitle = null;
 
         // 1. Try to load AI Onboarding Plan FIRST
         $hasAiPlan = false;
@@ -85,11 +85,6 @@ class StudyPlanService
                         }
                     }
                 }
-
-                $lessonResources = [
-                    ['id' => 'res-ai-1', 'type' => 'pdf', 'title' => 'Tổng quan lộ trình '.($onboarding['goal'] ?? ''), 'meta' => 'Tài liệu AI', 'url' => '#'],
-                    ['id' => 'res-ai-2', 'type' => 'video', 'title' => 'Hướng dẫn tiếp cận '.($onboarding['topics'][0] ?? 'chủ đề'), 'meta' => 'Bài giảng AI', 'url' => '#'],
-                ];
 
                 $activeSyllabus = [
                     'id' => 'ai-custom-'.$userId,
@@ -179,12 +174,6 @@ class StudyPlanService
                     $modIdx++;
                 }
 
-                if (empty($lessonResources)) {
-                    $lessonResources = [
-                        ['id' => 'res-fb-1', 'type' => 'pdf', 'title' => 'Tài liệu hướng dẫn', 'meta' => '1.2 MB PDF', 'url' => '#'],
-                    ];
-                }
-
                 $activeSyllabus = [
                     'id' => 'syllabus-'.$activeCourse->id,
                     'title' => $activeCourse->title,
@@ -206,7 +195,9 @@ class StudyPlanService
                     'id' => 'msg-init',
                     'sender' => 'ai',
                     'timestamp' => now()->format('h:i A'),
-                    'text' => "Chào bạn! 👋 Mình là **Nova**, trợ lý AI Co-Pilot đồng hành cùng bạn tại khóa học **{$courseTitle}**.\n\nBạn có câu hỏi gì về bài học hoặc lộ trình học tập hôm nay không?",
+                    'text' => $courseTitle
+                        ? "Chào bạn! Mình là **Nova**, trợ lý AI đồng hành cùng bạn trong **{$courseTitle}**.\n\nBạn có câu hỏi gì về bài học hoặc lộ trình học tập hôm nay không?"
+                        : "Chào bạn! Mình là **Nova**, trợ lý AI của MindNova.\n\nBạn chưa đăng ký khóa học nào, nhưng vẫn có thể hỏi mình về bất kỳ chủ đề nào bạn đang tìm hiểu.",
                 ],
             ];
         }
@@ -215,7 +206,9 @@ class StudyPlanService
             'active_syllabus' => $activeSyllabus,
             'core_concepts' => $coreConcepts,
             'lesson_resources' => $lessonResources,
-            'ai_insight' => "Hãy hỏi Gia sư Nova bất kỳ khái niệm nào bạn đang gặp khó khăn trong khóa học {$courseTitle}.",
+            'ai_insight' => $courseTitle
+                ? "Hãy hỏi Gia sư Nova bất kỳ khái niệm nào bạn đang gặp khó khăn trong {$courseTitle}."
+                : 'Đăng ký một khóa học hoặc hoàn tất khảo sát mục tiêu để Nova đề xuất lộ trình học phù hợp.',
             'initial_messages' => $initialMessages,
         ];
     }

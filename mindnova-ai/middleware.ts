@@ -25,7 +25,6 @@ export function middleware(request: NextRequest) {
     // Protected student routes requiring authentication
     const protectedStudentPaths = [
       '/courses/lesson',
-      '/courses/assignment',
       '/courses/certificates',
       '/practice',
       '/study-plan',

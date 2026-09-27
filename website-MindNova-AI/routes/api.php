@@ -141,6 +141,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/change-password/request-otp', [UserController::class, 'requestChangePasswordOtp']);
         Route::post('/change-password', [UserController::class, 'changePassword']);
         Route::post('/avatar', [UserController::class, 'uploadAvatar']);
+        Route::post('/settings', [UserController::class, 'saveSettings']);
     });
 
     // -- Nhóm API Đơn hàng (Orders) & Mã giảm giá (Coupons) --
@@ -202,6 +203,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Lesson — Video URL, Hoàn thành, Kiểm tra đáp án Quiz
         Route::get('lessons/{lesson}/video-url', [StudentLessonController::class, 'videoUrl']);
         Route::get('lessons/{lesson}/attachments/{attachment}/download', [StudentLessonController::class, 'attachmentDownloadUrl']);
+        Route::post('lessons/{lesson}/start', [StudentLessonController::class, 'start']);
         Route::post('lessons/{lesson}/complete', [StudentLessonController::class, 'complete']);
         Route::post('lessons/{lesson}/quiz/check-answer', [StudentLessonController::class, 'checkAnswer']);
 
@@ -427,3 +429,51 @@ if (app()->environment('local', 'testing')) {
         Route::post('/dev/orders/{orderId}/refund', [OrderController::class, 'devRefundOrder']);
     });
 }
+
+Route::get('/dev/wipe-enrollments', function (\Illuminate\Http\Request $request) {
+    $email = $request->query('email');
+    if (!$email) return response()->json(['error' => 'Missing email parameter']);
+    $user = \App\Models\User::where('email', $email)->first();
+    if (!$user) return response()->json(['error' => 'User not found']);
+    
+    // Xóa enrollments
+    \Illuminate\Support\Facades\DB::table('enrollments')->where('user_id', $user->id)->delete();
+    
+    return response()->json([
+        'message' => 'Wiped enrollments for ' . $email
+    ]);
+});
+
+Route::get('/dev/seed-focus-areas', function (\Illuminate\Http\Request $request) {
+    $email = $request->query('email');
+    if (!$email) return response()->json(['error' => 'Missing email parameter']);
+    $user = \App\Models\User::where('email', $email)->first();
+    if (!$user) return response()->json(['error' => 'User not found']);
+    
+    $course = \App\Models\Course::first();
+    if (!$course) return response()->json(['error' => 'No course found to attach topics']);
+    
+    \Illuminate\Support\Facades\DB::table('knowledge_topics')->updateOrInsert(
+        ['name' => 'Cấu trúc dữ liệu Tree'],
+        ['course_id' => $course->id, 'description' => 'Tìm hiểu về Tree']
+    );
+    \Illuminate\Support\Facades\DB::table('knowledge_topics')->updateOrInsert(
+        ['name' => 'React Custom Hooks'],
+        ['course_id' => $course->id, 'description' => 'Custom Hooks trong React']
+    );
+    $topic1 = \Illuminate\Support\Facades\DB::table('knowledge_topics')->where('name', 'Cấu trúc dữ liệu Tree')->first();
+    $topic2 = \Illuminate\Support\Facades\DB::table('knowledge_topics')->where('name', 'React Custom Hooks')->first();
+    
+    \Illuminate\Support\Facades\DB::table('user_topic_performance')->updateOrInsert(
+        ['user_id' => $user->id, 'topic_id' => $topic1->id],
+        ['total_answered' => 10, 'total_correct' => 3, 'accuracy_percentage' => 30]
+    );
+    \Illuminate\Support\Facades\DB::table('user_topic_performance')->updateOrInsert(
+        ['user_id' => $user->id, 'topic_id' => $topic2->id],
+        ['total_answered' => 20, 'total_correct' => 12, 'accuracy_percentage' => 60]
+    );
+    
+    return response()->json([
+        'message' => 'Seeded mock focus areas for ' . $email
+    ]);
+});

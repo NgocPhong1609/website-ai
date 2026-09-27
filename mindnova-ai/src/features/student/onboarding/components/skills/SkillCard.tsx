@@ -31,10 +31,10 @@ export default function SkillCard({
  onKeyDown={(e) => e.key === "Enter" && onClick?.()}
  aria-pressed={isActive}
  className={twMerge(
- "w-full bg-white rounded-2xl p-8 flex flex-col items-center text-center cursor-pointer transition-all duration-300",
+ "w-full bg-white rounded-xl p-8 flex flex-col items-center text-center cursor-pointer transition-all duration-300",
  "border border-transparent shadow-[0_4px_24px_rgba(0,0,0,0.02)]",
- "hover:-translate-y-1 hover:shadow-md",
- isActive && "border-[#E2E8F0] ring-1 ring-[#3B82F6] bg-[#F8F9FE]",
+ " hover:shadow-md",
+ isActive && "border-slate-200 ring-1 ring-blue-500 bg-slate-50",
  )}
  >
  {/* Icon */}
@@ -54,21 +54,21 @@ export default function SkillCard({
  </div>
 
  {/* Title */}
- <h3 className="text-[20px] font-semibold text-[#0F172A] mb-3">{level}</h3>
+ <h3 className="text-[20px] font-semibold text-slate-900 mb-3">{level}</h3>
 
  {/* Description */}
- <p className="text-[14px] text-[#0F172A] leading-relaxed mb-8">
+ <p className="text-[14px] text-slate-900 leading-relaxed mb-8">
  {description}
  </p>
 
  {/* Level indicator bars */}
- <div className="flex gap-1.5 mt-auto" aria-label={`Level: ${level}`}>
+ <div className="flex gap-1.5 mt-auto" aria-label={`Cấp độ: ${level}`}>
  {[1, 2, 3].map((barIndex) => (
  <div
  key={barIndex}
  className={twMerge(
  "h-1.5 w-6 rounded-full transition-colors",
- barIndex <= activeBars ? "bg-[#F8FAFC]" : "bg-[#E2E2EA]",
+ barIndex <= activeBars ? "bg-slate-50" : "bg-slate-200",
  )}
  />
  ))}

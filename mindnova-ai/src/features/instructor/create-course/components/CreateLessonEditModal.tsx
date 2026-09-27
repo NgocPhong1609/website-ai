@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
+import toast from "react-hot-toast";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { RichTextEditor } from "../../shared/components/RichTextEditor";
 import { QuizEditor } from "./QuizEditor";
@@ -86,7 +88,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
           media_id: result.media_id,
         };
       }
-      throw new Error("Upload failed");
+      throw new Error("Không thể tải tệp lên. Vui lòng thử lại.");
     } finally {
       setIsUploadingVideo(false);
     }
@@ -113,7 +115,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
       setVideoUrl(result.preview_url || result.url);
     } catch (error: any) {
       if (error.name !== 'CanceledError') {
-        alert("Có lỗi xảy ra khi tải video. Vui lòng thử lại.");
+        toast.error(getErrorMessage(error, "Không thể tải video lên. Vui lòng thử lại."));
         console.error(error);
       }
     } finally {
@@ -133,7 +135,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
         });
         return result.url;
       }
-      throw new Error("Upload failed");
+      throw new Error("Không thể tải tệp lên. Vui lòng thử lại.");
     } finally {
       setActiveImageUploads(prev => Math.max(0, prev - 1));
     }
@@ -141,16 +143,16 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
 
   const handleClose = useCallback(() => {
     if (isSaving) {
-      alert("Hệ thống đang trong quá trình lưu dữ liệu. Vui lòng chờ trong giây lát.");
+      toast.error("Hệ thống đang trong quá trình lưu dữ liệu. Vui lòng chờ trong giây lát.");
       return;
     }
     if (isUploadingVideo || activeImageUploads > 0) {
-      if (!confirm("Tiến trình tải tệp (video/ảnh) lên đang diễn ra. Bạn có chắc chắn muốn hủy tải lên và thoát mà không lưu?")) {
+      if (!window.confirm("Tiến trình tải tệp (video/ảnh) lên đang diễn ra. Bạn có chắc chắn muốn hủy tải lên và thoát mà không lưu?")) {
         return;
       }
       abortControllerRef.current?.abort();
     } else if (hasUnsavedChanges) {
-      if (!confirm("Bạn có các thay đổi chưa được lưu. Bạn có chắc chắn muốn thoát mà không lưu?")) {
+      if (!window.confirm("Bạn có các thay đổi chưa được lưu. Bạn có chắc chắn muốn thoát mà không lưu?")) {
         return;
       }
     }
@@ -252,9 +254,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
       setTempMediaMap(new Map());
     } catch (error: any) {
       setSaveError(
-        error?.response?.data?.message
-        || error?.message
-        || "Không thể lưu thay đổi. Vui lòng thử lại.",
+        getErrorMessage(error, "Không thể lưu thay đổi. Vui lòng thử lại."),
       );
     } finally {
       setIsSaving(false);
@@ -283,27 +283,27 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
           backdropMouseDownRef.current = false;
         }}
       />
-      <div className={`relative w-full ${isQuiz ? 'max-w-5xl' : 'max-w-4xl'} bg-white rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-fadeIn`}>
+      <div className={`relative w-full ${isQuiz ? 'max-w-5xl' : 'max-w-4xl'} bg-white rounded-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden animate-fadeIn`}>
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0]">
-          <h2 className="text-base font-black text-[#0F172A]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+          <h2 className="text-base font-bold text-slate-900">
             <span className="inline-flex items-center gap-2">
-              {isVideo ? <Video className="h-4 w-4 text-[#3B82F6]" aria-hidden /> : isQuiz ? <FileQuestion className="h-4 w-4 text-[#3B82F6]" aria-hidden /> : <FileText className="h-4 w-4 text-[#3B82F6]" aria-hidden />}
+              {isVideo ? <Video className="h-4 w-4 text-blue-500" aria-hidden /> : isQuiz ? <FileQuestion className="h-4 w-4 text-blue-500" aria-hidden /> : <FileText className="h-4 w-4 text-blue-500" aria-hidden />}
               {isVideo ? 'Soạn thảo Video' : isQuiz ? 'Chỉnh Sửa Bài Kiểm Tra' : 'Soạn thảo Tài liệu'}
             </span>
           </h2>
           <button 
             type="button" 
             onClick={handleClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-gray-100 hover:text-[#0F172A] transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
           >
             <X className="h-4 w-4" aria-hidden />
           </button>
         </div>
 
         {saveError && (
-          <div role="alert" className="mx-6 mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-bold text-rose-700">
+          <div role="alert" className="mx-6 mt-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-bold text-rose-700">
             {saveError}
           </div>
         )}
@@ -312,12 +312,12 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
         <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-6">
           {!isQuiz && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-black text-[#0F172A]">Tên bài học</label>
+              <label className="text-sm font-bold text-slate-900">Tên bài học</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl text-sm border border-[#E2E8F0] focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none transition-all font-bold text-[#0F172A]"
+                className="w-full px-4 py-2.5 rounded-lg text-sm border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all font-bold text-slate-900"
                 placeholder="Nhập tên bài học..."
               />
             </div>
@@ -337,21 +337,21 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
                 courseId={courseId ? Number(courseId) : undefined}
               />
             ) : isVideo ? (
-              <div className="flex flex-col gap-3 mb-6 p-5 border border-[#E2E8F0] rounded-2xl bg-[#F8FAFC]/50 shadow-2xs">
+              <div className="flex flex-col gap-3 mb-6 p-5 border border-slate-200 rounded-lg bg-slate-50/50 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-black text-[#0F172A]">Nguồn video bài học</label>
-                  <div className="flex gap-2 p-1 rounded-xl bg-gray-100 border border-[#E2E8F0]">
+                  <label className="text-sm font-bold text-slate-900">Nguồn video bài học</label>
+                  <div className="flex gap-2 p-1 rounded-lg bg-slate-100 border border-slate-200">
                     <button 
                       type="button" 
                       onClick={() => handleVideoMethodChange('url')}
-                      className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer ${videoMethod === 'url' ? 'bg-white text-[#0F172A] shadow-2xs' : 'text-[#64748B] hover:text-gray-700'}`}
+                      className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer ${videoMethod === 'url' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                       Dùng URL
                     </button>
                     <button 
                       type="button" 
                       onClick={() => handleVideoMethodChange('upload')}
-                      className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer ${videoMethod === 'upload' ? 'bg-[#3B82F6] text-white shadow-2xs' : 'text-[#64748B] hover:text-gray-700'}`}
+                      className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer ${videoMethod === 'upload' ? 'bg-blue-500 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                       Tải lên máy chủ
                     </button>
@@ -364,31 +364,31 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
                     value={videoUrl}
                     onChange={(e) => setVideoUrl(e.target.value)}
                     placeholder="Nhập đường dẫn video (YouTube, Vimeo, v.v.)..."
-                    className="w-full px-4 py-2.5 rounded-xl text-sm font-medium border border-[#E2E8F0] focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none"
+                    className="w-full px-4 py-2.5 rounded-lg text-sm font-medium border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
                   />
                 ) : (
                   (!videoUrl || isUploadingVideo) && (
-                    <div className="w-full p-9 rounded-2xl border-2 border-dashed border-gray-300 bg-white hover:bg-blue-50/30 hover:border-[#2563EB] transition-all flex flex-col items-center justify-center text-center group shadow-2xs relative mt-1">
+                    <div className="w-full p-9 rounded-xl border-2 border-dashed border-slate-300 bg-white hover:bg-blue-50/30 hover:border-blue-600 transition-all flex flex-col items-center justify-center text-center group shadow-sm relative mt-1">
                       <input type="file" accept="video/mp4,video/quicktime,.mp4,.mov" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed" onChange={handleVideoFileUpload} disabled={isUploadingVideo} />
-                      <div className="text-[#3B82F6] group-hover:scale-110 transition-transform mb-2">
+                      <div className="text-blue-500 group-hover:scale-110 transition-transform mb-2">
                         <Video className="h-8 w-8" aria-hidden />
                       </div>
                       {isUploadingVideo ? (
                         <>
-                          <h5 className="text-sm font-black text-[#0F172A]">Đang tải lên và xử lý... {videoUploadProgress}%</h5>
-                          <div className="w-full h-2 mt-4 bg-gray-200 rounded-full overflow-hidden max-w-[200px]">
-                            <div className="h-full bg-[#3B82F6] transition-all duration-300" style={{ width: `${videoUploadProgress}%` }} />
+                          <h5 className="text-sm font-bold text-slate-900">Đang tải lên và xử lý... {videoUploadProgress}%</h5>
+                          <div className="w-full h-2 mt-4 bg-slate-200 rounded-full overflow-hidden max-w-[200px]">
+                            <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${videoUploadProgress}%` }} />
                           </div>
                         </>
                       ) : (
                         <>
-                          <h5 className="text-sm font-black text-[#0F172A]">Kéo và thả tệp video MP4 hoặc MOV vào đây</h5>
-                          <p className="text-xs font-medium text-[#64748B] max-w-md mt-1 leading-relaxed">
-                            Hệ thống AI tự động nén, chuyển mã video đa độ phân giải (<strong className="text-[#3B82F6]">1080p, 720p, 480p</strong>) và tạo hình thu nhỏ thông minh.
+                          <h5 className="text-sm font-bold text-slate-900">Kéo và thả tệp video MP4 hoặc MOV vào đây</h5>
+                          <p className="text-xs font-medium text-slate-500 max-w-md mt-1 leading-relaxed">
+                            Hệ thống AI tự động nén, chuyển mã video đa độ phân giải (<strong className="text-blue-500">1080p, 720p, 480p</strong>) và tạo hình thu nhỏ thông minh.
                           </p>
                           <button
                             type="button"
-                            className="mt-4 px-5 py-2 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white text-xs font-extrabold shadow-2xs transition-all pointer-events-none"
+                            className="mt-4 px-5 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold shadow-sm transition-all pointer-events-none"
                           >
                             Chọn tệp video từ máy tính
                           </button>
@@ -400,7 +400,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
 
                 {videoUrl && !isUploadingVideo && (
                   <div className="mt-3 flex flex-col gap-3">
-                    <div className="w-full bg-black rounded-2xl overflow-hidden border border-[#E2E8F0] flex items-center justify-center relative shadow-sm min-h-[300px]">
+                    <div className="w-full bg-black rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center relative shadow-sm min-h-[300px]">
                       {getEmbedUrl(videoUrl) ? (
                         <iframe
                           src={getEmbedUrl(videoUrl)!}
@@ -419,7 +419,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
                     </div>
                     {videoMethod === 'upload' && (
                       <div className="flex justify-end">
-                        <label className="cursor-pointer px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-gray-800 hover:bg-gray-700 transition-colors shadow-2xs flex items-center gap-2">
+                        <label className="cursor-pointer px-4 py-2 rounded-lg text-xs font-semibold text-white bg-slate-800 hover:bg-slate-700 transition-colors shadow-sm flex items-center gap-2">
                           Thay thế video khác
                           <input type="file" accept="video/mp4,video/quicktime,.mp4,.mov" className="hidden" onChange={handleVideoFileUpload} />
                         </label>
@@ -430,7 +430,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
               </div>
             ) : isDoc ? (
               <>
-                <label className="text-sm font-black text-[#0F172A]">Nội dung chi tiết</label>
+                <label className="text-sm font-bold text-slate-900">Nội dung chi tiết</label>
                 <RichTextEditor
                   value={content}
                   onChange={setContent}
@@ -444,7 +444,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
                     initialAttachments={(lesson as any).attachments ?? []}
                   />
                 ) : (
-                  <p className="text-xs text-[#64748B]">
+                  <p className="text-xs text-slate-500">
                     Lưu bài học trước để tải tài liệu đính kèm.
                   </p>
                 )}
@@ -454,11 +454,11 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-[#E2E8F0] flex justify-end gap-3 bg-[#F8FAFC]">
+        <div className="px-6 py-4 border-t border-slate-200 flex justify-end gap-3 bg-slate-50">
           <button
             type="button"
             onClick={handleClose}
-            className="px-5 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-200 hover:text-[#0F172A] transition-colors cursor-pointer"
+            className="px-5 py-2.5 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition-colors cursor-pointer"
           >
             Hủy
           </button>
@@ -466,7 +466,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
             type="button"
             onClick={handleSave}
             disabled={isSaving || isUploadingVideo || activeImageUploads > 0}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-black text-white bg-[#3B82F6] shadow-2xs hover:bg-[#2563EB] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold text-white bg-blue-500 shadow-sm hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isUploadingVideo ? (
               <>

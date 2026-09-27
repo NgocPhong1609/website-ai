@@ -15,7 +15,8 @@ class GenerateAiQuizRequest extends FormRequest
     {
         return [
             'source_type' => 'nullable|in:content,topic,course,manual',
-            'course_id' => 'nullable|integer|exists:courses,id',
+            'course_id' => 'required_with:module_id|nullable|integer|exists:courses,id',
+            'module_id' => ['nullable', 'integer', \Illuminate\Validation\Rule::exists('course_modules', 'id')->where('course_id', $this->input('course_id'))],
             'content' => 'nullable|string',
             'topic' => 'nullable|string',
             'difficulty' => 'required|string|in:easy,medium,hard,mixed',
@@ -31,6 +32,7 @@ class GenerateAiQuizRequest extends FormRequest
     {
         return [
             'course_id.required' => 'Vui lòng chọn khóa học trước khi tạo Quiz.',
+            'module_id.exists' => 'Chương không thuộc khóa học được chọn.',
             'course_id.exists' => 'Khóa học được chọn không tồn tại trong hệ thống.',
         ];
     }

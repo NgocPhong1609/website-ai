@@ -34,16 +34,16 @@ export function CourseManualQuizModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto animate-fadeIn">
-      <div className="relative w-full max-w-5xl bg-[#FDFBF7] rounded-3xl shadow-2xl overflow-hidden my-8 border border-gray-200 max-h-[92vh] flex flex-col">
+      <div className="relative w-full max-w-5xl bg-white rounded-lg shadow-2xl overflow-hidden my-8 border border-slate-200 max-h-[92vh] flex flex-col">
         {/* Modal Header Bar */}
-        <div className="px-6 py-4 bg-white border-b border-gray-200 flex items-center justify-between shrink-0">
+        <div className="px-6 py-4 bg-white border-b border-slate-200 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm">
-              <PenLine className="h-4 w-4" aria-hidden />
+            <div className="w-10 h-10 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 flex items-center justify-center shadow-sm">
+              <PenLine className="h-5 w-5 text-emerald-600" aria-hidden />
             </div>
             <div>
-              <h3 className="text-base font-black text-[#0F172A]">Soạn Bài Kiểm Tra Thủ Công Cho Chuyên Đề</h3>
-              <p className="text-xs font-semibold text-gray-500">
+              <h3 className="text-base font-semibold text-slate-900">Soạn Bài Kiểm Tra Thủ Công Cho Chuyên Đề</h3>
+              <p className="text-sm font-medium text-slate-500 mt-0.5">
                 Biên soạn câu hỏi trắc nghiệm & tự luận và thêm thẳng vào chuyên đề
               </p>
             </div>
@@ -52,7 +52,7 @@ export function CourseManualQuizModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center font-bold text-sm transition-all cursor-pointer"
+            className="w-8 h-8 rounded-lg bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-700 border border-transparent hover:border-slate-200 flex items-center justify-center transition-all cursor-pointer"
             title="Đóng modal"
           >
             <X className="h-4 w-4" aria-hidden />

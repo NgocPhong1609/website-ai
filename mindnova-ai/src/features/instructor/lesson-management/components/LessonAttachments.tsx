@@ -81,14 +81,14 @@ export function LessonAttachments({
   };
 
   return (
-    <section className="flex flex-col gap-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+    <section className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h3 className="text-sm font-bold text-[#0F172A]">Tài liệu đính kèm</h3>
-          {!readOnly && <p className="text-xs text-[#64748B]">DOC, Excel, PowerPoint hoặc PDF — tối đa 25 MB/file.</p>}
+          <h3 className="text-sm font-bold text-slate-900">Tài liệu đính kèm</h3>
+          {!readOnly && <p className="text-xs text-slate-500">DOC, Excel, PowerPoint hoặc PDF — tối đa 25 MB/file.</p>}
         </div>
         {!readOnly && (
-          <label className="cursor-pointer rounded-lg bg-[#3B82F6] px-3 py-2 text-xs font-bold text-white hover:bg-[#2563EB]">
+          <label className="cursor-pointer rounded-lg bg-blue-500 px-3 py-2 text-xs font-bold text-white hover:bg-blue-600">
             {isUploading ? "Đang tải..." : "Chọn tài liệu"}
             <input
               aria-label="Chọn tài liệu"
@@ -109,25 +109,25 @@ export function LessonAttachments({
 
       {error && <p role="alert" className="text-xs font-semibold text-red-600">{error}</p>}
       {attachments.length === 0 ? (
-        <p className="text-xs text-[#64748B]">Chưa có tài liệu đính kèm.</p>
+        <p className="text-xs text-slate-500">Chưa có tài liệu đính kèm.</p>
       ) : (
         <ul className="flex flex-col gap-2">
           {attachments.map((attachment) => (
-            <li key={attachment.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white p-3">
+            <li key={attachment.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 bg-white p-3">
               {readOnly ? (
-                <span className="min-w-0 flex-1 truncate text-sm font-semibold text-[#0F172A]">{attachment.display_name}</span>
+                <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-900">{attachment.display_name}</span>
               ) : (
                 <input
-                  className="min-w-0 flex-1 rounded-md border border-[#E2E8F0] px-2 py-1 text-sm font-semibold text-[#0F172A]"
+                  className="min-w-0 flex-1 rounded-md border border-slate-200 px-2 py-1 text-sm font-semibold text-slate-900"
                   value={names[attachment.id] ?? attachment.display_name}
                   onChange={(event) => setNames((current) => ({ ...current, [attachment.id]: event.target.value }))}
                 />
               )}
-              <span className="text-xs uppercase text-[#64748B]">{attachment.extension} · {formatBytes(attachment.size_bytes)}</span>
+              <span className="text-xs uppercase text-slate-500">{attachment.extension} · {formatBytes(attachment.size_bytes)}</span>
               {!readOnly && (
-                <button type="button" aria-label={`Lưu tên ${names[attachment.id]}`} onClick={() => void handleRename(attachment)} className="text-xs font-bold text-[#3B82F6]">Lưu tên</button>
+                <button type="button" aria-label={`Lưu tên ${names[attachment.id]}`} onClick={() => void handleRename(attachment)} className="text-xs font-bold text-blue-500">Lưu tên</button>
               )}
-              <button type="button" aria-label={`Tải ${names[attachment.id] ?? attachment.display_name}`} onClick={() => void handleDownload(attachment)} className="text-xs font-bold text-[#3B82F6]">Tải xuống</button>
+              <button type="button" aria-label={`Tải ${names[attachment.id] ?? attachment.display_name}`} onClick={() => void handleDownload(attachment)} className="text-xs font-bold text-blue-500">Tải xuống</button>
               {!readOnly && (
                 <button type="button" aria-label={`Xóa ${names[attachment.id] ?? attachment.display_name}`} onClick={() => void handleDelete(attachment)} className="text-xs font-bold text-red-600">Xóa</button>
               )}

@@ -4,7 +4,7 @@ import { LoginContainer } from "@/src/features/student/auth";
 export const metadata: Metadata = {
  title: "Login",
  description:
- "Sign in to MindNova AI and continue your personalized AI-powered learning journey.",
+ "Đăng nhập MindNova AI để tiếp tục lộ trình học tập cá nhân hóa của bạn.",
 };
 
 import { Suspense } from "react";

@@ -2,18 +2,6 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Third Party Services
-    |--------------------------------------------------------------------------
-    |
-    | This file is for storing the credentials for third party services such
-    | as Mailgun, Postmark, AWS and more. This file provides the de facto
-    | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
-    |
-    */
-
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],
@@ -51,19 +39,20 @@ return [
     'gemini' => [
         'api_key' => env('GEMINI_API_KEY'),
         'model' => env('GEMINI_MODEL', 'gemini-3.8-flash'),
+        'fallback_models' => array_values(array_filter(array_map('trim', explode(',', env('GEMINI_FALLBACK_MODELS', ''))))),
         'force_failure' => env('AI_FORCE_PRIMARY_FAILURE', false),
     ],
 
     // AI trả lời câu hỏi / hỗ trợ học sinh (chat)
     'groq' => [
         'key' => env('GROQ_API_KEY'),
-        'model' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+        'model' => env('GROQ_MODEL', 'llama-3-70b-8192'),
     ],
 
     // The existing tutor stream uses the OpenAI-compatible chat endpoint.
     'ai_tutor' => [
         'provider' => env('AI_TUTOR_PROVIDER'),
-        'model' => env('AI_DEFAULT_MODEL', 'llama-3.1-8b-instant'),
+        'model' => env('AI_DEFAULT_MODEL', 'llama-3-70b-8192'),
         'openai_base_uri' => env('OPENAI_BASE_URI', ''),
         'gemini_base_uri' => env('GEMINI_BASE_URI', ''),
         'claude_base_uri' => env('CLAUDE_BASE_URI', ''),

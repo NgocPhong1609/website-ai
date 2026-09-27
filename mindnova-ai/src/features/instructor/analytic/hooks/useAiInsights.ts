@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useState, useEffect } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 
@@ -24,10 +25,10 @@ export function useAiInsights() {
  if (response.data?.success) {
  setInsights(response.data.data);
  } else {
- throw new Error(response.data?.message || "Failed to fetch AI insights");
+ throw new Error(response.data?.message || "Không thể tải phân tích bằng AI. Vui lòng thử lại.");
  }
  } catch (err: any) {
- setError(err.response?.data?.message || err.message || "An unexpected error occurred");
+ setError(getErrorMessage(err, "Đã xảy ra lỗi. Vui lòng thử lại."));
  } finally {
  setIsLoading(false);
  }

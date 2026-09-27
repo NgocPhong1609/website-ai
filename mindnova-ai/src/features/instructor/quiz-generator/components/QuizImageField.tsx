@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useEffect, useRef, useState } from "react";
 import { quizGeneratorApi } from "../api/quizGeneratorApi";
 import type { QuizImageValue } from "../types/quizGenerator.types";
@@ -48,7 +49,7 @@ export function QuizImageField({ label, purpose, value, onChange }: QuizImageFie
       const uploaded = await quizGeneratorApi.uploadMedia(file, purpose);
       onChange({ url: uploaded.url, r2_key: uploaded.r2_key });
     } catch (uploadError: any) {
-      setError(uploadError?.response?.data?.message || "Không thể tải ảnh lên. Vui lòng thử lại.");
+      setError(getErrorMessage(uploadError, "Không thể tải ảnh lên. Vui lòng thử lại."));
     } finally {
       setIsUploading(false);
       resetFileInput();
@@ -87,13 +88,13 @@ export function QuizImageField({ label, purpose, value, onChange }: QuizImageFie
   };
 
   return (
-    <div className="space-y-2 rounded-xl border border-[#E2E8F0] p-3">
-      <span className="block text-xs font-bold text-gray-700">{label}</span>
+    <div className="space-y-2 rounded-lg border border-slate-200 p-3">
+      <span className="block text-xs font-bold text-slate-700">{label}</span>
       {value.url && (
         <img src={value.url} alt={`Xem trước ${label}`} className="h-28 w-full rounded-lg border object-contain" />
       )}
       <div className="flex flex-wrap gap-2">
-        <label className="cursor-pointer rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-[#3B82F6]">
+        <label className="cursor-pointer rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-500">
           {isUploading ? "Đang tải..." : "Tải ảnh"}
           <input
             ref={fileInputRef}

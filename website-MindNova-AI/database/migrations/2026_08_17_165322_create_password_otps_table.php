@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('password_otps');
         Schema::create('password_otps', function (Blueprint $table) {
             $table->id();
             $table->string('email')->index();

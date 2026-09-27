@@ -85,7 +85,7 @@ class OnboardingController extends Controller
             $response = Http::withToken(env('GROQ_API_KEY'))
                 ->timeout(30)
                 ->post('https://api.groq.com/openai/v1/chat/completions', [
-                    'model' => 'llama-3.3-70b-versatile',
+                    'model' => env('GROQ_MODEL', 'llama-3-70b-8192'),
                     'messages' => [
                         ['role' => 'system', 'content' => 'You are a strict JSON generator. Return only raw JSON.'],
                         ['role' => 'user', 'content' => $prompt]
@@ -240,7 +240,7 @@ class OnboardingController extends Controller
         try {
             $response = Http::withToken(env('GROQ_API_KEY'))
                 ->post('https://api.groq.com/openai/v1/chat/completions', [
-                    'model' => 'llama-3.3-70b-versatile',
+                    'model' => env('GROQ_MODEL', 'llama-3-70b-8192'),
                     'messages' => [
                         ['role' => 'system', 'content' => 'Return only raw JSON.'],
                         ['role' => 'user', 'content' => $prompt]

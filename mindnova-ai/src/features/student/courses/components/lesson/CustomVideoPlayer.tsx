@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, Loader2, AlertTriangle } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import { fetchVideoUrl } from "../../api";
-import type { LessonData } from "./LessonWorkspace";
+import type { LessonData } from "./types";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 function Rewind10Icon({ className = "w-5 h-5" }: { className?: string }) {
   return (
@@ -36,9 +37,11 @@ function formatTime(seconds: number): string {
 export function CustomVideoPlayer({
  lesson,
  onComplete,
+ isPreview = false,
 }: {
  lesson: LessonData;
  onComplete: () => void;
+ isPreview?: boolean;
 }) {
  const containerRef = useRef<HTMLDivElement>(null);
  const videoRef = useRef<HTMLVideoElement>(null);
@@ -71,6 +74,7 @@ export function CustomVideoPlayer({
  setError("");
  setLoading(true);
  setIsPlaying(false);
+ setIsExternal(false);
  setCurrentTime(0);
  setDuration(0);
 
@@ -87,8 +91,8 @@ export function CustomVideoPlayer({
  return;
  }
 
- if (lesson.hasUploadedVideo) {
- fetchVideoUrl(lesson.id)
+ if (lesson.hasUploadedVideo || isPreview) {
+ fetchVideoUrl(lesson.id, isPreview)
  .then((result) => {
  if (result.source === "external") setIsExternal(true);
  setSignedUrl(result.signed_url);
@@ -111,7 +115,7 @@ export function CustomVideoPlayer({
  setError("Video chưa được tải lên.");
  setLoading(false);
  }
- }, [lesson.id, lesson.videoUrl, lesson.hasUploadedVideo]);
+ }, [lesson.id, lesson.videoUrl, lesson.hasUploadedVideo, isPreview]);
 
  // --- Auto Hide Controls Logic ---
  const resetControlsTimeout = useCallback(() => {
@@ -134,28 +138,33 @@ export function CustomVideoPlayer({
  };
  }, [isPlaying, resetControlsTimeout]);
 
- // --- Fallback Completion for Iframe (YouTube / Vimeo) ---
+ // --- Completion for Iframe players (YouTube / Vimeo) ---
+ // We cannot read the embedded player's position, so count the time the lesson is actually on screen
+ // and ask for completion after half the video length; the server re-checks the elapsed time.
  useEffect(() => {
- if (loading || error) return;
- 
+ if (loading || error || isPreview) return;
+
  const isIframe = isExternal && (
  signedUrl.includes("youtube.com") ||
  signedUrl.includes("youtu.be") ||
  signedUrl.includes("vimeo.com")
  );
+ if (!isIframe || completedRef.current) return;
 
- if (!isIframe) return;
- if (completedRef.current) return;
-
- const timer = setTimeout(() => {
- if (!completedRef.current) {
+ const requiredSeconds = Math.max(Math.ceil((lesson.durationSeconds || 0) / 2), 30);
+ let watched = 0;
+ const timer = setInterval(() => {
+ if (document.visibilityState !== "visible") return;
+ watched += 1;
+ if (watched >= requiredSeconds && !completedRef.current) {
  completedRef.current = true;
+ clearInterval(timer);
  onComplete();
  }
- }, 5000);
- 
- return () => clearTimeout(timer);
- }, [loading, error, isExternal, signedUrl, onComplete]);
+ }, 1000);
+
+ return () => clearInterval(timer);
+ }, [loading, error, isExternal, signedUrl, onComplete, isPreview, lesson.durationSeconds]);
 
  // --- Fullscreen Handling ---
  useEffect(() => {
@@ -275,19 +284,14 @@ export function CustomVideoPlayer({
  // --- Rendering Load/Error ---
  if (loading) {
  return (
- <div className="relative w-full aspect-video bg-[#0f172a] rounded-2xl overflow-hidden flex items-center justify-center border border-[#E2E8F0]">
- <div className="flex flex-col items-center gap-3">
- <div className="w-10 h-10 border-3 border-[#3B82F6] border-t-transparent rounded-full animate-spin" />
- <span className="text-sm text-[#64748B] font-medium">Đang tải video...</span>
- </div>
- </div>
+ <Skeleton role="status" aria-label="Đang tải video" className="w-full aspect-video rounded-xl" />
  );
  }
 
  if (error) {
  return (
- <div className="relative w-full aspect-video bg-[#F8FAFC] rounded-2xl overflow-hidden flex items-center justify-center border border-[#E2E8F0]">
- <div className="flex flex-col items-center gap-3 text-[#64748B]">
+ <div className="relative w-full aspect-video bg-slate-50 rounded-xl overflow-hidden flex items-center justify-center border border-slate-200">
+ <div className="flex flex-col items-center gap-3 text-slate-500">
  <AlertTriangle size={28} strokeWidth={1.75} aria-hidden />
  <span className="text-sm font-medium">{error}</span>
  </div>
@@ -313,7 +317,7 @@ export function CustomVideoPlayer({
  }
 
  return (
- <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-sm border border-[#E2E8F0]">
+ <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-sm border border-slate-200">
  <iframe
  src={embedUrl}
  title={lesson.title}
@@ -333,7 +337,7 @@ export function CustomVideoPlayer({
  ref={containerRef}
  className={twMerge(
  "relative w-full aspect-video bg-black overflow-hidden shadow-sm flex items-center justify-center group select-none",
- isFullscreen ? "rounded-none fixed inset-0 z-[9999]" : "rounded-2xl border border-[#E2E8F0]"
+ isFullscreen ? "rounded-none fixed inset-0 z-[9999]" : "rounded-xl border border-slate-200"
  )}
  onMouseMove={resetControlsTimeout}
  onMouseLeave={() => isPlaying && setShowControls(false)}
@@ -425,10 +429,10 @@ export function CustomVideoPlayer({
  {isPlaying ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current" />}
  </button>
 
- <button onClick={() => skipTime(-10)} className="hover:text-[#E2E8F0] transition-colors focus:outline-none hidden sm:block" title="Tua lại 10s">
+ <button onClick={() => skipTime(-10)} className="hover:text-slate-200 transition-colors focus:outline-none hidden sm:block" title="Tua lại 10s">
  <Rewind10Icon />
  </button>
- <button onClick={() => skipTime(10)} className="hover:text-[#E2E8F0] transition-colors focus:outline-none hidden sm:block" title="Tua đi 10s">
+ <button onClick={() => skipTime(10)} className="hover:text-slate-200 transition-colors focus:outline-none hidden sm:block" title="Tua đi 10s">
  <Forward10Icon />
  </button>
 
@@ -477,7 +481,7 @@ export function CustomVideoPlayer({
  onClick={() => changePlaybackRate(rate)}
  className={twMerge(
  "px-4 py-2 text-sm text-left hover:bg-white/10 transition-colors",
- playbackRate === rate ? "text-[#F1F5F9] font-bold" : "text-white/80 font-medium"
+ playbackRate === rate ? "text-slate-100 font-bold" : "text-white/80 font-medium"
  )}
  >
  {rate === 1 ? "Chuẩn" : `${rate}x`}

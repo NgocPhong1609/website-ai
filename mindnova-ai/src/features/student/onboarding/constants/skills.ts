@@ -6,20 +6,20 @@ export const ONBOARDING_SKILLS: ISkill[] = [
  level: "Beginner",
  iconPath: "/icons/smile.svg",
  iconBgColor: "bg-[#3B82F6]/20",
- description: "I am just getting started.",
+ description: "Tôi mới bắt đầu.",
  },
  {
  id: 2,
  level: "Intermediate",
  iconPath: "/icons/zigzac.svg",
  iconBgColor: "bg-[#3B82F6]/20",
- description: "I understand the basics and want to improve.",
+ description: "Tôi đã nắm cơ bản và muốn nâng cao.",
  },
  {
  id: 3,
  level: "Advanced",
  iconPath: "/icons/reward.svg",
  iconBgColor: "bg-[#3B82F6]/20",
- description: "I want to master advanced topics.",
+ description: "Tôi muốn làm chủ các chủ đề nâng cao.",
  },
 ];

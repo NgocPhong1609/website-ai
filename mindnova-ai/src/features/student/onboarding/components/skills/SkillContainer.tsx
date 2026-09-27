@@ -20,15 +20,15 @@ export default function SkillContainer() {
  return (
  <div className="max-w-5xl w-full flex flex-col items-center gap-4 px-8 py-32">
  <div className="w-full max-w-md pb-10">
- <Stepper currentStep={4} totalSteps={6} title="Profile Setup" />
+ <Stepper currentStep={4} totalSteps={6} title="Thiết lập hồ sơ" />
  </div>
 
  {/* Header */}
  <div className="w-full flex flex-col items-center gap-3">
- <h1 className="font-bold text-[32px] text-[#0F172A]">
- What is your current skill level?
+ <h1 className="font-bold text-[32px] text-slate-900">
+ Trình độ hiện tại của bạn?
  </h1>
- <p className="text-[16px] max-w-127.5 w-full text-center text-[#0F172A]">
+ <p className="text-[16px] max-w-127.5 w-full text-center text-slate-900">
  This helps our AI tailor the complexity of your study plan and
  practice exercises to your specific needs.
  </p>
@@ -56,8 +56,8 @@ export default function SkillContainer() {
  onClick={() => router.push("/onboarding/topics")}
  className={`py-[21.6px] px-[57.6px] rounded-lg transition-colors text-[14.4px] mt-8 ${
  selectedId !== null
- ? "bg-[#3B82F6] text-white shadow-md hover:bg-[#2563EB]"
- : "bg-[#E2E8F0] text-[#0F172A]/40 cursor-not-allowed"
+ ? "bg-blue-500 text-white shadow-md hover:bg-blue-600"
+ : "bg-slate-200 text-slate-900/40 cursor-not-allowed"
  }`}
  rightIcon={<ArrowRightIcon />}
  >

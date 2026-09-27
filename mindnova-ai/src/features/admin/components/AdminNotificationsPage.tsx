@@ -1,8 +1,11 @@
 "use client";
 
+import { getErrorMessage, readApiResponse } from "@/src/shared/lib/user-error";
 import { useMemo, useState } from "react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+import { clientApiUrl } from "@/src/shared/lib/api-url";
+
+const API_BASE_URL = clientApiUrl();
 
 type NotificationForm = {
  email: string;
@@ -99,15 +102,7 @@ export function AdminNotificationsPage() {
  }),
  });
 
- const payload = await response.json().catch(() => null);
-
- if (!response.ok) {
- if (response.status === 401 || response.status === 403) {
- throw new Error("Bạn không có quyền admin hoặc phiên đăng nhập đã hết hạn.");
- }
-
- throw new Error(payload?.message ?? "Gửi email thất bại.");
- }
+ const payload = await readApiResponse(response, "Gửi email thất bại.");
 
  setResult({
  message: payload?.message ?? "Email đã được đưa vào hàng đợi.",
@@ -117,7 +112,7 @@ export function AdminNotificationsPage() {
  });
  } catch (error) {
  setResult({
- message: error instanceof Error ? error.message : "Gửi email thất bại.",
+ message: getErrorMessage(error, "Gửi email thất bại."),
  isError: true,
  });
  } finally {
@@ -126,10 +121,10 @@ export function AdminNotificationsPage() {
  };
 
  return (
- <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-admin-body)]">
+ <div className="space-y-4 px-5 lg:px-6 pt-2.5 pb-5 [font-family:var(--font-sans)]">
  <section className="mn-stagger rounded-2xl border-[#E2E8F0]/20 bg-[linear-gradient(125deg,#14213d_0%,#113a63_45%,#2563EB_100%)] py-3.5 px-5 text-white shadow-[0_20px_50px_-25px_rgba(13,23,56,0.95)]">
  <p className="text-[10px] uppercase tracking-[0.35em] text-[#F8FAFC]/70">PB-036 · Email Notification</p>
- <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-admin-head)]">Gửi email thông báo từ trang quản trị</h1>
+ <h1 className="mt-1 text-2xl font-semibold [font-family:var(--font-sans)]">Gửi email thông báo từ trang quản trị</h1>
  <p className="mt-1 max-w-3xl text-xs text-slate-200/90">
  Soạn nội dung thông báo và đưa vào queue để hệ thống gửi nền. Endpoint sử dụng: POST /api/admin/notifications/test-email.
  </p>
@@ -141,7 +136,7 @@ export function AdminNotificationsPage() {
  className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-5 shadow-[0_20px_45px_-28px_rgba(13,23,56,0.45)]"
  >
  <div className="mb-4 flex items-center justify-between">
- <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Nội dung thông báo</h2>
+ <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-sans)]">Nội dung thông báo</h2>
  <div className="flex flex-wrap gap-2">
  <button
  type="button"
@@ -238,7 +233,7 @@ export function AdminNotificationsPage() {
 
  <aside className="space-y-4">
  <div className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4 shadow-[0_16px_35px_-24px_rgba(14,23,52,0.45)]">
- <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Trạng thái chức năng</h3>
+ <h3 className="text-base font-semibold text-slate-900 [font-family:var(--font-sans)]">Trạng thái chức năng</h3>
  <ul className="mt-3 space-y-2 text-sm text-slate-600">
  <li>Route API: /api/admin/notifications/test-email</li>
  <li>Phương thức: POST</li>
@@ -248,7 +243,7 @@ export function AdminNotificationsPage() {
  </div>
 
  <div className="rounded-2xl border border-amber-100/80 bg-amber-50/70 p-4 shadow-[0_16px_35px_-24px_rgba(120,53,15,0.25)]">
- <h3 className="text-base font-semibold text-amber-900 [font-family:var(--font-admin-head)]">Checklist vận hành</h3>
+ <h3 className="text-base font-semibold text-amber-900 [font-family:var(--font-sans)]">Checklist vận hành</h3>
  <ol className="mt-3 space-y-2 text-sm text-amber-900/85">
  <li>1. Kiểm tra MAIL_HOST, MAIL_PORT, MAIL_FROM trong backend .env</li>
  <li>2. Chạy php artisan migrate nếu chưa có jobs table</li>

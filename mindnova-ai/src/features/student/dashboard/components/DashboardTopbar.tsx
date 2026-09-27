@@ -10,7 +10,8 @@ import { twMerge } from "tailwind-merge";
 import { NotificationModal } from "./NotificationModal";
 import { useChatGlobalUnread } from "@/src/hooks/useChatGlobalUnread";
 import { NoDataAvailable } from "@/src/shared/components/ui";
-import { BellOff } from "lucide-react";
+import { BellOff, Menu } from "lucide-react";
+import { toggleMobileSidebar } from "@/src/features/student/layout/components/mobileSidebar";
 
 function BellIcon() {
  return (
@@ -116,14 +117,22 @@ export function DashboardTopbar() {
 
  return (
  <>
- <header className="sticky top-0 z-50 h-18 shrink-0 flex items-center justify-end gap-4 px-6 lg:px-8 bg-[#F8FAFC]/95 backdrop-blur-sm border-b border-[#E2E8F0] transition-all duration-200">
- <div className="flex items-center gap-3">
- <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-[#e2e8f0] shadow-sm">
+ <header className="sticky top-0 z-30 h-18 shrink-0 flex items-center justify-between md:justify-end gap-4 px-4 sm:px-6 lg:px-8 bg-slate-50/95 backdrop-blur-sm border-b border-slate-200 transition-all duration-200">
+ <button
+ type="button"
+ onClick={toggleMobileSidebar}
+ aria-label="Mở menu"
+ className="md:hidden w-10 h-10 rounded-lg flex items-center justify-center text-slate-600 bg-white border border-slate-200 hover:bg-slate-50"
+ >
+ <Menu size={20} aria-hidden />
+ </button>
+ <div className="flex items-center gap-2 sm:gap-3">
+ <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 shadow-sm">
  {/* Chat Button */}
  <a
  href="/messages"
- aria-label="Messages"
- className="group/chat relative w-9 h-9 rounded-md flex items-center justify-center text-[#64748b] hover:text-[#2563eb] hover:bg-[#f8fafc] transition-all duration-200 focus:outline-none"
+ aria-label="Tin nhắn"
+ className="group/chat relative w-9 h-9 rounded-md flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition-all duration-200 focus:outline-none"
  >
  <div className="group-hover/chat:scale-105 transition-transform duration-200">
  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -131,7 +140,7 @@ export function DashboardTopbar() {
  </svg>
  </div>
  {chatUnreadCount > 0 && (
- <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#3B82F6] animate-pulse ring-2 ring-white" />
+ <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse ring-2 ring-white" />
  )}
  </a>
 
@@ -141,25 +150,25 @@ export function DashboardTopbar() {
  type="button"
  onClick={() => setShowNotif(!showNotif)}
  aria-label="Notifications"
- className="group/bell relative w-9 h-9 rounded-md flex items-center justify-center text-[#64748b] hover:text-[#2563eb] hover:bg-[#f8fafc] transition-all duration-200 focus:outline-none"
+ className="group/bell relative w-9 h-9 rounded-md flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition-all duration-200 focus:outline-none"
  >
  <div className="group-hover/bell:rotate-6 transition-transform duration-200">
  <BellIcon />
  </div>
  {unreadCount > 0 && (
- <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#3B82F6] animate-pulse ring-2 ring-white" />
+ <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-500 animate-pulse ring-2 ring-white" />
  )}
  </button>
 
  {/* Notification Dropdown */}
  {showNotif && (
- <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-[#e2e8f0] overflow-hidden z-50">
- <div className="px-4 py-3 border-b border-[#f1f5f9] flex items-center justify-between bg-[#f8fafc]">
- <h3 className="text-sm font-semibold text-[#0f172a]">
+ <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden z-50">
+ <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+ <h3 className="text-sm font-semibold text-slate-900">
  Thông báo ({notifications.length}/50)
  </h3>
  {unreadCount > 0 && (
- <span className="text-[10px] font-semibold bg-[#EFF6FF] text-[#3B82F6] px-2 py-0.5 rounded-full">
+ <span className="text-[10px] font-semibold bg-blue-50 text-blue-500 px-2 py-0.5 rounded-full">
  {unreadCount} mới
  </span>
  )}
@@ -176,7 +185,7 @@ export function DashboardTopbar() {
  />
  </div>
  ) : (
- <div className="flex flex-col divide-y divide-[#f1f5f9]">
+ <div className="flex flex-col divide-y divide-slate-100">
  {notifications.map((notif) => {
  const senderAvatar = notif.sender?.avatar || "";
 
@@ -195,20 +204,20 @@ export function DashboardTopbar() {
  className={twMerge(
  "px-5 py-4 transition-colors duration-200 cursor-pointer flex gap-4 items-start",
  !notif.is_read
- ? "bg-[#eff6ff]/60 hover:bg-[#eff6ff]"
- : "bg-white hover:bg-[#f8fafc]"
+ ? "bg-blue-50/60 hover:bg-blue-50"
+ : "bg-white hover:bg-slate-50"
  )}
  >
  <div className="relative shrink-0 mt-0.5">
  <Avatar
  fallback="NV"
  src={senderAvatar}
- className="w-[46px] h-[46px] rounded-full text-[#2563eb] bg-[#dbeafe]"
+ className="w-[46px] h-[46px] rounded-full text-blue-600 bg-blue-100"
  />
  <span
  className={twMerge(
  "absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[2.5px] border-white shadow-sm",
- !notif.is_read ? "bg-[#2563eb]" : "bg-[#10b981]"
+ !notif.is_read ? "bg-blue-600" : "bg-emerald-500"
  )}
  />
  </div>
@@ -216,16 +225,16 @@ export function DashboardTopbar() {
  <div className="flex-1 min-w-0">
  <p
  className={twMerge(
- "text-[14px] text-[#0f172a] leading-tight mb-1",
+ "text-[14px] text-slate-900 leading-tight mb-1",
  !notif.is_read ? "font-bold" : "font-semibold"
  )}
  >
  {notif.title || "Thông báo mới"}
  </p>
- <p className="text-[13px] text-[#64748b] line-clamp-2 leading-relaxed mb-1.5">
+ <p className="text-[13px] text-slate-500 line-clamp-2 leading-relaxed mb-1.5">
  {notif.content}
  </p>
- <p className="text-[11px] text-[#94a3b8] font-medium">
+ <p className="text-[11px] text-slate-400 font-medium">
  {new Date(notif.created_at).toLocaleString("vi-VN")}
  </p>
  </div>
@@ -237,11 +246,11 @@ export function DashboardTopbar() {
  </div>
 
  {/* Footer action */}
- <div className="px-4 py-3 border-t border-[#f1f5f9] flex items-center justify-center bg-[#f8fafc]">
+ <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-center bg-slate-50">
  <button
  onClick={handleDeleteRead}
  disabled={notifications.filter((n) => n.is_read).length === 0}
- className="text-xs font-semibold text-[#2563eb] hover:text-[#1d4ed8] disabled:text-[#94a3b8] transition-colors"
+ className="text-xs font-semibold text-blue-600 hover:text-blue-700 disabled:text-slate-400 transition-colors"
  >
  Xóa thông báo đã đọc
  </button>
@@ -254,7 +263,7 @@ export function DashboardTopbar() {
  <button
  type="button"
  aria-label="Settings"
- className="group/settings w-9 h-9 rounded-md flex items-center justify-center text-[#64748b] hover:text-[#2563eb] hover:bg-[#f8fafc] transition-all duration-200 focus:outline-none"
+ className="group/settings w-9 h-9 rounded-md flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition-all duration-200 focus:outline-none"
  >
  <div className="group-hover/settings:rotate-30 transition-transform duration-300">
  <SettingsIcon />
@@ -262,7 +271,7 @@ export function DashboardTopbar() {
  </button>
  </div>
 
- <span className="w-px h-6 bg-[#e2e8f0] hidden sm:block" />
+ <span className="w-px h-6 bg-slate-200 hidden sm:block" />
 
  {/* Profile Avatar or Login/Register Links */}
  {isMounted && isLoggedIn ? (
@@ -284,32 +293,32 @@ export function DashboardTopbar() {
  .join("") || "MN"
  ).toUpperCase()}
  size="md"
- className="ring-2 ring-[#E2E8F0] hover:ring-[#3B82F6]/40 transition-all duration-200"
+ className="ring-2 ring-slate-200 hover:ring-blue-500/40 transition-all duration-200"
  />
  </div>
  {user?.name && (
- <span className="hidden md:inline text-sm font-semibold text-[#0F172A]">
+ <span className="hidden md:inline text-sm font-semibold text-slate-900">
  {user.name}
  </span>
  )}
  <span
- className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#27AE60] border-2 border-white shadow-xs"
+ className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-600 border-2 border-white shadow-xs"
  title="Online"
  />
  </button>
  ) : isMounted && !isLoggedIn ? (
- <div className="flex items-center gap-3 relative z-[9999] pointer-events-auto">
+ <div className="flex items-center gap-1 sm:gap-3">
  <Link
  href="/login"
  onClick={clearAuthCookies}
- className="px-4 py-2 text-sm font-semibold text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] rounded-lg transition-all relative z-[9999]"
+ className="px-3 sm:px-4 py-2 text-sm font-semibold whitespace-nowrap text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
  >
  Đăng nhập
  </Link>
  <Link
  href="/login?mode=register"
  onClick={clearAuthCookies}
- className="px-4 py-2 text-sm font-semibold text-white bg-[#0F172A] hover:bg-[#1C1D23] rounded-lg transition-all shadow-sm relative z-[9999]"
+ className="px-3 sm:px-4 py-2 text-sm font-semibold whitespace-nowrap text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors shadow-sm"
  >
  Đăng ký
  </Link>

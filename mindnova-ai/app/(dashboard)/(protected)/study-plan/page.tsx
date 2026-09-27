@@ -1,7 +1,6 @@
 import { StudyPlanWorkspace } from "@/src/features/student/ai-study-plan";
 import { getStudyPlanOverview } from "@/src/features/student/ai-study-plan/services/study-plan.service";
 import { Metadata } from "next";
-import { ArrowUpRight } from "lucide-react";
 
 export const metadata: Metadata = {
  title: "AI Study Plan | MindNova AI",
@@ -22,14 +21,14 @@ export default async function AIStudyPlanPage() {
  <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-8">
  {/* ─── Standardized Universal Hero Banner Blueprint ─── */}
  {activeSyllabus ? (
- <section className="relative overflow-hidden rounded-2xl bg-white border border-border p-6 sm:p-8 shadow-sm w-full">
+ <section className="relative overflow-hidden rounded-xl bg-white border border-border p-6 sm:p-8 shadow-sm w-full">
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 w-full">
             <div className="space-y-4 max-w-2xl">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-700">
                 Lộ trình học AI • Module {currentIdx} / {totalMods}
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A] leading-tight break-words">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 leading-tight break-words">
                 {activeSyllabus.title}
               </h1>
 
@@ -39,10 +38,10 @@ export default async function AIStudyPlanPage() {
             </div>
 
             {/* Synchronized Universal Wide Mastery Card */}
-            <div className="group shrink-0 bg-white rounded-2xl p-5 border border-border flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="group shrink-0 bg-white rounded-xl p-5 border border-border flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm hover:shadow-md transition-all duration-300">
               <div className="w-full flex items-center justify-between gap-4 mb-3">
-                <span className="text-xs font-semibold text-muted-foreground group-hover:text-blue-600 transition-colors flex items-center gap-1">
-                  Tiến độ lộ trình <ArrowUpRight className="w-3.5 h-3.5" />
+                <span className="text-xs font-semibold text-muted-foreground group-hover:text-blue-600 transition-colors">
+                  Tiến độ lộ trình
                 </span>
                 <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
                   Đúng tiến độ
@@ -66,22 +65,19 @@ export default async function AIStudyPlanPage() {
                 />
               </div>
 
-              <p className="text-xs font-medium text-muted-foreground mt-4 flex items-center justify-between gap-4">
-                <span>Tiếp tục giữ vững phong độ nhé!</span>
-                <span className="text-blue-600 font-semibold hover:underline cursor-pointer flex items-center gap-1">
-                  Tiếp tục <ArrowUpRight className="w-3.5 h-3.5" />
-                </span>
+              <p className="text-xs font-medium text-muted-foreground mt-4 text-center">
+                Tiếp tục giữ vững phong độ nhé!
               </p>
             </div>
           </div>
         </section>
  ) : (
- <section className="relative overflow-hidden rounded-2xl bg-muted border border-border p-8 text-center shadow-sm">
+ <section className="relative overflow-hidden rounded-xl bg-muted border border-border p-8 text-center shadow-sm">
  <h2 className="text-xl font-bold text-foreground mb-2">Chưa có Lộ trình học</h2>
  <p className="text-muted-foreground text-sm mb-6 max-w-md mx-auto">Bạn cần đăng ký khóa học để hệ thống tạo Lộ trình AI cá nhân hóa dành riêng cho bạn.</p>
- <a href="/explore" className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-medium text-sm transition-colors hover:bg-blue-700 shadow-sm">
- Khám phá Khóa học <ArrowUpRight className="w-4 h-4" />
- </a>
+<a href="/explore" className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-medium text-sm transition-colors hover:bg-blue-700 shadow-sm">
+  Khám phá Khóa học
+</a>
  </section>
  )}
 

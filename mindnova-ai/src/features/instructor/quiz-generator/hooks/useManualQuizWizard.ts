@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useState, useCallback, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { QuizConfig, GeneratedQuestion, QuizSummary } from "../types/quizGenerator.types";
@@ -152,7 +153,7 @@ export function useManualQuizWizard(options?: {
         throw new Error(response.message || "Lưu bài kiểm tra thất bại");
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || "Lỗi khi lưu bài kiểm tra");
+      setError(getErrorMessage(err, "Lỗi khi lưu bài kiểm tra"));
     } finally {
       setIsSaving(false);
     }

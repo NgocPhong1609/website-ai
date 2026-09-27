@@ -1,9 +1,12 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
+import toast from "react-hot-toast";
+import { useConfirmDialog } from "@/src/shared/components/ui/ConfirmDialog";
 import { useInstructorCourse } from "../../management/api/courses";
 import { useCreateCourseStore } from "../stores/createCourseStore";
 import { useUpdateCourse, useUploadCourseThumbnail, useDeleteCourse, useUpdateCourseStatus, useUpdateCoursePrice, useSubmitForReview } from "../api";
@@ -13,19 +16,15 @@ import { CourseEditTabs, EditCourseTab } from "./CourseEditTabs";
 import { CourseHealthCard } from "./CourseHealthCard";
 import { Step2CourseStructure } from "./Step2CourseStructure";
 import type { CourseBasicInfo, DifficultyLevel } from "../types";
-import {
- SaveIcon,
- EyeIcon,
- TrashIcon,
- ArrowLeftIcon,
- CheckIcon,
-} from "./icons";
+import { Skeleton } from "@/src/shared/components/ui";
 
 import { OTHER_CATEGORY_VALUE } from "../constants";
 import { useProposeCategory } from "../api";
+import { ArrowLeft, Check, Eye, Save, Trash2, Award, MessageSquare, Loader2 } from "lucide-react";
 
 export function EditCourseContainer({ courseId }: { courseId: string }) {
  const router = useRouter();
+ const { confirm } = useConfirmDialog();
  const { data: course, isLoading } = useInstructorCourse(courseId);
  const { mutateAsync: updateCourse, isPending: isUpdating } = useUpdateCourse();
  const { mutateAsync: updatePrice, isPending: isUpdatingPrice } = useUpdateCoursePrice();
@@ -75,7 +74,44 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  }, [course]);
 
  if (isLoading) {
- return <div className="p-8 text-center text-[#64748B] font-medium">Đang tải dữ liệu...</div>;
+ return (
+ <div className="min-h-screen bg-slate-50 flex flex-col font-sans pb-16">
+ <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 pt-3 pb-2 shadow-sm">
+ <div className="max-w-6xl mx-auto flex flex-col gap-2">
+ <div className="flex flex-wrap items-center justify-between gap-3">
+ <div className="flex items-center gap-3">
+ <Skeleton className="w-10 h-10 rounded-lg" />
+ <div>
+ <Skeleton className="h-3 w-40 mb-1" />
+ <Skeleton className="h-5 w-64" />
+ </div>
+ </div>
+ <div className="flex items-center gap-2.5">
+ <Skeleton className="w-24 h-9 rounded-lg" />
+ <Skeleton className="w-32 h-9 rounded-lg" />
+ </div>
+ </div>
+ <div className="flex gap-4 mt-2">
+ <Skeleton className="w-24 h-8" />
+ <Skeleton className="w-24 h-8" />
+ <Skeleton className="w-24 h-8" />
+ </div>
+ </div>
+ </header>
+ <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-6 flex flex-col gap-6">
+ <Skeleton className="w-full h-24 rounded-lg" />
+ <div className="grid grid-cols-1 md:grid-cols-[1fr_350px] gap-6">
+ <div className="flex flex-col gap-5">
+ <Skeleton className="w-full h-12 rounded-lg" />
+ <Skeleton className="w-full h-32 rounded-lg" />
+ </div>
+ <div className="flex flex-col gap-4">
+ <Skeleton className="w-full h-48 rounded-lg" />
+ </div>
+ </div>
+ </main>
+ </div>
+ );
  }
 
  if (!course) {
@@ -128,40 +164,53 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  setTimeout(() => setSaveSuccess(false), 3000);
  } catch (error) {
  console.error(error);
- alert("Lỗi khi lưu thông tin");
+ toast.error(getErrorMessage(error, "Không thể lưu thông tin khóa học. Vui lòng thử lại."));
  }
  };
 
  const handleDelete = async () => {
- if (confirm("Bạn có chắc chắn muốn xóa khóa học này? Toàn bộ module, bài học và dữ liệu liên quan sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác!")) {
+ const confirmed = await confirm({
+ title: "Xóa khóa học",
+ message: "Bạn có chắc chắn muốn xóa khóa học này? Toàn bộ module, bài học và dữ liệu liên quan sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác!",
+ confirmText: "Xóa vĩnh viễn",
+ cancelText: "Hủy bỏ",
+ variant: "danger",
+ });
+ if (!confirmed) return;
  try {
  await deleteCourse(courseId);
- alert("Đã xóa khóa học thành công!");
+ toast.success("Đã xóa khóa học thành công!");
  router.push("/instructor/courses");
  } catch (error: any) {
  console.error(error);
- alert(error?.response?.data?.message || "Lỗi khi xóa khóa học");
- }
+ toast.error(getErrorMessage(error, "Lỗi khi xóa khóa học"));
  }
  };
 
  const handleSubmitReview = async () => {
- if (!confirm("Bạn có chắc chắn muốn gửi khóa học này để quản trị viên xét duyệt?")) return;
+ const confirmed = await confirm({
+ title: "Gửi xét duyệt",
+ message: "Bạn có chắc chắn muốn gửi khóa học này để quản trị viên xét duyệt?",
+ confirmText: "Gửi xét duyệt",
+ cancelText: "Hủy bỏ",
+ variant: "info",
+ });
+ if (!confirmed) return;
  try {
  await submitForReview({ courseId });
- alert("Khóa học đã được gửi xét duyệt thành công!");
+ toast.success("Khóa học đã được gửi xét duyệt thành công!");
  router.refresh();
  } catch (error: any) {
- alert(error?.response?.data?.message || "Gửi xét duyệt thất bại!");
+ toast.error(getErrorMessage(error, "Gửi xét duyệt thất bại!"));
  }
  };
 
  const isPending = isUpdating || isUploading || isDeleting || isUpdatingStatus || isUpdatingPrice || isSubmittingReview;
 
  return (
- <div className="min-h-screen bg-[#F4F4F8] flex flex-col font-sans pb-16">
+ <div className="min-h-screen bg-slate-50 flex flex-col font-sans pb-16">
  {/* ── HEADER CẬP NHẬT ─────────────────────────────────────────────────── */}
- <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#E2E8F0] px-6 pt-3 pb-2 shadow-2xs">
+ <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 pt-3 pb-2 shadow-sm">
  <div className="max-w-6xl mx-auto flex flex-col gap-2">
  <div className="flex flex-wrap items-center justify-between gap-3">
  
@@ -169,25 +218,25 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <div className="flex items-center gap-3">
  <Link
  href="/instructor/courses"
- className="w-10 h-10 rounded-xl bg-[#F8FAFC] hover:bg-gray-100 text-gray-700 flex items-center justify-center transition-colors shadow-2xs border border-gray-100"
+ className="w-10 h-10 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-colors shadow-sm border border-slate-100"
  >
- <ArrowLeftIcon size={18} />
+ <ArrowLeft size={18} />
  </Link>
  <div>
- <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs font-bold text-[#64748B] mb-0.5">
- <Link href="/instructor/courses" className="hover:text-gray-800 transition-colors">
+ <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs font-bold text-slate-500 mb-0.5">
+ <Link href="/instructor/courses" className="hover:text-slate-800 transition-colors">
  Khóa học của tôi
  </Link>
  <span>/</span>
- <span className="text-[#3B82F6]">
+ <span className="text-blue-500">
  Chỉnh sửa khóa học #{courseId}
  </span>
  </nav>
  <div className="flex items-center gap-2.5">
- <h1 className="text-lg font-black text-[#0F172A] tracking-tight truncate max-w-md md:max-w-2xl">
+ <h1 className="text-lg font-bold text-slate-900 tracking-tight truncate max-w-md md:max-w-2xl">
  {basicInfo.title || "Tên khóa học"}
  </h1>
- <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black tracking-wider uppercase border ${course.status === "published" ? "bg-emerald-50 text-emerald-700" : course.status === "pending_review" ? "bg-blue-50 text-blue-600 border-blue-200" : "bg-slate-50 text-slate-600 border-slate-200"}`}>
+ <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border ${course.status === "published" ? "bg-emerald-50 text-emerald-700" : course.status === "pending_review" ? "bg-blue-50 text-blue-600 border-blue-200" : "bg-slate-50 text-slate-600 border-slate-200"}`}>
  {course.status === "published" ? "ĐÃ CÔNG KHAI" : course.status === "pending_review" ? "ĐANG CHỜ DUYỆT" : "BẢN NHÁP"}
  </span>
  </div>
@@ -199,9 +248,9 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <Link
  href={`/courses/lesson?course_id=${courseId}&preview=true`}
  target="_blank"
- className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-gray-700 bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-all shadow-2xs"
+ className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
  >
- <EyeIcon size={14} />
+ <Eye size={14} />
  <span className="hidden sm:inline">Xem trước</span>
  </Link>
 
@@ -210,7 +259,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  type="button"
  onClick={handleSubmitReview}
  disabled={isPending}
- className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-500 hover:bg-blue-600 transition-all shadow-sm disabled:bg-gray-400"
+ className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold text-white bg-blue-500 hover:bg-blue-600 transition-all shadow-sm disabled:bg-slate-400"
  >
  <span className="hidden sm:inline">{course.status === "published" ? "Gửi bản cập nhật" : "Gửi xét duyệt"}</span>
  </button>
@@ -220,7 +269,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <button
  type="button"
  disabled
- className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200 cursor-not-allowed shadow-sm"
+ className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200 cursor-not-allowed shadow-sm"
  >
  <span className="hidden sm:inline">Đang chờ duyệt</span>
  </button>
@@ -231,20 +280,20 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  onClick={handleSave}
  disabled={isPending}
  className={twMerge(
- "flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black text-white transition-all shadow-sm cursor-pointer",
- saveSuccess ? "text-[#0F172A] hover:bg-[#0F172A]" : "bg-[#3B82F6] hover:bg-[#2563EB] disabled:bg-gray-400"
+ "flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold text-white transition-all shadow-sm cursor-pointer",
+ saveSuccess ? "bg-emerald-500 hover:bg-emerald-600" : "bg-blue-500 hover:bg-blue-600 disabled:bg-slate-400"
  )}
  >
  {isUpdating || isUploading || isUpdatingPrice ? (
- <span> Đang lưu...</span>
+ <span><Loader2 className="inline h-4 w-4 mr-1.5 align-text-bottom animate-spin" aria-hidden />Đang lưu...</span>
  ) : saveSuccess ? (
  <>
- <CheckIcon size={14} />
+ <Check size={14} />
  <span>Đã lưu thay đổi</span>
  </>
  ) : (
  <>
- <SaveIcon size={14} />
+ <Save size={14} />
  <span>Lưu & Cập nhật</span>
  </>
  )}
@@ -286,40 +335,40 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  )}
 
  {activeTab === "advanced" && (
- <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col gap-2">
+ <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-2">
  <div className="flex flex-col gap-1 mb-2">
- <h2 className="text-[17px] font-black text-[#0F172A]">Cấu hình Quyền học tập</h2>
- <p className="text-[13px] text-[#64748B]">Quản lý cấp chứng chỉ tự động và khóa bình luận diễn đàn.</p>
+ <h2 className="text-[17px] font-bold text-slate-900">Cấu hình Quyền học tập</h2>
+ <p className="text-[13px] text-slate-500">Quản lý cấp chứng chỉ tự động và khóa bình luận diễn đàn.</p>
  </div>
 
- <div className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 bg-[#F8FAFC]/50">
+ <div className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-slate-50/50">
  <div className="flex items-center gap-3">
- <span className="text-xl"></span>
+ <span className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0"><Award className="h-4 w-4" aria-hidden /></span>
  <div>
- <span className="block text-[14px] font-bold text-[#0F172A]">Cấp Chứng Chỉ Tốt Nghiệp Tự Động (Blockchain ID)</span>
- <span className="text-[12px] text-[#64748B] block mt-0.5">Tự động sinh mã chứng nhận khi học viên đạt trên 80% tiến độ bài giảng</span>
+ <span className="block text-[14px] font-bold text-slate-900">Cấp Chứng Chỉ Tốt Nghiệp Tự Động (Blockchain ID)</span>
+ <span className="text-[12px] text-slate-500 block mt-0.5">Tự động sinh mã chứng nhận khi học viên đạt trên 80% tiến độ bài giảng</span>
  </div>
  </div>
- <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-[#3B82F6] focus:ring-[#3B82F6] cursor-pointer" />
+ <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500 cursor-pointer" />
  </div>
 
- <div className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 bg-[#F8FAFC]/50">
+ <div className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-slate-50/50">
  <div className="flex items-center gap-3">
- <span className="text-xl"></span>
+ <span className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0"><MessageSquare className="h-4 w-4" aria-hidden /></span>
  <div>
- <span className="block text-[14px] font-bold text-[#0F172A]">Hòm thư thảo luận trực tiếp</span>
- <span className="text-[12px] text-[#64748B] block mt-0.5">Cho phép học viên đặt câu hỏi Hỏi-Đáp bên dưới từng bài video</span>
+ <span className="block text-[14px] font-bold text-slate-900">Hòm thư thảo luận trực tiếp</span>
+ <span className="text-[12px] text-slate-500 block mt-0.5">Cho phép học viên đặt câu hỏi Hỏi-Đáp bên dưới từng bài video</span>
  </div>
  </div>
- <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-[#3B82F6] focus:ring-[#3B82F6] cursor-pointer" />
+ <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500 cursor-pointer" />
  </div>
 
  <div className="mt-4 pt-6 border-t border-rose-50 flex flex-col gap-4">
- <h3 className="text-[12px] font-black uppercase tracking-wider text-[#2563EB] flex items-center gap-1.5">
- <TrashIcon size={14} />
+ <h3 className="text-[12px] font-bold uppercase tracking-wider text-rose-600 flex items-center gap-1.5">
+ <Trash2 size={14} />
  <span>Khu Vực Nguy Hiểm (Danger Zone)</span>
  </h3>
- <div className="p-4 rounded-2xl bg-rose-50/50 border border-rose-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+ <div className="p-4 rounded-lg bg-rose-50/50 border border-rose-100 flex flex-col sm:flex-row items-center justify-between gap-4">
  <div>
  <span className="block text-[14px] font-bold text-rose-950">Xóa vĩnh viễn khóa học này</span>
  <span className="text-[12px] text-rose-700 block mt-1">
@@ -330,7 +379,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  type="button"
  onClick={handleDelete}
  disabled={isPending || isDeleting}
- className="px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-rose-700 text-white font-extrabold text-[13px] shadow-sm transition-all shrink-0 cursor-pointer disabled:bg-rose-300 disabled:cursor-not-allowed"
+ className="px-5 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold text-[13px] shadow-sm transition-all shrink-0 cursor-pointer disabled:bg-rose-300 disabled:cursor-not-allowed"
  >
  {isDeleting ? "Đang xóa..." : "Xóa bài giảng"}
  </button>

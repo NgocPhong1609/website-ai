@@ -68,7 +68,7 @@ export function FilteredCoursesView() {
  if (isError) {
  return (
  <div className="flex flex-col items-center justify-center py-20 min-h-[400px]">
- <p className="text-[#3B82F6] font-medium">Đã xảy ra lỗi khi tải khoá học. Vui lòng thử lại sau.</p>
+ <p role="alert" className="text-rose-600 font-medium">Đã xảy ra lỗi khi tải khoá học. Vui lòng thử lại sau.</p>
  </div>
  );
  }
@@ -87,7 +87,7 @@ export function FilteredCoursesView() {
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
  {isLoading ? (
    [...Array(6)].map((_, i) => (
-     <div key={i} className="bg-white border border-slate-100 rounded-xl flex flex-col h-[380px] overflow-hidden animate-pulse">
+     <div key={i} className="bg-white border border-slate-200 rounded-xl flex flex-col h-[380px] overflow-hidden animate-pulse">
        <div className="h-44 w-full bg-slate-200 shrink-0" />
        <div className="flex flex-col p-5 pt-6 flex-1">
          <div className="w-20 h-5 bg-slate-200 rounded-md mb-3" />
@@ -106,7 +106,7 @@ export function FilteredCoursesView() {
  <MyCourseCard key={`${course.id}-${idx}`} course={course} />
  ))
  ) : (
- <div className="col-span-full py-12 px-6 text-center bg-white rounded-2xl border border-slate-100 flex flex-col items-center justify-center shadow-sm">
+ <div className="col-span-full py-12 px-6 text-center bg-white rounded-xl border border-slate-200 flex flex-col items-center justify-center shadow-sm">
  <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1.5">Không tìm thấy khoá học phù hợp</h3>
  <p className="text-xs sm:text-sm font-normal text-slate-500 max-w-md mb-5 leading-relaxed">
  Hệ thống không tìm thấy khoá học nào trong mục "{TAB_LABELS[activeTab]}"{searchQuery ? ` với từ khoá "${searchQuery}"` : ""}. Bạn hãy thử thay đổi tiêu chí bộ lọc hoặc tìm kiếm từ khoá khác.

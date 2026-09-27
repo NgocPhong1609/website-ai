@@ -4,13 +4,13 @@ import { useInstructorCourses } from "../api/courses";
 import React, { useState, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { NoData } from "@/src/shared/components/ui/NoData";
-import { Loader } from "@/src/shared/components/ui/Loader";
+import { Skeleton } from "@/src/shared/components/ui";
 
 import { CourseFilterTabs } from "./CourseFilterTabs";
 import { CourseCard } from "./CourseCard";
 import { CreateCourseCard } from "./CreateCourseCard";
 import { CoursePagination } from "./CoursePagination";
-import { SearchIcon } from "./icons";
+import { Search, X } from "lucide-react";
 
 const PAGE_SIZE = 9;
 
@@ -76,15 +76,15 @@ function CourseManagementContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F4F4F8] font-sans">
+    <div className="min-h-screen bg-slate-50 font-sans">
       <div className="max-w-[1200px] w-full mx-auto p-6 lg:p-8 flex flex-col gap-8 pb-20 animate-fadeIn">
         {/* ── Page Header & Filter Tabs ───────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#E2E8F0] pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-6">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-black text-[#0F172A] tracking-tight">
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">
               Quản lý khóa học
             </h1>
-            <p className="mt-1.5 text-xs text-[#64748B] font-medium max-w-xl leading-relaxed">
+            <p className="mt-1.5 text-xs text-slate-500 font-medium max-w-xl leading-relaxed">
               Theo dõi, phân tích và tối ưu hóa hệ thống tài liệu giáo dục của bạn với sự hỗ trợ của trí tuệ nhân tạo MindNova AI.
             </p>
           </div>
@@ -93,11 +93,11 @@ function CourseManagementContent() {
         </div>
 
         {/* ── Search & Sort Bar ────────────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#E2E8F0] shadow-2xs">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
           {/* Search Box */}
           <div className="relative flex-1 max-w-md">
-            <span className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-[#64748B]">
-              <SearchIcon />
+            <span className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-slate-500">
+              <Search size={16} />
             </span>
             <input
               type="text"
@@ -107,28 +107,28 @@ function CourseManagementContent() {
                 setSearchQuery(e.target.value);
                 setPage(1);
               }}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] placeholder:text-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] transition-all"
+              className="w-full pl-10 pr-9 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute inset-y-0 right-3 flex items-center text-xs text-gray-400 hover:text-gray-600 font-bold"
+                className="absolute inset-y-0 right-3 flex items-center text-xs text-slate-400 hover:text-slate-600 font-bold"
               >
-                ✕
+                <X className="h-5 w-5" aria-hidden />
               </button>
             )}
           </div>
 
           {/* Sort Selector */}
           <div className="flex items-center gap-2 self-end sm:self-auto">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-[#64748B] shrink-0">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 shrink-0">
               Sắp xếp:
             </span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs font-bold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] cursor-pointer"
+              className="px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
             >
               <option value="newest">Mới nhất</option>
               <option value="oldest">Cũ nhất</option>
@@ -143,11 +143,23 @@ function CourseManagementContent() {
         <section aria-label="Danh sách khóa học">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {isLoading ? (
-              <div className="col-span-full py-12 flex items-center justify-center">
-                <Loader size="md" />
-              </div>
+              <>
+                {[...Array(6)].map((_, i) => (
+                <div key={i} className="flex flex-col bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm h-full min-h-[300px]">
+                  <Skeleton className="h-40 w-full rounded-none" />
+                  <div className="p-4 flex flex-col flex-1 gap-3">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <div className="mt-auto flex justify-between items-center pt-3 border-t border-slate-100">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-6 w-16" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              </>
             ) : isError ? (
-              <div className="col-span-full py-12 flex items-center justify-center text-[#3B82F6]">
+              <div className="col-span-full py-12 flex items-center justify-center text-blue-500">
                 Lỗi khi tải danh sách khóa học
               </div>
             ) : allItems.length === 1 && allItems[0] === "CREATE_CARD" ? (
@@ -191,7 +203,7 @@ function CourseManagementContent() {
 
 export function CourseManagementContainer() {
   return (
-    <Suspense fallback={<div className="flex-1 bg-[#F4F4F8] min-h-screen" />}>
+    <Suspense fallback={<div className="flex-1 bg-slate-50 min-h-screen" />}>
       <CourseManagementContent />
     </Suspense>
   );

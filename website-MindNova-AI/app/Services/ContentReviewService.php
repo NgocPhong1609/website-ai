@@ -359,6 +359,13 @@ class ContentReviewService
                 throw new \Exception('Giáo viên không còn quyền chỉnh sửa khóa học này.');
             }
 
+            // Course-level quizzes are live attachments, so recheck them at publication.
+            $quizIssues = $this->courseHealthService->courseQuizIssues($course);
+            if ($quizIssues !== []) {
+                $messages = collect($quizIssues)->pluck('message')->implode(' ');
+                throw new \DomainException("Khóa học chưa đạt điều kiện phát hành. {$messages}");
+            }
+
             // ── Publish the course version ──
             // Unset any previously published course version
             ContentVersion::where('versionable_type', Course::class)

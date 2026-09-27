@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useState, useCallback } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 
@@ -50,7 +51,7 @@ export function useGenerateOutline() {
  }
  } catch (err: any) {
  const status = err.response?.status;
- const serverMsg = err.response?.data?.message;
+ const serverMsg = getErrorMessage(err, "Hiện tại AI chưa thể tạo đề cương. Vui lòng thử lại sau ít phút.");
 
  let vietnameseError: string;
  if (status === 401 || status === 403) {
@@ -68,7 +69,7 @@ export function useGenerateOutline() {
  vietnameseError = "Hiện tại AI chưa thể tạo đề cương. Vui lòng thử lại sau ít phút.";
  }
  } else if (err.code === "ERR_NETWORK" || err.message === "Network Error") {
- vietnameseError = "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.";
+ vietnameseError = "Kết nối tới máy chủ bị gián đoạn trong lúc AI tạo đề cương. Vui lòng thử lại; lỗi này không nhất thiết do mạng của bạn.";
  } else {
  vietnameseError = "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.";
  }

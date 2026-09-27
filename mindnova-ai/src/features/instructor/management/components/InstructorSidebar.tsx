@@ -6,18 +6,8 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 import { axiosClient } from "@/src/shared/lib/axios";
-import {
- CourseManagementNavIcon,
- StudentManagementNavIcon,
- AITeachingNavIcon,
- RevenueNavIcon,
- SettingsNavIcon,
- HelpNavIcon,
- DiscussionsNavIcon,
- QuizNavIcon,
-} from "./icons";
 
-import { Plus } from "lucide-react";
+import { Menu, Plus, BookOpen, DollarSign, FileQuestion, MessageSquare, Users, type LucideIcon } from "lucide-react";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 
 function LogoMark() {
@@ -41,10 +31,10 @@ function CreateCourseCTA() {
  <Link
  href="/instructor/create-course"
  title="Create New Course"
- className="flex items-center justify-center gap-2 px-4 py-3 w-full rounded-xl text-xs font-black text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-md transition-all duration-200"
+ className="flex items-center justify-center gap-2 px-4 py-3 w-full rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all duration-200"
  >
  <Plus className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden />
- <span className="truncate tracking-wide uppercase font-black">TẠO KHÓA HỌC MỚI</span>
+ <span className="truncate tracking-wide uppercase font-bold">TẠO KHÓA HỌC MỚI</span>
  </Link>
  </div>
  );
@@ -113,7 +103,7 @@ function SidebarUserProfile({ isCollapsed }: { isCollapsed: boolean }) {
  <div className={twMerge("relative flex py-2", isCollapsed ? "flex-col gap-3 items-center" : "items-center gap-3 px-2")} ref={dropdownRef}>
  <button 
  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
- className="w-9 h-9 rounded-full bg-[#3B82F6]/15 text-[#3B82F6] flex items-center justify-center text-sm font-black shadow-2xs shrink-0 border border-[#3B82F6]/20 overflow-hidden hover:ring-2 hover:ring-[#3B82F6]/50 transition-all focus:outline-none"
+ className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold shadow-sm shrink-0 border border-blue-100 overflow-hidden hover:ring-2 hover:ring-blue-200 transition-all focus:outline-none"
  >
  {avatarUrl ? (
  <img src={avatarUrl} alt={name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerText = initial; }} />
@@ -124,19 +114,19 @@ function SidebarUserProfile({ isCollapsed }: { isCollapsed: boolean }) {
 
  {isDropdownOpen && (
  <div className={twMerge(
- "absolute z-50 bg-white border border-[#E2E8F0] rounded-xl shadow-lg py-1 min-w-[160px] overflow-hidden",
+ "absolute z-50 bg-white border border-slate-200 rounded-lg shadow-lg py-1 min-w-[160px] overflow-hidden",
  isCollapsed ? "left-full ml-2 bottom-0" : "bottom-full mb-2 left-2"
  )}>
  <Link
  href="/instructor/profile"
  onClick={() => setIsDropdownOpen(false)}
- className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-[#F8FAFC] hover:text-[#2563EB] transition-colors"
+ className="block px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors"
  >
  Thông tin tài khoản
  </Link>
  <button
  onClick={handleLogout}
- className="w-full text-left px-4 py-2 text-sm font-semibold text-[#2563EB] hover:bg-[#EFF6FF] transition-colors"
+ className="w-full text-left px-4 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
  >
  Đăng xuất
  </button>
@@ -145,7 +135,7 @@ function SidebarUserProfile({ isCollapsed }: { isCollapsed: boolean }) {
 
  {!isCollapsed && (
  <Link href="/instructor/profile" className="flex items-center gap-1 min-w-0 leading-tight group cursor-pointer">
- <span className="text-sm font-black text-[#0F172A] truncate group-hover:text-[#2563EB] transition-colors">{name}</span>
+ <span className="text-sm font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors">{name}</span>
  {user?.is_verified && <VerifiedTeacherBadge isVerified={true} size="xs" />}
  </Link>
  )}
@@ -157,7 +147,7 @@ interface NavItem {
  label: string;
  href: string;
  activePatterns?: string[];
- Icon: React.FC;
+ Icon: LucideIcon;
  isCollapsed?: boolean;
 }
 
@@ -173,22 +163,28 @@ function SidebarNavItem({ label, href, activePatterns, Icon, isCollapsed }: NavI
  aria-current={isActive ? "page" : undefined}
  title={isCollapsed ? label : undefined}
  className={twMerge(
- "group relative flex items-center gap-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150",
+ "group relative flex items-center gap-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150",
  isCollapsed ? "justify-center px-0" : "px-3",
  isActive
- ? "bg-[#3B82F6] text-white shadow-md shadow-[#3B82F6]/30"
- : "text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#0F172A]",
+ ? "bg-blue-50 text-blue-600"
+ : "text-slate-500 hover:bg-slate-50 hover:text-slate-900",
  )}
  >
  <span
  className={twMerge(
- "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-150",
+ "absolute left-0 w-[3px] h-5 rounded-r-full bg-blue-600 transition-all duration-200",
+ isActive ? "opacity-100 scale-y-100" : "opacity-0 scale-y-0",
+ )}
+ />
+ <span
+ className={twMerge(
+ "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-150 shrink-0",
  isActive
- ? "text-white"
- : "text-[#64748B] group-hover:text-[#2563EB] group-hover:bg-[#F8FAFC]",
+ ? "bg-blue-100/50 text-blue-600"
+ : "text-slate-400 group-hover:text-blue-600 group-hover:bg-blue-50",
  )}
  >
- <Icon />
+ <Icon size={18} aria-hidden />
  </span>
  {!isCollapsed && <span className="flex-1 truncate">{label}</span>}
  </Link>
@@ -212,35 +208,35 @@ export function InstructorSidebar() {
  }, []);
 
  const INSTRUCTOR_NAV: NavItem[] = [
- { label: "Quản lý Khóa học", href: "/instructor/courses", Icon: CourseManagementNavIcon },
+ { label: "Quản lý Khóa học", href: "/instructor/courses", Icon: BookOpen },
  { 
  label: "Tạo bài Kiểm tra", 
  href: "/instructor/quiz-generator", 
  activePatterns: ["/instructor/quiz-generator"], 
- Icon: QuizNavIcon 
+ Icon: FileQuestion 
  },
  { 
  label: "Thảo luận & Hỏi đáp", 
  href: "/instructor/discussions", 
  activePatterns: ["/instructor/discussions", "/instructor/messages", "/instructor/chat", "/chat"],
- Icon: DiscussionsNavIcon 
+ Icon: MessageSquare 
  },
- { label: "Quản lý Học viên", href: "/instructor/students", activePatterns: ["/instructor/analytics"], Icon: StudentManagementNavIcon },
- { label: "Quản lý Doanh thu", href: "/instructor/revenue", Icon: RevenueNavIcon },
+ { label: "Quản lý Học viên", href: "/instructor/students", activePatterns: ["/instructor/analytics"], Icon: Users },
+ { label: "Quản lý Doanh thu", href: "/instructor/revenue", Icon: DollarSign },
  ];
 
  return (
- <aside className={twMerge("shrink-0 h-full flex flex-col bg-white border-r border-[#E2E8F0] shadow-sm z-50 transition-all duration-300", isCollapsed ? "w-[80px]" : "w-[234px]")}>
+ <aside className={twMerge("shrink-0 h-full flex flex-col bg-white border-r border-slate-200 z-50 transition-all duration-300", isCollapsed ? "w-[80px]" : "w-[234px]")}>
  {/* Brand */}
- <div className={twMerge("h-16 shrink-0 border-b border-[#E2E8F0] flex items-center justify-center", isCollapsed ? "px-2" : "px-4")}>
+ <div className={twMerge("h-16 shrink-0 border-b border-slate-200 flex items-center justify-center", isCollapsed ? "px-2" : "px-4")}>
  <Link href="/instructor/courses" className="flex items-center gap-3 group" aria-label="MindNova AI — Instructor">
  <LogoMark />
  {!isCollapsed && (
  <div className="flex flex-col leading-tight">
- <span className="text-sm font-black text-[#0F172A] tracking-tight group-hover:text-[#2563EB] transition-colors duration-150">
+ <span className="text-sm font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors duration-150">
  Instructor Portal
  </span>
- <span className="text-[10px] text-[#64748B] font-extrabold tracking-wide uppercase">
+ <span className="text-xs text-slate-400 font-medium tracking-wide">
  Professional Suite
  </span>
  </div>
@@ -251,7 +247,7 @@ export function InstructorSidebar() {
  {/* Main nav */}
  <nav className={twMerge("flex-1 overflow-y-auto py-4", isCollapsed ? "px-2" : "px-3")} aria-label="Instructor navigation">
  {!isCollapsed && (
- <div className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-2 px-3">
+ <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-3">
  QUẢN LÝ & GIẢNG DẠY
  </div>
  )}
@@ -267,7 +263,7 @@ export function InstructorSidebar() {
  <Link
  href="/instructor/create-course"
  title="Create New Course"
- className="flex items-center justify-center w-full h-10 rounded-xl text-xs font-black text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-md transition-all duration-200"
+ className="flex items-center justify-center w-full h-10 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all duration-200"
  >
  <Plus className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden />
  </Link>
@@ -276,29 +272,21 @@ export function InstructorSidebar() {
  )}
  </div>
 
- <div className={twMerge("py-3 border-t border-gray-100 flex flex-col gap-3", isCollapsed ? "px-2" : "px-3")}>
+ <div className={twMerge("py-3 border-t border-slate-200 flex flex-col gap-3", isCollapsed ? "px-2" : "px-3")}>
  <SidebarUserProfile isCollapsed={isCollapsed} />
  <button
  onClick={() => setIsCollapsed(!isCollapsed)}
- className={twMerge("flex items-center gap-2 px-3 py-2 text-xs font-bold text-[#64748B] hover:text-[#0F172A] transition-colors border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC] group", isCollapsed ? "justify-center" : "justify-between w-full")}
+ className={twMerge("flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors border border-slate-200 rounded-lg hover:bg-slate-50 group", isCollapsed ? "justify-center" : "justify-between w-full")}
  >
  {isCollapsed ? (
- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 group-hover:text-[#0F172A] transition-colors">
- <line x1="4" x2="20" y1="12" y2="12" />
- <line x1="4" x2="20" y1="6" y2="6" />
- <line x1="4" x2="20" y1="18" y2="18" />
- </svg>
+ <Menu className="h-4 w-4 text-slate-400 group-hover:text-slate-900 transition-colors" strokeWidth={2.5} aria-hidden />
  ) : (
  <>
  <div className="flex items-center gap-2.5">
- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 group-hover:text-[#0F172A] transition-colors">
- <line x1="4" x2="20" y1="12" y2="12" />
- <line x1="4" x2="20" y1="6" y2="6" />
- <line x1="4" x2="20" y1="18" y2="18" />
- </svg>
+ <Menu className="h-4 w-4 text-slate-400 group-hover:text-slate-900 transition-colors" strokeWidth={2.5} aria-hidden />
  <span>Thu gọn</span>
  </div>
- <span className="px-1.5 py-0.5 rounded bg-gray-100 border border-[#E2E8F0] text-[10px] font-black tracking-widest text-gray-400 group-hover:text-[#64748B] group-hover:border-gray-300 transition-colors">Ctrl+B</span>
+ <span className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-xs font-semibold tracking-wide text-slate-400 group-hover:text-slate-500 group-hover:border-slate-300 transition-colors">Ctrl+B</span>
  </>
  )}
  </button>

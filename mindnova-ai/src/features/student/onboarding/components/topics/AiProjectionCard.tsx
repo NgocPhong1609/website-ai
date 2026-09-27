@@ -11,10 +11,10 @@ export interface AiProjectionCardProps {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const AI_INSIGHT_PLACEHOLDER =
- "Select topics above to see your personalized complexity projection.";
+ "Chọn chủ đề ở trên để xem dự báo độ khó phù hợp với bạn.";
 
 const AI_INSIGHT_ACTIVE =
- "Selecting more topics allows the AI to find deeper cross-disciplinary connections.";
+ "Chọn thêm chủ đề giúp AI tìm được liên kết sâu hơn giữa các lĩnh vực.";
 
 /** Decorative neural network nodes rendered in the visualization banner. */
 const NEURAL_NODES = [
@@ -56,10 +56,10 @@ function ComplexityMeter({ label, percent, level }: ComplexityMeterProps) {
  <div className="flex items-center gap-2.5">
  <ComplexityIcon />
  <div className="min-w-0">
- <p className="text-xs font-bold text-[#0F172A] truncate">
- Skill Complexity
+ <p className="text-xs font-bold text-slate-900 truncate">
+ Độ phức tạp kỹ năng
  </p>
- <p className="text-[11px] text-[#64748B] truncate">{label}</p>
+ <p className="text-[11px] text-slate-500 truncate">{label}</p>
  </div>
  </div>
 
@@ -71,8 +71,8 @@ function ComplexityMeter({ label, percent, level }: ComplexityMeterProps) {
  className={twMerge(
  "h-1.5 flex-1 rounded-full transition-all duration-500",
  i < level
- ? " bg-[#3B82F6] "
- : "bg-[#E8E8F0]",
+ ? " bg-blue-500 "
+ : "bg-slate-200",
  )}
  />
  ))}
@@ -84,7 +84,7 @@ function ComplexityMeter({ label, percent, level }: ComplexityMeterProps) {
  aria-valuenow={percent}
  aria-valuemin={0}
  aria-valuemax={100}
- aria-label={`Skill complexity: ${label}`}
+ aria-label={`Độ phức tạp: ${label}`}
  className="sr-only"
  />
  </div>
@@ -121,8 +121,8 @@ function NeuralNetworkVisualization() {
 
  {/* Label */}
  <div className="absolute inset-0 flex flex-col justify-end p-3">
- <span className="text-[9px] font-mono tracking-[0.2em] text-[#3B82F6]/50 uppercase">
- AI Neural Map
+ <span className="text-[9px] font-mono tracking-[0.2em] text-blue-500/50 uppercase">
+ Bản đồ kiến thức AI
  </span>
  </div>
  </div>
@@ -142,8 +142,8 @@ const TIME_ESTIMATES: Record<number, string> = {
 function TimeEstimate({ level }: { level: number }) {
  return (
  <div className="flex items-center justify-between text-[11px]">
- <span className="text-[#94A3B8]">Est. time to proficiency</span>
- <span className="font-semibold text-[#3B82F6]">
+ <span className="text-slate-400">Thời gian dự kiến để thành thạo</span>
+ <span className="font-semibold text-blue-500">
  {TIME_ESTIMATES[level] ?? "—"}
  </span>
  </div>
@@ -161,11 +161,11 @@ export function AiProjectionCard({ selectedCount }: AiProjectionCardProps) {
  {/* Title */}
  <div className="flex items-center gap-2">
  
- <h2 className="text-sm font-bold text-[#0F172A]">AI Projection</h2>
+ <h2 className="text-sm font-bold text-slate-900">Dự báo của AI</h2>
  </div>
 
  {/* Complexity card */}
- <div className="bg-white border border-[#E8E8F0] rounded-2xl p-4 space-y-3 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_12px_rgba(59, 130, 246,0.05)]">
+ <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_12px_rgba(59, 130, 246,0.05)]">
  <ComplexityMeter
  label={complexity.label}
  percent={complexity.percent}
@@ -174,7 +174,7 @@ export function AiProjectionCard({ selectedCount }: AiProjectionCardProps) {
 
  {hasSelection && (
  <>
- <div className="h-px bg-[#F0F0F7]" />
+ <div className="h-px bg-slate-100" />
  <TimeEstimate level={complexity.level} />
  </>
  )}
@@ -184,15 +184,15 @@ export function AiProjectionCard({ selectedCount }: AiProjectionCardProps) {
  className={twMerge(
  "flex gap-2 p-2.5 rounded-xl transition-all duration-300",
  hasSelection
- ? " bg-[#3B82F6] border border-[#E2E8F0]"
- : "bg-[#FAFAFA] border border-[#F0F0F7]",
+ ? " bg-blue-500 border border-slate-200"
+ : "bg-[#FAFAFA] border border-slate-100",
  )}
  >
  <></>
  <p
  className={twMerge(
  "text-[10.5px] leading-relaxed transition-colors duration-300",
- hasSelection ? "text-[#3B82F6]" : "text-[#94A3B8]",
+ hasSelection ? "text-blue-500" : "text-slate-400",
  )}
  >
  {hasSelection ? AI_INSIGHT_ACTIVE : AI_INSIGHT_PLACEHOLDER}

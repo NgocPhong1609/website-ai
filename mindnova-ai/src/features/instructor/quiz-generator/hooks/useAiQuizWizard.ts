@@ -1,5 +1,6 @@
 "use client";
 
+import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useState, useCallback, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { QuizConfig, GeneratedQuestion, QuizSummary } from "../types/quizGenerator.types";
@@ -50,6 +51,7 @@ export function useAiQuizWizard(options?: {
  thumbnail_r2_key: null,
  source_type: courseIdParam ? "course" : "topic",
  course_id: courseIdParam || undefined,
+ module_id: moduleIdParam || undefined,
  source_content: "",
  topic: "Kiến thức bài học",
  difficulty: "mixed",
@@ -68,9 +70,10 @@ export function useAiQuizWizard(options?: {
        description: prev.description === "Đề kiểm tra trắc nghiệm & tự luận được tạo bởi AI" ? getDefaultDescription() : prev.description,
        source_type: "course",
        course_id: Number(courseIdParam),
+       module_id: moduleIdParam || undefined,
      }));
    }
- }, [courseIdParam, position]);
+ }, [courseIdParam, moduleIdParam, position]);
 
  const [questions, setQuestions] = useState<GeneratedQuestion[]>([]);
 
@@ -121,10 +124,7 @@ export function useAiQuizWizard(options?: {
  const apiData = err.response?.data;
  const errorCode = apiData?.error_code || apiData?.errorCode || "AI_GENERATION_FAILED";
 
- let msg = apiData?.message || err.message;
- if (!msg || typeof msg !== "string" || msg.includes("status code 500") || msg.includes("AxiosError")) {
- msg = "Hệ thống AI đang gặp lỗi khi tạo câu hỏi. Vui lòng thử lại.";
- }
+ const msg = getErrorMessage(err, "Hệ thống AI chưa thể tạo câu hỏi. Vui lòng thử lại.", "Quá thời gian chờ tạo quiz bằng AI. Hệ thống chưa nhận được kết quả. Vui lòng thử lại sau ít phút.");
 
  setErrorInfo({
  message: msg,
@@ -165,14 +165,14 @@ export function useAiQuizWizard(options?: {
  setIsReviewConfirmed(false);
  try {
  const contextText = config.source_type === "content" ? config.source_content : config.topic;
- const res = await quizGeneratorApi.regenerateSingleQuestion(type, difficulty, contextText);
+ const res = await quizGeneratorApi.regenerateSingleQuestion(type, difficulty, contextText, config);
 
  if (res.success && res.data) {
  const newQ: GeneratedQuestion = res.data;
  setQuestions((prev) => prev.map((q) => (q.id === id ? { ...newQ, id } : q)));
  }
  } catch (err: any) {
- alert("Không thể sinh lại câu hỏi: " + (err.message || "Lỗi AI"));
+ alert(getErrorMessage(err, "Không thể sinh lại câu hỏi. Vui lòng thử lại.", "Quá thời gian chờ AI tạo lại câu hỏi. Vui lòng thử lại sau ít phút."));
  }
  }, [config]);
 
@@ -194,6 +194,7 @@ export function useAiQuizWizard(options?: {
     source_type: config.source_type,
     source_content: config.source_type === "course" ? (config.course_title || "") : (config.source_type === "content" ? config.source_content : config.topic),
     course_id: targetCourseId,
+    module_id: config.source_type === "course" ? config.module_id : undefined,
     difficulty: config.difficulty,
     time_limit_minutes: config.time_limit_minutes,
     passing_score: config.passing_score,
@@ -218,7 +219,7 @@ export function useAiQuizWizard(options?: {
         } catch (attachErr) {
           console.warn("Auto attach course-level quiz failed:", attachErr);
         }
-      } else if (targetCourseId && options?.initialModuleId) {
+      } else if (targetCourseId && options?.initialModuleId && !config.module_id) {
         try {
           await quizGeneratorApi.attachQuiz(quizData.id, {
             course_id: targetCourseId,
@@ -242,7 +243,7 @@ export function useAiQuizWizard(options?: {
  throw new Error(response.message || "Lưu bài kiểm tra thất bại");
  }
  } catch (err: any) {
- setError(err.response?.data?.message || err.message || "Lỗi khi lưu bài kiểm tra");
+ setError(getErrorMessage(err, "Lỗi khi lưu bài kiểm tra", "Quá thời gian chờ lưu quiz. Hãy kiểm tra danh sách bài kiểm tra trước khi lưu lại để tránh tạo trùng."));
  } finally {
  setIsSaving(false);
  }

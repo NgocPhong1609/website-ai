@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { 
   AiSuggestionCard, 
   ContinueLearning, 
@@ -21,12 +22,12 @@ export default async function DashboardPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
         <h1 className="text-xl font-bold text-slate-900 mb-2">
-          {dashboardData.session_expired ? "Phiên đăng nhập hết hạn" : "Không thể tải bảng điều khiển"}
+          {dashboardData?.session_expired ? "Phiên đăng nhập hết hạn" : "Không thể tải bảng điều khiển"}
         </h1>
         <p className="text-sm text-slate-500 max-w-md mb-6">
           {dashboardData?.error || "Vui lòng đăng nhập lại để tiếp tục sử dụng hệ thống."}
         </p>
-        <Link href={dashboardData.session_expired ? "/login?sessionExpired=1" : "/login"} className="px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">
+        <Link href={dashboardData?.session_expired ? "/login?sessionExpired=1" : "/login"} className="px-5 py-2.5 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">
           Đăng nhập lại
         </Link>
       </div>

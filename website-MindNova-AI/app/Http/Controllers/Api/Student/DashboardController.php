@@ -66,6 +66,23 @@ class DashboardController extends Controller
             $date = $weekStart->copy()->addDays($offset)->toDateString();
             $weeklyActivity[$key] = in_array($date, $checkedInDates, true);
         }
+        
+        $focusAreas = \Illuminate\Support\Facades\DB::table('user_topic_performance')
+            ->join('knowledge_topics', 'user_topic_performance.topic_id', '=', 'knowledge_topics.id')
+            ->where('user_topic_performance.user_id', $user->id)
+            ->orderBy('user_topic_performance.accuracy_percentage', 'asc')
+            ->select('knowledge_topics.id', 'knowledge_topics.name', 'user_topic_performance.accuracy_percentage')
+            ->take(2)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'topic' => $item->name,
+                    'accuracy' => $item->accuracy_percentage,
+                    'action' => $item->accuracy_percentage < 50 ? 'review' : 'practice',
+                ];
+            })
+            ->toArray();
 
         return response()->json([
             'success' => true,
@@ -92,7 +109,7 @@ class DashboardController extends Controller
                 ],
                 'weekly_activity' => $weeklyActivity,
                 'courses' => [],
-                'focus_areas' => [],
+                'focus_areas' => $focusAreas,
                 'ai_suggestion' => null,
                 'advanced_recommendations' => [],
             ]

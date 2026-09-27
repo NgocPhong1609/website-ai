@@ -1,5 +1,6 @@
 import React from 'react';
 import { Conversation } from '../types';
+import { MoreVertical, Search } from "lucide-react";
 
 interface ChatHeaderProps {
  conversation: Conversation;
@@ -30,14 +31,10 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({ conversation }) => {
  </div>
  <div className="flex items-center gap-2.5">
  <button className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-200 border border-transparent hover:border-blue-100">
- <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
- </svg>
+ <Search className="w-5 h-5" aria-hidden />
  </button>
  <button className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-200 border border-transparent hover:border-blue-100">
- <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
- </svg>
+ <MoreVertical className="w-5 h-5" aria-hidden />
  </button>
  </div>
  </div>

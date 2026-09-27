@@ -22,33 +22,33 @@ export const TOPIC_PHASE_MAP: Record<TopicIconKey, number> = {
 export const DEFAULT_PLAN_PHASES: IPlanPhase[] = [
  {
  id: 1,
- title: "Phase 1 — Foundation",
+ title: "Giai đoạn 1 — Nền tảng",
  duration: "2–4 weeks",
  items: [
- { id: 1, label: "HTML & CSS Fundamentals", status: "ready", duration: "1 week" },
- { id: 2, label: "JavaScript Core Concepts", status: "ready", duration: "1 week" },
- { id: 3, label: "UI/UX Design Principles", status: "ready", duration: "3 days" },
+ { id: 1, label: "Nền tảng HTML & CSS", status: "ready", duration: "1 week" },
+ { id: 2, label: "Khái niệm cốt lõi JavaScript", status: "ready", duration: "1 week" },
+ { id: 3, label: "Nguyên tắc thiết kế UI/UX", status: "ready", duration: "3 days" },
  ],
  },
  {
  id: 2,
- title: "Phase 2 — Core Framework",
+ title: "Giai đoạn 2 — Framework cốt lõi",
  duration: "1–2 months",
  items: [
- { id: 4, label: "TypeScript Essentials", status: "upcoming", duration: "1 week" },
- { id: 5, label: "React Fundamentals", status: "upcoming", duration: "2 weeks" },
+ { id: 4, label: "TypeScript thiết yếu", status: "upcoming", duration: "1 week" },
+ { id: 5, label: "Nền tảng React", status: "upcoming", duration: "2 weeks" },
  { id: 6, label: "Next.js App Router", status: "upcoming", duration: "1 week" },
  ],
  },
  {
  id: 3,
- title: "Phase 3 — Backend & APIs",
+ title: "Giai đoạn 3 — Backend & API",
  duration: "2–3 months",
  items: [
  { id: 7, label: "Node.js & Express", status: "locked", duration: "2 weeks" },
- { id: 8, label: "Database Design", status: "locked", duration: "2 weeks" },
- { id: 9, label: "REST API Development", status: "locked", duration: "2 weeks" },
- { id: 10, label: "Authentication & Auth", status: "locked", duration: "1 week" },
+ { id: 8, label: "Thiết kế cơ sở dữ liệu", status: "locked", duration: "2 weeks" },
+ { id: 9, label: "Phát triển REST API", status: "locked", duration: "2 weeks" },
+ { id: 10, label: "Xác thực & phân quyền", status: "locked", duration: "1 week" },
  ],
  },
 ];

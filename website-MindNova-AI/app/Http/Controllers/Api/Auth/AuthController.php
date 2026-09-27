@@ -46,21 +46,21 @@ class AuthController extends Controller
             $roleId = Role::idFor($roleName);
 
 DB::table('role_user')->insert([
-    'user_id' => $user->id, 
+    'user_id' => $user->id,
     'role_id' => $roleId,
     'created_at' => now(),
     'updated_at' => now()
 ]);
 
 DB::table('user_profiles')->insert([
-    'user_id' => $user->id, 
-    'created_at' => now(), 
+    'user_id' => $user->id,
+    'created_at' => now(),
     'updated_at' => now()
 ]);
 
 // Bảng này không có cột created_at
 DB::table('user_streaks')->insert([
-    'user_id' => $user->id, 
+    'user_id' => $user->id,
     'updated_at' => now()
 ]);
 
@@ -78,7 +78,7 @@ DB::table('user_streaks')->insert([
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Lỗi server khi đăng ký', 
+                'message' => 'Lỗi server khi đăng ký',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -96,46 +96,38 @@ DB::table('user_streaks')->insert([
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $email = trim($request->email);
-        $user = User::where('email', $email)->first();
+        return DB::transaction(function () use ($request) {
+            $user = User::where('email', trim($request->email))->lockForUpdate()->first();
 
-        // 1. Kiểm tra sự tồn tại của user
-        if (!$user) {
-            return response()->json(['message' => 'Email hoặc mật khẩu không chính xác!'], 401);
-        }
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return response()->json(['message' => 'Email hoặc mật khẩu không chính xác!'], 401);
+            }
 
-        // 2. Kiểm tra mật khẩu
-        if (!Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Email hoặc mật khẩu không chính xác!'], 401);
-        }
+            if ($user->is_locked == 1) {
+                return response()->json(['message' => 'Tài khoản của bạn hiện đang bị khóa!'], 403);
+            }
 
-        // 3. Kiểm tra trạng thái khóa tài khoản
-        if ($user->is_locked == 1) {
-            return response()->json(['message' => 'Tài khoản của bạn hiện đang bị khóa!'], 403);
-        }
+            $user->update(['last_login_at' => now()]);
 
-        // 4. Cập nhật đăng nhập & Log
-        $user->update(['last_login_at' => now()]);
+            ActivityLog::create([
+                'user_id' => $user->id,
+                'action' => 'login',
+                'subject_type' => User::class,
+                'subject_id' => $user->id,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'metadata' => ['guard' => 'web'],
+            ]);
 
-        ActivityLog::create([
-            'user_id' => $user->id,
-            'action' => 'login',
-            'subject_type' => User::class,
-            'subject_id' => $user->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'metadata' => ['guard' => 'web'],
-        ]);
+            $token = $user->createToken('auth_token')->plainTextToken;
 
-        // 5. Tạo Sanctum Token
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'Đăng nhập thành công',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user->load('roles')
-        ], 200);
+            return response()->json([
+                'message' => 'Đăng nhập thành công',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => $user->load('roles')
+            ], 200);
+        });
     }
 
     // 3. API Đăng xuất
@@ -155,7 +147,7 @@ DB::table('user_streaks')->insert([
             ->where('type', 'forgot_password')
             ->orderBy('id', 'desc')
             ->first();
-        
+
         if ($lastOtp && $lastOtp->created_at->diffInSeconds(now()) < 60) {
             return response()->json(['message' => 'Vui lòng đợi 60 giây để yêu cầu mã mới.'], 429);
         }
@@ -250,7 +242,7 @@ DB::table('user_streaks')->insert([
     {
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
-            
+
             DB::beginTransaction();
 
             $user = User::where('email', $googleUser->getEmail())->first();
@@ -282,7 +274,7 @@ DB::table('user_streaks')->insert([
             DB::commit();
 
             $token = $user->createToken('auth_token')->plainTextToken;
-            return redirect()->away('http://localhost:3000/login-success?token=' . $token);
+            return redirect()->away(rtrim(config('app.frontend_url'), '/') . '/login-success?token=' . rawurlencode($token));
 
         } catch (\Exception $e) {
             DB::rollBack();
