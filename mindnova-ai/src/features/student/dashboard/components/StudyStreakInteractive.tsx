@@ -141,24 +141,24 @@ export function StudyStreakInteractive({
     <>
       <div 
         onClick={() => setShowModal(true)}
-        className="group cursor-pointer bg-white rounded-xl p-5 border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-500 transition-all duration-300 flex flex-col justify-between gap-4 h-full focus:outline-none focus:border-blue-500"
+        className="group cursor-pointer bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-lg hover:border-blue-500 hover:shadow-blue-500/10 transition-all duration-300 flex flex-col justify-between gap-5 h-full focus:outline-none focus:border-blue-500 relative overflow-hidden"
       >
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 group-hover:text-blue-600 transition-colors uppercase tracking-wider">Chuỗi chuyên cần ↗</span>
-            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shadow-sm border border-amber-500/20">
-              <Flame size={16} fill="currentColor" />
+            <span className="text-xs font-bold text-slate-500 group-hover:text-blue-600 transition-colors uppercase tracking-widest">Chuỗi chuyên cần ↗</span>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-100 to-amber-50 text-amber-500 flex items-center justify-center shadow-sm border border-amber-200/50 group-hover:scale-110 transition-transform duration-300">
+              <Flame size={20} fill="currentColor" />
             </div>
           </div>
           
           <div className="flex items-baseline justify-between">
-             <span className="text-3xl font-bold text-slate-900">{streakDays} <span className="text-sm font-medium text-slate-500">Ngày</span></span>
+             <span className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700 tracking-tight leading-none">{streakDays} <span className="text-sm font-bold text-slate-500">Ngày</span></span>
             <button
               onClick={(e) => { e.stopPropagation(); handleCheckIn(); }}
               disabled={isCheckedIn || isLoading}
               className={twMerge(
-                "text-xs font-medium px-3 py-1.5 rounded-lg transition-all shadow-sm z-10 border",
-                isCheckedIn ? "bg-emerald-50 text-emerald-600 border-emerald-600/20 cursor-default" : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:scale-105"
+                "text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm z-10 border",
+                isCheckedIn ? "bg-emerald-50 text-emerald-700 border-emerald-200 cursor-default" : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-md hover:shadow-blue-500/25 hover:-translate-y-0.5 border-transparent"
               )}
             >
               {isLoading ? "Đang xử lý..." : (isCheckedIn ? "Đã điểm danh ✓" : "Điểm danh ngay")}
@@ -166,16 +166,16 @@ export function StudyStreakInteractive({
           </div>
         </div>
         
-        <div className="grid grid-cols-7 gap-1.5 pt-4 border-t border-slate-100 mt-auto">
+        <div className="grid grid-cols-7 gap-2 pt-5 border-t border-slate-100 mt-auto">
           {weekDays.map((d) => (
-             <div key={d} className="flex flex-col items-center gap-1.5">
-               <span className="text-[10px] font-medium text-slate-500 uppercase">{d}</span>
+             <div key={d} className="flex flex-col items-center gap-2">
+               <span className="text-[11px] font-bold text-slate-500 uppercase">{d}</span>
                <div
                  data-checked={activeDays[d] || (d === resolvedTodayKey && isCheckedIn) ? "true" : "false"}
                  className={twMerge(
-                   "w-full h-1.5 rounded-full transition-all duration-300",
+                   "w-full h-2 rounded-full transition-all duration-500",
                    activeDays[d] || (d === resolvedTodayKey && isCheckedIn)
-                     ? "bg-gradient-to-r from-blue-500 to-blue-600"
+                     ? "bg-gradient-to-r from-amber-400 to-amber-500 shadow-sm shadow-amber-500/20"
                      : "bg-slate-100"
                  )}
                />
