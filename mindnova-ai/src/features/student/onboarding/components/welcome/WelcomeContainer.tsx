@@ -1,16 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Compass, Map, Sparkles } from "lucide-react";
+import { ArrowRight, Compass, Map, Sparkles, CheckCircle2 } from "lucide-react";
 import { WELCOME_HIGHLIGHTS } from "../../constants";
 import { useOnboardingHydration } from "../../hooks";
 import { useOnboardingStore } from "../../stores/onboardingStore";
 import { OnboardingShell } from "../shared/OnboardingShell";
 
 const PREVIEW_PHASES = [
-  { title: "Nền tảng", width: "w-4/5" },
-  { title: "Thực hành chuyên sâu", width: "w-3/5" },
-  { title: "Dự án và hoàn thiện", width: "w-2/3" },
+  { 
+    title: "Nền tảng", 
+    desc: "Xây dựng kiến thức gốc rễ vững chắc",
+    highlight: "Khóa học lộ trình chuẩn"
+  },
+  { 
+    title: "Thực hành chuyên sâu", 
+    desc: "Áp dụng vào các bài toán nhỏ",
+    highlight: "Bài tập & Quiz AI chấm"
+  },
+  { 
+    title: "Dự án và hoàn thiện", 
+    desc: "Sẵn sàng áp dụng vào thực tế",
+    highlight: "Thử thách & Chứng chỉ"
+  },
 ];
 
 export default function WelcomeContainer() {
@@ -59,14 +71,16 @@ export default function WelcomeContainer() {
             )}
           </div>
 
-          <ul className="mt-10 grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
+          <ul className="mt-10 flex flex-col md:flex-row flex-wrap gap-4">
             {WELCOME_HIGHLIGHTS.map(({ icon: Icon, title, description }) => (
-              <li key={title} className="flex flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+              <li key={title} className="flex-1 min-w-[200px] flex items-start gap-3.5 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md hover:border-blue-200">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                   <Icon className="h-5 w-5" aria-hidden />
                 </span>
-                <p className="mt-4 text-[13px] sm:text-sm font-bold text-slate-900 leading-snug">{title}</p>
-                <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">{description}</p>
+                <div className="flex flex-col pt-0.5">
+                  <p className="text-[13.5px] font-bold text-slate-900 leading-snug">{title}</p>
+                  <p className="mt-1 text-xs text-slate-500 leading-relaxed">{description}</p>
+                </div>
               </li>
             ))}
           </ul>
@@ -103,10 +117,13 @@ function PlanPreview() {
             >
               {index + 1}
             </span>
-            <div className="flex-1 rounded-xl border border-slate-100 bg-slate-50 p-3">
-              <p className="text-sm font-semibold text-slate-800">{phase.title}</p>
-              <div className={`mt-2 h-2 rounded-full bg-slate-200 ${phase.width}`} />
-              <div className="mt-1.5 h-2 w-2/5 rounded-full bg-slate-200" />
+            <div className="flex-1 rounded-xl border border-slate-100 bg-slate-50 p-3.5 transition-colors hover:bg-white hover:shadow-sm">
+              <p className="text-[13.5px] font-bold text-slate-900">{phase.title}</p>
+              <p className="mt-1 text-xs text-slate-500 leading-relaxed">{phase.desc}</p>
+              <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-md bg-white px-2 py-1 text-[10px] font-semibold text-blue-600 shadow-sm border border-slate-100">
+                <CheckCircle2 className="h-3 w-3" aria-hidden />
+                {phase.highlight}
+              </div>
             </div>
           </li>
         ))}

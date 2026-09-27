@@ -14,11 +14,11 @@ export const getEchoInstance = (token: string) => {
         echoInstance = new Echo({
             broadcaster: 'reverb',
             key: process.env.NEXT_PUBLIC_REVERB_APP_KEY || 'mindnova_chat_key',
-            wsHost: process.env.NEXT_PUBLIC_REVERB_HOST || 'localhost',
+            wsHost: process.env.NEXT_PUBLIC_REVERB_HOST || '127.0.0.1',
             wsPort: port,
             wssPort: port,
             forceTLS: (process.env.NEXT_PUBLIC_REVERB_SCHEME ?? 'http') === 'https',
-            enabledTransports: ['ws', 'wss'],
+            enabledTransports: (process.env.NEXT_PUBLIC_REVERB_SCHEME ?? 'http') === 'https' ? ['ws', 'wss'] : ['ws'],
             authEndpoint: clientApiUrl('broadcasting/auth'),
             auth: {
                 headers: {
