@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getRevenueOverview } from "../api";
 import { WithdrawalModal } from "./WithdrawalModal";
 import { RevenueChart as UIRevenueChart, Skeleton } from "@/src/shared/components/ui";
-import { Clock, Info, Sparkles, TrendingUp, Wallet } from "lucide-react";
+import { Clock, Info, Sparkles, TrendingUp, Wallet, AlertTriangle } from "lucide-react";
 
 function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
  return (
@@ -193,7 +193,7 @@ function RecentTransactions({ transactions }: { transactions: any[] }) {
  <div className="flex flex-col p-4 gap-2.5 flex-1">
  {transactions.length === 0 ? (
  <div className="flex-1 flex flex-col items-center justify-center text-slate-400 py-8">
- <span className="text-2xl mb-2"></span>
+ <Wallet className="h-7 w-7 mb-2 text-slate-300" aria-hidden />
  <span className="text-xs font-medium">Chưa có giao dịch nào</span>
  </div>
  ) : (
@@ -280,7 +280,7 @@ export function RevenueContainer() {
  </div>
  ) : error || !data ? (
  <div className="flex flex-col items-center justify-center py-20">
- <span className="text-4xl mb-3">️</span>
+ <AlertTriangle className="h-10 w-10 mb-3 text-rose-400" aria-hidden />
  <p className="text-sm font-semibold text-slate-500 mb-4">Lỗi khi tải dữ liệu. Vui lòng thử lại.</p>
  <button onClick={() => refetch()} className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold shadow-sm">
  Tải lại trang

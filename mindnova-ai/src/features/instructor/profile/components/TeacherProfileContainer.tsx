@@ -7,6 +7,8 @@ import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBad
 import { VerificationRequestModal } from "./VerificationRequestModal";
 import { EditCertificateModal } from "./EditCertificateModal";
 import { writeStoredUser } from "@/src/shared/lib/userStorage";
+import { Lock, Camera } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 export function TeacherProfileContainer() {
  const [profileData, setProfileData] = useState<any>(null);
@@ -125,8 +127,25 @@ export function TeacherProfileContainer() {
 
  if (isLoading) {
  return (
- <div className="flex items-center justify-center min-h-[400px] text-slate-500 font-semibold">
- Đang tải thông tin hồ sơ giáo viên...
+ <div role="status" aria-busy="true" aria-label="Đang tải hồ sơ giáo viên" className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
+ <div className="rounded-xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center md:items-start gap-6">
+ <Skeleton className="w-24 h-24 md:w-28 md:h-28 rounded-full shrink-0" />
+ <div className="flex-1 w-full space-y-3">
+ <Skeleton className="h-8 w-64" />
+ <Skeleton className="h-4 w-40" />
+ <Skeleton className="h-4 w-full max-w-xl" />
+ </div>
+ </div>
+ <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+ <div className="lg:col-span-2 rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+ <Skeleton className="h-5 w-48" />
+ {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
+ </div>
+ <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+ <Skeleton className="h-5 w-32" />
+ {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
+ </div>
+ </div>
  </div>
  );
  }
@@ -139,7 +158,7 @@ export function TeacherProfileContainer() {
  <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
  {/* Header Profile Banner */}
  <div className="relative rounded-lg border border-slate-200/80 bg-white p-6 md:p-8 shadow-sm overflow-hidden">
- <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500 text-blue-500/5 rounded-full blur-3xl -z-0 pointer-events-none" />
+ <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -z-0 pointer-events-none" />
 
  <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
  {/* Avatar Upload */}
@@ -157,7 +176,8 @@ export function TeacherProfileContainer() {
  </div>
 
  <label className="absolute inset-0 rounded-full bg-black/40 text-white flex flex-col items-center justify-center text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
- <span> Thay ảnh</span>
+ <Camera className="h-4 w-4 mb-0.5" aria-hidden />
+ <span>Thay ảnh</span>
  <input
  type="file"
  accept="image/jpeg,image/png,image/webp"
@@ -368,7 +388,7 @@ export function TeacherProfileContainer() {
       title="Bằng cấp đã được Admin xác minh không thể sửa"
       className="text-slate-400 font-bold text-[11px] cursor-not-allowed select-none flex items-center gap-1"
     >
-      🔒 Đã xác minh
+      <Lock className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Đã xác minh
     </span>
   ) : (
     <button

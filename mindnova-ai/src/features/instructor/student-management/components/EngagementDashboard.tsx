@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getDashboardMetrics, getEngagementChart } from "../api";
 import { EngagementChart } from "./EngagementChart";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
+import { Users } from "lucide-react";
 
 export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id: string) => void }) {
  const [timeRange, setTimeRange] = useState(7);
@@ -78,12 +80,19 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
  </thead>
  <tbody className="divide-y divide-slate-100">
  {metricsLoading ? (
- <tr><td colSpan={4} className="p-8 text-center text-slate-400 text-sm">Đang tải dữ liệu...</td></tr>
+ Array.from({ length: 4 }).map((_, i) => (
+ <tr key={i} aria-busy="true">
+ <td className="px-5 py-3"><div className="flex items-center gap-3"><Skeleton className="h-8 w-8 rounded-full" /><Skeleton className="h-3.5 w-28" /></div></td>
+ <td className="px-5 py-3"><Skeleton className="h-3.5 w-32" /></td>
+ <td className="px-5 py-3"><Skeleton className="h-3.5 w-16" /></td>
+ <td className="px-5 py-3"><Skeleton className="h-3.5 w-16 ml-auto" /></td>
+ </tr>
+ ))
  ) : metrics.new_students.length === 0 ? (
  <tr>
  <td colSpan={4} className="p-12 text-center text-slate-400">
  <div className="flex flex-col items-center justify-center">
- <span className="text-4xl mb-3 opacity-50 grayscale">‍</span>
+ <Users className="h-10 w-10 mb-3 text-slate-300" aria-hidden />
  <span className="text-sm font-bold text-slate-500">Chưa có học viên mới nào</span>
  <span className="text-xs font-medium text-slate-400 mt-1">Học viên ghi danh trong 30 ngày qua sẽ xuất hiện ở đây</span>
  </div>

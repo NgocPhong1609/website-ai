@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { requestWithdrawal, getPayoutMethods, updatePayoutMethods } from "../api";
-import { ArrowRight, X } from "lucide-react";
+import { ArrowRight, X, AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 interface WithdrawalModalProps {
   isOpen: boolean;
@@ -82,7 +83,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
     onSuccess: (data) => {
       queryClient.setQueryData(["instructorPayoutMethods"], data);
       setIsEditingBank(false);
-      setStatusMessage("✅ Đã lưu thông tin tài khoản ngân hàng thành công!");
+      setStatusMessage("Đã lưu thông tin tài khoản ngân hàng thành công!");
       setIsErrorMsg(false);
     },
     onError: (err: any) => {
@@ -96,7 +97,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
     mutationFn: requestWithdrawal,
     onSuccess: () => {
       setIsErrorMsg(false);
-      setStatusMessage("🎉 Yêu cầu rút tiền đã được gửi thành công!");
+      setStatusMessage("Yêu cầu rút tiền đã được gửi thành công!");
       queryClient.invalidateQueries({ queryKey: ["instructorRevenueOverview"] });
       queryClient.invalidateQueries({ queryKey: ["instructorTransactions"] });
       onSuccess();
@@ -246,8 +247,10 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
             </div>
 
             {isLoadingPayout ? (
-              <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs font-medium text-slate-500 text-center">
-                Đang tải thông tin tài khoản...
+              <div role="status" aria-busy="true" aria-label="Đang tải thông tin tài khoản" className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2.5">
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-4 w-1/3" />
               </div>
             ) : isEditingBank || !hasValidBank ? (
               <form onSubmit={handleSaveBankInfo} className="p-4 rounded-lg bg-slate-50 border border-slate-200 flex flex-col gap-3">
@@ -332,9 +335,12 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
           </div>
 
           {statusMessage && (
-            <div className={twMerge("p-3.5 rounded-lg font-bold text-xs flex items-center justify-between shadow-sm", isErrorMsg ? "bg-rose-100 text-rose-700 border border-rose-300" : "bg-slate-900 text-white")}>
-              <span>{statusMessage}</span>
-              {(withdrawMutation.isPending || saveBankMutation.isPending) && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+            <div className={twMerge("p-3.5 rounded-lg font-bold text-xs flex items-center justify-between gap-2", isErrorMsg ? "bg-rose-50 text-rose-700 border border-rose-200" : "bg-emerald-50 text-emerald-800 border border-emerald-200")}>
+              <span className="flex items-center gap-2">
+                {isErrorMsg ? <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden /> : <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />}
+                {statusMessage}
+              </span>
+              {(withdrawMutation.isPending || saveBankMutation.isPending) && <Loader2 className="h-4 w-4 animate-spin shrink-0" aria-hidden />}
             </div>
           )}
 

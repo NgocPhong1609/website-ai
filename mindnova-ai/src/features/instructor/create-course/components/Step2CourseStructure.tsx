@@ -26,29 +26,8 @@ import { CourseAiQuizModal } from "./CourseAiQuizModal";
 import { CourseManualQuizModal } from "./CourseManualQuizModal";
 import { SelectCourseLevelQuizModal } from "./SelectCourseLevelQuizModal";
 import { useCreateCourseStore } from "../stores/createCourseStore";
-import {
-  AlertTriangle,
-  BookOpen,
-  Bot,
-  Check,
-  ChevronDown,
-  ClipboardList,
-  Eye,
-  FileQuestion,
-  FileText,
-  Flag,
-  Folder,
-  FolderOpen,
-  GripVertical,
-  PenLine,
-  Plus,
-  RefreshCw,
-  Target,
-  Timer,
-  Trash2,
-  Trophy,
-  Video,
-} from "lucide-react";
+import { AlertTriangle, BookOpen, Bot, Check, ChevronDown, ClipboardList, Eye, FileQuestion, FileText, Flag, Folder, FolderOpen, GripVertical, PenLine, Plus, RefreshCw, Target, Timer, Trash2, Trophy, Video, Zap } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 function GripIcon({ size = 16 }: { size?: number }) {
   return <GripVertical size={size} aria-hidden />;
@@ -669,7 +648,25 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   }, []);
 
   if (courseId && isLoadingModules) {
-    return <div className="p-8 text-center text-slate-500 font-medium">Đang nạp cấu trúc giáo trình &amp; bài thi...</div>;
+    return (
+      <div role="status" aria-busy="true" aria-label="Đang nạp cấu trúc giáo trình" className="flex flex-col gap-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-5 w-1/3" />
+              <Skeleton className="h-8 w-24" />
+            </div>
+            {Array.from({ length: 2 }).map((__, j) => (
+              <div key={j} className="flex items-center gap-3 p-3 rounded-lg border border-slate-100">
+                <Skeleton className="h-8 w-8 rounded-lg shrink-0" />
+                <Skeleton className="h-4 flex-1" />
+                <Skeleton className="h-6 w-16" />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return (
@@ -1091,7 +1088,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                   {/* AI Co-Creator Quick Action Tag */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 text-[11px] font-bold text-slate-400 gap-1">
                     <span className="flex items-center gap-1 text-blue-500">
-                      ⚡ AI Generator: Tạo bộ câu hỏi trắc nghiệm tự động theo ngữ cảnh bài học của chuyên đề này.
+                      <Zap className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />AI Generator: Tạo bộ câu hỏi trắc nghiệm tự động theo ngữ cảnh bài học của chuyên đề này.
                     </span>
                     <span>Tổng {chap.lessons.length} bài học &amp; bài thi</span>
                   </div>

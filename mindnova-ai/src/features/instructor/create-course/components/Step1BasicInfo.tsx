@@ -11,6 +11,7 @@ import {
 import { useInstructorCategories } from "../api";
 import type { CourseBasicInfo, DifficultyLevel } from "../types";
 import { ChevronDown } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 interface CharCountProps {
  current: number;
@@ -186,7 +187,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  !selectedName ? "text-slate-400" : "text-slate-900"
  }`}
  >
- {categoriesLoading ? "Đang tải danh mục..." : selectedName || "-- Chọn lĩnh vực --"}
+ {categoriesLoading ? <Skeleton className="h-4 w-40 my-0.5" aria-label="Đang tải danh mục" /> : selectedName || "-- Chọn lĩnh vực --"}
  </button>
  <div className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-slate-500">
  <ChevronDown size={14} />

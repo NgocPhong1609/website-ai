@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Loader } from "@/src/shared/components/ui/Loader";
 import { useAIQuizGenerator, type GeneratedQuestion } from "@/src/hooks/instructor/useAIQuizGenerator";
+import { Wand2, Trash2 } from "lucide-react";
 
 export interface LessonAIQuizModalProps {
  lessonTitle?: string;
@@ -56,8 +57,8 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  {/* Top Header */}
  <div className="p-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white flex items-center justify-between">
  <div className="flex items-center gap-3">
- <div className="w-11 h-11 rounded-lg bg-blue-500 to-[#F368E0] flex items-center justify-center text-2xl font-bold shadow-md">
- 🪄
+ <div className="w-11 h-11 rounded-lg bg-white/15 flex items-center justify-center shadow-md">
+ <Wand2 className="h-5 w-5" aria-hidden />
  </div>
  <div>
  <div className="flex items-center gap-2">
@@ -276,7 +277,7 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
 
  {!isGenerating && questions.length > 0 && activeQuestions.length === 0 && (
  <div className="p-12 text-center rounded-lg bg-white border border-slate-200 flex flex-col items-center gap-3 text-slate-500">
- <span className="text-4xl"></span>
+ <Trash2 className="h-10 w-10 text-slate-300" aria-hidden />
  <p className="text-sm font-bold text-slate-900">All generated questions were discarded.</p>
  <button
  type="button"

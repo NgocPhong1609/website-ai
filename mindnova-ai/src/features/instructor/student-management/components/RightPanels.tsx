@@ -7,6 +7,7 @@ import { twMerge } from "tailwind-merge";
 import { useQuery } from "@tanstack/react-query";
 import { getLatestDiscussions, getAnalytics } from "../api";
 import { Plus, Sparkles, TrendingUp } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 function DiscussionAvatar({ initials, color }: { initials: string; color: string }) {
  return (
@@ -38,8 +39,16 @@ function DiscussionPanel({ courseId }: { courseId?: string }) {
 
  <div className="divide-y divide-slate-100 min-h-[100px]">
  {isLoading ? (
- <div className="flex items-center justify-center p-6">
- 
+ <div role="status" aria-busy="true" aria-label="Đang tải thảo luận" className="p-4 space-y-4">
+ {Array.from({ length: 3 }).map((_, i) => (
+ <div key={i} className="flex items-start gap-3">
+ <Skeleton className="h-8 w-8 rounded-full shrink-0" />
+ <div className="flex-1 space-y-2">
+ <Skeleton className="h-3.5 w-2/3" />
+ <Skeleton className="h-3 w-full" />
+ </div>
+ </div>
+ ))}
  </div>
  ) : discussions.length === 0 ? (
  <div className="p-4 text-center text-xs text-slate-400 font-bold">Chưa có thảo luận nào.</div>
@@ -183,8 +192,13 @@ function ProgressStatsPanel({ courseId }: { courseId?: string }) {
 
  <div className="p-4 flex flex-col gap-4">
  {isLoading ? (
- <div className="flex items-center justify-center py-6">
- 
+ <div role="status" aria-busy="true" aria-label="Đang tải thống kê" className="space-y-4">
+ {Array.from({ length: 3 }).map((_, i) => (
+ <div key={i} className="space-y-2">
+ <div className="flex justify-between"><Skeleton className="h-3 w-40" /><Skeleton className="h-3 w-10" /></div>
+ <Skeleton className="h-2 w-full rounded-full" />
+ </div>
+ ))}
  </div>
  ) : (
  <>

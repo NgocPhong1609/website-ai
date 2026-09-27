@@ -3,6 +3,7 @@
 import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useState } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
+import { AlertTriangle } from "lucide-react";
 
 interface VerificationRequestModalProps {
  isOpen: boolean;
@@ -120,8 +121,8 @@ export function VerificationRequestModal({
  <form onSubmit={handleSubmit} className="flex flex-col min-h-0 flex-1">
  <div className="flex-1 overflow-y-auto p-5 space-y-3.5">
  {errorMsg && (
- <div className="p-3 rounded-lg bg-blue-50 border border-blue-100 text-xs font-bold text-blue-700">
- ️ {errorMsg}
+ <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs font-bold text-rose-700 flex items-start gap-2">
+ <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden /> {errorMsg}
  </div>
  )}
 

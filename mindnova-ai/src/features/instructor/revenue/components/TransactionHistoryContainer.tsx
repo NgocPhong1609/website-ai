@@ -6,6 +6,7 @@ import { twMerge } from "tailwind-merge";
 import { useQuery } from "@tanstack/react-query";
 import { getTransactions, getRevenueOverview } from "../api";
 import { BookOpen, Calendar, ChevronDown, ChevronLeft, ChevronRight, Landmark, Sparkles, TrendingUp, Wallet } from "lucide-react";
+import { SkeletonTable } from "@/src/shared/components/ui/Skeleton";
 
 function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
  return (
@@ -240,9 +241,8 @@ function TransactionTable({
 
  if (isLoading) {
  return (
- <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-12 flex flex-col items-center justify-center">
- 
- <p className="text-slate-500 font-bold text-sm">Đang tải lịch sử giao dịch...</p>
+ <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+ <SkeletonTable rows={8} cols={5} />
  </div>
  );
  }

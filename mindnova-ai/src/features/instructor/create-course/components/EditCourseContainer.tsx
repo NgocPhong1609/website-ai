@@ -20,7 +20,7 @@ import { Skeleton } from "@/src/shared/components/ui";
 
 import { OTHER_CATEGORY_VALUE } from "../constants";
 import { useProposeCategory } from "../api";
-import { ArrowLeft, Check, Eye, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, Eye, Save, Trash2, Award, MessageSquare } from "lucide-react";
 
 export function EditCourseContainer({ courseId }: { courseId: string }) {
  const router = useRouter();
@@ -343,7 +343,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
 
  <div className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-slate-50/50">
  <div className="flex items-center gap-3">
- <span className="text-xl"></span>
+ <span className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0"><Award className="h-4 w-4" aria-hidden /></span>
  <div>
  <span className="block text-[14px] font-bold text-slate-900">Cấp Chứng Chỉ Tốt Nghiệp Tự Động (Blockchain ID)</span>
  <span className="text-[12px] text-slate-500 block mt-0.5">Tự động sinh mã chứng nhận khi học viên đạt trên 80% tiến độ bài giảng</span>
@@ -354,7 +354,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
 
  <div className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-slate-50/50">
  <div className="flex items-center gap-3">
- <span className="text-xl"></span>
+ <span className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0"><MessageSquare className="h-4 w-4" aria-hidden /></span>
  <div>
  <span className="block text-[14px] font-bold text-slate-900">Hòm thư thảo luận trực tiếp</span>
  <span className="text-[12px] text-slate-500 block mt-0.5">Cho phép học viên đặt câu hỏi Hỏi-Đáp bên dưới từng bài video</span>

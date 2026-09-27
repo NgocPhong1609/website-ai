@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getStudents, exportStudentsCSV, getNotificationOptions } from "../api";
 import { StudentDetailSidebar, type StudentDetailData } from "./StudentDetailSidebar";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 export type ProgressStatus = "Hoàn tất" | "Đang học" | "Chưa bắt đầu" | "Nguy cơ trễ";
 
@@ -211,12 +212,15 @@ export function StudentTable({
  </thead>
  <tbody className="divide-y divide-slate-100 text-xs font-medium">
  {isLoading ? (
- <tr>
- <td colSpan={5} className="py-14 text-center">
- 
- <p className="mt-2 font-bold text-slate-400">Đang tải dữ liệu học viên...</p>
- </td>
+ Array.from({ length: 6 }).map((_, i) => (
+ <tr key={i} aria-busy="true">
+ <td className="px-5 py-4"><div className="flex items-center gap-3"><Skeleton className="h-9 w-9 rounded-full shrink-0" /><div className="space-y-2"><Skeleton className="h-3.5 w-32" /><Skeleton className="h-3 w-40" /></div></div></td>
+ <td className="px-5 py-4"><Skeleton className="h-3.5 w-40" /></td>
+ <td className="px-5 py-4"><Skeleton className="h-2 w-28" /></td>
+ <td className="px-5 py-4"><Skeleton className="h-3.5 w-20" /></td>
+ <td className="px-5 py-4"><Skeleton className="h-7 w-16 ml-auto" /></td>
  </tr>
+ ))
  ) : isError ? (
  <tr>
  <td colSpan={5} className="py-14 text-center text-xs font-bold text-rose-500">

@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { Check, CreditCard, Gift, Info, Sparkles, Zap } from "lucide-react";
+import { Check, CreditCard, Gift, Info, Sparkles, Zap, TrendingUp } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -96,8 +96,8 @@ function RevenueStatPanel() {
  <span className="text-[13px] text-slate-500 mb-0.5">/tháng</span>
  </div>
  <div className="flex items-center gap-1.5 text-slate-900 text-[12px] font-semibold">
- <span className="w-5 h-5 rounded-full bg-slate-50 flex items-center justify-center text-slate-900">
- ↑
+ <span className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+ <TrendingUp className="h-3 w-3" aria-hidden />
  </span>
  +12% so với trung bình
  </div>
@@ -224,7 +224,7 @@ function FlashSaleInputs({
  <div className="flex flex-col gap-4 mt-2 p-4 rounded-lg border border-slate-200 bg-slate-50">
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
- <span className="text-slate-900"></span>
+ <Zap className="h-4 w-4 text-amber-500" aria-hidden />
  <span className="text-[13px] font-bold text-slate-900">Lên Lịch Giảm Giá & Khuyến Mãi Flash Sale</span>
  </div>
  <input

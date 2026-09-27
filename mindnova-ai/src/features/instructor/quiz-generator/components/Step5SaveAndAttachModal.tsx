@@ -5,6 +5,8 @@ import React, { useEffect, useState } from "react";
 import { QuizSummary } from "../types/quizGenerator.types";
 import { quizGeneratorApi } from "../api/quizGeneratorApi";
 import { useRouter, useSearchParams } from "next/navigation";
+import { AlertTriangle, Flag, Loader2, PartyPopper, Rocket, Target, Trophy, X, Check } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 interface Step5SaveAndAttachModalProps {
   quiz: QuizSummary;
@@ -181,7 +183,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
         {/* Header */}
         <div className="flex items-center gap-4 border-b border-slate-100 pb-5">
           <div className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-bold border border-emerald-100">
-            🎯
+            <Target className="h-5 w-5" aria-hidden />
           </div>
           <div>
             <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Lưu Thành Công</span>
@@ -195,7 +197,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
         {errorInfo && (
           <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-900 flex items-start justify-between gap-3 animate-fadeIn">
             <div className="flex items-start gap-3">
-              <span className="text-xl">⚠️</span>
+              <AlertTriangle className="h-5 w-5 shrink-0" aria-hidden />
               <div>
                 <h4 className="text-xs font-bold text-rose-800">Không thể gắn bài kiểm tra vào khóa học</h4>
                 <p className="text-xs font-medium text-rose-700 mt-0.5">{errorInfo.message}</p>
@@ -206,14 +208,14 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
               onClick={() => setErrorInfo(null)}
               className="text-xs font-bold text-rose-600 hover:text-rose-800 cursor-pointer"
             >
-              ✕
+              <X className="h-5 w-5" aria-hidden />
             </button>
           </div>
         )}
 
         {attachedSuccess ? (
           <div className="p-6 rounded-lg bg-emerald-50 border border-emerald-200 flex flex-col items-center justify-center text-center gap-3 animate-fadeIn">
-            <span className="text-4xl">🎉</span>
+            <PartyPopper className="h-8 w-8 shrink-0" aria-hidden />
             <h3 className="text-base font-semibold text-emerald-900">Đã Gắn Bài Kiểm Tra Vào Khóa Học Thành Công!</h3>
             <p className="text-xs font-medium text-emerald-700">
               Học viên trong khóa học "{courseTitle}" hiện có thể tham gia làm bài kiểm tra theo đúng vị trí bạn đã thiết lập.
@@ -228,12 +230,10 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
               </label>
 
               {isLoadingCourses ? (
-                <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-bold text-slate-400 animate-pulse">
-                  Đang nạp danh sách khóa học...
-                </div>
+                <Skeleton className="h-11 w-full" aria-label="Đang nạp danh sách khóa học" />
               ) : courses.length === 0 ? (
                 <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex flex-col gap-1">
-                  <span>⚠️ Bạn chưa có khóa học nào trong tài khoản.</span>
+                  <span><AlertTriangle className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Bạn chưa có khóa học nào trong tài khoản.</span>
                   <span className="text-[11px] font-medium text-amber-700">
                     Hãy tạo khóa học trước khi gắn bài kiểm tra.
                   </span>
@@ -256,7 +256,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
                       ID: #{selectedCourseId}
                     </span>
                     {isLoadingCourseDetails ? (
-                      <span className="text-[10px] font-bold text-blue-600 animate-pulse">Đang nạp Modules...</span>
+                      <Skeleton className="h-3 w-20" aria-label="Đang nạp Modules" />
                     ) : (
                       <span className="text-[10px] text-emerald-600 font-semibold">{modules.length} Modules</span>
                     )}
@@ -281,10 +281,10 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
                     <div className="flex items-center justify-between px-2 text-[11px]">
                       <span className="font-semibold text-slate-500">
                         {isLoadingCourseDetails ? (
-                          <span className="text-blue-600 font-bold animate-pulse">⏳ Đang nạp Modules & Lessons...</span>
+                          <Skeleton className="h-4 w-48" aria-label="Đang nạp Modules & Lessons" />
                         ) : (
-                          <span className="text-emerald-700 font-bold">
-                            ✓ {modules.length} Modules, {lessons.length} Lessons đã nạp
+                          <span className="text-emerald-700 font-bold flex items-center gap-1">
+                            <Check className="h-3.5 w-3.5" aria-hidden /> {modules.length} Modules, {lessons.length} Lessons đã nạp
                           </span>
                         )}
                       </span>
@@ -302,8 +302,8 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
               </label>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { key: "capability_assessment", label: "Kiểm tra tổng quát", icon: "🏆" },
-                  { key: "end_of_course", label: "Cuối khóa học", icon: "🏁" },
+                  { key: "capability_assessment", label: "Kiểm tra tổng quát", icon: <Trophy className="h-4 w-4" aria-hidden /> },
+                  { key: "end_of_course", label: "Cuối khóa học", icon: <Flag className="h-4 w-4" aria-hidden /> },
                 ].map((pos) => (
                   <button
                     key={pos.key}
@@ -340,7 +340,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
               onClick={() => router.push(`/instructor/courses/${selectedCourseId}/edit`)}
               className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-lg transition-all cursor-pointer flex items-center gap-2"
             >
-              <span>🚀 Xem Trong Quản Lý Khóa Học</span>
+              <span><Rocket className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Xem Trong Quản Lý Khóa Học</span>
             </button>
           ) : (
             <button

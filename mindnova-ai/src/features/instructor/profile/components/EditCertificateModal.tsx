@@ -3,6 +3,7 @@
 import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useState, useEffect } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
+import { Lock, X, AlertTriangle } from "lucide-react";
 
 interface EditCertificateModalProps {
   isOpen: boolean;
@@ -135,7 +136,7 @@ export function EditCertificateModal({
             onClick={onClose}
             className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-500 hover:bg-slate-100 flex items-center justify-center transition-colors shadow-sm font-bold"
           >
-            ✕
+            <X className="h-5 w-5" aria-hidden />
           </button>
         </div>
 
@@ -144,13 +145,13 @@ export function EditCertificateModal({
           <div className="flex-1 overflow-y-auto p-5 space-y-3.5">
             {isApproved && (
               <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs font-bold text-amber-800">
-                🔒 Bằng cấp đã được Admin xác minh chính thức. Không thể chỉnh sửa thông tin.
+                <Lock className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Bằng cấp đã được Admin xác minh chính thức. Không thể chỉnh sửa thông tin.
               </div>
             )}
 
             {errorMsg && (
-              <div className="p-3 rounded-lg bg-blue-50 border border-blue-100 text-xs font-bold text-blue-700">
-                ⚠️ {errorMsg}
+              <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs font-bold text-rose-700 flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden /> {errorMsg}
               </div>
             )}
 

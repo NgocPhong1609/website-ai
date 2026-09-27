@@ -10,7 +10,7 @@ import { CourseFilterTabs } from "./CourseFilterTabs";
 import { CourseCard } from "./CourseCard";
 import { CreateCourseCard } from "./CreateCourseCard";
 import { CoursePagination } from "./CoursePagination";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 const PAGE_SIZE = 9;
 
@@ -115,7 +115,7 @@ function CourseManagementContent() {
                 onClick={() => setSearchQuery("")}
                 className="absolute inset-y-0 right-3 flex items-center text-xs text-slate-400 hover:text-slate-600 font-bold"
               >
-                ✕
+                <X className="h-5 w-5" aria-hidden />
               </button>
             )}
           </div>

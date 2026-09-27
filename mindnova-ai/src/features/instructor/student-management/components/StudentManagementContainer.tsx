@@ -7,7 +7,7 @@ import { StudentTable } from "./StudentTable";
 import { RightPanels } from "./RightPanels";
 import { AINotificationModal } from "./AINotificationModal";
 import { exportStudentsCSV } from "../api";
-import { Download, Sparkles } from "lucide-react";
+import { Download, Sparkles, Loader2 } from "lucide-react";
 
 function StudentNavigationTabs({ active }: { active: "students" | "analytics" }) {
   return (
@@ -71,7 +71,7 @@ function PageHeader({ onOpenModal, onExport }: { onOpenModal: () => void, onExpo
           className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition-all cursor-pointer shadow-sm disabled:opacity-50"
         >
           {isExporting ? (
-            <div className="w-3.5 h-3.5 border-2 border-slate-300 border-t-slate-700 rounded-full animate-spin"></div>
+            <Loader2 size={14} className="animate-spin" aria-hidden />
           ) : (
             <Download size={14} />
           )}

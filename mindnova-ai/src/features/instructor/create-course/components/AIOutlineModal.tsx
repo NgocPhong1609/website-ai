@@ -4,7 +4,7 @@ import React, { useState, useCallback } from "react";
 import { twMerge } from "tailwind-merge";
 import { Loader } from "@/src/shared/components/ui/Loader";
 import { useGenerateOutline, OutlineChapter, OutlineLesson, GeneratedOutline } from "../hooks/useGenerateOutline";
-import { CheckCircle, PlayCircle, Sparkles } from "lucide-react";
+import { CheckCircle, PlayCircle, Sparkles, ArrowLeft, X } from "lucide-react";
 
 export interface AIOutlineModalProps {
 
@@ -77,7 +77,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  onClick={onClose}
  className="text-slate-400 hover:text-slate-700 font-bold text-lg p-2 transition-colors rounded-lg border border-transparent hover:border-slate-200"
  >
- ✕
+ <X className="h-5 w-5" aria-hidden />
  </button>
  </div>
 
@@ -194,7 +194,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  onClick={() => setStep("params")}
  className="text-xs font-bold text-blue-500 hover:underline"
  >
- ← Thay đổi thông số
+ <ArrowLeft className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Thay đổi thông số
  </button>
  </div>
 

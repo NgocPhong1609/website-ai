@@ -7,7 +7,7 @@ import { Step2ConfigForm } from "./Step2ConfigForm";
 import { Step3GeneratingState } from "./Step3GeneratingState";
 import { Step4ReviewEditor } from "./Step4ReviewEditor";
 import { Step5SaveAndAttachModal } from "./Step5SaveAndAttachModal";
-import { Sparkles } from "lucide-react";
+import { Sparkles, AlertTriangle, X } from "lucide-react";
 
 interface QuizGeneratorWizardProps {
   onSuccessComplete?: (savedQuiz?: any) => void;
@@ -120,7 +120,7 @@ export function QuizGeneratorWizard({
         <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex flex-col gap-2 shadow-xs animate-fadeIn">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-2">
-              <span className="text-base">⚠️</span>
+              <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
               <div className="flex flex-col gap-1">
                 <span className="font-semibold text-rose-900">Không thể tạo đề kiểm tra</span>
                 <span className="text-slate-700 font-medium">{error}</span>
@@ -142,7 +142,7 @@ export function QuizGeneratorWizard({
               </div>
             </div>
             <button type="button" onClick={clearError} className="text-rose-400 hover:text-rose-700 font-bold cursor-pointer text-sm">
-              ✕
+              <X className="h-5 w-5" aria-hidden />
             </button>
           </div>
         </div>

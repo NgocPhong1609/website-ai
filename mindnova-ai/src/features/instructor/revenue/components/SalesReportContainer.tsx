@@ -7,7 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getSalesReport } from "../api";
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Calendar, Download, TrendingUp } from "lucide-react";
+import { Calendar, Download, TrendingUp, BarChart3, AlertTriangle } from "lucide-react";
+import { Skeleton, SkeletonStatGrid, SkeletonTable } from "@/src/shared/components/ui/Skeleton";
 
 function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
  return (
@@ -240,7 +241,7 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  </ResponsiveContainer>
  ) : (
  <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
- <span className="text-4xl mb-3 opacity-50 grayscale"></span>
+ <BarChart3 className="h-10 w-10 mb-3 text-slate-300" aria-hidden />
  <span className="text-sm font-bold text-slate-500">Chưa có dữ liệu báo cáo</span>
  <span className="text-xs font-medium text-slate-400 mt-1">Sẽ hiển thị khi có phát sinh doanh thu/hoàn tiền</span>
  </div>
@@ -324,16 +325,30 @@ export function SalesReportContainer() {
 
  if (isLoading) {
  return (
- <div className="flex flex-col min-h-screen bg-slate-50 font-sans items-center justify-center">
- 
- <p className="text-slate-500 font-bold text-sm">Đang tải báo cáo bán hàng...</p>
+ <div className="flex flex-col gap-6 p-6 md:p-8 max-w-7xl mx-auto w-full">
+ <div className="flex items-center justify-between">
+ <div className="space-y-2">
+ <Skeleton className="h-8 w-64" />
+ <Skeleton className="h-4 w-80" />
+ </div>
+ <Skeleton className="h-10 w-40" />
+ </div>
+ <SkeletonStatGrid count={4} />
+ <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+ <Skeleton className="h-5 w-48" />
+ <Skeleton className="h-72 w-full" />
+ </div>
+ <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+ <SkeletonTable rows={5} cols={4} />
+ </div>
  </div>
  );
  }
 
  if (isError || !data) {
  return (
- <div className="flex flex-col min-h-screen bg-slate-50 font-sans items-center justify-center">
+ <div className="flex flex-col min-h-[60vh] font-sans items-center justify-center gap-3">
+ <AlertTriangle className="h-10 w-10 text-rose-400" aria-hidden />
  <p className="text-rose-500 font-bold">Đã có lỗi xảy ra khi tải dữ liệu báo cáo.</p>
  </div>
  );

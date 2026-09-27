@@ -9,7 +9,7 @@ import { twMerge } from "tailwind-merge";
 import { generateAiNotification, sendNotification, getNotificationOptions } from "../api";
 import { MultiSelect } from "@/src/shared/components/ui/MultiSelect";
 import { SingleSelect } from "@/src/shared/components/ui/SingleSelect";
-import { X as LucideX, RefreshCw, Copy, Bold, Italic, Underline, List, Link as LucideLink, ChevronDown, Plus, Sparkles } from "lucide-react";
+import { X as LucideX, RefreshCw, Copy, Bold, Italic, Underline, List, Link as LucideLink, ChevronDown, Plus, Sparkles, Mail } from "lucide-react";
 
 // ─── Local icons ──────────────────────────────────────────────────────────────
 
@@ -505,7 +505,7 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
  />
  ) : (
  <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-300 border-2 border-dashed border-slate-200 rounded-lg">
- <span className="text-4xl"></span>
+ <Mail className="h-10 w-10" aria-hidden />
  <p className="text-[12px] font-semibold text-center">
  Nhập chủ đề và nhấn{" "}
  <span className="text-blue-500">&quot;Tạo dự thảo bằng AI&quot;</span>

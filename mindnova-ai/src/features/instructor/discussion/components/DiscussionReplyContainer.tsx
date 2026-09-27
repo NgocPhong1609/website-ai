@@ -5,6 +5,8 @@ import { twMerge } from "tailwind-merge";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
+import { CheckCircle2, Check } from "lucide-react";
+import { SkeletonList } from "@/src/shared/components/ui/Skeleton";
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -201,10 +203,10 @@ export function DiscussionReplyContainer() {
 
  {/* Thread Cards List */}
  {loading ? (
- <div className="p-16 text-center text-slate-400 font-medium">Đang tải dữ liệu...</div>
+ <SkeletonList items={4} />
  ) : filteredThreads.length === 0 ? (
  <div className="p-16 text-center rounded-lg bg-white border border-slate-200 flex flex-col items-center gap-2 text-slate-400">
- <span className="text-4xl"></span>
+ <CheckCircle2 className="h-10 w-10 text-emerald-500" aria-hidden />
  <p className="text-sm font-bold text-slate-900">Tuyệt vời! Tất cả thảo luận đã được trả lời!</p>
  <p className="text-xs">Không có thảo luận nào cần bạn chú ý ở bộ lọc hiện tại.</p>
  </div>
@@ -276,7 +278,7 @@ export function DiscussionReplyContainer() {
  thread.isResolved ? "bg-blue-500 text-white shadow-sm" : "bg-emerald-50 hover:bg-blue-50 text-slate-900 border border-slate-200"
  )}
  >
- {thread.isResolved ? " Đã phản hồi" : "️ Xác nhận đã phản hồi"}
+ {thread.isResolved ? <><CheckCircle2 className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Đã phản hồi</> : <><Check className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Xác nhận đã phản hồi</>}
  </button>
  </div>
 

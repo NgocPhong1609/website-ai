@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { useAiInsights } from "../hooks/useAiInsights";
-import { Loader } from "@/src/shared/components/ui/Loader";
+import { CheckCircle2, Lightbulb } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 export function AIInsightsTab() {
  const { insights: initialInsights, isLoading, error, refetch } = useAiInsights();
@@ -31,9 +32,16 @@ export function AIInsightsTab() {
 
  if (isLoading) {
  return (
- <div className="flex flex-col items-center justify-center p-20 gap-4">
- <Loader size="md" />
- <p className="text-sm font-bold text-slate-500">Đang phân tích dữ liệu học viên bằng AI...</p>
+ <div role="status" aria-busy="true" aria-label="Đang phân tích dữ liệu học viên" className="grid grid-cols-1 md:grid-cols-2 gap-4">
+ {Array.from({ length: 4 }).map((_, i) => (
+ <div key={i} className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-3">
+ <div className="flex gap-2"><Skeleton className="h-5 w-20" /><Skeleton className="h-5 w-16" /></div>
+ <Skeleton className="h-5 w-3/4" />
+ <Skeleton className="h-3 w-full" />
+ <Skeleton className="h-3 w-5/6" />
+ <Skeleton className="h-16 w-full rounded-lg" />
+ </div>
+ ))}
  </div>
  );
  }
@@ -104,7 +112,7 @@ export function AIInsightsTab() {
  {/* Insights List Grid */}
  {filtered.length === 0 ? (
  <div className="p-14 text-center rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col items-center gap-2 text-slate-500">
- <span className="text-4xl"></span>
+ <CheckCircle2 className="h-10 w-10 text-emerald-500" aria-hidden />
  <p className="text-sm font-bold text-slate-900">Tất cả các điểm nghẽn bài học đều đã được giải quyết!</p>
  <p className="text-xs max-w-md">Các chỉ số tương tác bài giảng của bạn đang ở tình trạng tối ưu hóa xuất sắc.</p>
  </div>
@@ -153,10 +161,10 @@ export function AIInsightsTab() {
  )}
 
  {/* AI Rationale & Remediation Suggestion */}
- <div className="p-3.5 mt-2 rounded-lg bg-blue-50/60 border-slate-200 text-xs font-medium text-blue-950 leading-relaxed flex flex-col gap-1.5">
+ <div className="p-3.5 mt-2 rounded-lg bg-blue-50/60 border border-blue-100 text-xs font-medium text-blue-950 leading-relaxed flex flex-col gap-1.5">
  <div className="flex items-center gap-2">
- <span className="text-base shrink-0"></span>
- <strong className="font-semibold text-blue-500">Đề xuất Kế hoạch hành động: </strong>
+ <Lightbulb className="h-4 w-4 shrink-0 text-blue-600" aria-hidden />
+ <strong className="font-semibold text-blue-700">Đề xuất Kế hoạch hành động: </strong>
  </div>
  <ul className="list-disc list-inside text-xs pl-6 flex flex-col gap-1">
  {item.actionPlan?.map((plan, idx) => (

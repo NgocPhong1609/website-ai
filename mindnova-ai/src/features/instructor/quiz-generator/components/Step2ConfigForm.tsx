@@ -3,6 +3,7 @@
 import React from "react";
 import { QuizConfig, DifficultyType } from "../types/quizGenerator.types";
 import { QuizImageField } from "./QuizImageField";
+import { AlertTriangle, ArrowLeft, ArrowRight, CheckCircle2, GraduationCap, Loader2, Sparkles, Zap } from "lucide-react";
 
 interface Step2ConfigFormProps {
   config: QuizConfig;
@@ -55,7 +56,7 @@ export function Step2ConfigForm({
           {!embeddedMode && config.source_type === "course" && config.course_title && (
             <div className="p-3.5 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-base">🎓</span>
+                <GraduationCap className="h-4 w-4 shrink-0" aria-hidden />
                 <div>
                   <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider block">Khóa học được chọn</span>
                   <span className="text-xs font-bold text-slate-900">{config.course_title}{config.module_id ? ` — ${config.module_title || `Chương #${config.module_id}`}` : ""}</span>
@@ -114,10 +115,10 @@ export function Step2ConfigForm({
             <label className="block text-xs font-bold text-slate-700 mb-1.5">Độ khó câu hỏi</label>
             <div className="grid grid-cols-4 gap-2">
               {[
-                { key: "easy", label: "Dễ", icon: "🟢" },
-                { key: "medium", label: "Trung bình", icon: "🟡" },
-                { key: "hard", label: "Khó", icon: "🔴" },
-                { key: "mixed", label: "Hỗn hợp", icon: "⚡" },
+                { key: "easy", label: "Dễ", icon: <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 inline-block" aria-hidden /> },
+                { key: "medium", label: "Trung bình", icon: <span className="h-2.5 w-2.5 rounded-full bg-amber-500 inline-block" aria-hidden /> },
+                { key: "hard", label: "Khó", icon: <span className="h-2.5 w-2.5 rounded-full bg-rose-500 inline-block" aria-hidden /> },
+                { key: "mixed", label: "Hỗn hợp", icon: <Zap className="h-4 w-4" aria-hidden /> },
               ].map((diff) => (
                 <button
                   key={diff.key}
@@ -167,7 +168,7 @@ export function Step2ConfigForm({
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                <span>⚡ Cân Bằng Cấu Trúc Đề</span>
+                <span><Zap className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Cân Bằng Cấu Trúc Đề</span>
               </h3>
               <span className="px-3 py-1 rounded-lg bg-white text-blue-500 text-xs font-mono font-bold border border-blue-100 shadow-sm">
                 Tổng: {total} câu
@@ -245,12 +246,12 @@ export function Step2ConfigForm({
           <div className="mt-4">
             {isValidBalance ? (
               <div className="p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center gap-2 shadow-sm">
-                <span>✅</span>
+                <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
                 <span>Cấu trúc đề hợp lệ: {mc} trắc nghiệm + {essay} tự luận = {total} câu.</span>
               </div>
             ) : (
               <div className="p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2 shadow-sm">
-                <span>⚠️</span>
+                <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
                 <span>Chưa khớp: Bạn đang chọn {mc} trắc nghiệm + {essay} tự luận = {sum} câu, nhưng tổng số câu yêu cầu là {total}.</span>
               </div>
             )}
@@ -267,7 +268,7 @@ export function Step2ConfigForm({
             disabled={isGenerating}
             className="px-6 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-all cursor-pointer disabled:opacity-50"
           >
-            🠔 Quay lại
+            <ArrowLeft className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Quay lại
           </button>
         )}
 
@@ -278,9 +279,9 @@ export function Step2ConfigForm({
           className="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-lg shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 cursor-pointer flex items-center gap-2"
         >
           {isGenerating ? (
-            <span>⏳ Đang tạo câu hỏi bằng AI...</span>
+            <span><Loader2 className="inline h-4 w-4 mr-1 align-text-bottom animate-spin" aria-hidden />Đang tạo câu hỏi bằng AI...</span>
           ) : (
-            <span>✨ AI Sinh {total} Câu Hỏi Ngay ➔</span>
+            <span><Sparkles className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />AI Sinh {total} Câu Hỏi Ngay<ArrowRight className="inline h-4 w-4 ml-1 align-text-bottom" aria-hidden /></span>
           )}
         </button>
       </div>

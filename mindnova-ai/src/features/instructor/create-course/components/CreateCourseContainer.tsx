@@ -364,7 +364,7 @@ export function CreateCourseContainer() {
  disabled={step === 1}
  className="flex items-center gap-2 px-4.5 py-2.5 rounded-lg text-xs font-bold text-slate-700 border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shadow-sm"
  >
- <span>← Quay lại</span>
+ <span><ArrowLeft className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Quay lại</span>
  </button>
 
  <button

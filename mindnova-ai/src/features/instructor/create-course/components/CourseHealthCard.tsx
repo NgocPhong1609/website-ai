@@ -1,12 +1,19 @@
 "use client";
 
 import { useCourseHealth } from "../api";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 export function CourseHealthCard({ courseId }: { courseId: string }) {
  const { data: report, isLoading, isError, refetch } = useCourseHealth(courseId);
 
  if (isLoading) {
- return <div className="mb-5 h-24 animate-pulse rounded-lg border border-slate-100 bg-white" />;
+ return (
+ <div role="status" aria-busy="true" aria-label="Đang kiểm tra mức sẵn sàng" className="mb-5 rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+ <Skeleton className="h-4 w-48" />
+ <Skeleton className="h-3 w-full" />
+ <Skeleton className="h-3 w-2/3" />
+ </div>
+ );
  }
 
  if (isError || !report) {

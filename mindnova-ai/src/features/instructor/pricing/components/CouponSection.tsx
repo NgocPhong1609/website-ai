@@ -5,8 +5,8 @@ import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { NoData } from "@/src/shared/components/ui/NoData";
 import { useCoupons, Coupon } from "../hooks/useCoupons";
-import { Loader } from "@/src/shared/components/ui/Loader";
-import { Gift, PlusCircle, Trash2 } from "lucide-react";
+import { Gift, PlusCircle, Trash2, CalendarDays, X } from "lucide-react";
+import { SkeletonTable } from "@/src/shared/components/ui/Skeleton";
 
 // ------------------------------------------------------------------------------------------------
 // StatusBadge
@@ -112,7 +112,7 @@ function CreateCouponDialog({
               <h3 className="text-[14px] font-bold text-slate-900">Tạo mã giảm giá</h3>
               <p className="text-[11px] text-slate-500">Tạo mã ưu đãi và thiết lập thời hạn khuyến mãi</p>
             </div>
-            <button type="button" onClick={onClose} className="w-7 h-7 rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 flex items-center justify-center cursor-pointer">✕</button>
+            <button type="button" onClick={onClose} className="w-7 h-7 rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 flex items-center justify-center cursor-pointer" aria-label="Đóng"><X className="h-4 w-4" aria-hidden /></button>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-5 py-5 max-h-[85vh] overflow-y-auto">
@@ -185,7 +185,7 @@ function CreateCouponDialog({
 
             {/* Hạn sử dụng chương trình (Bắt đầu & Kết thúc) */}
             <div className="flex flex-col gap-1.5 border-t border-slate-100 pt-3">
-              <span className="text-[12px] font-bold text-slate-900">📅 Thời gian áp dụng chương trình</span>
+              <span className="text-[12px] font-bold text-slate-900"><CalendarDays className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Thời gian áp dụng chương trình</span>
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
                   <label className="text-[11px] font-semibold text-slate-500">Ngày bắt đầu</label>
@@ -308,8 +308,8 @@ export function CouponSection({ courseId }: { courseId?: string } = {}) {
         {/* Table */}
         <div className="overflow-x-auto relative">
           {isLoading && (
-            <div className="absolute inset-0 z-10 bg-white/50 backdrop-blur-sm flex items-center justify-center">
-              <Loader size="sm" />
+            <div className="absolute inset-0 z-10 bg-white">
+              <SkeletonTable rows={3} cols={5} />
             </div>
           )}
           {error && (

@@ -8,7 +8,8 @@ import { SelectQuizModal } from "@/src/features/instructor/quiz-generator/compon
 import { QuizImageField } from "@/src/features/instructor/quiz-generator/components/QuizImageField";
 import type { GeneratedQuestion, DifficultyType } from "@/src/features/instructor/quiz-generator/types/quizGenerator.types";
 import type { DraftQuizData } from "../types";
-import { Download, Sparkles } from "lucide-react";
+import { Download, Sparkles, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 interface QuizEditorProps {
   value?: DraftQuizData | any;
@@ -276,11 +277,19 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
     <div className="flex flex-col gap-6 animate-fadeIn relative">
       {/* Loading overlay — shown on top of content, does NOT destroy form state */}
       {isLoading && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 rounded-lg backdrop-blur-[2px]">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 rounded-full border-4 border-blue-500 border-t-transparent animate-spin" />
-            <span className="text-xs font-bold text-slate-500">Đang tải dữ liệu bài kiểm tra...</span>
+        <div role="status" aria-busy="true" aria-label="Đang tải dữ liệu bài kiểm tra" className="absolute inset-0 z-10 bg-white rounded-xl p-4 flex flex-col gap-4">
+          <Skeleton className="h-14 w-full rounded-xl" />
+          <div className="grid grid-cols-2 gap-3">
+            <Skeleton className="h-10" />
+            <Skeleton className="h-10" />
           </div>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="p-4 rounded-xl border border-slate-200 space-y-3">
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-9 w-full" />
+              <Skeleton className="h-9 w-full" />
+            </div>
+          ))}
         </div>
       )}
       {/* Import from Bank Banner */}
@@ -426,7 +435,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
         {isValidTotal ? (
           <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="text-base">✅</span>
+              <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm chuẩn hợp lệ: <strong>10 / 10 điểm</strong>. Bài thi sẵn sàng lưu.</span>
             </div>
             <span className="px-2.5 py-1 bg-emerald-600 text-white text-[10px] font-bold uppercase rounded-lg">Standard 10.0</span>
@@ -434,7 +443,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
         ) : isLess ? (
           <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-950 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="text-base">⚠️</span>
+              <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm chưa đủ 10 (Hiện tại: <strong>{totalPoints} / 10</strong>). Vui lòng tăng điểm câu hỏi.</span>
             </div>
             <span className="px-2.5 py-1 bg-amber-600 text-white text-[10px] font-bold uppercase rounded-lg">Thiếu {Number((10 - totalPoints).toFixed(2))}đ</span>
@@ -442,7 +451,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
         ) : (
           <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-950 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="text-base">⚠️</span>
+              <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm vượt quá 10 (Hiện tại: <strong>{totalPoints} / 10</strong>). Vui lòng giảm điểm câu hỏi.</span>
             </div>
             <span className="px-2.5 py-1 bg-rose-600 text-white text-[10px] font-bold uppercase rounded-lg">Vượt {Number((totalPoints - totalPoints).toFixed(2))}đ</span>
@@ -510,7 +519,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
       <div className="flex flex-col gap-4 max-h-[550px] overflow-y-auto pr-1">
         {filteredQuestions.length === 0 ? (
           <div className="p-10 text-center rounded-lg bg-white border border-slate-200 text-slate-500 font-medium text-xs">
-            {isLoading ? 'Đang tải câu hỏi...' : 'Chưa có câu hỏi nào. Nhấn "+ Trắc nghiệm" hoặc "+ Tự luận" ở trên để thêm.'}
+            {isLoading ? '' : 'Chưa có câu hỏi nào. Nhấn "+ Trắc nghiệm" hoặc "+ Tự luận" ở trên để thêm.'}
           </div>
         ) : (
           filteredQuestions.map((q, idx) => {

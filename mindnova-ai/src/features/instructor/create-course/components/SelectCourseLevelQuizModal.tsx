@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { QuizSummary } from "@/src/features/instructor/quiz-generator/types/quizGenerator.types";
-import { Check, ClipboardList, Eye, FileQuestion, Flag, Search, Target, Timer, Trophy, X } from "lucide-react";
+import { Check, ClipboardList, Eye, FileQuestion, Flag, Search, Target, Timer, Trophy, X, Loader2 } from "lucide-react";
 
 interface SelectCourseLevelQuizModalProps {
   isOpen: boolean;
@@ -186,9 +186,9 @@ export function SelectCourseLevelQuizModal({
                         className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white text-xs font-semibold rounded-lg shadow-sm transition-all cursor-pointer flex items-center gap-1"
                       >
                         {isLoadingThis ? (
-                          <span>⏳ Đang xử lý...</span>
+                          <span><Loader2 className="inline h-4 w-4 mr-1 align-text-bottom animate-spin" aria-hidden />Đang xử lý...</span>
                         ) : (
-                          <span>✓ Chọn bài này</span>
+                          <span><Check className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Chọn bài này</span>
                         )}
                       </button>
                     )}

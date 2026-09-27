@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { quizGeneratorApi } from "../api/quizGeneratorApi";
 import { QuizSummary } from "../types/quizGenerator.types";
+import { ClipboardList, Inbox, X, Clock, Loader2 } from "lucide-react";
+import { SkeletonList } from "@/src/shared/components/ui/Skeleton";
 
 interface SelectQuizModalProps {
   isOpen: boolean;
@@ -71,9 +73,7 @@ export function SelectQuizModal({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-blue-50 bg-slate-50">
           <div className="flex items-center gap-2.5">
-            <span className="w-9 h-9 rounded-lg bg-blue-500 text-white flex items-center justify-center text-lg font-bold shadow-xs">
-              📥
-            </span>
+            <Inbox className="h-5 w-5 shrink-0" aria-hidden />
             <div>
               <h3 className="text-sm font-bold text-slate-900">Chọn Đề Thi từ Ngân Hàng Quiz</h3>
               <p className="text-[11px] text-slate-500 font-medium">
@@ -86,7 +86,7 @@ export function SelectQuizModal({
             onClick={onClose}
             className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
-            ✕
+            <X className="h-5 w-5" aria-hidden />
           </button>
         </div>
 
@@ -104,13 +104,10 @@ export function SelectQuizModal({
         {/* Body List */}
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
           {isLoading ? (
-            <div className="py-12 text-center flex flex-col items-center justify-center gap-2">
-              <div className="w-7 h-7 rounded-full border-3 border-blue-500 border-t-transparent animate-spin" />
-              <span className="text-xs font-bold text-slate-500">Đang tải danh sách bài thi...</span>
-            </div>
+            <SkeletonList items={4} withAvatar={false} />
           ) : filteredQuizzes.length === 0 ? (
             <div className="py-12 text-center rounded-lg bg-slate-50 border border-slate-100 text-slate-500 flex flex-col items-center justify-center gap-2">
-              <span className="text-3xl">📋</span>
+              <ClipboardList className="h-7 w-7 shrink-0" aria-hidden />
               <p className="text-xs font-bold text-slate-700">Chưa tìm thấy đề thi nào phù hợp</p>
               <p className="text-[11px] text-slate-500">
                 Hãy tạo bài thi mới trên giao diện Bộ tạo bài kiểm tra AI hoặc tạo trực tiếp câu hỏi ở đây.
@@ -132,8 +129,8 @@ export function SelectQuizModal({
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
                         {q.questions_count || q.total_questions || 0} câu hỏi
                       </span>
-                      <span className="text-[10px] font-medium text-slate-500">
-                        ⏱️ {q.time_limit_minutes || 15} phút
+                      <span className="text-[10px] font-medium text-slate-500 flex items-center gap-1">
+                        <Clock className="h-3 w-3" aria-hidden /> {q.time_limit_minutes || 15} phút
                       </span>
                     </div>
                     <h4 className="text-xs font-semibold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
@@ -154,8 +151,8 @@ export function SelectQuizModal({
                   >
                     {isSelectedLoading ? (
                       <>
-                        <div className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                        <span>Đang tải...</span>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                        <span>Đang chọn...</span>
                       </>
                     ) : (
                       <span>Chọn đề thi này</span>

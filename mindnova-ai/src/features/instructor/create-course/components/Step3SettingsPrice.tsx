@@ -6,6 +6,8 @@ import { useInstructorPricing } from "@/src/hooks/instructor/useInstructorPricin
 import { useCreateCourseStore } from "../stores/createCourseStore";
 import { CouponSection } from "@/src/features/instructor/pricing/components/CouponSection";
 import { useCommissionTiers } from "../api";
+import { AlertTriangle } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 export interface Step3SettingsPriceProps {
  courseId?: string;
@@ -143,13 +145,18 @@ export function Step3SettingsPrice({
 
  {validationError && (
  <p className="text-xs font-bold text-rose-600 bg-rose-50 p-3 rounded-lg border border-rose-200 flex items-center gap-2">
- ️ {validationError}
+ <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden /> {validationError}
  </p>
  )}
 
  <div className="flex flex-col gap-2 pt-1">
  <label className="text-sm font-semibold text-slate-900">Cấp Độ Hợp Tác Giảng Viên:</label>
- {commissionTiers.isLoading && <p role="status" className="text-xs text-slate-500">Đang tải cấu hình hoa hồng...</p>}
+ {commissionTiers.isLoading && (
+ <div role="status" aria-busy="true" aria-label="Đang tải cấu hình hoa hồng" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+ <Skeleton className="h-20 rounded-xl" />
+ <Skeleton className="h-20 rounded-xl" />
+ </div>
+ )}
  {commissionTiers.isError && <p role="alert" className="text-xs font-bold text-rose-600">Không thể tải tỷ lệ hoa hồng. Bạn vẫn có thể giữ lựa chọn cấp hợp tác và thử lại sau.</p>}
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
  {(tierDefinitions.length > 0 ? tierDefinitions : [{ tier: "standard" }, { tier: "exclusive" }]).map((definition) => (

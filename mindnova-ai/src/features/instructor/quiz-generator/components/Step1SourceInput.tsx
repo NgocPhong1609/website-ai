@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { QuizConfig } from "../types/quizGenerator.types";
 import { quizGeneratorApi } from "../api/quizGeneratorApi";
+import { AlertTriangle, ArrowRight, BookOpen, GraduationCap, RefreshCw, Search, Target } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 interface Step1SourceInputProps {
   config: QuizConfig;
@@ -141,7 +143,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
         <div className="flex flex-col gap-5">
           {/* Search Box */}
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
+            <Search className="h-4 w-4 shrink-0" aria-hidden />
             <input
               type="text"
               value={searchTerm}
@@ -153,12 +155,20 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
 
           {/* Course Selection List */}
           {isLoadingCourses ? (
-            <div className="p-8 bg-slate-50 rounded-lg border border-slate-100 text-center text-xs font-bold text-slate-500 animate-pulse">
-              Đang tải danh sách khóa học của bạn...
+            <div role="status" aria-busy="true" aria-label="Đang tải danh sách khóa học" className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="p-4 rounded-xl border border-slate-200 bg-white flex items-center gap-3">
+                  <Skeleton className="h-12 w-12 rounded-lg shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : courses.length === 0 ? (
             <div className="p-8 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-center flex flex-col gap-2">
-              <span className="text-2xl">⚠️</span>
+              <AlertTriangle className="h-6 w-6 shrink-0" aria-hidden />
               <span className="font-semibold text-sm">Bạn chưa có khóa học nào trong tài khoản.</span>
               <span className="text-xs font-medium text-amber-800">
                 Hãy tạo khóa học trước trong bảng điều khiển để tiếp tục tạo bài thi AI.
@@ -177,7 +187,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
                 >
                   <div className="flex items-start gap-3.5">
                     <div className="w-11 h-11 rounded-lg bg-blue-50 text-blue-500 border border-blue-100 flex items-center justify-center text-xl shrink-0 font-bold group-hover:scale-105 transition-transform">
-                      📚
+                      <BookOpen className="h-5 w-5" aria-hidden />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -201,7 +211,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
                     onClick={() => handleSelectCourse(course)}
                     className="w-full py-2.5 px-4 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
                   >
-                    <span>🎯 Chọn khóa học này</span>
+                    <span><Target className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Chọn khóa học này</span>
                   </button>
                 </div>
               ))}
@@ -215,7 +225,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
           <div className="p-5 rounded-lg bg-emerald-50/60 border-2 border-emerald-300 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
             <div className="flex items-center gap-3.5">
               <div className="w-12 h-12 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-2xl font-bold shadow-md shrink-0">
-                🎓
+                <GraduationCap className="h-5 w-5" aria-hidden />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -234,7 +244,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
               onClick={handleResetCourseSelection}
               className="px-4 py-2 bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 shrink-0 shadow-sm"
             >
-              <span>🔄 Thay đổi khóa học</span>
+              <span><RefreshCw className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Thay đổi khóa học</span>
             </button>
           </div>
 
@@ -287,8 +297,8 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
             </div>
 
             {isLoadingDetails ? (
-              <div className="text-[11px] font-bold text-slate-400 animate-pulse pt-2">
-                Đang nạp danh sách các bài học thuộc khóa học...
+              <div role="status" aria-busy="true" aria-label="Đang nạp danh sách bài học" className="flex flex-col gap-1.5 pt-2 border-t border-slate-100">
+                {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-7 w-full" />)}
               </div>
             ) : lessonsList.length > 0 ? (
               <div className="flex flex-col gap-1.5 pt-2 border-t border-slate-100">
@@ -319,7 +329,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
       {/* Warning Alert if User Tries to Continue Without Selecting Course */}
       {showWarning && !config.course_id && (
         <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 font-bold text-xs flex items-center gap-2 animate-fadeIn shadow-sm">
-          <span className="text-base">⚠️</span>
+          <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
           <span>Vui lòng chọn một khóa học trước khi tiếp tục.</span>
         </div>
       )}
@@ -338,7 +348,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
           disabled={!config.course_id || isLoadingDetails || !selectedCourseDetails || Boolean(config.module_id && lessonsList.length === 0)}
           className="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-lg shadow-lg hover:scale-[1.02] transition-all disabled:opacity-40 disabled:hover:scale-100 cursor-pointer disabled:cursor-not-allowed"
         >
-          Tiếp theo: Cấu hình Quiz ➡️
+          Tiếp theo: Cấu hình Quiz<ArrowRight className="inline h-4 w-4 ml-1 align-text-bottom" aria-hidden />
         </button>
       </div>
     </div>

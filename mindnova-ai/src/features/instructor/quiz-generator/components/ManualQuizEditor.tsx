@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { GeneratedQuestion } from "../types/quizGenerator.types";
 import { QuestionCardMultipleChoice } from "./QuestionCardMultipleChoice";
 import { QuestionCardEssay } from "./QuestionCardEssay";
+import { AlertTriangle, ArrowLeft, CheckCircle2, Sparkles, Loader2, Save } from "lucide-react";
 
 interface ManualQuizEditorProps {
   questions: GeneratedQuestion[];
@@ -84,7 +85,7 @@ export function ManualQuizEditor({
         {isValidTotal ? (
           <div className="p-4 rounded-lg bg-emerald-50 border-slate-200 text-slate-900 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="text-base">✅</span>
+              <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm hợp lệ: <strong>10 / 10</strong>. Bài kiểm tra đã sẵn sàng để xuất bản.</span>
             </div>
             <span className="px-2.5 py-1 bg-slate-900 text-white text-[10px] font-bold uppercase rounded-lg">Standard 10.0</span>
@@ -92,7 +93,7 @@ export function ManualQuizEditor({
         ) : isLess ? (
           <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="text-base">⚠️</span>
+              <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm chưa đủ 10 (Hiện tại: <strong>{totalPoints} / 10</strong>). Vui lòng điều chỉnh điểm các câu hỏi.</span>
             </div>
             <span className="px-2.5 py-1 bg-amber-600 text-white text-[10px] font-bold uppercase rounded-lg">Thiếu {Number((10 - totalPoints).toFixed(2))}đ</span>
@@ -100,7 +101,7 @@ export function ManualQuizEditor({
         ) : (
           <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-900 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="text-base">⚠️</span>
+              <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm vượt quá 10 (Hiện tại: <strong>{totalPoints} / 10</strong>). Vui lòng giảm điểm các câu hỏi.</span>
             </div>
             <span className="px-2.5 py-1 bg-rose-600 text-white text-[10px] font-bold uppercase rounded-lg">Vượt {Number((totalPoints - 10).toFixed(2))}đ</span>
@@ -209,13 +210,13 @@ export function ManualQuizEditor({
           onClick={onBack}
           className="px-6 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-all cursor-pointer"
         >
-          🠔 Sửa cấu hình
+          <ArrowLeft className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Sửa cấu hình
         </button>
 
         <div className="flex items-center gap-3">
           {!isValidTotal && (
             <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
-              ⚠️ Tổng điểm phải bằng 10 để lưu.
+              <AlertTriangle className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Tổng điểm phải bằng 10 để lưu.
             </span>
           )}
 
@@ -225,7 +226,7 @@ export function ManualQuizEditor({
             disabled={isSaving || !isValidTotal || questions.length === 0}
             className="px-6 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {isSaving ? "Đang lưu..." : "💾 Lưu Nháp"}
+            {isSaving ? <><Loader2 className="inline h-4 w-4 mr-1 align-text-bottom animate-spin" aria-hidden />Đang lưu...</> : <><Save className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Lưu Nháp</>}
           </button>
 
           <button
@@ -240,7 +241,7 @@ export function ManualQuizEditor({
                 <span>Đang lưu bài kiểm tra...</span>
               </>
             ) : (
-              <span>✨ Hoàn Tất &amp; Thêm Vào Giáo Trình</span>
+              <span><Sparkles className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Hoàn Tất &amp; Thêm Vào Giáo Trình</span>
             )}
           </button>
         </div>
