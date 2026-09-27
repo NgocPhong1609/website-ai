@@ -9,11 +9,13 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Tests\Concerns\CreatesUsersWithRoles;
 use Tests\TestCase;
 
 class NotificationTest extends TestCase
 {
     use RefreshDatabase;
+    use CreatesUsersWithRoles;
 
     protected $teacher;
     protected $student;
@@ -22,15 +24,9 @@ class NotificationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
-        $roleTeacher = Role::firstOrCreate(['name' => 'teacher']);
-        $roleStudent = Role::firstOrCreate(['name' => 'student']);
 
-        $this->teacher = User::factory()->create();
-        $this->teacher->roles()->attach($roleTeacher);
-
-        $this->student = User::factory()->create();
-        $this->student->roles()->attach($roleStudent);
+        $this->teacher = $this->createTeacher();
+        $this->student = $this->createStudent();
 
         $category = Category::create(['name' => 'Test', 'slug' => 'test']);
         

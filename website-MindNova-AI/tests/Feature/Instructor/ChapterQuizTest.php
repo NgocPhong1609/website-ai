@@ -7,8 +7,7 @@ use App\Models\User;
 use App\Services\Ai\AiRouterService;
 
 beforeEach(function () {
-    $this->teacher = User::factory()->create();
-    $this->teacher->roles()->attach(Role::firstOrCreate(['name' => 'teacher']));
+    $this->teacher = teacher();
     $this->course = Course::create(['teacher_id' => $this->teacher->id, 'title' => 'Course', 'slug' => 'chapter-course', 'description' => 'WHOLE_COURSE_DESCRIPTION', 'price' => 0]);
     $this->chapter = $this->course->modules()->create(['title' => 'Chapter A', 'order' => 1]);
     $this->chapter->lessons()->create(['course_id' => $this->course->id, 'title' => 'Lesson A', 'content' => '<p>ONLY_CHAPTER_A</p>', 'type' => 'article', 'order' => 1]);

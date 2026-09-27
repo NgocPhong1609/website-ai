@@ -10,11 +10,13 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Tests\Concerns\CreatesUsersWithRoles;
 use Tests\TestCase;
 
 class ModuleAndLessonManagementTest extends TestCase
 {
     use RefreshDatabase;
+    use CreatesUsersWithRoles;
 
     private User $teacher;
 
@@ -24,9 +26,7 @@ class ModuleAndLessonManagementTest extends TestCase
     {
         parent::setUp();
 
-        $role = Role::create(['name' => 'teacher', 'display_name' => 'Teacher']);
-        $this->teacher = User::factory()->create();
-        $this->teacher->roles()->attach($role->id);
+        $this->teacher = $this->createTeacher();
 
         $this->course = Course::create([
             'teacher_id' => $this->teacher->id,

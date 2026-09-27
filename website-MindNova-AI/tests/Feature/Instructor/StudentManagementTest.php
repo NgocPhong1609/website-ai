@@ -10,11 +10,13 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\CourseModule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\CreatesUsersWithRoles;
 use Tests\TestCase;
 
 class StudentManagementTest extends TestCase
 {
     use RefreshDatabase;
+    use CreatesUsersWithRoles;
 
     private User $teacher;
     private User $student;
@@ -24,13 +26,8 @@ class StudentManagementTest extends TestCase
     {
         parent::setUp();
 
-        $role = Role::create(['name' => 'teacher']);
-        $this->teacher = User::factory()->create();
-        $this->teacher->roles()->attach($role->id);
-
-        $studentRole = Role::create(['name' => 'student']);
-        $this->student = User::factory()->create();
-        $this->student->roles()->attach($studentRole->id);
+        $this->teacher = $this->createTeacher();
+        $this->student = $this->createStudent();
 
         $this->course = Course::create([
             'teacher_id' => $this->teacher->id,
@@ -71,7 +68,7 @@ class StudentManagementTest extends TestCase
     public function test_teacher_can_reply_to_discussion()
     {
         $module = CourseModule::create(['course_id' => $this->course->id, 'title' => 'M1']);
-        $lesson = Lesson::create(['module_id' => $module->id, 'title' => 'L1', 'type' => 'video']);
+        $lesson = Lesson::create(['module_id' => $module->id, 'course_id' => $this->course->id, 'title' => 'L1', 'type' => 'video']);
         $discussion = Discussion::create([
             'lesson_id' => $lesson->id,
             'student_id' => $this->student->id,

@@ -6,30 +6,23 @@ use App\Models\Course;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\CreatesUsersWithRoles;
 use Tests\TestCase;
 
 class CourseManagementTest extends TestCase
 {
     use RefreshDatabase;
+    use CreatesUsersWithRoles;
 
     private User $teacher;
     private User $student;
-    private Role $teacherRole;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Setup Roles
-        $this->teacherRole = Role::create(['name' => 'teacher', 'display_name' => 'Teacher']);
-        $studentRole = Role::create(['name' => 'student', 'display_name' => 'Student']);
-
-        // Setup Users
-        $this->teacher = User::factory()->create();
-        $this->teacher->roles()->attach($this->teacherRole->id);
-
-        $this->student = User::factory()->create();
-        $this->student->roles()->attach($studentRole->id);
+        $this->teacher = $this->createTeacher();
+        $this->student = $this->createStudent();
     }
 
     public function test_teacher_can_create_course()
@@ -68,8 +61,7 @@ class CourseManagementTest extends TestCase
 
     public function test_teacher_can_list_their_courses()
     {
-        $teacher = User::factory()->create();
-        $teacher->roles()->attach($this->teacherRole->id);
+        $teacher = $this->createTeacher();
 
         Course::create([
             'teacher_id' => $teacher->id,

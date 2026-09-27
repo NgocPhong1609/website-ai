@@ -10,21 +10,21 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
+use Tests\Concerns\CreatesUsersWithRoles;
 use Tests\TestCase;
 
 class R2UploadTest extends TestCase
 {
     use RefreshDatabase;
+    use CreatesUsersWithRoles;
 
     protected $teacher;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
-        $roleTeacher = Role::firstOrCreate(['name' => 'teacher']);
-        $this->teacher = User::factory()->create();
-        $this->teacher->roles()->attach($roleTeacher);
+
+        $this->teacher = $this->createTeacher();
     }
 
     public function test_teacher_can_upload_video_to_r2()

@@ -10,17 +10,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->teacherRole = Role::firstOrCreate(['name' => 'teacher']);
-    $this->studentRole = Role::firstOrCreate(['name' => 'student']);
-
-    $this->teacher = User::factory()->create();
-    $this->teacher->roles()->syncWithoutDetaching($this->teacherRole);
-
-    $this->otherTeacher = User::factory()->create();
-    $this->otherTeacher->roles()->syncWithoutDetaching($this->teacherRole);
-
-    $this->student = User::factory()->create();
-    $this->student->roles()->syncWithoutDetaching($this->studentRole);
+    $this->teacher = teacher();
+    $this->otherTeacher = teacher();
+    $this->student = student();
 
     $this->quizPayload = fn (array $questionOverrides = []) => [
         'title' => 'Quiz selection mode',
