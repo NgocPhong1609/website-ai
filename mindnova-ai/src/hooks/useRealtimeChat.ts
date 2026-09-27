@@ -10,16 +10,28 @@ export const getEchoInstance = (token: string) => {
     if (!echoInstance) {
         (window as any).Pusher = Pusher;
         Pusher.logToConsole = process.env.NEXT_PUBLIC_ENABLE_PUSHER_LOGS === 'true';
-        const port = Number(process.env.NEXT_PUBLIC_REVERB_PORT || 8080);
+        const isProd = process.env.NODE_ENV === 'production';
+        let defaultHost = '127.0.0.1';
+        try {
+            if (process.env.NEXT_PUBLIC_API_URL) {
+                // E.g. https://api.mindnova.com/api -> api.mindnova.com
+                defaultHost = new URL(process.env.NEXT_PUBLIC_API_URL).hostname;
+            } else if (isProd && typeof window !== 'undefined') {
+                defaultHost = window.location.hostname;
+            }
+        } catch (e) {}
+
+        const port = Number(process.env.NEXT_PUBLIC_REVERB_PORT || (isProd ? 443 : 8080));
+
         echoInstance = new Echo({
             broadcaster: 'reverb',
             key: process.env.NEXT_PUBLIC_REVERB_APP_KEY || 'mindnova_chat_key',
-            wsHost: process.env.NEXT_PUBLIC_REVERB_HOST || '127.0.0.1',
+            wsHost: process.env.NEXT_PUBLIC_REVERB_HOST || defaultHost,
             wsPort: port,
             wssPort: port,
-            forceTLS: process.env.NODE_ENV === 'production' || (process.env.NEXT_PUBLIC_REVERB_SCHEME === 'https'),
+            forceTLS: isProd || (process.env.NEXT_PUBLIC_REVERB_SCHEME === 'https'),
             disableStats: true,
-            enabledTransports: (process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_REVERB_SCHEME === 'https') ? ['ws', 'wss'] : ['ws'],
+            enabledTransports: (isProd || process.env.NEXT_PUBLIC_REVERB_SCHEME === 'https') ? ['ws', 'wss'] : ['ws'],
             authEndpoint: clientApiUrl('broadcasting/auth'),
             auth: {
                 headers: {
