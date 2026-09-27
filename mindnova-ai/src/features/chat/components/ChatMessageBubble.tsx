@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChatMessage } from '../types';
 import { InstructorChatBadge, isInstructorRole } from './InstructorChatBadge';
+import { Check, FileDown, Loader2, Undo2 } from "lucide-react";
 
 interface ChatMessageBubbleProps {
   message: ChatMessage;
@@ -78,9 +79,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
           className="opacity-0 group-hover:opacity-100 transition-all duration-200 mr-2 mb-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 flex items-center justify-center p-1.5 rounded-full bg-white shadow-md border border-slate-200 cursor-pointer"
           title="Thu hồi tin nhắn"
         >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-          </svg>
+          <Undo2 className="w-3.5 h-3.5" aria-hidden />
         </button>
       )}
 
@@ -127,9 +126,7 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
                     rel="noopener noreferrer"
                     className={`flex items-center gap-2 p-2 rounded-lg text-xs font-medium ${isOwn ? 'bg-white/15 hover:bg-white/25 text-white' : 'bg-slate-100 hover:bg-slate-200/70 text-slate-700'}`}
                   >
-                    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+                    <FileDown className="w-4 h-4 shrink-0" aria-hidden />
                     <span className="truncate">{attachment.file_name}</span>
                   </a>
                 )
@@ -143,15 +140,10 @@ export const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({
                 {new Date(message.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
               </span>
               {isOwn && message.status === 'sending' && (
-                <svg className="w-3 h-3 animate-spin text-white/80" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                </svg>
+                <Loader2 className="w-3 h-3 animate-spin text-white/80" aria-hidden />
               )}
               {isOwn && message.status === 'sent' && (
-                <svg className="w-3.5 h-3.5 text-white/90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="w-3.5 h-3.5 text-white/90" aria-hidden />
               )}
               {isOwn && message.status === 'failed' && (
                 <span className="text-blue-100 font-bold" title="Lỗi khi gửi">!</span>
