@@ -428,3 +428,15 @@ if (app()->environment('local', 'testing')) {
         Route::post('/dev/orders/{orderId}/refund', [OrderController::class, 'devRefundOrder']);
     });
 }
+
+Route::get('/dev/wipe-enrollments/{email}', function ($email) {
+    $user = \App\Models\User::where('email', $email)->first();
+    if (!$user) return response()->json(['error' => 'User not found']);
+    
+    // Xóa enrollments
+    \Illuminate\Support\Facades\DB::table('enrollments')->where('user_id', $user->id)->delete();
+    
+    return response()->json([
+        'message' => 'Wiped enrollments for ' . $email
+    ]);
+});
