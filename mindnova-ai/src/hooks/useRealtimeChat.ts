@@ -17,8 +17,9 @@ export const getEchoInstance = (token: string) => {
             wsHost: process.env.NEXT_PUBLIC_REVERB_HOST || '127.0.0.1',
             wsPort: port,
             wssPort: port,
-            forceTLS: (process.env.NEXT_PUBLIC_REVERB_SCHEME ?? 'http') === 'https',
-            enabledTransports: (process.env.NEXT_PUBLIC_REVERB_SCHEME ?? 'http') === 'https' ? ['ws', 'wss'] : ['ws'],
+            forceTLS: process.env.NODE_ENV === 'production' || (process.env.NEXT_PUBLIC_REVERB_SCHEME === 'https'),
+            disableStats: true,
+            enabledTransports: (process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_REVERB_SCHEME === 'https') ? ['ws', 'wss'] : ['ws'],
             authEndpoint: clientApiUrl('broadcasting/auth'),
             auth: {
                 headers: {
