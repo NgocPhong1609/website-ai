@@ -33,7 +33,7 @@ export function LearningHistory() {
 
   if (isLoading) {
   return (
-  <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-[70vh] flex flex-col gap-6 animate-pulse">
+  <div role="status" aria-busy="true" aria-label="Đang tải lịch sử học tập" className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-[70vh] flex flex-col gap-6 animate-pulse">
     {/* Header Skeleton */}
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
       <div>

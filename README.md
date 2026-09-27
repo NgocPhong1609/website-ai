@@ -179,6 +179,22 @@ cd website-MindNova-AI
 php artisan test
 ```
 
+End-to-end (Playwright, luồng học viên). Cần backend `:8000` và frontend `:3000` đang chạy, catalog có ít nhất một khóa **miễn phí** đã publish:
+
+```bash
+cd mindnova-ai
+npx playwright install chromium   # lần đầu
+pnpm test:e2e                     # E2E_BASE_URL / E2E_API_URL để đổi địa chỉ
+```
+
+Bộ E2E tự đăng ký tài khoản `e2e.student.*@mindnova.test`. Dọn dữ liệu này (chỉ chạy ở local/testing):
+
+```bash
+cd website-MindNova-AI
+php artisan e2e:purge-users --dry-run   # xem trước
+php artisan e2e:purge-users
+```
+
 ## Git (làm việc nhóm)
 
 Làm trên branch riêng, không commit thẳng lên `main` trừ khi được giao rõ.

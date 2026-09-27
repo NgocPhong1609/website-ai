@@ -167,7 +167,7 @@ Pattern: Request → middleware → Controller → Service → Model. Không có
 | Progress / history | `features/student/progress/`, `history/` | `ProgressController`, `HistoryController` |
 | Profile | `features/student/profile/` | `UserController` `/api/profile` |
 | Checkout / payment | `features/student/checkout/` | `OrderController`, `PaymentController`, `PaymentService` |
-| Billing / certificates | UI gần như **mock**, chưa nối đủ API | `Certificate` model tồn tại |
+| Billing / certificates | `features/student/billing/`, `certificates/` | `GET /api/orders`, refund eligibility theo `course_id` của đơn; `GET/POST /api/student/certificates` |
 | Streak check-in | dashboard | `POST /api/student/check-in` |
 | Reviews | course detail | `Student\ReviewController` |
 | Discussions | lesson workspace | `Student\DiscussionController` |
@@ -293,7 +293,7 @@ Chi tiết đầy đủ: `website-MindNova-AI/routes/api.php`. Dưới đây là
 | POST | `/api/student/ai-tutor/chat` | streamChat | |
 | CUD | `/api/student/courses/{course}/reviews` | ReviewController | |
 | GET/POST | course/lesson quiz + grade-essay | StudentQuizController | |
-| GET/POST | lesson video-url, complete, check-answer | LessonController | |
+| GET/POST | lesson video-url, start, complete, check-answer | LessonController | `start` ghi thời điểm mở bài (cache); `complete` yêu cầu thời gian học thực ≥ ½ thời lượng video / ⅓ bài đọc |
 | GET/PATCH/DELETE | notifications | NotificationController | |
 | CRUD | lesson discussions | DiscussionController | |
 | POST | `/api/broadcasting/auth` | framework | Echo |
@@ -530,12 +530,12 @@ php artisan reverb:start     # Needs verification nếu config chưa publish
 php artisan storage:link
 ```
 
-Khác: `app:cleanup-temp-media` (scheduled), `revenue:unlock-pending`, `chat:fix-missing-members`, lệnh demo `demo:revenue3` / `mock:purchases` **phá data**.
+Khác: `app:cleanup-temp-media` (scheduled), `revenue:unlock-pending`, `chat:fix-missing-members`, `e2e:purge-users` (xóa tài khoản E2E, chỉ local/testing), lệnh demo `demo:revenue3` / `mock:purchases` **phá data**.
 
 `composer.json` script `dev`: serve + queue:listen + pail + vite (Blade), **không** thay Next.js.
 
 Tests BE: Pest, MySQL `du_an_testing` (`phpunit.xml`).  
-Tests FE: `palette.test.ts`, `LearningHistory.test.tsx`, `LessonContent.test.tsx` (placeholder). `next.config.ts` **`typescript.ignoreBuildErrors: true`**.
+Tests FE: Vitest (`pnpm test`) + Playwright E2E luồng student trong `mindnova-ai/e2e/` (`pnpm test:e2e`, cần BE + FE đang chạy). `next.config.ts` **`typescript.ignoreBuildErrors: true`**.
 
 Dependencies đặc biệt: `james-heinrich/getid3` (duration video), `openai-php/laravel`, `league/flysystem-aws-s3-v3`, CKEditor 5, laravel-echo, jspdf (admin export). FE `graphql` / `react-hook-form` / `zod` **installed unused**.
 
@@ -565,6 +565,8 @@ Dependencies đặc biệt: `james-heinrich/getid3` (duration video), `openai-ph
 - Role storage: chỉ `roles` + `role_user`. API vẫn trả field `role` từ accessor.
 - Register `role_id` 2/3 phụ thuộc thứ tự seed — fragile.
 - API student nhiều GET/AI **public** — đừng “fix” bằng cách giả định đã auth.
+- Course detail (`CourseService::getCourseDetail`) chỉ trả `video_url`, nội dung bài đọc, tài liệu và quiz cho user đã ghi danh; FE chặn trang lesson khi `is_enrolled=false`.
+- Hoàn thành bài học đo thời gian phía server (`POST lessons/{id}/start` → `complete`); không tin `playback_position` từ client.
 - `PaymentService` callback: nếu không resolve user thì fallback `User::first()` — nguy hiểm, đừng nhân rộng.
 - Enrollment/chat member không unique DB — race có thể duplicate (code dùng `firstOrCreate` member).
 - JSON response shape không thống nhất toàn API.
@@ -582,7 +584,6 @@ Dependencies đặc biệt: `james-heinrich/getid3` (duration video), `openai-ph
 - Không có TODO/FIXME đáng kể trong app PHP/TS.
 - HistoryService có placeholder stats khi thiếu data.
 - Student billing: `GET /api/orders` (auth). Certificates: `GET/POST /api/student/certificates` (auth, bảng `certificates`). Practice modules: `GET /api/student/practice/overview` field `modules_list`. AI quiz practice routes yêu cầu Sanctum, không fallback userId 201.
-- Billing + certificates student: UI tĩnh.
 - `/welcome`, `app/loading.tsx`, `app/not-found.tsx` stub.
 - `ads-hourly` không gắn.
 - Google icon trên login; **FE không có handler OAuth** (BE có).
@@ -593,7 +594,6 @@ Dependencies đặc biệt: `james-heinrich/getid3` (duration video), `openai-ph
 - `revenue:unlock-pending` phải chạy thủ công hoặc cron — chưa schedule.
 - Seed/demo commands có thể wipe quiz/order.
 - Admin analytics: README nói chưa nối đủ API.
-- Vitest `LessonContent` test không cover hành vi lesson thật.
 
 ### Điểm dễ regression
 

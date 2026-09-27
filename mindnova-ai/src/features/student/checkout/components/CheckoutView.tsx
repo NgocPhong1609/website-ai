@@ -5,6 +5,7 @@ import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useGetCourseDetail } from "../../courses/api";
 import { checkoutService } from "../services/checkout.service";
 import { useGetPaymentMethods } from "../../billing/api";
@@ -20,6 +21,7 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
   const [savedMethodId, setSavedMethodId] = useState<number | null>(null);
   const [confirmAccount, setConfirmAccount] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const queryClient = useQueryClient();
   const { data: savedMethods = [] } = useGetPaymentMethods();
 
   useEffect(() => {
@@ -134,7 +136,12 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
       if (res.success) {
         if (isEffectiveFree || !res.payment_url) {
           toast.success("Bạn đã nhận khóa học thành công!");
-          router.replace(`/courses/detail?courseId=${courseId}`);
+          // Refresh enrolment-dependent data (detail, reviews, my courses, billing) and close the modal.
+          await queryClient.invalidateQueries({ queryKey: ["student"] });
+          setIsProcessing(false);
+          if (onClose) onClose();
+          else router.replace(`/courses/detail?courseId=${courseId}`);
+          router.refresh();
           return;
         }
 
