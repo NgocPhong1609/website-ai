@@ -9,7 +9,8 @@ import { useGetCourseDetail } from "../../courses/api";
 import { checkoutService } from "../services/checkout.service";
 import { useGetPaymentMethods } from "../../billing/api";
 import { Ticket, AlertTriangle, Gift, PartyPopper, Sparkles } from "lucide-react";
-import { Loader } from "@/src/shared/components/ui/Loader";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
+import Link from "next/link";
 import toast from "react-hot-toast";
 
 export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?: () => void }) {
@@ -44,16 +45,30 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
 
   if (isLoading) {
     return (
-      <div className="p-6 min-h-[70vh] flex items-center justify-center">
-        <Loader size="lg" text="Đang tải thông tin hóa đơn..." />
+      <div role="status" aria-busy="true" aria-label="Đang tải thông tin đơn hàng" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="rounded-xl border border-slate-200 bg-white p-6 space-y-4">
+          <Skeleton className="h-5 w-40" />
+          <div className="flex gap-4"><Skeleton className="h-20 w-24 rounded-lg" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-2/3" /><Skeleton className="h-4 w-20" /></div></div>
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-6 w-full" />
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-6 space-y-4">
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-11 w-full" />
+        </div>
       </div>
     );
   }
 
   if (isError || !data) {
     return (
-      <div className="p-6 text-center text-[#3B82F6] font-bold">
-        Lỗi tải thông tin khóa học. Vui lòng thử lại.
+      <div className="rounded-xl border border-rose-200 bg-rose-50 p-6 text-center">
+        <p className="font-semibold text-rose-700">Không tìm thấy khóa học cần thanh toán.</p>
+        <p className="mt-1 text-sm text-rose-600">Khóa học có thể đã bị ẩn hoặc đường dẫn không đúng.</p>
+        <Link href="/explore" className="mt-4 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+          Quay lại danh sách khóa học
+        </Link>
       </div>
     );
   }
@@ -178,7 +193,8 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
             </div>
           </div>
 
-          {/* Ô nhập mã giảm giá (Coupon input) */}
+          {/* Ô nhập mã giảm giá (Coupon input) — không cần cho khóa miễn phí */}
+          {originalPrice > 0 && (
           <div className="border-t border-[#E2E8F0] pt-5 mb-6">
             <label className="text-xs font-semibold uppercase text-[#64748B] tracking-wider flex items-center gap-1.5 mb-2">
               <Ticket size={16} /> Mã giảm giá / Khuyến mãi
@@ -227,11 +243,12 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
             )}
 
             {couponError && (
-              <p className="mt-2 text-xs font-bold text-[#3B82F6] bg-[#EFF6FF] p-2.5 rounded-xl border border-[#3B82F6]/20 flex items-center gap-1.5">
+              <p role="alert" className="mt-2 text-xs font-bold text-rose-700 bg-rose-50 p-2.5 rounded-xl border border-rose-200 flex items-center gap-1.5">
                 <AlertTriangle size={14} /> {couponError}
               </p>
             )}
           </div>
+          )}
 
           {/* Chi tiết chi phí */}
           <div className="space-y-3 border-t border-[#E2E8F0] pt-4">

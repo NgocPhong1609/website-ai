@@ -63,7 +63,8 @@ export interface CourseDetailHeaderInfo {
  title: string;
  level: string;
  description: string;
- next_lesson_title: string;
+ next_lesson_title: string | null;
+ is_completed?: boolean;
  next_lesson_id?: number | null;
  duration_text: string;
  rating_text: string;

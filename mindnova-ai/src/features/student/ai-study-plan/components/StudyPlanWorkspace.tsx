@@ -46,7 +46,7 @@ return (
  coreConcepts={coreConcepts}
  lessonResources={lessonResources}
  aiInsight={aiInsight}
- moduleBadge={`Module ${currentModuleIndex}`}
+ moduleBadge={coreConcepts?.length ? `Chương ${currentModuleIndex}` : undefined}
  onAskConcept={handleAskConcept}
  />
  </div>

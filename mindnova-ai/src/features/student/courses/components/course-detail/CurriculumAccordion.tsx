@@ -10,10 +10,11 @@ import toast from "react-hot-toast";
 import { LessonStatusIcon, lessonDisplayTitle } from "../LessonStatusIcon";
 
 // ─── Lesson Item Row ──────────────────────────────────────────────────────────
-function LessonItemRow({ lesson, courseId }: { lesson: CourseDetailLessonItem; courseId: string | number }) {
- const isCompleted = lesson.status === "completed";
- const isCurrent = lesson.status === "current";
- const isLocked = lesson.status === "locked";
+function LessonItemRow({ lesson, courseId, isEnrolled }: { lesson: CourseDetailLessonItem; courseId: string | number; isEnrolled: boolean }) {
+ // Learning states only make sense once the student owns the course.
+ const isCompleted = isEnrolled && lesson.status === "completed";
+ const isCurrent = isEnrolled && lesson.status === "current";
+ const isLocked = !isEnrolled || lesson.status === "locked";
 
  const content = (
  <div className={twMerge(
@@ -75,7 +76,7 @@ function LessonItemRow({ lesson, courseId }: { lesson: CourseDetailLessonItem; c
  if (isLocked) {
  return (
  <div 
- onClick={() => toast("Vui lòng hoàn tất các bài học trước để tự động mở khóa bài học này!")}
+ onClick={() => toast(isEnrolled ? "Vui lòng hoàn tất các bài học trước để mở khóa bài học này." : "Đăng ký khóa học để bắt đầu học bài này.")}
  className="block cursor-not-allowed"
  >
  {content}
@@ -91,7 +92,7 @@ function LessonItemRow({ lesson, courseId }: { lesson: CourseDetailLessonItem; c
 }
 
 // ─── Main Accordion Component ─────────────────────────────────────────────────
-export function CurriculumAccordion({ modules = [], courseId = 1 }: { modules?: CourseDetailModuleItem[], courseId?: string | number }) {
+export function CurriculumAccordion({ modules = [], courseId, isEnrolled = false }: { modules?: CourseDetailModuleItem[], courseId: string | number, isEnrolled?: boolean }) {
  const [expandedMap, setExpandedMap] = useState<Record<string, boolean>>({});
 
  // Automatically expand all modules on initial render so user sees full curriculum
@@ -195,7 +196,7 @@ export function CurriculumAccordion({ modules = [], courseId = 1 }: { modules?: 
  ? "bg-[#ECFDF5] text-[#10B981] border-none"
  : "bg-[#F1F5F9] text-[#64748B] border-none"
  }`}>
- {completedInMod}/{totalInMod} Đã học
+ {isEnrolled ? `${completedInMod}/${totalInMod} Đã học` : `${totalInMod} bài học`}
  </span>
  <div className="w-8 h-8 rounded-lg bg-transparent text-[#94A3B8] flex items-center justify-center shrink-0">
  {isExpanded ? <ChevronUp size={18} strokeWidth={2} aria-hidden /> : <ChevronDown size={18} strokeWidth={2} aria-hidden />}
@@ -208,7 +209,7 @@ export function CurriculumAccordion({ modules = [], courseId = 1 }: { modules?: 
  <div className="p-4 pt-0 space-y-2.5 border-t border-[#E2E8F0]">
  <div className="pt-4 space-y-2.5">
  {module.lessons && module.lessons.map((lesson, lessonIdx) => (
- <LessonItemRow key={lesson.id || lessonIdx} lesson={lesson} courseId={courseId} />
+ <LessonItemRow key={lesson.id || lessonIdx} lesson={lesson} courseId={courseId} isEnrolled={isEnrolled} />
  ))}
  </div>
  </div>

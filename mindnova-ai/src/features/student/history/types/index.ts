@@ -9,13 +9,13 @@ export interface HistoryOverviewCard {
 export interface HistoryMetricStat {
  value: string | number;
  unit?: string;
- change_tag?: string;
+ change_tag?: string | null;
  progress_tag?: string;
  tag?: string;
  level_label?: string;
  xp_text?: string;
  percentage?: number;
- ranking_tag?: string;
+ ranking_tag?: string | null;
 }
 
 export interface HistoryMetricsRow {

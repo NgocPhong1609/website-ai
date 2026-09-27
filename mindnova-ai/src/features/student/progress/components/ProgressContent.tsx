@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import {
-  Sparkles, ArrowRight, ArrowUpRight, Zap, Lock,
+  Sparkles, ArrowRight, ArrowUpRight, Zap,
   BookOpen, MessageCircle, Crown, Award, Clock, BarChart3, Target,
   CheckCircle2, LayoutList, LayoutGrid, Flame,
 } from "lucide-react";
@@ -267,9 +267,9 @@ export function ProgressContent() {
                             </button>
                           </Link>
                         ) : (
-                          <span className="flex items-center gap-1.5 text-xs font-medium text-slate-400 whitespace-nowrap">
-                            <Lock size={12} /> Chưa mở
-                          </span>
+                          <Link href={mod.action_link || "/courses"} className="text-xs font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap">
+                            Chưa bắt đầu
+                          </Link>
                         )}
                       </div>
                     </div>
@@ -310,7 +310,6 @@ export function ProgressContent() {
                           {isCompleted ? <CheckCircle2 className="w-4 h-4" /> : (i + 1)}
                         </div>
                         {isActive && <Zap size={14} className="text-amber-500" />}
-                        {isLocked && <Lock size={14} className="text-slate-300" />}
                       </div>
                       <h3 className="text-base font-bold text-slate-900 leading-tight">{mod.title}</h3>
                       <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">{mod.subtitle}</p>

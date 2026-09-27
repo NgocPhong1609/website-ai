@@ -26,9 +26,10 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
   const title = info?.title || "Khóa học AI MindNova";
   const level = info?.level || "Beginner";
   const description = info?.description || "Chương trình đào tạo chất lượng cao cung cấp kiến thức nền tảng và nâng cao.";
-  const nextLesson = info?.next_lesson_title || "Bài giảng tiếp theo";
-  const nextLessonId = info?.next_lesson_id || "1";
-  const durationText = info?.duration_text || "0 Phút tổng cộng";
+  const nextLesson = info?.next_lesson_title;
+  const nextLessonId = info?.next_lesson_id;
+  const isCourseCompleted = !!info?.is_completed;
+  const durationText = info?.duration_text || "Chưa có thời lượng";
   const ratingText = info?.rating_text || "0.0 (0 Đánh giá)";
   const studentsText = info?.students_text || "0 Học viên tích cực";
   const categoryTag = info?.category_tag || "Khóa học AI";
@@ -57,8 +58,8 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
           {/* Breadcrumb & Pill tag */}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <nav className="flex items-center gap-1.5 text-xs font-medium text-[#64748B]">
-              <Link href="/courses" className="hover:text-[#0F172A] transition-colors text-decoration-none">
-                Khóa học của tôi
+              <Link href={isEnrolled ? "/courses" : "/explore"} className="hover:text-[#0F172A] transition-colors text-decoration-none">
+                {isEnrolled ? "Khóa học của tôi" : "Khám phá"}
               </Link>
               <ChevronRight size={14} className="text-[#94A3B8]" />
               <span className="text-[#0F172A] font-semibold">
@@ -102,17 +103,18 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
           <div className="flex flex-wrap items-center gap-3 pt-2">
             {isEnrolled ? (
               <>
-                <Link
-                  href={`/courses/lesson?courseId=${info?.id || 1}&lessonId=${nextLessonId}`}
-                  className="text-decoration-none"
-                >
-                  <button
-                    type="button"
-                    className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-all cursor-pointer shadow-sm"
+                {nextLessonId ? (
+                  <Link
+                    href={`/courses/lesson?courseId=${info?.id}&lessonId=${nextLessonId}`}
+                    className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-colors shadow-sm text-decoration-none"
                   >
-                    <span>Tiếp tục bài học: <strong className="font-normal underline decoration-white/50">{nextLesson}</strong></span>
-                  </button>
-                </Link>
+                    {isCourseCompleted || !nextLesson ? (
+                      <span>Ôn tập lại khóa học</span>
+                    ) : (
+                      <span>Tiếp tục bài học: <strong className="font-normal underline decoration-white/50">{nextLesson}</strong></span>
+                    )}
+                  </Link>
+                ) : null}
 
                 <button
                   type="button"

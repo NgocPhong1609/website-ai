@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { CheckCircle2, AlertTriangle, Lightbulb, Bot, Target, MessageSquare, ClipboardList, Eye, GraduationCap, X, FileEdit, Check, Lock, Flag, Trophy, PartyPopper, ChevronsUpDown, ArrowLeft, ChevronRight, BookOpen, Sparkles, Pencil, Trash2 } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { LessonStatusIcon, lessonDisplayTitle } from "../LessonStatusIcon";
 import Link from "next/link";
@@ -10,7 +11,7 @@ import { useSearchParams } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 import { useQueryClient } from "@tanstack/react-query";
 import { axiosClient } from "@/src/shared/lib/axios";
-import { useGetCourseDetail, useGetInstructorCoursePreview, useInvalidateCourseDetail, completeLesson, fetchQuiz, checkQuizAnswer, submitQuiz, useGetDiscussions, useCreateDiscussion, useUpdateDiscussion, useDeleteDiscussion } from "../../api";
+import { useGetCourseDetail, useGetInstructorCoursePreview, useInvalidateCourseDetail, completeLesson, startLesson, fetchQuiz, checkQuizAnswer, submitQuiz, useGetDiscussions, useCreateDiscussion, useUpdateDiscussion, useDeleteDiscussion } from "../../api";
 import type { CourseDetailLessonItem, CourseDetailData } from "../../types";
 import { CustomVideoPlayer } from "./CustomVideoPlayer";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
@@ -979,30 +980,19 @@ function LessonWorkspaceContent() {
  setActiveTab("content");
  };
 
+ // Record the server-side start time whenever a lesson is opened (completion is validated against it).
+ const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+ useEffect(() => {
+ if (isPreview || !activeLesson?.id || activeLesson.completed) return;
+ startLesson(activeLesson.id).catch(() => {});
+ return () => {
+ if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+ };
+ }, [activeLesson?.id, activeLesson?.completed, isPreview]);
+
  // Handle lesson completion
  const handleLessonComplete = useCallback(async () => {
  if (isPreview || !activeLesson || activeLesson.completed) return;
-
- // Instant UI Update: Modify the TanStack Query Cache directly!
- queryClient.setQueryData(["student", "courses", "detail", String(parsedCourseId)], (oldData: CourseDetailData | undefined) => {
- if (!oldData) return oldData;
- return {
- ...oldData,
- modules: oldData.modules.map(mod => ({
- ...mod,
- lessons: mod.lessons.map(les => ({
- ...les,
- status: les.id.toString() === activeLesson.id ? 'completed' : les.status
- }))
- })),
- progress_card: oldData.progress_card ? {
- ...oldData.progress_card,
- progress_percentage: oldData.progress_card.progress_percentage,
- completed_lessons_count: oldData.progress_card.completed_lessons_count,
- total_lessons_count: oldData.progress_card.total_lessons_count,
- } : undefined
- };
- });
 
  const payload: { playback_position?: number; time_spent_seconds?: number } = {};
  if (activeLesson.type === 'video') {
@@ -1038,10 +1028,19 @@ function LessonWorkspaceContent() {
 
  // Background refetch to guarantee synchronization
  invalidateCourseDetail(parsedCourseId);
- } catch (err) {
+ } catch (err: any) {
+ // The server measures real study time; if it is not enough yet, retry once it is.
+ const remaining = Number(err?.response?.data?.errors?.remaining_seconds);
+ if (err?.response?.status === 422 && remaining > 0) {
+ if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+ retryTimerRef.current = setTimeout(() => { void handleLessonCompleteRef.current?.(); }, (remaining + 1) * 1000);
+ return;
+ }
  console.warn("Completion API error:", err);
  }
  }, [activeLesson, invalidateCourseDetail, parsedCourseId, isPreview, queryClient]);
+ const handleLessonCompleteRef = useRef(handleLessonComplete);
+ useEffect(() => { handleLessonCompleteRef.current = handleLessonComplete; }, [handleLessonComplete]);
 
  // Post comment
  const [confirmDeleteId, setConfirmDeleteId] = useState<string | number | null>(null);
@@ -1119,6 +1118,24 @@ function LessonWorkspaceContent() {
  );
  }
 
+ // Lesson material is only for enrolled learners (the API also strips it for everyone else).
+ if (!isPreview && apiDetail && apiDetail.header_info?.is_enrolled === false) {
+ return (
+ <div className="w-full min-h-[70vh] flex flex-col items-center justify-center p-6">
+ <div className="bg-white p-8 rounded-xl shadow-sm max-w-md w-full text-center border border-slate-200">
+ <div className="mx-auto mb-4 w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center">
+ <Lock size={22} aria-hidden />
+ </div>
+ <h2 className="text-lg font-bold text-slate-900 mb-2">Bạn chưa đăng ký khóa học này</h2>
+ <p className="text-sm text-slate-500 mb-6">Đăng ký khóa học để xem bài giảng, tài liệu và làm bài kiểm tra.</p>
+ <Link href={`/courses/detail?courseId=${parsedCourseId}`} className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors shadow-sm">
+ Xem thông tin khóa học
+ </Link>
+ </div>
+ </div>
+ );
+ }
+
  if (isPreview && (error || (!isLoading && !activeLesson))) {
  const status = (error as any)?.response?.status;
  const message = status === 403 ? "Bạn không có quyền xem trước khóa học này."
@@ -1134,9 +1151,22 @@ function LessonWorkspaceContent() {
 
  if (isLoading || !activeLesson) {
  return (
- <div className="w-full h-screen flex flex-col items-center justify-center bg-blue-50/50">
- <div className="w-12 h-12 border-4 border-[#3B82F6] border-t-transparent rounded-full animate-spin mb-4"></div>
- <p className="text-[#64748B] font-semibold text-sm">Đang tải dữ liệu bài học...</p>
+ <div role="status" aria-busy="true" aria-label="Đang tải bài học" className="w-full min-h-screen bg-slate-50/50">
+ <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+ <div className="space-y-2"><Skeleton className="h-3 w-40" /><Skeleton className="h-5 w-64" /></div>
+ <Skeleton className="h-2 w-40 rounded-full" />
+ </div>
+ <div className="max-w-[1400px] mx-auto p-6 flex flex-col lg:flex-row gap-8">
+ <div className="flex-1 space-y-6">
+ <Skeleton className="aspect-video w-full rounded-xl" />
+ <Skeleton className="h-12 w-full rounded-xl" />
+ <Skeleton className="h-40 w-full rounded-xl" />
+ </div>
+ <div className="w-full lg:w-[340px] space-y-4">
+ <Skeleton className="h-24 w-full rounded-xl" />
+ {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" />)}
+ </div>
+ </div>
  </div>
  );
  }

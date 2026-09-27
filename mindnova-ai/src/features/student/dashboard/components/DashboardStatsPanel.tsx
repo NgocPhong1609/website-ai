@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
-import { FOCUS_AREAS, OVERALL_PROGRESS, STUDY_STREAK } from "../constants";
 import { StudyStreakInteractive } from "./StudyStreakInteractive";
 
 import type { FocusActionKind, FocusArea as FocusAreaType, OverallProgress, StudyStreak } from "../types";
@@ -28,24 +27,28 @@ function OverallProgressCard({ data }: { data: OverallProgress }) {
  <span className="text-2xl font-bold text-slate-900 tracking-tight">
  {percent ?? 0}%
  </span>
+ {/^[+-]?\d/.test(delta ?? "") && (
  <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md">
- +{delta}
+ {delta}
  </span>
+ )}
  </div>
+ {data.level != null && (
  <span className="text-[11px] font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">
- Level {data.level ?? 1}
+ Level {data.level}
  </span>
+ )}
  </div>
 
  <p className="text-xs text-slate-500 font-normal leading-relaxed line-clamp-1">
- {data.description || "Tối ưu hóa đều đặn qua từng học phần của khoá học."}
+ {data.description || ((percent ?? 0) > 0 ? "Trung bình tiến độ các khóa học bạn đang theo." : "Bạn chưa bắt đầu khóa học nào.")}
  </p>
  </div>
 
  <div className="pt-3 border-t border-slate-200 space-y-2">
  <div className="flex items-center justify-between text-xs font-medium text-slate-500">
  <span>Hoàn tất lộ trình</span>
- <span className="text-slate-900 font-semibold">Đạt tiến độ chuẩn</span>
+ <span className="text-slate-900 font-semibold">{percent ?? 0}%</span>
  </div>
  <div className="h-1.5 rounded-full bg-slate-200 overflow-hidden">
  <div
@@ -145,9 +148,9 @@ interface DashboardStatsPanelProps {
 }
 
 export function DashboardStatsPanel({
- overallProgress = OVERALL_PROGRESS,
- studyStreak = STUDY_STREAK,
- focusAreas = FOCUS_AREAS,
+ overallProgress = { percent: 0, delta: "" },
+ studyStreak = { days: 0, message: "" },
+ focusAreas = [],
  weeklyActivity,
  todayKey,
  checkedInDates = [],

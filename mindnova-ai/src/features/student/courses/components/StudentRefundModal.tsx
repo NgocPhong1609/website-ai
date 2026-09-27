@@ -143,7 +143,7 @@ export function StudentRefundModal({
                     <span className="text-[13px] font-medium text-slate-500 mt-0.5">
                       {eligibility?.days_since_purchase !== undefined
                         ? `Đã mua ${eligibility.days_since_purchase} ngày trước`
-                        : "Trong thời hạn 30 ngày"}
+                        : "Chưa xác định được ngày mua"}
                     </span>
                   </div>
                 </div>

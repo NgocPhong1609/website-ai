@@ -21,4 +21,6 @@ export interface Transaction {
  amount: number | string;
  status: TransactionStatus;
  canRefund: boolean;
+ courseId: number | null;
+ paymentLabel: string;
 }

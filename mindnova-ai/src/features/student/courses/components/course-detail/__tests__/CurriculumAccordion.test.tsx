@@ -21,7 +21,7 @@ const modules = [
 
 describe("CurriculumAccordion lesson icons", () => {
   it("uses a Lucide icon that matches each lesson kind", () => {
-    render(<CurriculumAccordion modules={modules} courseId={67} />);
+    render(<CurriculumAccordion modules={modules} courseId={67} isEnrolled />);
 
     expect(screen.getByLabelText("Bài video")).toBeInTheDocument();
     expect(screen.getAllByLabelText("Bài kiểm tra")).toHaveLength(2);
@@ -30,5 +30,14 @@ describe("CurriculumAccordion lesson icons", () => {
     expect(screen.queryByText("▶")).not.toBeInTheDocument();
     expect(screen.getByText("AI Quiz Test After Lesson 144")).toBeInTheDocument();
     expect(screen.queryByText("📜 AI Quiz Test After Lesson 144")).not.toBeInTheDocument();
+  });
+
+  it("does not show learning state or lesson links before enrollment", () => {
+    render(<CurriculumAccordion modules={modules} courseId={67} />);
+
+    expect(screen.queryByText("Đang học")).not.toBeInTheDocument();
+    expect(screen.queryByText("1/5 Đã học")).not.toBeInTheDocument();
+    expect(screen.getByText("5 bài học")).toBeInTheDocument();
+    expect(screen.queryAllByRole("link")).toHaveLength(0);
   });
 });

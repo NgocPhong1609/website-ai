@@ -113,7 +113,9 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  setStatusMessage("Đăng ký thành công...");
   toast.success('Đăng ký thành công!');
   setTimeout(() => {
-  window.location.assign(getRedirectPath(user));
+  // New learners set their goals first so the AI study plan has something to work with.
+  const target = getUserRoleStr(user) === "student" && !user?.is_onboarded ? "/onboarding" : getRedirectPath(user);
+  window.location.assign(target);
   }, 1000);
  }
  } catch (error) {

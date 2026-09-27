@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { 
  AiSuggestionCard, 
  ContinueLearning, 
@@ -36,7 +37,11 @@ export default async function DashboardPage() {
  </div>
  
  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 leading-tight">
- Chào mừng trở lại, <span className="text-blue-600">{userName}!</span>
+ {dashboardData.user ? (
+ <>Xin chào, <span className="text-blue-600">{userName}!</span></>
+ ) : (
+ <>Chào mừng đến với <span className="text-blue-600">MindNova AI</span></>
+ )}
  </h1>
  
  <p className="text-sm text-slate-500 leading-relaxed">
@@ -50,9 +55,9 @@ export default async function DashboardPage() {
  {dashboardData.user ? (
  <Link href="/study-plan" className="group block shrink-0 bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-center min-w-[320px] sm:min-w-[380px] hover:border-blue-500 hover:shadow-md transition-all text-decoration-none focus:outline-none">
  <div className="w-full flex items-center justify-between gap-4 mb-3">
- <span className="text-xs font-semibold text-slate-500 group-hover:text-blue-600 transition-colors">Mục tiêu trong ngày ↗</span>
+ <span className="text-xs font-semibold text-slate-500 group-hover:text-blue-600 transition-colors inline-flex items-center gap-1">Mục tiêu trong ngày <ArrowUpRight className="h-3.5 w-3.5" aria-hidden /></span>
  <span className="text-[11px] font-medium text-slate-700 bg-white px-2.5 py-0.5 rounded-full border border-slate-200 shadow-sm">
- {dashboardData.daily_goal?.percentage === 100 ? "Hoàn thành" : "Đang tiến hành"}
+ {dashboardData.daily_goal?.percentage === 100 ? "Hoàn thành" : (dashboardData.daily_goal?.completed ? "Đang tiến hành" : "Chưa bắt đầu")}
  </span>
  </div>
  
@@ -74,7 +79,7 @@ export default async function DashboardPage() {
  </div>
  
  <p className="text-xs font-medium text-slate-500 mt-4 flex items-center justify-between gap-4">
- <span>{dashboardData.daily_goal?.percentage === 100 ? "Bạn đã đạt mục tiêu hôm nay!" : "Tiếp tục cố gắng nhé!"}</span>
+ <span>{dashboardData.daily_goal?.percentage === 100 ? "Bạn đã đạt mục tiêu hôm nay!" : (dashboardData.daily_goal?.completed ? "Tiếp tục cố gắng nhé!" : "Hoàn thành bài học đầu tiên hôm nay.")}</span>
  <span className="text-blue-600 font-semibold group-hover:underline">Vào học tiếp</span>
  </p>
  </Link>
@@ -115,13 +120,13 @@ export default async function DashboardPage() {
  </>
  ) : (
  <div className="flex flex-col items-center justify-center py-20 px-4 text-center border border-dashed border-slate-200 rounded-xl bg-white">
- <h2 className="text-xl font-semibold text-slate-900 mb-2">Bạn chưa bắt đầu khóa học nào</h2>
+ <h2 className="text-xl font-semibold text-slate-900 mb-2">Bắt đầu hành trình học tập của bạn</h2>
  <p className="text-sm text-slate-500 max-w-md mb-6">
- Khám phá hàng trăm khóa học chất lượng từ chuyên gia và xây dựng lộ trình học tập của riêng bạn ngay hôm nay.
+ Khám phá các khóa học từ giảng viên và đăng nhập để lưu tiến độ, nhận gợi ý từ Trợ lý AI Nova.
  </p>
  <Link 
  href="/explore" 
- className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium text-white bg-slate-900 hover:bg-slate-800 transition-all shadow-sm"
+ className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-sm"
  >
  Tìm khóa học ngay 
  </Link>

@@ -137,28 +137,33 @@ export function CustomVideoPlayer({
  };
  }, [isPlaying, resetControlsTimeout]);
 
- // --- Fallback Completion for Iframe (YouTube / Vimeo) ---
+ // --- Completion for Iframe players (YouTube / Vimeo) ---
+ // We cannot read the embedded player's position, so count the time the lesson is actually on screen
+ // and ask for completion after half the video length; the server re-checks the elapsed time.
  useEffect(() => {
- if (loading || error) return;
- 
+ if (loading || error || isPreview) return;
+
  const isIframe = isExternal && (
  signedUrl.includes("youtube.com") ||
  signedUrl.includes("youtu.be") ||
  signedUrl.includes("vimeo.com")
  );
+ if (!isIframe || completedRef.current) return;
 
- if (!isIframe) return;
- if (completedRef.current) return;
-
- const timer = setTimeout(() => {
- if (!completedRef.current) {
+ const requiredSeconds = Math.max(Math.ceil((lesson.durationSeconds || 0) / 2), 30);
+ let watched = 0;
+ const timer = setInterval(() => {
+ if (document.visibilityState !== "visible") return;
+ watched += 1;
+ if (watched >= requiredSeconds && !completedRef.current) {
  completedRef.current = true;
+ clearInterval(timer);
  onComplete();
  }
- }, 5000);
- 
- return () => clearTimeout(timer);
- }, [loading, error, isExternal, signedUrl, onComplete]);
+ }, 1000);
+
+ return () => clearInterval(timer);
+ }, [loading, error, isExternal, signedUrl, onComplete, isPreview, lesson.durationSeconds]);
 
  // --- Fullscreen Handling ---
  useEffect(() => {

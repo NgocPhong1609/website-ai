@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { CheckoutView } from "@/src/features/student/checkout/components/CheckoutView";
 
 export const metadata: Metadata = {
@@ -13,7 +14,9 @@ type Props = {
 export default async function CheckoutPage({ searchParams }: Props) {
  const resolvedParams = await searchParams;
  const courseIdStr = resolvedParams.courseId;
- const courseId = courseIdStr ? parseInt(courseIdStr as string, 10) : 1;
+ const courseId = courseIdStr ? parseInt(courseIdStr as string, 10) : NaN;
+ // Checkout always needs a concrete course; send the learner back to the catalog otherwise.
+ if (!Number.isInteger(courseId) || courseId <= 0) redirect("/explore");
 
  return (
  <div className="p-6 md:p-8 max-w-[1200px] mx-auto min-h-full">

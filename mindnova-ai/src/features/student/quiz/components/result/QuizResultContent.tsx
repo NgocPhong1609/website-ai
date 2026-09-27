@@ -7,6 +7,7 @@ import { useGetQuizAttemptResult } from "../../api";
 import type { QuizGradingResult, QuestionResultDetail } from "../../types";
 import toast from "react-hot-toast";
 import { axiosClient } from "@shared/lib/axios";
+import { Lightbulb } from "lucide-react";
 
 export function QuizResultContent() {
  const router = useRouter();
@@ -237,7 +238,7 @@ export function QuizResultContent() {
  <span className="text-[#2563eb] font-semibold mr-1">Câu {idx + 1}:</span> {q.question}
  </h3>
  <span className={`text-[11px] font-medium px-2.5 py-1 rounded-full shrink-0 border ${
- isCorrect ? "bg-[#ECFDF5] text-[#10B981] border-[#10B981]/20" : "bg-[#eff6ff] text-[#2563eb] border-[#2563eb]/20"
+ isCorrect ? "bg-[#ECFDF5] text-[#10B981] border-[#10B981]/20" : "bg-rose-50 text-rose-700 border-rose-200"
  }`}>
  {isCorrect ? "Chính xác" : "Chưa đúng"}
  </span>
@@ -246,11 +247,11 @@ export function QuizResultContent() {
  {isEssayOrFill ? (
  <div className="space-y-2 text-xs sm:text-sm">
  <div className="p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
- <span className="font-semibold text-slate-500 block mb-1">️ Bài làm của bạn:</span>
+ <span className="font-semibold text-slate-500 block mb-1">Bài làm của bạn:</span>
  <p className="text-slate-900">{userAns || <em className="text-slate-500">Bỏ trống</em>}</p>
  </div>
  <div className="p-3.5 rounded-xl bg-[#f8fafc]/40 border border-[#0f172a]/30">
- <span className="font-semibold text-[#065F46] block mb-1"> Đáp số / Gợi ý chuẩn:</span>
+ <span className="font-semibold text-[#065F46] block mb-1">Đáp số / Gợi ý chuẩn:</span>
  <p className="text-[#065F46] font-medium">{rawCorrect}</p>
  </div>
  </div>
@@ -265,14 +266,14 @@ export function QuizResultContent() {
  if (isRightKey) {
  style = "bg-[#ECFDF5] border-[#10B981]/40 text-[#065F46] font-medium shadow-xs";
  } else if (isChosen && !isRightKey) {
- style = "bg-[#eff6ff] border-[#2563eb]/40 text-[#1d4ed8] font-medium shadow-xs";
+ style = "bg-rose-50 border-rose-300 text-rose-800 font-medium shadow-xs";
  }
 
  return (
  <div key={optIdx} className={`p-3.5 rounded-xl border text-xs sm:text-sm flex items-center justify-between transition-colors ${style}`}>
  <span>{opt}</span>
  {isChosen && (
- <span className={`text-[10px] font-medium px-2 py-0.5 rounded-md ${isRightKey ? "bg-[#10B981] text-white" : "bg-blue-600 text-white"}`}>
+ <span className={`text-[10px] font-medium px-2 py-0.5 rounded-md ${isRightKey ? "bg-[#10B981] text-white" : "bg-rose-600 text-white"}`}>
  Bạn chọn
  </span>
  )}
@@ -286,7 +287,7 @@ export function QuizResultContent() {
  <div className="p-4 rounded-xl bg-[#f8fafc]/70 border border-[#2563eb]/20 space-y-2">
  <div className="flex items-center justify-between">
  <span className="text-xs font-bold text-[#2563eb] flex items-center gap-1.5">
- <span></span> Hướng dẫn giải từ AI:
+ <Lightbulb size={14} aria-hidden /> Hướng dẫn giải từ AI:
  </span>
  <button
  type="button"

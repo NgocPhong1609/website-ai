@@ -16,16 +16,6 @@ class HistoryService
          $page = max(1, $page);
          $perPage = max(1, $perPage);
          
-         // Default metrics & activity numbers
-         $totalActivities = 142;
-         $totalLessons = 142;
-         $quizAverage = '88%';
-         $studyHours = '48.5';
-         $aiLevel = 'Level 8';
-         $aiXpText = '80 / 100 XP';
-         $aiPercentage = 80;
-         $streakLabel = '🔥 Chuỗi 30 ngày chuyên cần';
-
          $timelineItems = collect();
 
          // 1. Get real quiz attempts
@@ -40,7 +30,7 @@ class HistoryService
                          'type' => 'quiz',
                          'badge_text' => 'Bài đánh giá',
                          'created_at' => $att->created_at,
-                         'time_text' => $att->created_at ? $att->created_at->format('H:i A') : '',
+                         'time_text' => $att->created_at ? $att->created_at->format('H:i') : '',
                          'date_string' => $att->created_at ? $att->created_at->format('Y-m-d') : now()->format('Y-m-d'),
                          'title' => $att->quiz ? $att->quiz->title : "Khảo sát Trắc nghiệm #{$att->id}",
                          'subtitle' => 'Đánh giá chuyên môn MindNova Co-Pilot',
@@ -63,7 +53,7 @@ class HistoryService
                          'type' => 'lesson',
                          'badge_text' => 'Bài học hoàn tất',
                          'created_at' => $c->completed_at ?? $c->created_at ?? now(),
-                         'time_text' => ($c->completed_at ?? $c->created_at ?? now())->format('H:i A'),
+                         'time_text' => ($c->completed_at ?? $c->created_at ?? now())->format('H:i'),
                          'date_string' => ($c->completed_at ?? $c->created_at ?? now())->format('Y-m-d'),
                          'title' => $c->lesson ? $c->lesson->title : 'Bài học',
                          'subtitle' => $c->lesson && $c->lesson->module ? $c->lesson->module->title : 'Học phần',
@@ -114,34 +104,36 @@ class HistoryService
              ];
          }
 
+         $metrics = $this->buildMetrics($userId, $timelineItems);
+
          return [
              'overview_card' => [
                  'total_activities' => $totalActivities,
-                 'status_badge' => 'Tích cực 100%',
-                 'status_tag' => 'Active',
-                 'streak_label' => $streakLabel,
-                 'next_level_label' => 'Level 8 ➔',
+                 'status_badge' => $metrics['active_this_week'] ? 'Hoạt động tuần này' : 'Chưa hoạt động tuần này',
+                 'status_tag' => $metrics['active_this_week'] ? 'Active' : 'Idle',
+                 'streak_label' => $metrics['streak'] > 0 ? "Chuỗi {$metrics['streak']} ngày chuyên cần" : 'Chưa có chuỗi chuyên cần',
+                 'next_level_label' => "Level {$metrics['level']}",
              ],
              'metrics_row' => [
                  'total_lessons' => [
                      'value' => $totalLessons,
                      'unit' => 'bài',
-                     'change_tag' => '+12% tháng này',
+                     'change_tag' => $metrics['lessons_this_month'] > 0 ? "+{$metrics['lessons_this_month']} tháng này" : null,
                  ],
                  'quiz_average' => [
-                     'value' => $quizAverage,
-                     'progress_tag' => 'Tiến bộ tốt',
+                     'value' => $metrics['quiz_average'] !== null ? "{$metrics['quiz_average']}%" : '—',
+                     'progress_tag' => $metrics['quiz_average'] === null ? 'Chưa làm bài' : ($metrics['quiz_average'] >= 80 ? 'Tốt' : ($metrics['quiz_average'] >= 50 ? 'Đạt' : 'Cần cố gắng')),
                  ],
                  'study_hours' => [
-                     'value' => $studyHours,
+                     'value' => $metrics['study_hours'],
                      'unit' => 'giờ',
-                     'tag' => 'Chuyên cần cao',
+                     'tag' => 'Theo bài đã học',
                  ],
                  'ai_proficiency' => [
-                     'level_label' => $aiLevel,
-                     'xp_text' => $aiXpText,
-                     'percentage' => $aiPercentage,
-                     'ranking_tag' => '🌟 Top 10%',
+                     'level_label' => "Level {$metrics['level']}",
+                     'xp_text' => "{$metrics['xp_in_level']} / 100 XP",
+                     'percentage' => $metrics['xp_in_level'],
+                     'ranking_tag' => null,
                  ],
              ],
              'timeline_groups' => $timelineGroups,
@@ -153,6 +145,40 @@ class HistoryService
                  'total_pages' => $totalPages,
                  'has_more' => $page < $totalPages,
              ],
+         ];
+     }
+
+     /**
+      * Real learner metrics. XP: 10 per completed lesson, 20 per finished quiz; 100 XP per level.
+      */
+     private function buildMetrics(?int $userId, \Illuminate\Support\Collection $timelineItems): array
+     {
+         $empty = ['quiz_average' => null, 'study_hours' => '0', 'streak' => 0, 'level' => 1, 'xp_in_level' => 0, 'lessons_this_month' => 0, 'active_this_week' => false];
+         if (!$userId) {
+             return $empty;
+         }
+
+         $courseScores = UserQuizAttempt::where('user_id', $userId)->pluck('score');
+         $aiScores = \App\Models\AiGeneratedQuiz::where('user_id', $userId)->where('is_completed', true)->pluck('score');
+         $scores = $courseScores->merge($aiScores)->filter(fn ($v) => $v !== null);
+         $quizAverage = $scores->isNotEmpty() ? (int) round($scores->avg()) : null;
+
+         $seconds = \App\Models\LessonCompletion::where('lesson_completions.user_id', $userId)
+             ->join('lessons', 'lessons.id', '=', 'lesson_completions.lesson_id')
+             ->sum('lessons.duration_seconds');
+
+         $streak = (int) (\App\Models\UserStreak::where('user_id', $userId)->value('current_streak') ?? 0);
+
+         $xp = $timelineItems->where('type', 'lesson')->count() * 10 + $scores->count() * 20;
+
+         return [
+             'quiz_average' => $quizAverage,
+             'study_hours' => rtrim(rtrim(number_format($seconds / 3600, 1, '.', ''), '0'), '.') ?: '0',
+             'streak' => $streak,
+             'level' => intdiv($xp, 100) + 1,
+             'xp_in_level' => $xp % 100,
+             'lessons_this_month' => $timelineItems->where('type', 'lesson')->filter(fn ($i) => \Carbon\Carbon::parse($i['created_at'])->isCurrentMonth())->count(),
+             'active_this_week' => $timelineItems->contains(fn ($i) => \Carbon\Carbon::parse($i['created_at'])->greaterThanOrEqualTo(now()->subDays(7))),
          ];
      }
 }

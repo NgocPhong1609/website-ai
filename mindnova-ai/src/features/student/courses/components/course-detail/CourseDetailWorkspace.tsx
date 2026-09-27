@@ -3,17 +3,33 @@
 import { getErrorMessage } from "@/src/shared/lib/user-error";
 
 import React from "react";
-import { Loader } from "@/src/shared/components/ui/Loader";
+import { Skeleton, SkeletonList } from "@/src/shared/components/ui/Skeleton";
+import { useConfirmDialog } from "@/src/shared/components/ui/ConfirmDialog";
 import { NoDataAvailable } from "@/src/shared/components/ui";
-import { MessageSquareOff, Star } from "lucide-react";
+import { Lock, MessageSquareOff, Star } from "lucide-react";
 import { useGetCourseDetail, useGetCourseReviews, useCreateCourseReview, useUpdateCourseReview, useDeleteCourseReview } from "../../api";
 import { CourseHeader } from "./CourseHeader";
 import { CurriculumAccordion } from "./CurriculumAccordion";
 import { CourseSidebar } from "./CourseSidebar";
 import toast from "react-hot-toast";
 
-function CourseReviewSection({ courseId }: { courseId: string | number }) {
+function useCurrentUserId(): string | null {
+ const [id, setId] = React.useState<string | null>(null);
+ React.useEffect(() => {
+ try {
+ const raw = window.localStorage.getItem("userInfo");
+ setId(raw ? String(JSON.parse(raw)?.id ?? "") || null : null);
+ } catch {
+ setId(null);
+ }
+ }, []);
+ return id;
+}
+
+function CourseReviewSection({ courseId, isEnrolled }: { courseId: string | number; isEnrolled: boolean }) {
  const { data: reviewsData, isLoading: isReviewsLoading } = useGetCourseReviews(courseId);
+ const currentUserId = useCurrentUserId();
+ const { confirm } = useConfirmDialog();
  const createReviewMutation = useCreateCourseReview();
  const updateReviewMutation = useUpdateCourseReview();
  const deleteReviewMutation = useDeleteCourseReview();
@@ -26,6 +42,9 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
 
  const reviews = reviewsData?.reviews ?? [];
  const averageRating = reviewsData?.average_rating ?? 0;
+ const isMine = (review: typeof reviews[0]) => !!currentUserId && String(review.user?.id ?? "") === currentUserId;
+ const myReview = reviews.find(isMine);
+ const canWriteReview = isEnrolled && !myReview;
 
  const onSubmit = async (e: React.FormEvent) => {
  e.preventDefault();
@@ -45,6 +64,7 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
 
  setComment("");
  setRating(5);
+ toast.success("Cảm ơn bạn đã đánh giá khóa học!");
  } catch (error: any) {
  const message = getErrorMessage(error, "Không thể gửi nhận xét. Vui lòng thử lại.");
  setSubmitError(message);
@@ -75,7 +95,13 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  };
 
  const handleDelete = async (reviewId: string | number) => {
- if (!window.confirm("Bạn có chắc muốn xóa nhận xét này?")) return;
+ const confirmed = await confirm({
+ title: "Xóa nhận xét",
+ message: "Bạn có chắc muốn xóa nhận xét này? Bạn có thể viết lại nhận xét mới sau đó.",
+ confirmText: "Xóa nhận xét",
+ variant: "danger",
+ });
+ if (!confirmed) return;
 
  try {
  await deleteReviewMutation.mutateAsync({
@@ -99,6 +125,16 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  </div>
  </div>
 
+ {!isEnrolled ? (
+ <div className="mt-6 flex items-center gap-3 rounded-xl border border-dashed border-[#E2E8F0] bg-[#F8FAFC] p-4 text-sm text-[#64748B]">
+ <Lock size={16} className="shrink-0 text-[#94A3B8]" aria-hidden />
+ <span>Đăng ký khóa học để gửi nhận xét và đánh giá của bạn.</span>
+ </div>
+ ) : !canWriteReview ? (
+ <div className="mt-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-sm text-[#64748B]">
+ Bạn đã đánh giá khóa học này. Bạn có thể sửa hoặc xóa nhận xét của mình ở danh sách bên dưới.
+ </div>
+ ) : (
  <form onSubmit={onSubmit} className="mt-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
  <div className="flex items-center gap-1 mb-2">
  <span className="text-sm font-medium text-[#64748B] mr-2">Mức độ hài lòng:</span>
@@ -138,13 +174,14 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  </div>
 
  {submitError ? (
- <p className="mt-3 text-sm text-[#3B82F6] font-medium">{submitError}</p>
+ <p className="mt-3 text-sm text-rose-600 font-medium" role="alert">{submitError}</p>
  ) : null}
  </form>
+ )}
 
  <div className="mt-6 space-y-4">
  {isReviewsLoading ? (
- <div className="flex items-center justify-center py-8 text-sm text-[#64748B]">Đang tải bình luận...</div>
+ <SkeletonList items={2} />
  ) : reviews.length === 0 ? (
  <NoDataAvailable
   icon={MessageSquareOff}
@@ -217,6 +254,7 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  ) : (
  <>
  <p className="mt-3 text-sm leading-relaxed text-[#64748B]">{review.comment}</p>
+ {isMine(review) && (
  <div className="mt-3 flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
  <button
  onClick={() => handleEdit(review)}
@@ -227,11 +265,12 @@ function CourseReviewSection({ courseId }: { courseId: string | number }) {
  <button
  onClick={() => handleDelete(review.id)}
  disabled={deleteReviewMutation.isPending}
- className="text-xs font-bold text-[#3B82F6] hover:text-[#2563EB] transition-colors disabled:opacity-50"
+ className="text-xs font-bold text-rose-600 hover:text-rose-700 transition-colors disabled:opacity-50"
  >
  Xóa
  </button>
  </div>
+ )}
  </>
  )}
  </div>
@@ -247,8 +286,23 @@ export function CourseDetailWorkspace({ courseId }: { courseId: string | number 
 
  if (isLoading) {
  return (
- <div className="p-6 md:p-12 max-w-[1400px] mx-auto min-h-[70vh] flex items-center justify-center">
- <Loader size="lg" text="Đang đồng bộ dữ liệu giáo trình và trợ lý AI Nova cho khóa học..." />
+ <div role="status" aria-busy="true" aria-label="Đang tải khóa học" className="p-6 md:p-8 max-w-[1400px] mx-auto flex flex-col lg:flex-row items-start gap-8">
+ <div className="flex-1 w-full space-y-6">
+ <div className="rounded-xl border border-[#E2E8F0] bg-white p-6 space-y-4">
+ <Skeleton className="h-4 w-48" />
+ <Skeleton className="h-9 w-2/3" />
+ <Skeleton className="h-4 w-1/2" />
+ <Skeleton className="h-10 w-40" />
+ </div>
+ <div className="rounded-xl border border-[#E2E8F0] bg-white p-6 space-y-3">
+ <Skeleton className="h-6 w-64" />
+ {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
+ </div>
+ </div>
+ <div className="w-full lg:w-[340px] space-y-6">
+ <Skeleton className="h-44 w-full rounded-xl" />
+ <Skeleton className="h-32 w-full rounded-xl" />
+ </div>
  </div>
  );
  }
@@ -256,8 +310,8 @@ export function CourseDetailWorkspace({ courseId }: { courseId: string | number 
  if (isError || !data) {
  return (
  <div className="p-6 md:p-12 max-w-[1400px] mx-auto min-h-[60vh] flex flex-col items-center justify-center text-center gap-3">
- <div className="px-4 py-1.5 rounded-md bg-[#3B82F6] text-white text-xs font-bold tracking-widest uppercase mb-1">
- LỖI
+ <div className="px-4 py-1.5 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold tracking-widest uppercase mb-1">
+ Lỗi
  </div>
  <h3 className="text-lg font-semibold text-[#0F172A]">Không thể tải thông tin khóa học</h3>
  <p className="text-xs text-[#64748B] max-w-md leading-relaxed">
@@ -266,7 +320,7 @@ export function CourseDetailWorkspace({ courseId }: { courseId: string | number 
  <button 
  type="button"
  onClick={() => refetch()} 
- className="mt-4 px-6 py-2.5 bg-[#0F172A] text-white text-xs font-bold rounded-lg hover:bg-[#1C1D23] transition-all cursor-pointer"
+ className="mt-4 px-6 py-2.5 bg-[#3B82F6] text-white text-xs font-bold rounded-lg hover:bg-[#2563EB] transition-colors cursor-pointer"
  >
  Thử tải lại ngay
  </button>
@@ -281,8 +335,8 @@ export function CourseDetailWorkspace({ courseId }: { courseId: string | number 
  {/* Main Content (Left) */}
  <div className="flex-1 w-full min-w-0">
  <CourseHeader info={header_info} />
- <CurriculumAccordion modules={modules} courseId={courseId} />
- <CourseReviewSection courseId={courseId} />
+ <CurriculumAccordion modules={modules} courseId={courseId} isEnrolled={!!header_info.is_enrolled} />
+ <CourseReviewSection courseId={courseId} isEnrolled={!!header_info.is_enrolled} />
  </div>
 
  {/* Sidebar (Right) */}

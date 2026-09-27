@@ -135,7 +135,7 @@ function TransactionRow({ tx, onRefundClick }: { tx: Transaction; onRefundClick?
               {tx.service}
             </p>
             <p className="text-[11px] font-normal text-slate-500">
-              Thanh toán thành công qua thẻ trực tuyến
+              {tx.paymentLabel}
             </p>
           </div>
         </div>
@@ -154,7 +154,7 @@ function TransactionRow({ tx, onRefundClick }: { tx: Transaction; onRefundClick?
       {/* Actions */}
       <td className="pr-6 pl-4 py-4 whitespace-nowrap text-right">
         <div className="flex items-center justify-end gap-2">
-          {tx.status === "Paid" && (
+          {tx.canRefund && (
             <button
               type="button"
               onClick={() => onRefundClick?.(tx)}
@@ -171,6 +171,20 @@ function TransactionRow({ tx, onRefundClick }: { tx: Transaction; onRefundClick?
 }
 
 // ─── Transaction History Table ────────────────────────────────────────────────
+
+const PERIOD_MONTHS: Record<FilterPeriod, number | null> = {
+  "3 Tháng qua": 3,
+  "6 Tháng qua": 6,
+  "1 Năm qua": 12,
+  "Tất cả thời gian": null,
+};
+
+const PAYMENT_LABELS: Record<string, string> = {
+  free: "Nhận miễn phí",
+  vnpay: "Thanh toán qua VNPay",
+  momo: "Thanh toán qua MoMo",
+  banking: "Chuyển khoản ngân hàng",
+};
 
 function mapStatus(status: string): TransactionStatus {
   if (status === "completed") return "Paid";
@@ -192,10 +206,20 @@ export function TransactionHistoryTable({ orders = [], isLoading = false }: { or
     serviceIcon: "course",
     amount: `${Number(order.total_amount).toLocaleString("vi-VN")} VNĐ`,
     status: mapStatus(order.status),
-    canRefund: order.status === "completed",
+    // Free enrolments have nothing to refund; the modal itself checks the 30-day/progress rules.
+    canRefund: order.status === "completed" && Number(order.total_amount) > 0 && !!order.course_id,
+    courseId: order.course_id ?? null,
+    paymentLabel: PAYMENT_LABELS[order.payment_method] ?? "Thanh toán trực tuyến",
   }));
 
-  const displayed = showAll ? transactions : transactions.slice(0, 4);
+  const months = PERIOD_MONTHS[filter];
+  const cutoff = new Date();
+  if (months) cutoff.setMonth(cutoff.getMonth() - months);
+  const filtered = months ? transactions.filter((tx) => {
+    const [d, m, y] = tx.date.split("/").map(Number);
+    return !y || new Date(y, (m || 1) - 1, d || 1) >= cutoff;
+  }) : transactions;
+  const displayed = showAll ? filtered : filtered.slice(0, 4);
 
   return (
     <div className="rounded-xl bg-white border border-[#e2e8f0] shadow-2xs overflow-hidden transition-all duration-300 hover:shadow-md">
@@ -205,7 +229,7 @@ export function TransactionHistoryTable({ orders = [], isLoading = false }: { or
           <h2 className="text-base font-semibold text-slate-900 flex items-center gap-2">
             <span>Lịch Sử Giao Dịch &amp; Học Phí</span>
             <span className="text-[11px] font-medium text-[#2563eb] bg-[#f8fafc] px-2.5 py-0.5 rounded-full border border-[#2563eb]/20">
-              {isLoading ? "..." : `${transactions.length} Giao dịch`}
+              {isLoading ? "..." : `${filtered.length} Giao dịch`}
             </span>
           </h2>
           <p className="text-xs font-normal text-slate-500 mt-1">
@@ -262,7 +286,7 @@ export function TransactionHistoryTable({ orders = [], isLoading = false }: { or
       </div>
 
       {/* Footer view controls */}
-      {!showAll && transactions.length > 4 && (
+      {!showAll && filtered.length > 4 && (
         <div className="border-t border-[#F0F2FA] p-4 flex justify-center bg-[#F8FAFC]/40">
           <button
             type="button"
@@ -275,11 +299,11 @@ export function TransactionHistoryTable({ orders = [], isLoading = false }: { or
         </div>
       )}
 
-      {refundTx && (
+      {refundTx?.courseId && (
         <StudentRefundModal
           isOpen={!!refundTx}
           onClose={() => setRefundTx(null)}
-          courseId={68}
+          courseId={refundTx.courseId}
           courseTitle={refundTx.service}
         />
       )}

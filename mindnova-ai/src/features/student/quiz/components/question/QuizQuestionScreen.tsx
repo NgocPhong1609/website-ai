@@ -560,7 +560,8 @@ export function QuizQuestionScreen({
                     <span className={`ml-3.5 text-sm sm:text-base flex-1 leading-relaxed transition-colors ${
                       isSelected ? "font-semibold text-slate-900" : "font-normal text-slate-500"
                     }`}>
-                      {answer.content}
+                      {/* AI-generated options often already start with "A." — the letter badge shows it */}
+                      {String(answer.content ?? "").replace(/^\s*[A-Da-d][.):]\s*/, "")}
                       {answer.image_url && (
                         <img
                           src={answer.image_url}
