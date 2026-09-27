@@ -151,6 +151,23 @@ export function ProgressContent() {
       </section>
 
       {/* ── Tab + View Toggle ── */}
+      {(!roadmap_modules || roadmap_modules.length === 0) ? (
+        <div className="flex flex-col items-center justify-center bg-white border border-slate-200 rounded-xl py-20 px-6 text-center shadow-sm flex-1">
+          <div className="w-20 h-20 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mb-5">
+            <BookOpen className="w-10 h-10 text-slate-300" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">Chưa có dữ liệu học tập</h3>
+          <p className="text-sm text-slate-500 max-w-md mx-auto mb-8 leading-relaxed">
+            Bạn chưa đăng ký khóa học nào nên tiến trình học tập hiện đang trống. Hãy khám phá các khóa học phù hợp và bắt đầu rèn luyện kỹ năng ngay nhé.
+          </p>
+          <Link href="/explore">
+            <button className="px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-sm cursor-pointer flex items-center gap-2">
+              Khám phá khóa học <ArrowRight size={16} />
+            </button>
+          </Link>
+        </div>
+      ) : (
+        <>
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
           <button
@@ -466,6 +483,8 @@ export function ProgressContent() {
             </div>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );
