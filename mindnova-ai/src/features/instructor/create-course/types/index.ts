@@ -17,7 +17,7 @@ export interface CourseBasicInfo {
  categoryName?: string | null;
  otherName: string;
  difficulty: DifficultyLevel;
- thumbnailFile: File | null;
+ thumbnailMediaId: number | null;
  thumbnailPreview: string | null;
 }
 

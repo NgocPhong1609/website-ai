@@ -1,11 +1,13 @@
 import { InstructorSidebar } from "@/src/features/instructor/management/components/InstructorSidebar";
 import { InstructorTopbar } from "@/src/features/instructor/management/components/InstructorTopbar";
-import { FloatingAiChat } from "@/src/features/student/layout";
 import { InstructorRoleGuard } from "@/src/shared/components/InstructorRoleGuard";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
- title: "Quản lý Khóa học — MindNova AI Instructor",
+ title: {
+  template: "%s — MindNova Giảng viên",
+  default: "Quản lý Khóa học — MindNova Giảng viên",
+ },
  description:
  "Bảng điều khiển giảng viên MindNova AI — quản lý khóa học, học viên và doanh thu.",
 };
@@ -21,7 +23,6 @@ export default function InstructorLayout({
  <InstructorTopbar />
  <main className="flex-1 overflow-y-auto pb-24">{children}</main>
  </div>
- <FloatingAiChat />
  </div>
  </InstructorRoleGuard>
  );

@@ -2,8 +2,8 @@ import { SalesReportContainer } from "@features/instructor/revenue";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
- title: "Detailed Sales Analytics — MindNova AI",
- description: "Detailed sales reports and analytics.",
+ title: "Báo cáo Bán hàng",
+ description: "Phân tích chi tiết doanh số bán hàng.",
 };
 
 export default function SalesReportPage() {

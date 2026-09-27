@@ -50,6 +50,7 @@ use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardControll
 
 // Nhóm Instructor (Giáo viên)
 use App\Http\Controllers\Api\Instructor\CourseController;
+use App\Http\Controllers\Api\Instructor\CourseWizardController;
 use App\Http\Controllers\Api\Instructor\CourseModuleController;
 use App\Http\Controllers\Api\Instructor\LessonController;
 use App\Http\Controllers\Api\Instructor\MediaController;
@@ -229,6 +230,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::post('categories', [InstructorCategoryController::class, 'store']);
 
     // Khóa học
+    Route::post('courses/wizard', [CourseWizardController::class, 'store']);
     Route::apiResource('courses', CourseController::class);
     Route::post('courses/{course}/thumbnail', [CourseController::class, 'uploadThumbnail']);
     Route::patch('courses/{course}/status', [CourseController::class, 'updateStatus']);

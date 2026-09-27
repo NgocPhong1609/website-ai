@@ -2,7 +2,7 @@ import { StudentManagementContainer } from "@/src/features/instructor/student-ma
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
- title: "Quản lý Học viên — MindNova AI",
+ title: "Quản lý Học viên",
  description:
  "Theo dõi, hỗ trợ và tương tác với cộng đồng học viên MindNova AI.",
 };

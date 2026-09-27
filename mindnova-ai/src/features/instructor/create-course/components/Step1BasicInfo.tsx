@@ -8,10 +8,11 @@ import {
  MAX_TITLE_LENGTH,
  MAX_DESCRIPTION_LENGTH,
 } from "../constants";
-import { useInstructorCategories } from "../api";
+import { useInstructorCategories, useUploadTempMedia } from "../api";
 import type { CourseBasicInfo, DifficultyLevel } from "../types";
 import { ChevronDown } from "lucide-react";
 import { Skeleton } from "@/src/shared/components/ui/Skeleton";
+import toast from "react-hot-toast";
 
 interface CharCountProps {
  current: number;
@@ -70,9 +71,10 @@ function DifficultyToggle({ value, onChange }: DifficultyToggleProps) {
 interface Step1BasicInfoProps {
  data: CourseBasicInfo;
  onChange: <K extends keyof CourseBasicInfo>(key: K, value: CourseBasicInfo[K]) => void;
+ errors?: Record<string, string>;
 }
 
-export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
+export function Step1BasicInfo({ data, onChange, errors = {} }: Step1BasicInfoProps) {
  const { data: categories = [], isLoading: categoriesLoading, isError: categoriesError, refetch: refetchCategories } = useInstructorCategories();
  const [search, setSearch] = useState("");
  const [open, setOpen] = useState(false);
@@ -90,16 +92,27 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
    ?? data.categoryName
    ?? "";
 
+ const { mutateAsync: uploadTempMedia } = useUploadTempMedia();
+
  const handleThumbnail = useCallback(
- (file: File, preview: string) => {
- onChange("thumbnailFile", file);
- onChange("thumbnailPreview", preview);
+ async (file: File, preview: string) => {
+ onChange("thumbnailPreview", preview); // Show preview immediately
+
+ try {
+ const data = await uploadTempMedia({ file });
+ // Assuming data returns { id, url, ... }
+ onChange("thumbnailMediaId", data.data.id);
+ } catch (error) {
+ toast.error("Lỗi khi tải ảnh lên. Vui lòng thử lại.");
+ onChange("thumbnailMediaId", null);
+ onChange("thumbnailPreview", null);
+ }
  },
- [onChange]
+ [onChange, uploadTempMedia]
  );
 
  const handleThumbnailRemove = useCallback(() => {
- onChange("thumbnailFile", null);
+ onChange("thumbnailMediaId", null);
  onChange("thumbnailPreview", null);
  }, [onChange]);
 
@@ -148,8 +161,9 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  maxLength={MAX_TITLE_LENGTH}
  placeholder="Ví dụ: Lập trình Trí tuệ Nhân tạo AI Mastery với LLM & RAG 2026..."
  onChange={(e) => onChange("title", e.target.value)}
- className="w-full px-4 py-2.5 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm"
+ className={`w-full px-4 py-2.5 rounded-lg text-sm text-slate-900 bg-white border focus:outline-none focus:ring-1 transition-all shadow-sm ${errors?.title ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500 placeholder:text-rose-300' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500 placeholder:text-slate-400'}`}
  />
+ {errors?.title && <p className="text-xs text-rose-500">{errors.title}</p>}
  </div>
 
  {/* Description */}
@@ -167,8 +181,9 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  rows={4}
  placeholder="Nhập tóm tắt khóa học giúp học viên nhanh chóng nắm bắt được giá trị kiến thức, cơ hội việc làm và mục tiêu đạt được sau tốt nghiệp..."
  onChange={(e) => onChange("description", e.target.value)}
- className="w-full px-4 py-3 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none leading-relaxed shadow-sm"
+ className={`w-full px-4 py-3 rounded-lg text-sm text-slate-900 bg-white border focus:outline-none focus:ring-1 transition-all resize-none leading-relaxed shadow-sm ${errors?.description ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500 placeholder:text-rose-300' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500 placeholder:text-slate-400'}`}
  />
+ {errors?.description && <p className="text-xs text-rose-500">{errors.description}</p>}
  </div>
 
  {/* Field + Difficulty row */}
@@ -250,12 +265,16 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  )}
  </div>
  {data.field === OTHER_CATEGORY_VALUE && (
+ <div className="mt-2">
  <input
  value={data.otherName}
  onChange={(e) => onChange("otherName", e.target.value)}
  placeholder="Nhập lĩnh vực khác..."
- className="mt-2 w-full px-4 py-2.5 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+ className={`w-full px-4 py-2.5 rounded-lg text-sm text-slate-900 bg-white border focus:outline-none focus:ring-1 transition-all
+ ${errors?.otherName ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500 placeholder:text-rose-300' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500 placeholder:text-slate-400'}`}
  />
+ {errors?.otherName && <p className="text-xs text-rose-500 mt-1">{errors.otherName}</p>}
+ </div>
  )}
  </div>
 

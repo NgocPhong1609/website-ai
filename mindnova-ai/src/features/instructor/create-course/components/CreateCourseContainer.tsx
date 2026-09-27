@@ -11,7 +11,7 @@ import { Step2CourseStructure } from "./Step2CourseStructure";
 import { Step3SettingsPrice } from "./Step3SettingsPrice";
 import { AIOutlineModal } from "./AIOutlineModal";
 import type { CourseBasicInfo, StepKey } from "../types";
-import { useCreateCourse, useUploadCourseThumbnail, useUpdateCoursePrice, useUpdateCourseStatus, useProposeCategory } from "../api";
+import { useCreateCourseWizard, CourseWizardPayload, useProposeCategory } from "../api";
 import { useCreateModule, useCreateLesson, useCreateQuiz } from "../../lesson-management/api";
 import { useCreateCourseStore } from "../stores/createCourseStore";
 import { OTHER_CATEGORY_VALUE } from "../constants";
@@ -22,6 +22,7 @@ export function CreateCourseContainer() {
  
  // ── Zustand store ─────────────────────────────────────────────────────────────
  const step = useCreateCourseStore((s) => s.step);
+ const idempotencyKey = useCreateCourseStore((s) => s.idempotencyKey);
  const courseInfo = useCreateCourseStore((s) => s.courseInfo);
  const modules = useCreateCourseStore((s) => s.modules);
  const settings = useCreateCourseStore((s) => s.settings);
@@ -38,14 +39,8 @@ export function CreateCourseContainer() {
  const [publishError, setPublishError] = useState<string | null>(null);
 
  // ── API mutations ─────────────────────────────────────────────────────────────
- const { mutateAsync: createCourse } = useCreateCourse();
+ const { mutateAsync: createCourseWizard } = useCreateCourseWizard();
  const { mutateAsync: proposeCategory } = useProposeCategory();
- const { mutateAsync: uploadThumbnail } = useUploadCourseThumbnail();
- const { mutateAsync: updatePrice } = useUpdateCoursePrice();
- const { mutateAsync: updateStatus } = useUpdateCourseStatus();
- const { mutateAsync: createModule } = useCreateModule();
- const { mutateAsync: createLesson } = useCreateLesson();
- const { mutateAsync: createQuiz } = useCreateQuiz();
 
  useEffect(() => {
  hydrate();
@@ -118,14 +113,37 @@ export function CreateCourseContainer() {
  setIsOutlineOpen(false);
  }, []);
 
+ const [errors, setErrors] = useState<Record<string, string>>({});
+
  const handleNext = useCallback(() => {
+ setErrors({}); // Clear old errors
  if (step === 1) {
- if (!courseInfo.title.trim()) {
- toast.error("Vui lòng nhập tên khóa học.");
- return;
+ let isValid = true;
+ const newErrors: Record<string, string> = {};
+
+ if (!courseInfo.title || courseInfo.title.trim().length < 3) {
+ newErrors.title = "Tên khóa học phải chứa ít nhất 3 ký tự.";
+ isValid = false;
  }
- if (!courseInfo.thumbnailFile && !courseInfo.thumbnailPreview) {
+ if (!courseInfo.description || courseInfo.description.trim().length < 30) {
+ newErrors.description = "Mô tả khóa học phải chứa ít nhất 30 ký tự.";
+ isValid = false;
+ }
+ if (!courseInfo.thumbnailMediaId && !courseInfo.thumbnailPreview) {
  toast.error("Vui lòng tải lên ảnh bìa khóa học.");
+ isValid = false;
+ }
+ if (courseInfo.field === OTHER_CATEGORY_VALUE && !courseInfo.otherName?.trim()) {
+ newErrors.otherName = "Vui lòng nhập tên lĩnh vực.";
+ isValid = false;
+ }
+ if (courseInfo.field !== OTHER_CATEGORY_VALUE && !courseInfo.categoryId) {
+ toast.error("Vui lòng chọn lĩnh vực.");
+ isValid = false;
+ }
+
+ if (!isValid) {
+ setErrors(newErrors);
  return;
  }
  }
@@ -177,96 +195,73 @@ export function CreateCourseContainer() {
  categoryId = proposed.id;
  }
 
- // We bypass upload if thumbnailFile is missing but preview exists (mock behavior or previously uploaded)
- // In production, we'd upload the file if it exists.
- const courseData = await createCourse({
- title: courseInfo.title,
- description: courseInfo.description,
- level: courseInfo.difficulty,
- category_id: categoryId, 
- thumbnail: courseInfo.thumbnailFile || new File(["mock"], "mock.png", { type: "image/png" }),
- });
-
- const courseId = courseData.id;
-
- for (const mod of modules) {
- const createdModule = await createModule({
- courseId,
- title: mod.title,
- order: mod.order,
- });
-
- const moduleId = createdModule.id;
-
- for (const lesson of mod.lessons) {
- // Content validation is removed as per new UI logic
- const payloadType = lesson.type === 'quiz' ? 'quiz_module' : (lesson.type === 'document' ? 'article' : lesson.type);
- const createdLesson = await createLesson({
- courseId,
- moduleId,
- payload: {
- title: lesson.title,
- type: payloadType,
- content: lesson.content || "",
- order: lesson.order,
- status: 'published',
- temp_media_ids: lesson.temp_media_ids || (lesson as any).tempMediaIds || [],
- video_url: lesson.video_url || (lesson as any).videoUrl || "",
- quizData: lesson.quizData,
- }
- });
-
- if (((lesson.type as string) === 'quiz' || (lesson.type as string) === 'quiz_module') && lesson.quizData && createdLesson?.id) {
-    try {
-      await createQuiz({
-        lessonId: createdLesson.id,
-        payload: lesson.quizData,
-      });
-    } catch (qErr) {
-      console.error("Quiz creation error:", qErr);
+    const priceNum = Number(String(settings.basePrice).replace(/[^0-9]/g, ""));
+    if (priceNum !== 0 && (priceNum < 100000 || priceNum > 100000000)) {
+      throw new Error("Giá khóa học phải bằng 0 hoặc từ 100.000 đến 100.000.000 VNĐ.");
     }
+
+    const isFlashSaleActive = priceNum > 0 && Boolean(settings.isFlashSale);
+    const salePriceNum = settings.salePrice ? Number(String(settings.salePrice).replace(/[^0-9]/g, "")) : undefined;
+    
+    if (isFlashSaleActive) {
+      if (!salePriceNum || salePriceNum >= priceNum) {
+        throw new Error("Giá giảm phải nhỏ hơn giá gốc.");
+      }
+      if (!settings.saleStartDate || !settings.saleEndDate) {
+        throw new Error("Vui lòng chọn thời gian bắt đầu và kết thúc flash sale.");
+      }
+    }
+    
+    const validSalePrice = (isFlashSaleActive && salePriceNum && salePriceNum < priceNum) ? salePriceNum : undefined;
+
+    const payload: CourseWizardPayload = {
+      title: courseInfo.title,
+      description: courseInfo.description,
+      level: courseInfo.difficulty,
+      category_id: categoryId,
+      other_category_name: courseInfo.field === OTHER_CATEGORY_VALUE ? courseInfo.otherName.trim() : undefined,
+      thumbnail_media_id: courseInfo.thumbnailMediaId || undefined,
+      modules: modules.map(m => ({
+        title: m.title,
+        order: m.order,
+        lessons: m.lessons.map(l => ({
+          title: l.title,
+          type: l.type === 'quiz' ? 'quiz_module' : (l.type === 'document' ? 'article' : l.type),
+          content: l.content || "",
+          order: l.order,
+          temp_media_ids: l.temp_media_ids || (l as any).tempMediaIds || [],
+          video_url: l.video_url || (l as any).videoUrl || "",
+          quiz: l.quizData,
+        }))
+      })),
+      price: priceNum,
+      partnership_tier: settings.partnershipTier || "standard",
+      flash_sale: isFlashSaleActive ? {
+        sale_price: validSalePrice!,
+        start_date: settings.saleStartDate!,
+        end_date: settings.saleEndDate!
+      } : undefined
+    };
+
+    await createCourseWizard({ payload, idempotencyKey });
+
+    resetDraft();
+    toast.success("Tạo khóa học thành công!");
+    window.location.href = "/instructor/courses";
+  } catch (error: any) {
+    console.error("Publish failed:", error);
+    setPublishError(getErrorMessage(error, "Không thể tạo khóa học. Vui lòng thử lại."));
+  } finally {
+    setIsPublishing(false);
   }
- }
- }
-
- const priceNum = Number(String(settings.basePrice).replace(/[^0-9]/g, ""));
- const isFlashSaleActive = priceNum > 0 && Boolean(settings.isFlashSale);
- const salePriceNum = settings.salePrice ? Number(String(settings.salePrice).replace(/[^0-9]/g, "")) : undefined;
- const validSalePrice = (isFlashSaleActive && salePriceNum && salePriceNum < priceNum) ? salePriceNum : undefined;
-
- await updatePrice({ 
- courseId, 
- price: priceNum,
- partnership_tier: settings.partnershipTier || "standard",
- is_flash_sale: isFlashSaleActive,
- sale_price: validSalePrice,
- sale_start_date: isFlashSaleActive ? settings.saleStartDate : undefined,
- sale_end_date: isFlashSaleActive ? settings.saleEndDate : undefined
- });
-
- await updateStatus({ courseId, status: "draft" });
-
- resetDraft();
- toast.success("Tạo khóa học thành công!");
- window.location.href = "/instructor/courses";
- } catch (error: any) {
- console.error("Publish failed:", error);
- setPublishError(getErrorMessage(error, "Không thể tạo khóa học. Vui lòng thử lại."));
- } finally {
- setIsPublishing(false);
- }
  }, [
- courseInfo,
- modules,
- settings,
- createCourse,
- uploadThumbnail,
- createModule,
- updatePrice,
- updateStatus,
- resetDraft,
- createLesson,
- createQuiz,
+  courseInfo,
+  modules,
+  settings,
+  idempotencyKey,
+  createCourseWizard,
+  proposeCategory,
+  resetDraft,
  ]);
 
  const createStepLabels: Record<1 | 2 | 3, string> = {
@@ -337,7 +332,7 @@ export function CreateCourseContainer() {
 
  {step === 1 && (
  <div className="flex flex-col gap-6">
- <Step1BasicInfo data={courseInfo} onChange={handleChange} />
+ <Step1BasicInfo data={courseInfo} onChange={handleChange} errors={errors} />
  </div>
  )}
 

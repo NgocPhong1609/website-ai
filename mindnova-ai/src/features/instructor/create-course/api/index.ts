@@ -272,8 +272,55 @@ export function useDeleteCourse() {
  const { data } = await axiosClient.delete(`/api/instructor/courses/${courseId}`);
  return data;
  },
- onSuccess: () => {
- queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
- },
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
+  },
  });
+}
+
+export interface CourseWizardPayload {
+  title: string;
+  description: string;
+  category_id?: number;
+  other_category_name?: string;
+  level: string;
+  thumbnail_media_id?: number;
+  modules: Array<{
+    title: string;
+    order: number;
+    lessons: Array<{
+      title: string;
+      type: string;
+      content?: string;
+      order: number;
+      temp_media_ids?: number[];
+      video_url?: string;
+      quiz?: any;
+    }>;
+  }>;
+  price: number;
+  partnership_tier: string;
+  flash_sale?: {
+    sale_price: number;
+    start_date: string;
+    end_date: string;
+  };
+}
+
+export function useCreateCourseWizard() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ payload, idempotencyKey }: { payload: CourseWizardPayload; idempotencyKey: string }) => {
+      const { data } = await axiosClient.post("/api/instructor/courses/wizard", payload, {
+        headers: {
+          "Idempotency-Key": idempotencyKey
+        }
+      });
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
+    },
+  });
 }

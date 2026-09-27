@@ -2,7 +2,7 @@ import { DiscussionReplyContainer } from "@/src/features/instructor/discussion";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
- title: "Phản hồi & Mentoring — MindNova AI",
+ title: "Thảo luận & Hỏi đáp",
  description: "Giải đáp thắc mắc và hỗ trợ học viên.",
 };
 
