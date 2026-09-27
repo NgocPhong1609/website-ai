@@ -99,9 +99,9 @@ Route::prefix('student')->group(function () {
     Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
     Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
     Route::get('/courses/{course}/reviews', [StudentReviewController::class, 'index']);
-    Route::post('/onboarding', [OnboardingController::class, 'store']);
+    Route::post('/onboarding', [OnboardingController::class, 'store'])->middleware('throttle:10,1');
     Route::get('/available-topics', [OnboardingController::class, 'getAvailableTopics']);
-    Route::post('/analyze-lesson', [AnalyzeLessonController::class, 'analyze']);
+    Route::post('/analyze-lesson', [AnalyzeLessonController::class, 'analyze'])->middleware('throttle:20,1');
     Route::post('/courses/{courseId}/self-assessment/generate', [SelfAssessmentController::class, 'generate']);
     Route::post('/self-assessment/submit', [SelfAssessmentController::class, 'submit']);
 });

@@ -1,79 +1,81 @@
-export interface IGoal {
- id: number;
- icon: string;
- title: string;
- description: string;
+import type { LucideIcon } from "lucide-react";
+
+export type GoalId = "frontend" | "backend" | "fullstack" | "english" | "certificate" | "ai-data";
+export type LevelId = "beginner" | "intermediate" | "advanced";
+export type TimeId = "30m" | "1-2h" | "2-4h" | "4h+";
+
+export interface OnboardingOption<TId extends string> {
+  id: TId;
+  title: string;
+  description: string;
+  icon: LucideIcon;
 }
 
-export interface IFeature {
- id: number;
- icon: string;
- title: string;
- description: string;
+export interface OnboardingGoal extends OnboardingOption<GoalId> {
+  /** Topics suggested on step 3 for this goal. */
+  topics: string[];
 }
 
-export type SkillLevel = "Beginner" | "Intermediate" | "Advanced";
-
-export interface ISkill {
- id: number;
- level: SkillLevel;
- iconPath: string;
- iconBgColor?: string;
- description: string;
+export interface OnboardingAnswers {
+  goalId: GoalId | null;
+  levelId: LevelId | null;
+  topics: string[];
+  timeId: TimeId | null;
 }
 
-export type OnboardingStep =
- | "welcome"
- | "goal"
- | "level"
- | "topics"
- | "signup"
- | "generating";
+/** Route segment of each question step; used for guards and the stepper. */
+export type OnboardingStepKey = "goal" | "skills" | "topics";
 
-export interface OnboardingFormData {
- goal: string;
- currentLevel: string;
- timeAvailable: string;
+// ─── API contract (POST /api/student/onboarding) ─────────────────────────────
+
+export interface GeneratePlanPayload {
+  goal: string;
+  currentLevel: string;
+  timeAvailable: string;
+  topics: string[];
 }
 
-export type GeneratingStepStatus = "completed" | "in-progress" | "pending";
-
-export interface IGeneratingStep {
- id: number;
- label: string;
- status: GeneratingStepStatus;
+export interface RecommendedCourse {
+  id: number;
+  title: string;
+  slug?: string | null;
+  thumbnail?: string | null;
+  price: number;
+  instructor?: string | null;
+  students_count: number;
+  rating: number | null;
 }
 
-export type TopicIconKey =
- | "html-css"
- | "javascript"
- | "typescript"
- | "react"
- | "nextjs"
- | "nodejs"
- | "database"
- | "api"
- | "authentication"
- | "ui-ux";
-
-export interface ITopic {
- id: number;
- label: string;
- iconKey: TopicIconKey;
+export interface PlanLesson {
+  name: string;
+  duration: string;
 }
 
-export type PlanItemStatus = "ready" | "upcoming" | "locked";
-
-export interface IPlanItem {
- id: number;
- label: string;
- status: PlanItemStatus;
- duration: string;
+export interface PlanPhase {
+  phase: number;
+  title: string;
+  description: string;
+  duration: string;
+  status: "unlocked" | "locked";
+  lessons: PlanLesson[];
+  courses: RecommendedCourse[];
 }
 
-export interface IPlanPhase {
- id: number;
- title: string;
- duration: string;
- items: IPlanItem[];
+export interface GeneratedPlan {
+  profile: {
+    goal: string;
+    level: string;
+    time_available: string;
+    topics: string[];
+    est_time: string;
+  };
+  learning_path: PlanPhase[];
+  source: "ai" | "fallback";
+}
+
+export interface LessonAnalysis {
+  overview: string;
+  key_takeaways: string[];
+  recommended_courses: RecommendedCourse[];
+  source: "ai" | "fallback";
 }

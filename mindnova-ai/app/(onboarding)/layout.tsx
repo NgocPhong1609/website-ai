@@ -1,15 +1,3 @@
-interface OnboardingLayoutProps {
- children: React.ReactNode;
-}
-
-export default function OnboardingLayout({
- children,
-}: Readonly<OnboardingLayoutProps>) {
- return (
- <main className="min-h-screen w-full flex flex-col bg-background relative">
- <div className="max-w-7xl min-h-screen w-full flex flex-col items-center mx-auto">
- {children}
- </div>
- </main>
- );
+export default function OnboardingLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return <div className="min-h-screen w-full bg-slate-50">{children}</div>;
 }
