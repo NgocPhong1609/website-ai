@@ -80,7 +80,11 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
           newMap.set(result.url, result.media_id);
           return newMap;
         });
-        return { url: result.url, media_id: result.media_id };
+        return {
+          url: result.url,
+          preview_url: result.preview_url,
+          media_id: result.media_id,
+        };
       }
       throw new Error("Upload failed");
     } finally {
@@ -103,10 +107,10 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
     if (!file) return;
 
     try {
-      const { url } = await handleVideoUpload(file, (progress) => {
+      const result = await handleVideoUpload(file, (progress) => {
         setVideoUploadProgress(progress);
       });
-      setVideoUrl(url);
+      setVideoUrl(result.preview_url || result.url);
     } catch (error: any) {
       if (error.name !== 'CanceledError') {
         alert("Có lỗi xảy ra khi tải video. Vui lòng thử lại.");

@@ -205,14 +205,14 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <span className="hidden sm:inline">Xem trước</span>
  </Link>
 
- {course.status === "draft" && (
+ {(course.status === "draft" || course.status === "needs_fixes" || course.status === "rejected" || course.status === "published") && (
  <button
  type="button"
  onClick={handleSubmitReview}
  disabled={isPending}
  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-500 hover:bg-blue-600 transition-all shadow-sm disabled:bg-gray-400"
  >
- <span className="hidden sm:inline">Gửi xét duyệt</span>
+ <span className="hidden sm:inline">{course.status === "published" ? "Gửi bản cập nhật" : "Gửi xét duyệt"}</span>
  </button>
  )}
 

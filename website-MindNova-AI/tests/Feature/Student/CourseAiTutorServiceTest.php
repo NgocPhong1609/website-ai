@@ -73,6 +73,8 @@ class CourseAiTutorServiceTest extends TestCase
     {
         $student = User::factory()->create();
         $lesson = self::enrolledLesson($student);
+        $videoFileUri = 'https://generativelanguage.googleapis.com/v1beta/files/test-video';
+        $lesson->update(['gemini_file_uri' => $videoFileUri]);
         $lesson->course->update(['title' => 'private-unpublished-title', 'description' => 'private-unpublished-description']);
         app(CourseModuleService::class)->updateModule($lesson->module, ['title' => 'private-unreviewed-module-title']);
         Lesson::create([
@@ -114,9 +116,12 @@ GUARD;
         $this->assertSame('Route model binding', $context['lesson_title']);
         $this->assertSame('Implicit binding ánh xạ tham số route đến model.', $context['lesson_content']);
         $this->assertSame([], $context['attachments']);
+        $this->assertStringNotContainsString($videoFileUri, $prompt);
+        $this->assertStringContainsString('Inspect its visual frames and audio', $prompt);
         $this->assertStringNotContainsString('private-', json_encode($payload));
         $this->assertStringContainsString('Giải thích bằng ví dụ ngắn.', data_get($payload, 'contents.0.parts.0.text'));
-        $this->assertSame('Giải thích nội dung này', data_get($payload, 'contents.1.parts.0.text'));
+        $this->assertSame($videoFileUri, data_get($payload, 'contents.1.parts.0.file_data.file_uri'));
+        $this->assertSame('Giải thích nội dung này', data_get($payload, 'contents.1.parts.1.text'));
         Http::assertSentCount(1);
     }
 

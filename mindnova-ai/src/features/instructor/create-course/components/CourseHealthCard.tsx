@@ -38,7 +38,9 @@ export function CourseHealthCard({ courseId }: { courseId: string }) {
  <ul className="mt-3 space-y-1.5 text-xs text-gray-800" aria-live="polite">
  {report.issues.slice(0, 4).map((issue) => (
  <li key={`${issue.severity}-${issue.field}-${issue.message}`} className="flex gap-2">
- <span aria-hidden="true">{issue.severity === "error" ? "" : "!"}</span>
+ <span className={`shrink-0 font-black ${issue.severity === "error" ? "text-rose-700" : "text-amber-700"}`}>
+  {issue.severity === "error" ? "Bắt buộc" : "Khuyến nghị"}
+ </span>
  <span>{issue.message}</span>
  </li>
  ))}

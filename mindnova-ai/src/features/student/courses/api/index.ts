@@ -315,3 +315,14 @@ export function useGetCourseAssessmentStatus(courseId: string | number) {
   });
 }
 
+// ─── AI Assistant API ────────────────────────────────────────────────────────
+
+export function useAskAiAssistant() {
+  return useMutation({
+    mutationFn: async (payload: { action: string; videoId: string; question: string; videoUrl?: string }) => {
+      // Gọi lên cái route /api/course-ai mà bạn vừa tạo lúc nãy
+      const { data } = await axiosClient.post("/api/course-ai", payload);
+      return data;
+    },
+  });
+}

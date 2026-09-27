@@ -288,10 +288,12 @@ class LessonService
         ]);
 
         $url = Storage::disk('r2')->url($filename);
+        $previewUrl = Storage::disk('r2')->temporaryUrl($filename, now()->addHour());
 
         return [
             'media_id' => $media->id,
             'url' => $url,
+            'preview_url' => $previewUrl,
             'media_type' => $mediaType,
         ];
     }
@@ -388,10 +390,44 @@ class LessonService
                     $contentChanged = true;
                 }
 
-                // If media is video, set official R2 URL to video_url
+                // If media is video, set official R2 URL and UPLOAD TO GEMINI
                 if ($media->media_type === 'video') {
                     $videoUrl = $newUrl;
                     $contentChanged = true;
+
+                    // ==========================================
+                    // 🚀 BẮT ĐẦU ĐỒNG BỘ VIDEO LÊN GEMINI API
+                    // ==========================================
+                    try {
+                        $videoContent = Storage::disk('r2')->get($newKey);
+                        $mimeType = 'video/mp4';
+
+                        $response = \Illuminate\Support\Facades\Http::withHeaders([
+                            'X-Goog-Upload-Protocol' => 'raw',
+                            'X-Goog-Upload-Command' => 'upload, finalize',
+                            'X-Goog-Upload-Header-Content-Length' => strlen($videoContent),
+                            'X-Goog-Upload-Header-Content-Type' => $mimeType,
+                        ])
+                        ->timeout(300) // 🟢 THÊM DÒNG NÀY ĐỂ KÉO DÀI THỜI GIAN CHỜ LÊN 5 PHÚT
+                        ->withBody($videoContent, $mimeType)
+                        ->post('https://generativelanguage.googleapis.com/upload/v1beta/files?key=' . env('GEMINI_API_KEY'));
+
+                        if ($response->successful()) {
+                            $geminiData = $response->json();
+                            $geminiFileUri = $geminiData['file']['uri'] ?? null;
+
+                            // Lưu uri này vào DB để lát Frontend gọi
+                            $lesson->gemini_file_uri = $geminiFileUri;
+                            $contentChanged = true;
+
+                            \Log::info("✅ [Gemini Sync] Thành công: " . $geminiFileUri);
+                        } else {
+                            \Log::error("❌ [Gemini Sync] Thất bại: " . $response->body());
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error("❌ [Gemini Sync] Lỗi cục bộ: " . $e->getMessage());
+                    }
+                    // ==========================================
                 }
 
                 if ($lesson->type === 'video' && $media->media_type === 'video' && $media->duration_seconds > 0) {
@@ -401,8 +437,7 @@ class LessonService
             }
         }
 
-        // 2. Clean up orphaned media (files in DB but no longer in HTML content or video_url)
-        // Exclude mediaIds that were just attached!
+        // 2. Clean up orphaned media
         $existingMedia = $lesson->media()
             ->where('is_temp', false)
             ->whereNotIn('id', $mediaIds)
@@ -410,7 +445,6 @@ class LessonService
 
         foreach ($existingMedia as $media) {
             $mediaUrl = Storage::disk('r2')->url($media->r2_key);
-            // If the URL is no longer in the HTML content or video_url, delete the file and record
             if (!str_contains($content, $mediaUrl) && !str_contains($videoUrl, $mediaUrl)) {
                 Storage::disk('r2')->delete($media->r2_key);
                 $media->delete();

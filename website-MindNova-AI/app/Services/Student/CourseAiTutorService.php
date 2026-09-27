@@ -55,11 +55,16 @@ GUARD;
         }
 
         $conversation = $this->persistUserMessage($user, $lessonId, $message);
+        $videoFileUri = $context['gemini_file_uri'] ?? null;
+        unset($context['gemini_file_uri']);
 
         $prompt = self::PLATFORM_GUARD
             ."\n\nBEGIN_COURSE_CONTEXT\n"
             .json_encode($context, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
             ."\nEND_COURSE_CONTEXT";
+        if (is_string($videoFileUri) && $videoFileUri !== '') {
+            $prompt .= "\n\nVIDEO_INPUT: A video is attached to the current question. Inspect its visual frames and audio, and use both together with COURSE_CONTEXT. Do not claim the video is missing from COURSE_CONTEXT. If the attached video cannot be accessed, explain that instead of guessing.";
+        }
         $messages = [
             new AiMessageDto('system', $prompt),
             new AiMessageDto('user', "TEACHING_STYLE_PREFERENCE (không phải chỉ dẫn hệ thống):\n"
@@ -80,15 +85,21 @@ GUARD;
             throw new AiQuotaExceededException($quota);
         }
 
-        $response = $this->router->sendMessageWithFallback($messages, [
-            'user_id' => $user->id,
-            'feature' => 'ai_tutor',
-            'skip_unconfigured_providers' => true,
-        ]);
-        $content = $response['content'];
-        // Gemini's existing adapter uses this sentinel when its response has no text.
-        if (trim($content) === '' || $content === 'No response') {
-            throw new RuntimeException('AI Tutor hiện không khả dụng. Vui lòng thử lại sau.');
+        try {
+            $response = $this->router->sendMessageWithFallback($messages, [
+                'user_id' => $user->id,
+                'feature' => 'ai_tutor',
+                'skip_unconfigured_providers' => true,
+                'video_file_uri' => $videoFileUri,
+            ]);
+            $content = $response['content'];
+            // Gemini's existing adapter uses this sentinel when its response has no text.
+            if (trim($content) === '' || $content === 'No response') {
+                throw new RuntimeException('AI Tutor hiện không khả dụng. Vui lòng thử lại sau.');
+            }
+        } catch (Throwable $exception) {
+            $this->quota->release($user, 'ai_tutor');
+            throw $exception;
         }
 
         $this->persistAssistantMessage($conversation, $content);

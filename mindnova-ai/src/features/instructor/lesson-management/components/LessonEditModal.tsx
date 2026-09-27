@@ -142,7 +142,11 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  newMap.set(result.url, result.media_id);
  return newMap;
  });
- return { url: result.url, media_id: result.media_id };
+ return {
+ url: result.url,
+ preview_url: result.preview_url,
+ media_id: result.media_id,
+ };
  }
  throw new Error("Upload failed");
  };
@@ -154,7 +158,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  setVideoUploadProgress(0);
  try {
  const result = await handleVideoUpload(file, setVideoUploadProgress);
- setVideoUrl(result.url);
+  setVideoUrl(result.preview_url || result.url);
  } catch (err: any) {
  if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED' || err?.message === 'canceled') {
  // User cancelled upload

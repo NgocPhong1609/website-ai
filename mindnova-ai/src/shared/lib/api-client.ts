@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const API_BASE_URL = process.env.BACKEND_URL || "http://127.0.0.1:8000";
+const API_BASE_URL = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
 export async function apiClient<T>(
   endpoint: string,
@@ -8,7 +8,7 @@ export async function apiClient<T>(
 ): Promise<T> {
   if (!API_BASE_URL) {
     throw new Error(
-      "[apiClient] BACKEND_URL is not set. Check your .env file."
+      "[apiClient] BACKEND_URL or NEXT_PUBLIC_API_URL is not set. Check your .env file."
     );
   }
 
@@ -22,10 +22,21 @@ export async function apiClient<T>(
 
   const url = `${baseUrl}${apiPrefix}${cleanEndpoint}`;
 
-  // Attach auth token from cookies (server-side only)
-  const cookieStore = await cookies();
-  const rawToken = cookieStore.get("accessToken")?.value;
-  const token = rawToken ? decodeURIComponent(rawToken) : undefined;
+  // Attach auth token safely from cookies (server-side support with fallbacks)
+  let token: string | undefined = undefined;
+  try {
+    const cookieStore = await cookies();
+    // Thử quét qua các tên cookie phổ biến để tránh lệch pha tên biến
+    const rawToken = 
+      cookieStore.get("accessToken")?.value || 
+      cookieStore.get("token")?.value || 
+      cookieStore.get("auth_token")?.value;
+      
+    token = rawToken ? decodeURIComponent(rawToken) : undefined;
+  } catch {
+    // Trường hợp chạy ở môi trường ngoại lệ không gọi được cookies()
+    token = undefined;
+  }
 
   const headers: Record<string, string> = {
     Accept: "application/json",

@@ -50,7 +50,7 @@ return [
     // AI tạo nội dung (course generation, v.v.)
     'gemini' => [
         'api_key' => env('GEMINI_API_KEY'),
-        'model' => env('GEMINI_MODEL', 'gemini-3.6-flash'),
+        'model' => env('GEMINI_MODEL', 'gemini-3.8-flash'),
         'force_failure' => env('AI_FORCE_PRIMARY_FAILURE', false),
     ],
 
@@ -73,9 +73,9 @@ return [
     ],
 
     'backup_ai' => [
-        'provider' => env('BACKUP_AI_PROVIDER', 'openai'),
+        'provider' => env('BACKUP_AI_PROVIDER', 'groq'),
         'api_key' => env('BACKUP_AI_API_KEY'),
-        'model' => env('BACKUP_AI_MODEL', 'llama-3.3-70b-versatile'),
+        'model' => env('BACKUP_AI_MODEL', 'openai/gpt-oss-120b'),
     ],
 
     'momo' => [

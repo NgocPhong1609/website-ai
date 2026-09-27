@@ -61,6 +61,25 @@ class GeminiAiService extends AbstractAiService
             }
         }
 
+        $videoFileUri = $options['video_file_uri'] ?? null;
+        if (is_string($videoFileUri)
+            && parse_url($videoFileUri, PHP_URL_SCHEME) === 'https'
+            && parse_url($videoFileUri, PHP_URL_HOST) === 'generativelanguage.googleapis.com') {
+            for ($index = count($contents) - 1; $index >= 0; $index--) {
+                if ($contents[$index]['role'] !== 'user') {
+                    continue;
+                }
+
+                array_unshift($contents[$index]['parts'], [
+                    'file_data' => [
+                        'mime_type' => 'video/mp4',
+                        'file_uri' => $videoFileUri,
+                    ],
+                ]);
+                break;
+            }
+        }
+
         $payload = [
             'contents' => $contents,
         ];

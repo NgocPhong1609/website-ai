@@ -10,7 +10,7 @@ class CourseService
 {
     /**
      * Helper to calculate accurate progress dynamically for a student in a course.
-     * 
+     *
      * SECURITY: Only counts published lessons toward progress.
      */
     public function calculateStudentProgress(Course $course, int $userId): array
@@ -38,7 +38,7 @@ class CourseService
 
                 $totalLessons++;
                 $isCompleted = in_array($lesson->id, $completedLessonIds);
-                
+
                 if ($isCompleted) {
                     $completedLessonsCount++;
                 } else if ($nextLessonTitle === null) {
@@ -78,12 +78,12 @@ class CourseService
     public function getCourseDetail($courseId = 1, ?User $user = null): array
     {
         $userId = $user ? $user->id : null;
-        
+
         $title = "Chưa có tiêu đề";
         $level = "Beginner";
         $description = "Chưa có mô tả khóa học.";
         $thumbnail = null;
-        
+
         $modules = [];
         $resources = [];
         $totalLessons = 0;
@@ -91,7 +91,7 @@ class CourseService
         $nextLessonId = null;
         $nextLessonTitle = "Chưa có bài học";
         $categoryName = "Chuyên đề AI";
-        
+
         $instructorName = 'Giảng viên MindNova';
         $instructorRole = 'Giảng viên chuyên môn';
         $instructorAvatar = '/avatar-placeholder.png';
@@ -110,7 +110,7 @@ class CourseService
                     ->where('status', 'published')
                     ->whereNotNull('published_version_id')
                     ->find($courseId);
-                
+
                 if (!$dbCourse) {
                     // Fallback to first published course
                     $dbCourse = Course::with(['modules.lessons.attachments', 'teacher', 'category'])
@@ -126,7 +126,7 @@ class CourseService
                     $description = $dbCourse->description ?: $description;
                     $thumbnail = $dbCourse->thumbnail ?: $thumbnail;
                     $categoryName = $dbCourse->category ? $dbCourse->category->name : $categoryName;
-                    
+
                     if ($dbCourse->teacher) {
                         $instructorName = $dbCourse->teacher->name;
                         $instructorAvatar = $dbCourse->teacher->avatar ?? '/avatar-placeholder.png';
@@ -208,7 +208,7 @@ class CourseService
                         ];
                     };
 
-                    $progressData = $this->calculateStudentProgress($dbCourse, $userId);
+                    $progressData = $this->calculateStudentProgress($dbCourse, $userId ?: 0);
                     $totalLessons = $progressData['total_lessons'];
                     $completedLessons = $progressData['completed_lessons'];
                     $nextLessonId = $progressData['next_lesson_id'];
@@ -227,7 +227,7 @@ class CourseService
                                     }
 
                                     $isCompleted = in_array($les->id, $completedLessonIds);
-                                    
+
                                     if ($isCompleted) {
                                         $status = 'completed';
                                     } else {
@@ -302,6 +302,7 @@ class CourseService
                                         'duration_seconds' => $durationSec,
                                         'status' => $status,
                                         'video_url' => $les->video_url,
+                                        'gemini_file_uri' => $les->gemini_file_uri,
                                         'has_uploaded_video' => $les->media()->where('media_type', 'video')->where('status', 'ready')->exists(),
                                         'content' => $lessonType === 'article' ? $les->content : null,
                                         'attachments' => $les->attachments->map(fn ($attachment) => [
@@ -317,7 +318,7 @@ class CourseService
                                         'quiz' => $quizDataPayload,
                                         'questions' => $quizDataPayload ? ($quizDataPayload['questions'] ?? []) : [],
                                     ];
-                                    
+
                                     if ($les->video_url && count($resources) < 3) {
                                         $resources[] = [
                                             'id' => 'res-vid-' . $les->id,
@@ -364,7 +365,7 @@ class CourseService
                             $modOrder++;
                         }
                     }
-                    
+
                     // Handle 'end_of_course' quizzes (append as a new final module)
                     $endOfCourseQuizzes = $quizAttachments->whereIn('position', ['end_of_course', 'capability_assessment']);
                     if ($endOfCourseQuizzes->isNotEmpty()) {
@@ -374,7 +375,7 @@ class CourseService
                             $finalLessons[] = $formatQuiz($attachment, $lOrder);
                             $lOrder++;
                         }
-                        
+
                         $modules[] = [
                             'id' => 'module-final-quizzes',
                             'order' => $modOrder,
@@ -388,7 +389,7 @@ class CourseService
         } catch (\Exception $e) {
             // Handle exception
         }
-        
+
         if (empty($resources)) {
             $resources = [
                 [

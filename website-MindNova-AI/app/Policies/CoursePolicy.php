@@ -60,7 +60,24 @@ class CoursePolicy
             return false;
         }
 
-        // Can only submit from draft, needs_fixes, or rejected states
-        return in_array($course->status, ['draft', 'needs_fixes', 'rejected']);
+        if (in_array($course->status, ['draft', 'needs_fixes', 'rejected'], true)) {
+            return true;
+        }
+
+        // A published course may submit a new version after its working copy changes.
+        if ($course->status !== 'published') {
+            return false;
+        }
+
+        return $course->modules()
+            ->where(function ($query) {
+                $query->where('status', '!=', 'published')
+                    ->orWhereHas('lessons', function ($lessonQuery) {
+                        $lessonQuery
+                            ->where('status', '!=', 'published')
+                            ->orWhereNull('published_version_id');
+                    });
+            })
+            ->exists();
     }
 }

@@ -18,7 +18,7 @@ import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/q
 import toast from "react-hot-toast";
 import { LessonAttachments } from "@/src/features/instructor/lesson-management/components/LessonAttachments";
 import type { LessonAttachment } from "@/src/features/instructor/lesson-management/api";
-
+import { AiNovaTab } from "./AiNovaTab"; 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 export interface LessonData {
  id: string;
@@ -28,6 +28,7 @@ export interface LessonData {
  durationSeconds: number;
  completed: boolean;
  videoUrl: string;
+ geminiFileUri?: string | null;
  hasUploadedVideo: boolean;
  content: string; // HTML for article
  quiz_id?: number | string | null;
@@ -912,6 +913,7 @@ function LessonWorkspaceContent() {
         durationSeconds: l.duration_seconds || 300,
         completed: l.status === "completed",
         videoUrl: l.video_url || l.videoUrl || "",
+        geminiFileUri: l.gemini_file_uri || null,
         hasUploadedVideo: Boolean(l.has_uploaded_video || l.video_url || l.videoUrl),
         content: l.content || "",
         quiz_id: l.quiz_id || l.quizId || null,
@@ -1110,11 +1112,48 @@ function LessonWorkspaceContent() {
  );
  }
 
- if (isLoading || !activeLesson) {
+ if (isLoading) {
  return (
  <div className="w-full h-screen flex flex-col items-center justify-center bg-[#F8FAFC]">
  <div className="w-12 h-12 border-4 border-[#3B82F6] border-t-transparent rounded-full animate-spin mb-4"></div>
  <p className="text-[#64748B] font-semibold text-sm">Đang tải dữ liệu bài học...</p>
+ </div>
+ );
+ }
+
+ if (error) {
+ return (
+ <div className="w-full h-screen flex flex-col items-center justify-center bg-[#F8FAFC] p-6">
+ <div className="bg-white p-8 rounded-3xl shadow-sm max-w-md w-full text-center border border-[#E2E8F0]">
+ <AlertTriangle className="mx-auto text-amber-500 mb-4" size={32} aria-hidden />
+ <h2 className="text-xl font-bold text-[#0F172A] mb-2">Không thể tải dữ liệu bài học</h2>
+ <p className="text-sm text-[#64748B] mb-6">Vui lòng kiểm tra kết nối và thử tải lại trang.</p>
+ <button
+ type="button"
+ onClick={() => window.location.reload()}
+ className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold transition-all shadow-sm"
+ >
+ Tải lại trang
+ </button>
+ </div>
+ </div>
+ );
+ }
+
+ if (!activeLesson) {
+ return (
+ <div className="w-full h-screen flex flex-col items-center justify-center bg-[#F8FAFC] p-6">
+ <div className="bg-white p-8 rounded-3xl shadow-sm max-w-md w-full text-center border border-[#E2E8F0]">
+ <BookOpen className="mx-auto text-[#3B82F6] mb-4" size={32} aria-hidden />
+ <h2 className="text-xl font-bold text-[#0F172A] mb-2">Khóa học chưa có bài học</h2>
+ <p className="text-sm text-[#64748B] mb-6">Giảng viên chưa cập nhật nội dung cho khóa học này.</p>
+ <Link
+ href={`/courses/detail?courseId=${parsedCourseId}`}
+ className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold transition-all shadow-sm"
+ >
+ Quay lại chi tiết khóa học
+ </Link>
+ </div>
  </div>
  );
  }
@@ -1293,18 +1332,21 @@ function LessonWorkspaceContent() {
         </div>
       )}
 
-      {/* Tab 2: AI Tips */}
+      {/* Tab 2: Cố vấn AI Nova */}
       {activeTab === "ai_tips" && (
-        <div className="flex flex-col gap-5 animate-fadeIn">
-          <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 flex items-start gap-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-              <Lightbulb size={20} />
-            </div>
-            <div>
-              <h3 className="font-extrabold text-slate-900 text-sm mb-1">Phân tích chuyên sâu từ MindNova Co-Pilot</h3>
-              <p className="text-[13px] text-slate-600 leading-relaxed">Các lưu ý chuyên môn được đúc kết từ thực tiễn. Tính năng đang trong quá trình thử nghiệm và sớm ra mắt.</p>
-            </div>
-          </div>
+        <div className="flex flex-col gap-5 animate-fadeIn mt-2">
+           {activeLesson.type === 'video' && activeLesson.videoUrl ? (
+              <AiNovaTab 
+                videoId={activeLesson.id} 
+                videoUrl={activeLesson.videoUrl} 
+                geminiFileUri={activeLesson.geminiFileUri} // 🟢 TRUYỀN XUỐNG COMPONENT CHAT
+              />
+           ) : (
+              <div className="p-8 text-center text-slate-500 bg-slate-50 rounded-2xl border border-slate-200">
+                  <Bot className="mx-auto mb-3 text-slate-400" size={32} />
+                  <p className="text-sm font-medium">Cố vấn AI Nova hiện chỉ hỗ trợ phân tích và giải đáp cho các bài học định dạng Video.</p>
+              </div>
+           )}
         </div>
       )}
 

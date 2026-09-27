@@ -15,6 +15,7 @@ class Lesson extends Model
         'type', // video, article, quiz_module
         'content',
         'video_url',
+        'gemini_file_uri',
         'duration_seconds',
         'order',
         'status',
