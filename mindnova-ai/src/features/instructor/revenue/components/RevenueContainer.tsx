@@ -13,7 +13,7 @@ import {
  SparklesIcon,
 } from "./icons";
 import { WithdrawalModal } from "./WithdrawalModal";
-import { RevenueChart as UIRevenueChart } from "@/src/shared/components/ui";
+import { RevenueChart as UIRevenueChart, Skeleton } from "@/src/shared/components/ui";
 
 function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
  return (
@@ -251,9 +251,38 @@ export function RevenueContainer() {
  />
 
  {isLoading ? (
- <div className="flex flex-col items-center justify-center py-20 bg-blue-500">
- <></>
- <span className="text-sm font-semibold">Đang tải dữ liệu doanh thu...</span>
+ <div className="animate-fadeIn">
+ <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+ {[...Array(4)].map((_, i) => (
+ <div key={i} className="bg-white rounded-lg p-5 border border-slate-200 shadow-sm flex flex-col gap-3">
+ <Skeleton className="h-4 w-32" />
+ <Skeleton className="h-8 w-40" />
+ <Skeleton className="h-3 w-48 mt-2" />
+ </div>
+ ))}
+ </div>
+ <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
+ <div className="bg-white rounded-lg border border-slate-200 p-6 shadow-sm">
+ <Skeleton className="h-6 w-64 mb-2" />
+ <Skeleton className="h-4 w-80 mb-6" />
+ <Skeleton className="w-full h-[250px] rounded-lg" />
+ </div>
+ <div className="bg-white rounded-lg border border-slate-200 p-6 shadow-sm">
+ <Skeleton className="h-5 w-40 mb-4" />
+ {[...Array(4)].map((_, i) => (
+ <div key={i} className="flex justify-between py-3 border-b border-slate-100 last:border-0">
+ <div className="flex flex-col gap-2">
+ <Skeleton className="h-4 w-24" />
+ <Skeleton className="h-3 w-32" />
+ </div>
+ <div className="flex flex-col gap-2 items-end">
+ <Skeleton className="h-4 w-20" />
+ <Skeleton className="h-4 w-16" />
+ </div>
+ </div>
+ ))}
+ </div>
+ </div>
  </div>
  ) : error || !data ? (
  <div className="flex flex-col items-center justify-center py-20">

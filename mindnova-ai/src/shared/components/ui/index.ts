@@ -14,3 +14,4 @@ export { ArrowRightIcon } from "../icons/ArrowRightIcon";
 export { NoDataAvailable } from "./NoDataAvailable";
 export type { NoDataAvailableProps } from "./NoDataAvailable";
 export * from "./RevenueChart";
+export * from "./Skeleton";

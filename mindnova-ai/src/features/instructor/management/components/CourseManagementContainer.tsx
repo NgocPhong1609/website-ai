@@ -4,7 +4,7 @@ import { useInstructorCourses } from "../api/courses";
 import React, { useState, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { NoData } from "@/src/shared/components/ui/NoData";
-import { Loader } from "@/src/shared/components/ui/Loader";
+import { Skeleton } from "@/src/shared/components/ui";
 
 import { CourseFilterTabs } from "./CourseFilterTabs";
 import { CourseCard } from "./CourseCard";
@@ -143,9 +143,19 @@ function CourseManagementContent() {
         <section aria-label="Danh sách khóa học">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {isLoading ? (
-              <div className="col-span-full py-12 flex items-center justify-center">
-                <Loader size="md" />
-              </div>
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="flex flex-col bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm h-full min-h-[300px]">
+                  <Skeleton className="h-40 w-full rounded-none" />
+                  <div className="p-4 flex flex-col flex-1 gap-3">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <div className="mt-auto flex justify-between items-center pt-3 border-t border-slate-100">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-6 w-16" />
+                    </div>
+                  </div>
+                </div>
+              ))}
             ) : isError ? (
               <div className="col-span-full py-12 flex items-center justify-center text-blue-500">
                 Lỗi khi tải danh sách khóa học
