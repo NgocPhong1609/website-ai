@@ -325,7 +325,7 @@ class OrderController extends Controller
                         }
                     }
                     
-                    app(InstructorPayoutService::class)->createForOrder($order);
+                    app(\App\Services\Instructor\InstructorPayoutService::class)->createForOrder($order);
                 }
             }
             return response()->json(['RspCode' => '00', 'Message' => 'Confirm Success']);
@@ -401,7 +401,7 @@ class OrderController extends Controller
                         }
                     }
                     
-                    app(InstructorPayoutService::class)->createForOrder($order);
+                    app(\App\Services\Instructor\InstructorPayoutService::class)->createForOrder($order);
                 }
                 return response()->json(['message' => 'Success']);
             }
