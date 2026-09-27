@@ -129,18 +129,6 @@ export function CourseHeader({ info }: { info?: CourseDetailHeaderInfo }) {
               </>
             ) : (
               <>
-                <Link
-                  href={`/checkout?courseId=${info?.id || 1}`}
-                  className="text-decoration-none"
-                >
-                  <button
-                    type="button"
-                    className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-all cursor-pointer shadow-sm"
-                  >
-                    <span>Đăng ký học ngay — {(info?.price ? info.price.toLocaleString("vi-VN") + " VNĐ" : "Miễn phí")}</span>
-                  </button>
-                </Link>
-
                 <button
                   type="button"
                   onClick={handleSaveToggle}
