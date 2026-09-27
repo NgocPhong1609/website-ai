@@ -4,41 +4,41 @@ export const ONBOARDING_GOALS: IGoal[] = [
  {
  id: 1,
  icon: "/icons/frontend.svg",
- title: "Become a Frontend Developer",
- description: "Master HTML, CSS, React, and modern UI design principles.",
+ title: "Trở thành lập trình viên Frontend",
+ description: "Thành thạo HTML, CSS, React và nguyên tắc thiết kế giao diện hiện đại.",
  },
  {
  id: 2,
  icon: "/icons/backend.svg",
- title: "Become a Backend Developer",
+ title: "Trở thành lập trình viên Backend",
  description:
- "Dive into Node.js, Python, databases, and scalable architecture.",
+ "Đi sâu vào Node.js, Python, cơ sở dữ liệu và kiến trúc mở rộng.",
  },
  {
  id: 3,
  icon: "/icons/fullstack.svg",
- title: "Become a Fullstack Developer",
+ title: "Trở thành lập trình viên Fullstack",
  description:
- "Combine frontend and backend skills to build complete products.",
+ "Kết hợp kỹ năng frontend và backend để xây dựng sản phẩm hoàn chỉnh.",
  },
  {
  id: 4,
  icon: "/icons/english.svg",
- title: "Improve English",
+ title: "Cải thiện tiếng Anh",
  description:
- "Enhance your vocabulary, grammar, and speaking for tech careers.",
+ "Nâng cao từ vựng, ngữ pháp và kỹ năng nói cho nghề công nghệ.",
  },
  {
  id: 5,
  icon: "/icons/exam.svg",
- title: "Prepare for Exams",
- description: "Focused study plans for certifications and academic tests.",
+ title: "Ôn thi chứng chỉ",
+ description: "Kế hoạch ôn tập tập trung cho các kỳ thi chứng chỉ và học thuật.",
  },
  {
  id: 6,
  icon: "/icons/gemini2.svg",
- title: "Learn AI / Data",
+ title: "Học AI / Dữ liệu",
  description:
- "Explore machine learning, data analysis, and AI implementation.",
+ "Tìm hiểu học máy, phân tích dữ liệu và ứng dụng AI.",
  },
 ];

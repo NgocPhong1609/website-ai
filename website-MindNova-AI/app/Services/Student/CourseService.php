@@ -13,10 +13,10 @@ class CourseService
      * 
      * SECURITY: Only counts published lessons toward progress.
      */
-    public function calculateStudentProgress(Course $course, int $userId): array
+    public function calculateStudentProgress(Course $course, ?int $userId): array
     {
         $completedLessonIds = [];
-        if (class_exists(\App\Models\LessonCompletion::class)) {
+        if ($userId && class_exists(\App\Models\LessonCompletion::class)) {
             $completedLessonIds = \App\Models\LessonCompletion::where('user_id', $userId)
                 ->pluck('lesson_id')
                 ->toArray();
@@ -56,7 +56,7 @@ class CourseService
         if ($totalLessons === 0) {
             $nextLessonText = 'Chưa có bài học';
         } elseif ($completedLessonsCount === $totalLessons) {
-            $nextLessonText = 'Đã hoàn thành khóa học 🎉';
+            $nextLessonText = 'Đã hoàn thành khóa học';
         } else {
             $nextLessonText = $nextLessonTitle ?: 'Tiếp tục bài học';
         }
@@ -389,24 +389,6 @@ class CourseService
             // Handle exception
         }
         
-        if (empty($resources)) {
-            $resources = [
-                [
-                    'id' => 'res-fb-1',
-                    'title' => "Giáo trình {$title} (PDF)",
-                    'type' => 'pdf',
-                    'size' => '2.5 MB',
-                    'url' => '#'
-                ],
-                [
-                    'id' => 'res-fb-2',
-                    'title' => 'Phòng thảo luận Discord khóa học',
-                    'type' => 'chat',
-                    'size' => 'Tham gia',
-                    'url' => '#'
-                ]
-            ];
-        }
 
         $isEnrolled = false;
         if ($userId && class_exists(\App\Models\Enrollment::class)) {
@@ -425,8 +407,43 @@ class CourseService
             : 0;
 
         $progressPercentage = ($totalLessons > 0) ? round(($completedLessons / $totalLessons) * 100) : 0;
-        $timeLeftText = ($totalLessons - $completedLessons) * 15; // Giả định mỗi bài 15 phút
-        $timeLeftTextStr = $timeLeftText > 0 ? floor($timeLeftText / 60) . 'h ' . ($timeLeftText % 60) . 'm thời lượng còn lại' : 'Đã hoàn thành khóa học';
+
+        // Durations come from the lessons themselves instead of a fixed 15 minutes per lesson.
+        $allLessons = collect($modules)->flatMap(fn ($m) => $m['lessons'] ?? []);
+        $totalMinutes = (int) ceil($allLessons->sum(fn ($l) => (int) ($l['duration_seconds'] ?? 0)) / 60);
+        $remainingMinutes = (int) ceil($allLessons->where('status', '!=', 'completed')->sum(fn ($l) => (int) ($l['duration_seconds'] ?? 0)) / 60);
+        $formatMinutes = fn (int $m) => $m >= 60 ? intdiv($m, 60) . ' giờ ' . ($m % 60 ? ($m % 60) . ' phút' : '') : $m . ' phút';
+        $timeLeftTextStr = $completedLessons >= $totalLessons && $totalLessons > 0
+            ? 'Đã hoàn thành khóa học'
+            : trim($formatMinutes($remainingMinutes)) . ' còn lại';
+        $courseFinished = $totalLessons > 0 && $completedLessons >= $totalLessons;
+
+        // Lesson material is only delivered to enrolled learners.
+        if (!$isEnrolled) {
+            $resources = [];
+            $modules = array_map(function ($module) {
+                $module['lessons'] = array_map(fn ($lesson) => array_merge($lesson, [
+                    'video_url' => null,
+                    'has_uploaded_video' => false,
+                    'content' => null,
+                    'attachments' => [],
+                    'quizData' => null,
+                    'quiz' => null,
+                    'questions' => [],
+                ]), $module['lessons'] ?? []);
+                return $module;
+            }, $modules);
+        }
+
+        if (!$isEnrolled) {
+            $insightSummary = 'Đăng ký khóa học để Gia sư Nova theo dõi tiến độ và gợi ý nội dung phù hợp với bạn.';
+        } elseif ($courseFinished) {
+            $insightSummary = 'Bạn đã hoàn thành toàn bộ bài học. Hãy ôn tập lại các phần còn chưa chắc chắn hoặc hỏi Gia sư Nova khi cần.';
+        } elseif ($completedLessons === 0) {
+            $insightSummary = "Hãy bắt đầu với bài \"{$nextLessonTitle}\". Gia sư Nova sẵn sàng giải thích khi bạn gặp khái niệm khó.";
+        } else {
+            $insightSummary = "Bạn đã hoàn thành {$completedLessons}/{$totalLessons} bài. Bài tiếp theo: \"{$nextLessonTitle}\".";
+        }
         $ratingText = $reviewCount > 0
             ? number_format($averageRating, 1, '.', '') . ' (' . $reviewCount . ' Đánh giá)'
             : '0.0 (0 Đánh giá)';
@@ -439,9 +456,10 @@ class CourseService
                 'level' => $level,
                 'description' => $description,
                 'thumbnail' => $thumbnail,
-                'next_lesson_title' => $nextLessonTitle,
-                'next_lesson_id' => $nextLessonId,
-                'duration_text' => ($totalLessons * 15) . ' Phút tổng cộng',
+                'next_lesson_title' => $courseFinished ? null : $nextLessonTitle,
+                'next_lesson_id' => $nextLessonId ?? ($allLessons->first()['id'] ?? null),
+                'is_completed' => $courseFinished,
+                'duration_text' => trim($formatMinutes($totalMinutes)) . ' tổng thời lượng',
                 'rating_text' => $ratingText,
                 'students_text' => $studentsText,
                 'category_tag' => $categoryName,
@@ -458,9 +476,9 @@ class CourseService
             'ai_insight' => [
                 'title' => 'Gia sư Trí tuệ Nova',
                 'status_tag' => 'Online 24/7',
-                'summary_text' => "Bạn đang có tiến độ rất tốt! Bài học tiếp theo ({$nextLessonTitle}) có chứa các khái niệm cốt lõi quan trọng. Hãy chuẩn bị ghi chép nhé.",
-                'suggestion_text' => 'Xem nhanh tài liệu đính kèm trước khi vào video bài giảng.',
-                'action_label' => 'Mở khung chat Gia sư Nova ➔'
+                'summary_text' => $insightSummary,
+                'suggestion_text' => $isEnrolled ? 'Xem nhanh tài liệu đính kèm trước khi vào video bài giảng.' : null,
+                'action_label' => 'Mở khung chat Gia sư Nova'
             ],
             'instructor' => [
                 'name' => $instructorName,

@@ -1,880 +1,26 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
-import { CheckCircle2, AlertTriangle, Lightbulb, Bot, Target, MessageSquare, ClipboardList, Eye, GraduationCap, X, FileEdit, Check, Lock, Flag, Trophy, PartyPopper, ChevronsUpDown, ArrowLeft, ChevronRight, BookOpen, Sparkles, Pencil, Trash2 } from "lucide-react";
+import { CheckCircle2, MessageSquare, Eye, GraduationCap, X, Check, Lock, ChevronsUpDown, ArrowLeft, ChevronRight, Sparkles, Pencil, Trash2 } from "lucide-react";
+import { Skeleton, SkeletonList } from "@/src/shared/components/ui/Skeleton";
 import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { LessonStatusIcon, lessonDisplayTitle } from "../LessonStatusIcon";
 import Link from "next/link";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 import { useQueryClient } from "@tanstack/react-query";
-import { axiosClient } from "@/src/shared/lib/axios";
-import { useGetCourseDetail, useGetInstructorCoursePreview, useInvalidateCourseDetail, completeLesson, fetchQuiz, checkQuizAnswer, submitQuiz, useGetDiscussions, useCreateDiscussion, useUpdateDiscussion, useDeleteDiscussion } from "../../api";
-import type { CourseDetailLessonItem, CourseDetailData } from "../../types";
+import { useGetCourseDetail, useGetInstructorCoursePreview, useInvalidateCourseDetail, completeLesson, startLesson, useGetDiscussions, useCreateDiscussion, useUpdateDiscussion, useDeleteDiscussion } from "../../api";
+import type { CourseDetailData } from "../../types";
 import { CustomVideoPlayer } from "./CustomVideoPlayer";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 import { NoDataAvailable } from "@/src/shared/components/ui";
-import { quizGeneratorApi } from "@/src/features/instructor/quiz-generator/api/quizGeneratorApi";
 import toast from "react-hot-toast";
-import { LessonAttachments } from "@/src/features/instructor/lesson-management/components/LessonAttachments";
-import type { LessonAttachment } from "@/src/features/instructor/lesson-management/api";
-
-// ─── Interfaces ───────────────────────────────────────────────────────────────
-export interface LessonData {
- id: string;
- title: string;
- type: 'video' | 'article' | 'quiz_module' | 'quiz' | string;
- duration: string;
- durationSeconds: number;
- completed: boolean;
- videoUrl: string;
- hasUploadedVideo: boolean;
- content: string; // HTML for article
- quiz_id?: number | string | null;
- quizData?: any;
- questions?: any[];
- attachments?: LessonAttachment[];
-}
-
-interface ModuleData {
- id: string;
- title: string;
- subtitle: string;
- lessons: LessonData[];
-}
-
-interface CommentItem {
- id: string;
- author: string;
- avatar: string;
- role: string;
- time: string;
- content: string;
- isAi?: boolean;
-}
-
-// ─── Quiz Types ───────────────────────────────────────────────────────────────
-interface QuizQuestion {
- id: string;
- content: string;
- order: number;
- answers: { id: string; content: string }[];
-}
-
-interface QuizData {
-  id?: string;
-  quiz_id: number;
-  title: string;
-  course_title?: string;
-  questions_count?: number;
-  time_limit_minutes: number;
-  passing_score: number;
-  questions: QuizQuestion[];
-}
-
-// ─── Lesson Type Labels ───────────────────────────────────────────────────────
-function getLessonTypeLabel(type: string): string {
- switch (type) {
- case 'video': return 'Video';
- case 'article': return 'Văn bản';
- case 'quiz_module': return 'Câu hỏi';
- default: return 'Bài học';
- }
-}
-
-function getLessonTypeColor(type: string): string {
- switch (type) {
- case 'video': return 'bg-[#F1F5F9] text-[#0F172A]';
- case 'article': return 'bg-[#ECFDF5] text-[#0F172A]';
- case 'quiz_module': return 'bg-[#FFFBEB] text-[#F59E0B]';
- default: return 'bg-[#F1F5F9] text-[#64748B]';
- }
-}
-
-// ─── Text/Article Renderer ────────────────────────────────────────────────────
-function ArticleRenderer({
- lesson,
- onComplete,
-}: {
- lesson: LessonData;
- onComplete: () => void;
-}) {
- const [timeSpent, setTimeSpent] = useState(0);
- const completedRef = useRef(false);
- const requiredTime = Math.ceil((lesson.durationSeconds || 60) * 1 / 3);
-
- useEffect(() => {
- completedRef.current = false;
- setTimeSpent(0);
- }, [lesson.id]);
-
- useEffect(() => {
- if (completedRef.current) return;
-
- const interval = setInterval(() => {
- // Only count time when the tab is visible
- if (document.visibilityState === 'visible') {
- setTimeSpent((prev) => {
- const next = prev + 1;
- if (next >= requiredTime && !completedRef.current) {
- completedRef.current = true;
- onComplete();
- }
- return next;
- });
- }
- }, 1000);
-
- return () => clearInterval(interval);
- }, [requiredTime, onComplete, lesson.id]);
-
- const progressPercent = Math.min((timeSpent / requiredTime) * 100, 100);
-
- if (!lesson.content) {
- return (
- <div className="w-full p-12 flex flex-col items-center justify-center text-gray-400 bg-blue-50/50 rounded-xl border border-blue-100">
- <BookOpen size={28} strokeWidth={1.75} aria-hidden />
- <span className="text-sm font-medium mt-3">Nội dung bài học chưa được cập nhật.</span>
- </div>
- );
- }
-
- return (
- <div className="flex flex-col gap-4">
- {/* Reading progress bar */}
- {!completedRef.current && (
- <div className="flex items-center gap-3 p-3 rounded-xl bg-blue-50/50 border border-blue-100">
- <BookOpen size={16} className="text-[#3B82F6] shrink-0" aria-hidden />
- <div className="flex-1">
- <div className="w-full h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
- <div
- className="h-full bg-[#3B82F6] rounded-full transition-all duration-1000"
- style={{ width: `${progressPercent}%` }}
- />
- </div>
- </div>
- <span className="text-[11px] font-semibold text-[#64748B] shrink-0">
- {Math.floor(timeSpent / 60)}:{String(timeSpent % 60).padStart(2, '0')} / {Math.floor(requiredTime / 60)}:{String(requiredTime % 60).padStart(2, '0')}
- </span>
- </div>
- )}
-
- {/* CKEditor HTML Content — Styled Container */}
- <div
- className="ck-content prose prose-sm sm:prose max-w-none
- bg-white rounded-xl border border-blue-100 p-6 sm:p-8 shadow-sm
- [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-[#0F172A] [&_h1]:mb-4 [&_h1]:mt-6
- [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-[#0F172A] [&_h2]:mb-3 [&_h2]:mt-5
- [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-[#0F172A] [&_h3]:mb-2 [&_h3]:mt-4
- [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-[#0F172A] [&_h4]:mb-2
- [&_p]:text-[15px] [&_p]:text-[#0F172A] [&_p]:leading-relaxed [&_p]:mb-4
- [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ul]:text-[#0F172A]
- [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_ol]:text-[#0F172A]
- [&_li]:mb-1.5 [&_li]:text-[15px] [&_li]:leading-relaxed
- [&_a]:text-[#0F172A] [&_a]:underline [&_a]:hover:text-[#2563EB]
- [&_img]:rounded-xl [&_img]:shadow-sm [&_img]:my-4 [&_img]:max-w-full [&_img]:h-auto
- [&_blockquote]:border-l-4 [&_blockquote]:border-[#3B82F6] [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-[#64748B] [&_blockquote]:my-4
- [&_table]:w-full [&_table]:border-collapse [&_table]:my-4
- [&_th]:bg-[#F1F5F9] [&_th]:border [&_th]:border-blue-100 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_th]:text-sm
- [&_td]:border [&_td]:border-blue-100 [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm
- [&_pre]:bg-[#1F2937] [&_pre]:text-gray-200 [&_pre]:rounded-xl [&_pre]:p-4 [&_pre]:overflow-x-auto [&_pre]:my-4
- [&_code]:font-mono [&_code]:text-sm
- [&_hr]:border-blue-100 [&_hr]:my-6
- [&_figure]:my-4 [&_figure]:mx-auto
- [&_figcaption]:text-center [&_figcaption]:text-sm [&_figcaption]:text-[#64748B] [&_figcaption]:mt-2
- [&_strong]:font-bold [&_em]:italic
- [&_mark]:bg-yellow-200 [&_mark]:px-1 [&_mark]:rounded"
- dangerouslySetInnerHTML={{ __html: lesson.content }}
- />
- {lesson.attachments && lesson.attachments.length > 0 && (
-   <LessonAttachments
-     lessonId={lesson.id}
-     initialAttachments={lesson.attachments}
-     readOnly
-     audience="student"
-   />
- )}
- </div>
- );
-}
-
-// ─── Quiz Component ───────────────────────────────────────────────────────────
-function QuizRenderer({
- lesson,
- onComplete,
- isPreview = false,
-}: {
- lesson: LessonData;
- onComplete: () => void;
- isPreview?: boolean;
-}) {
-  const [previewFinished, setPreviewFinished] = useState(false);
-  const [quizData, setQuizData] = useState<QuizData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string>("");
-  const [essayText, setEssayText] = useState<string>("");
-  const [answerResult, setAnswerResult] = useState<boolean | null>(null);
-  const [answered, setAnswered] = useState(false);
-  const [correctCount, setCorrectCount] = useState(0);
-  const [phase, setPhase] = useState<'quiz' | 'result'>('quiz');
-  const [submitting, setSubmitting] = useState(false);
-  const [submittingFinal, setSubmittingFinal] = useState(false);
-  const [allAnswers, setAllAnswers] = useState<Record<string, string>>({});
-  const [essayResult, setEssayResult] = useState<Record<string, any>>({});
-  const [quizResult, setQuizResult] = useState<any>(null);
-  const [timeLeft, setTimeLeft] = useState<number | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const hasCompletedRef = useRef(false);
-
-  // Helper to normalize questions from any source
-  const normalizeQuestions = useCallback((rawQuestions: any[]) => {
-    if (!Array.isArray(rawQuestions)) return [];
-    return rawQuestions.map((q, idx) => {
-      const isEssay = q.type === "essay" || q.type === "tu_luan";
-      const content = q.content || q.question || q.title || `Câu hỏi #${idx + 1}`;
-
-      let answers: any[] = [];
-      if (Array.isArray(q.answers) && q.answers.length > 0) {
-        answers = q.answers.map((a: any, aIdx: number) => ({
-          id: a.id ? String(a.id) : String(aIdx + 1),
-          content: typeof a === "string" ? a : (a.content || a.text || a.option || `Lựa chọn ${aIdx + 1}`),
-          is_correct: Boolean(a.is_correct),
-        }));
-      } else if (Array.isArray(q.options) && q.options.length > 0) {
-        answers = q.options.map((opt: any, aIdx: number) => ({
-          id: String(aIdx + 1),
-          content: typeof opt === "string" ? opt : (opt.content || opt.text || `Lựa chọn ${aIdx + 1}`),
-          is_correct: aIdx === q.correct_answer_index,
-        }));
-      }
-
-      return {
-        id: q.id ? String(q.id) : `q_${idx + 1}`,
-        content,
-        type: isEssay ? "essay" : "multiple_choice",
-        sample_answer: q.sample_answer || q.sampleAnswer || "",
-        rubric: q.rubric || "",
-        explanation: q.explanation || "",
-        points: q.points || 1.0,
-        answers,
-      };
-    });
-  }, []);
-
-  // Load quiz
-  useEffect(() => {
-    setLoading(true);
-    setPreviewFinished(false);
-    setError("");
-    setCurrentIndex(0);
-    setSelectedAnswer("");
-    setEssayText("");
-    setAnswerResult(null);
-    setAnswered(false);
-    setCorrectCount(0);
-    setAllAnswers({});
-
-    // Restore saved quiz result if student already completed this quiz
-    if (!isPreview && typeof window !== "undefined") {
-      const savedRes = window.localStorage.getItem(`student_quiz_result_${lesson.id}`);
-      if (savedRes) {
-        try {
-          const parsed = JSON.parse(savedRes);
-          if (parsed && typeof parsed === "object" && typeof parsed.score !== "undefined") {
-            setQuizResult(parsed);
-            setPhase('result');
-            hasCompletedRef.current = true;
-          } else {
-            setQuizResult(null);
-            setPhase('quiz');
-          }
-        } catch (e) {
-          setQuizResult(null);
-          setPhase('quiz');
-        }
-      } else {
-        setQuizResult(null);
-        setPhase('quiz');
-      }
-    } else {
-      setQuizResult(null);
-      setPhase('quiz');
-    }
-
-    const loadQuizData = async () => {
-      // 0. Check localStorage for instructor edited quiz
-      if (!isPreview && typeof window !== "undefined") {
-        const stored = window.localStorage.getItem(`instructor_quiz_${lesson.id}`);
-        if (stored) {
-          try {
-            const parsed = JSON.parse(stored);
-            const rawQs = Array.isArray(parsed) ? parsed : (parsed.questions || parsed.quiz_questions || []);
-            if (Array.isArray(rawQs) && rawQs.length > 0) {
-              const normQuestions = normalizeQuestions(rawQs);
-              setQuizData({
-                id: String(lesson.id),
-                quiz_id: Number((lesson as any).quiz_id || lesson.id),
-                title: parsed.title || lesson.title || "Bài kiểm tra",
-                course_title: "",
-                time_limit_minutes: parsed.time_limit_minutes || 15,
-                passing_score: parsed.passing_score || 70,
-                questions_count: normQuestions.length,
-                questions: normQuestions as any,
-              });
-              setTimeLeft((parsed.time_limit_minutes || 15) * 60);
-              setLoading(false);
-              return;
-            }
-          } catch (e) {}
-        }
-      }
-
-      // 1. Embedded lesson quizData or questions first
-      const embedded = (lesson as any).quizData || (lesson as any).quiz || (lesson as any).questions || (lesson as any).quiz_questions;
-      if (embedded) {
-        const rawQs = Array.isArray(embedded) ? embedded : (embedded.questions || embedded.quiz_questions || []);
-        if (Array.isArray(rawQs) && rawQs.length > 0) {
-          const normQuestions = normalizeQuestions(rawQs);
-          setQuizData({
-            id: String(lesson.id),
-            quiz_id: Number((lesson as any).quiz_id || lesson.id),
-            title: embedded.title || lesson.title || "Bài kiểm tra",
-            course_title: "",
-            time_limit_minutes: embedded.time_limit_minutes || 15,
-            passing_score: embedded.passing_score || 70,
-            questions_count: normQuestions.length,
-            questions: normQuestions as any,
-          });
-          setTimeLeft((embedded.time_limit_minutes || 15) * 60);
-          setLoading(false);
-          return;
-        }
-      }
-
-      // 2. Instructor API by targetQuizId
-      const targetQuizId = (lesson as any).quiz_id || (lesson as any).quizId || lesson.id;
-      if (targetQuizId) {
-        try {
-          const instData = await quizGeneratorApi.getQuizById(Number(targetQuizId));
-          if (instData && Array.isArray(instData.questions) && instData.questions.length > 0) {
-            const normQuestions = normalizeQuestions(instData.questions);
-            setQuizData({
-              id: String(instData.id),
-              quiz_id: instData.id,
-              title: instData.title || lesson.title || "Bài kiểm tra",
-              course_title: "",
-              time_limit_minutes: instData.time_limit_minutes || 15,
-              passing_score: instData.passing_score || 70,
-              questions_count: normQuestions.length,
-              questions: normQuestions as any,
-            });
-            if (instData.time_limit_minutes > 0) {
-              setTimeLeft(instData.time_limit_minutes * 60);
-            }
-            setLoading(false);
-            return;
-          }
-        } catch (e) {}
-      }
-
-      // 3. Fallback: No quiz data available from any source
-      setQuizData(null as any);
-      setError("Bài kiểm tra chưa có câu hỏi. Vui lòng liên hệ giảng viên để cập nhật nội dung.");
-      setLoading(false);
-    };
-
-    loadQuizData();
-  }, [lesson, normalizeQuestions, isPreview]);
-
-  const handleFinishQuiz = useCallback(async (currentAnswers: Record<string, string>) => {
-    if (!quizData) return;
-    if (isPreview) {
-      if (timerRef.current) clearInterval(timerRef.current);
-      setTimeLeft(null);
-      setPreviewFinished(true);
-      return;
-    }
-    setSubmittingFinal(true);
-    if (timerRef.current) clearInterval(timerRef.current);
-    try {
-      const timeTaken = quizData.time_limit_minutes > 0 && timeLeft !== null 
-        ? (quizData.time_limit_minutes * 60) - timeLeft 
-        : 60;
-      const res = await submitQuiz(lesson.id, currentAnswers, timeTaken);
-      setQuizResult(res);
-      setPhase('result');
-
-      // Save result to localStorage for persistence upon page refresh (F5)
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(`student_quiz_result_${lesson.id}`, JSON.stringify(res));
-      }
-
-      // Báo hiệu hoàn thành để Component cha cập nhật Progress / Sidebar
-      if (res.passed) {
-        onComplete();
-      }
-    } catch (err) {
-      setError("Lỗi khi nộp bài. Vui lòng tải lại trang.");
-    }
-    setSubmittingFinal(false);
-  }, [quizData, lesson.id, timeLeft, onComplete, isPreview]);
-
- // Timer
- useEffect(() => {
- if (timeLeft === null || phase !== 'quiz') return;
- if (timeLeft <= 0 && !submittingFinal) {
- // Time's up — force finish
- handleFinishQuiz(allAnswers);
- return;
- }
- timerRef.current = setInterval(() => {
- setTimeLeft((prev) => {
- if (prev === null) return null;
- if (prev <= 1) {
- clearInterval(timerRef.current!);
- if (!submittingFinal) handleFinishQuiz(allAnswers);
- return 0;
- }
- return prev - 1;
- });
- }, 1000);
- return () => { if (timerRef.current) clearInterval(timerRef.current); };
- }, [timeLeft, phase, submittingFinal, handleFinishQuiz, allAnswers]);
-
- // Auto-completion effect for result phase (Top Level Hook)
- useEffect(() => {
- if (phase === 'result' && quizResult) {
- const passed = quizResult.passed;
- if (passed && !hasCompletedRef.current) {
- hasCompletedRef.current = true;
- onComplete();
- }
- }
- }, [phase, quizResult, onComplete]);
-
-  const handleAnswer = async () => {
-    if (!quizData || answered) return;
-    const currentQ = quizData.questions[currentIndex] as any;
-    const isEssayQ = currentQ?.type === "essay" || !currentQ?.answers || currentQ?.answers.length === 0;
-
-    if (isEssayQ) {
-      if (!essayText.trim()) return;
-      if (isPreview) {
-        setAnswered(true);
-        setAnswerResult(true);
-        setAllAnswers((prev) => ({ ...prev, [currentQ.id]: essayText }));
-        return;
-      }
-      setSubmitting(true);
-      setAllAnswers((prev) => ({ ...prev, [currentQ.id]: essayText }));
-
-      try {
-        const res = await axiosClient.post("/api/student/quiz/grade-essay", {
-          question_id: currentQ.id,
-          question_content: currentQ.content,
-          sample_answer: currentQ.sample_answer || "",
-          rubric: currentQ.rubric || "",
-          max_score: currentQ.points || 2.5,
-          student_answer: essayText,
-        });
-        const evalData = res.data?.data || res.data;
-        if (evalData) {
-          setEssayResult((prev) => ({ ...prev, [currentQ.id]: evalData }));
-          if (evalData.score >= (currentQ.points || 2.5) * 0.7) {
-            setCorrectCount((c) => c + 1);
-          }
-        }
-      } catch (err) {
-        console.warn("AI grading single essay fallback:", err);
-      } finally {
-        setAnswered(true);
-        setAnswerResult(true);
-        setSubmitting(false);
-      }
-      return;
-    }
-
-    if (!selectedAnswer) return;
-    setSubmitting(true);
-
-    let isCorrect = false;
-
-    // Check locally if answers array has is_correct property
-    if (Array.isArray(currentQ.answers) && currentQ.answers.length > 0) {
-      const selectedAnsObj = currentQ.answers.find(
-        (ans: any) => String(ans.id) === String(selectedAnswer)
-      ) || currentQ.answers.find(
-        (ans: any) => ans.content === selectedAnswer
-      );
-
-      if (selectedAnsObj && typeof selectedAnsObj.is_correct !== "undefined") {
-        isCorrect = Boolean(selectedAnsObj.is_correct);
-      } else {
-        const correctIdx = typeof currentQ.correct_answer_index === "number" ? currentQ.correct_answer_index : 0;
-        const selectedIdx = currentQ.answers.findIndex(
-          (ans: any) => String(ans.id) === String(selectedAnswer)
-        );
-        isCorrect = selectedIdx >= 0 && selectedIdx === correctIdx;
-      }
-      setAnswered(true);
-      setAnswerResult(isCorrect);
-      if (isCorrect) setCorrectCount((c) => c + 1);
-      setAllAnswers((prev) => ({ ...prev, [currentQ.id]: selectedAnswer }));
-    } else {
-      try {
-        const result = await checkQuizAnswer(lesson.id, currentQ.id, selectedAnswer);
-        isCorrect = Boolean(result.correct);
-        setAnswered(true);
-        setAnswerResult(isCorrect);
-        if (isCorrect) setCorrectCount((c) => c + 1);
-        setAllAnswers((prev) => ({ ...prev, [currentQ.id]: selectedAnswer }));
-      } catch {
-        const correctIdx = typeof currentQ.correct_answer_index === "number" ? currentQ.correct_answer_index : 0;
-        const answersList = currentQ.options || [];
-        const foundIdx = answersList.indexOf(selectedAnswer);
-        isCorrect = foundIdx >= 0 && foundIdx === correctIdx;
-        setAnswered(true);
-        setAnswerResult(isCorrect);
-        if (isCorrect) setCorrectCount((c) => c + 1);
-        setAllAnswers((prev) => ({ ...prev, [currentQ.id]: selectedAnswer }));
-      }
-    }
-    setSubmitting(false);
-  };
-
-  const handleNext = () => {
-    if (!quizData) return;
-    if (currentIndex < quizData.questions.length - 1) {
-      setCurrentIndex((i) => i + 1);
-      setSelectedAnswer("");
-      setEssayText("");
-      setAnswerResult(null);
-      setAnswered(false);
-    } else {
-      handleFinishQuiz(allAnswers);
-    }
-  };
-
-  const handleRetry = () => {
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem(`student_quiz_result_${lesson.id}`);
-    }
-    setCurrentIndex(0);
-    setSelectedAnswer("");
-    setEssayText("");
-    setAnswerResult(null);
-    setAnswered(false);
-    setCorrectCount(0);
-    setAllAnswers({});
-    setQuizResult(null);
-    setPhase('quiz');
-    hasCompletedRef.current = false;
-    if (quizData && quizData.time_limit_minutes > 0) {
-      setTimeLeft(quizData.time_limit_minutes * 60);
-    }
-  };
-
- if (previewFinished) {
- return <p className="p-8 text-center text-slate-700">Đã hoàn thành lượt xem thử. Kết quả và tiến độ không được lưu.</p>;
- }
-
- if (loading) {
- return (
- <div className="w-full p-12 flex flex-col items-center justify-center bg-blue-50/50 rounded-xl border border-blue-100">
- <div className="w-10 h-10 border-3 border-[#3B82F6] border-t-transparent rounded-full animate-spin" />
- <span className="text-sm text-[#64748B] font-medium mt-3">Đang tải bài kiểm tra...</span>
- </div>
- );
- }
-
- if (error || !quizData || quizData.questions.length === 0) {
- return (
- <div className="w-full p-12 flex flex-col items-center justify-center text-gray-400 bg-blue-50/50 rounded-xl border border-blue-100">
- <AlertTriangle size={28} strokeWidth={1.75} aria-hidden />
- <span className="text-sm font-medium mt-3">{error || "Bài kiểm tra chưa có câu hỏi."}</span>
- </div>
- );
- }
-
- // Result Phase
- if (submittingFinal) {
- return (
- <div className="w-full p-12 flex flex-col items-center justify-center bg-blue-50/50 rounded-xl border border-blue-100">
- <div className="w-10 h-10 border-3 border-[#3B82F6] border-t-transparent rounded-full animate-spin" />
- <span className="text-sm text-[#64748B] font-medium mt-3">Đang nộp bài...</span>
- </div>
- );
- }
-
-  if (phase === 'result' && quizResult) {
-    const passed = quizResult.passed;
-    const scorePercent = quizResult.score;
-    const totalQ = quizResult.total_questions;
-    const actualCorrect = quizResult.correct_count;
-
-    const score10 = typeof quizResult.score_10 === 'number' 
-      ? quizResult.score_10 
-      : (typeof quizResult.total_earned_points === 'number' 
-          ? Number(quizResult.total_earned_points.toFixed(1)) 
-          : Number(((scorePercent / 100) * 10).toFixed(1)));
-
-    return (
-      <div className="w-full bg-white rounded-xl border border-blue-100 shadow-sm p-8 flex flex-col items-center gap-6">
-        <div className={twMerge(
-          "w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold",
-          passed ? "bg-blue-50/50 text-[#065F46]" : "bg-blue-50/50 text-[#3B82F6]"
-        )}>
-          {passed ? <PartyPopper size={16} className="inline mr-1" /> : <AlertTriangle size={16} className="inline mr-1" />}
-        </div>
-
-        <h2 className="text-2xl font-bold text-[#0F172A]">
-          {passed ? "Chúc mừng! Bạn đã vượt qua!" : "Chưa đạt yêu cầu"}
-        </h2>
-
-        <div className="text-center space-y-1">
-          <p className="text-2xl font-semibold text-[#0F172A]">
-            {score10} / 10 điểm
-          </p>
-          <p className="text-xs font-semibold text-[#64748B]">
-            Tỷ lệ đạt: {scorePercent}% — Yêu cầu tối thiểu: {quizData?.passing_score}%
-          </p>
-          <p className="text-[11px] text-gray-400 mt-0.5">
-            (Đã trả lời đúng {actualCorrect}/{totalQ} câu)
-          </p>
-        </div>
-
-        {/* Progress bar */}
-        <div className="w-full max-w-xs">
-          <div className="w-full h-3 bg-[#F1F5F9] rounded-full overflow-hidden">
-            <div
-              className={twMerge(
-                "h-full rounded-full transition-all duration-700",
-                passed ? "bg-[#059669]" : "bg-[#2563EB]"
-              )}
-              style={{ width: `${scorePercent}%` }}
-            />
-          </div>
-        </div>
-
- {passed ? (
- <div className="flex flex-col items-center gap-3">
- <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-50/50 text-[#065F46] font-semibold text-sm">
- HOÀN THÀNH
- </div>
- <button
- onClick={handleRetry}
- className="px-4 py-2 text-sm text-[#0F172A] hover:text-[#2563EB] font-medium transition-colors cursor-pointer"
- >
- Làm lại để luyện tập
- </button>
- </div>
- ) : (
- <button
- onClick={handleRetry}
- className="px-6 py-3 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm transition-colors cursor-pointer shadow-sm"
- >
- Làm lại
- </button>
- )}
- </div>
- );
- }
-
-// Quiz Phase — Show one question at a time
- const question = quizData.questions[currentIndex];
- const isLast = currentIndex === quizData.questions.length - 1;
-
- return (
- <div className="w-full bg-white rounded-xl border border-blue-100 shadow-sm overflow-hidden">
- {/* Quiz Header */}
- <div className="flex items-center justify-between px-6 py-4 bg-blue-50/50 border-b border-blue-100">
- <div className="flex items-center gap-3">
- <span className="text-sm font-bold text-[#0F172A]">{quizData.title}</span>
- <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#F1F5F9] text-[#0F172A]">
- Câu {currentIndex + 1}/{quizData.questions.length}
- </span>
- </div>
- {timeLeft !== null && (
- <span className={twMerge(
- "text-sm font-semibold px-3 py-1 rounded-full",
- timeLeft < 60 ? "bg-[#EFF6FF] text-[#3B82F6] animate-pulse" : "bg-[#F1F5F9] text-[#64748B]"
- )}>
- {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
- </span>
- )}
- </div>
-
- {/* Question */}
- <div className="p-6 sm:p-8">
-  <h3 className="text-lg font-bold text-[#0F172A] mb-6 leading-relaxed">
-  {question.content}
-  </h3>
-
-  {/* Answers - MCQ or Essay */}
-  {((question as any).type === "essay" || !question.answers || question.answers.length === 0) ? (
-  <div className="flex flex-col gap-3 mb-6">
-  <label className="text-xs font-bold text-[#0F172A]">Câu trả lời tự luận của bạn:</label>
-  <textarea
-  value={essayText}
-  onChange={(e) => setEssayText(e.target.value)}
-  disabled={answered}
-  rows={4}
-  placeholder="Nhập nội dung bài làm tự luận của bạn..."
-  className="w-full p-4 rounded-xl border border-blue-100 text-sm text-[#0F172A] focus:border-[#3B82F6] focus:outline-none bg-white font-medium shadow-2xs"
-  />
-
-  {answered && (
-  <div className="p-5 rounded-xl bg-blue-50/50 border border-blue-100 flex flex-col gap-4 text-xs animate-fadeIn mt-2 shadow-2xs">
-  {essayResult[question.id] ? (
-  <div className="flex flex-col gap-3 p-4 rounded-xl bg-white border border-blue-100 shadow-2xs">
-    <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-      <div className="flex items-center gap-2">
-        <Bot size={16} className="text-[#2563EB]" />
-        <span className="font-semibold text-[#0F172A] text-sm">Kết quả đánh giá từ Gia sư AI (Gemini):</span>
-      </div>
-      <div className="px-3 py-1 rounded-full bg-[#E8F8F0] text-[#27AE60] font-semibold text-xs">
-        <Target size={14} className="inline mr-1 text-[#27AE60]" /> Điểm: {essayResult[question.id].score} / {essayResult[question.id].max_score || (question as any).points || 2.5} điểm
-      </div>
-    </div>
-
-    <p className="text-[#64748B] font-medium text-xs leading-relaxed bg-[#F1F5F9]/50 p-3 rounded-lg border border-blue-100/60">
-      <MessageSquare size={14} className="inline mr-1 text-[#0F172A]" /> <strong>Nhận xét AI:</strong> {essayResult[question.id].feedback}
-    </p>
-
-    {Array.isArray(essayResult[question.id].ai_analysis?.matched_points) && essayResult[question.id].ai_analysis.matched_points.length > 0 && (
-      <div className="flex flex-col gap-1">
-        <span className="font-bold text-[#27AE60] text-[11px]"><CheckCircle2 size={12} className="inline mr-1" /> Ý trả lời tốt:</span>
-        <ul className="list-disc list-inside text-[#27AE60] text-xs space-y-0.5 pl-1">
-          {essayResult[question.id].ai_analysis.matched_points.map((pt: string, pIdx: number) => (
-            <li key={pIdx}>{pt}</li>
-          ))}
-        </ul>
-      </div>
-    )}
-
-    {Array.isArray(essayResult[question.id].ai_analysis?.missing_points) && essayResult[question.id].ai_analysis.missing_points.length > 0 && (
-      <div className="flex flex-col gap-1">
-        <span className="font-bold text-[#3B82F6] text-[11px]"><AlertTriangle size={12} className="inline mr-1" /> Cần bổ sung / hoàn thiện:</span>
-        <ul className="list-disc list-inside text-[#2563EB] text-xs space-y-0.5 pl-1">
-          {essayResult[question.id].ai_analysis.missing_points.map((pt: string, pIdx: number) => (
-            <li key={pIdx}>{pt}</li>
-          ))}
-        </ul>
-      </div>
-    )}
-  </div>
-  ) : (
-  <div className="p-3 rounded-xl bg-[#E8F8F0] border border-[#27AE60]/20 text-[#27AE60] text-xs font-bold flex items-center justify-between">
-    <span><CheckCircle2 size={14} className="inline mr-1 text-[#27AE60]" /> {isPreview ? "Xem thử tự luận — đối chiếu đáp án và tiêu chí bên dưới." : <>Đã nộp bài tự luận - Thang điểm: <strong>{(question as any).points || 2.5} điểm</strong></>}</span>
-    <span className="px-2.5 py-0.5 rounded bg-[#27AE60] text-white text-[10px] uppercase font-bold">{isPreview ? "Không lưu" : "Đã ghi nhận"}</span>
-  </div>
-  )}
-
-  <div className="flex flex-col gap-1.5">
-    <span className="text-[#0F172A] font-semibold text-xs"><Lightbulb size={12} className="inline mr-1 text-[#D97706]" /> Đáp án tham khảo mẫu từ Giảng viên:</span>
-    <p className="text-[#64748B] font-medium leading-relaxed whitespace-pre-line bg-white p-4 rounded-xl border border-blue-100 shadow-2xs">
-      {(question as any).sample_answer || "Yêu cầu học viên phân tích đầy đủ các luận điểm chính trong bài học."}
-    </p>
-  </div>
-
-  {(question as any).rubric && (
-  <div className="flex flex-col gap-1.5 pt-2 border-t border-blue-100">
-  <span className="font-semibold text-[#3B82F6] text-xs"><ClipboardList size={12} className="inline mr-1 text-[#3B82F6]" /> Thang điểm & Rubric chấm điểm:</span>
-  <p className="text-[#2563EB] font-medium leading-relaxed whitespace-pre-line bg-[#EFF6FF]/60 p-3.5 rounded-xl border border-[#3B82F6]/20">
-    {(question as any).rubric}
-  </p>
-  </div>
-  )}
-  </div>
-  )}
-  </div>
-  ) : (
-  <div className="flex flex-col gap-3 mb-6">
-  {question.answers.map((ans: any, idx: number) => {
-  const letter = String.fromCharCode(65 + idx);
-  const isSelected = selectedAnswer === ans.id;
-  let ansStyle = "bg-white border-blue-100 hover:border-[#2563EB] hover:bg-blue-50/50";
-
-  if (answered && isSelected) {
-  ansStyle = answerResult
-  ? "bg-blue-50/50 border-[#34D399] text-[#065F46]"
-  : "bg-blue-50/50 border-[#60A5FA] text-[#3B82F6]";
-  } else if (isSelected) {
-  ansStyle = "bg-[#F1F5F9] border-[#3B82F6]";
-  }
-
-  return (
-  <button
-  key={ans.id || idx}
-  onClick={() => !answered && setSelectedAnswer(ans.id)}
-  disabled={answered}
-  className={twMerge(
-  "flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left cursor-pointer",
-  ansStyle,
-  answered && !isSelected && "opacity-60"
-  )}
-  >
-  <span className={twMerge(
-  "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 border-2",
-  isSelected && !answered ? "bg-[#3B82F6] text-white border-[#3B82F6]" :
-  answered && isSelected && answerResult ? "bg-[#059669] text-white border-[#059669]" :
-  answered && isSelected && !answerResult ? "bg-[#2563EB] text-white border-[#2563EB]" :
-  "bg-[#F1F5F9] text-[#64748B] border-blue-100"
-  )}>
-  {letter}
-  </span>
-  <span className="text-[15px] font-medium">{ans.content}</span>
-  </button>
-  );
-  })}
-  </div>
-  )}
-
-  {/* Answer feedback */}
-  {answered && !((question as any).type === "essay" || !question.answers || question.answers.length === 0) && (
-  <div className={twMerge(
-  "p-4 rounded-xl mb-4 text-sm font-semibold",
-  answerResult ? "bg-blue-50/50 text-[#065F46]" : "bg-blue-50/50 text-[#3B82F6]"
-  )}>
-  {answerResult ? " Chính xác!" : " Chưa đúng. Hãy cố gắng ở câu tiếp theo!"}
-  </div>
-  )}
-
-  {/* Action buttons */}
- <div className="flex justify-end gap-3">
- {!answered ? (
-  <button
-  onClick={handleAnswer}
-  disabled={
-    ((question as any).type === "essay" || !question.answers || question.answers.length === 0)
-      ? (!essayText.trim() || submitting)
-      : (!selectedAnswer || submitting)
-  }
-  className="px-6 py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm flex items-center gap-2"
-  >
-  {submitting ? (
-    ((question as any).type === "essay" || !question.answers || question.answers.length === 0)
-      ? <span className="flex items-center gap-1.5"><Bot size={14} /> Gia sư AI đang chấm điểm...</span>
-      : "Đang kiểm tra..."
-  ) : "Trả lời"}
-  </button>
- ) : (
- <button
- onClick={handleNext}
- className="px-6 py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm transition-colors cursor-pointer shadow-sm flex items-center gap-2"
- >
- {isLast ? "Hoàn thành" : "Câu tiếp theo"}
- <ChevronRight size={16} aria-hidden />
- </button>
- )}
- </div>
- </div>
- </div>
- );
-}
+import type { LessonData, ModuleData } from "./types";
+import { getLessonTypeLabel, getLessonTypeColor } from "./lessonTypeLabels";
+import { ArticleRenderer } from "./ArticleRenderer";
+import { QuizRenderer } from "./QuizRenderer";
+
+export type { LessonData } from "./types";
 
 // ─── Inner Workspace Content ─────────────────────────────────────────────────
 function LessonWorkspaceContent() {
@@ -979,30 +125,19 @@ function LessonWorkspaceContent() {
  setActiveTab("content");
  };
 
+ // Record the server-side start time whenever a lesson is opened (completion is validated against it).
+ const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+ useEffect(() => {
+ if (isPreview || !activeLesson?.id || activeLesson.completed) return;
+ startLesson(activeLesson.id).catch(() => {});
+ return () => {
+ if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+ };
+ }, [activeLesson?.id, activeLesson?.completed, isPreview]);
+
  // Handle lesson completion
  const handleLessonComplete = useCallback(async () => {
  if (isPreview || !activeLesson || activeLesson.completed) return;
-
- // Instant UI Update: Modify the TanStack Query Cache directly!
- queryClient.setQueryData(["student", "courses", "detail", String(parsedCourseId)], (oldData: CourseDetailData | undefined) => {
- if (!oldData) return oldData;
- return {
- ...oldData,
- modules: oldData.modules.map(mod => ({
- ...mod,
- lessons: mod.lessons.map(les => ({
- ...les,
- status: les.id.toString() === activeLesson.id ? 'completed' : les.status
- }))
- })),
- progress_card: oldData.progress_card ? {
- ...oldData.progress_card,
- progress_percentage: oldData.progress_card.progress_percentage,
- completed_lessons_count: oldData.progress_card.completed_lessons_count,
- total_lessons_count: oldData.progress_card.total_lessons_count,
- } : undefined
- };
- });
 
  const payload: { playback_position?: number; time_spent_seconds?: number } = {};
  if (activeLesson.type === 'video') {
@@ -1038,10 +173,19 @@ function LessonWorkspaceContent() {
 
  // Background refetch to guarantee synchronization
  invalidateCourseDetail(parsedCourseId);
- } catch (err) {
+ } catch (err: any) {
+ // The server measures real study time; if it is not enough yet, retry once it is.
+ const remaining = Number(err?.response?.data?.errors?.remaining_seconds);
+ if (err?.response?.status === 422 && remaining > 0) {
+ if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+ retryTimerRef.current = setTimeout(() => { void handleLessonCompleteRef.current?.(); }, (remaining + 1) * 1000);
+ return;
+ }
  console.warn("Completion API error:", err);
  }
  }, [activeLesson, invalidateCourseDetail, parsedCourseId, isPreview, queryClient]);
+ const handleLessonCompleteRef = useRef(handleLessonComplete);
+ useEffect(() => { handleLessonCompleteRef.current = handleLessonComplete; }, [handleLessonComplete]);
 
  // Post comment
  const [confirmDeleteId, setConfirmDeleteId] = useState<string | number | null>(null);
@@ -1109,11 +253,29 @@ function LessonWorkspaceContent() {
  return (
  <div className="w-full h-screen flex flex-col items-center justify-center bg-blue-50/50 p-6">
  <div className="bg-white p-8 rounded-xl shadow-sm max-w-md w-full text-center border border-blue-100">
- <h2 className="text-xl font-bold text-[#0F172A] mb-2">Không tìm thấy khóa học</h2>
- <p className="text-sm text-[#64748B] mb-6">Vui lòng chọn một khóa học để bắt đầu học.</p>
- <a href="/courses" className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold transition-all shadow-sm">
+ <h2 className="text-xl font-bold text-slate-900 mb-2">Không tìm thấy khóa học</h2>
+ <p className="text-sm text-slate-500 mb-6">Vui lòng chọn một khóa học để bắt đầu học.</p>
+ <a href="/courses" className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-all shadow-sm">
  Xem danh sách khóa học
  </a>
+ </div>
+ </div>
+ );
+ }
+
+ // Lesson material is only for enrolled learners (the API also strips it for everyone else).
+ if (!isPreview && apiDetail && apiDetail.header_info?.is_enrolled === false) {
+ return (
+ <div className="w-full min-h-[70vh] flex flex-col items-center justify-center p-6">
+ <div className="bg-white p-8 rounded-xl shadow-sm max-w-md w-full text-center border border-slate-200">
+ <div className="mx-auto mb-4 w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center">
+ <Lock size={22} aria-hidden />
+ </div>
+ <h2 className="text-lg font-bold text-slate-900 mb-2">Bạn chưa đăng ký khóa học này</h2>
+ <p className="text-sm text-slate-500 mb-6">Đăng ký khóa học để xem bài giảng, tài liệu và làm bài kiểm tra.</p>
+ <Link href={`/courses/detail?courseId=${parsedCourseId}`} className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors shadow-sm">
+ Xem thông tin khóa học
+ </Link>
  </div>
  </div>
  );
@@ -1134,9 +296,22 @@ function LessonWorkspaceContent() {
 
  if (isLoading || !activeLesson) {
  return (
- <div className="w-full h-screen flex flex-col items-center justify-center bg-blue-50/50">
- <div className="w-12 h-12 border-4 border-[#3B82F6] border-t-transparent rounded-full animate-spin mb-4"></div>
- <p className="text-[#64748B] font-semibold text-sm">Đang tải dữ liệu bài học...</p>
+ <div role="status" aria-busy="true" aria-label="Đang tải bài học" className="w-full min-h-screen bg-slate-50/50">
+ <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+ <div className="space-y-2"><Skeleton className="h-3 w-40" /><Skeleton className="h-5 w-64" /></div>
+ <Skeleton className="h-2 w-40 rounded-full" />
+ </div>
+ <div className="max-w-[1400px] mx-auto p-6 flex flex-col lg:flex-row gap-8">
+ <div className="flex-1 space-y-6">
+ <Skeleton className="aspect-video w-full rounded-xl" />
+ <Skeleton className="h-12 w-full rounded-xl" />
+ <Skeleton className="h-40 w-full rounded-xl" />
+ </div>
+ <div className="w-full lg:w-[340px] space-y-4">
+ <Skeleton className="h-24 w-full rounded-xl" />
+ {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" />)}
+ </div>
+ </div>
  </div>
  );
  }
@@ -1211,12 +386,12 @@ function LessonWorkspaceContent() {
         <main className="lg:col-span-8 flex flex-col gap-6 w-full min-w-0">
 
           {/* AI Notice */}
-          <div className="w-full px-5 py-4 rounded-xl bg-gradient-to-r from-indigo-50 via-blue-50 to-sky-50 border border-indigo-100/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
+          <div className="w-full px-5 py-4 rounded-xl bg-gradient-to-r from-sky-50 via-blue-50 to-sky-50 border border-sky-100/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
             {/* Decorative background glow */}
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-400/10 blur-2xl rounded-full pointer-events-none" />
             
             <div className="flex items-center gap-4 min-w-0 relative z-10">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(79,70,229,0.3)]">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(79,70,229,0.3)]">
                 <Sparkles size={22} />
               </div>
               <div className="min-w-0">
@@ -1315,7 +490,7 @@ function LessonWorkspaceContent() {
       {/* Tab 2: AI Tips */}
       {activeTab === "ai_tips" && (
         <div className="flex flex-col gap-5 animate-fadeIn">
-          <div className="p-5 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 flex items-start gap-4">
+          <div className="p-5 rounded-xl bg-gradient-to-br from-blue-50 to-sky-50 border border-blue-100 flex items-start gap-4">
             <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm">
               <Sparkles size={22} />
             </div>
@@ -1354,10 +529,7 @@ function LessonWorkspaceContent() {
           {/* Discussion List */}
           <div className="flex flex-col gap-6">
             {isDiscussionsLoading ? (
-              <div className="py-12 flex flex-col items-center justify-center gap-3">
-                <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-blue-600 animate-spin" />
-                <span className="text-[13px] font-semibold text-slate-500">Đang tải thảo luận...</span>
-              </div>
+              <SkeletonList items={3} />
             ) : apiDiscussions?.length === 0 ? (
               <div className="py-8">
                 <NoDataAvailable
@@ -1685,7 +857,7 @@ function LessonWorkspaceContent() {
 // ─── Exported Master Component ────────────────────────────────────────────────
 export function LessonWorkspace() {
  return (
- <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center font-semibold text-[#64748B]">Đang tải khoá học Trợ lý AI MindNova...</div>}>
+ <Suspense fallback={<div role="status" aria-busy="true" aria-label="Đang tải bài học" className="max-w-[1400px] mx-auto p-6 space-y-6"><Skeleton className="aspect-video w-full rounded-xl" /><Skeleton className="h-40 w-full rounded-xl" /></div>}>
  <LessonWorkspaceContent />
  </Suspense>
  );

@@ -12,6 +12,7 @@ use App\Models\UserQuizAttempt;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class LessonController extends Controller
@@ -105,6 +106,58 @@ class LessonController extends Controller
     }
 
     /**
+     * POST /api/student/lessons/{lesson}/start
+     * Records (once) when the learner opened the lesson, so completion can be
+     * validated against real elapsed time instead of client-reported values.
+     */
+    public function start(Request $request, Lesson $lesson): JsonResponse
+    {
+        $user = $request->user('sanctum') ?? $request->user();
+        if (!$user) {
+            return $this->unauthorizedResponse('Bạn cần đăng nhập.');
+        }
+
+        if ($lesson->status !== 'published' || $lesson->published_version_id === null) {
+            return $this->notFoundResponse('Không tìm thấy bài học.');
+        }
+
+        $courseId = $lesson->module?->course_id;
+        if (!$courseId || !Enrollment::where('user_id', $user->id)->where('course_id', $courseId)->exists()) {
+            return $this->forbiddenResponse('Bạn chưa đăng ký khóa học này.');
+        }
+
+        $startedAt = Cache::get($this->startKey($user->id, $lesson->id));
+        if (!$startedAt) {
+            $startedAt = now()->timestamp;
+            Cache::put($this->startKey($user->id, $lesson->id), $startedAt, now()->addDay());
+        }
+
+        return $this->successResponse([
+            'started_at' => $startedAt,
+            'required_seconds' => $this->requiredStudySeconds($lesson),
+        ], 'Đã ghi nhận thời điểm bắt đầu bài học.');
+    }
+
+    private function startKey(int $userId, int $lessonId): string
+    {
+        return "lesson_start:{$userId}:{$lessonId}";
+    }
+
+    /**
+     * Minimum real time a learner must spend before a lesson can be completed.
+     * Videos: half the duration (allows up to 2x playback). Articles: a third of the reading time.
+     */
+    private function requiredStudySeconds(Lesson $lesson): int
+    {
+        $duration = (int) ($lesson->duration_seconds ?? 0);
+        return match ($lesson->type ?? 'video') {
+            'video' => (int) ceil($duration / 2),
+            'article' => (int) ceil($duration / 3),
+            default => 0,
+        };
+    }
+
+    /**
      * POST /api/student/lessons/{lesson}/complete
      * Mark a lesson as completed with server-side validation.
      */
@@ -143,6 +196,21 @@ class LessonController extends Controller
 
         $lessonType = $lesson->type ?? 'video';
         $durationSeconds = $lesson->duration_seconds ?? (($lesson->duration_minutes ?? 0) * 60);
+
+        // Server-measured study time: the client cannot skip ahead by reporting a fake position.
+        $requiredSeconds = $this->requiredStudySeconds($lesson);
+        if ($requiredSeconds > 0) {
+            $startedAt = Cache::get($this->startKey($user->id, $lesson->id));
+            $elapsed = $startedAt ? now()->timestamp - (int) $startedAt : 0;
+            if ($elapsed < $requiredSeconds) {
+                $remaining = $requiredSeconds - $elapsed;
+                return $this->errorResponse(
+                    "Bạn cần học thêm {$remaining} giây nữa để hoàn thành bài học này.",
+                    422,
+                    ['remaining_seconds' => $remaining, 'required_seconds' => $requiredSeconds]
+                );
+            }
+        }
 
         // Server-side validation based on lesson type
         if ($lessonType === 'video') {

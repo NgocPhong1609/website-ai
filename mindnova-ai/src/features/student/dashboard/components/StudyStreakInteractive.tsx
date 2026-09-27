@@ -8,7 +8,7 @@ import { twMerge } from "tailwind-merge";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { vi } from "date-fns/locale";
-import { Flame, Snowflake, X } from "lucide-react";
+import { Flame, Snowflake, X, Check } from "lucide-react";
 import type { StudyStreak } from "../types";
 import { DayOfWeek } from "./DashboardStatsPanel";
 import { axiosClient } from "@/src/shared/lib/axios";
@@ -104,7 +104,7 @@ export function StudyStreakInteractive({
     setIsLoading(true);
 
     try {
-      // 🚀 Sửa lại đúng tên key 'accessToken' mà bạn vừa nhìn thấy trong LocalStorage
+      // Token is stored under 'accessToken' in localStorage
       const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") || "" : "";
 
       if (!token) {
@@ -161,7 +161,7 @@ export function StudyStreakInteractive({
                 isCheckedIn ? "bg-emerald-50 text-emerald-600 border-emerald-600/20 cursor-default" : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:scale-105"
               )}
             >
-              {isLoading ? "Đang xử lý..." : (isCheckedIn ? "Đã điểm danh ✓" : "Điểm danh ngay")}
+              {isLoading ? "Đang xử lý..." : (isCheckedIn ? <span className="inline-flex items-center gap-1"><Check size={14} aria-hidden />Đã điểm danh</span> : "Điểm danh ngay")}
             </button>
           </div>
         </div>

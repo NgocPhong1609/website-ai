@@ -5,11 +5,13 @@ import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useGetCourseDetail } from "../../courses/api";
 import { checkoutService } from "../services/checkout.service";
 import { useGetPaymentMethods } from "../../billing/api";
 import { Ticket, AlertTriangle, Gift, PartyPopper, Sparkles } from "lucide-react";
-import { Loader } from "@/src/shared/components/ui/Loader";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
+import Link from "next/link";
 import toast from "react-hot-toast";
 
 export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?: () => void }) {
@@ -19,6 +21,7 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
   const [savedMethodId, setSavedMethodId] = useState<number | null>(null);
   const [confirmAccount, setConfirmAccount] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const queryClient = useQueryClient();
   const { data: savedMethods = [] } = useGetPaymentMethods();
 
   useEffect(() => {
@@ -44,16 +47,30 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
 
   if (isLoading) {
     return (
-      <div className="p-6 min-h-[70vh] flex items-center justify-center">
-        <Loader size="lg" text="Đang tải thông tin hóa đơn..." />
+      <div role="status" aria-busy="true" aria-label="Đang tải thông tin đơn hàng" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="rounded-xl border border-slate-200 bg-white p-6 space-y-4">
+          <Skeleton className="h-5 w-40" />
+          <div className="flex gap-4"><Skeleton className="h-20 w-24 rounded-lg" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-2/3" /><Skeleton className="h-4 w-20" /></div></div>
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-6 w-full" />
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-6 space-y-4">
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-11 w-full" />
+        </div>
       </div>
     );
   }
 
   if (isError || !data) {
     return (
-      <div className="p-6 text-center text-[#3B82F6] font-bold">
-        Lỗi tải thông tin khóa học. Vui lòng thử lại.
+      <div className="rounded-xl border border-rose-200 bg-rose-50 p-6 text-center">
+        <p className="font-semibold text-rose-700">Không tìm thấy khóa học cần thanh toán.</p>
+        <p className="mt-1 text-sm text-rose-600">Khóa học có thể đã bị ẩn hoặc đường dẫn không đúng.</p>
+        <Link href="/explore" className="mt-4 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+          Quay lại danh sách khóa học
+        </Link>
       </div>
     );
   }
@@ -118,8 +135,13 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
 
       if (res.success) {
         if (isEffectiveFree || !res.payment_url) {
-          toast.success("🎉 Chúc mừng! Bạn đã nhận khóa học thành công.");
-          router.replace(`/courses/detail?courseId=${courseId}`);
+          toast.success("Bạn đã nhận khóa học thành công!");
+          // Refresh enrolment-dependent data (detail, reviews, my courses, billing) and close the modal.
+          await queryClient.invalidateQueries({ queryKey: ["student"] });
+          setIsProcessing(false);
+          if (onClose) onClose();
+          else router.replace(`/courses/detail?courseId=${courseId}`);
+          router.refresh();
           return;
         }
 
@@ -152,42 +174,43 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
   };
 
   return (
-    <div className="w-full flex flex-col lg:flex-row lg:divide-x divide-[#E2E8F0]">
+    <div className="w-full flex flex-col lg:flex-row lg:divide-x divide-slate-200">
       {/* Cột trái: Tóm tắt hóa đơn & Nhập mã giảm giá */}
       <div className="flex-1 p-6 lg:p-8 space-y-6">
         <div>
-          <h2 className="text-lg font-semibold text-[#0F172A] mb-6 border-b border-[#E2E8F0] pb-4">
+          <h2 className="text-lg font-semibold text-slate-900 mb-6 border-b border-slate-200 pb-4">
             Tóm tắt Đơn hàng
           </h2>
           
           <div className="flex gap-4 mb-6">
             {header_info.thumbnail ? (
-              <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 relative border border-gray-100">
+              <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 relative border border-slate-100">
                 <Image src={header_info.thumbnail} alt={header_info.title} fill className="object-cover" />
               </div>
             ) : (
               <div className="w-24 h-24 rounded-xl bg-slate-100 shrink-0" />
             )}
             <div>
-              <h3 className="text-base font-bold text-[#0F172A] leading-snug mb-1">
+              <h3 className="text-base font-bold text-slate-900 leading-snug mb-1">
                 {header_info.title}
               </h3>
-              <span className="inline-block px-2.5 py-1 bg-[#EFF6FF] text-[#2563EB] text-xs font-medium rounded-md capitalize">
+              <span className="inline-block px-2.5 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded-md capitalize">
                 {header_info.level}
               </span>
             </div>
           </div>
 
-          {/* Ô nhập mã giảm giá (Coupon input) */}
-          <div className="border-t border-[#E2E8F0] pt-5 mb-6">
-            <label className="text-xs font-semibold uppercase text-[#64748B] tracking-wider flex items-center gap-1.5 mb-2">
+          {/* Ô nhập mã giảm giá (Coupon input) — không cần cho khóa miễn phí */}
+          {originalPrice > 0 && (
+          <div className="border-t border-slate-200 pt-5 mb-6">
+            <label className="text-xs font-semibold uppercase text-slate-500 tracking-wider flex items-center gap-1.5 mb-2">
               <Ticket size={16} /> Mã giảm giá / Khuyến mãi
             </label>
 
             {appliedCoupon ? (
-              <div className="p-4 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] flex items-center justify-between gap-3 shadow-sm">
-                <div className="flex items-center gap-2 text-xs font-semibold text-[#2563EB]">
-                  <span className="px-2.5 py-1 rounded-md bg-[#3B82F6] text-white font-mono text-xs font-medium uppercase shadow-sm">
+              <div className="p-4 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between gap-3 shadow-sm">
+                <div className="flex items-center gap-2 text-xs font-semibold text-blue-600">
+                  <span className="px-2.5 py-1 rounded-md bg-blue-500 text-white font-mono text-xs font-medium uppercase shadow-sm">
                     {appliedCoupon.code}
                   </span>
                   <span>
@@ -199,7 +222,7 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
                 <button
                   type="button"
                   onClick={handleRemoveCoupon}
-                  className="text-xs font-semibold text-[#3B82F6] hover:text-[#2563EB] underline cursor-pointer"
+                  className="text-xs font-semibold text-blue-500 hover:text-blue-600 underline cursor-pointer"
                 >
                   Hủy bỏ mã
                 </button>
@@ -214,12 +237,12 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
                     if (couponError) setCouponError(null);
                   }}
                   placeholder="Nhập mã giảm giá (VD: TEST)..."
-                  className="flex-1 px-4 py-2.5 rounded-md text-xs font-medium border border-[#E2E8F0] focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none uppercase text-[#0F172A]"
+                  className="flex-1 px-4 py-2.5 rounded-md text-xs font-medium border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none uppercase text-slate-900"
                 />
                 <button
                   type="submit"
                   disabled={isApplyingCoupon || !couponCodeInput.trim()}
-                  className="px-5 py-2.5 rounded-md text-xs font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] disabled:opacity-50 transition-all cursor-pointer shrink-0 shadow-sm"
+                  className="px-5 py-2.5 rounded-md text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 disabled:opacity-50 transition-all cursor-pointer shrink-0 shadow-sm"
                 >
                   {isApplyingCoupon ? "Đang xử lý..." : "Áp dụng"}
                 </button>
@@ -227,29 +250,30 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
             )}
 
             {couponError && (
-              <p className="mt-2 text-xs font-bold text-[#3B82F6] bg-[#EFF6FF] p-2.5 rounded-xl border border-[#3B82F6]/20 flex items-center gap-1.5">
+              <p role="alert" className="mt-2 text-xs font-bold text-rose-700 bg-rose-50 p-2.5 rounded-xl border border-rose-200 flex items-center gap-1.5">
                 <AlertTriangle size={14} /> {couponError}
               </p>
             )}
           </div>
+          )}
 
           {/* Chi tiết chi phí */}
-          <div className="space-y-3 border-t border-[#E2E8F0] pt-4">
-            <div className="flex justify-between text-sm text-[#64748B]">
+          <div className="space-y-3 border-t border-slate-200 pt-4">
+            <div className="flex justify-between text-sm text-slate-500">
               <span>Giá khóa học gốc</span>
               <span className="font-medium">{originalPrice === 0 ? "Miễn phí" : `${originalPrice.toLocaleString()} VND`}</span>
             </div>
 
             {appliedCoupon && (
-              <div className="flex justify-between text-sm text-[#3B82F6] font-semibold">
+              <div className="flex justify-between text-sm text-blue-500 font-semibold">
                 <span>Khuyến mãi ({appliedCoupon.code})</span>
                 <span>- {discountAmount.toLocaleString()} VND</span>
               </div>
             )}
 
-            <div className="flex justify-between text-lg font-semibold text-[#0F172A] pt-2 border-t border-[#E2E8F0]">
+            <div className="flex justify-between text-lg font-semibold text-slate-900 pt-2 border-t border-slate-200">
               <span>Tổng thanh toán</span>
-              <span className="text-[#3B82F6]">
+              <span className="text-blue-500">
                 {isEffectiveFree ? "0 VND (Miễn phí)" : `${finalTotal.toLocaleString()} VND`}
               </span>
             </div>
@@ -258,15 +282,15 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
       </div>
 
       {/* Cột phải: Phương thức thanh toán hoặc nhận khóa học */}
-      <div className="w-full lg:w-[420px] shrink-0 p-6 lg:p-8 bg-[#F8FAFC]">
+      <div className="w-full lg:w-[420px] shrink-0 p-6 lg:p-8 bg-slate-50">
         <div>
           {isEffectiveFree ? (
             <>
-              <h2 className="text-lg font-semibold text-[#0F172A] mb-4 border-b border-[#E2E8F0] pb-4 flex items-center gap-2">
-                <Gift size={20} className="text-[#3B82F6]" /> Nhận khóa học Miễn phí
+              <h2 className="text-lg font-semibold text-slate-900 mb-4 border-b border-slate-200 pb-4 flex items-center gap-2">
+                <Gift size={20} className="text-blue-500" /> Nhận khóa học Miễn phí
               </h2>
-              <div className="mb-6 space-y-2.5 p-4 rounded-md bg-[#EFF6FF] border border-[#BFDBFE]">
-                <p className="text-[#2563EB] text-xs font-semibold leading-relaxed flex items-start gap-1.5">
+              <div className="mb-6 space-y-2.5 p-4 rounded-md bg-blue-50 border border-blue-200">
+                <p className="text-blue-600 text-xs font-semibold leading-relaxed flex items-start gap-1.5">
                   {appliedCoupon ? (
                     <>
                       <PartyPopper size={14} className="shrink-0 mt-0.5" />
@@ -276,7 +300,7 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
                     "Khóa học này hoàn toàn miễn phí."
                   )}
                 </p>
-                <p className="text-[#64748B] text-xs font-medium">
+                <p className="text-slate-500 text-xs font-medium">
                   Nhấn nút bên dưới để thêm ngay khóa học vào tài khoản của bạn.
                 </p>
               </div>
@@ -285,14 +309,14 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
                 type="button"
                 onClick={handleCheckout}
                 disabled={isProcessing}
-                className="w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-sm hover:shadow-md disabled:opacity-60 transition-all flex justify-center items-center gap-2 cursor-pointer"
+                className="w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 shadow-sm hover:shadow-md disabled:opacity-60 transition-all flex justify-center items-center gap-2 cursor-pointer"
               >
                 {isProcessing ? "Đang xử lý..." : <><Sparkles size={16} /> Xác nhận Nhận khóa học ngay</>}
               </button>
             </>
           ) : (
             <>
-              <h2 className="text-lg font-semibold text-[#0F172A] mb-6 border-b border-[#E2E8F0] pb-4">
+              <h2 className="text-lg font-semibold text-slate-900 mb-6 border-b border-slate-200 pb-4">
                 Phương thức thanh toán
               </h2>
               
@@ -300,32 +324,32 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
                 {savedMethods.length > 0 ? (
                   <>
                     {savedMethods.map((method) => (
-                      <label key={method.id} className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${savedMethodId === method.id ? "border-[#3B82F6] bg-white ring-1 ring-[#3B82F6]/30 shadow-sm" : "border-[#E2E8F0] bg-white hover:bg-slate-50"}`}>
-                        <input type="radio" name="savedMethod" checked={savedMethodId === method.id} onChange={() => { setSavedMethodId(method.id); setConfirmAccount(false); }} className="w-4 h-4 text-[#3B82F6]" />
+                      <label key={method.id} className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${savedMethodId === method.id ? "border-blue-500 bg-white ring-1 ring-blue-500/30 shadow-sm" : "border-slate-200 bg-white hover:bg-slate-50"}`}>
+                        <input type="radio" name="savedMethod" checked={savedMethodId === method.id} onChange={() => { setSavedMethodId(method.id); setConfirmAccount(false); }} className="w-4 h-4 text-blue-500" />
                         <div>
-                          <div className="font-medium text-sm text-[#0F172A]">{method.label}</div>
-                          <div className="text-xs text-[#64748B]">{method.provider.toUpperCase()}</div>
+                          <div className="font-medium text-sm text-slate-900">{method.label}</div>
+                          <div className="text-xs text-slate-500">{method.provider.toUpperCase()}</div>
                         </div>
                       </label>
                     ))}
-                    <label className="flex items-center gap-2 text-xs font-semibold text-[#0F172A]">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-900">
                       <input type="checkbox" checked={confirmAccount} onChange={(e) => setConfirmAccount(e.target.checked)} />
                       Xác nhận dùng tài khoản đã chọn để thanh toán
                     </label>
                   </>
                 ) : (
                   <>
-                <label className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${paymentMethod === 'vnpay' ? 'border-[#3B82F6] bg-white ring-1 ring-[#3B82F6]/30 shadow-sm' : 'border-[#E2E8F0] bg-white hover:bg-slate-50'}`}>
-                  <input type="radio" name="paymentMethod" value="vnpay" checked={paymentMethod === 'vnpay'} onChange={() => setPaymentMethod('vnpay')} className="w-4 h-4 text-[#3B82F6]" />
-                  <div className="font-medium text-sm text-[#0F172A]">Thanh toán qua VNPay</div>
+                <label className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${paymentMethod === 'vnpay' ? 'border-blue-500 bg-white ring-1 ring-blue-500/30 shadow-sm' : 'border-slate-200 bg-white hover:bg-slate-50'}`}>
+                  <input type="radio" name="paymentMethod" value="vnpay" checked={paymentMethod === 'vnpay'} onChange={() => setPaymentMethod('vnpay')} className="w-4 h-4 text-blue-500" />
+                  <div className="font-medium text-sm text-slate-900">Thanh toán qua VNPay</div>
                 </label>
-                <label className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${paymentMethod === 'momo' ? 'border-[#3B82F6] bg-white ring-1 ring-[#3B82F6]/30 shadow-sm' : 'border-[#E2E8F0] bg-white hover:bg-slate-50'}`}>
-                  <input type="radio" name="paymentMethod" value="momo" checked={paymentMethod === 'momo'} onChange={() => setPaymentMethod('momo')} className="w-4 h-4 text-[#3B82F6]" />
-                  <div className="font-medium text-sm text-[#0F172A]">Ví điện tử Momo</div>
+                <label className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${paymentMethod === 'momo' ? 'border-blue-500 bg-white ring-1 ring-blue-500/30 shadow-sm' : 'border-slate-200 bg-white hover:bg-slate-50'}`}>
+                  <input type="radio" name="paymentMethod" value="momo" checked={paymentMethod === 'momo'} onChange={() => setPaymentMethod('momo')} className="w-4 h-4 text-blue-500" />
+                  <div className="font-medium text-sm text-slate-900">Ví điện tử Momo</div>
                 </label>
-                <label className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${paymentMethod === 'banking' ? 'border-[#3B82F6] bg-white ring-1 ring-[#3B82F6]/30 shadow-sm' : 'border-[#E2E8F0] bg-white hover:bg-slate-50'}`}>
-                  <input type="radio" name="paymentMethod" value="banking" checked={paymentMethod === 'banking'} onChange={() => setPaymentMethod('banking')} className="w-4 h-4 text-[#3B82F6]" />
-                  <div className="font-medium text-sm text-[#0F172A]">Chuyển khoản Ngân hàng</div>
+                <label className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${paymentMethod === 'banking' ? 'border-blue-500 bg-white ring-1 ring-blue-500/30 shadow-sm' : 'border-slate-200 bg-white hover:bg-slate-50'}`}>
+                  <input type="radio" name="paymentMethod" value="banking" checked={paymentMethod === 'banking'} onChange={() => setPaymentMethod('banking')} className="w-4 h-4 text-blue-500" />
+                  <div className="font-medium text-sm text-slate-900">Chuyển khoản Ngân hàng</div>
                 </label>
                   </>
                 )}
@@ -335,7 +359,7 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
                 type="button"
                 onClick={handleCheckout}
                 disabled={isProcessing}
-                className="w-full py-3.5 rounded-md text-sm font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] shadow-sm hover:shadow-md disabled:opacity-60 transition-all flex justify-center items-center gap-2 cursor-pointer"
+                className="w-full py-3.5 rounded-md text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 shadow-sm hover:shadow-md disabled:opacity-60 transition-all flex justify-center items-center gap-2 cursor-pointer"
               >
                 {isProcessing ? "Đang xử lý..." : "Xác nhận Thanh toán"}
               </button>
@@ -346,7 +370,7 @@ export function CheckoutView({ courseId, onClose }: { courseId: number; onClose?
             type="button"
             onClick={() => { if (onClose) onClose(); else router.back(); }}
             disabled={isProcessing}
-            className="w-full mt-3 py-3 rounded-md text-sm font-medium text-[#64748B] bg-white border border-[#E2E8F0] hover:bg-slate-50 transition-all cursor-pointer"
+            className="w-full mt-3 py-3 rounded-md text-sm font-medium text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 transition-all cursor-pointer"
           >
             Quay lại
           </button>

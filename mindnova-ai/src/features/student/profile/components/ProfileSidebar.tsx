@@ -5,16 +5,15 @@ import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import type { ProfileTab } from "../types";
-import { PersonalInfoIcon, SecurityIcon, SettingsIcon } from "./icons";
 import { PROFILE_TABS } from "../constants";
 import { useUploadAvatar } from "../api";
-import { ShieldCheck, Camera, Upload, CheckCircle2, ChevronRight } from "lucide-react";
+import { ShieldCheck, Camera, Upload, CheckCircle2, ChevronRight, Loader2, Settings, Shield, User } from "lucide-react";
 import toast from "react-hot-toast";
 
 const TAB_ICON_MAP = {
-  "personal-info": PersonalInfoIcon,
-  security: SecurityIcon,
-  settings: SettingsIcon,
+  "personal-info": User,
+  security: Shield,
+  settings: Settings,
 };
 
 interface ProfileSidebarProps {
@@ -42,8 +41,8 @@ function ProfileAvatar({ name, avatarUrl, onClick, isLoading }: ProfileAvatarPro
 
   return (
     <div className="relative mx-auto w-24 h-24 group cursor-pointer" onClick={onClick}>
-      <div className="w-full h-full rounded-[24px] bg-white border border-[#EAEAF4] shadow-sm p-1.5 transition-all duration-300 group-hover:shadow-md group-hover:border-[#3b82f6]/40 group-">
-        <div className="w-full h-full rounded-lg bg-[#F8FAFC] flex items-center justify-center relative overflow-hidden">
+      <div className="w-full h-full rounded-[24px] bg-white border border-slate-200 shadow-sm p-1.5 transition-all duration-300 group-hover:shadow-md group-hover:border-blue-500/40 group-">
+        <div className="w-full h-full rounded-lg bg-slate-50 flex items-center justify-center relative overflow-hidden">
           {avatarUrl ? (
             <img
               src={avatarUrl}
@@ -62,7 +61,7 @@ function ProfileAvatar({ name, avatarUrl, onClick, isLoading }: ProfileAvatarPro
 
           {isLoading ? (
             <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-30">
-              <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <Loader2 className="w-5 h-5 text-blue-600 animate-spin" aria-hidden />
             </div>
           ) : (
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 text-white">
@@ -91,7 +90,7 @@ interface TabButtonProps {
 }
 
 function TabButton({ id, label, isActive, onClick }: TabButtonProps) {
-  const Icon = TAB_ICON_MAP[id] || PersonalInfoIcon;
+  const Icon = TAB_ICON_MAP[id] || User;
   return (
     <button
       type="button"
@@ -99,8 +98,8 @@ function TabButton({ id, label, isActive, onClick }: TabButtonProps) {
       className={twMerge(
         "group relative w-full flex items-center justify-between px-4 py-3.5 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer outline-none border",
         isActive
-          ? "bg-[#eff6ff] text-[#1d4ed8] shadow-xs border-[#3b82f6]/20 font-semibold"
-          : "bg-white text-slate-500 border-transparent hover:bg-[#F8FAFC] hover:text-slate-900 hover:border-[#EAEAF4]"
+          ? "bg-blue-50 text-blue-700 shadow-xs border-blue-500/20 font-semibold"
+          : "bg-white text-slate-500 border-transparent hover:bg-slate-50 hover:text-slate-900 hover:border-slate-200"
       )}
     >
       <div className="flex items-center gap-3.5">
@@ -108,18 +107,18 @@ function TabButton({ id, label, isActive, onClick }: TabButtonProps) {
           className={twMerge(
             "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300 shrink-0",
             isActive
-              ? "bg-gradient-to-br from-[#3b82f6] to-[#1d4ed8] text-white shadow-md shadow-blue-500/20 scale-110"
-              : "bg-[#F1F5F9] text-slate-500 group-hover:bg-white group-hover:text-[#3b82f6] group-hover:shadow-md"
+              ? "bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-md shadow-blue-500/20 scale-110"
+              : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-blue-500 group-hover:shadow-md"
           )}
         >
-          <Icon />
+          <Icon size={16} aria-hidden />
         </span>
         <span className="truncate">{label}</span>
       </div>
       {isActive ? (
-        <CheckCircle2 className="w-4 h-4 text-[#3b82f6] shrink-0" />
+        <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
       ) : (
-        <ChevronRight className="w-4 h-4 text-[#94a3b8] opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300 shrink-0" />
+        <ChevronRight className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300 shrink-0" />
       )}
     </button>
   );
@@ -172,7 +171,7 @@ export function ProfileSidebar({
   const displayAvatarUrl = localPreview || avatarUrl;
 
   return (
-    <div className="flex flex-col gap-6 bg-white rounded-[24px] border border-[#EAEAF4] p-5 sm:p-6 shadow-sm">
+    <div className="flex flex-col gap-6 bg-white rounded-[24px] border border-slate-200 p-5 sm:p-6 shadow-sm">
       
       {/* Avatar + Info */}
       <div className="flex flex-col items-center gap-4 text-center">
@@ -194,7 +193,7 @@ export function ProfileSidebar({
         </div>
       </div>
 
-      <hr className="border-[#EAEAF4]" />
+      <hr className="border-slate-200" />
 
       {/* Tabs */}
       <nav className="flex flex-col gap-1.5">

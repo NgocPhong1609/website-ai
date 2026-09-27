@@ -36,19 +36,19 @@ function renderFormattedText(text: string) {
       const token = match[0];
       if (token.startsWith("**") && token.endsWith("**")) {
         parts.push(
-          <strong key={`bold-${idx++}`} className="font-semibold text-[#0F172A]">
+          <strong key={`bold-${idx++}`} className="font-semibold text-slate-900">
             {token.slice(2, -2)}
           </strong>
         );
       } else if (token.startsWith("*") && token.endsWith("*")) {
         parts.push(
-          <em key={`italic-${idx++}`} className="italic text-[#0F172A]">
+          <em key={`italic-${idx++}`} className="italic text-slate-900">
             {token.slice(1, -1)}
           </em>
         );
       } else if (token.startsWith("`") && token.endsWith("`")) {
         parts.push(
-          <code key={`code-${idx++}`} className="font-mono text-xs text-[#475569] bg-[#F8FAFC] px-1 py-0.5 rounded">
+          <code key={`code-${idx++}`} className="font-mono text-xs text-slate-600 bg-slate-50 px-1 py-0.5 rounded">
             {token.slice(1, -1)}
           </code>
         );
@@ -382,7 +382,7 @@ export function ChatPanel({
             )}
           </div>
           <div className="flex items-center gap-2 bg-blue-50 px-3.5 py-1.5 rounded-lg border border-blue-200 text-xs font-semibold text-blue-700 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5" /><span>AI Ready</span>
+            <Sparkles className="w-3.5 h-3.5" /><span>AI sẵn sàng</span>
           </div>
         </div>
       </header>
@@ -408,7 +408,7 @@ export function ChatPanel({
                     {isPinned && <span className="text-[11px] font-medium bg-secondary text-muted-foreground px-2.5 py-0.5 rounded-full border border-border"><Star size={12} fill="currentColor" className="mr-1 inline" /> Đã lưu</span>}
                   </div>
                 </div>
-                <div className="bg-white text-[#0F172A] px-5 py-4 rounded-xl rounded-tl-sm border border-border shadow-sm text-sm sm:text-[14.5px] leading-relaxed font-normal transition-all break-words">
+                <div className="bg-white text-slate-900 px-5 py-4 rounded-xl rounded-tl-sm border border-border shadow-sm text-sm sm:text-[14.5px] leading-relaxed font-normal transition-all break-words">
                   {msg.animate ? (
                     <TypewriterText
                       id={msg.id}
@@ -525,7 +525,7 @@ export function ChatPanel({
                 type="button"
                 onClick={() => handleSend(prompt.query)}
                 disabled={isGenerating || isQuotaBlocked}
-                className="group relative text-left p-3.5 rounded-xl bg-white hover:bg-[#F8FAFC] disabled:opacity-50 border border-[#E2E8F0] hover:border-[#3B82F6]/50 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 focus:outline-none cursor-pointer flex flex-col justify-between gap-2.5"
+                className="group relative text-left p-3.5 rounded-xl bg-white hover:bg-slate-50 disabled:opacity-50 border border-slate-200 hover:border-blue-500/50 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 focus:outline-none cursor-pointer flex flex-col justify-between gap-2.5"
               >
                 <div className="flex items-center justify-between">
                   <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-md border ${prompt.color}`}>
@@ -556,7 +556,7 @@ export function ChatPanel({
                 onKeyDown={handleKeyDown}
                 disabled={isGenerating || isQuotaBlocked}
                 placeholder={isGenerating ? "Nova đang tổng hợp câu trả lời cho bạn..." : "Hỏi Nova bất cứ điều gì về bài tập hay lộ trình học bối rối nhé..."}
-                className="w-full bg-[#F8FAFC] focus:bg-white disabled:bg-gray-100 border border-[#E2E8F0] focus:border-[#3B82F6] rounded-xl pl-4 pr-24 py-2.5 text-xs sm:text-sm text-[#0F172A] placeholder:text-[#9092A8] shadow-inner focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/15 transition-all duration-200 font-medium"
+                className="w-full bg-slate-50 focus:bg-white disabled:bg-slate-100 border border-slate-200 focus:border-blue-500 rounded-xl pl-4 pr-24 py-2.5 text-xs sm:text-sm text-slate-900 placeholder:text-[#9092A8] shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-500/15 transition-all duration-200 font-medium"
               />
               <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-bold text-stone-400 hidden sm:flex items-center gap-1">
                 <CornerDownLeft className="w-3.5 h-3.5" />
@@ -576,7 +576,7 @@ export function ChatPanel({
                 type="button"
                 onClick={() => handleSend()}
                 disabled={!inputText.trim() || isQuotaBlocked}
-                aria-label="Send message"
+                aria-label="Gửi tin nhắn"
                 className="shrink-0 w-11 h-11 flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:bg-stone-200 disabled:text-stone-400 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-sm cursor-pointer"
               >
                 <Send className="w-5 h-5 ml-0.5" />
@@ -584,9 +584,9 @@ export function ChatPanel({
             )}
           </div>
           
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs font-normal text-[#64748B] pt-1 text-center">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs font-normal text-slate-500 pt-1 text-center">
             {quota && (
-              <span aria-label="Hạn mức AI hôm nay" className="shrink-0 text-[11px] text-[#64748B]">
+              <span aria-label="Hạn mức AI hôm nay" className="shrink-0 text-[11px] text-slate-500">
                 Còn {quota.remaining}/{quota.daily_limit} lượt hôm nay
               </span>
             )}

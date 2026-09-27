@@ -12,6 +12,7 @@ import {
 import { LearningPathCard } from "./LearningPathCard";
 import { PlanSummaryCard } from "./PlanSummaryCard";
 import type { IPlanPhase } from "@/src/features/student/onboarding/types";
+import { ArrowLeft } from "lucide-react";
 
 interface IAIRoadmapCourse {
  id: number;
@@ -74,10 +75,10 @@ function usePlan() {
 
 function StepBadge() {
  return (
- <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#3B82F6] border border-[#E2E8F0] backdrop-blur-sm">
- <span className="text-[#3B82F6]"><SparkleIcon /></span>
- <span className="text-xs font-bold text-[#3B82F6] tracking-wider uppercase">
- Step 4 of 4 — Your Plan
+ <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500 border border-slate-200 backdrop-blur-sm">
+ <span className="text-blue-500"><SparkleIcon /></span>
+ <span className="text-xs font-bold text-blue-500 tracking-wider uppercase">
+ Bước 4/4 — Lộ trình của bạn
  </span>
  </div>
  );
@@ -85,7 +86,7 @@ function StepBadge() {
 
 function CelebrationBanner({ goal }: { goal: string }) {
  return (
- <div className="relative w-full max-w-4xl bg-[#3B82F6] via-[#818cf8]/6 border border-[#E2E8F0] rounded-xl px-6 py-4 overflow-hidden">
+ <div className="relative w-full max-w-4xl bg-blue-500 via-blue-400/6 border border-slate-200 rounded-xl px-6 py-4 overflow-hidden">
  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_50%,rgba(59, 130, 246,0.12)_0%,transparent_60%)]" aria-hidden="true" />
  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_100%_50%,rgba(76,215,246,0.10)_0%,transparent_60%)]" aria-hidden="true" />
 
@@ -93,10 +94,10 @@ function CelebrationBanner({ goal }: { goal: string }) {
  
 
  <div className="flex flex-col gap-0.5">
- <span className="text-sm font-bold text-[#0F172A]">
- Your personalized learning path is ready! 
+ <span className="text-sm font-bold text-slate-900">
+ Lộ trình học tập cá nhân hóa đã sẵn sàng! 
  </span>
- <span className="text-xs text-[#64748B]">
+ <span className="text-xs text-slate-500">
  Crafted dynamically by AI based on your goal{goal ? ` — ${goal}` : ""}, skill level & selected topics.
  </span>
  </div>
@@ -119,14 +120,14 @@ export default function PlanContainer() {
  <StepBadge />
 
  <div className="flex flex-col items-center gap-3 text-center max-w-2xl">
- <h1 className="text-[44px] font-bold text-[#0F172A] leading-tight tracking-tight">
+ <h1 className="text-[44px] font-bold text-slate-900 leading-tight tracking-tight">
  Here&apos;s your{" "}
- <span className="text-transparent bg-clip-text bg-[#3B82F6] via-[#818cf8] ">
- AI-crafted path
+ <span className="text-transparent bg-clip-text bg-blue-500 via-blue-400 ">
+ Lộ trình do AI thiết kế
  </span>
  </h1>
- <p className="text-base text-[#64748B] leading-relaxed max-w-lg">
- Every phase is dynamically tailored to your unique goal and expertise — start when you&apos;re ready.
+ <p className="text-base text-slate-500 leading-relaxed max-w-lg">
+ Mỗi giai đoạn được điều chỉnh theo mục tiêu và trình độ của bạn. Bắt đầu khi bạn sẵn sàng.
  </p>
  </div>
 
@@ -148,9 +149,9 @@ export default function PlanContainer() {
  onClick={handleBack}
  size="unstyled"
  variant="unstyled"
- className="px-6 py-4 rounded-xl text-sm font-semibold text-[#64748B] border border-[#E2E2EA] bg-white hover:border-[#E2E8F0] hover:text-[#2563EB] transition-all duration-200 cursor-pointer"
+ className="px-6 py-4 rounded-xl text-sm font-semibold text-slate-500 border border-slate-200 bg-white hover:border-slate-200 hover:text-blue-600 transition-all duration-200 cursor-pointer"
  >
- ← Back
+ <ArrowLeft className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Back
  </Button>
 
  <Button
@@ -160,7 +161,7 @@ export default function PlanContainer() {
  className={[
  "relative px-14 py-4 rounded-xl text-sm font-bold tracking-wide",
  "text-white cursor-pointer",
- " bg-[#3B82F6] ",
+ " bg-blue-500 ",
  "shadow-[0_6px_24px_rgba(59, 130, 246,0.45)]",
  "hover:shadow-[0_8px_32px_rgba(59, 130, 246,0.6)] hover:-translate-y-0.5",
  "active:translate-y-0 active:shadow-[0_3px_14px_rgba(59, 130, 246,0.35)]",
@@ -168,14 +169,14 @@ export default function PlanContainer() {
  ].join(" ")}
  rightIcon={<RocketIcon />}
  >
- Start My Learning Journey
+ Bắt đầu học ngay
  </Button>
  </div>
 
- <p className="flex items-center gap-1.5 text-[11px] text-[#94A3B8]">
+ <p className="flex items-center gap-1.5 text-[11px] text-slate-400">
  <ShieldCheckIcon />
  <span>
- AI-powered intelligent curriculum generation engine
+ Giáo trình được tạo bởi AI
  </span>
  </p>
  </div>

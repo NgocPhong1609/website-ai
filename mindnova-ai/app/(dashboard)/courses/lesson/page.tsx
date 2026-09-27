@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function LessonPage() {
  return (
- <div className="min-h-screen w-full bg-[#F6F6FB] relative">
+ <div className="min-h-screen w-full bg-slate-50 relative">
  <LessonWorkspace />
  </div>
  );

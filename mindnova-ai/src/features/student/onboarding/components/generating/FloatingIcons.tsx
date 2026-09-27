@@ -34,7 +34,7 @@ interface IconCardProps {
 function IconCard({ children, className = "" }: IconCardProps) {
  return (
  <div
- className={`w-16 h-16 rounded-xl bg-white/60 border border-[#E2E2EA]/80 flex items-center justify-center shadow-sm backdrop-blur-sm ${className}`}
+ className={`w-16 h-16 rounded-xl bg-white/60 border border-slate-200/80 flex items-center justify-center shadow-sm backdrop-blur-sm ${className}`}
  >
  {children}
  </div>

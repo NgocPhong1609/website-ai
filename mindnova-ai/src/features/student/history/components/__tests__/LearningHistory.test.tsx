@@ -49,7 +49,7 @@ describe('LearningHistory', () => {
  } as any);
 
  render(<LearningHistory />);
- expect(screen.getByText(/Đang đồng bộ nhật ký rèn luyện/i)).toBeInTheDocument();
+ expect(screen.getByRole('status', { name: 'Đang tải lịch sử học tập' })).toBeInTheDocument();
  });
 
  it('renders error state when API fails', () => {

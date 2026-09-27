@@ -4,14 +4,14 @@ import { getErrorMessage } from "@/src/shared/lib/user-error";
 
 import React, { useState } from "react";
 import { NoDataAvailable } from "@/src/shared/components/ui";
-import { PlusIcon } from "./icons";
-import { ShieldCheck, CreditCard, Trash2, X } from "lucide-react";
+import { ShieldCheck, CreditCard, Trash2, X, Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import {
   useDeletePaymentMethod,
   useGetPaymentMethods,
   useSavePaymentMethod,
 } from "../api";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 const PROVIDER_LABEL: Record<string, string> = {
   vnpay: "VNPay",
@@ -51,8 +51,8 @@ export function PaymentMethodsCard() {
   }
 
   return (
-    <div className="rounded-xl bg-white border border-[#EAEAF4] shadow-2xs p-6 flex flex-col gap-5 transition-all duration-300 hover:shadow-md">
-      <div className="flex items-center justify-between gap-4 border-b border-[#F0F2FA] pb-4">
+    <div className="rounded-xl bg-white border border-slate-200 shadow-2xs p-6 flex flex-col gap-5 transition-all duration-300 hover:shadow-md">
+      <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-4">
         <div>
           <h2 className="text-base font-semibold text-slate-900 flex items-center gap-2">
             <span>Phương thức Thanh toán</span>
@@ -65,17 +65,17 @@ export function PaymentMethodsCard() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#1d4ed8] bg-[#eff6ff] hover:bg-[#E2E6FF] border border-[#1d4ed8]/20 transition-all duration-150 cursor-pointer shrink-0"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-[#E2E6FF] border border-blue-700/20 transition-all duration-150 cursor-pointer shrink-0"
         >
-          <PlusIcon size={13} />
+          <Plus size={13} />
           <span>Thêm thẻ mới</span>
         </button>
       </div>
 
       <div className="flex flex-col gap-3">
-        {isLoading && <p className="text-xs text-slate-500">Đang tải phương thức thanh toán...</p>}
+        {isLoading && <div role="status" aria-label="Đang tải phương thức thanh toán" className="space-y-2"><Skeleton className="h-14 w-full" /><Skeleton className="h-14 w-full" /></div>}
         {!isLoading && methods.map((method) => (
-          <div key={method.id} className="flex items-center justify-between py-3 px-3.5 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC]/60">
+          <div key={method.id} className="flex items-center justify-between py-3 px-3.5 rounded-xl border border-slate-200 bg-slate-50/60">
             <div className="min-w-0">
               <p className="text-sm font-semibold text-slate-900 truncate">{method.label}</p>
               <p className="text-xs text-slate-500">
@@ -87,7 +87,7 @@ export function PaymentMethodsCard() {
               type="button"
               aria-label="Xóa tài khoản"
               onClick={() => deleteMutation.mutate(method.id)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#2563eb] hover:bg-[#dbeafe]/70 cursor-pointer"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-blue-100/70 cursor-pointer"
             >
               <Trash2 size={15} />
             </button>
@@ -109,7 +109,7 @@ export function PaymentMethodsCard() {
             </div>
             <label className="block text-xs font-semibold text-slate-500">
               Cổng thanh toán
-              <select value={provider} onChange={(e) => setProvider(e.target.value)} className="mt-1 w-full h-10 px-3 rounded-xl border border-[#E2E8F0] text-sm text-slate-900">
+              <select value={provider} onChange={(e) => setProvider(e.target.value)} className="mt-1 w-full h-10 px-3 rounded-xl border border-slate-200 text-sm text-slate-900">
                 <option value="banking">Ngân hàng</option>
                 <option value="vnpay">VNPay</option>
                 <option value="momo">MoMo</option>
@@ -117,17 +117,17 @@ export function PaymentMethodsCard() {
             </label>
             <label className="block text-xs font-semibold text-slate-500">
               Chủ tài khoản
-              <input required value={holderName} onChange={(e) => setHolderName(e.target.value)} className="mt-1 w-full h-10 px-3 rounded-xl border border-[#E2E8F0] text-sm text-slate-900" />
+              <input required value={holderName} onChange={(e) => setHolderName(e.target.value)} className="mt-1 w-full h-10 px-3 rounded-xl border border-slate-200 text-sm text-slate-900" />
             </label>
             {provider === "banking" && (
               <label className="block text-xs font-semibold text-slate-500">
                 Ngân hàng
-                <input required value={bankName} onChange={(e) => setBankName(e.target.value)} className="mt-1 w-full h-10 px-3 rounded-xl border border-[#E2E8F0] text-sm text-slate-900" />
+                <input required value={bankName} onChange={(e) => setBankName(e.target.value)} className="mt-1 w-full h-10 px-3 rounded-xl border border-slate-200 text-sm text-slate-900" />
               </label>
             )}
             <label className="block text-xs font-semibold text-slate-500">
               Số tài khoản / số ví
-              <input required minLength={6} value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} className="mt-1 w-full h-10 px-3 rounded-xl border border-[#E2E8F0] text-sm text-slate-900" />
+              <input required minLength={6} value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} className="mt-1 w-full h-10 px-3 rounded-xl border border-slate-200 text-sm text-slate-900" />
             </label>
             <label className="flex items-center gap-2 text-xs font-semibold text-slate-900">
               <input type="checkbox" checked={isDefault} onChange={(e) => setIsDefault(e.target.checked)} />

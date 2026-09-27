@@ -46,7 +46,7 @@ function FormInput({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full px-4 py-3 rounded-lg text-sm text-slate-900 bg-[#F8FAFC] border border-[#EAEAF4] focus:border-[#3b82f6] focus:bg-white focus:ring-4 focus:ring-[#3b82f6]/10 outline-none transition-all placeholder:text-[#94a3b8]"
+      className="w-full px-4 py-3 rounded-lg text-sm text-slate-900 bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:text-slate-400"
     />
   );
 }
@@ -139,18 +139,18 @@ export function PersonalInfoPanel({
             onChange={(e) => setBio(e.target.value)}
             rows={5}
             placeholder="Hãy chia sẻ ngắn gọn về sở trường, năng lực kỹ thuật và những mục tiêu bạn muốn Trợ lý Nova đồng hành..."
-            className="w-full px-4 py-3 rounded-lg text-sm text-slate-900 bg-[#F8FAFC] border border-[#EAEAF4] focus:border-[#3b82f6] focus:bg-white focus:ring-4 focus:ring-[#3b82f6]/10 outline-none transition-all resize-none placeholder:text-[#94a3b8] leading-relaxed"
+            className="w-full px-4 py-3 rounded-lg text-sm text-slate-900 bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-none placeholder:text-slate-400 leading-relaxed"
           />
         </div>
       </div>
 
       {/* Footer Actions */}
-      <div className="mt-8 pt-6 border-t border-[#EAEAF4] flex items-center justify-end gap-4">
+      <div className="mt-8 pt-6 border-t border-slate-200 flex items-center justify-end gap-4">
         <button
           type="button"
           onClick={handleDiscard}
           disabled={!isDirty || updateProfileMutation.isPending}
-          className="px-6 py-2.5 rounded-lg text-sm font-semibold text-slate-500 bg-white border border-[#EAEAF4] hover:bg-[#F8FAFC] hover:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+          className="px-6 py-2.5 rounded-lg text-sm font-semibold text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
         >
           <RefreshCcw size={16} /> Khôi phục
         </button>
@@ -159,7 +159,7 @@ export function PersonalInfoPanel({
           type="button"
           onClick={handleSave}
           disabled={updateProfileMutation.isPending || !isDirty}
-          className="px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] hover:opacity-95 shadow-md shadow-blue-500/20 disabled:from-[#94a3b8] disabled:to-[#cbd5e1] disabled:shadow-none disabled:cursor-not-allowed transition-all flex items-center gap-2"
+          className="px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:opacity-95 shadow-md shadow-blue-500/20 disabled:from-slate-400 disabled:to-slate-300 disabled:shadow-none disabled:cursor-not-allowed transition-all flex items-center gap-2"
         >
           <Save size={16} /> 
           {updateProfileMutation.isPending ? "Đang lưu..." : saved ? "Đã lưu thành công" : "Lưu thay đổi"}

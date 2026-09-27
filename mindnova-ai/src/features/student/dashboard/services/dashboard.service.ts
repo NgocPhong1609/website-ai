@@ -42,12 +42,16 @@ export async function getDashboardOverview(): Promise<DashboardOverview> {
  };
  }
  } catch (error: any) {
-  if (isUnauthorizedError(error)) throw error;
+ // Guests (or expired sessions) get the public dashboard instead of an error page.
+ if (isUnauthorizedError(error)) return emptyDashboard();
  console.warn("[DashboardService] Unable to reach backend /student/dashboard API:", error);
  }
 
+ return { ...emptyDashboard(), error: "Không thể tải bảng điều khiển. Vui lòng thử lại." };
+}
+
+function emptyDashboard(): DashboardOverview {
  return {
- error: "Không thể tải bảng điều khiển. Vui lòng thử lại.",
  user: null,
  courses: [],
  focus_areas: [],

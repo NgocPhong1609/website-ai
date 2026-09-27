@@ -22,7 +22,7 @@ export default function GoalContainer() {
  <div className="w-full flex flex-col items-center gap-8 px-6 py-12">
  {/* Header */}
  <div className="w-3xl flex flex-col items-center justify-center gap-4">
- <div className="w-[151.5px] px-3 py-1 flex justify-center items-center gap-3 rounded-full bg-[#57DFFE]/10 border border-[#57DFFE]/20">
+ <div className="w-[151.5px] px-3 py-1 flex justify-center items-center gap-3 rounded-full bg-sky-300/10 border border-sky-300/20">
  <Image
  src="/icons/gemini2.svg"
  width={16.5}
@@ -34,11 +34,11 @@ export default function GoalContainer() {
  MINDNOVA AI
  </span>
  </div>
- <h1 className="text-[48px] font-bold text-[#0F172A]">
- What is your learning goal?
+ <h1 className="text-[48px] font-bold text-slate-900">
+ Mục tiêu học tập của bạn là gì?
  </h1>
- <p className="text-lg text-[#0F172A]">
- Choose one main goal to help MindNova AI personalize your experience.
+ <p className="text-lg text-slate-900">
+ Chọn một mục tiêu chính để MindNova AI cá nhân hóa trải nghiệm cho bạn.
  </p>
  </div>
 
@@ -65,15 +65,15 @@ export default function GoalContainer() {
  onClick={() => router.push("/onboarding/skills")}
  className={`py-[21.6px] px-[57.6px] rounded-lg transition-colors text-[14.4px] ${
  selectedId !== null
- ? "bg-[#3B82F6] text-white shadow-md hover:bg-[#2563EB]"
- : "bg-[#E2E8F0] text-[#0F172A]/40 cursor-not-allowed"
+ ? "bg-blue-500 text-white shadow-md hover:bg-blue-600"
+ : "bg-slate-200 text-slate-900/40 cursor-not-allowed"
  }`}
  rightIcon={<ArrowRightIcon />}
  >
  Continue
  </Button>
- <span className="text-[14px] text-[#0F172A]">
- You can always change your goal later in settings.
+ <span className="text-[14px] text-slate-900">
+ Bạn có thể đổi mục tiêu bất cứ lúc nào trong phần cài đặt.
  </span>
  </div>
  </div>

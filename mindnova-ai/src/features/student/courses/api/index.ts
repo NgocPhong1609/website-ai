@@ -60,6 +60,12 @@ export async function fetchVideoUrl(lessonId: number | string, isPreview = false
  return isPreview ? { ...data.data, source: 'uploaded', duration_seconds: 0 } : data.data;
 }
 
+/** Tell the server the learner opened a lesson (starts the server-side study timer). */
+export async function startLesson(lessonId: number | string): Promise<{ started_at: number; required_seconds: number }> {
+ const { data } = await axiosClient.post(`/api/student/lessons/${lessonId}/start`);
+ return data.data;
+}
+
 /** Mark a lesson as completed */
 export async function completeLesson(
  lessonId: number | string,

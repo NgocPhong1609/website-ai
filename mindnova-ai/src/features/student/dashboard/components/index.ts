@@ -7,4 +7,3 @@ export { DashboardTopbar } from "./DashboardTopbar";
 export { AdvancedRecommendationsSection } from "./AdvancedRecommendationsSection";
 
 // Sub-folder components
-export * from "./main";

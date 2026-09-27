@@ -22,13 +22,13 @@ class ProgressService
         $completionPercentage = 0;
         $quizAvgScore = '0%';
         $studyTimeHours = '0 Giờ';
-        $studyTimeWeeklyChange = '⚡ +0h tuần này';
-        $rankingText = '⭐ Chưa có dữ liệu';
+        $studyTimeWeeklyChange = '+0h tuần này';
+        $rankingText = 'Chưa có dữ liệu';
         $performanceRating = 'Chưa xếp loại';
         $xpPoints = '0 PTS';
         $streakDays = '0 Ngày liên tiếp';
         $skillsMasteredText = '0 / 0';
-        $skillsMasteredTag = '🌱 Bắt đầu học';
+        $skillsMasteredTag = 'Bắt đầu học';
 
         // Check DB for real attempts if user exists
         if ($userId && class_exists(UserQuizAttempt::class)) {
@@ -41,13 +41,13 @@ class ProgressService
                     $calcXp = 1000 + ($count * 50);
                     $xpPoints = "{$calcXp} PTS";
                     if ($avg >= 90) {
-                        $rankingText = '🏆 Top 1% lớp (Xuất sắc)';
+                        $rankingText = 'Top 1% lớp (Xuất sắc)';
                         $performanceRating = 'S (Xuất sắc)';
                     } elseif ($avg >= 80) {
-                        $rankingText = '🏆 Top 5% lớp (Giỏi)';
+                        $rankingText = 'Top 5% lớp (Giỏi)';
                         $performanceRating = 'A+ (Giỏi)';
                     } else {
-                        $rankingText = '⭐ Đang bứt phá nỗ lực!';
+                        $rankingText = 'Đang bứt phá nỗ lực!';
                         $performanceRating = 'B (Khá)';
                     }
                 }
@@ -87,7 +87,7 @@ class ProgressService
 
                 $diffHours = round(($thisWeekSeconds - $lastWeekSeconds) / 3600, 1);
                 $sign = $diffHours >= 0 ? '+' : '';
-                $studyTimeWeeklyChange = "⚡ {$sign}{$diffHours}h tuần này";
+                $studyTimeWeeklyChange = "{$sign}{$diffHours}h tuần này";
             }
         }
 
@@ -112,11 +112,11 @@ class ProgressService
 
                     $skillsMasteredText = "{$masteredCount} / {$totalTopics}";
                     if ($masteredCount === $totalTopics) {
-                        $skillsMasteredTag = '🏆 Mastered All';
+                        $skillsMasteredTag = 'Đã thành thạo toàn bộ';
                     } elseif ($masteredCount > 0) {
-                        $skillsMasteredTag = '🎯 Core Mastery';
+                        $skillsMasteredTag = 'Nắm vững cốt lõi';
                     } else {
-                        $skillsMasteredTag = '🌱 Đang phát triển';
+                        $skillsMasteredTag = 'Đang phát triển';
                     }
                 }
             }
@@ -126,38 +126,41 @@ class ProgressService
         $roadmapModules = [];
         try {
             if ($activeCourse && class_exists(CourseModule::class)) {
-                $dbModules = $activeCourse->modules()->orderBy('order', 'asc')->get();
-                if ($dbModules->isNotEmpty()) {
-                    $idx = 1;
-                    foreach ($dbModules as $m) {
-                        $count = $m->lessons->count();
-                        
-                        // Simple logic for test: 
-                        // If progress > (idx * 30), it's completed, else if it's the active one...
-                        $status = 'locked';
-                        $progressPct = 0;
-                        if ($completionPercentage >= ($idx * 25)) {
-                            $status = 'completed';
-                            $progressPct = 100;
-                        } elseif ($completionPercentage >= (($idx - 1) * 25)) {
-                            $status = 'active';
-                            $progressPct = ($completionPercentage - (($idx - 1) * 25)) * 4;
-                        }
+                $dbModules = $activeCourse->modules()->with('lessons')->orderBy('order', 'asc')->get();
+                $completedIds = $userId
+                    ? \App\Models\LessonCompletion::where('user_id', $userId)->pluck('lesson_id')->all()
+                    : [];
+                $activeAssigned = false;
+                $idx = 1;
+                foreach ($dbModules as $m) {
+                    // Status comes from the lessons actually completed in this module.
+                    $lessonIds = $m->lessons->pluck('id');
+                    $count = $lessonIds->count();
+                    $done = $lessonIds->intersect($completedIds)->count();
+                    $progressPct = $count > 0 ? (int) round($done / $count * 100) : 0;
 
-                        $roadmapModules[] = [
-                            'id' => $m->id,
-                            'module_number' => "Module 0{$idx}",
-                            'title' => $m->title ?: "Module 0{$idx}: Chuyên đề",
-                            'subtitle' => $m->description ?: "Mô tả chi tiết nội dung module.",
-                            'lesson_count_text' => "{$count} Bài học • " . ($status === 'completed' ? 'Đã hoàn thành' : ($status === 'active' ? 'Đang học' : 'Chưa mở khóa')),
-                            'status' => $status,
-                            'progress_percentage' => $progressPct,
-                            'progress_text' => $status === 'active' ? round($progressPct) . '% Hoàn thành' : null,
-                            'action_text' => $status === 'completed' ? '🔄 Ôn tập lại' : ($status === 'active' ? '▶ Tiếp tục học ➔' : '🔒 Cần hoàn tất Module trước'),
-                            'action_link' => "/courses/detail/{$activeCourse->id}"
-                        ];
-                        $idx++;
+                    if ($count > 0 && $done === $count) {
+                        $status = 'completed';
+                    } elseif (!$activeAssigned) {
+                        $status = 'active';
+                        $activeAssigned = true;
+                    } else {
+                        $status = 'locked';
                     }
+
+                    $roadmapModules[] = [
+                        'id' => $m->id,
+                        'module_number' => "Chương {$idx}",
+                        'title' => $m->title ?: "Chương {$idx}",
+                        'subtitle' => $m->description ?: '',
+                        'lesson_count_text' => "{$count} bài học • " . ($status === 'completed' ? 'Đã hoàn thành' : ($status === 'active' ? "{$done}/{$count} bài đã học" : 'Chưa bắt đầu')),
+                        'status' => $status,
+                        'progress_percentage' => $status === 'completed' ? 100 : $progressPct,
+                        'progress_text' => $status === 'active' ? $progressPct . '% Hoàn thành' : null,
+                        'action_text' => $status === 'completed' ? 'Ôn tập lại' : ($status === 'active' ? 'Tiếp tục học' : 'Xem nội dung'),
+                        'action_link' => "/courses/detail?courseId={$activeCourse->id}",
+                    ];
+                    $idx++;
                 }
             }
         } catch (\Exception $e) {
@@ -165,8 +168,10 @@ class ProgressService
         }
 
         // Lấy Lesson Completions để tính total/completed lessons
-        if ($userId && class_exists(\App\Models\LessonCompletion::class)) {
-            $completedLessons = \App\Models\LessonCompletion::where('user_id', $userId)->count();
+        if ($userId && $activeCourse && class_exists(\App\Models\LessonCompletion::class)) {
+            $completedLessons = \App\Models\LessonCompletion::where('user_id', $userId)
+                ->whereIn('lesson_id', $activeCourse->modules->flatMap->lessons->pluck('id'))
+                ->count();
         }
 
         if ($activeCourse) {
@@ -197,11 +202,11 @@ class ProgressService
         if ($activeModule) {
             $recommendations[] = [
                 'id' => 'rec-1',
-                'title' => '🎯 Cột mốc kế tiếp',
+                'title' => 'Cột mốc kế tiếp',
                 'priority_tag' => 'Ưu tiên cao',
                 'color_scheme' => 'indigo',
                 'content' => "Tiếp tục hoàn thành '{$activeModule['title']}' để duy trì nhịp độ học tập của bạn.",
-                'action_label' => '▶ Tiếp tục học ➔',
+                'action_label' => 'Tiếp tục học',
                 'action_url' => $nextActionUrl
             ];
         }
@@ -209,21 +214,21 @@ class ProgressService
         if ($weakestTopic && $weakestTopic->accuracy_percentage < 80) {
             $recommendations[] = [
                 'id' => 'rec-2',
-                'title' => '💡 Trọng tâm cần ôn tập',
+                'title' => 'Trọng tâm cần ôn tập',
                 'priority_tag' => '+40% Ghi nhớ',
                 'color_scheme' => 'teal',
                 'content' => "Kiến thức về '{$weakestTopic->name}' đang cần được củng cố (Hiện tại: {$weakestTopic->accuracy_percentage}%). Hãy làm vài bài tập nhỏ để nắm vững hơn nhé.",
-                'action_label' => '📝 Ôn tập chuyên đề ➔',
+                'action_label' => 'Ôn tập chuyên đề',
                 'action_url' => "/practice/topic?courseId=" . ($activeCourse ? $activeCourse->id : 1)
             ];
         } else {
             $recommendations[] = [
                 'id' => 'rec-2',
-                'title' => '🏆 Phong độ xuất sắc',
+                'title' => 'Phong độ xuất sắc',
                 'priority_tag' => 'Duy trì',
                 'color_scheme' => 'teal',
                 'content' => 'Bạn đang làm rất tốt tất cả các chuyên đề! Hãy thử sức với bài kiểm tra tổng hợp để rèn luyện kỹ năng thực tế.',
-                'action_label' => '📝 Làm bài Test tổng hợp ➔',
+                'action_label' => 'Làm bài Test tổng hợp',
                 'action_url' => "/practice/quiz/question?courseId=" . ($activeCourse ? $activeCourse->id : 1)
             ];
         }
@@ -235,7 +240,7 @@ class ProgressService
                 'completion_percentage' => $completionPercentage,
                 'completed_lessons' => $completedLessons,
                 'total_lessons' => $totalLessons,
-                'next_module_label' => $activeModule ? $activeModule['module_number'] . ' ➔' : 'Xem chi tiết ➔',
+                'next_module_label' => $activeModule ? $activeModule['module_number'] . '' : 'Xem chi tiết',
                 'status_badge' => $completionPercentage >= 100 ? 'Hoàn thành' : 'Đang học',
             ],
             'key_metrics' => [
@@ -261,19 +266,19 @@ class ProgressService
                     [
                         'label' => 'Chuẩn chuyên cần (Streak)',
                         'value' => $streakDays,
-                        'icon' => '🔥',
+                        'icon' => '',
                         'tag_class' => 'text-[#D97706] bg-[#FFF8EB] border-[#D97706]/20'
                     ],
                     [
                         'label' => 'Xếp loại năng lực',
                         'value' => $performanceRating,
-                        'icon' => '⭐',
+                        'icon' => '',
                         'tag_class' => 'text-[#0D9488] bg-[#EAF8F5] border-[#0D9488]/20'
                     ],
                     [
                         'label' => 'Điểm kinh nghiệm (XP)',
                         'value' => $xpPoints,
-                        'icon' => '💎',
+                        'icon' => '',
                         'tag_class' => 'text-[#5052EE] bg-[#EEF2FF] border-[#5052EE]/20'
                     ]
                 ]

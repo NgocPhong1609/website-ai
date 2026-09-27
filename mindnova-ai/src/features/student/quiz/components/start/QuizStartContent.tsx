@@ -9,6 +9,7 @@ import { useGetPracticeOverview } from "../../api";
 import { SelfAssessmentModal } from "../self-assessment/SelfAssessmentModal";
 import toast from "react-hot-toast";
 import { Sparkles, Brain, History, Settings, X, Clock, ListChecks, Wand2, FileText, CheckCircle2, XCircle, ArrowRight, BookOpen, Trash2, Eye, PlayCircle } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 export function QuizStartContent() {
   const { data, isLoading, isError } = useGetPracticeOverview();
@@ -356,7 +357,7 @@ export function QuizStartContent() {
       {/* TAB CONTENT: DEFAULT MODULES */}
       {activeTab === "default_modules" && (
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-          {isLoading && <p className="text-center text-sm text-muted-foreground py-16">Đang tải chuyên đề...</p>}
+          {isLoading && <div role="status" aria-label="Đang tải chuyên đề" className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-32 w-full rounded-xl" />)}</div>}
           {isError && <p className="text-center text-sm text-rose-600 py-16">Không thể tải chuyên đề. Vui lòng thử lại.</p>}
           {!isLoading && !isError && practiceModules.length === 0 && (
             <p className="text-center text-sm text-muted-foreground py-16">Chưa có bài kiểm tra nào. Hãy tạo đề AI hoặc ghi danh khóa học.</p>
@@ -441,7 +442,7 @@ export function QuizStartContent() {
                         <td className="px-6 py-4 text-muted-foreground font-medium">{quiz.difficulty} <span className="mx-1 text-stone-300">•</span> {quiz.questions_count} câu</td>
                         <td className="px-6 py-4">
                           {quiz.is_completed ? (
-                            <span className={`inline-flex items-center gap-1.5 font-bold px-2.5 py-1 rounded-full text-xs ${quiz.score >= 70 ? "bg-success-bg text-success" : "bg-blue-600-muted text-[#1D4ED8]"}`}>
+                            <span className={`inline-flex items-center gap-1.5 font-bold px-2.5 py-1 rounded-full text-xs ${quiz.score >= 70 ? "bg-success-bg text-success" : "bg-blue-600-muted text-blue-700"}`}>
                               {quiz.score >= 70 ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                               {quiz.score}%
                             </span>
@@ -500,7 +501,7 @@ export function QuizStartContent() {
                 </span>
                 <h3 className="text-xl font-bold text-foreground tracking-tight">{reviewingQuiz.title}</h3>
                 <p className="text-[15px] text-muted-foreground mt-2 flex items-center gap-2 font-medium">
-                  Điểm số: <strong className={`px-2 py-0.5 rounded-md ${reviewingQuiz.score >= 70 ? "bg-emerald-100 text-success" : "bg-[#EFF6FF] text-[#1D4ED8]"}`}>{reviewingQuiz.score}%</strong> 
+                  Điểm số: <strong className={`px-2 py-0.5 rounded-md ${reviewingQuiz.score >= 70 ? "bg-emerald-100 text-success" : "bg-blue-50 text-blue-700"}`}>{reviewingQuiz.score}%</strong> 
                   <span className="text-stone-300">•</span> Đúng: <strong className="text-foreground">{reviewingQuiz.correct_count || 0}/{reviewingQuiz.questions_count}</strong> câu
                 </p>
               </div>
@@ -541,7 +542,7 @@ export function QuizStartContent() {
                       <h4 className="text-base font-bold text-foreground leading-relaxed">
                         <span className="text-stone-400 font-medium">Câu {idx + 1}.</span> {q.question}
                       </h4>
-                      <span className={`text-xs font-bold px-3 py-1 rounded-full shrink-0 flex items-center gap-1.5 ${isCorrect ? "bg-success-bg text-success border border-emerald-100" : "bg-blue-600-muted text-[#1D4ED8] border border-[#DBEAFE]"}`}>
+                      <span className={`text-xs font-bold px-3 py-1 rounded-full shrink-0 flex items-center gap-1.5 ${isCorrect ? "bg-success-bg text-success border border-emerald-100" : "bg-blue-600-muted text-blue-700 border border-blue-100"}`}>
                         {isCorrect ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                         {isCorrect ? "Đúng" : "Sai"}
                       </span>
@@ -569,7 +570,7 @@ export function QuizStartContent() {
                           if (isRightKey) {
                             optStyle = "bg-success-bg border-emerald-200 text-emerald-800 font-semibold";
                           } else if (isChosen && !isRightKey) {
-                            optStyle = "bg-blue-600-muted border-blue-200 text-[#1D4ED8] font-semibold";
+                            optStyle = "bg-blue-600-muted border-blue-200 text-blue-700 font-semibold";
                           }
 
                           return (
@@ -588,7 +589,7 @@ export function QuizStartContent() {
                     )}
 
                     {q.explanation && (
-                      <div className="p-4 rounded-xl border border-[#DBEAFE] bg-blue-600-muted/50 text-sm">
+                      <div className="p-4 rounded-xl border border-blue-100 bg-blue-600-muted/50 text-sm">
                         <span className="font-bold text-blue-800 block mb-1 flex items-center gap-1.5"><Brain className="w-4 h-4" /> Gia sư Nova giải thích:</span>
                         <p className="leading-relaxed text-blue-900/80">{q.explanation}</p>
                       </div>
