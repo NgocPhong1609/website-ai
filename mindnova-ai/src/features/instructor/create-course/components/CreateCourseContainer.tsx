@@ -4,6 +4,7 @@ import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useEffect, useCallback, useState } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
+import toast from "react-hot-toast";
 import { StepIndicator } from "./StepIndicator";
 import { Step1BasicInfo } from "./Step1BasicInfo";
 import { Step2CourseStructure } from "./Step2CourseStructure";
@@ -131,11 +132,11 @@ export function CreateCourseContainer() {
  const handleNext = useCallback(() => {
  if (step === 1) {
  if (!courseInfo.title.trim()) {
- alert("Vui lòng nhập tên khóa học.");
+ toast.error("Vui lòng nhập tên khóa học.");
  return;
  }
  if (!courseInfo.thumbnailFile && !courseInfo.thumbnailPreview) {
- alert("Vui lòng tải lên ảnh bìa khóa học.");
+ toast.error("Vui lòng tải lên ảnh bìa khóa học.");
  return;
  }
  }
@@ -155,7 +156,7 @@ export function CreateCourseContainer() {
  }
  
  if (!isValid) {
- alert(errorMessage);
+ toast.error(errorMessage);
  return;
  }
  }
@@ -257,7 +258,7 @@ export function CreateCourseContainer() {
  await updateStatus({ courseId, status: "draft" });
 
  resetDraft();
- alert(" Tạo khóa học thành công!");
+ toast.success("Tạo khóa học thành công!");
  window.location.href = "/instructor/courses";
  } catch (error: any) {
  console.error("Publish failed:", error);

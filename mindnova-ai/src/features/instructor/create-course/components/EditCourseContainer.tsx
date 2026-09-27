@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
+import toast from "react-hot-toast";
+import { useConfirmDialog } from "@/src/shared/components/ui/ConfirmDialog";
 import { useInstructorCourse } from "../../management/api/courses";
 import { useCreateCourseStore } from "../stores/createCourseStore";
 import { useUpdateCourse, useUploadCourseThumbnail, useDeleteCourse, useUpdateCourseStatus, useUpdateCoursePrice, useSubmitForReview } from "../api";
@@ -28,6 +30,7 @@ import { useProposeCategory } from "../api";
 
 export function EditCourseContainer({ courseId }: { courseId: string }) {
  const router = useRouter();
+ const { confirm } = useConfirmDialog();
  const { data: course, isLoading } = useInstructorCourse(courseId);
  const { mutateAsync: updateCourse, isPending: isUpdating } = useUpdateCourse();
  const { mutateAsync: updatePrice, isPending: isUpdatingPrice } = useUpdateCoursePrice();
@@ -167,31 +170,44 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  setTimeout(() => setSaveSuccess(false), 3000);
  } catch (error) {
  console.error(error);
- alert(getErrorMessage(error, "Không thể lưu thông tin khóa học. Vui lòng thử lại."));
+ toast.error(getErrorMessage(error, "Không thể lưu thông tin khóa học. Vui lòng thử lại."));
  }
  };
 
  const handleDelete = async () => {
- if (confirm("Bạn có chắc chắn muốn xóa khóa học này? Toàn bộ module, bài học và dữ liệu liên quan sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác!")) {
+ const confirmed = await confirm({
+ title: "Xóa khóa học",
+ message: "Bạn có chắc chắn muốn xóa khóa học này? Toàn bộ module, bài học và dữ liệu liên quan sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác!",
+ confirmText: "Xóa vĩnh viễn",
+ cancelText: "Hủy bỏ",
+ variant: "danger",
+ });
+ if (!confirmed) return;
  try {
  await deleteCourse(courseId);
- alert("Đã xóa khóa học thành công!");
+ toast.success("Đã xóa khóa học thành công!");
  router.push("/instructor/courses");
  } catch (error: any) {
  console.error(error);
- alert(getErrorMessage(error, "Lỗi khi xóa khóa học"));
- }
+ toast.error(getErrorMessage(error, "Lỗi khi xóa khóa học"));
  }
  };
 
  const handleSubmitReview = async () => {
- if (!confirm("Bạn có chắc chắn muốn gửi khóa học này để quản trị viên xét duyệt?")) return;
+ const confirmed = await confirm({
+ title: "Gửi xét duyệt",
+ message: "Bạn có chắc chắn muốn gửi khóa học này để quản trị viên xét duyệt?",
+ confirmText: "Gửi xét duyệt",
+ cancelText: "Hủy bỏ",
+ variant: "info",
+ });
+ if (!confirmed) return;
  try {
  await submitForReview({ courseId });
- alert("Khóa học đã được gửi xét duyệt thành công!");
+ toast.success("Khóa học đã được gửi xét duyệt thành công!");
  router.refresh();
  } catch (error: any) {
- alert(getErrorMessage(error, "Gửi xét duyệt thất bại!"));
+ toast.error(getErrorMessage(error, "Gửi xét duyệt thất bại!"));
  }
  };
 

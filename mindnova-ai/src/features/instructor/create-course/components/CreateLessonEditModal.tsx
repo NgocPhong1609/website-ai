@@ -1,6 +1,7 @@
 "use client";
 
 import { getErrorMessage } from "@/src/shared/lib/user-error";
+import toast from "react-hot-toast";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { RichTextEditor } from "../../shared/components/RichTextEditor";
 import { QuizEditor } from "./QuizEditor";
@@ -110,7 +111,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
       setVideoUrl(url);
     } catch (error: any) {
       if (error.name !== 'CanceledError') {
-        alert(getErrorMessage(error, "Không thể tải video lên. Vui lòng thử lại."));
+        toast.error(getErrorMessage(error, "Không thể tải video lên. Vui lòng thử lại."));
         console.error(error);
       }
     } finally {
@@ -138,16 +139,16 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
 
   const handleClose = useCallback(() => {
     if (isSaving) {
-      alert("Hệ thống đang trong quá trình lưu dữ liệu. Vui lòng chờ trong giây lát.");
+      toast.error("Hệ thống đang trong quá trình lưu dữ liệu. Vui lòng chờ trong giây lát.");
       return;
     }
     if (isUploadingVideo || activeImageUploads > 0) {
-      if (!confirm("Tiến trình tải tệp (video/ảnh) lên đang diễn ra. Bạn có chắc chắn muốn hủy tải lên và thoát mà không lưu?")) {
+      if (!window.confirm("Tiến trình tải tệp (video/ảnh) lên đang diễn ra. Bạn có chắc chắn muốn hủy tải lên và thoát mà không lưu?")) {
         return;
       }
       abortControllerRef.current?.abort();
     } else if (hasUnsavedChanges) {
-      if (!confirm("Bạn có các thay đổi chưa được lưu. Bạn có chắc chắn muốn thoát mà không lưu?")) {
+      if (!window.confirm("Bạn có các thay đổi chưa được lưu. Bạn có chắc chắn muốn thoát mà không lưu?")) {
         return;
       }
     }

@@ -1,6 +1,7 @@
 "use client";
 
 import { getErrorMessage } from "@/src/shared/lib/user-error";
+import toast from "react-hot-toast";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { RichTextEditor } from "@/src/features/instructor/shared/components/RichTextEditor";
@@ -79,16 +80,16 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
 
  const handleClose = useCallback(() => {
  if (isSaving) {
- alert("Hệ thống đang lưu dữ liệu. Vui lòng chờ trong giây lát.");
+ toast.error("Hệ thống đang lưu dữ liệu. Vui lòng chờ trong giây lát.");
  return;
  }
  if (isUploadingVideo || activeImageUploads > 0) {
- if (!confirm("Tiến trình tải lên đang diễn ra. Bạn có chắc chắn muốn dừng tải lên và đóng?")) {
+ if (!window.confirm("Tiến trình tải lên đang diễn ra. Bạn có chắc chắn muốn dừng tải lên và đóng?")) {
  return;
  }
  abortControllerRef.current?.abort();
  } else if (hasUnsavedChanges) {
- if (!confirm("Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn đóng?")) {
+ if (!window.confirm("Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn đóng?")) {
  return;
  }
  }
@@ -161,7 +162,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  // User cancelled upload
  } else {
  console.error(err);
- alert(getErrorMessage(err, "Không thể tải video lên. Vui lòng thử lại."));
+ toast.error(getErrorMessage(err, "Không thể tải video lên. Vui lòng thử lại."));
  }
  } finally {
  setIsUploadingVideo(false);
@@ -230,7 +231,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
       setTempMediaMap(new Map());
     } catch (e) {
       console.error("Lỗi khi lưu bài học:", e);
-      alert(getErrorMessage(e, "Không thể lưu bài học. Vui lòng thử lại."));
+      toast.error(getErrorMessage(e, "Không thể lưu bài học. Vui lòng thử lại."));
     } finally {
       setIsSaving(false);
     }

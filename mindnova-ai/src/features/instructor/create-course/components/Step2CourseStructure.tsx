@@ -4,6 +4,8 @@ import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useState, useCallback, useEffect, useMemo, type DragEvent } from "react";
 import { useRouter } from "next/navigation";
 import { twMerge } from "tailwind-merge";
+import toast from "react-hot-toast";
+import { useConfirmDialog } from "@/src/shared/components/ui/ConfirmDialog";
 import { NoData } from "@/src/shared/components/ui/NoData";
 import { useCourseStructure, type LessonType, type LessonNode } from "@/src/hooks/instructor/useCourseStructure";
 import { CreateLessonEditModal } from "./CreateLessonEditModal";
@@ -244,6 +246,7 @@ function LessonRow({
 
 export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   const router = useRouter();
+  const { confirm } = useConfirmDialog();
 
   // API Hooks for existing course edit
   const { data: apiModules, isLoading: isLoadingModules, refetch: refetchModules } = useCourseModules(courseId || "");
@@ -323,16 +326,22 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   });
 
   const handleDetachQuiz = async (quizId: number) => {
-    if (!confirm("Bạn có chắc chắn muốn gỡ bài kiểm tra này khỏi khóa học?")) return;
+    const confirmed = await confirm({
+      title: "Gỡ bài kiểm tra",
+      message: "Bạn có chắc chắn muốn gỡ bài kiểm tra này khỏi khóa học?",
+      confirmText: "Gỡ bài kiểm tra",
+      variant: "warning",
+    });
+    if (!confirmed) return;
     try {
       await quizGeneratorApi.deleteQuiz(quizId, true);
-      alert("Đã gỡ bài kiểm tra khỏi khóa học thành công!");
+      toast.success("Đã gỡ bài kiểm tra khỏi khóa học thành công!");
       if (courseId) {
         refetchModules();
         refetchCourseQuizzes();
       }
     } catch (err: any) {
-      alert(getErrorMessage(err, "Không thể gỡ bài kiểm tra. Vui lòng thử lại."));
+      toast.error(getErrorMessage(err, "Không thể gỡ bài kiểm tra. Vui lòng thử lại."));
     }
   };
 
@@ -343,7 +352,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
       refetchCourseQuizzes();
       refetchModules();
     } catch (err: any) {
-      alert(getErrorMessage(err, "Không thể chọn bài thi chính. Vui lòng thử lại."));
+      toast.error(getErrorMessage(err, "Không thể chọn bài thi chính. Vui lòng thử lại."));
     }
   };
 
@@ -381,7 +390,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         });
         await refetchModules();
       } catch (err: any) {
-        alert(getErrorMessage(err, "Không thể tạo chuyên đề. Vui lòng thử lại."));
+        toast.error(getErrorMessage(err, "Không thể tạo chuyên đề. Vui lòng thử lại."));
       }
     } else {
       addDraftChapter(title);
@@ -440,13 +449,19 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   };
 
   const handleDeleteChapter = async (chapterId: string) => {
-    if (!confirm("Bạn có chắc chắn muốn xóa chuyên đề này và tất cả các bài học bên trong?")) return;
+    const confirmed = await confirm({
+      title: "Xóa chuyên đề",
+      message: "Bạn có chắc chắn muốn xóa chuyên đề này và tất cả các bài học bên trong?",
+      confirmText: "Xóa chuyên đề",
+      variant: "danger",
+    });
+    if (!confirmed) return;
     if (courseId) {
       try {
         await deleteModuleMutation.mutateAsync({ courseId, moduleId: chapterId });
         await refetchModules();
       } catch (err: any) {
-        alert(getErrorMessage(err, "Không thể xóa chuyên đề. Vui lòng thử lại."));
+        toast.error(getErrorMessage(err, "Không thể xóa chuyên đề. Vui lòng thử lại."));
       }
     } else {
       deleteDraftChapter(chapterId);
@@ -469,7 +484,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         await refetchModules();
         setEditingLesson({ chapterId, lesson: { ...created, type: "video" } });
       } catch (err: any) {
-        alert(getErrorMessage(err, "Không thể thêm bài học video. Vui lòng thử lại."));
+        toast.error(getErrorMessage(err, "Không thể thêm bài học video. Vui lòng thử lại."));
       }
     } else {
       addDraftLesson(chapterId, `Bài học ${currentCount + 1}: Video bài giảng mới`, "video");
@@ -509,7 +524,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         await refetchModules();
         setEditingLesson({ chapterId, lesson: { ...created, type: "document" } });
       } catch (err: any) {
-        alert(getErrorMessage(err, "Không thể thêm tài liệu. Vui lòng thử lại."));
+        toast.error(getErrorMessage(err, "Không thể thêm tài liệu. Vui lòng thử lại."));
       }
     } else {
       addDraftLesson(chapterId, `Tài liệu đọc #${currentCount + 1}`, "document");
@@ -526,13 +541,19 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   };
 
   const handleDeleteLesson = async (chapterId: string, lessonId: string) => {
-    if (!confirm("Bạn có chắc chắn muốn xóa bài học này?")) return;
+    const confirmed = await confirm({
+      title: "Xóa bài học",
+      message: "Bạn có chắc chắn muốn xóa bài học này?",
+      confirmText: "Xóa bài học",
+      variant: "danger",
+    });
+    if (!confirmed) return;
     if (courseId) {
       try {
         await deleteLessonMutation.mutateAsync({ courseId, lessonId });
         await refetchModules();
       } catch (err: any) {
-        alert(getErrorMessage(err, "Không thể xóa bài học. Vui lòng thử lại."));
+        toast.error(getErrorMessage(err, "Không thể xóa bài học. Vui lòng thử lại."));
       }
     } else {
       deleteDraftLesson(chapterId, lessonId);
@@ -565,7 +586,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         refetchCourseQuizzes();
         setEditingLesson(null);
       } catch (err: any) {
-        alert(getErrorMessage(err, "Không thể lưu thay đổi. Vui lòng thử lại."));
+        toast.error(getErrorMessage(err, "Không thể lưu thay đổi. Vui lòng thử lại."));
       }
     } else if (editingLesson) {
       updateDraftLesson(editingLesson.chapterId, lessonId, updates);
@@ -623,7 +644,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                 refetchModules();
               })
               .catch((err: any) => {
-                alert(getErrorMessage(err, "Không thể cập nhật thứ tự mới. Vui lòng thử lại."));
+                toast.error(getErrorMessage(err, "Không thể cập nhật thứ tự mới. Vui lòng thử lại."));
                 refetchModules();
               });
 
