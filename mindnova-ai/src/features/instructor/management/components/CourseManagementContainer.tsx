@@ -143,7 +143,8 @@ function CourseManagementContent() {
         <section aria-label="Danh sách khóa học">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {isLoading ? (
-              {[...Array(6)].map((_, i) => (
+              <>
+                {[...Array(6)].map((_, i) => (
                 <div key={i} className="flex flex-col bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm h-full min-h-[300px]">
                   <Skeleton className="h-40 w-full rounded-none" />
                   <div className="p-4 flex flex-col flex-1 gap-3">
@@ -156,6 +157,7 @@ function CourseManagementContent() {
                   </div>
                 </div>
               ))}
+              </>
             ) : isError ? (
               <div className="col-span-full py-12 flex items-center justify-center text-blue-500">
                 Lỗi khi tải danh sách khóa học
