@@ -25,18 +25,18 @@ export default function GoalCard({
  "w-full p-6 bg-white border rounded-xl cursor-pointer transition-all duration-200",
  "hover:-translate-y-0.5 hover:shadow-md",
  isActive
- ? "border-[#E2E8F0] ring-1 ring-[#3B82F6] bg-[#F8F9FE]"
- : "border-[#C7C4D7]",
+ ? "border-slate-200 ring-1 ring-blue-500 bg-slate-50"
+ : "border-slate-300",
  )}
  >
  <div className="flex flex-col items-start gap-4">
- <div className="w-12 h-12 bg-[#EAEDFF] rounded-lg flex justify-center items-center">
+ <div className="w-12 h-12 bg-blue-50 rounded-lg flex justify-center items-center">
  <Image src={icon} width={24} height={24} alt="" aria-hidden="true" />
  </div>
- <h3 className="max-w-[275.33px] w-full text-[20px] font-semibold text-[#0F172A]">
+ <h3 className="max-w-[275.33px] w-full text-[20px] font-semibold text-slate-900">
  {title}
  </h3>
- <p className="max-w-[275.33px] w-full text-[14px] text-[#0F172A]">
+ <p className="max-w-[275.33px] w-full text-[14px] text-slate-900">
  {description}
  </p>
  </div>

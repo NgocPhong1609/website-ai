@@ -5,22 +5,21 @@ import { twMerge } from "tailwind-merge";
 import { FILTER_PERIODS } from "../constants";
 import type { BillingOrder } from "../api";
 import type { Transaction, TransactionStatus, FilterPeriod } from "../types";
-import { FilterIcon, ChevronDownSmall } from "./icons";
 import { StudentRefundModal } from "../../courses/components/StudentRefundModal";
-import { Banknote } from "lucide-react";
+import { Banknote, ChevronDown, Filter } from "lucide-react";
 import toast from "react-hot-toast";
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
 const STATUS_STYLES: Record<TransactionStatus, { text: string; clazz: string }> = {
- Paid: { text: "Thành công", clazz: "bg-[#EAF8F5] text-slate-900 border border-[#0f172a]/25" },
- Refunded: { text: "Đã hoàn tiền", clazz: "bg-[#FFFBEB] text-[#D97706] border border-[#F59E0B]/25" },
- Pending: { text: "Đang xử lý", clazz: "bg-[#f8fafc] text-[#2563eb] border border-[#2563eb]/25" },
- Failed: { text: "Thất bại", clazz: "bg-[#f8fafc] text-[#2563eb] border border-[#3B82F6]/25" },
+ Paid: { text: "Thành công", clazz: "bg-emerald-50 text-slate-900 border border-slate-900/25" },
+ Refunded: { text: "Đã hoàn tiền", clazz: "bg-amber-50 text-amber-600 border border-amber-500/25" },
+ Pending: { text: "Đang xử lý", clazz: "bg-slate-50 text-blue-600 border border-blue-600/25" },
+ Failed: { text: "Thất bại", clazz: "bg-slate-50 text-blue-600 border border-blue-500/25" },
 };
 
 function StatusBadge({ status }: { status: TransactionStatus }) {
- const config = STATUS_STYLES[status] || { text: status, clazz: "bg-gray-100 text-slate-500 border border-[#e2e8f0]" };
+ const config = STATUS_STYLES[status] || { text: status, clazz: "bg-slate-100 text-slate-500 border border-slate-200" };
  return (
  <span
  className={twMerge(
@@ -37,9 +36,9 @@ function StatusBadge({ status }: { status: TransactionStatus }) {
 // ─── Service Icon ─────────────────────────────────────────────────────────────
 
 const SERVICE_COLORS: Record<Transaction["serviceIcon"], string> = {
- course: "bg-[#f8fafc] text-[#2563eb] border border-[#2563eb]/20",
- subscription: "bg-[#EAF8F5] text-slate-900 border border-[#0f172a]/20",
- python: "bg-[#FFFBEB] text-[#D97706] border border-[#F59E0B]/20",
+ course: "bg-slate-50 text-blue-600 border border-blue-600/20",
+ subscription: "bg-emerald-50 text-slate-900 border border-slate-900/20",
+ python: "bg-amber-50 text-amber-600 border border-amber-500/20",
 };
 
 const SERVICE_LETTERS: Record<Transaction["serviceIcon"], string> = {
@@ -76,14 +75,14 @@ function FilterDropdown({ value, onChange }: FilterDropdownProps) {
  <button
  type="button"
  onClick={() => setOpen((o) => !o)}
- className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-900 bg-[#F8FAFC] border border-[#E4E6F0] hover:border-[#2563eb]/40 hover:bg-white transition-all duration-150 shadow-2xs cursor-pointer"
+ className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-900 bg-slate-50 border border-slate-200 hover:border-blue-600/40 hover:bg-white transition-all duration-150 shadow-2xs cursor-pointer"
  >
- <span className="text-[#2563eb]"></span>
+ <span className="text-blue-600"></span>
  <span>{value}</span>
- <ChevronDownSmall />
+ <ChevronDown size={12} />
  </button>
  {open && (
- <div className="absolute right-0 top-full mt-1.5 z-30 w-44 rounded-xl bg-white border border-[#e2e8f0] shadow-[0_8px_24px_rgba(0,0,0,0.12)] py-1 overflow-hidden">
+ <div className="absolute right-0 top-full mt-1.5 z-30 w-44 rounded-xl bg-white border border-slate-200 shadow-[0_8px_24px_rgba(0,0,0,0.12)] py-1 overflow-hidden">
  {FILTER_PERIODS.map((period) => (
  <button
  key={period}
@@ -95,12 +94,12 @@ function FilterDropdown({ value, onChange }: FilterDropdownProps) {
  className={twMerge(
  "w-full text-left px-4 py-2.5 text-xs font-medium transition-colors duration-100 flex items-center justify-between cursor-pointer",
  period === value
- ? "text-[#2563eb] bg-[#F0F2FF] font-semibold"
- : "text-slate-500 hover:bg-[#F8F8FC] hover:text-slate-900",
+ ? "text-blue-600 bg-[#F0F2FF] font-semibold"
+ : "text-slate-500 hover:bg-slate-50 hover:text-slate-900",
  )}
  >
  <span>{period}</span>
- {period === value && <span className="text-[#2563eb]"></span>}
+ {period === value && <span className="text-blue-600"></span>}
  </button>
  ))}
  </div>
@@ -113,10 +112,10 @@ function FilterDropdown({ value, onChange }: FilterDropdownProps) {
 
 function TransactionRow({ tx, onRefundClick }: { tx: Transaction; onRefundClick?: (tx: Transaction) => void }) {
   return (
-    <tr className="group hover:bg-[#F8FAFC]/80 transition-colors duration-150 border-b border-[#F4F5FB] last:border-b-0">
+    <tr className="group hover:bg-slate-50/80 transition-colors duration-150 border-b border-slate-100 last:border-b-0">
       {/* Invoice ID */}
       <td className="pl-6 pr-4 py-4 whitespace-nowrap">
-        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#F4F5FD] text-[#2563eb] font-semibold text-xs border border-[#e2e8f0] select-all">
+        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#F4F5FD] text-blue-600 font-semibold text-xs border border-slate-200 select-all">
           {tx.invoiceId}
         </span>
       </td>
@@ -131,7 +130,7 @@ function TransactionRow({ tx, onRefundClick }: { tx: Transaction; onRefundClick?
         <div className="flex items-center gap-3">
           <ServiceIcon icon={tx.serviceIcon} />
           <div className="space-y-0.5">
-            <p className="text-xs sm:text-sm font-semibold text-slate-900 leading-snug group-hover:text-[#2563eb] transition-colors">
+            <p className="text-xs sm:text-sm font-semibold text-slate-900 leading-snug group-hover:text-blue-600 transition-colors">
               {tx.service}
             </p>
             <p className="text-[11px] font-normal text-slate-500">
@@ -158,7 +157,7 @@ function TransactionRow({ tx, onRefundClick }: { tx: Transaction; onRefundClick?
             <button
               type="button"
               onClick={() => onRefundClick?.(tx)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#2563eb] bg-[#eff6ff] hover:bg-[#eff6ff]/80 border border-[#2563eb]/20 transition-all duration-150 cursor-pointer shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-50/80 border border-blue-600/20 transition-all duration-150 cursor-pointer shadow-2xs"
               title="Yêu cầu hoàn tiền khóa học nếu tiến độ ≤ 10% hoặc chưa học quá 5 bài"
             >
               <span className="flex items-center gap-1.5"><Banknote size={14} /> Hoàn tiền</span>
@@ -222,13 +221,13 @@ export function TransactionHistoryTable({ orders = [], isLoading = false }: { or
   const displayed = showAll ? filtered : filtered.slice(0, 4);
 
   return (
-    <div className="rounded-xl bg-white border border-[#e2e8f0] shadow-2xs overflow-hidden transition-all duration-300 hover:shadow-md">
+    <div className="rounded-xl bg-white border border-slate-200 shadow-2xs overflow-hidden transition-all duration-300 hover:shadow-md">
       {/* Table header console */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-5 border-b border-[#e2e8f0] bg-[#F8FAFC]/50">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-5 border-b border-slate-200 bg-slate-50/50">
         <div>
           <h2 className="text-base font-semibold text-slate-900 flex items-center gap-2">
             <span>Lịch Sử Giao Dịch &amp; Học Phí</span>
-            <span className="text-[11px] font-medium text-[#2563eb] bg-[#f8fafc] px-2.5 py-0.5 rounded-full border border-[#2563eb]/20">
+            <span className="text-[11px] font-medium text-blue-600 bg-slate-50 px-2.5 py-0.5 rounded-full border border-blue-600/20">
               {isLoading ? "..." : `${filtered.length} Giao dịch`}
             </span>
           </h2>
@@ -242,10 +241,10 @@ export function TransactionHistoryTable({ orders = [], isLoading = false }: { or
           <button
             type="button"
             aria-label="Lọc nâng cao"
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 bg-white border border-[#E4E6F0] hover:border-[#2563eb]/40 hover:text-[#2563eb] transition-all duration-150 shadow-2xs cursor-pointer"
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 bg-white border border-slate-200 hover:border-blue-600/40 hover:text-blue-600 transition-all duration-150 shadow-2xs cursor-pointer"
             title="Bộ lọc nâng cao"
           >
-            <FilterIcon size={15} />
+            <Filter size={15} />
           </button>
         </div>
       </div>
@@ -254,7 +253,7 @@ export function TransactionHistoryTable({ orders = [], isLoading = false }: { or
       <div className="overflow-x-auto">
         <table className="w-full text-left min-w-[760px]">
           <thead>
-            <tr className="border-b border-[#e2e8f0] bg-[#F8FAFC]">
+            <tr className="border-b border-slate-200 bg-slate-50">
               {[
                 { label: "Mã Giao Dịch", clazz: "pl-6 pr-4 py-3 text-left w-[15%]" },
                 { label: "Ngày Giao Dịch", clazz: "px-4 py-3 text-left w-[15%]" },
@@ -272,7 +271,7 @@ export function TransactionHistoryTable({ orders = [], isLoading = false }: { or
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#F4F5FB]">
+          <tbody className="divide-y divide-slate-100">
             {displayed.map((tx) => (
               <TransactionRow key={tx.id} tx={tx} onRefundClick={(t) => setRefundTx(t)} />
             ))}
@@ -287,14 +286,14 @@ export function TransactionHistoryTable({ orders = [], isLoading = false }: { or
 
       {/* Footer view controls */}
       {!showAll && filtered.length > 4 && (
-        <div className="border-t border-[#F0F2FA] p-4 flex justify-center bg-[#F8FAFC]/40">
+        <div className="border-t border-slate-100 p-4 flex justify-center bg-slate-50/40">
           <button
             type="button"
             onClick={() => setShowAll(true)}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-semibold text-[#2563eb] bg-white border border-[#E4E6F0] hover:bg-[#f8fafc] hover:border-[#2563eb]/30 transition-all duration-200 shadow-2xs cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-semibold text-blue-600 bg-white border border-slate-200 hover:bg-slate-50 hover:border-blue-600/30 transition-all duration-200 shadow-2xs cursor-pointer"
           >
             <span>Xem toàn bộ lịch sử học phí</span>
-            <ChevronDownSmall />
+            <ChevronDown size={12} />
           </button>
         </div>
       )}

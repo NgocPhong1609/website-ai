@@ -35,19 +35,19 @@ function renderFormattedText(text: string) {
       const token = match[0];
       if (token.startsWith("**") && token.endsWith("**")) {
         parts.push(
-          <strong key={`bold-${idx++}`} className="font-semibold text-blue-600 bg-[#EFF6FF]/70 px-1.5 py-0.5 rounded-md border border-blue-600/15">
+          <strong key={`bold-${idx++}`} className="font-semibold text-blue-600 bg-blue-50/70 px-1.5 py-0.5 rounded-md border border-blue-600/15">
             {token.slice(2, -2)}
           </strong>
         );
       } else if (token.startsWith("*") && token.endsWith("*")) {
         parts.push(
-          <span key={`italic-${idx++}`} className="font-medium text-[#27AE60] bg-[#EAF8F5]/80 px-1.5 py-0.5 rounded-md border border-[#27AE60]/15">
+          <span key={`italic-${idx++}`} className="font-medium text-emerald-600 bg-emerald-50/80 px-1.5 py-0.5 rounded-md border border-emerald-600/15">
             {token.slice(1, -1)}
           </span>
         );
       } else if (token.startsWith("`") && token.endsWith("`")) {
         parts.push(
-          <code key={`code-${idx++}`} className="font-mono text-xs text-[#D97706] bg-[#FFF8EB] px-1.5 py-0.5 rounded-md border border-[#D97706]/20">
+          <code key={`code-${idx++}`} className="font-mono text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-600/20">
             {token.slice(1, -1)}
           </code>
         );
@@ -112,7 +112,7 @@ function TypewriterText({
     const timer = setInterval(() => {
       if (isStoppedRef.current) {
         clearInterval(timer);
-        setDisplayedText((prev) => prev + " ⏸️ *(Đã bị tạm dừng)*");
+        setDisplayedText((prev) => prev + " *(Đã bị tạm dừng)*");
         onTypingRef.current?.(false);
         return;
       }
@@ -157,7 +157,7 @@ export function FloatingAiChat() {
     {
       id: "init-1",
       sender: "ai",
-      text: "Chào bạn! 👋 Mình là **Nova**, gia sư AI đồng hành cùng bạn 24/7. Bạn có câu hỏi hay bài tập nào cần mình hướng dẫn hôm nay không?",
+      text: "Chào bạn! Mình là **Nova**, gia sư AI đồng hành cùng bạn 24/7. Bạn có câu hỏi hay bài tập nào cần mình hướng dẫn hôm nay không?",
       time: "Vừa xong",
     },
   ]);
@@ -414,7 +414,7 @@ export function FloatingAiChat() {
       const stoppedReply: Message = {
         id: `stop-${Date.now()}`,
         sender: "ai",
-        text: "⏸️ *(Bạn đã tạm dừng Gia sư Nova trước khi câu trả lời được hoàn thành)*",
+        text: "*(Bạn đã tạm dừng Gia sư Nova trước khi câu trả lời được hoàn thành)*",
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         animate: false,
       };
@@ -513,8 +513,8 @@ export function FloatingAiChat() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
             </svg>
             <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#27AE60] opacity-80" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#27AE60] border border-white" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-600 opacity-80" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600 border border-white" />
             </span>
           </div>
           
@@ -530,7 +530,7 @@ export function FloatingAiChat() {
 
       {/* Expanded Floating Modal Window - 5% Larger Dimensions (340px x 445px) with Draggable Header */}
       <div
-        className={`w-[calc(100vw-2rem)] sm:w-[340px] h-[445px] max-h-[80vh] bg-white rounded-xl shadow-[0_16px_48px_rgba(26,26,46,0.22)] border border-[#E4E6F0] flex-col overflow-hidden transition-transform duration-250 animate-in fade-in zoom-in-95 origin-bottom-right ${
+        className={`w-[calc(100vw-2rem)] sm:w-[340px] h-[445px] max-h-[80vh] bg-white rounded-xl shadow-[0_16px_48px_rgba(26,26,46,0.22)] border border-slate-200 flex-col overflow-hidden transition-transform duration-250 animate-in fade-in zoom-in-95 origin-bottom-right ${
           isDragging ? "ring-2 ring-blue-600/50 shadow-2xl scale-[1.01]" : ""
         } ${isOpen ? "flex" : "hidden"}`}
       >
@@ -538,12 +538,12 @@ export function FloatingAiChat() {
           <header
             onMouseDown={handleMouseDown}
             onTouchStart={handleTouchStart}
-            className="px-4 py-3 border-b border-[#E8E9F2] bg-gradient-to-r from-[#F8F9FD] via-[#F5F7FD] to-[#EFF6FF] flex items-center justify-between shrink-0 cursor-move select-none group/header hover:bg-[#EFF6FF]/60 transition-colors"
+            className="px-4 py-3 border-b border-slate-200 bg-gradient-to-r from-[#F8F9FD] via-[#F5F7FD] to-blue-50 flex items-center justify-between shrink-0 cursor-move select-none group/header hover:bg-blue-50/60 transition-colors"
             title="Nhấn và kéo thanh tiêu đề để chuyển vị trí cửa sổ trên màn hình"
           >
             <div className="flex items-center gap-2.5">
               {/* Grip icon indicating dragging capability */}
-              <span className="text-[#64748B] group-hover/header:text-blue-600 text-xs font-bold tracking-tighter transition-colors">
+              <span className="text-slate-500 group-hover/header:text-blue-600 text-xs font-bold tracking-tighter transition-colors">
                 ⋮⋮
               </span>
               <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-blue-600 via-blue-500 to-blue-600 text-white flex items-center justify-center shadow-2xs text-xs font-bold">
@@ -551,12 +551,12 @@ export function FloatingAiChat() {
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="text-xs font-bold text-[#0F172A] tracking-tight">
+                  <h3 className="text-xs font-bold text-slate-900 tracking-tight">
                     Nova AI Co-Pilot
                   </h3>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#27AE60]" title="Online" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" title="Online" />
                 </div>
-                <p className="text-[10px] font-medium text-[#64748B]">Trợ lý học tập 24/7 • <span className="italic text-blue-600/80">Kéo để di chuyển</span></p>
+                <p className="text-[10px] font-medium text-slate-500">Trợ lý học tập 24/7 • <span className="italic text-blue-600/80">Kéo để di chuyển</span></p>
               </div>
             </div>
 
@@ -566,7 +566,7 @@ export function FloatingAiChat() {
                 onClick={() => setShowConfirmDelete(true)}
                 aria-label="Xóa lịch sử chat"
                 title="Xóa và làm mới cuộc trò chuyện"
-                className="w-7 h-7 rounded-lg hover:bg-[#EFF6FF] text-[#64748B] hover:text-[#2563EB] flex items-center justify-center transition-colors focus:outline-none cursor-pointer text-xs font-normal"
+                className="w-7 h-7 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600 flex items-center justify-center transition-colors focus:outline-none cursor-pointer text-xs font-normal"
               >
                 <Trash2 size={14} />
               </button>
@@ -575,7 +575,7 @@ export function FloatingAiChat() {
                 onClick={() => setIsOpen(false)}
                 aria-label="Thu nhỏ"
                 title="Thu nhỏ cửa sổ"
-                className="w-7 h-7 rounded-lg hover:bg-[#E0E5FF] text-[#64748B] hover:text-blue-600 flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
+                className="w-7 h-7 rounded-lg hover:bg-[#E0E5FF] text-slate-500 hover:text-blue-600 flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -594,11 +594,11 @@ export function FloatingAiChat() {
                 }`}
               >
                 {msg.sender === "ai" ? (
-                  <div className="w-6.5 h-6.5 rounded-lg bg-[#EFF6FF] text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 shadow-2xs border border-blue-600/20">
+                  <div className="w-6.5 h-6.5 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 shadow-2xs border border-blue-600/20">
                     N
                   </div>
                 ) : (
-                  <div className="w-6.5 h-6.5 rounded-full overflow-hidden shrink-0 mt-0.5 border border-[#EAEAF4] shadow-2xs">
+                  <div className="w-6.5 h-6.5 rounded-full overflow-hidden shrink-0 mt-0.5 border border-slate-200 shadow-2xs">
                     <Image
                       src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
                       width={26}
@@ -615,7 +615,7 @@ export function FloatingAiChat() {
                     className={`p-3 rounded-xl text-[12.5px] leading-relaxed whitespace-pre-line ${
                       msg.sender === "user"
                         ? "bg-gradient-to-r from-blue-600 via-blue-500 to-blue-500 text-white rounded-tr-none shadow-2xs font-medium"
-                        : "bg-[#F4F6FC] text-[#0F172A] border border-[#E4E6F0] rounded-tl-none font-normal"
+                        : "bg-slate-50 text-slate-900 border border-slate-200 rounded-tl-none font-normal"
                     }`}
                   >
                     {msg.sender === "ai" ? (
@@ -635,7 +635,7 @@ export function FloatingAiChat() {
                       msg.text
                     )}
                   </div>
-                  <span className="text-[10px] font-normal text-[#64748B] px-1">{msg.time}</span>
+                  <span className="text-[10px] font-normal text-slate-500 px-1">{msg.time}</span>
                 </div>
               </div>
             ))}
@@ -643,10 +643,10 @@ export function FloatingAiChat() {
             {/* Live Typing Indicator */}
             {chatMutation.isPending && (
               <div className="flex items-start gap-2.5 max-w-[80%]">
-                <div className="w-6.5 h-6.5 rounded-lg bg-[#EFF6FF] text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 shadow-2xs border border-blue-600/20 animate-pulse">
+                <div className="w-6.5 h-6.5 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5 shadow-2xs border border-blue-600/20 animate-pulse">
                   N
                 </div>
-                <div className="bg-[#F4F6FC] border border-[#E4E6F0] px-3.5 py-2.5 rounded-xl rounded-tl-none flex items-center gap-1.5 shadow-2xs">
+                <div className="bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl rounded-tl-none flex items-center gap-1.5 shadow-2xs">
                   <span className="text-xs font-semibold text-blue-600 mr-1">Nova đang nghĩ...</span>
                   <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                   <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
@@ -659,14 +659,14 @@ export function FloatingAiChat() {
           </div>
 
           {/* Localized Quick Prompt Chips */}
-          <div className="px-3.5 py-2 border-t border-[#F0F2FA] bg-white flex items-center gap-1.5 overflow-x-auto hide-scrollbar shrink-0">
+          <div className="px-3.5 py-2 border-t border-slate-100 bg-white flex items-center gap-1.5 overflow-x-auto hide-scrollbar shrink-0">
             {quickSuggestions.map((item, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => handleSend(item.label)}
                 disabled={isGenerating || isQuotaBlocked}
-                className="shrink-0 flex items-center justify-center text-xs font-semibold bg-[#F8FAFC] hover:bg-[#EFF6FF] disabled:opacity-50 text-[#64748B] hover:text-blue-600 border border-[#EAEAF4] hover:border-blue-600/30 rounded-xl px-3 py-1.5 transition-all duration-200 focus:outline-none cursor-pointer shadow-2xs"
+                className="shrink-0 flex items-center justify-center text-xs font-semibold bg-slate-50 hover:bg-blue-50 disabled:opacity-50 text-slate-500 hover:text-blue-600 border border-slate-200 hover:border-blue-600/30 rounded-xl px-3 py-1.5 transition-all duration-200 focus:outline-none cursor-pointer shadow-2xs"
               >
                 {item.icon} {item.label}
               </button>
@@ -674,7 +674,7 @@ export function FloatingAiChat() {
           </div>
 
           {/* Footer Input Bar */}
-          <div role="group" aria-label="Khung nhập tin nhắn AI" className="w-full min-w-0 p-2.5 bg-white border-t border-[#E8E9F2] shrink-0">
+          <div role="group" aria-label="Khung nhập tin nhắn AI" className="w-full min-w-0 p-2.5 bg-white border-t border-slate-200 shrink-0">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -688,7 +688,7 @@ export function FloatingAiChat() {
                 onChange={(e) => setInput(e.target.value)}
                 disabled={isGenerating || isQuotaBlocked}
                 placeholder={isGenerating ? "Nova đang trả lời..." : "Nhập câu hỏi cho Nova..."}
-                className="min-w-0 flex-1 bg-[#F8FAFC] focus:bg-white disabled:bg-gray-100 border border-[#EAEAF4] focus:border-blue-600 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#0F172A] placeholder:text-[#64748B] focus:outline-none focus:ring-2 focus:ring-blue-600/25 transition-all duration-200"
+                className="min-w-0 flex-1 bg-slate-50 focus:bg-white disabled:bg-slate-100 border border-slate-200 focus:border-blue-600 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-600/25 transition-all duration-200"
               />
               {isGenerating ? (
                 <button
@@ -696,7 +696,7 @@ export function FloatingAiChat() {
                   onClick={handleStop}
                   aria-label="Tạm dừng AI trả lời"
                   title="Dừng câu trả lời của AI"
-                  className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#3B82F6] to-[#2563EB] hover:from-[#2563EB] hover:to-[#1D4ED8] text-white rounded-xl transition-all duration-200 focus:outline-none shadow-[0_4px_12px_rgba(37,99,235,0.35)] animate-pulse active:scale-95 cursor-pointer"
+                  className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-[0_4px_12px_rgba(37,99,235,0.35)] animate-pulse active:scale-95 cursor-pointer"
                 >
                   <Square className="w-4 h-4" fill="currentColor" aria-hidden />
                 </button>
@@ -705,7 +705,7 @@ export function FloatingAiChat() {
                   type="submit"
                   aria-label="Gửi tin nhắn"
                   disabled={!input.trim() || isQuotaBlocked}
-                  className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-[#3B82F6] to-[#2563EB] hover:from-[#2563EB] hover:to-[#1D4ED8] disabled:opacity-50 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-sm active:scale-95 cursor-pointer"
+                  className="shrink-0 w-9 h-9 flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 text-white rounded-xl transition-all duration-200 focus:outline-none shadow-sm active:scale-95 cursor-pointer"
                 >
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
@@ -714,7 +714,7 @@ export function FloatingAiChat() {
               )}
             </form>
             {quota && (
-              <span aria-label="Hạn mức AI hôm nay" className="mt-1.5 block text-center text-[11px] text-[#64748B]">
+              <span aria-label="Hạn mức AI hôm nay" className="mt-1.5 block text-center text-[11px] text-slate-500">
                 Còn {quota.remaining}/{quota.daily_limit} lượt hôm nay
               </span>
             )}
@@ -722,8 +722,8 @@ export function FloatingAiChat() {
           
           {/* Custom Confirm Delete Modal */}
           {showConfirmDelete && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#0f172a]/20 backdrop-blur-sm rounded-xl">
-              <div className="bg-white p-5 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] w-[85%] max-w-[280px] border border-[#e2e8f0] transform transition-all">
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/20 backdrop-blur-sm rounded-xl">
+              <div className="bg-white p-5 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] w-[85%] max-w-[280px] border border-slate-200 transform transition-all">
                 <h3 className="text-sm font-bold text-slate-900 mb-2">Xóa lịch sử trò chuyện?</h3>
                 <p className="text-xs text-slate-500 mb-5 leading-relaxed">
                   Bạn có chắc chắn muốn xóa toàn bộ tin nhắn và bắt đầu hội thoại mới không?
@@ -732,7 +732,7 @@ export function FloatingAiChat() {
                   <button
                     type="button"
                     onClick={() => setShowConfirmDelete(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 bg-[#f8fafc] hover:bg-[#f1f5f9] hover:text-slate-900 transition-all cursor-pointer focus:outline-none"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 bg-slate-50 hover:bg-slate-100 hover:text-slate-900 transition-all cursor-pointer focus:outline-none"
                   >
                     Hủy
                   </button>
@@ -742,7 +742,7 @@ export function FloatingAiChat() {
                       const defaultMsg: Message = {
                         id: `init-${Date.now()}`,
                         sender: "ai",
-                        text: "Chào bạn! 👋 Mình là **Nova**, gia sư AI đồng hành cùng bạn 24/7. Bạn có câu hỏi hay bài tập nào cần mình hướng dẫn hôm nay không?",
+                        text: "Chào bạn! Mình là **Nova**, gia sư AI đồng hành cùng bạn 24/7. Bạn có câu hỏi hay bài tập nào cần mình hướng dẫn hôm nay không?",
                         time: "Vừa xong",
                       };
                       setMessages([defaultMsg]);
@@ -750,7 +750,7 @@ export function FloatingAiChat() {
                       toast.success("Đã xóa lịch sử trò chuyện và tạo hội thoại mới");
                       setShowConfirmDelete(false);
                     }}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-[#3B82F6] hover:bg-[#2563EB] transition-all shadow-sm cursor-pointer focus:outline-none"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 transition-all shadow-sm cursor-pointer focus:outline-none"
                   >
                     Xóa
                   </button>

@@ -5,15 +5,14 @@ import { getErrorMessage } from "@/src/shared/lib/user-error";
 
 import { useState, useEffect } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
-import { MonitorIcon } from "./icons";
-import { Shield, Key, CheckCircle2, Search, Smartphone } from "lucide-react";
+import { Shield, Key, CheckCircle2, Search, Smartphone, Loader2, Monitor } from "lucide-react";
 import toast from "react-hot-toast";
 
 function ActiveSessionsBox() {
   return (
-    <div className="mt-8 p-5 rounded-lg bg-[#F8FAFC] border border-[#EAEAF4] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-[#3b82f6]/30 hover:bg-white hover:shadow-md">
+    <div className="mt-8 p-5 rounded-lg bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-blue-500/30 hover:bg-white hover:shadow-md">
       <div className="flex items-start gap-4">
-        <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-white border border-[#EAEAF4] text-slate-500 shrink-0 shadow-sm">
+        <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-white border border-slate-200 text-slate-500 shrink-0 shadow-sm">
           <Smartphone className="w-6 h-6" />
         </div>
         <div className="space-y-1 mt-0.5">
@@ -24,8 +23,8 @@ function ActiveSessionsBox() {
       
       <button
         type="button"
-        onClick={() => toast("Hệ thống an ninh ghi nhận: Không có truy cập bất thường nào từ các thiết bị lạ.", { icon: '🛡️' })}
-        className="shrink-0 px-4 py-2.5 rounded-lg bg-white border border-[#EAEAF4] hover:bg-[#F8FAFC] hover:text-slate-900 text-sm font-semibold text-slate-500 transition-all cursor-pointer shadow-sm"
+        onClick={() => toast.success("Không phát hiện truy cập bất thường từ thiết bị lạ.")}
+        className="shrink-0 px-4 py-2.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-900 text-sm font-semibold text-slate-500 transition-all cursor-pointer shadow-sm"
       >
         Kiểm tra nhật ký
       </button>
@@ -139,7 +138,7 @@ export function SecurityPanel() {
               value={value}
               onChange={(e) => set(e.target.value)}
               placeholder={placeholder}
-              className="w-full px-4 py-3 rounded-lg text-sm text-slate-900 bg-[#F8FAFC] border border-[#EAEAF4] focus:border-[#3b82f6] focus:bg-white focus:ring-4 focus:ring-[#3b82f6]/10 outline-none transition-all placeholder:text-[#94a3b8]"
+              className="w-full px-4 py-3 rounded-lg text-sm text-slate-900 bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:text-slate-400"
             />
             {value.length > 0 && validation && !validation.isValid && (
               <p className="text-xs font-medium text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-lg mt-1.5">
@@ -160,10 +159,10 @@ export function SecurityPanel() {
             type="button"
             onClick={handleUpdate}
             disabled={!canSave || isLoading || updated}
-            className="px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] hover:opacity-95 shadow-md shadow-blue-500/20 disabled:from-[#94a3b8] disabled:to-[#cbd5e1] disabled:shadow-none disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 w-full sm:w-auto"
+            className="px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:opacity-95 shadow-md shadow-blue-500/20 disabled:from-slate-400 disabled:to-slate-300 disabled:shadow-none disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             {isLoading ? (
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" aria-hidden />
             ) : updated ? (
               <CheckCircle2 className="w-4 h-4" />
             ) : (
@@ -301,7 +300,7 @@ export function SettingsPanel() {
             onClick={() => {
               if (!isSaving) handler();
             }}
-            className={`group flex items-center justify-between gap-4 p-5 rounded-lg border border-[#EAEAF4] transition-all ${isSaving ? "opacity-70 cursor-not-allowed bg-slate-50" : "cursor-pointer bg-white hover:bg-[#F8FAFC] hover:border-[#3b82f6]/40 hover:shadow-md"}`}
+            className={`group flex items-center justify-between gap-4 p-5 rounded-lg border border-slate-200 transition-all ${isSaving ? "opacity-70 cursor-not-allowed bg-slate-50" : "cursor-pointer bg-white hover:bg-slate-50 hover:border-blue-500/40 hover:shadow-md"}`}
           >
             <div className="space-y-1">
               <p className="text-sm font-semibold text-slate-900">{label}</p>
@@ -318,7 +317,7 @@ export function SettingsPanel() {
                 if (!isSaving) handler();
               }}
               className={`relative w-[46px] h-6 rounded-full transition-colors duration-300 outline-none shrink-0 ${isSaving ? "cursor-not-allowed" : "cursor-pointer"} ${
-                value ? "bg-[#3b82f6]" : "bg-[#cbd5e1]"
+                value ? "bg-blue-500" : "bg-slate-300"
               }`}
             >
               <span

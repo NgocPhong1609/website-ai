@@ -5,7 +5,7 @@ import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Banknote, X, Check, PartyPopper, AlertTriangle } from "lucide-react";
+import { Banknote, X, Check, PartyPopper, AlertTriangle, Loader2 } from "lucide-react";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { useGetPaymentMethods } from "../../billing/api";
 
@@ -92,9 +92,9 @@ export function StudentRefundModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fadeIn font-sans">
       <div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col animate-scaleIn">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-[#EAEAF4] bg-white">
+        <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-white">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-11 h-11 bg-[#EFF6FF] rounded-xl text-[#3B82F6]">
+            <div className="flex items-center justify-center w-11 h-11 bg-blue-50 rounded-xl text-blue-500">
               <Banknote size={20} strokeWidth={2.5} />
             </div>
             <div>
@@ -106,27 +106,27 @@ export function StudentRefundModal({
             type="button"
             onClick={onClose}
             aria-label="Đóng"
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[#94a3b8] hover:text-slate-900 hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
           >
             <X size={18} strokeWidth={2.5} />
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="p-6 flex flex-col gap-6 max-h-[75vh] overflow-y-auto bg-[#F8FAFC]">
+        <div className="p-6 flex flex-col gap-6 max-h-[75vh] overflow-y-auto bg-slate-50">
           {/* Course Summary Box */}
-          <div className="p-5 rounded-xl bg-white border border-[#EAEAF4] shadow-sm">
-            <span className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wider">Khóa học yêu cầu hoàn</span>
+          <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Khóa học yêu cầu hoàn</span>
             <h4 className="text-[15px] font-semibold text-slate-900 mt-1.5">{eligibility?.course_title || courseTitle || "Khóa học của bạn"}</h4>
             {eligibility?.amount && (
-              <p className="text-sm font-semibold text-[#3B82F6] mt-2">
+              <p className="text-sm font-semibold text-blue-500 mt-2">
                 Số tiền hoàn lại: {Number(eligibility.amount).toLocaleString("vi-VN")} VNĐ
               </p>
             )}
           </div>
 
           {/* Refund Rules Checklist */}
-          <div className="flex flex-col gap-4 p-5 rounded-xl bg-white border border-[#EAEAF4] shadow-sm">
+          <div className="flex flex-col gap-4 p-5 rounded-xl bg-white border border-slate-200 shadow-sm">
             <h5 className="text-[13px] font-semibold text-slate-900">Kiểm tra điều kiện hoàn tiền</h5>
 
             {isLoading ? (
@@ -135,7 +135,7 @@ export function StudentRefundModal({
               <div className="flex flex-col gap-4">
                 {/* Rule 1: Within 30 days */}
                 <div className="flex items-start gap-3">
-                  <span className={twMerge("flex items-center justify-center w-5 h-5 rounded-full mt-0.5 shrink-0 transition-colors", eligibility?.within_30_days ? "bg-[#EAF8F5] text-[#10B981]" : "bg-[#FEF2F2] text-[#EF4444]")}>
+                  <span className={twMerge("flex items-center justify-center w-5 h-5 rounded-full mt-0.5 shrink-0 transition-colors", eligibility?.within_30_days ? "bg-emerald-50 text-emerald-500" : "bg-rose-50 text-rose-500")}>
                     {eligibility?.within_30_days ? <Check size={12} strokeWidth={3.5} /> : <X size={12} strokeWidth={3.5} />}
                   </span>
                   <div className="flex flex-col">
@@ -150,7 +150,7 @@ export function StudentRefundModal({
 
                 {/* Rule 2: Progress <= 10% AND completed <= 5 */}
                 <div className="flex items-start gap-3">
-                  <span className={twMerge("flex items-center justify-center w-5 h-5 rounded-full mt-0.5 shrink-0 transition-colors", eligibility?.progress_eligible ? "bg-[#EAF8F5] text-[#10B981]" : "bg-[#FEF2F2] text-[#EF4444]")}>
+                  <span className={twMerge("flex items-center justify-center w-5 h-5 rounded-full mt-0.5 shrink-0 transition-colors", eligibility?.progress_eligible ? "bg-emerald-50 text-emerald-500" : "bg-rose-50 text-rose-500")}>
                     {eligibility?.progress_eligible ? <Check size={12} strokeWidth={3.5} /> : <X size={12} strokeWidth={3.5} />}
                   </span>
                   <div className="flex flex-col">
@@ -168,18 +168,18 @@ export function StudentRefundModal({
           {!isLoading && (
             <div>
               {isEligible ? (
-                <div className="p-4 rounded-xl bg-[#EAF8F5] border border-[#10B981]/20 flex flex-col gap-1.5 shadow-sm">
-                  <div className="flex items-center gap-2 text-[#10B981] font-semibold text-[13px]">
+                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-500/20 flex flex-col gap-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 text-emerald-500 font-semibold text-[13px]">
                     <PartyPopper size={16} strokeWidth={2.5} />
                     <span>Bạn đủ điều kiện nhận lại 100% học phí!</span>
                   </div>
-                  <p className="text-[13px] font-medium text-[#047857]">
+                  <p className="text-[13px] font-medium text-emerald-700">
                     Khóa học thỏa mãn tất cả các điều kiện hoàn tiền của MindNova AI.
                   </p>
                 </div>
               ) : (
-                <div className="p-4 rounded-xl bg-[#FEF2F2] border border-[#EF4444]/20 flex flex-col gap-2 shadow-sm">
-                  <div className="flex items-center gap-2 text-[#EF4444] font-semibold text-[13px]">
+                <div className="p-4 rounded-xl bg-rose-50 border border-rose-500/20 flex flex-col gap-2 shadow-sm">
+                  <div className="flex items-center gap-2 text-rose-500 font-semibold text-[13px]">
                     <AlertTriangle size={16} strokeWidth={2.5} />
                     <span>Không đủ điều kiện hoàn tiền</span>
                   </div>
@@ -195,12 +195,12 @@ export function StudentRefundModal({
 
           {/* Account Selection */}
           {isEligible && savedMethods.length > 0 && (
-            <div className="flex flex-col gap-4 p-5 rounded-xl bg-white border border-[#EAEAF4] shadow-sm">
+            <div className="flex flex-col gap-4 p-5 rounded-xl bg-white border border-slate-200 shadow-sm">
               <label className="text-[13px] font-semibold text-slate-900">Tài khoản nhận tiền</label>
               <div className="flex flex-col gap-3">
                 {savedMethods.map((method) => (
                   <label key={method.id} className="flex items-center gap-3 cursor-pointer group">
-                    <div className={`w-[18px] h-[18px] rounded-full border flex items-center justify-center shrink-0 transition-colors ${savedMethodId === method.id ? "border-[#3B82F6] bg-[#3B82F6]" : "border-[#cbd5e1] group-hover:border-[#94a3b8]"}`}>
+                    <div className={`w-[18px] h-[18px] rounded-full border flex items-center justify-center shrink-0 transition-colors ${savedMethodId === method.id ? "border-blue-500 bg-blue-500" : "border-slate-300 group-hover:border-slate-400"}`}>
                       {savedMethodId === method.id && <span className="w-2 h-2 rounded-full bg-white" />}
                     </div>
                     <input
@@ -213,9 +213,9 @@ export function StudentRefundModal({
                   </label>
                 ))}
               </div>
-              <div className="h-[1px] bg-[#EAEAF4] w-full my-1" />
+              <div className="h-[1px] bg-slate-200 w-full my-1" />
               <label className="flex items-center gap-3 cursor-pointer group">
-                <div className={`w-[18px] h-[18px] rounded-md border flex items-center justify-center shrink-0 transition-colors ${confirmAccount ? "bg-[#3B82F6] border-[#3B82F6]" : "border-[#cbd5e1] group-hover:border-[#94a3b8] bg-white"}`}>
+                <div className={`w-[18px] h-[18px] rounded-md border flex items-center justify-center shrink-0 transition-colors ${confirmAccount ? "bg-blue-500 border-blue-500" : "border-slate-300 group-hover:border-slate-400 bg-white"}`}>
                   {confirmAccount && <Check size={12} strokeWidth={4} className="text-white" />}
                 </div>
                 <input type="checkbox" className="hidden" checked={confirmAccount} onChange={(e) => setConfirmAccount(e.target.checked)} />
@@ -224,17 +224,17 @@ export function StudentRefundModal({
             </div>
           )}
           {isEligible && savedMethods.length === 0 && (
-            <p className="text-[13px] text-[#3B82F6] font-medium bg-[#EFF6FF] p-4 rounded-xl border border-[#3B82F6]/20">Hãy thêm tài khoản thanh toán trong thẻ Thanh Toán &amp; Hóa Đơn trước khi hoàn tiền.</p>
+            <p className="text-[13px] text-blue-500 font-medium bg-blue-50 p-4 rounded-xl border border-blue-500/20">Hãy thêm tài khoản thanh toán trong thẻ Thanh Toán &amp; Hóa Đơn trước khi hoàn tiền.</p>
           )}
 
           {/* Reason Select */}
           {isEligible && (
-            <div className="flex flex-col gap-2 p-5 rounded-xl bg-white border border-[#EAEAF4] shadow-sm">
+            <div className="flex flex-col gap-2 p-5 rounded-xl bg-white border border-slate-200 shadow-sm">
               <label className="text-[13px] font-semibold text-slate-900">Lý do hoàn tiền (Tùy chọn)</label>
               <select
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="w-full h-11 px-4 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC] text-[13px] font-medium text-slate-900 focus:outline-none focus:border-[#3B82F6] focus:bg-white transition-all cursor-pointer"
+                className="w-full h-11 px-4 rounded-xl border border-slate-200 bg-slate-50 text-[13px] font-medium text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all cursor-pointer"
               >
                 <option value="Nội dung không phù hợp với nhu cầu">Nội dung không phù hợp với nhu cầu</option>
                 <option value="Mua nhầm khóa học">Mua nhầm khóa học</option>
@@ -245,18 +245,18 @@ export function StudentRefundModal({
           )}
 
           {statusMsg && (
-            <div className={twMerge("p-4 rounded-xl text-[13px] font-semibold shadow-sm", isError ? "bg-[#FEF2F2] text-[#EF4444] border border-[#EF4444]/20" : "bg-[#0f172a] text-white")}>
+            <div className={twMerge("p-4 rounded-xl text-[13px] font-semibold shadow-sm", isError ? "bg-rose-50 text-rose-500 border border-rose-500/20" : "bg-slate-900 text-white")}>
               {statusMsg}
             </div>
           )}
         </div>
 
         {/* Submit Button */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#EAEAF4] bg-white">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 bg-white">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-500 hover:bg-[#F8FAFC] hover:text-slate-900 transition-all cursor-pointer"
+            className="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer"
           >
             Hủy bỏ
           </button>
@@ -266,9 +266,9 @@ export function StudentRefundModal({
               type="button"
               onClick={() => refundMutation.mutate()}
               disabled={refundMutation.isPending || (savedMethods.length === 0)}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] text-white text-[13px] font-semibold shadow-md shadow-[#3B82F6]/20 hover:opacity-95 transition-all disabled:from-[#94a3b8] disabled:to-[#cbd5e1] disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white text-[13px] font-semibold shadow-md shadow-blue-500/20 hover:opacity-95 transition-all disabled:from-slate-400 disabled:to-slate-300 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {refundMutation.isPending && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              {refundMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" aria-hidden />}
               {refundMutation.isPending ? "Đang xử lý..." : "Xác nhận & Hoàn tiền"}
             </button>
           )}

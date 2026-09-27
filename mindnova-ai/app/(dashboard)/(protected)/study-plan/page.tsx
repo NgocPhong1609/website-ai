@@ -28,7 +28,7 @@ export default async function AIStudyPlanPage() {
                 Lộ trình học AI • Module {currentIdx} / {totalMods}
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A] leading-tight break-words">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 leading-tight break-words">
                 {activeSyllabus.title}
               </h1>
 

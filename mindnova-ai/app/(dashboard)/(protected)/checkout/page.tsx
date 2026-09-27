@@ -21,10 +21,10 @@ export default async function CheckoutPage({ searchParams }: Props) {
  return (
  <div className="p-6 md:p-8 max-w-[1200px] mx-auto min-h-full">
  <div className="mb-8">
- <h1 className="text-2xl sm:text-3xl font-semibold text-[#0F172A] tracking-tight">
+ <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight">
  Thanh toán Khóa học
  </h1>
- <p className="text-sm text-[#64748B] mt-2">
+ <p className="text-sm text-slate-500 mt-2">
  Vui lòng kiểm tra lại thông tin đơn hàng và chọn phương thức thanh toán phù hợp.
  </p>
  </div>

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
-import { CheckCircle2, AlertTriangle, Lightbulb, Bot, Target, MessageSquare, ClipboardList, Eye, GraduationCap, X, FileEdit, Check, Lock, Flag, Trophy, PartyPopper, ChevronsUpDown, ArrowLeft, ChevronRight, BookOpen, Sparkles, Pencil, Trash2 } from "lucide-react";
-import { Skeleton } from "@/src/shared/components/ui/Skeleton";
+import { CheckCircle2, AlertTriangle, Lightbulb, Bot, Target, MessageSquare, ClipboardList, Eye, GraduationCap, X, FileEdit, Check, Lock, Flag, Trophy, PartyPopper, ChevronsUpDown, ArrowLeft, ChevronRight, BookOpen, Sparkles, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Skeleton, SkeletonList } from "@/src/shared/components/ui/Skeleton";
 import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { LessonStatusIcon, lessonDisplayTitle } from "../LessonStatusIcon";
 import Link from "next/link";
@@ -86,10 +86,10 @@ function getLessonTypeLabel(type: string): string {
 
 function getLessonTypeColor(type: string): string {
  switch (type) {
- case 'video': return 'bg-[#F1F5F9] text-[#0F172A]';
- case 'article': return 'bg-[#ECFDF5] text-[#0F172A]';
- case 'quiz_module': return 'bg-[#FFFBEB] text-[#F59E0B]';
- default: return 'bg-[#F1F5F9] text-[#64748B]';
+ case 'video': return 'bg-slate-100 text-slate-900';
+ case 'article': return 'bg-emerald-50 text-slate-900';
+ case 'quiz_module': return 'bg-amber-50 text-amber-500';
+ default: return 'bg-slate-100 text-slate-500';
  }
 }
 
@@ -134,7 +134,7 @@ function ArticleRenderer({
 
  if (!lesson.content) {
  return (
- <div className="w-full p-12 flex flex-col items-center justify-center text-gray-400 bg-blue-50/50 rounded-xl border border-blue-100">
+ <div className="w-full p-12 flex flex-col items-center justify-center text-slate-400 bg-blue-50/50 rounded-xl border border-blue-100">
  <BookOpen size={28} strokeWidth={1.75} aria-hidden />
  <span className="text-sm font-medium mt-3">Nội dung bài học chưa được cập nhật.</span>
  </div>
@@ -146,16 +146,16 @@ function ArticleRenderer({
  {/* Reading progress bar */}
  {!completedRef.current && (
  <div className="flex items-center gap-3 p-3 rounded-xl bg-blue-50/50 border border-blue-100">
- <BookOpen size={16} className="text-[#3B82F6] shrink-0" aria-hidden />
+ <BookOpen size={16} className="text-blue-500 shrink-0" aria-hidden />
  <div className="flex-1">
  <div className="w-full h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
  <div
- className="h-full bg-[#3B82F6] rounded-full transition-all duration-1000"
+ className="h-full bg-blue-500 rounded-full transition-all duration-1000"
  style={{ width: `${progressPercent}%` }}
  />
  </div>
  </div>
- <span className="text-[11px] font-semibold text-[#64748B] shrink-0">
+ <span className="text-[11px] font-semibold text-slate-500 shrink-0">
  {Math.floor(timeSpent / 60)}:{String(timeSpent % 60).padStart(2, '0')} / {Math.floor(requiredTime / 60)}:{String(requiredTime % 60).padStart(2, '0')}
  </span>
  </div>
@@ -165,25 +165,25 @@ function ArticleRenderer({
  <div
  className="ck-content prose prose-sm sm:prose max-w-none
  bg-white rounded-xl border border-blue-100 p-6 sm:p-8 shadow-sm
- [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-[#0F172A] [&_h1]:mb-4 [&_h1]:mt-6
- [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-[#0F172A] [&_h2]:mb-3 [&_h2]:mt-5
- [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-[#0F172A] [&_h3]:mb-2 [&_h3]:mt-4
- [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-[#0F172A] [&_h4]:mb-2
- [&_p]:text-[15px] [&_p]:text-[#0F172A] [&_p]:leading-relaxed [&_p]:mb-4
- [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ul]:text-[#0F172A]
- [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_ol]:text-[#0F172A]
+ [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-slate-900 [&_h1]:mb-4 [&_h1]:mt-6
+ [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-slate-900 [&_h2]:mb-3 [&_h2]:mt-5
+ [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-slate-900 [&_h3]:mb-2 [&_h3]:mt-4
+ [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-slate-900 [&_h4]:mb-2
+ [&_p]:text-[15px] [&_p]:text-slate-900 [&_p]:leading-relaxed [&_p]:mb-4
+ [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ul]:text-slate-900
+ [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_ol]:text-slate-900
  [&_li]:mb-1.5 [&_li]:text-[15px] [&_li]:leading-relaxed
- [&_a]:text-[#0F172A] [&_a]:underline [&_a]:hover:text-[#2563EB]
+ [&_a]:text-slate-900 [&_a]:underline [&_a]:hover:text-blue-600
  [&_img]:rounded-xl [&_img]:shadow-sm [&_img]:my-4 [&_img]:max-w-full [&_img]:h-auto
- [&_blockquote]:border-l-4 [&_blockquote]:border-[#3B82F6] [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-[#64748B] [&_blockquote]:my-4
+ [&_blockquote]:border-l-4 [&_blockquote]:border-blue-500 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-500 [&_blockquote]:my-4
  [&_table]:w-full [&_table]:border-collapse [&_table]:my-4
- [&_th]:bg-[#F1F5F9] [&_th]:border [&_th]:border-blue-100 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_th]:text-sm
+ [&_th]:bg-slate-100 [&_th]:border [&_th]:border-blue-100 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_th]:text-sm
  [&_td]:border [&_td]:border-blue-100 [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm
- [&_pre]:bg-[#1F2937] [&_pre]:text-gray-200 [&_pre]:rounded-xl [&_pre]:p-4 [&_pre]:overflow-x-auto [&_pre]:my-4
+ [&_pre]:bg-[#1F2937] [&_pre]:text-slate-200 [&_pre]:rounded-xl [&_pre]:p-4 [&_pre]:overflow-x-auto [&_pre]:my-4
  [&_code]:font-mono [&_code]:text-sm
  [&_hr]:border-blue-100 [&_hr]:my-6
  [&_figure]:my-4 [&_figure]:mx-auto
- [&_figcaption]:text-center [&_figcaption]:text-sm [&_figcaption]:text-[#64748B] [&_figcaption]:mt-2
+ [&_figcaption]:text-center [&_figcaption]:text-sm [&_figcaption]:text-slate-500 [&_figcaption]:mt-2
  [&_strong]:font-bold [&_em]:italic
  [&_mark]:bg-yellow-200 [&_mark]:px-1 [&_mark]:rounded"
  dangerouslySetInnerHTML={{ __html: lesson.content }}
@@ -584,16 +584,16 @@ function QuizRenderer({
 
  if (loading) {
  return (
- <div className="w-full p-12 flex flex-col items-center justify-center bg-blue-50/50 rounded-xl border border-blue-100">
- <div className="w-10 h-10 border-3 border-[#3B82F6] border-t-transparent rounded-full animate-spin" />
- <span className="text-sm text-[#64748B] font-medium mt-3">Đang tải bài kiểm tra...</span>
+ <div role="status" aria-busy="true" aria-label="Đang tải bài kiểm tra" className="w-full p-6 rounded-xl border border-slate-200 bg-white space-y-4">
+ <Skeleton className="h-5 w-2/3" />
+ {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
  </div>
  );
  }
 
  if (error || !quizData || quizData.questions.length === 0) {
  return (
- <div className="w-full p-12 flex flex-col items-center justify-center text-gray-400 bg-blue-50/50 rounded-xl border border-blue-100">
+ <div className="w-full p-12 flex flex-col items-center justify-center text-slate-400 bg-blue-50/50 rounded-xl border border-blue-100">
  <AlertTriangle size={28} strokeWidth={1.75} aria-hidden />
  <span className="text-sm font-medium mt-3">{error || "Bài kiểm tra chưa có câu hỏi."}</span>
  </div>
@@ -604,8 +604,8 @@ function QuizRenderer({
  if (submittingFinal) {
  return (
  <div className="w-full p-12 flex flex-col items-center justify-center bg-blue-50/50 rounded-xl border border-blue-100">
- <div className="w-10 h-10 border-3 border-[#3B82F6] border-t-transparent rounded-full animate-spin" />
- <span className="text-sm text-[#64748B] font-medium mt-3">Đang nộp bài...</span>
+ <Loader2 className="w-10 h-10 text-blue-500 animate-spin" aria-hidden />
+ <span className="text-sm text-slate-500 font-medium mt-3">Đang nộp bài...</span>
  </div>
  );
  }
@@ -626,34 +626,34 @@ function QuizRenderer({
       <div className="w-full bg-white rounded-xl border border-blue-100 shadow-sm p-8 flex flex-col items-center gap-6">
         <div className={twMerge(
           "w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold",
-          passed ? "bg-blue-50/50 text-[#065F46]" : "bg-blue-50/50 text-[#3B82F6]"
+          passed ? "bg-blue-50/50 text-emerald-800" : "bg-blue-50/50 text-blue-500"
         )}>
           {passed ? <PartyPopper size={16} className="inline mr-1" /> : <AlertTriangle size={16} className="inline mr-1" />}
         </div>
 
-        <h2 className="text-2xl font-bold text-[#0F172A]">
+        <h2 className="text-2xl font-bold text-slate-900">
           {passed ? "Chúc mừng! Bạn đã vượt qua!" : "Chưa đạt yêu cầu"}
         </h2>
 
         <div className="text-center space-y-1">
-          <p className="text-2xl font-semibold text-[#0F172A]">
+          <p className="text-2xl font-semibold text-slate-900">
             {score10} / 10 điểm
           </p>
-          <p className="text-xs font-semibold text-[#64748B]">
+          <p className="text-xs font-semibold text-slate-500">
             Tỷ lệ đạt: {scorePercent}% — Yêu cầu tối thiểu: {quizData?.passing_score}%
           </p>
-          <p className="text-[11px] text-gray-400 mt-0.5">
+          <p className="text-[11px] text-slate-400 mt-0.5">
             (Đã trả lời đúng {actualCorrect}/{totalQ} câu)
           </p>
         </div>
 
         {/* Progress bar */}
         <div className="w-full max-w-xs">
-          <div className="w-full h-3 bg-[#F1F5F9] rounded-full overflow-hidden">
+          <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
             <div
               className={twMerge(
                 "h-full rounded-full transition-all duration-700",
-                passed ? "bg-[#059669]" : "bg-[#2563EB]"
+                passed ? "bg-emerald-600" : "bg-blue-600"
               )}
               style={{ width: `${scorePercent}%` }}
             />
@@ -662,12 +662,12 @@ function QuizRenderer({
 
  {passed ? (
  <div className="flex flex-col items-center gap-3">
- <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-50/50 text-[#065F46] font-semibold text-sm">
+ <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-50/50 text-emerald-800 font-semibold text-sm">
  HOÀN THÀNH
  </div>
  <button
  onClick={handleRetry}
- className="px-4 py-2 text-sm text-[#0F172A] hover:text-[#2563EB] font-medium transition-colors cursor-pointer"
+ className="px-4 py-2 text-sm text-slate-900 hover:text-blue-600 font-medium transition-colors cursor-pointer"
  >
  Làm lại để luyện tập
  </button>
@@ -675,7 +675,7 @@ function QuizRenderer({
  ) : (
  <button
  onClick={handleRetry}
- className="px-6 py-3 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm transition-colors cursor-pointer shadow-sm"
+ className="px-6 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-semibold text-sm transition-colors cursor-pointer shadow-sm"
  >
  Làm lại
  </button>
@@ -693,15 +693,15 @@ function QuizRenderer({
  {/* Quiz Header */}
  <div className="flex items-center justify-between px-6 py-4 bg-blue-50/50 border-b border-blue-100">
  <div className="flex items-center gap-3">
- <span className="text-sm font-bold text-[#0F172A]">{quizData.title}</span>
- <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#F1F5F9] text-[#0F172A]">
+ <span className="text-sm font-bold text-slate-900">{quizData.title}</span>
+ <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-900">
  Câu {currentIndex + 1}/{quizData.questions.length}
  </span>
  </div>
  {timeLeft !== null && (
  <span className={twMerge(
  "text-sm font-semibold px-3 py-1 rounded-full",
- timeLeft < 60 ? "bg-[#EFF6FF] text-[#3B82F6] animate-pulse" : "bg-[#F1F5F9] text-[#64748B]"
+ timeLeft < 60 ? "bg-blue-50 text-blue-500 animate-pulse" : "bg-slate-100 text-slate-500"
  )}>
  {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
  </span>
@@ -710,45 +710,45 @@ function QuizRenderer({
 
  {/* Question */}
  <div className="p-6 sm:p-8">
-  <h3 className="text-lg font-bold text-[#0F172A] mb-6 leading-relaxed">
+  <h3 className="text-lg font-bold text-slate-900 mb-6 leading-relaxed">
   {question.content}
   </h3>
 
   {/* Answers - MCQ or Essay */}
   {((question as any).type === "essay" || !question.answers || question.answers.length === 0) ? (
   <div className="flex flex-col gap-3 mb-6">
-  <label className="text-xs font-bold text-[#0F172A]">Câu trả lời tự luận của bạn:</label>
+  <label className="text-xs font-bold text-slate-900">Câu trả lời tự luận của bạn:</label>
   <textarea
   value={essayText}
   onChange={(e) => setEssayText(e.target.value)}
   disabled={answered}
   rows={4}
   placeholder="Nhập nội dung bài làm tự luận của bạn..."
-  className="w-full p-4 rounded-xl border border-blue-100 text-sm text-[#0F172A] focus:border-[#3B82F6] focus:outline-none bg-white font-medium shadow-2xs"
+  className="w-full p-4 rounded-xl border border-blue-100 text-sm text-slate-900 focus:border-blue-500 focus:outline-none bg-white font-medium shadow-2xs"
   />
 
   {answered && (
   <div className="p-5 rounded-xl bg-blue-50/50 border border-blue-100 flex flex-col gap-4 text-xs animate-fadeIn mt-2 shadow-2xs">
   {essayResult[question.id] ? (
   <div className="flex flex-col gap-3 p-4 rounded-xl bg-white border border-blue-100 shadow-2xs">
-    <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+    <div className="flex items-center justify-between pb-2 border-b border-slate-100">
       <div className="flex items-center gap-2">
-        <Bot size={16} className="text-[#2563EB]" />
-        <span className="font-semibold text-[#0F172A] text-sm">Kết quả đánh giá từ Gia sư AI (Gemini):</span>
+        <Bot size={16} className="text-blue-600" />
+        <span className="font-semibold text-slate-900 text-sm">Kết quả đánh giá từ Gia sư AI (Gemini):</span>
       </div>
-      <div className="px-3 py-1 rounded-full bg-[#E8F8F0] text-[#27AE60] font-semibold text-xs">
-        <Target size={14} className="inline mr-1 text-[#27AE60]" /> Điểm: {essayResult[question.id].score} / {essayResult[question.id].max_score || (question as any).points || 2.5} điểm
+      <div className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 font-semibold text-xs">
+        <Target size={14} className="inline mr-1 text-emerald-600" /> Điểm: {essayResult[question.id].score} / {essayResult[question.id].max_score || (question as any).points || 2.5} điểm
       </div>
     </div>
 
-    <p className="text-[#64748B] font-medium text-xs leading-relaxed bg-[#F1F5F9]/50 p-3 rounded-lg border border-blue-100/60">
-      <MessageSquare size={14} className="inline mr-1 text-[#0F172A]" /> <strong>Nhận xét AI:</strong> {essayResult[question.id].feedback}
+    <p className="text-slate-500 font-medium text-xs leading-relaxed bg-slate-100/50 p-3 rounded-lg border border-blue-100/60">
+      <MessageSquare size={14} className="inline mr-1 text-slate-900" /> <strong>Nhận xét AI:</strong> {essayResult[question.id].feedback}
     </p>
 
     {Array.isArray(essayResult[question.id].ai_analysis?.matched_points) && essayResult[question.id].ai_analysis.matched_points.length > 0 && (
       <div className="flex flex-col gap-1">
-        <span className="font-bold text-[#27AE60] text-[11px]"><CheckCircle2 size={12} className="inline mr-1" /> Ý trả lời tốt:</span>
-        <ul className="list-disc list-inside text-[#27AE60] text-xs space-y-0.5 pl-1">
+        <span className="font-bold text-emerald-600 text-[11px]"><CheckCircle2 size={12} className="inline mr-1" /> Ý trả lời tốt:</span>
+        <ul className="list-disc list-inside text-emerald-600 text-xs space-y-0.5 pl-1">
           {essayResult[question.id].ai_analysis.matched_points.map((pt: string, pIdx: number) => (
             <li key={pIdx}>{pt}</li>
           ))}
@@ -758,8 +758,8 @@ function QuizRenderer({
 
     {Array.isArray(essayResult[question.id].ai_analysis?.missing_points) && essayResult[question.id].ai_analysis.missing_points.length > 0 && (
       <div className="flex flex-col gap-1">
-        <span className="font-bold text-[#3B82F6] text-[11px]"><AlertTriangle size={12} className="inline mr-1" /> Cần bổ sung / hoàn thiện:</span>
-        <ul className="list-disc list-inside text-[#2563EB] text-xs space-y-0.5 pl-1">
+        <span className="font-bold text-blue-500 text-[11px]"><AlertTriangle size={12} className="inline mr-1" /> Cần bổ sung / hoàn thiện:</span>
+        <ul className="list-disc list-inside text-blue-600 text-xs space-y-0.5 pl-1">
           {essayResult[question.id].ai_analysis.missing_points.map((pt: string, pIdx: number) => (
             <li key={pIdx}>{pt}</li>
           ))}
@@ -768,23 +768,23 @@ function QuizRenderer({
     )}
   </div>
   ) : (
-  <div className="p-3 rounded-xl bg-[#E8F8F0] border border-[#27AE60]/20 text-[#27AE60] text-xs font-bold flex items-center justify-between">
-    <span><CheckCircle2 size={14} className="inline mr-1 text-[#27AE60]" /> {isPreview ? "Xem thử tự luận — đối chiếu đáp án và tiêu chí bên dưới." : <>Đã nộp bài tự luận - Thang điểm: <strong>{(question as any).points || 2.5} điểm</strong></>}</span>
-    <span className="px-2.5 py-0.5 rounded bg-[#27AE60] text-white text-[10px] uppercase font-bold">{isPreview ? "Không lưu" : "Đã ghi nhận"}</span>
+  <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-600/20 text-emerald-600 text-xs font-bold flex items-center justify-between">
+    <span><CheckCircle2 size={14} className="inline mr-1 text-emerald-600" /> {isPreview ? "Xem thử tự luận — đối chiếu đáp án và tiêu chí bên dưới." : <>Đã nộp bài tự luận - Thang điểm: <strong>{(question as any).points || 2.5} điểm</strong></>}</span>
+    <span className="px-2.5 py-0.5 rounded bg-emerald-600 text-white text-[10px] uppercase font-bold">{isPreview ? "Không lưu" : "Đã ghi nhận"}</span>
   </div>
   )}
 
   <div className="flex flex-col gap-1.5">
-    <span className="text-[#0F172A] font-semibold text-xs"><Lightbulb size={12} className="inline mr-1 text-[#D97706]" /> Đáp án tham khảo mẫu từ Giảng viên:</span>
-    <p className="text-[#64748B] font-medium leading-relaxed whitespace-pre-line bg-white p-4 rounded-xl border border-blue-100 shadow-2xs">
+    <span className="text-slate-900 font-semibold text-xs"><Lightbulb size={12} className="inline mr-1 text-amber-600" /> Đáp án tham khảo mẫu từ Giảng viên:</span>
+    <p className="text-slate-500 font-medium leading-relaxed whitespace-pre-line bg-white p-4 rounded-xl border border-blue-100 shadow-2xs">
       {(question as any).sample_answer || "Yêu cầu học viên phân tích đầy đủ các luận điểm chính trong bài học."}
     </p>
   </div>
 
   {(question as any).rubric && (
   <div className="flex flex-col gap-1.5 pt-2 border-t border-blue-100">
-  <span className="font-semibold text-[#3B82F6] text-xs"><ClipboardList size={12} className="inline mr-1 text-[#3B82F6]" /> Thang điểm & Rubric chấm điểm:</span>
-  <p className="text-[#2563EB] font-medium leading-relaxed whitespace-pre-line bg-[#EFF6FF]/60 p-3.5 rounded-xl border border-[#3B82F6]/20">
+  <span className="font-semibold text-blue-500 text-xs"><ClipboardList size={12} className="inline mr-1 text-blue-500" /> Thang điểm & Rubric chấm điểm:</span>
+  <p className="text-blue-600 font-medium leading-relaxed whitespace-pre-line bg-blue-50/60 p-3.5 rounded-xl border border-blue-500/20">
     {(question as any).rubric}
   </p>
   </div>
@@ -797,14 +797,14 @@ function QuizRenderer({
   {question.answers.map((ans: any, idx: number) => {
   const letter = String.fromCharCode(65 + idx);
   const isSelected = selectedAnswer === ans.id;
-  let ansStyle = "bg-white border-blue-100 hover:border-[#2563EB] hover:bg-blue-50/50";
+  let ansStyle = "bg-white border-blue-100 hover:border-blue-600 hover:bg-blue-50/50";
 
   if (answered && isSelected) {
   ansStyle = answerResult
-  ? "bg-blue-50/50 border-[#34D399] text-[#065F46]"
-  : "bg-blue-50/50 border-[#60A5FA] text-[#3B82F6]";
+  ? "bg-blue-50/50 border-[#34D399] text-emerald-800"
+  : "bg-blue-50/50 border-blue-400 text-blue-500";
   } else if (isSelected) {
-  ansStyle = "bg-[#F1F5F9] border-[#3B82F6]";
+  ansStyle = "bg-slate-100 border-blue-500";
   }
 
   return (
@@ -820,10 +820,10 @@ function QuizRenderer({
   >
   <span className={twMerge(
   "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 border-2",
-  isSelected && !answered ? "bg-[#3B82F6] text-white border-[#3B82F6]" :
-  answered && isSelected && answerResult ? "bg-[#059669] text-white border-[#059669]" :
-  answered && isSelected && !answerResult ? "bg-[#2563EB] text-white border-[#2563EB]" :
-  "bg-[#F1F5F9] text-[#64748B] border-blue-100"
+  isSelected && !answered ? "bg-blue-500 text-white border-blue-500" :
+  answered && isSelected && answerResult ? "bg-emerald-600 text-white border-emerald-600" :
+  answered && isSelected && !answerResult ? "bg-blue-600 text-white border-blue-600" :
+  "bg-slate-100 text-slate-500 border-blue-100"
   )}>
   {letter}
   </span>
@@ -838,7 +838,7 @@ function QuizRenderer({
   {answered && !((question as any).type === "essay" || !question.answers || question.answers.length === 0) && (
   <div className={twMerge(
   "p-4 rounded-xl mb-4 text-sm font-semibold",
-  answerResult ? "bg-blue-50/50 text-[#065F46]" : "bg-blue-50/50 text-[#3B82F6]"
+  answerResult ? "bg-blue-50/50 text-emerald-800" : "bg-blue-50/50 text-blue-500"
   )}>
   {answerResult ? " Chính xác!" : " Chưa đúng. Hãy cố gắng ở câu tiếp theo!"}
   </div>
@@ -854,7 +854,7 @@ function QuizRenderer({
       ? (!essayText.trim() || submitting)
       : (!selectedAnswer || submitting)
   }
-  className="px-6 py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm flex items-center gap-2"
+  className="px-6 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-semibold text-sm transition-colors disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-sm flex items-center gap-2"
   >
   {submitting ? (
     ((question as any).type === "essay" || !question.answers || question.answers.length === 0)
@@ -865,7 +865,7 @@ function QuizRenderer({
  ) : (
  <button
  onClick={handleNext}
- className="px-6 py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm transition-colors cursor-pointer shadow-sm flex items-center gap-2"
+ className="px-6 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-semibold text-sm transition-colors cursor-pointer shadow-sm flex items-center gap-2"
  >
  {isLast ? "Hoàn thành" : "Câu tiếp theo"}
  <ChevronRight size={16} aria-hidden />
@@ -1108,9 +1108,9 @@ function LessonWorkspaceContent() {
  return (
  <div className="w-full h-screen flex flex-col items-center justify-center bg-blue-50/50 p-6">
  <div className="bg-white p-8 rounded-xl shadow-sm max-w-md w-full text-center border border-blue-100">
- <h2 className="text-xl font-bold text-[#0F172A] mb-2">Không tìm thấy khóa học</h2>
- <p className="text-sm text-[#64748B] mb-6">Vui lòng chọn một khóa học để bắt đầu học.</p>
- <a href="/courses" className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold transition-all shadow-sm">
+ <h2 className="text-xl font-bold text-slate-900 mb-2">Không tìm thấy khóa học</h2>
+ <p className="text-sm text-slate-500 mb-6">Vui lòng chọn một khóa học để bắt đầu học.</p>
+ <a href="/courses" className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-all shadow-sm">
  Xem danh sách khóa học
  </a>
  </div>
@@ -1241,12 +1241,12 @@ function LessonWorkspaceContent() {
         <main className="lg:col-span-8 flex flex-col gap-6 w-full min-w-0">
 
           {/* AI Notice */}
-          <div className="w-full px-5 py-4 rounded-xl bg-gradient-to-r from-indigo-50 via-blue-50 to-sky-50 border border-indigo-100/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
+          <div className="w-full px-5 py-4 rounded-xl bg-gradient-to-r from-sky-50 via-blue-50 to-sky-50 border border-sky-100/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
             {/* Decorative background glow */}
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-400/10 blur-2xl rounded-full pointer-events-none" />
             
             <div className="flex items-center gap-4 min-w-0 relative z-10">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(79,70,229,0.3)]">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(79,70,229,0.3)]">
                 <Sparkles size={22} />
               </div>
               <div className="min-w-0">
@@ -1345,7 +1345,7 @@ function LessonWorkspaceContent() {
       {/* Tab 2: AI Tips */}
       {activeTab === "ai_tips" && (
         <div className="flex flex-col gap-5 animate-fadeIn">
-          <div className="p-5 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 flex items-start gap-4">
+          <div className="p-5 rounded-xl bg-gradient-to-br from-blue-50 to-sky-50 border border-blue-100 flex items-start gap-4">
             <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm">
               <Sparkles size={22} />
             </div>
@@ -1384,10 +1384,7 @@ function LessonWorkspaceContent() {
           {/* Discussion List */}
           <div className="flex flex-col gap-6">
             {isDiscussionsLoading ? (
-              <div className="py-12 flex flex-col items-center justify-center gap-3">
-                <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-blue-600 animate-spin" />
-                <span className="text-[13px] font-semibold text-slate-500">Đang tải thảo luận...</span>
-              </div>
+              <SkeletonList items={3} />
             ) : apiDiscussions?.length === 0 ? (
               <div className="py-8">
                 <NoDataAvailable
@@ -1715,7 +1712,7 @@ function LessonWorkspaceContent() {
 // ─── Exported Master Component ────────────────────────────────────────────────
 export function LessonWorkspace() {
  return (
- <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center font-semibold text-[#64748B]">Đang tải khoá học Trợ lý AI MindNova...</div>}>
+ <Suspense fallback={<div role="status" aria-busy="true" aria-label="Đang tải bài học" className="max-w-[1400px] mx-auto p-6 space-y-6"><Skeleton className="aspect-video w-full rounded-xl" /><Skeleton className="h-40 w-full rounded-xl" /></div>}>
  <LessonWorkspaceContent />
  </Suspense>
  );

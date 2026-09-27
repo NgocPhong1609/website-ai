@@ -57,9 +57,9 @@ function useTimeSelection() {
 
 function StepBadge() {
  return (
- <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F8FAFC] border border-[#E2E8F0]">
+ <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200">
  <SparkleIcon />
- <span className="text-xs font-semibold text-[#3B82F6] tracking-wide">
+ <span className="text-xs font-semibold text-blue-500 tracking-wide">
  Bước 3/4 — Cá nhân hóa
  </span>
  </div>
@@ -84,13 +84,13 @@ export default function TopicsContainer() {
 
  {/* Header */}
  <div className="flex flex-col items-center gap-3 text-center max-w-2xl">
- <h1 className="text-4xl font-bold text-[#0F172A] leading-tight tracking-tight">
+ <h1 className="text-4xl font-bold text-slate-900 leading-tight tracking-tight">
  Bạn có bao nhiêu{" "}
- <span className="text-transparent bg-clip-text bg-[#3B82F6] ">
+ <span className="text-transparent bg-clip-text bg-blue-500 ">
  thời gian rảnh
  </span> mỗi ngày?
  </h1>
- <p className="text-[15px] text-[#64748B] leading-relaxed max-w-lg">
+ <p className="text-[15px] text-slate-500 leading-relaxed max-w-lg">
  Chọn thời gian phù hợp để AI tính toán khối lượng bài học tối ưu cho bạn.
  </p>
  </div>
@@ -98,10 +98,10 @@ export default function TopicsContainer() {
  {/* Content: topics grid + AI sidebar */}
  <div className="flex items-start gap-5 w-full max-w-4xl">
  
- <div className="flex-1 bg-white border border-[#E8E8F0] rounded-3xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col gap-4">
+ <div className="flex-1 bg-white border border-slate-200 rounded-3xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col gap-4">
  <div className="flex items-center gap-2 mb-2">
- <div className="w-1.5 h-1.5 rounded-full bg-[#F8FAFC]" />
- <h3 className="text-xs font-bold text-[#64748B] uppercase tracking-wider">Thời gian rảnh</h3>
+ <div className="w-1.5 h-1.5 rounded-full bg-slate-50" />
+ <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Thời gian rảnh</h3>
  </div>
 
  <div className="flex flex-col gap-3 min-h-[120px] content-start">
@@ -114,12 +114,12 @@ export default function TopicsContainer() {
  onClick={() => toggleTime(time)}
  className={`px-4 py-3.5 flex items-center justify-between gap-2 rounded-xl text-sm font-semibold transition-all border ${
  isSelected
- ? "bg-[#F8FAFC] text-[#3B82F6] border-[#E2E8F0] shadow-sm"
- : "bg-white text-[#0F172A] border-[#E8E8F0] hover:border-[#C7C4D7] hover:bg-[#F8F8FF]"
+ ? "bg-slate-50 text-blue-500 border-slate-200 shadow-sm"
+ : "bg-white text-slate-900 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
  }`}
  >
  <span>{time}</span>
- {isSelected && <span className="text-[#3B82F6]"></span>}
+ {isSelected && <span className="text-blue-500"></span>}
  </button>
  );
  })}
@@ -139,7 +139,7 @@ export default function TopicsContainer() {
  variant="unstyled"
  className={[
  "relative px-12 py-3.5 rounded-xl text-sm font-semibold text-white",
- " bg-[#3B82F6] ",
+ " bg-blue-500 ",
  "shadow-[0_4px_20px_rgba(59, 130, 246,0.4)]",
  "hover:shadow-[0_6px_28px_rgba(59, 130, 246,0.55)] hover:-translate-y-0.5",
  "active:translate-y-0 active:shadow-[0_2px_12px_rgba(59, 130, 246,0.3)]",
@@ -151,11 +151,11 @@ export default function TopicsContainer() {
  Tạo lộ trình học tập
  </Button>
 
- <p className="flex items-center gap-1.5 text-[11px] text-[#94A3B8]">
+ <p className="flex items-center gap-1.5 text-[11px] text-slate-400">
  <ShieldCheckIcon />
  <span>
  Data-driven pathing based on{" "}
- <span className="text-[#3B82F6] font-medium">
+ <span className="text-blue-500 font-medium">
  50,000+ career trajectories
  </span>
  </span>

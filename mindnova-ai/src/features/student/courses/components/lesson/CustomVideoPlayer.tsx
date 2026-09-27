@@ -5,6 +5,7 @@ import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, Loader2, AlertTriang
 import { twMerge } from "tailwind-merge";
 import { fetchVideoUrl } from "../../api";
 import type { LessonData } from "./LessonWorkspace";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 function Rewind10Icon({ className = "w-5 h-5" }: { className?: string }) {
   return (
@@ -283,19 +284,14 @@ export function CustomVideoPlayer({
  // --- Rendering Load/Error ---
  if (loading) {
  return (
- <div className="relative w-full aspect-video bg-[#0f172a] rounded-xl overflow-hidden flex items-center justify-center border border-[#E2E8F0]">
- <div className="flex flex-col items-center gap-3">
- <div className="w-10 h-10 border-3 border-[#3B82F6] border-t-transparent rounded-full animate-spin" />
- <span className="text-sm text-[#64748B] font-medium">Đang tải video...</span>
- </div>
- </div>
+ <Skeleton role="status" aria-label="Đang tải video" className="w-full aspect-video rounded-xl" />
  );
  }
 
  if (error) {
  return (
- <div className="relative w-full aspect-video bg-[#F8FAFC] rounded-xl overflow-hidden flex items-center justify-center border border-[#E2E8F0]">
- <div className="flex flex-col items-center gap-3 text-[#64748B]">
+ <div className="relative w-full aspect-video bg-slate-50 rounded-xl overflow-hidden flex items-center justify-center border border-slate-200">
+ <div className="flex flex-col items-center gap-3 text-slate-500">
  <AlertTriangle size={28} strokeWidth={1.75} aria-hidden />
  <span className="text-sm font-medium">{error}</span>
  </div>
@@ -321,7 +317,7 @@ export function CustomVideoPlayer({
  }
 
  return (
- <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-sm border border-[#E2E8F0]">
+ <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-sm border border-slate-200">
  <iframe
  src={embedUrl}
  title={lesson.title}
@@ -341,7 +337,7 @@ export function CustomVideoPlayer({
  ref={containerRef}
  className={twMerge(
  "relative w-full aspect-video bg-black overflow-hidden shadow-sm flex items-center justify-center group select-none",
- isFullscreen ? "rounded-none fixed inset-0 z-[9999]" : "rounded-xl border border-[#E2E8F0]"
+ isFullscreen ? "rounded-none fixed inset-0 z-[9999]" : "rounded-xl border border-slate-200"
  )}
  onMouseMove={resetControlsTimeout}
  onMouseLeave={() => isPlaying && setShowControls(false)}
@@ -433,10 +429,10 @@ export function CustomVideoPlayer({
  {isPlaying ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current" />}
  </button>
 
- <button onClick={() => skipTime(-10)} className="hover:text-[#E2E8F0] transition-colors focus:outline-none hidden sm:block" title="Tua lại 10s">
+ <button onClick={() => skipTime(-10)} className="hover:text-slate-200 transition-colors focus:outline-none hidden sm:block" title="Tua lại 10s">
  <Rewind10Icon />
  </button>
- <button onClick={() => skipTime(10)} className="hover:text-[#E2E8F0] transition-colors focus:outline-none hidden sm:block" title="Tua đi 10s">
+ <button onClick={() => skipTime(10)} className="hover:text-slate-200 transition-colors focus:outline-none hidden sm:block" title="Tua đi 10s">
  <Forward10Icon />
  </button>
 
@@ -485,7 +481,7 @@ export function CustomVideoPlayer({
  onClick={() => changePlaybackRate(rate)}
  className={twMerge(
  "px-4 py-2 text-sm text-left hover:bg-white/10 transition-colors",
- playbackRate === rate ? "text-[#F1F5F9] font-bold" : "text-white/80 font-medium"
+ playbackRate === rate ? "text-slate-100 font-bold" : "text-white/80 font-medium"
  )}
  >
  {rate === 1 ? "Chuẩn" : `${rate}x`}

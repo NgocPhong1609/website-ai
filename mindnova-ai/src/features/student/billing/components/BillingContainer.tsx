@@ -17,15 +17,15 @@ export default function BillingContainer() {
  <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-8">
  
  {/* ─── Synchronized Universal Hero Banner matching /courses & /study-plan ─── */}
- <section className="relative overflow-hidden rounded-xl bg-white border border-[#e2e8f0] p-6 sm:p-7 transition-all duration-300 w-full">
+ <section className="relative overflow-hidden rounded-xl bg-white border border-slate-200 p-6 sm:p-7 transition-all duration-300 w-full">
  <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 w-full">
  <div className="space-y-4 max-w-xl">
- <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-[#e2e8f0] text-xs font-semibold text-[#2563eb] shadow-sm">
+ <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200 text-xs font-semibold text-blue-600 shadow-sm">
  Học phí &amp; Thanh toán
  </div>
 
  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 leading-tight">
- Quản Lý &amp; <span className="text-[#2563eb] font-bold drop-shadow-2xs">Thanh Toán Trực Tuyến </span>
+ Quản Lý &amp; <span className="text-blue-600 font-bold drop-shadow-2xs">Thanh Toán Trực Tuyến </span>
  </h1>
 
  <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">
@@ -36,10 +36,10 @@ export default function BillingContainer() {
  </div>
 
  {/* Universal Wide Mastery Card representing Active Subscription (No automatic renewal / gia hạn messaging) */}
- <div className="group shrink-0 bg-white/95 backdrop-blur-md rounded-xl p-5 sm:p-6 border border-[#e2e8f0] flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm hover:border-[#e2e8f0] hover:-translate-y-0.5 transition-all duration-300">
+ <div className="group shrink-0 bg-white/95 backdrop-blur-md rounded-xl p-5 sm:p-6 border border-slate-200 flex flex-col justify-center min-w-[320px] sm:min-w-[380px] shadow-sm hover:border-slate-200 hover:-translate-y-0.5 transition-all duration-300">
  <div className="text-2xl sm:text-3xl font-bold text-slate-900 my-1 flex items-baseline justify-between gap-4">
  <div>
- <span className="text-[#2563eb] font-bold">{isLoading ? "..." : amountLabel}</span>
+ <span className="text-blue-600 font-bold">{isLoading ? "..." : amountLabel}</span>
  <span className="text-xs font-medium text-slate-500 ml-1.5">đã thanh toán</span>
  </div>
  <span className="text-xs font-semibold text-slate-500">
@@ -47,9 +47,9 @@ export default function BillingContainer() {
  </span>
  </div>
 
- <p className="text-xs font-medium text-slate-500 mt-3.5 flex items-center justify-between gap-4 pt-3 border-t border-[#e2e8f0]">
+ <p className="text-xs font-medium text-slate-500 mt-3.5 flex items-center justify-between gap-4 pt-3 border-t border-slate-200">
  <span className="truncate">{latestPaid?.service ? `Gần nhất: ${latestPaid.service}` : "Bạn chưa mua khóa học nào."}</span>
- <Link href="/courses" className="text-[#2563eb] font-semibold hover:underline shrink-0">Khóa học của tôi</Link>
+ <Link href="/courses" className="text-blue-600 font-semibold hover:underline shrink-0">Khóa học của tôi</Link>
  </p>
  </div>
  </div>

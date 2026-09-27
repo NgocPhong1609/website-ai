@@ -114,30 +114,30 @@ function CourseReviewSection({ courseId, isEnrolled }: { courseId: string | numb
  };
 
  return (
- <section className="mt-8 w-full rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+ <section className="mt-8 w-full rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
  <div>
- <p className="text-xs font-bold uppercase tracking-widest text-[#94A3B8]">Bình luận & nhận xét</p>
- <h3 className="mt-2 text-2xl font-semibold text-[#0F172A]">Đánh giá khóa học</h3>
+ <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Bình luận & nhận xét</p>
+ <h3 className="mt-2 text-2xl font-semibold text-slate-900">Đánh giá khóa học</h3>
  </div>
- <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-2 text-sm font-semibold text-[#0F172A]">
+ <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-900">
  Đánh giá: {averageRating.toFixed(1)} / 5
  </div>
  </div>
 
  {!isEnrolled ? (
- <div className="mt-6 flex items-center gap-3 rounded-xl border border-dashed border-[#E2E8F0] bg-[#F8FAFC] p-4 text-sm text-[#64748B]">
- <Lock size={16} className="shrink-0 text-[#94A3B8]" aria-hidden />
+ <div className="mt-6 flex items-center gap-3 rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+ <Lock size={16} className="shrink-0 text-slate-400" aria-hidden />
  <span>Đăng ký khóa học để gửi nhận xét và đánh giá của bạn.</span>
  </div>
  ) : !canWriteReview ? (
- <div className="mt-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-sm text-[#64748B]">
+ <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
  Bạn đã đánh giá khóa học này. Bạn có thể sửa hoặc xóa nhận xét của mình ở danh sách bên dưới.
  </div>
  ) : (
- <form onSubmit={onSubmit} className="mt-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+ <form onSubmit={onSubmit} className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
  <div className="flex items-center gap-1 mb-2">
- <span className="text-sm font-medium text-[#64748B] mr-2">Mức độ hài lòng:</span>
+ <span className="text-sm font-medium text-slate-500 mr-2">Mức độ hài lòng:</span>
  {[1, 2, 3, 4, 5].map((star) => (
  <button
  key={star}
@@ -148,7 +148,7 @@ function CourseReviewSection({ courseId, isEnrolled }: { courseId: string | numb
  >
  <Star 
  size={24} 
- className={star <= rating ? "text-[#F59E0B] fill-[#F59E0B]" : "text-[#E2E8F0]"} 
+ className={star <= rating ? "text-amber-500 fill-amber-500" : "text-slate-200"} 
  />
  </button>
  ))}
@@ -159,15 +159,15 @@ function CourseReviewSection({ courseId, isEnrolled }: { courseId: string | numb
  onChange={(e) => setComment(e.target.value)}
  rows={4}
  placeholder="Viết nhận xét của bạn về khóa học..."
- className="mt-4 w-full resize-none rounded-xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm text-[#0F172A] placeholder:text-[#94A3B8] outline-none transition focus:border-[#94A3B8]"
+ className="mt-4 w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-slate-400"
  />
 
  <div className="mt-4 flex items-center justify-between gap-3">
- <p className="text-xs text-[#64748B]">{reviews.length} nhận xét đã được gửi</p>
+ <p className="text-xs text-slate-500">{reviews.length} nhận xét đã được gửi</p>
  <button
  type="submit"
  disabled={createReviewMutation.isPending || !comment.trim()}
- className="rounded-lg bg-[#3B82F6] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#2563EB] disabled:opacity-50"
+ className="rounded-lg bg-blue-500 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-blue-600 disabled:opacity-50"
  >
  {createReviewMutation.isPending ? "Đang gửi..." : "Gửi nhận xét"}
  </button>
@@ -191,19 +191,19 @@ function CourseReviewSection({ courseId, isEnrolled }: { courseId: string | numb
  />
  ) : (
  reviews.map((review) => (
- <div key={review.id} className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+ <div key={review.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
  <div className="flex items-start justify-between gap-3">
  <div className="flex items-center gap-3">
- <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0F172A] text-sm font-bold text-white">
+ <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-sm font-bold text-white">
  {(review.user?.name ?? "H").charAt(0).toUpperCase()}
  </div>
  <div>
- <p className="font-bold text-[#0F172A]">{review.user?.name ?? "Học viên"}</p>
- <p className="text-xs text-[#64748B]">{new Date(review.created_at ?? Date.now()).toLocaleDateString("vi-VN")}</p>
+ <p className="font-bold text-slate-900">{review.user?.name ?? "Học viên"}</p>
+ <p className="text-xs text-slate-500">{new Date(review.created_at ?? Date.now()).toLocaleDateString("vi-VN")}</p>
  </div>
  </div>
  <div className="flex items-center gap-2">
- <div className="rounded-md border border-[#E2E8F0] bg-white px-2 py-1 text-xs font-bold text-[#0F172A]">
+ <div className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-bold text-slate-900">
  Đánh giá: {review.rating}/5
  </div>
  </div>
@@ -219,8 +219,8 @@ function CourseReviewSection({ courseId, isEnrolled }: { courseId: string | numb
  onClick={() => setEditRating(star)}
  className={`w-7 h-7 rounded text-xs font-bold border transition-colors ${
  star <= editRating 
- ? "bg-[#0F172A] text-white border-[#0F172A]" 
- : "bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#94A3B8]"
+ ? "bg-slate-900 text-white border-slate-900" 
+ : "bg-white text-slate-500 border-slate-200 hover:border-slate-400"
  }`}
  aria-label={`Chọn ${star} sao`}
  >
@@ -232,20 +232,20 @@ function CourseReviewSection({ courseId, isEnrolled }: { courseId: string | numb
  value={editComment}
  onChange={(e) => setEditComment(e.target.value)}
  rows={3}
- className="w-full resize-none rounded-xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm text-[#0F172A] outline-none focus:border-[#94A3B8]"
+ className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-slate-400"
  />
  <div className="flex justify-end gap-2">
  <button
  type="button"
  onClick={() => setEditingReviewId(null)}
- className="rounded-lg border border-[#E2E8F0] bg-white px-4 py-2 text-xs font-bold text-[#64748B] hover:bg-[#F1F5F9]"
+ className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100"
  >
  Hủy
  </button>
  <button
  type="submit"
  disabled={updateReviewMutation.isPending}
- className="rounded-lg bg-[#0F172A] px-4 py-2 text-xs font-bold text-white hover:bg-[#1C1D23] disabled:opacity-50"
+ className="rounded-lg bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-[#1C1D23] disabled:opacity-50"
  >
  {updateReviewMutation.isPending ? "Đang lưu..." : "Lưu"}
  </button>
@@ -253,12 +253,12 @@ function CourseReviewSection({ courseId, isEnrolled }: { courseId: string | numb
  </form>
  ) : (
  <>
- <p className="mt-3 text-sm leading-relaxed text-[#64748B]">{review.comment}</p>
+ <p className="mt-3 text-sm leading-relaxed text-slate-500">{review.comment}</p>
  {isMine(review) && (
- <div className="mt-3 flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
+ <div className="mt-3 flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
  <button
  onClick={() => handleEdit(review)}
- className="text-xs font-bold text-[#64748B] hover:text-[#0F172A] transition-colors"
+ className="text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors"
  >
  Sửa
  </button>
@@ -288,13 +288,13 @@ export function CourseDetailWorkspace({ courseId }: { courseId: string | number 
  return (
  <div role="status" aria-busy="true" aria-label="Đang tải khóa học" className="p-6 md:p-8 max-w-[1400px] mx-auto flex flex-col lg:flex-row items-start gap-8">
  <div className="flex-1 w-full space-y-6">
- <div className="rounded-xl border border-[#E2E8F0] bg-white p-6 space-y-4">
+ <div className="rounded-xl border border-slate-200 bg-white p-6 space-y-4">
  <Skeleton className="h-4 w-48" />
  <Skeleton className="h-9 w-2/3" />
  <Skeleton className="h-4 w-1/2" />
  <Skeleton className="h-10 w-40" />
  </div>
- <div className="rounded-xl border border-[#E2E8F0] bg-white p-6 space-y-3">
+ <div className="rounded-xl border border-slate-200 bg-white p-6 space-y-3">
  <Skeleton className="h-6 w-64" />
  {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
  </div>
@@ -313,14 +313,14 @@ export function CourseDetailWorkspace({ courseId }: { courseId: string | number 
  <div className="px-4 py-1.5 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold tracking-widest uppercase mb-1">
  Lỗi
  </div>
- <h3 className="text-lg font-semibold text-[#0F172A]">Không thể tải thông tin khóa học</h3>
- <p className="text-xs text-[#64748B] max-w-md leading-relaxed">
+ <h3 className="text-lg font-semibold text-slate-900">Không thể tải thông tin khóa học</h3>
+ <p className="text-xs text-slate-500 max-w-md leading-relaxed">
  Đã xảy ra sự cố khi kết nối tới máy chủ khóa học MindNova AI. Vui lòng kiểm tra kết nối mạng và thử tải lại sau ít phút.
  </p>
  <button 
  type="button"
  onClick={() => refetch()} 
- className="mt-4 px-6 py-2.5 bg-[#3B82F6] text-white text-xs font-bold rounded-lg hover:bg-[#2563EB] transition-colors cursor-pointer"
+ className="mt-4 px-6 py-2.5 bg-blue-500 text-white text-xs font-bold rounded-lg hover:bg-blue-600 transition-colors cursor-pointer"
  >
  Thử tải lại ngay
  </button>
@@ -331,7 +331,7 @@ export function CourseDetailWorkspace({ courseId }: { courseId: string | number 
  const { header_info, progress_card, ai_insight, instructor, modules, resources } = data;
 
  return (
- <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col lg:flex-row items-start gap-8 bg-[#F8FAFC]">
+ <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col lg:flex-row items-start gap-8 bg-slate-50">
  {/* Main Content (Left) */}
  <div className="flex-1 w-full min-w-0">
  <CourseHeader info={header_info} />

@@ -149,20 +149,20 @@ export function FormField({ id, label, leftIcon, rightElement, labelRight, error
  return (
  <div className="space-y-1.5">
  <div className="flex items-center justify-between">
- <label htmlFor={id} className={`text-sm font-semibold ${error ? "text-rose-600" : "text-[#0F172A]"}`}>
+ <label htmlFor={id} className={`text-sm font-semibold ${error ? "text-rose-600" : "text-slate-900"}`}>
  {label}
  </label>
  {labelRight}
  </div>
  <div className="relative group">
  {leftIcon && (
- <div className={`pointer-events-none absolute inset-y-0 left-4 flex items-center transition-colors duration-200 ${error ? "text-rose-400 group-focus-within:text-rose-600" : "text-[#94A3B8] group-focus-within:text-[#3B82F6]"}`}>
+ <div className={`pointer-events-none absolute inset-y-0 left-4 flex items-center transition-colors duration-200 ${error ? "text-rose-400 group-focus-within:text-rose-600" : "text-slate-400 group-focus-within:text-blue-500"}`}>
  {leftIcon}
  </div>
  )}
  <input
  id={id}
- className={`w-full ${leftIcon ? "pl-11" : "pl-4"} ${rightElement ? "pr-11" : "pr-4"} py-3.5 rounded-xl text-sm text-[#0F172A] placeholder-[#C0C0D8] bg-[#F8F8FC] border transition-all duration-200 focus:outline-none focus:bg-white ${error ? "border-rose-300 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 hover:border-rose-400" : "border-[#E4E4EF] focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 hover:border-[#C8C8E0]"}`}
+ className={`w-full ${leftIcon ? "pl-11" : "pl-4"} ${rightElement ? "pr-11" : "pr-4"} py-3.5 rounded-xl text-sm text-slate-900 placeholder-[#C0C0D8] bg-slate-50 border transition-all duration-200 focus:outline-none focus:bg-white ${error ? "border-rose-300 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 hover:border-rose-400" : "border-[#E4E4EF] focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 hover:border-[#C8C8E0]"}`}
  aria-invalid={error ? true : undefined}
  aria-describedby={error ? `${id}-error` : undefined}
  {...inputProps}

@@ -157,7 +157,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  {/* Content â€” cÄƒn giá»¯a dá»c */}
  <div className="flex flex-col justify-center w-full max-w-[480px] mx-auto py-6 my-auto">
  <div className="mb-5">
- <h1 className="text-[26px] font-bold text-[#0F172A] leading-tight tracking-tight">
+ <h1 className="text-[26px] font-bold text-slate-900 leading-tight tracking-tight">
  Tạo tài khoản
  </h1>
  </div>
@@ -167,8 +167,8 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  role={statusMessage.includes("thành công") ? "status" : "alert"}
  className={`mb-3 p-3 rounded-xl text-xs font-medium border ${
   statusMessage.includes("thành công")
-  ? "bg-[#E8F8F0] text-[#27AE60] border-[#27AE60]/20"
-  : "bg-[#EFF6FF] text-[#3B82F6] border-[#3B82F6]/30"
+  ? "bg-emerald-50 text-emerald-600 border-emerald-600/20"
+  : "bg-blue-50 text-blue-500 border-blue-500/30"
  }`}
  >
  {statusMessage}
@@ -177,14 +177,14 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
 
  <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
   {/* Role Selection */}
-  <div className="flex p-1 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+  <div className="flex p-1 bg-slate-50 rounded-xl border border-slate-200">
   <button
   type="button"
   onClick={() => handleRoleChange("student")}
   className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all duration-200 ${
   values.role === "student"
-  ? "bg-white text-[#3B82F6] shadow-sm"
-  : "text-[#64748B] hover:text-[#2563EB]"
+  ? "bg-white text-blue-500 shadow-sm"
+  : "text-slate-500 hover:text-blue-600"
   }`}
   >
   Học viên
@@ -194,8 +194,8 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
   onClick={() => handleRoleChange("teacher")}
   className={`flex-1 py-1.5 text-[13px] font-semibold rounded-lg transition-all duration-200 ${
   values.role === "teacher"
-  ? "bg-white text-[#3B82F6] shadow-sm"
-  : "text-[#64748B] hover:text-[#2563EB]"
+  ? "bg-white text-blue-500 shadow-sm"
+  : "text-slate-500 hover:text-blue-600"
   }`}
   >
   Giảng viên
@@ -207,30 +207,30 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
   <div className="flex flex-col gap-3 animate-pulse w-full opacity-50">
   {/* Full Name Skeleton */}
   <div className="space-y-1.5">
-  <div className="h-[18px] bg-[#E2E8F0] rounded w-24"></div>
-  <div className="h-[52px] bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"></div>
+  <div className="h-[18px] bg-slate-200 rounded w-24"></div>
+  <div className="h-[52px] bg-slate-50 rounded-xl border border-slate-200"></div>
   </div>
   
   {/* Email Skeleton */}
   <div className="space-y-1.5">
-  <div className="h-[18px] bg-[#E2E8F0] rounded w-28"></div>
-  <div className="h-[52px] bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"></div>
+  <div className="h-[18px] bg-slate-200 rounded w-28"></div>
+  <div className="h-[52px] bg-slate-50 rounded-xl border border-slate-200"></div>
   </div>
   
   {/* Password Grid Skeleton */}
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
   <div className="space-y-1.5">
-  <div className="h-[18px] bg-[#E2E8F0] rounded w-20"></div>
-  <div className="h-[52px] bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"></div>
+  <div className="h-[18px] bg-slate-200 rounded w-20"></div>
+  <div className="h-[52px] bg-slate-50 rounded-xl border border-slate-200"></div>
   </div>
   <div className="space-y-1.5">
-  <div className="h-[18px] bg-[#E2E8F0] rounded w-32"></div>
-  <div className="h-[52px] bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]"></div>
+  <div className="h-[18px] bg-slate-200 rounded w-32"></div>
+  <div className="h-[52px] bg-slate-50 rounded-xl border border-slate-200"></div>
   </div>
   </div>
   
   {/* Submit Button Skeleton */}
-  <div className="mt-1 h-[48px] bg-[#E2E8F0] rounded-xl"></div>
+  <div className="mt-1 h-[48px] bg-slate-200 rounded-xl"></div>
   </div>
   </div>
   ) : (
@@ -272,7 +272,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  <button
  type="button"
  onClick={togglePassword}
- className="text-[#94A3B8] hover:text-[#2563EB] transition-colors focus:outline-none"
+ className="text-slate-400 hover:text-blue-600 transition-colors focus:outline-none"
  >
  {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
  </button>
@@ -292,7 +292,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  <button
  type="button"
  onClick={toggleConfirmPassword}
- className="text-[#94A3B8] hover:text-[#2563EB] transition-colors focus:outline-none"
+ className="text-slate-400 hover:text-blue-600 transition-colors focus:outline-none"
  >
  {showConfirmPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
  </button>
@@ -303,7 +303,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
  <button
  type="submit"
  disabled={isLoading || !canSubmit}
- className="mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-[#3B82F6]/30"
+ className="mt-6 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold text-white bg-blue-500 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-blue-500/30"
  >
  {isLoading ? "Đang tạo tài khoản..." : <>Đăng ký <ArrowRightIcon /></>}
  </button>
@@ -312,12 +312,12 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
 
  </form>
 
- <p className="mt-5 text-center text-[13px] text-[#64748B]">
+ <p className="mt-5 text-center text-[13px] text-slate-500">
  Đã có tài khoản?{" "}
  <button
  type="button"
  onClick={onFlipToLogin}
- className="font-semibold text-[#3B82F6] hover:text-[#2563EB] transition-colors hover:underline underline-offset-2 focus:outline-none"
+ className="font-semibold text-blue-500 hover:text-blue-600 transition-colors hover:underline underline-offset-2 focus:outline-none"
  >
  Đăng nhập
  </button>
@@ -326,7 +326,7 @@ export function RegisterForm({ onFlipToLogin }: RegisterFormProps) {
 
  {/* Footer â€” bÃ¡m sÃ¡t phÃ­a dÆ°á»›i */}
  <div className="mt-auto text-center">
- <p className="text-[11px] text-[#94A3B8] leading-relaxed">
+ <p className="text-[11px] text-slate-400 leading-relaxed">
  © 2026 MindNova AI. Nền tảng học tập cá nhân hóa cùng AI.
  </p>
  </div>
