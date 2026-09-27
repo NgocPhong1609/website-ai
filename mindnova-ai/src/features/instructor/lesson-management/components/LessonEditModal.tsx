@@ -1,6 +1,7 @@
 "use client";
 
 import { getErrorMessage } from "@/src/shared/lib/user-error";
+import toast from "react-hot-toast";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { RichTextEditor } from "@/src/features/instructor/shared/components/RichTextEditor";
@@ -79,16 +80,16 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
 
  const handleClose = useCallback(() => {
  if (isSaving) {
- alert("Hệ thống đang lưu dữ liệu. Vui lòng chờ trong giây lát.");
+ toast.error("Hệ thống đang lưu dữ liệu. Vui lòng chờ trong giây lát.");
  return;
  }
  if (isUploadingVideo || activeImageUploads > 0) {
- if (!confirm("Tiến trình tải lên đang diễn ra. Bạn có chắc chắn muốn dừng tải lên và đóng?")) {
+ if (!window.confirm("Tiến trình tải lên đang diễn ra. Bạn có chắc chắn muốn dừng tải lên và đóng?")) {
  return;
  }
  abortControllerRef.current?.abort();
  } else if (hasUnsavedChanges) {
- if (!confirm("Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn đóng?")) {
+ if (!window.confirm("Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn đóng?")) {
  return;
  }
  }
@@ -161,7 +162,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  // User cancelled upload
  } else {
  console.error(err);
- alert(getErrorMessage(err, "Không thể tải video lên. Vui lòng thử lại."));
+ toast.error(getErrorMessage(err, "Không thể tải video lên. Vui lòng thử lại."));
  }
  } finally {
  setIsUploadingVideo(false);
@@ -230,7 +231,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
       setTempMediaMap(new Map());
     } catch (e) {
       console.error("Lỗi khi lưu bài học:", e);
-      alert(getErrorMessage(e, "Không thể lưu bài học. Vui lòng thử lại."));
+      toast.error(getErrorMessage(e, "Không thể lưu bài học. Vui lòng thử lại."));
     } finally {
       setIsSaving(false);
     }
@@ -245,12 +246,12 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  <div className="relative w-full max-w-4xl bg-white rounded-lg shadow-2xl flex flex-col max-h-full overflow-hidden animate-fadeIn">
  
  {/* Header */}
- <div className="flex items-center justify-between px-6 py-4 border-b border-[#F0F0F8]">
+ <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
  <h2 className="text-[16px] font-bold text-slate-900">Chỉnh sửa bài học</h2>
  <button 
  type="button" 
  onClick={handleClose}
- className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-[#E2E8F0] transition-colors"
+ className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors"
  >
  
  </button>
@@ -265,7 +266,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  type="text"
  value={title}
  onChange={(e) => setTitle(e.target.value)}
- className="w-full px-4 py-2.5 rounded-lg text-sm border border-slate-200 focus:border-slate-200 focus:ring-2 focus:ring-[#3B82F6]/20 outline-none transition-all"
+ className="w-full px-4 py-2.5 rounded-lg text-sm border border-slate-200 focus:border-slate-200 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
  />
  </div>
  <div className="flex flex-col gap-1.5">
@@ -273,7 +274,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  <select
  value={type}
  onChange={(e) => setType(e.target.value as any)}
- className="w-full px-4 py-2.5 rounded-lg text-sm border border-slate-200 focus:border-slate-200 focus:ring-2 focus:ring-[#3B82F6]/20 outline-none transition-all appearance-none bg-white"
+ className="w-full px-4 py-2.5 rounded-lg text-sm border border-slate-200 focus:border-slate-200 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all appearance-none bg-white"
  >
  <option value="video">Video bài giảng</option>
  <option value="article">Tài liệu đọc</option>
@@ -290,18 +291,18 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  type="radio" 
  checked={status === 'published'} 
  onChange={() => setStatus('published')}
- className="w-4 h-4 text-blue-500 focus:ring-[#3B82F6]"
+ className="w-4 h-4 text-blue-500 focus:ring-blue-500"
  />
- <span className="text-sm text-[#475569]">Đã xuất bản</span>
+ <span className="text-sm text-slate-600">Đã xuất bản</span>
  </label>
  <label className="flex items-center gap-2 cursor-pointer">
  <input 
  type="radio" 
  checked={status === 'draft'} 
  onChange={() => setStatus('draft')}
- className="w-4 h-4 text-blue-500 focus:ring-[#3B82F6]"
+ className="w-4 h-4 text-blue-500 focus:ring-blue-500"
  />
- <span className="text-sm text-[#475569]">Bản nháp</span>
+ <span className="text-sm text-slate-600">Bản nháp</span>
  </label>
  </div>
  </div>
@@ -315,7 +316,7 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  courseId={courseId ? Number(courseId) : undefined}
  />
  ) : type === 'video' ? (
- <div className="flex flex-col gap-3 mb-6 p-4 border border-slate-200 rounded-lg bg-[#F8F8FC]">
+ <div className="flex flex-col gap-3 mb-6 p-4 border border-slate-200 rounded-lg bg-slate-50">
  <div className="flex items-center justify-between">
  <label className="text-sm font-semibold text-slate-900">Video bài học</label>
  <div className="flex gap-2">
@@ -342,12 +343,12 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  value={videoUrl}
  onChange={(e) => setVideoUrl(e.target.value)}
  placeholder="Nhập đường dẫn video (YouTube, Vimeo, v.v.)..."
- className="w-full px-4 py-2.5 rounded-lg text-sm border border-slate-200 focus:border-slate-200 focus:ring-2 focus:ring-[#3B82F6]/20 outline-none"
+ className="w-full px-4 py-2.5 rounded-lg text-sm border border-slate-200 focus:border-slate-200 focus:ring-2 focus:ring-blue-500/20 outline-none"
  />
  ) : (
  <div className="flex flex-col gap-2">
  <div className="flex items-center gap-3">
- <label className="cursor-pointer px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-[#64647A] hover:bg-[#475569] transition-colors">
+ <label className="cursor-pointer px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-slate-500 hover:bg-slate-600 transition-colors">
  Chọn file video
  <input type="file" accept="video/*" className="hidden" onChange={handleVideoFileUpload} disabled={isUploadingVideo} />
  </label>
@@ -356,12 +357,12 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  </span>
  </div>
  {isUploadingVideo && (
- <div className="w-full h-2 bg-[#EAEAF4] rounded-full overflow-hidden">
+ <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
  <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${videoUploadProgress}%` }} />
  </div>
  )}
  {videoUrl && !isUploadingVideo && videoUrl.includes('r2.dev') && (
- <div className="text-xs text-slate-900 font-medium bg-[#ECFDF5] px-3 py-1.5 rounded-lg inline-flex max-w-fit">
+ <div className="text-xs text-slate-900 font-medium bg-emerald-50 px-3 py-1.5 rounded-lg inline-flex max-w-fit">
  Video đã được tải lên Cloudflare R2
  </div>
  )}
@@ -405,12 +406,12 @@ export function LessonEditModal({ lesson, onSave, onClose, courseId }: LessonEdi
  </div>
 
  {/* Footer */}
- <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#F0F0F8] bg-[#F8F8FC]">
+ <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-100 bg-slate-50">
  <button
  type="button"
  onClick={handleClose}
  disabled={isSaving}
- className="px-5 py-2.5 rounded-lg text-sm font-medium text-slate-500 bg-white border border-slate-200 hover:bg-[#E2E8F0] transition-colors disabled:opacity-50"
+ className="px-5 py-2.5 rounded-lg text-sm font-medium text-slate-500 bg-white border border-slate-200 hover:bg-slate-200 transition-colors disabled:opacity-50"
  >
  Hủy bỏ
  </button>

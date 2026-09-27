@@ -380,7 +380,7 @@ export function RichTextEditor({
  setShowMenu(false);
  fileInputRef.current?.click();
  }}
- className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-900 hover:bg-[#E2E8F0] hover:text-[#2563EB] rounded-lg transition-colors w-full text-left disabled:opacity-50"
+ className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-200 hover:text-blue-600 rounded-lg transition-colors w-full text-left disabled:opacity-50"
  >
  <></>
  Tải video từ máy
@@ -391,7 +391,7 @@ export function RichTextEditor({
  setShowMenu(false);
  setShowLinkDialog(true);
  }}
- className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-900 hover:bg-[#E2E8F0] hover:text-[#2563EB] rounded-lg transition-colors w-full text-left"
+ className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-200 hover:text-blue-600 rounded-lg transition-colors w-full text-left"
  >
  <></>
  Gắn liên kết video
@@ -405,7 +405,7 @@ export function RichTextEditor({
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
  <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setShowLinkDialog(false)} />
  <div className="relative w-full max-w-md bg-white rounded-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
- <div className="px-6 py-5 border-b border-[#F0F0F8]">
+ <div className="px-6 py-5 border-b border-slate-100">
  <h2 className="text-lg font-bold text-slate-900">Gắn liên kết Video</h2>
  </div>
  <form onSubmit={handleLinkSubmit}>
@@ -417,15 +417,15 @@ export function RichTextEditor({
  placeholder="https://..."
  value={linkInput}
  onChange={(e) => setLinkInput(e.target.value)}
- className="w-full px-4 py-2.5 rounded-lg text-sm border border-slate-200 focus:border-slate-200 focus:ring-2 focus:ring-[#3B82F6]/20 outline-none transition-all"
+ className="w-full px-4 py-2.5 rounded-lg text-sm border border-slate-200 focus:border-slate-200 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
  required
  />
  </div>
- <div className="px-6 py-4 bg-[#FAFAFE] border-t border-[#F0F0F8] flex justify-end gap-3">
+ <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
  <button
  type="button"
  onClick={() => setShowLinkDialog(false)}
- className="px-5 py-2.5 rounded-lg text-sm font-semibold text-slate-500 hover:bg-[#EAEAF4] transition-colors"
+ className="px-5 py-2.5 rounded-lg text-sm font-semibold text-slate-500 hover:bg-slate-200 transition-colors"
  >
  Hủy
  </button>
@@ -454,7 +454,7 @@ export function RichTextEditor({
  <Loader size="lg" className="mb-4" />
  <div className="text-slate-900 font-medium mb-1">Đang tải video lên...</div>
  <div className="text-slate-500 text-sm">{Math.round(uploadProgress)}%</div>
- <div className="w-48 h-1.5 bg-[#E2E8F0] rounded-full mt-3 overflow-hidden">
+ <div className="w-48 h-1.5 bg-slate-200 rounded-full mt-3 overflow-hidden">
  <div
  className="h-full bg-blue-500 transition-all duration-300"
  style={{ width: `${uploadProgress}%` }}

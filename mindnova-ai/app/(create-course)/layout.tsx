@@ -12,7 +12,7 @@ export default function CreateCourseLayout({
  children,
 }: Readonly<{ children: React.ReactNode }>) {
  return (
- <div className="min-h-screen bg-[#F8F8FD] flex flex-col">
+ <div className="min-h-screen bg-[#F7F7FB] flex flex-col">
  <CreateCourseTopbar />
  <main className="flex-1 pb-24">{children}</main>
  <FloatingAiChat />

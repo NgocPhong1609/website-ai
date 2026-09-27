@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { QuizConfig } from "../types/quizGenerator.types";
 import { quizGeneratorApi } from "../api/quizGeneratorApi";
+import { AlertTriangle, ArrowRight, BookOpen, GraduationCap, RefreshCw, Search, Target } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 interface Step1SourceInputProps {
   config: QuizConfig;
@@ -122,7 +124,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
   }
 
   return (
-    <div className="p-8 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
@@ -141,31 +143,39 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
         <div className="flex flex-col gap-5">
           {/* Search Box */}
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
+            <Search className="h-4 w-4 shrink-0" aria-hidden />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Tìm kiếm khóa học của bạn..."
-              className="w-full pl-11 pr-4 py-3.5 rounded-lg border-2 border-gray-200 bg-[#FAF8FF] text-xs font-bold text-slate-900 focus:outline-none focus:border-[#3B82F6] focus:bg-white transition-all shadow-xs"
+              className="w-full pl-11 pr-4 py-3.5 rounded-lg border-2 border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all shadow-xs"
             />
           </div>
 
           {/* Course Selection List */}
           {isLoadingCourses ? (
-            <div className="p-8 bg-[#FAF8FF] rounded-lg border border-gray-100 text-center text-xs font-bold text-slate-500 animate-pulse">
-              Đang tải danh sách khóa học của bạn...
+            <div role="status" aria-busy="true" aria-label="Đang tải danh sách khóa học" className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="p-4 rounded-xl border border-slate-200 bg-white flex items-center gap-3">
+                  <Skeleton className="h-12 w-12 rounded-lg shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : courses.length === 0 ? (
             <div className="p-8 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-center flex flex-col gap-2">
-              <span className="text-2xl">⚠️</span>
+              <AlertTriangle className="h-6 w-6 shrink-0" aria-hidden />
               <span className="font-semibold text-sm">Bạn chưa có khóa học nào trong tài khoản.</span>
               <span className="text-xs font-medium text-amber-800">
                 Hãy tạo khóa học trước trong bảng điều khiển để tiếp tục tạo bài thi AI.
               </span>
             </div>
           ) : filteredCourses.length === 0 ? (
-            <div className="p-6 rounded-lg bg-gray-50 border border-gray-200 text-center text-xs font-bold text-gray-500">
+            <div className="p-6 rounded-lg bg-slate-50 border border-slate-200 text-center text-xs font-bold text-slate-500">
               Không tìm thấy khóa học nào phù hợp với từ khóa "{searchTerm}".
             </div>
           ) : (
@@ -173,11 +183,11 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
               {filteredCourses.map((course) => (
                 <div
                   key={course.id}
-                  className="p-5 rounded-lg border-2 border-slate-200 hover:border-[#2563EB]/50 bg-white transition-all duration-200 flex flex-col justify-between gap-4 shadow-sm hover:shadow-md group"
+                  className="p-5 rounded-xl border-2 border-slate-200 hover:border-blue-600/50 bg-white transition-all duration-200 flex flex-col justify-between gap-4 shadow-sm hover:shadow-md group"
                 >
                   <div className="flex items-start gap-3.5">
                     <div className="w-11 h-11 rounded-lg bg-blue-50 text-blue-500 border border-blue-100 flex items-center justify-center text-xl shrink-0 font-bold group-hover:scale-105 transition-transform">
-                      📚
+                      <BookOpen className="h-5 w-5" aria-hidden />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -201,7 +211,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
                     onClick={() => handleSelectCourse(course)}
                     className="w-full py-2.5 px-4 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
                   >
-                    <span>🎯 Chọn khóa học này</span>
+                    <span><Target className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Chọn khóa học này</span>
                   </button>
                 </div>
               ))}
@@ -215,7 +225,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
           <div className="p-5 rounded-lg bg-emerald-50/60 border-2 border-emerald-300 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
             <div className="flex items-center gap-3.5">
               <div className="w-12 h-12 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-2xl font-bold shadow-md shrink-0">
-                🎓
+                <GraduationCap className="h-5 w-5" aria-hidden />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -234,7 +244,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
               onClick={handleResetCourseSelection}
               className="px-4 py-2 bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 shrink-0 shadow-sm"
             >
-              <span>🔄 Thay đổi khóa học</span>
+              <span><RefreshCw className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Thay đổi khóa học</span>
             </button>
           </div>
 
@@ -252,7 +262,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
                   title: `Đề kiểm tra: ${module?.title || config.course_title || selectedCourseDetails?.title}`,
                 });
               }}
-              className="w-full rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-900 focus:border-[#3B82F6]"
+              className="w-full rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-900 focus:border-blue-500"
             >
               <option value="">Toàn khóa học</option>
               {modulesList.map((module: any) => <option key={module.id} value={module.id}>{module.title}</option>)}
@@ -265,7 +275,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
           </div>
 
           {/* Selected Course Modules & Lessons Preview Card */}
-          <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col gap-3">
+          <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-xs font-bold text-slate-900">
@@ -280,18 +290,18 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
                 <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-500 border border-blue-100">
                   {sourceModules.length} Modules
                 </span>
-                <span className="px-2.5 py-1 rounded-lg bg-purple-50 text-purple-800 border border-purple-100">
+                <span className="px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 border border-sky-100">
                   {lessonsList.length} Lessons
                 </span>
               </div>
             </div>
 
             {isLoadingDetails ? (
-              <div className="text-[11px] font-bold text-gray-400 animate-pulse pt-2">
-                Đang nạp danh sách các bài học thuộc khóa học...
+              <div role="status" aria-busy="true" aria-label="Đang nạp danh sách bài học" className="flex flex-col gap-1.5 pt-2 border-t border-slate-100">
+                {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-7 w-full" />)}
               </div>
             ) : lessonsList.length > 0 ? (
-              <div className="flex flex-col gap-1.5 pt-2 border-t border-gray-100">
+              <div className="flex flex-col gap-1.5 pt-2 border-t border-slate-100">
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Các bài học được trích xuất:
                 </span>
@@ -299,7 +309,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
                   {lessonsList.map((les, idx) => (
                     <span
                       key={les.id || idx}
-                      className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-gray-700 text-[11px] font-bold truncate max-w-xs"
+                      className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 text-[11px] font-bold truncate max-w-xs"
                       title={les.title}
                     >
                       Bài {idx + 1}: {les.title}
@@ -308,7 +318,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
                 </div>
               </div>
             ) : (
-              <div className="text-[11px] font-bold text-gray-400 pt-2 border-t border-gray-100">
+              <div className="text-[11px] font-bold text-slate-400 pt-2 border-t border-slate-100">
                 {config.module_id ? "Chương này chưa có nội dung bài học dạng văn bản để tạo quiz. Hãy bổ sung nội dung hoặc chọn chương khác." : "Khóa học hiện chưa có bài học nào. AI sẽ sử dụng thông tin tổng quan của khóa học để thiết kế câu hỏi."}
               </div>
             )}
@@ -319,13 +329,13 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
       {/* Warning Alert if User Tries to Continue Without Selecting Course */}
       {showWarning && !config.course_id && (
         <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 font-bold text-xs flex items-center gap-2 animate-fadeIn shadow-sm">
-          <span className="text-base">⚠️</span>
+          <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
           <span>Vui lòng chọn một khóa học trước khi tiếp tục.</span>
         </div>
       )}
 
       {/* Footer Navigation */}
-      <div className="flex items-center justify-end border-t border-gray-100 pt-4 mt-2">
+      <div className="flex items-center justify-end border-t border-slate-100 pt-4 mt-2">
         <button
           type="button"
           onClick={() => {
@@ -338,7 +348,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
           disabled={!config.course_id || isLoadingDetails || !selectedCourseDetails || Boolean(config.module_id && lessonsList.length === 0)}
           className="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-lg shadow-lg hover:scale-[1.02] transition-all disabled:opacity-40 disabled:hover:scale-100 cursor-pointer disabled:cursor-not-allowed"
         >
-          Tiếp theo: Cấu hình Quiz ➡️
+          Tiếp theo: Cấu hình Quiz<ArrowRight className="inline h-4 w-4 ml-1 align-text-bottom" aria-hidden />
         </button>
       </div>
     </div>

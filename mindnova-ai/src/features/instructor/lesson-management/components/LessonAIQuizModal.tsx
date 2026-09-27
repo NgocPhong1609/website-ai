@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Loader } from "@/src/shared/components/ui/Loader";
 import { useAIQuizGenerator, type GeneratedQuestion } from "@/src/hooks/instructor/useAIQuizGenerator";
+import { Wand2, Trash2, Check, CheckCircle2, Loader2, Pencil, Save, Sparkles, Lightbulb } from "lucide-react";
 
 export interface LessonAIQuizModalProps {
  lessonTitle?: string;
@@ -54,10 +55,10 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  <div className="bg-white rounded-lg border border-slate-200 shadow-[0_30px_90px_rgba(0,0,0,0.3)] max-w-4xl w-full overflow-hidden flex flex-col max-h-[90vh]">
  
  {/* Top Header */}
- <div className="p-6 bg-gradient-to-r from-[#1E233E] via-[#1D4ED8] to-[#121626] text-white flex items-center justify-between">
+ <div className="p-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white flex items-center justify-between">
  <div className="flex items-center gap-3">
- <div className="w-11 h-11 rounded-lg bg-blue-500 to-[#F368E0] flex items-center justify-center text-2xl font-bold shadow-md">
- 🪄
+ <div className="w-11 h-11 rounded-lg bg-white/15 flex items-center justify-center shadow-md">
+ <Wand2 className="h-5 w-5" aria-hidden />
  </div>
  <div>
  <div className="flex items-center gap-2">
@@ -66,20 +67,20 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  Rapid Review UI
  </span>
  </div>
- <p className="text-xs text-gray-300 font-semibold mt-0.5">
- Target Lesson: <strong className="text-[#F8FAFC]">{lessonTitle}</strong>
+ <p className="text-xs text-slate-300 font-semibold mt-0.5">
+ Target Lesson: <strong className="text-slate-50">{lessonTitle}</strong>
  </p>
  </div>
  </div>
 
  <div className="flex items-center gap-4">
- <span className="px-3 py-1.5 rounded-lg bg-[#0F172A]/20 text-[#F8FAFC] border-[#0F172A]/30 text-xs font-bold">
+ <span className="px-3 py-1.5 rounded-lg bg-slate-900/20 text-slate-50 border-slate-900/30 text-xs font-bold">
  Approved: {approvedCount}
  </span>
  <button
  type="button"
  onClick={onClose}
- className="text-gray-400 hover:text-white font-semibold text-xl transition-colors p-1"
+ className="text-slate-400 hover:text-white font-semibold text-xl transition-colors p-1"
  >
  
  </button>
@@ -87,11 +88,11 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  </div>
 
  {/* Modal Content */}
- <div className="p-6 overflow-y-auto flex-1 flex flex-col gap-6 bg-[#FAF8FF]">
+ <div className="p-6 overflow-y-auto flex-1 flex flex-col gap-6 bg-slate-50">
  
  {/* Transcript Source Box */}
  {questions.length === 0 && (
- <div className="p-6 rounded-lg bg-white border border-slate-200 shadow-xs flex flex-col gap-4">
+ <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-col gap-4">
  <div className="flex flex-col gap-4 animate-fadeIn">
  <div className="flex items-center gap-3">
  
@@ -101,7 +102,7 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  The AI analyzes semantic vocabulary, code blocks, and architectural concepts in your text to generate highly accurate assessment rubrics.
  </p>
  {error && (
- <div className="p-3 bg-[#EFF6FF] border border-[#DBEAFE] text-[#2563EB] rounded-lg text-xs font-bold">
+ <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs font-bold">
  {error}
  </div>
  )}
@@ -109,7 +110,7 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  value={transcriptSource}
  onChange={(e) => setTranscriptSource(e.target.value)}
  rows={5}
- className="w-full p-4 rounded-lg border-slate-200 bg-[#F8F9FF] text-xs font-medium text-gray-700 leading-relaxed focus:outline-none focus:border-slate-200 transition-colors"
+ className="w-full p-4 rounded-lg border border-slate-200 bg-slate-50 text-xs font-medium text-slate-700 leading-relaxed focus:outline-none focus:border-slate-200 transition-colors"
  placeholder="Paste lesson transcript or markdown notes here..."
  />
  </div>
@@ -117,9 +118,9 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  type="button"
  onClick={() => generateFromTranscript(lessonTitle)}
  disabled={isGenerating || !transcriptSource.trim()}
- className="self-end px-8 py-3 bg-blue-500 text-white text-xs font-bold rounded-lg shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50"
+ className="self-end px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors disabled:opacity-50"
  >
- {isGenerating ? " Extracting Rubrics..." : " Generate Diagnostic Quiz Decks Now"}
+ {isGenerating ? <><Loader2 className="inline h-3.5 w-3.5 mr-1 align-text-bottom animate-spin" aria-hidden />Extracting Rubrics...</> : <><Sparkles className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Generate Diagnostic Quiz Decks Now</>}
  </button>
  </div>
  )}
@@ -147,7 +148,7 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  <button
  type="button"
  onClick={() => generateFromTranscript(lessonTitle)}
- className="text-xs font-bold text-[#5153DF] hover:underline"
+ className="text-xs font-bold text-blue-600 hover:underline"
  >
  Regenerate Decks
  </button>
@@ -174,7 +175,7 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  <span className="w-7 h-7 rounded-lg bg-blue-50 text-blue-500 font-bold text-xs flex items-center justify-center">
  #{idx + 1}
  </span>
- <span className="text-[11px] font-bold uppercase px-2.5 py-1 rounded-lg bg-gray-100 text-slate-500 border">
+ <span className="text-[11px] font-bold uppercase px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 border">
  {q.type.replace("_", " ")}
  </span>
  {isApproved && (
@@ -192,22 +193,22 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  disabled={isApproved}
  className={twMerge(
  "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
- isApproved ? "text-slate-900 text-white cursor-default" : "bg-emerald-50 hover:bg-[#0F172A] text-slate-900 hover:text-white border-slate-200"
+ isApproved ? "bg-emerald-600 text-white cursor-default" : "bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-200"
  )}
  >
- {isApproved ? "Approved " : " Approve"}
+ {isApproved ? <><CheckCircle2 className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Approved</> : <><Check className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Approve</>}
  </button>
  <button
  type="button"
  onClick={() => (isEditing ? commitEdit(q.id) : startEdit(q))}
- className="px-3.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-500 hover:text-white border-slate-200 text-xs font-semibold transition-all"
+ className="px-3.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-500 hover:text-white border border-slate-200 text-xs font-semibold transition-all"
  >
- {isEditing ? "Save Edit" : " Edit"}
+ {isEditing ? <><Save className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Save Edit</> : <><Pencil className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Edit</>}
  </button>
  <button
  type="button"
  onClick={() => discardQuestion(q.id)}
- className="px-3.5 py-1.5 rounded-lg bg-[#EFF6FF] hover:bg-blue-600 text-[#2563EB] hover:text-white border border-[#DBEAFE] text-xs font-semibold transition-all"
+ className="px-3.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white border border-blue-100 text-xs font-semibold transition-all"
  >
  Discard
  </button>
@@ -232,7 +233,7 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  type="text"
  value={draftA}
  onChange={(e) => setDraftA(e.target.value)}
- className="w-full p-3 rounded-lg border-[#0F172A] font-semibold text-sm text-slate-900 bg-emerald-50/50"
+ className="w-full p-3 rounded-lg border-slate-900 font-semibold text-sm text-slate-900 bg-emerald-50/50"
  />
  </div>
  </div>
@@ -243,13 +244,13 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  </h5>
 
  {q.codeSnippet && (
- <pre className="p-3.5 rounded-lg bg-[#1E233E] text-[#F8FAFC] font-mono text-xs overflow-x-auto border-[#3B82F6]/30">
+ <pre className="p-3.5 rounded-lg bg-slate-900 text-slate-50 font-mono text-xs overflow-x-auto border-blue-500/30">
  <code>{q.codeSnippet}</code>
  </pre>
  )}
 
  <div className="flex flex-col gap-2">
- <div className="flex items-center gap-3 p-3 rounded-lg bg-emerald-50 border-slate-200 font-bold text-sm text-slate-900">
+ <div className="flex items-center gap-3 p-3 rounded-lg bg-emerald-50 border border-slate-200 font-bold text-sm text-slate-900">
  
  <span>Correct Answer: {q.correctAnswer}</span>
  </div>
@@ -262,8 +263,8 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  ))}
  </div>
 
- <div className="mt-1 p-3 rounded-lg bg-[#F0F0FF] text-xs font-medium text-[#4A4B68]">
- <strong className="text-[#5153DF]"> AI Pedagogical Rationale:</strong> {q.explanation}
+ <div className="mt-1 p-3 rounded-lg bg-slate-50 text-xs font-medium text-slate-600">
+ <strong className="text-blue-600"><Lightbulb className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />AI Pedagogical Rationale:</strong> {q.explanation}
  </div>
  </div>
  )}
@@ -275,8 +276,8 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  )}
 
  {!isGenerating && questions.length > 0 && activeQuestions.length === 0 && (
- <div className="p-12 text-center rounded-lg bg-white border border-slate-200 flex flex-col items-center gap-3 text-slate-500">
- <span className="text-4xl"></span>
+ <div className="p-12 text-center rounded-xl bg-white border border-slate-200 flex flex-col items-center gap-3 text-slate-500">
+ <Trash2 className="h-10 w-10 text-slate-300" aria-hidden />
  <p className="text-sm font-bold text-slate-900">All generated questions were discarded.</p>
  <button
  type="button"
@@ -298,7 +299,7 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  <button
  type="button"
  onClick={onClose}
- className="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-all"
+ className="px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all"
  >
  Close Without Applying
  </button>
@@ -309,7 +310,7 @@ export function LessonAIQuizModal({ lessonTitle = "Building Type-Safe Server Act
  onClose();
  }}
  disabled={approvedCount === 0}
- className="px-6 py-2.5 bg-[#0F172A] hover:bg-blue-600 text-white text-xs font-bold rounded-lg shadow-lg transition-all disabled:opacity-50 cursor-pointer"
+ className="px-6 py-2.5 bg-slate-900 hover:bg-blue-600 text-white text-xs font-bold rounded-lg shadow-lg transition-all disabled:opacity-50 cursor-pointer"
  >
  Save ({approvedCount}) Approved To Lesson
  </button>

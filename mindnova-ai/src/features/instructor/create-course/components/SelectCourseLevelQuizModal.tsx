@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { QuizSummary } from "@/src/features/instructor/quiz-generator/types/quizGenerator.types";
-import { Check, ClipboardList, Eye, FileQuestion, Flag, Search, Target, Timer, Trophy, X } from "lucide-react";
+import { Check, ClipboardList, Eye, FileQuestion, Flag, Search, Target, Timer, Trophy, X, Loader2 } from "lucide-react";
 
 interface SelectCourseLevelQuizModalProps {
   isOpen: boolean;
@@ -93,7 +93,7 @@ export function SelectCourseLevelQuizModal({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Tìm bài kiểm tra theo tên..."
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm"
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm"
             />
           </div>
 
@@ -134,7 +134,7 @@ export function SelectCourseLevelQuizModal({
                   className={`p-4 rounded-lg border-2 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                     isActive
                       ? "border-emerald-500 bg-emerald-50/40 shadow-sm"
-                      : "border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50/20"
+                      : "border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20"
                   }`}
                 >
                   <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -183,12 +183,12 @@ export function SelectCourseLevelQuizModal({
                         type="button"
                         disabled={isLoadingThis}
                         onClick={() => handleSelect(quiz.id)}
-                        className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white text-xs font-semibold rounded-lg shadow-sm transition-all cursor-pointer flex items-center gap-1"
+                        className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white text-xs font-semibold rounded-lg shadow-sm transition-all cursor-pointer flex items-center gap-1"
                       >
                         {isLoadingThis ? (
-                          <span>⏳ Đang xử lý...</span>
+                          <span><Loader2 className="inline h-4 w-4 mr-1 align-text-bottom animate-spin" aria-hidden />Đang xử lý...</span>
                         ) : (
-                          <span>✓ Chọn bài này</span>
+                          <span><Check className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Chọn bài này</span>
                         )}
                       </button>
                     )}

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { GeneratedQuestion } from "../types/quizGenerator.types";
 import { QuestionCardMultipleChoice } from "./QuestionCardMultipleChoice";
 import { QuestionCardEssay } from "./QuestionCardEssay";
+import { AlertTriangle, ArrowLeft, CheckCircle2, Sparkles, Loader2, Save, ListChecks, Scale } from "lucide-react";
 
 interface ManualQuizEditorProps {
   questions: GeneratedQuestion[];
@@ -45,12 +46,12 @@ export function ManualQuizEditor({
   const dummyRegenerate = (id: string) => {};
 
   return (
-    <div className="p-8 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 bg-blue-50 text-blue-500 text-xs font-bold rounded-lg border-slate-200 uppercase tracking-wider">
+            <span className="px-3 py-1 bg-blue-50 text-blue-500 text-xs font-bold rounded-lg border border-slate-200 uppercase tracking-wider">
               Bước 2 / 3
             </span>
             <h2 className="text-xl font-bold text-slate-900">Biên Soạn Câu Hỏi</h2>
@@ -62,8 +63,8 @@ export function ManualQuizEditor({
 
         {/* Realtime Summary Badge */}
         <div className="flex items-center gap-3">
-          <div className="px-3 py-2 rounded-lg bg-blue-50 border-slate-200 flex items-center gap-2 text-xs font-bold text-blue-500">
-            <span> Tổng câu:</span>
+          <div className="px-3 py-2 rounded-lg bg-blue-50 border border-slate-200 flex items-center gap-2 text-xs font-bold text-blue-500">
+            <span><ListChecks className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Tổng câu:</span>
             <span className="font-semibold text-sm">{questions.length}</span>
           </div>
           <div
@@ -73,7 +74,7 @@ export function ManualQuizEditor({
                 : "bg-amber-50 border-amber-200 text-amber-800"
             }`}
           >
-            <span> Tổng điểm hiện tại:</span>
+            <span><Scale className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Tổng điểm hiện tại:</span>
             <span className="font-bold text-sm">{totalPoints} / 10</span>
           </div>
         </div>
@@ -82,17 +83,17 @@ export function ManualQuizEditor({
       {/* Score Validation Banner */}
       <div>
         {isValidTotal ? (
-          <div className="p-4 rounded-lg bg-emerald-50 border-slate-200 text-slate-900 text-xs font-bold flex items-center justify-between shadow-sm">
+          <div className="p-4 rounded-lg bg-emerald-50 border border-slate-200 text-slate-900 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="text-base">✅</span>
+              <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm hợp lệ: <strong>10 / 10</strong>. Bài kiểm tra đã sẵn sàng để xuất bản.</span>
             </div>
-            <span className="px-2.5 py-1 bg-[#0F172A] text-white text-[10px] font-bold uppercase rounded-lg">Standard 10.0</span>
+            <span className="px-2.5 py-1 bg-slate-900 text-white text-[10px] font-bold uppercase rounded-lg">Standard 10.0</span>
           </div>
         ) : isLess ? (
           <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="text-base">⚠️</span>
+              <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm chưa đủ 10 (Hiện tại: <strong>{totalPoints} / 10</strong>). Vui lòng điều chỉnh điểm các câu hỏi.</span>
             </div>
             <span className="px-2.5 py-1 bg-amber-600 text-white text-[10px] font-bold uppercase rounded-lg">Thiếu {Number((10 - totalPoints).toFixed(2))}đ</span>
@@ -100,7 +101,7 @@ export function ManualQuizEditor({
         ) : (
           <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-900 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="text-base">⚠️</span>
+              <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm vượt quá 10 (Hiện tại: <strong>{totalPoints} / 10</strong>). Vui lòng giảm điểm các câu hỏi.</span>
             </div>
             <span className="px-2.5 py-1 bg-rose-600 text-white text-[10px] font-bold uppercase rounded-lg">Vượt {Number((totalPoints - 10).toFixed(2))}đ</span>
@@ -109,7 +110,7 @@ export function ManualQuizEditor({
       </div>
 
       {/* Control Bar: Filters & Actions */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-lg bg-[#FAF8FF] border border-blue-50">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-lg bg-slate-50 border border-blue-50">
         {/* Filter Tabs */}
         <div className="flex items-center gap-2">
           <button
@@ -118,7 +119,7 @@ export function ManualQuizEditor({
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               filterType === "all"
                 ? "bg-blue-500 text-white shadow-md"
-                : "bg-white text-slate-500 hover:bg-gray-100 border border-slate-200"
+                : "bg-white text-slate-500 hover:bg-slate-100 border border-slate-200"
             }`}
           >
             Tất cả ({questions.length})
@@ -129,7 +130,7 @@ export function ManualQuizEditor({
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               filterType === "multiple_choice"
                 ? "bg-blue-500 text-white shadow-md"
-                : "bg-white text-slate-500 hover:bg-gray-100 border border-slate-200"
+                : "bg-white text-slate-500 hover:bg-slate-100 border border-slate-200"
             }`}
           >
             Trắc nghiệm ({mcQuestions.length})
@@ -140,7 +141,7 @@ export function ManualQuizEditor({
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               filterType === "essay"
                 ? "text-blue-500 text-white shadow-md"
-                : "bg-white text-slate-500 hover:bg-gray-100 border border-slate-200"
+                : "bg-white text-slate-500 hover:bg-slate-100 border border-slate-200"
             }`}
           >
             Tự luận ({essayQuestions.length})
@@ -159,7 +160,7 @@ export function ManualQuizEditor({
           <button
             type="button"
             onClick={() => onAddQuestion("essay")}
-            className="px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-semibold rounded-lg border border-purple-100 transition-all cursor-pointer"
+            className="px-4 py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-semibold rounded-lg border border-sky-100 transition-all cursor-pointer"
           >
             + Tự luận
           </button>
@@ -203,19 +204,19 @@ export function ManualQuizEditor({
       </div>
 
       {/* Footer Navigation & Save Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-gray-100 pt-4 mt-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-slate-100 pt-4 mt-2">
         <button
           type="button"
           onClick={onBack}
-          className="px-6 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs transition-all cursor-pointer"
+          className="px-6 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-all cursor-pointer"
         >
-          🠔 Sửa cấu hình
+          <ArrowLeft className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Sửa cấu hình
         </button>
 
         <div className="flex items-center gap-3">
           {!isValidTotal && (
             <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
-              ⚠️ Tổng điểm phải bằng 10 để lưu.
+              <AlertTriangle className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Tổng điểm phải bằng 10 để lưu.
             </span>
           )}
 
@@ -223,9 +224,9 @@ export function ManualQuizEditor({
             type="button"
             onClick={() => onSave("draft")}
             disabled={isSaving || !isValidTotal || questions.length === 0}
-            className="px-6 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-6 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {isSaving ? "Đang lưu..." : "💾 Lưu Nháp"}
+            {isSaving ? <><Loader2 className="inline h-4 w-4 mr-1 align-text-bottom animate-spin" aria-hidden />Đang lưu...</> : <><Save className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Lưu Nháp</>}
           </button>
 
           <button
@@ -240,7 +241,7 @@ export function ManualQuizEditor({
                 <span>Đang lưu bài kiểm tra...</span>
               </>
             ) : (
-              <span>✨ Hoàn Tất &amp; Thêm Vào Giáo Trình</span>
+              <span><Sparkles className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Hoàn Tất &amp; Thêm Vào Giáo Trình</span>
             )}
           </button>
         </div>

@@ -6,11 +6,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { twMerge } from "tailwind-merge";
-import { SparklesIcon, PlusIcon } from "./icons";
 import { generateAiNotification, sendNotification, getNotificationOptions } from "../api";
 import { MultiSelect } from "@/src/shared/components/ui/MultiSelect";
 import { SingleSelect } from "@/src/shared/components/ui/SingleSelect";
-import { X as LucideX, RefreshCw, Copy, Bold, Italic, Underline, List, Link as LucideLink, ChevronDown } from "lucide-react";
+import { X as LucideX, RefreshCw, Copy, Bold, Italic, Underline, List, Link as LucideLink, ChevronDown, Plus, Sparkles, Mail } from "lucide-react";
 
 // ─── Local icons ──────────────────────────────────────────────────────────────
 
@@ -69,10 +68,10 @@ function SuggestionChip({
  type="button"
  onClick={onClick}
  className={twMerge(
- "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30",
+ "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500/30",
  active
- ? "border-slate-200 bg-[#EFF6FF] text-blue-500"
- : "border-slate-200 text-slate-500 bg-white hover:border-[#DBEAFE] hover:text-[#2563EB]",
+ ? "border-slate-200 bg-blue-50 text-blue-500"
+ : "border-slate-200 text-slate-500 bg-white hover:border-blue-100 hover:text-blue-600",
  )}
  >
  <span>{icon}</span>
@@ -93,14 +92,14 @@ function EditorToolbar({ onFormat }: { onFormat: (cmd: string) => void }) {
  ];
 
  return (
- <div className="flex items-center gap-0.5 px-2 py-1.5 bg-[#F8F8FD] border-b border-slate-200">
+ <div className="flex items-center gap-0.5 px-2 py-1.5 bg-slate-50 border-b border-slate-200">
  {tools.map(({ icon, cmd, label }) => (
  <button
  key={cmd}
  type="button"
  aria-label={label}
  onMouseDown={(e) => { e.preventDefault(); onFormat(cmd); }}
- className="w-7 h-7 rounded-md flex items-center justify-center text-slate-500 hover:text-[#2563EB] hover:bg-[#EFF6FF] transition-all duration-150 focus:outline-none"
+ className="w-7 h-7 rounded-md flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-150 focus:outline-none"
  >
  {icon}
  </button>
@@ -130,8 +129,8 @@ function DraftPreview({
  .split("\n")
  .map((line, i) => {
  if (!line.trim()) return `<br/>`;
- if (line.startsWith("•")) return `<li class="ml-4 list-disc text-[13px] text-[#475569] leading-relaxed">${line.slice(1).trim()}</li>`;
- return `<p class="text-[13px] text-[#475569] leading-relaxed">${line}</p>`;
+ if (line.startsWith("•")) return `<li class="ml-4 list-disc text-[13px] text-slate-600 leading-relaxed">${line.slice(1).trim()}</li>`;
+ return `<p class="text-[13px] text-slate-600 leading-relaxed">${line}</p>`;
  })
  .join("");
  };
@@ -150,13 +149,13 @@ function DraftPreview({
  <div className="flex flex-col h-full">
  {/* Sub-header */}
  <div className="flex items-center justify-between mb-2">
- <span className="text-[12px] font-semibold text-[#475569]">Dự thảo được tạo:</span>
+ <span className="text-[12px] font-semibold text-slate-600">Dự thảo được tạo:</span>
  <div className="flex items-center gap-1">
  <button
  type="button"
  aria-label="Tạo lại"
  onClick={onRefresh}
- className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#2563EB] hover:bg-[#EFF6FF] transition-all duration-150"
+ className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-150"
  >
  <RefreshIcon />
  </button>
@@ -164,7 +163,7 @@ function DraftPreview({
  type="button"
  aria-label="Sao chép"
  onClick={onCopy}
- className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#2563EB] hover:bg-[#EFF6FF] transition-all duration-150"
+ className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-150"
  >
  <CopyIcon />
  </button>
@@ -172,13 +171,13 @@ function DraftPreview({
  </div>
 
  {/* Editor */}
- <div className="flex-1 flex flex-col rounded-lg border border-[#DDDDF0] bg-white overflow-hidden focus-within:border-slate-200 focus-within:ring-2 focus-within:ring-[#3B82F6]/15 transition-all duration-150">
+ <div className="flex-1 flex flex-col rounded-lg border border-slate-200 bg-white overflow-hidden focus-within:border-slate-200 focus-within:ring-2 focus-within:ring-blue-500/15 transition-all duration-150">
  <EditorToolbar onFormat={handleFormat} />
  <div
  ref={editorRef}
  contentEditable
  suppressContentEditableWarning
- className="flex-1 px-4 py-3 text-[13px] text-[#475569] leading-relaxed overflow-y-auto focus:outline-none min-h-[280px] max-h-[340px]"
+ className="flex-1 px-4 py-3 text-[13px] text-slate-600 leading-relaxed overflow-y-auto focus:outline-none min-h-[280px] max-h-[340px]"
  dangerouslySetInnerHTML={{ __html: renderContent(content) }}
  />
  </div>
@@ -194,12 +193,12 @@ function GeneratingShimmer() {
  {[80, 100, 65, 90, 75, 55].map((w, i) => (
  <div
  key={i}
- className="h-3 rounded-full bg-gradient-to-r from-[#EFF6FF] via-[#DBEAFE] to-[#EFF6FF] animate-pulse"
+ className="h-3 rounded-full bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 animate-pulse"
  style={{ width: `${w}%`, animationDelay: `${i * 100}ms` }}
  />
  ))}
  <div className="flex items-center gap-2 mt-2 text-[12px] text-blue-500 font-semibold animate-pulse">
- <SparklesIcon size={12} />
+ <Sparkles size={12} />
  AI đang soạn thảo...
  </div>
  </div>
@@ -238,10 +237,10 @@ function LeftPanel({
  ];
 
  return (
- <div className="flex flex-col gap-4 pr-5 border-r border-[#F0F0F8]">
+ <div className="flex flex-col gap-4 pr-5 border-r border-slate-100">
  {/* Recipient */}
  <div className="flex flex-col gap-1.5">
- <label htmlFor="recipient-select" className="text-[12px] font-semibold text-[#475569]">
+ <label htmlFor="recipient-select" className="text-[12px] font-semibold text-slate-600">
  Gửi đến:
  </label>
  <div className="relative">
@@ -258,7 +257,7 @@ function LeftPanel({
  
  {/* Tone input */}
  <div className="flex flex-col gap-1.5">
- <label htmlFor="tone-select" className="text-[12px] font-semibold text-[#475569]">
+ <label htmlFor="tone-select" className="text-[12px] font-semibold text-slate-600">
  Giọng điệu:
  </label>
  <div className="relative">
@@ -272,7 +271,7 @@ function LeftPanel({
 
  {/* Topic input */}
  <div className="flex flex-col gap-1.5">
- <label htmlFor="notification-topic" className="text-[12px] font-semibold text-[#475569]">
+ <label htmlFor="notification-topic" className="text-[12px] font-semibold text-slate-600">
  Chủ đề hoặc ý chính:
  </label>
  <textarea
@@ -281,13 +280,13 @@ function LeftPanel({
  onChange={(e) => setTopic(e.target.value)}
  placeholder="Nhập chủ đề hoặc ý chính..."
  rows={5}
- className="w-full px-3 py-2.5 rounded-lg border border-[#DDDDF0] bg-[#FAFAFE] text-[13px] text-slate-900 placeholder:text-[#C4C4D8] focus:outline-none focus:border-slate-200 focus:ring-2 focus:ring-[#3B82F6]/15 transition-all duration-150 resize-none leading-relaxed"
+ className="w-full px-3 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-[13px] text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-slate-200 focus:ring-2 focus:ring-blue-500/15 transition-all duration-150 resize-none leading-relaxed"
  />
  </div>
 
  {/* Suggestion chips */}
  <div className="flex flex-col gap-2">
- <span className="text-[12px] font-semibold text-[#475569]">Gợi ý chủ đề:</span>
+ <span className="text-[12px] font-semibold text-slate-600">Gợi ý chủ đề:</span>
  <div className="flex flex-wrap gap-2">
  {SUGGESTION_CHIPS.map(({ icon, label }) => (
  <SuggestionChip
@@ -310,7 +309,7 @@ function LeftPanel({
  id="btn-generate-draft"
  onClick={onGenerate}
  disabled={isGenerating}
- className="flex items-center justify-center gap-2 w-full py-3 rounded-lg text-[13px] font-semibold text-white bg-blue-500 shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:pointer-events-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/40"
+ className="flex items-center justify-center gap-2 w-full py-3 rounded-lg text-[13px] font-semibold text-white bg-blue-500 shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:pointer-events-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
  >
  {isGenerating ? (
  <>
@@ -319,7 +318,7 @@ function LeftPanel({
  </>
  ) : (
  <>
- <span className="animate-pulse"><SparklesIcon size={13} /></span>
+ <span className="animate-pulse"><Sparkles size={13} /></span>
  Tạo dự thảo bằng AI
  </>
  )}
@@ -440,9 +439,9 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
  className="pointer-events-auto w-full max-w-[740px] bg-white rounded-lg border border-slate-200 shadow-[0_24px_80px_rgba(70,72,212,0.18)] overflow-hidden"
  >
  {/* Modal header */}
- <div className="flex items-start gap-3 px-6 py-5 border-b border-[#F0F0F8]">
+ <div className="flex items-start gap-3 px-6 py-5 border-b border-slate-100">
  <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center text-white shadow-[0_4px_14px_rgba(59,130,246,0.4)] shrink-0">
- <SparklesIcon size={17} />
+ <Sparkles size={17} />
  </div>
  <div className="flex-1">
  <h2 className="text-[16px] font-semibold text-slate-900 tracking-tight">
@@ -456,7 +455,7 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
  type="button"
  onClick={onClose}
  aria-label="Đóng"
- className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-[#E2E8F0] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#EAEAF4] shrink-0"
+ className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-slate-200 shrink-0"
  >
  <XIcon />
  </button>
@@ -487,12 +486,12 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
  {isGenerating ? (
  <div className="flex flex-col h-full">
  <div className="flex items-center justify-between mb-2">
- <span className="text-[12px] font-semibold text-[#475569]">Dự thảo được tạo:</span>
+ <span className="text-[12px] font-semibold text-slate-600">Dự thảo được tạo:</span>
  </div>
- <div className="flex-1 rounded-lg border border-[#DDDDF0] bg-white overflow-hidden">
- <div className="px-3 py-2 bg-[#F8F8FD] border-b border-slate-200 flex gap-1">
+ <div className="flex-1 rounded-lg border border-slate-200 bg-white overflow-hidden">
+ <div className="px-3 py-2 bg-slate-50 border-b border-slate-200 flex gap-1">
  {[...Array(5)].map((_, i) => (
- <div key={i} className="w-5 h-4 rounded bg-[#EAEAF4]" />
+ <div key={i} className="w-5 h-4 rounded bg-slate-200" />
  ))}
  </div>
  <GeneratingShimmer />
@@ -505,8 +504,8 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
  onCopy={handleCopy}
  />
  ) : (
- <div className="flex-1 flex flex-col items-center justify-center gap-3 text-[#C4C4D8] border-2 border-dashed border-slate-200 rounded-lg">
- <span className="text-4xl"></span>
+ <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-300 border-2 border-dashed border-slate-200 rounded-lg">
+ <Mail className="h-10 w-10" aria-hidden />
  <p className="text-[12px] font-semibold text-center">
  Nhập chủ đề và nhấn{" "}
  <span className="text-blue-500">&quot;Tạo dự thảo bằng AI&quot;</span>
@@ -518,7 +517,7 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
  </div>
 
  {/* Modal footer */}
- <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#F0F0F8]">
+ <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-100">
  {copied && (
  <span className="text-[11px] text-slate-900 font-semibold mr-auto">
  Đã sao chép vào clipboard!
@@ -541,7 +540,7 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
  id="btn-send-notification-modal"
  onClick={handleSend}
  disabled={!draft || isGenerating || isSending || courseIds.length === 0}
- className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-500 shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/40"
+ className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-500 shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
  >
  {isSending ? (
  <>

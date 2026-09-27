@@ -5,9 +5,9 @@ import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { PricingModelSection } from "./PricingModelSection";
 import { CouponSection } from "./CouponSection";
-import { SaveIcon, ChevronRightIcon } from "./icons";
 import { useUpdateCoursePrice } from "../../create-course/api";
 import { useInstructorCourse } from "../../management/api/courses";
+import { ChevronRight, Save } from "lucide-react";
 
 const TABS = [
  { id: "pricing", label: "Giá & Kiếm tiền" },
@@ -27,7 +27,7 @@ function PageTabs({ active, onChange }: { active: TabId; onChange: (t: TabId) =>
  onClick={() => onChange(tab.id)}
  className={twMerge(
  "relative px-4 py-3 text-xs font-bold transition-all duration-150 cursor-pointer",
- active === tab.id ? "text-blue-500" : "text-gray-400 hover:text-gray-700"
+ active === tab.id ? "text-blue-500" : "text-slate-400 hover:text-slate-700"
  )}
  >
  {tab.label}
@@ -45,12 +45,12 @@ function PageTabs({ active, onChange }: { active: TabId; onChange: (t: TabId) =>
 
 function Breadcrumb() {
  return (
- <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs font-bold text-gray-400">
- <Link href="/instructor/courses" className="hover:text-[#2563EB] transition-colors">
+ <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
+ <Link href="/instructor/courses" className="hover:text-blue-600 transition-colors">
  Khóa học của tôi
  </Link>
- <ChevronRightIcon size={12} />
- <span className="text-gray-700">Generative AI Masterclass 2026</span>
+ <ChevronRight size={12} />
+ <span className="text-slate-700">Generative AI Masterclass 2026</span>
  </nav>
  );
 }
@@ -74,7 +74,7 @@ function PageHeader({ onSave }: { onSave: () => void }) {
  onClick={onSave}
  className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 shadow-sm transition-all cursor-pointer shrink-0"
  >
- <SaveIcon size={14} />
+ <Save size={14} />
  <span>Lưu thiết lập</span>
  </button>
  </div>
@@ -86,7 +86,7 @@ function SaveToast({ visible }: { visible: boolean }) {
  return (
  <div
  className={twMerge(
- "fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-lg bg-gray-900 text-white text-xs font-bold shadow-lg transition-all duration-300",
+ "fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-lg bg-slate-900 text-white text-xs font-bold shadow-lg transition-all duration-300",
  visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
  )}
  >
@@ -145,7 +145,7 @@ export function PricingContainer({ courseId }: { courseId?: string }) {
  };
 
  return (
- <div className="flex flex-col min-h-[calc(100vh-64px)] bg-[#F4F4F8]">
+ <div className="flex flex-col min-h-[calc(100vh-64px)] bg-slate-50">
  {/* Sticky page header & tab bar */}
  <div className="sticky top-0 z-10 bg-white shadow-sm">
  <PageHeader onSave={handleSave} />
@@ -168,13 +168,13 @@ export function PricingContainer({ courseId }: { courseId?: string }) {
  )}
 
  {activeTab === "content" && (
- <div className="max-w-[900px] mx-auto flex items-center justify-center py-24 text-gray-400 font-bold text-xs">
+ <div className="max-w-[900px] mx-auto flex items-center justify-center py-24 text-slate-400 font-bold text-xs">
  Danh sách bài giảng và nội dung học liệu AI sẽ hiển thị tại tab này.
  </div>
  )}
 
  {activeTab === "students" && (
- <div className="max-w-[900px] mx-auto flex items-center justify-center py-24 text-gray-400 font-bold text-xs">
+ <div className="max-w-[900px] mx-auto flex items-center justify-center py-24 text-slate-400 font-bold text-xs">
  Báo cáo chuyên sâu và danh sách học viên đăng ký khóa học sẽ hiển thị tại đây.
  </div>
  )}

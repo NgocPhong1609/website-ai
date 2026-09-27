@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { SparklesIcon, CheckIcon, InfoIcon, FreeIcon, PaidIcon, SubscribeIcon } from "./icons";
+import { Check, CreditCard, Gift, Info, Sparkles, Zap, TrendingUp } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -25,19 +25,19 @@ const MODELS: ModelOption[] = [
  id: "free",
  label: "Cung cấp miễn phí",
  description: "Thu hút học viên & xây dựng cộng đồng.",
- Icon: FreeIcon,
+ Icon: Gift,
  },
  {
  id: "paid",
  label: "Cung cấp trả phí",
  description: "Tối ưu hóa doanh thu từ nội dung cao cấp.",
- Icon: PaidIcon,
+ Icon: CreditCard,
  },
  {
  id: "subscription",
  label: "Cho thuê",
  description: "Cho phép truy cập trong thời gian giới hạn.",
- Icon: SubscribeIcon,
+ Icon: Zap,
  },
 ];
 
@@ -45,9 +45,9 @@ const MODELS: ModelOption[] = [
 
 function AIInsightPanel({ onApply }: { onApply: (price: string) => void }) {
  return (
- <div className="rounded-lg border border-[#DDD9FF] bg-[#F7F5FF] p-4 flex flex-col gap-3">
+ <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 flex flex-col gap-3">
  <div className="flex items-center gap-2">
- <SparklesIcon size={14} />
+ <Sparkles size={14} />
  <span className="text-[12px] font-bold text-blue-500 tracking-wide uppercase">
  AI Pricing Insight
  </span>
@@ -62,7 +62,7 @@ function AIInsightPanel({ onApply }: { onApply: (price: string) => void }) {
  <span>890k</span>
  <span>1.1M</span>
  </div>
- <div className="h-2 rounded-full bg-[#DDD9FF] overflow-hidden">
+ <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
  <div
  className="h-full rounded-full bg-blue-500 "
  style={{ width: "65%" }}
@@ -73,7 +73,7 @@ function AIInsightPanel({ onApply }: { onApply: (price: string) => void }) {
  <button
  type="button"
  onClick={() => onApply("990.000")}
- className="w-full py-2 rounded-lg border border-slate-200 text-[12px] font-semibold text-blue-500 hover:bg-[#EFF6FF] hover:text-[#1D4ED8] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30"
+ className="w-full py-2 rounded-lg border border-slate-200 text-[12px] font-semibold text-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
  >
  Áp dụng giá gợi ý
  </button>
@@ -85,7 +85,7 @@ function AIInsightPanel({ onApply }: { onApply: (price: string) => void }) {
 
 function RevenueStatPanel() {
  return (
- <div className="rounded-lg border border-slate-200 bg-[#FAFAFE] p-4 flex flex-col gap-2">
+ <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 flex flex-col gap-2">
  <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">
  Thống kê doanh thu dự kiến
  </span>
@@ -96,8 +96,8 @@ function RevenueStatPanel() {
  <span className="text-[13px] text-slate-500 mb-0.5">/tháng</span>
  </div>
  <div className="flex items-center gap-1.5 text-slate-900 text-[12px] font-semibold">
- <span className="w-5 h-5 rounded-full bg-slate-50 flex items-center justify-center text-slate-900">
- ↑
+ <span className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+ <TrendingUp className="h-3 w-3" aria-hidden />
  </span>
  +12% so với trung bình
  </div>
@@ -122,10 +122,10 @@ function ModelCard({
  onClick={onSelect}
  aria-pressed={isSelected}
  className={twMerge(
- "relative flex flex-col items-center gap-2 p-4 rounded-lg border text-center cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30",
+ "relative flex flex-col items-center gap-2 p-4 rounded-lg border text-center cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30",
  isSelected
- ? "border-slate-200 bg-[#F5F3FF] shadow-[0_0_0_3px_rgba(59,130,246,0.18)]"
- : "border-slate-200 bg-white hover:border-[#DBEAFE] hover:bg-[#FAFAFE]",
+ ? "border-slate-200 bg-slate-50 shadow-[0_0_0_3px_rgba(59,130,246,0.18)]"
+ : "border-slate-200 bg-white hover:border-blue-100 hover:bg-slate-50",
  )}
  >
  {/* Radio dot */}
@@ -134,7 +134,7 @@ function ModelCard({
  "absolute top-2.5 right-2.5 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all duration-200",
  isSelected
  ? "border-slate-200 bg-slate-50"
- : "border-[#D0D0E8] bg-white",
+ : "border-slate-200 bg-white",
  )}
  >
  {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -146,7 +146,7 @@ function ModelCard({
  "w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200",
  isSelected
  ? "bg-slate-50 text-blue-500"
- : "bg-[#E2E8F0] text-slate-500",
+ : "bg-slate-200 text-slate-500",
  )}
  >
  <option.Icon size={22} />
@@ -155,7 +155,7 @@ function ModelCard({
  <span
  className={twMerge(
  "text-[12px] font-semibold leading-snug transition-colors duration-150",
- isSelected ? "text-slate-900" : "text-[#475569]",
+ isSelected ? "text-slate-900" : "text-slate-600",
  )}
  >
  {option.label}
@@ -178,11 +178,11 @@ function PriceInputs({
 }) {
  return (
  <div className="flex flex-col gap-1.5 flex-1 min-w-[160px]">
- <label htmlFor="base-price" className="text-[12px] font-semibold text-[#475569] uppercase tracking-wide">
+ <label htmlFor="base-price" className="text-[12px] font-semibold text-slate-600 uppercase tracking-wide">
  Giá bán niêm yết (100,000 - 100,000,000 VNĐ)
  </label>
- <div className="flex items-center gap-0 rounded-lg border border-[#DDDDF0] bg-[#FAFAFE] overflow-hidden focus-within:border-slate-200 focus-within:ring-2 focus-within:ring-[#3B82F6]/15 transition-all duration-150">
- <span className="h-10 flex items-center px-3 text-[14px] font-bold text-slate-500 bg-[#FAFAFE]">
+ <div className="flex items-center gap-0 rounded-lg border border-slate-200 bg-slate-50 overflow-hidden focus-within:border-slate-200 focus-within:ring-2 focus-within:ring-blue-500/15 transition-all duration-150">
+ <span className="h-10 flex items-center px-3 text-[14px] font-bold text-slate-500 bg-slate-50">
  đ
  </span>
  <input
@@ -191,9 +191,9 @@ function PriceInputs({
  value={basePrice}
  onChange={(e) => onBaseChange(e.target.value)}
  placeholder="0"
- className="flex-1 h-10 px-1 text-sm font-semibold text-slate-900 bg-transparent focus:outline-none placeholder:text-[#C4C4D8]"
+ className="flex-1 h-10 px-1 text-sm font-semibold text-slate-900 bg-transparent focus:outline-none placeholder:text-slate-300"
  />
- <span className="h-10 flex items-center px-3 text-[12px] font-bold text-blue-500 border-l border-[#DDDDF0] bg-[#F0F0FF]">
+ <span className="h-10 flex items-center px-3 text-[12px] font-bold text-blue-500 border-l border-slate-200 bg-slate-50">
  VNĐ
  </span>
  </div>
@@ -221,17 +221,17 @@ function FlashSaleInputs({
  setSaleEndDate: (v: string) => void;
 }) {
  return (
- <div className="flex flex-col gap-4 mt-2 p-4 rounded-lg border border-slate-200 bg-[#FAFAFE]">
+ <div className="flex flex-col gap-4 mt-2 p-4 rounded-lg border border-slate-200 bg-slate-50">
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
- <span className="text-slate-900"></span>
+ <Zap className="h-4 w-4 text-amber-500" aria-hidden />
  <span className="text-[13px] font-bold text-slate-900">Lên Lịch Giảm Giá & Khuyến Mãi Flash Sale</span>
  </div>
  <input
  type="checkbox"
  checked={isFlashSale}
  onChange={(e) => setIsFlashSale(e.target.checked)}
- className="w-4 h-4 text-blue-500 rounded border-[#DDDDF0] focus:ring-[#3B82F6]"
+ className="w-4 h-4 text-blue-500 rounded border border-slate-200 focus:ring-blue-500"
  />
  </div>
  <p className="text-[11px] text-slate-500 mt-[-8px]">Tăng tỷ lệ chuyển đổi học viên bằng các đợt giảm giá ngắn hạn hấp dẫn.</p>
@@ -239,30 +239,30 @@ function FlashSaleInputs({
  {isFlashSale && (
  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
  <div className="flex flex-col gap-1.5">
- <label className="text-[10px] font-bold text-[#475569] uppercase tracking-wide">Giá khuyến mãi (VNĐ)</label>
+ <label className="text-[10px] font-bold text-slate-600 uppercase tracking-wide">Giá khuyến mãi (VNĐ)</label>
  <input
  type="text"
  value={salePrice}
  onChange={(e) => onSaleChange(e.target.value)}
- className="h-10 px-3 rounded-lg border border-[#DDDDF0] text-sm text-slate-900 font-bold focus:outline-none focus:border-slate-200"
+ className="h-10 px-3 rounded-lg border border-slate-200 text-sm text-slate-900 font-bold focus:outline-none focus:border-slate-200"
  />
  </div>
  <div className="flex flex-col gap-1.5">
- <label className="text-[10px] font-bold text-[#475569] uppercase tracking-wide">Ngày bắt đầu</label>
+ <label className="text-[10px] font-bold text-slate-600 uppercase tracking-wide">Ngày bắt đầu</label>
  <input
  type="date"
  value={saleStartDate}
  onChange={(e) => setSaleStartDate(e.target.value)}
- className="h-10 px-3 rounded-lg border border-[#DDDDF0] text-sm text-slate-900 focus:outline-none focus:border-slate-200"
+ className="h-10 px-3 rounded-lg border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-slate-200"
  />
  </div>
  <div className="flex flex-col gap-1.5">
- <label className="text-[10px] font-bold text-[#475569] uppercase tracking-wide">Ngày kết thúc (Tối đa 7 ngày)</label>
+ <label className="text-[10px] font-bold text-slate-600 uppercase tracking-wide">Ngày kết thúc (Tối đa 7 ngày)</label>
  <input
  type="date"
  value={saleEndDate}
  onChange={(e) => setSaleEndDate(e.target.value)}
- className="h-10 px-3 rounded-lg border border-[#DDDDF0] text-sm text-slate-900 focus:outline-none focus:border-slate-200"
+ className="h-10 px-3 rounded-lg border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-slate-200"
  />
  </div>
  </div>
@@ -276,7 +276,7 @@ function FlashSaleInputs({
 function AIBadge() {
  return (
  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500 text-[10px] font-bold text-white tracking-wide shadow-[0_2px_8px_rgba(59,130,246,0.35)]">
- <SparklesIcon size={9} />
+ <Sparkles size={9} />
  AI Recommended
  </span>
  );
@@ -296,12 +296,12 @@ export function PricingModelSection({
  return (
  <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-4">
  {/* Left: main card */}
- <div className="rounded-lg border border-slate-200 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] p-5 flex flex-col gap-5">
+ <div className="rounded-xl border border-slate-200 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] p-5 flex flex-col gap-5">
  {/* Header */}
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
- <span className="w-6 h-6 rounded-md bg-[#EFF6FF] text-blue-500 flex items-center justify-center">
- <PaidIcon size={14} />
+ <span className="w-6 h-6 rounded-md bg-blue-50 text-blue-500 flex items-center justify-center">
+ <CreditCard size={14} />
  </span>
  <span className="text-[14px] font-bold text-slate-900">Mô hình định giá</span>
  </div>
@@ -345,8 +345,8 @@ export function PricingModelSection({
  )}
 
  {model === "free" && (
- <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-emerald-50 border-slate-200">
- <CheckIcon size={13} />
+ <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-emerald-50 border border-slate-200">
+ <Check size={13} />
  <p className="text-[12px] text-slate-900 font-medium">
  Khóa học sẽ hiển thị miễn phí — không cần cấu hình giá.
  </p>

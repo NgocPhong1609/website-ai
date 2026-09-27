@@ -2,7 +2,7 @@
 
 import React from "react";
 import { twMerge } from "tailwind-merge";
-import { ChevronLeftIcon, ChevronRightIcon } from "./icons";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface CoursePaginationProps {
  currentPage: number;
@@ -43,7 +43,7 @@ export function CoursePagination({
  onClick={() => onPageChange(Math.max(1, currentPage - 1))}
  className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 border border-slate-200 bg-white hover:bg-slate-50 hover:text-slate-900 disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shadow-sm"
  >
- <ChevronLeftIcon />
+ <ChevronLeft size={16} />
  </button>
  {pages.map((p) => (
  <button
@@ -56,7 +56,7 @@ export function CoursePagination({
  className={twMerge(
  "w-8 h-8 rounded-lg font-semibold transition-all cursor-pointer shadow-sm",
  p === currentPage
- ? "bg-blue-500 text-white border border-[#3B82F6]"
+ ? "bg-blue-500 text-white border border-blue-500"
  : "text-slate-500 border border-slate-200 bg-white hover:bg-slate-50 hover:text-slate-900"
  )}
  >
@@ -72,7 +72,7 @@ export function CoursePagination({
  onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
  className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 border border-slate-200 bg-white hover:bg-slate-50 hover:text-slate-900 disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shadow-sm"
  >
- <ChevronRightIcon />
+ <ChevronRight size={16} />
  </button>
  </div>
  </div>

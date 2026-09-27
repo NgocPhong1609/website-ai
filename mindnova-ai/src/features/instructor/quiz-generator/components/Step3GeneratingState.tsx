@@ -24,10 +24,10 @@ export function Step3GeneratingState() {
  }, [steps.length]);
 
  return (
- <div className="p-12 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center gap-6 animate-fadeIn min-h-[420px]">
+ <div className="p-12 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center gap-6 animate-fadeIn min-h-[420px]">
  {/* Icon Spin & Glowing Orb */}
  <div className="relative flex items-center justify-center">
- <div className="w-24 h-24 rounded-full bg-blue-500 text-blue-500 blur-xl opacity-40 animate-pulse" />
+ <div className="w-24 h-24 rounded-full bg-blue-500 blur-xl opacity-40 animate-pulse" />
  <div className="absolute w-20 h-20 rounded-lg bg-blue-500 text-white flex items-center justify-center shadow-2xl animate-bounce">
  <Sparkles className="h-9 w-9" aria-hidden />
  </div>
@@ -41,7 +41,7 @@ export function Step3GeneratingState() {
  </div>
 
  <div className="w-full max-w-md flex flex-col gap-3">
- <div className="p-4 rounded-lg bg-[#FAF8FF] border-slate-200 flex items-center gap-3">
+ <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 flex items-center gap-3">
  <Loader size="sm" />
  <span className="text-xs font-semibold text-blue-500 animate-pulse">
  {steps[currentProgressStep]}
@@ -54,7 +54,7 @@ export function Step3GeneratingState() {
  <div
  key={idx}
  className={`h-2 flex-1 mx-1 rounded-full transition-all duration-500 ${
- idx <= currentProgressStep ? "bg-blue-500" : "bg-gray-200"
+ idx <= currentProgressStep ? "bg-blue-500" : "bg-slate-200"
  }`}
  />
  ))}

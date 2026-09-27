@@ -8,7 +8,8 @@ import { SelectQuizModal } from "@/src/features/instructor/quiz-generator/compon
 import { QuizImageField } from "@/src/features/instructor/quiz-generator/components/QuizImageField";
 import type { GeneratedQuestion, DifficultyType } from "@/src/features/instructor/quiz-generator/types/quizGenerator.types";
 import type { DraftQuizData } from "../types";
-import { Download, Sparkles } from "lucide-react";
+import { Download, Sparkles, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 interface QuizEditorProps {
   value?: DraftQuizData | any;
@@ -276,11 +277,19 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
     <div className="flex flex-col gap-6 animate-fadeIn relative">
       {/* Loading overlay — shown on top of content, does NOT destroy form state */}
       {isLoading && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 rounded-lg backdrop-blur-[2px]">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 rounded-full border-4 border-[#3B82F6] border-t-transparent animate-spin" />
-            <span className="text-xs font-bold text-gray-500">Đang tải dữ liệu bài kiểm tra...</span>
+        <div role="status" aria-busy="true" aria-label="Đang tải dữ liệu bài kiểm tra" className="absolute inset-0 z-10 bg-white rounded-xl p-4 flex flex-col gap-4">
+          <Skeleton className="h-14 w-full rounded-xl" />
+          <div className="grid grid-cols-2 gap-3">
+            <Skeleton className="h-10" />
+            <Skeleton className="h-10" />
           </div>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="p-4 rounded-xl border border-slate-200 space-y-3">
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-9 w-full" />
+              <Skeleton className="h-9 w-full" />
+            </div>
+          ))}
         </div>
       )}
       {/* Import from Bank Banner */}
@@ -289,7 +298,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
           <Sparkles className="h-5 w-5 text-blue-500" aria-hidden />
           <div>
             <h4 className="text-xs font-bold text-slate-900">Chèn đề thi từ Ngân Hàng Quiz</h4>
-            <p className="text-[11px] font-medium text-gray-500">
+            <p className="text-[11px] font-medium text-slate-500">
               {selectedQuizId
                 ? `Đang liên kết với Bài thi #${selectedQuizId}`
                 : "Bạn có thể chèn một đề thi đã được tạo sẵn từ Bộ Tạo Bài Kiểm Tra AI vào bài học này."}
@@ -315,7 +324,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
       />
 
       {/* Quiz Meta Settings */}
-      <div className="p-6 rounded-lg bg-[#EFF6FF] border border-blue-100 flex flex-col gap-4">
+      <div className="p-6 rounded-lg bg-blue-50 border border-blue-100 flex flex-col gap-4">
         <QuizImageField
           label="Ảnh đại diện Quiz"
           purpose="thumbnail"
@@ -347,7 +356,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
                 setTitle(val);
                 notifyParent(questions, val);
               }}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-[#3B82F6]"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500"
               placeholder="VD: Kiểm tra cuối chương 1"
             />
           </div>
@@ -362,7 +371,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
                 setDescription(val);
                 notifyParent(questions, title, timeLimit, passingScore, difficulty, val);
               }}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-xs font-medium text-slate-900 focus:outline-none focus:border-[#3B82F6]"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-900 focus:outline-none focus:border-blue-500"
               placeholder="Mục tiêu đánh giá kiến thức..."
             />
           </div>
@@ -370,7 +379,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-blue-50">
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">Thời gian làm bài (Phút)</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Thời gian làm bài (Phút)</label>
             <input
               type="number"
               min={1}
@@ -381,12 +390,12 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
                 setTimeLimit(val);
                 notifyParent(questions, title, val);
               }}
-              className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">Điểm đạt (%)</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Điểm đạt (%)</label>
             <input
               type="number"
               min={0}
@@ -397,12 +406,12 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
                 setPassingScore(val);
                 notifyParent(questions, title, timeLimit, val);
               }}
-              className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">Độ khó chung</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Độ khó chung</label>
             <select
               value={difficulty}
               onChange={(e) => {
@@ -410,7 +419,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
                 setDifficulty(val);
                 notifyParent(questions, title, timeLimit, passingScore, val);
               }}
-              className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
             >
               <option value="easy">Dễ</option>
               <option value="medium">Trung bình</option>
@@ -426,7 +435,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
         {isValidTotal ? (
           <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="text-base">✅</span>
+              <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm chuẩn hợp lệ: <strong>10 / 10 điểm</strong>. Bài thi sẵn sàng lưu.</span>
             </div>
             <span className="px-2.5 py-1 bg-emerald-600 text-white text-[10px] font-bold uppercase rounded-lg">Standard 10.0</span>
@@ -434,7 +443,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
         ) : isLess ? (
           <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-950 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="text-base">⚠️</span>
+              <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm chưa đủ 10 (Hiện tại: <strong>{totalPoints} / 10</strong>). Vui lòng tăng điểm câu hỏi.</span>
             </div>
             <span className="px-2.5 py-1 bg-amber-600 text-white text-[10px] font-bold uppercase rounded-lg">Thiếu {Number((10 - totalPoints).toFixed(2))}đ</span>
@@ -442,7 +451,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
         ) : (
           <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-950 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="text-base">⚠️</span>
+              <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm vượt quá 10 (Hiện tại: <strong>{totalPoints} / 10</strong>). Vui lòng giảm điểm câu hỏi.</span>
             </div>
             <span className="px-2.5 py-1 bg-rose-600 text-white text-[10px] font-bold uppercase rounded-lg">Vượt {Number((totalPoints - totalPoints).toFixed(2))}đ</span>
@@ -451,7 +460,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
       </div>
 
       {/* Question Filter & Action Toolbar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-lg bg-[#FAF8FF] border border-blue-50">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-lg bg-slate-50 border border-blue-50">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -459,7 +468,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
             className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               filterType === "all"
                 ? "bg-blue-500 text-white shadow-xs"
-                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
             }`}
           >
             Tất cả ({questions.length})
@@ -470,7 +479,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
             className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               filterType === "multiple_choice"
                 ? "bg-blue-500 text-white shadow-xs"
-                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
             }`}
           >
             Trắc nghiệm ({mcQuestions.length})
@@ -481,7 +490,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
             className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               filterType === "essay"
                 ? "bg-blue-500 text-white shadow-xs"
-                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
             }`}
           >
             Tự luận ({essayQuestions.length})
@@ -499,7 +508,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
           <button
             type="button"
             onClick={() => handleAddQuestion("essay")}
-            className="px-3.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-semibold rounded-lg border border-purple-100 transition-all cursor-pointer"
+            className="px-3.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-semibold rounded-lg border border-sky-100 transition-all cursor-pointer"
           >
             + Tự luận
           </button>
@@ -509,8 +518,8 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
       {/* Questions List */}
       <div className="flex flex-col gap-4 max-h-[550px] overflow-y-auto pr-1">
         {filteredQuestions.length === 0 ? (
-          <div className="p-10 text-center rounded-lg bg-white border border-gray-200 text-gray-500 font-medium text-xs">
-            {isLoading ? 'Đang tải câu hỏi...' : 'Chưa có câu hỏi nào. Nhấn "+ Trắc nghiệm" hoặc "+ Tự luận" ở trên để thêm.'}
+          <div className="p-10 text-center rounded-xl bg-white border border-slate-200 text-slate-500 font-medium text-xs">
+            {isLoading ? '' : 'Chưa có câu hỏi nào. Nhấn "+ Trắc nghiệm" hoặc "+ Tự luận" ở trên để thêm.'}
           </div>
         ) : (
           filteredQuestions.map((q, idx) => {

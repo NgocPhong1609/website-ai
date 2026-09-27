@@ -2,6 +2,7 @@
 
 import React from "react";
 import { twMerge } from "tailwind-merge";
+import { X } from "lucide-react";
 
 export interface StudentDetailData {
   id: number | string;
@@ -27,13 +28,10 @@ export function StudentDetailSidebar({ student, onClose }: { student: StudentDet
 
   return (
     <div className="fixed inset-y-0 right-0 w-80 bg-white border-l border-slate-200 shadow-2xl z-50 flex flex-col animate-slideInRight font-sans">
-      <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+      <div className="p-4 border-b border-slate-100 flex items-center justify-between">
         <h3 className="font-bold text-slate-900 text-sm">Hồ Sơ Học Viên</h3>
-        <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg text-slate-500 transition-colors cursor-pointer">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
+        <button onClick={onClose} aria-label="Đóng hồ sơ học viên" className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors cursor-pointer">
+          <X size={20} aria-hidden />
         </button>
       </div>
       
@@ -55,38 +53,38 @@ export function StudentDetailSidebar({ student, onClose }: { student: StudentDet
           </span>
         </div>
 
-        <div className="bg-slate-50 p-4 rounded-lg border border-gray-200 text-xs flex flex-col gap-3">
+        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs flex flex-col gap-3">
           <div>
             <span className="text-[11px] font-bold text-slate-500 uppercase block">Khóa học ghi danh</span>
             <span className="font-semibold text-slate-900">{student.course?.title || "Chưa có"}</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-100">
+          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
             <div>
               <span className="text-[10px] font-bold text-slate-500 uppercase block">Tiến độ học</span>
               <span className="font-bold text-blue-500 text-sm">{student.progress}%</span>
             </div>
             <div>
               <span className="text-[10px] font-bold text-slate-500 uppercase block">Điểm trung bình</span>
-              <span className="font-bold text-gray-800 text-sm">{student.average_score !== null && student.average_score !== undefined ? `${student.average_score}/100` : "N/A"}</span>
+              <span className="font-bold text-slate-800 text-sm">{student.average_score !== null && student.average_score !== undefined ? `${student.average_score}/100` : "N/A"}</span>
             </div>
           </div>
 
           {student.enrolled_at && (
-            <div className="pt-2 border-t border-gray-100">
+            <div className="pt-2 border-t border-slate-100">
               <span className="text-[10px] font-bold text-slate-500 uppercase block">Ngày tham gia</span>
-              <span className="font-semibold text-gray-700">{new Date(student.enrolled_at).toLocaleDateString("vi-VN")}</span>
+              <span className="font-semibold text-slate-700">{new Date(student.enrolled_at).toLocaleDateString("vi-VN")}</span>
             </div>
           )}
         </div>
 
         {Array.isArray(student.quiz_scores) && student.quiz_scores.length > 0 && (
-          <div className="bg-white p-4 rounded-lg border border-gray-200 text-xs flex flex-col gap-2">
+          <div className="bg-white p-4 rounded-lg border border-slate-200 text-xs flex flex-col gap-2">
             <h5 className="font-bold text-slate-900 text-xs uppercase tracking-wide">Điểm Các Bài Kiểm Tra</h5>
             <div className="flex flex-col gap-1.5">
               {student.quiz_scores.map((q: any, i: number) => (
-                <div key={i} className="flex items-center justify-between text-[11px] p-2 rounded-lg bg-gray-50 border border-gray-100">
-                  <span className="font-bold text-gray-800 truncate max-w-[150px]">{q.title}</span>
+                <div key={i} className="flex items-center justify-between text-[11px] p-2 rounded-lg bg-slate-50 border border-slate-100">
+                  <span className="font-bold text-slate-800 truncate max-w-[150px]">{q.title}</span>
                   <span className="font-bold text-blue-500">{q.score}/100</span>
                 </div>
               ))}
@@ -95,8 +93,8 @@ export function StudentDetailSidebar({ student, onClose }: { student: StudentDet
         )}
       </div>
       
-      <div className="p-4 border-t border-gray-100 bg-slate-50">
-        <a href={`mailto:${student.email}`} className="w-full py-2.5 rounded-lg bg-[#0F172A] hover:bg-blue-600 text-white text-xs font-bold shadow-sm transition-colors text-center block">
+      <div className="p-4 border-t border-slate-100 bg-slate-50">
+        <a href={`mailto:${student.email}`} className="w-full py-2.5 rounded-lg bg-slate-900 hover:bg-blue-600 text-white text-xs font-bold shadow-sm transition-colors text-center block">
           Gửi Email Trực Tiếp
         </a>
       </div>

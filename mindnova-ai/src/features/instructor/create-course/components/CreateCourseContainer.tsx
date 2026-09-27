@@ -4,6 +4,7 @@ import { getErrorMessage } from "@/src/shared/lib/user-error";
 import { useEffect, useCallback, useState } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
+import toast from "react-hot-toast";
 import { StepIndicator } from "./StepIndicator";
 import { Step1BasicInfo } from "./Step1BasicInfo";
 import { Step2CourseStructure } from "./Step2CourseStructure";
@@ -13,19 +14,8 @@ import type { CourseBasicInfo, StepKey } from "../types";
 import { useCreateCourse, useUploadCourseThumbnail, useUpdateCoursePrice, useUpdateCourseStatus, useProposeCategory } from "../api";
 import { useCreateModule, useCreateLesson, useCreateQuiz } from "../../lesson-management/api";
 import { useCreateCourseStore } from "../stores/createCourseStore";
-import {
- SparklesIcon,
- BookOpenIcon,
- TagIcon,
- SettingsIcon,
- CheckIcon,
- SaveIcon,
- EyeIcon,
- TrashIcon,
- ArrowRightIcon,
- ArrowLeftIcon,
-} from "./icons";
 import { OTHER_CATEGORY_VALUE } from "../constants";
+import { ArrowLeft, ArrowRight, BookOpen, Check, Eye, Save, Settings, Sparkles, Tag, Trash2, X } from "lucide-react";
 
 export function CreateCourseContainer() {
  const mode = "create"; // Currently creating course
@@ -131,11 +121,11 @@ export function CreateCourseContainer() {
  const handleNext = useCallback(() => {
  if (step === 1) {
  if (!courseInfo.title.trim()) {
- alert("Vui lòng nhập tên khóa học.");
+ toast.error("Vui lòng nhập tên khóa học.");
  return;
  }
  if (!courseInfo.thumbnailFile && !courseInfo.thumbnailPreview) {
- alert("Vui lòng tải lên ảnh bìa khóa học.");
+ toast.error("Vui lòng tải lên ảnh bìa khóa học.");
  return;
  }
  }
@@ -155,7 +145,7 @@ export function CreateCourseContainer() {
  }
  
  if (!isValid) {
- alert(errorMessage);
+ toast.error(errorMessage);
  return;
  }
  }
@@ -257,7 +247,7 @@ export function CreateCourseContainer() {
  await updateStatus({ courseId, status: "draft" });
 
  resetDraft();
- alert(" Tạo khóa học thành công!");
+ toast.success("Tạo khóa học thành công!");
  window.location.href = "/instructor/courses";
  } catch (error: any) {
  console.error("Publish failed:", error);
@@ -286,7 +276,7 @@ export function CreateCourseContainer() {
  };
 
  return (
- <div className="min-h-screen bg-[#F4F4F8] flex flex-col font-sans pb-16">
+ <div className="min-h-screen bg-slate-50 flex flex-col font-sans pb-16">
  {/* ── Header Bar ──────────────────────────────────────────────────────── */}
  <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 py-4 shadow-sm">
  <div className="max-w-6xl mx-auto flex flex-col gap-4">
@@ -294,14 +284,14 @@ export function CreateCourseContainer() {
  <div className="flex items-center gap-3">
  <Link
  href="/instructor/courses"
- className="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors shadow-sm"
+ className="w-10 h-10 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors shadow-sm"
  title="Quay lại danh sách khóa học"
  >
- <ArrowLeftIcon size={18} />
+ <ArrowLeft size={18} />
  </Link>
  <div>
  <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-slate-500 mb-0.5 font-semibold">
- <Link href="/instructor/courses" className="hover:text-[#2563EB] transition-colors">
+ <Link href="/instructor/courses" className="hover:text-blue-600 transition-colors">
  Khóa học của tôi
  </Link>
  <span>/</span>
@@ -325,7 +315,7 @@ export function CreateCourseContainer() {
  onClick={() => setIsOutlineOpen(true)}
  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 shadow-sm transition-all cursor-pointer"
  >
- <SparklesIcon size={13} />
+ <Sparkles size={13} />
  <span>Sinh đề cương AI</span>
  </button>
  </div>
@@ -339,9 +329,9 @@ export function CreateCourseContainer() {
  <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-8 flex flex-col gap-6">
  
  {publishError && (
- <div className="p-4 rounded-lg bg-[#EFF6FF] border border-[#DBEAFE] text-[#1D4ED8] text-sm font-medium flex items-center justify-between">
+ <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium flex items-center justify-between">
  <span>{publishError}</span>
- <button type="button" onClick={() => setPublishError(null)} className="text-blue-500 hover:text-[#1D4ED8] ml-3"></button>
+ <button type="button" onClick={() => setPublishError(null)} aria-label="Đóng thông báo lỗi" className="text-rose-500 hover:text-rose-700 ml-3"><X className="h-4 w-4" aria-hidden /></button>
  </div>
  )}
 
@@ -367,14 +357,14 @@ export function CreateCourseContainer() {
  )}
 
  {/* Wizard Navigation Footer */}
- <div className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-between bg-white p-5 rounded-lg shadow-sm">
+ <div className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-between bg-white p-5 rounded-xl shadow-sm">
  <button
  type="button"
  onClick={handleBack}
  disabled={step === 1}
- className="flex items-center gap-2 px-4.5 py-2.5 rounded-lg text-xs font-bold text-gray-700 border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shadow-sm"
+ className="flex items-center gap-2 px-4.5 py-2.5 rounded-lg text-xs font-bold text-slate-700 border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shadow-sm"
  >
- <span>← Quay lại</span>
+ <span><ArrowLeft className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Quay lại</span>
  </button>
 
  <button
@@ -385,13 +375,13 @@ export function CreateCourseContainer() {
  >
  {step === 3 ? (
  <>
- <SparklesIcon size={14} />
+ <Sparkles size={14} />
  <span>{isPublishing ? "Đang xử lý..." : "Hoàn tất & Tạo khóa học"}</span>
  </>
  ) : (
  <>
  <span>Tiếp theo</span>
- <ArrowRightIcon size={14} />
+ <ArrowRight size={14} />
  </>
  )}
  </button>

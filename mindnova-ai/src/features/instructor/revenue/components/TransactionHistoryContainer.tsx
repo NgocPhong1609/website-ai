@@ -5,31 +5,22 @@ import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { useQuery } from "@tanstack/react-query";
 import { getTransactions, getRevenueOverview } from "../api";
-import {
- CalendarIcon,
- ChevronDownIcon,
- ChevronLeftIcon,
- ChevronRightIcon,
- BookOpenIcon,
- WalletIcon,
- SparklesIcon,
- BuildingBankIcon,
- TrendUpIcon,
-} from "./icons";
+import { BookOpen, Calendar, ChevronDown, ChevronLeft, ChevronRight, Landmark, Sparkles, TrendingUp, Wallet, BarChart3, History, LayoutDashboard } from "lucide-react";
+import { SkeletonTable } from "@/src/shared/components/ui/Skeleton";
 
 function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
  return (
- <div className="flex items-center gap-2 p-1.5 bg-white rounded-lg border border-slate-200 shadow-sm w-fit">
+ <div className="flex items-center gap-2 p-1.5 bg-white rounded-xl border border-slate-200 shadow-sm w-fit">
  <Link
  href="/instructor/revenue"
  className={twMerge(
  "px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer",
  active === "overview"
  ? "bg-blue-500 text-white shadow-sm"
- : "text-slate-500 hover:bg-gray-100 hover:text-slate-900"
+ : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
- <span> Tổng quan Doanh thu</span>
+ <span><LayoutDashboard className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Tổng quan Doanh thu</span>
  </Link>
 
  <Link
@@ -38,10 +29,10 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  "px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer",
  active === "report"
  ? "bg-blue-500 text-white shadow-sm"
- : "text-slate-500 hover:bg-gray-100 hover:text-slate-900"
+ : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
- <span> Báo cáo Bán hàng</span>
+ <span><BarChart3 className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Báo cáo Bán hàng</span>
  </Link>
 
  <Link
@@ -50,10 +41,10 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  "px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer",
  active === "history"
  ? "bg-blue-500 text-white shadow-sm"
- : "text-slate-500 hover:bg-gray-100 hover:text-slate-900"
+ : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
- <span> Lịch sử Giao dịch</span>
+ <span><History className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Lịch sử Giao dịch</span>
  </Link>
  </div>
  );
@@ -100,7 +91,7 @@ function Filters({
 
  return (
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
- <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg p-1 shadow-sm overflow-x-auto">
+ <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 shadow-sm overflow-x-auto">
  {tabs.map((tab) => (
  <button
  key={tab.id}
@@ -125,14 +116,14 @@ function Filters({
  type="date" 
  value={startDate}
  onChange={(e) => setStartDate(e.target.value)}
- className="px-3 py-2 rounded-lg border border-slate-200 text-xs font-bold text-gray-700 bg-white shadow-sm outline-none focus:border-[#3B82F6] transition-colors"
+ className="px-3 py-2 rounded-lg border border-slate-200 text-xs font-bold text-slate-700 bg-white shadow-sm outline-none focus:border-blue-500 transition-colors"
  />
- <span className="text-gray-400 font-bold text-xs">-</span>
+ <span className="text-slate-400 font-bold text-xs">-</span>
  <input 
  type="date" 
  value={endDate}
  onChange={(e) => setEndDate(e.target.value)}
- className="px-3 py-2 rounded-lg border border-slate-200 text-xs font-bold text-gray-700 bg-white shadow-sm outline-none focus:border-[#3B82F6] transition-colors"
+ className="px-3 py-2 rounded-lg border border-slate-200 text-xs font-bold text-slate-700 bg-white shadow-sm outline-none focus:border-blue-500 transition-colors"
  />
  </div>
  )}
@@ -140,13 +131,13 @@ function Filters({
  <div className="relative">
  <button 
  onClick={() => setIsOpen(!isOpen)}
- className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-xs font-bold text-gray-700 bg-white shadow-sm hover:border-[#2563EB] transition-colors cursor-pointer min-w-[170px] justify-between"
+ className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-xs font-bold text-slate-700 bg-white shadow-sm hover:border-blue-600 transition-colors cursor-pointer min-w-[170px] justify-between"
  >
  <div className="flex items-center gap-2">
- <CalendarIcon />
+ <Calendar size={14} />
  <span>{activeLabel}</span>
  </div>
- <ChevronDownIcon />
+ <ChevronDown size={12} />
  </button>
  
  {isOpen && (
@@ -205,22 +196,22 @@ function TransactionTable({
  });
 
  const getIcon = (type: string) => {
- if (type === 'revenue') return <BookOpenIcon size={16} />;
- if (type === 'withdrawal') return <WalletIcon size={16} />;
- return <SparklesIcon size={16} />;
+ if (type === 'revenue') return <BookOpen size={16} />;
+ if (type === 'withdrawal') return <Wallet size={16} />;
+ return <Sparkles size={16} />;
  };
 
  const getIconColor = (type: string) => {
- if (type === 'revenue') return "text-[#047857] bg-emerald-50";
- if (type === 'withdrawal') return "text-blue-500 bg-purple-50";
+ if (type === 'revenue') return "text-emerald-700 bg-emerald-50";
+ if (type === 'withdrawal') return "text-blue-500 bg-sky-50";
  return "text-amber-600 bg-amber-50 border-amber-100";
  };
 
  const getStatusStyle = (status: string) => {
- if (status === 'available' || status === 'completed') return "text-[#047857] bg-emerald-50";
+ if (status === 'available' || status === 'completed') return "text-emerald-700 bg-emerald-50";
  if (status === 'processing') return "text-blue-500 bg-blue-50";
  if (status === 'escrow') return "text-amber-700 bg-amber-50 border-amber-200";
- return "text-gray-700 bg-slate-50 border-slate-200";
+ return "text-slate-700 bg-slate-50 border-slate-200";
  };
 
  const getStatusText = (status: string) => {
@@ -250,16 +241,15 @@ function TransactionTable({
 
  if (isLoading) {
  return (
- <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-12 flex flex-col items-center justify-center">
- 
- <p className="text-slate-500 font-bold text-sm">Đang tải lịch sử giao dịch...</p>
+ <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+ <SkeletonTable rows={8} cols={5} />
  </div>
  );
  }
 
  if (isError || !data) {
  return (
- <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-12 flex flex-col items-center justify-center text-rose-500">
+ <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 flex flex-col items-center justify-center text-rose-500">
  <p className="font-bold">Đã có lỗi xảy ra khi tải dữ liệu giao dịch.</p>
  </div>
  );
@@ -269,7 +259,7 @@ function TransactionTable({
  const meta = data;
 
  return (
- <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col overflow-hidden">
+ <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
  <div className="overflow-x-auto">
  <table className="w-full text-left border-collapse min-w-[750px]">
  <thead>
@@ -281,7 +271,7 @@ function TransactionTable({
  <th className="px-6 py-3.5 text-right w-[150px]">Số Tiền</th>
  </tr>
  </thead>
- <tbody className="divide-y divide-gray-100 text-xs font-medium">
+ <tbody className="divide-y divide-slate-100 text-xs font-medium">
  {transactions.length > 0 ? (
  transactions.map((t: any) => {
  const dt = formatDate(t.created_at);
@@ -291,7 +281,7 @@ function TransactionTable({
  <td className="px-6 py-4">
  <div className="flex flex-col">
  <span className="font-semibold text-slate-900">{dt.date}</span>
- <span className="text-[11px] text-gray-400 mt-0.5">{dt.time}</span>
+ <span className="text-[11px] text-slate-400 mt-0.5">{dt.time}</span>
  </div>
  </td>
  <td className="px-6 py-4">
@@ -321,7 +311,7 @@ function TransactionTable({
  })
  ) : (
  <tr>
- <td colSpan={5} className="px-6 py-12 text-center text-gray-400 font-bold">
+ <td colSpan={5} className="px-6 py-12 text-center text-slate-400 font-bold">
  Không tìm thấy giao dịch nào thuộc bộ lọc này.
  </td>
  </tr>
@@ -330,23 +320,23 @@ function TransactionTable({
  </table>
  </div>
 
- <div className="px-6 py-4 flex items-center justify-between border-t border-gray-100 bg-slate-50/50">
+ <div className="px-6 py-4 flex items-center justify-between border-t border-slate-100 bg-slate-50/50">
  <span className="text-xs font-semibold text-slate-500">Hiển thị {transactions.length} trên tổng số {meta.total} giao dịch</span>
  <div className="flex items-center gap-1">
  <button 
  onClick={() => setPage(page - 1)}
  disabled={page === 1}
  aria-label="Trang trước" 
- className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-gray-400 disabled:opacity-50 hover:bg-slate-50 transition-colors cursor-pointer disabled:cursor-not-allowed">
- <ChevronLeftIcon />
+ className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 disabled:opacity-50 hover:bg-slate-50 transition-colors cursor-pointer disabled:cursor-not-allowed">
+ <ChevronLeft size={12} />
  </button>
  <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-500 text-white font-semibold text-xs shadow-sm">{page}</button>
  <button 
  onClick={() => setPage(page + 1)}
  disabled={page === meta.last_page || meta.last_page === 0}
  aria-label="Trang sau" 
- className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-gray-400 disabled:opacity-50 hover:bg-slate-50 transition-colors cursor-pointer disabled:cursor-not-allowed">
- <ChevronRightIcon />
+ className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 disabled:opacity-50 hover:bg-slate-50 transition-colors cursor-pointer disabled:cursor-not-allowed">
+ <ChevronRight size={12} />
  </button>
  </div>
  </div>
@@ -363,9 +353,9 @@ function BottomCards() {
 
  return (
  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
- <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm flex items-center gap-4">
- <div className="w-12 h-12 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 border-slate-200">
- <BuildingBankIcon size={22} />
+ <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4">
+ <div className="w-12 h-12 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 border border-slate-200">
+ <Landmark size={22} />
  </div>
  <div>
  <span className="text-xs font-bold text-slate-500 block uppercase">Số dư khả dụng</span>
@@ -373,9 +363,9 @@ function BottomCards() {
  </div>
  </div>
 
- <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm flex items-center gap-4">
- <div className="w-12 h-12 rounded-lg bg-emerald-50 text-slate-900 flex items-center justify-center shrink-0 border-slate-200">
- <TrendUpIcon size={22} />
+ <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4">
+ <div className="w-12 h-12 rounded-lg bg-emerald-50 text-slate-900 flex items-center justify-center shrink-0 border border-slate-200">
+ <TrendingUp size={22} />
  </div>
  <div>
  <span className="text-xs font-bold text-slate-500 block uppercase">Thu nhập Tích lũy Tháng</span>
@@ -383,7 +373,7 @@ function BottomCards() {
  </div>
  </div>
 
- <div className="bg-blue-50/50 rounded-lg border-slate-200 p-5 flex items-center justify-between gap-3 shadow-sm">
+ <div className="bg-blue-50/50 rounded-lg border border-slate-200 p-5 flex items-center justify-between gap-3 shadow-sm">
  <div>
  <span className="text-sm font-bold text-blue-500 block">Yêu Cầu Rút Tiền Hoa Hồng</span>
  <span className="text-xs text-blue-500/80 font-medium mt-0.5 block">Hệ thống thanh toán nhanh 24/7</span>
@@ -417,7 +407,7 @@ export function TransactionHistoryContainer() {
  };
 
  return (
- <div className="flex flex-col min-h-screen bg-[#F4F4F8] font-sans">
+ <div className="flex flex-col min-h-screen bg-slate-50 font-sans">
  <main className="flex-1 overflow-y-auto">
  <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col gap-6 pb-16">
  <RevenueNavigationTabs active="history" />

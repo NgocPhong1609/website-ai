@@ -3,8 +3,8 @@
 import React, { useState, useCallback } from "react";
 import { twMerge } from "tailwind-merge";
 import { Loader } from "@/src/shared/components/ui/Loader";
-import { SparklesIcon, CheckCircleIcon, PlayCircleIcon } from "./icons";
 import { useGenerateOutline, OutlineChapter, OutlineLesson, GeneratedOutline } from "../hooks/useGenerateOutline";
+import { CheckCircle, PlayCircle, Sparkles, ArrowLeft, X } from "lucide-react";
 
 export interface AIOutlineModalProps {
 
@@ -65,7 +65,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  <div className="p-6 bg-white border-b border-slate-200 flex items-center justify-between">
  <div className="flex items-center gap-3">
  <span className="w-10 h-10 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 flex items-center justify-center shadow-sm">
- <SparklesIcon size={20} className="text-emerald-600" />
+ <Sparkles size={20} className="text-emerald-600" />
  </span>
  <div>
  <h3 className="text-base font-semibold text-slate-900">Trợ lý AI tạo Đề cương (Mục 2.1)</h3>
@@ -77,7 +77,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  onClick={onClose}
  className="text-slate-400 hover:text-slate-700 font-bold text-lg p-2 transition-colors rounded-lg border border-transparent hover:border-slate-200"
  >
- ✕
+ <X className="h-5 w-5" aria-hidden />
  </button>
  </div>
 
@@ -157,7 +157,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  : "border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
  )}
  >
- <p className="text-sm font-semibold"> Nắm vững Học thuật Toàn diện</p>
+ <p className="text-sm font-semibold">Nắm vững Học thuật Toàn diện</p>
  <p className="text-xs font-medium text-slate-500 mt-1">
  Đi sâu vào lý thuyết, nghiên cứu các tình huống thực tế và phân tích kiến thức chuyên sâu.
  </p>
@@ -179,14 +179,14 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  ) : error ? (
  <div className="py-20 flex flex-col items-center justify-center gap-4 text-center text-blue-500">
  <h4 className="text-sm font-semibold">{error}</h4>
- <button disabled={isGenerating} onClick={handleGenerate} className="px-4 py-2 bg-[#EFF6FF] text-[#2563EB] rounded-lg font-bold hover:bg-[#DBEAFE] disabled:opacity-50">
+ <button disabled={isGenerating} onClick={handleGenerate} className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-bold hover:bg-blue-100 disabled:opacity-50">
  Thử lại
  </button>
  </div>
  ) : (
  <div className="flex flex-col gap-4">
  <div className="flex items-center justify-between">
- <span className="text-xs font-semibold text-slate-900 px-3 py-1 bg-emerald-50 rounded-lg border-slate-200">
+ <span className="text-xs font-semibold text-slate-900 px-3 py-1 bg-emerald-50 rounded-lg border border-slate-200">
  Đã tạo Đề cương bằng AI
  </span>
  <button
@@ -194,7 +194,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  onClick={() => setStep("params")}
  className="text-xs font-bold text-blue-500 hover:underline"
  >
- ← Thay đổi thông số
+ <ArrowLeft className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Thay đổi thông số
  </button>
  </div>
 
@@ -241,7 +241,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  </div>
  {/* Preview nội dung */}
  {lesson.type === "document" && lesson.content && (
- <p className="text-[11px] text-gray-400 font-medium ml-6 line-clamp-2">
+ <p className="text-[11px] text-slate-400 font-medium ml-6 line-clamp-2">
  Đã có nội dung ({lesson.content.replace(/<[^>]*>/g, '').slice(0, 80)}...)
  </p>
  )}
@@ -263,11 +263,11 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  </div>
 
  {/* Footer */}
- <div className="p-4 px-6 bg-[#F8F9FF] border-t border-slate-200 flex items-center justify-between">
+ <div className="p-4 px-6 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
  <button
  type="button"
  onClick={onClose}
- className="px-5 py-2 rounded-lg text-xs font-semibold text-slate-500 hover:bg-gray-200 transition-colors"
+ className="px-5 py-2 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-200 transition-colors"
  >
  Hủy bỏ
  </button>
@@ -278,7 +278,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  onClick={handleGenerate}
  className="px-6 py-2.5 bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-md hover:opacity-95 transition-all flex items-center gap-2"
  >
- <span> Tạo Đề cương</span>
+ <span><Sparkles className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Tạo Đề cương</span>
  </button>
  ) : (
  <div className="flex items-center gap-3">
@@ -286,7 +286,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  type="button"
  onClick={handleGenerate}
  disabled={isGenerating}
- className="px-4 py-2 bg-white border border-[#DBEAFE] text-blue-500 text-xs font-semibold rounded-lg hover:bg-[#FAF8FF] transition-all disabled:opacity-50"
+ className="px-4 py-2 bg-white border border-blue-100 text-blue-500 text-xs font-semibold rounded-lg hover:bg-slate-50 transition-all disabled:opacity-50"
  >
  Tạo lại
  </button>
@@ -294,7 +294,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  type="button"
  onClick={handleApply}
  disabled={isGenerating || outline.chapters.length === 0}
- className="px-6 py-2.5 bg-[#0F172A] text-white text-xs font-bold rounded-lg shadow-md hover:bg-blue-600 transition-all disabled:opacity-50"
+ className="px-6 py-2.5 bg-slate-900 text-white text-xs font-bold rounded-lg shadow-md hover:bg-blue-600 transition-all disabled:opacity-50"
  >
  Áp dụng vào Khóa học
  </button>

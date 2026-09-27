@@ -5,6 +5,8 @@ import { twMerge } from "tailwind-merge";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
+import { CheckCircle2, Check, Pin, PinOff } from "lucide-react";
+import { SkeletonList } from "@/src/shared/components/ui/Skeleton";
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -141,7 +143,7 @@ export function DiscussionReplyContainer() {
  const filteredThreads = threads;
 
  return (
- <div className="flex flex-col min-h-screen bg-[#FAF8FF]">
+ <div className="flex flex-col min-h-screen bg-slate-50">
  <main className="flex-1 overflow-y-auto">
  <div className="max-w-[1080px] mx-auto px-6 py-8 flex flex-col gap-8">
  
@@ -168,7 +170,7 @@ export function DiscussionReplyContainer() {
  <div className="flex flex-col gap-6 animate-fadeIn">
  {/* Inbox Filters */}
  <div className="flex items-center justify-between flex-wrap gap-4">
- <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-lg border border-slate-200">
+ <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200">
  {[
  { id: "all", label: "Tất cả thảo luận" },
  { id: "needs_attention", label: "Cần phản hồi" },
@@ -194,35 +196,35 @@ export function DiscussionReplyContainer() {
  ))}
  </div>
 
- <p className="text-xs font-bold text-gray-400">
- Đang hiển thị <strong className="text-gray-800">{pagination?.total || filteredThreads.length}</strong> cuộc thảo luận đang hoạt động
+ <p className="text-xs font-bold text-slate-400">
+ Đang hiển thị <strong className="text-slate-800">{pagination?.total || filteredThreads.length}</strong> cuộc thảo luận đang hoạt động
  </p>
  </div>
 
  {/* Thread Cards List */}
  {loading ? (
- <div className="p-16 text-center text-gray-400 font-medium">Đang tải dữ liệu...</div>
+ <SkeletonList items={4} />
  ) : filteredThreads.length === 0 ? (
- <div className="p-16 text-center rounded-lg bg-white border border-slate-200 flex flex-col items-center gap-2 text-gray-400">
- <span className="text-4xl"></span>
+ <div className="p-16 text-center rounded-xl bg-white border border-slate-200 flex flex-col items-center gap-2 text-slate-400">
+ <CheckCircle2 className="h-10 w-10 text-emerald-500" aria-hidden />
  <p className="text-sm font-bold text-slate-900">Tuyệt vời! Tất cả thảo luận đã được trả lời!</p>
  <p className="text-xs">Không có thảo luận nào cần bạn chú ý ở bộ lọc hiện tại.</p>
  </div>
  ) : (
  <div className="flex flex-col gap-6">
  {filteredThreads.map((thread: any) => (
- <div key={thread.id} className="p-6 rounded-lg bg-white border border-slate-200 shadow-xs flex flex-col gap-5">
+ <div key={thread.id} className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-col gap-5">
  
  {/* Thread Top Info */}
  <div className="flex items-start justify-between gap-4">
  <div className="flex items-center gap-3.5">
- <div className="w-11 h-11 rounded-lg bg-blue-500 text-blue-500 text-white font-bold text-sm flex items-center justify-center shadow-sm">
+ <div className="w-11 h-11 rounded-lg bg-blue-600 text-white font-bold text-sm flex items-center justify-center shadow-sm">
  {thread.studentName.slice(0, 2).toUpperCase()}
  </div>
  <div>
  <div className="flex items-center gap-2">
  <h4 className="text-sm font-bold text-slate-900">{thread.studentName}</h4>
- <span className="text-[11px] font-bold text-gray-400">({thread.timeAgo})</span>
+ <span className="text-[11px] font-bold text-slate-400">({thread.timeAgo})</span>
  </div>
  <p className="text-xs font-semibold text-blue-500 mt-0.5">
  {thread.course} • <span className="text-slate-500">{thread.lesson}</span>
@@ -241,13 +243,13 @@ export function DiscussionReplyContainer() {
  </div>
 
  {/* Content Body */}
- <div className="p-4 rounded-lg bg-[#F8F9FF] border border-slate-200 text-sm font-medium text-gray-800 leading-relaxed">
+ <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 text-sm font-medium text-slate-800 leading-relaxed">
  {thread.content}
  </div>
 
  {/* Previous Reply Display */}
  {thread.replyText && (
- <div className="p-5 rounded-lg from-emerald-50/60 to-teal-50/20 border-slate-200 text-xs font-medium text-gray-800 flex flex-col gap-2">
+ <div className="p-5 rounded-lg from-emerald-50/60 to-teal-50/20 border border-slate-200 text-xs font-medium text-slate-800 flex flex-col gap-2">
  <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
  
  <span>Phản hồi của giảng viên:</span>
@@ -258,32 +260,32 @@ export function DiscussionReplyContainer() {
  )}
 
  {/* Action & Reply Bar */}
- <div className="flex flex-col gap-3 pt-3 border-t border-gray-100">
+ <div className="flex flex-col gap-3 pt-3 border-t border-slate-100">
  <div className="flex items-center justify-between gap-4 flex-wrap">
  <div className="flex items-center gap-2">
  <button
  type="button"
  onClick={() => togglePin(thread.id)}
- className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs transition-all cursor-pointer"
+ className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-all cursor-pointer"
  >
- {thread.isPinned ? "Bỏ ghim bình luận" : " Ghim bình luận"}
+ {thread.isPinned ? <><PinOff className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Bỏ ghim bình luận</> : <><Pin className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Ghim bình luận</>}
  </button>
  <button
  type="button"
  onClick={() => toggleResolvedStatus(thread.id, thread.isResolved)}
  className={twMerge(
  "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
- thread.isResolved ? "bg-blue-500 text-white shadow-sm" : "bg-emerald-50 hover:bg-[#EFF6FF] text-slate-900 border border-slate-200"
+ thread.isResolved ? "bg-blue-500 text-white shadow-sm" : "bg-emerald-50 hover:bg-blue-50 text-slate-900 border border-slate-200"
  )}
  >
- {thread.isResolved ? " Đã phản hồi" : "️ Xác nhận đã phản hồi"}
+ {thread.isResolved ? <><CheckCircle2 className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Đã phản hồi</> : <><Check className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Xác nhận đã phản hồi</>}
  </button>
  </div>
 
  <button
  type="button"
  onClick={() => deleteThread(thread.id)}
- className="text-gray-400 hover:text-[#2563EB] font-semibold text-xs px-2 py-1 transition-colors cursor-pointer"
+ className="text-slate-400 hover:text-blue-600 font-semibold text-xs px-2 py-1 transition-colors cursor-pointer"
  >
  Xóa thảo luận
  </button>
@@ -296,12 +298,12 @@ export function DiscussionReplyContainer() {
  placeholder="Viết hướng dẫn hoặc ví dụ mã hữu ích..."
  value={draftReplies[thread.id] || ""}
  onChange={(e) => setDraftReplies((prev) => ({ ...prev, [thread.id]: e.target.value }))}
- className="flex-1 px-4 py-3 rounded-lg border border-[#DBEAFE] bg-white text-xs font-bold focus:outline-none focus:border-slate-200"
+ className="flex-1 px-4 py-3 rounded-lg border border-blue-100 bg-white text-xs font-bold focus:outline-none focus:border-slate-200"
  />
  <button
  type="button"
  onClick={() => submitReply(thread.id, draftReplies[thread.id] || "")}
- className="px-6 py-3 rounded-lg bg-[#0F172A] hover:bg-blue-600 text-white font-semibold text-xs shadow-md transition-all cursor-pointer"
+ className="px-6 py-3 rounded-lg bg-slate-900 hover:bg-blue-600 text-white font-semibold text-xs shadow-md transition-all cursor-pointer"
  >
  Gửi trả lời 
  </button>

@@ -28,7 +28,7 @@ describe('ChatMessageBubble instructor identity', () => {
   it('uses distinct styling for an incoming instructor message', () => {
     render(<ChatMessageBubble message={message('teacher')} isOwn={false} />);
 
-    expect(screen.getByText('Please review this lesson').parentElement).toHaveClass('bg-[#EFF6FF]');
+    expect(screen.getByText('Please review this lesson').parentElement).toHaveClass('bg-blue-50/80');
   });
 
   it('keeps the instructor badge when a message is recalled', () => {

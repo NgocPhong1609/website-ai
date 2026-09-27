@@ -48,7 +48,7 @@ export function CourseAiQuizModal({
         className="absolute inset-0"
         onClick={handleSafeClose}
       />
-      <div className="relative w-full max-w-5xl bg-[#FDFBF7] rounded-lg shadow-2xl overflow-hidden my-6 border border-gray-200 max-h-[92vh] flex flex-col z-10">
+      <div className="relative w-full max-w-5xl bg-slate-50 rounded-lg shadow-2xl overflow-hidden my-6 border border-slate-200 max-h-[92vh] flex flex-col z-10">
         
         {/* Modal Header */}
         <div className="px-6 py-4 bg-white border-b border-slate-200 flex items-center justify-between shrink-0">

@@ -10,7 +10,7 @@ import { CourseFilterTabs } from "./CourseFilterTabs";
 import { CourseCard } from "./CourseCard";
 import { CreateCourseCard } from "./CreateCourseCard";
 import { CoursePagination } from "./CoursePagination";
-import { SearchIcon } from "./icons";
+import { Search, X } from "lucide-react";
 
 const PAGE_SIZE = 9;
 
@@ -76,7 +76,7 @@ function CourseManagementContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F4F4F8] font-sans">
+    <div className="min-h-screen bg-slate-50 font-sans">
       <div className="max-w-[1200px] w-full mx-auto p-6 lg:p-8 flex flex-col gap-8 pb-20 animate-fadeIn">
         {/* ── Page Header & Filter Tabs ───────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-6">
@@ -93,11 +93,11 @@ function CourseManagementContent() {
         </div>
 
         {/* ── Search & Sort Bar ────────────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
           {/* Search Box */}
           <div className="relative flex-1 max-w-md">
             <span className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-slate-500">
-              <SearchIcon />
+              <Search size={16} />
             </span>
             <input
               type="text"
@@ -113,9 +113,9 @@ function CourseManagementContent() {
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute inset-y-0 right-3 flex items-center text-xs text-gray-400 hover:text-gray-600 font-bold"
+                className="absolute inset-y-0 right-3 flex items-center text-xs text-slate-400 hover:text-slate-600 font-bold"
               >
-                ✕
+                <X className="h-5 w-5" aria-hidden />
               </button>
             )}
           </div>
@@ -145,7 +145,7 @@ function CourseManagementContent() {
             {isLoading ? (
               <>
                 {[...Array(6)].map((_, i) => (
-                <div key={i} className="flex flex-col bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm h-full min-h-[300px]">
+                <div key={i} className="flex flex-col bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm h-full min-h-[300px]">
                   <Skeleton className="h-40 w-full rounded-none" />
                   <div className="p-4 flex flex-col flex-1 gap-3">
                     <Skeleton className="h-5 w-3/4" />

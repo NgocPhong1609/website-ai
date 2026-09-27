@@ -4,6 +4,8 @@ import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useState, useCallback, useEffect, useMemo, type DragEvent } from "react";
 import { useRouter } from "next/navigation";
 import { twMerge } from "tailwind-merge";
+import toast from "react-hot-toast";
+import { useConfirmDialog } from "@/src/shared/components/ui/ConfirmDialog";
 import { NoData } from "@/src/shared/components/ui/NoData";
 import { useCourseStructure, type LessonType, type LessonNode } from "@/src/hooks/instructor/useCourseStructure";
 import { CreateLessonEditModal } from "./CreateLessonEditModal";
@@ -24,29 +26,8 @@ import { CourseAiQuizModal } from "./CourseAiQuizModal";
 import { CourseManualQuizModal } from "./CourseManualQuizModal";
 import { SelectCourseLevelQuizModal } from "./SelectCourseLevelQuizModal";
 import { useCreateCourseStore } from "../stores/createCourseStore";
-import {
-  AlertTriangle,
-  BookOpen,
-  Bot,
-  Check,
-  ChevronDown,
-  ClipboardList,
-  Eye,
-  FileQuestion,
-  FileText,
-  Flag,
-  Folder,
-  FolderOpen,
-  GripVertical,
-  PenLine,
-  Plus,
-  RefreshCw,
-  Target,
-  Timer,
-  Trash2,
-  Trophy,
-  Video,
-} from "lucide-react";
+import { AlertTriangle, BookOpen, Bot, Check, ChevronDown, ClipboardList, Eye, FileQuestion, FileText, Flag, Folder, FolderOpen, GripVertical, PenLine, Plus, RefreshCw, Target, Timer, Trash2, Trophy, Video, Zap } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 function GripIcon({ size = 16 }: { size?: number }) {
   return <GripVertical size={size} aria-hidden />;
@@ -144,7 +125,7 @@ function LessonRow({
             e.stopPropagation();
             onDragStart && onDragStart(e, chapterId, lesson.id);
           }}
-          className="text-gray-300 group-hover:text-slate-500 cursor-grab active:cursor-grabbing transition-colors shrink-0 p-1 rounded hover:bg-gray-100"
+          className="text-slate-300 group-hover:text-slate-500 cursor-grab active:cursor-grabbing transition-colors shrink-0 p-1 rounded hover:bg-slate-100"
           title="Giữ và kéo để sắp xếp vị trí bài học"
         >
           <GripIcon size={16} />
@@ -232,7 +213,7 @@ function LessonRow({
               onDelete(chapterId, lesson.id);
             }
           }}
-          className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-transparent hover:border-rose-200 transition-all cursor-pointer flex items-center justify-center shrink-0"
+          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-transparent hover:border-rose-200 transition-all cursor-pointer flex items-center justify-center shrink-0"
           title={isQuiz ? "Gỡ bài thi khỏi khóa học" : "Xóa bài học"}
         >
           <TrashIcon size={15} />
@@ -244,6 +225,7 @@ function LessonRow({
 
 export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   const router = useRouter();
+  const { confirm } = useConfirmDialog();
 
   // API Hooks for existing course edit
   const { data: apiModules, isLoading: isLoadingModules, refetch: refetchModules } = useCourseModules(courseId || "");
@@ -323,16 +305,22 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   });
 
   const handleDetachQuiz = async (quizId: number) => {
-    if (!confirm("Bạn có chắc chắn muốn gỡ bài kiểm tra này khỏi khóa học?")) return;
+    const confirmed = await confirm({
+      title: "Gỡ bài kiểm tra",
+      message: "Bạn có chắc chắn muốn gỡ bài kiểm tra này khỏi khóa học?",
+      confirmText: "Gỡ bài kiểm tra",
+      variant: "warning",
+    });
+    if (!confirmed) return;
     try {
       await quizGeneratorApi.deleteQuiz(quizId, true);
-      alert("Đã gỡ bài kiểm tra khỏi khóa học thành công!");
+      toast.success("Đã gỡ bài kiểm tra khỏi khóa học thành công!");
       if (courseId) {
         refetchModules();
         refetchCourseQuizzes();
       }
     } catch (err: any) {
-      alert(getErrorMessage(err, "Không thể gỡ bài kiểm tra. Vui lòng thử lại."));
+      toast.error(getErrorMessage(err, "Không thể gỡ bài kiểm tra. Vui lòng thử lại."));
     }
   };
 
@@ -343,7 +331,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
       refetchCourseQuizzes();
       refetchModules();
     } catch (err: any) {
-      alert(getErrorMessage(err, "Không thể chọn bài thi chính. Vui lòng thử lại."));
+      toast.error(getErrorMessage(err, "Không thể chọn bài thi chính. Vui lòng thử lại."));
     }
   };
 
@@ -381,7 +369,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         });
         await refetchModules();
       } catch (err: any) {
-        alert(getErrorMessage(err, "Không thể tạo chuyên đề. Vui lòng thử lại."));
+        toast.error(getErrorMessage(err, "Không thể tạo chuyên đề. Vui lòng thử lại."));
       }
     } else {
       addDraftChapter(title);
@@ -440,13 +428,19 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   };
 
   const handleDeleteChapter = async (chapterId: string) => {
-    if (!confirm("Bạn có chắc chắn muốn xóa chuyên đề này và tất cả các bài học bên trong?")) return;
+    const confirmed = await confirm({
+      title: "Xóa chuyên đề",
+      message: "Bạn có chắc chắn muốn xóa chuyên đề này và tất cả các bài học bên trong?",
+      confirmText: "Xóa chuyên đề",
+      variant: "danger",
+    });
+    if (!confirmed) return;
     if (courseId) {
       try {
         await deleteModuleMutation.mutateAsync({ courseId, moduleId: chapterId });
         await refetchModules();
       } catch (err: any) {
-        alert(getErrorMessage(err, "Không thể xóa chuyên đề. Vui lòng thử lại."));
+        toast.error(getErrorMessage(err, "Không thể xóa chuyên đề. Vui lòng thử lại."));
       }
     } else {
       deleteDraftChapter(chapterId);
@@ -469,7 +463,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         await refetchModules();
         setEditingLesson({ chapterId, lesson: { ...created, type: "video" } });
       } catch (err: any) {
-        alert(getErrorMessage(err, "Không thể thêm bài học video. Vui lòng thử lại."));
+        toast.error(getErrorMessage(err, "Không thể thêm bài học video. Vui lòng thử lại."));
       }
     } else {
       addDraftLesson(chapterId, `Bài học ${currentCount + 1}: Video bài giảng mới`, "video");
@@ -509,7 +503,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         await refetchModules();
         setEditingLesson({ chapterId, lesson: { ...created, type: "document" } });
       } catch (err: any) {
-        alert(getErrorMessage(err, "Không thể thêm tài liệu. Vui lòng thử lại."));
+        toast.error(getErrorMessage(err, "Không thể thêm tài liệu. Vui lòng thử lại."));
       }
     } else {
       addDraftLesson(chapterId, `Tài liệu đọc #${currentCount + 1}`, "document");
@@ -526,13 +520,19 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   };
 
   const handleDeleteLesson = async (chapterId: string, lessonId: string) => {
-    if (!confirm("Bạn có chắc chắn muốn xóa bài học này?")) return;
+    const confirmed = await confirm({
+      title: "Xóa bài học",
+      message: "Bạn có chắc chắn muốn xóa bài học này?",
+      confirmText: "Xóa bài học",
+      variant: "danger",
+    });
+    if (!confirmed) return;
     if (courseId) {
       try {
         await deleteLessonMutation.mutateAsync({ courseId, lessonId });
         await refetchModules();
       } catch (err: any) {
-        alert(getErrorMessage(err, "Không thể xóa bài học. Vui lòng thử lại."));
+        toast.error(getErrorMessage(err, "Không thể xóa bài học. Vui lòng thử lại."));
       }
     } else {
       deleteDraftLesson(chapterId, lessonId);
@@ -565,7 +565,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
         refetchCourseQuizzes();
         setEditingLesson(null);
       } catch (err: any) {
-        alert(getErrorMessage(err, "Không thể lưu thay đổi. Vui lòng thử lại."));
+        toast.error(getErrorMessage(err, "Không thể lưu thay đổi. Vui lòng thử lại."));
       }
     } else if (editingLesson) {
       updateDraftLesson(editingLesson.chapterId, lessonId, updates);
@@ -623,7 +623,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                 refetchModules();
               })
               .catch((err: any) => {
-                alert(getErrorMessage(err, "Không thể cập nhật thứ tự mới. Vui lòng thử lại."));
+                toast.error(getErrorMessage(err, "Không thể cập nhật thứ tự mới. Vui lòng thử lại."));
                 refetchModules();
               });
 
@@ -648,7 +648,25 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
   }, []);
 
   if (courseId && isLoadingModules) {
-    return <div className="p-8 text-center text-slate-500 font-medium">Đang nạp cấu trúc giáo trình &amp; bài thi...</div>;
+    return (
+      <div role="status" aria-busy="true" aria-label="Đang nạp cấu trúc giáo trình" className="flex flex-col gap-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-5 w-1/3" />
+              <Skeleton className="h-8 w-24" />
+            </div>
+            {Array.from({ length: 2 }).map((__, j) => (
+              <div key={j} className="flex items-center gap-3 p-3 rounded-lg border border-slate-100">
+                <Skeleton className="h-8 w-8 rounded-lg shrink-0" />
+                <Skeleton className="h-4 flex-1" />
+                <Skeleton className="h-6 w-16" />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return (
@@ -662,7 +680,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
 
       {/* KHU VỰC 2 — QUẢN LÝ QUIZ CẤP KHÓA HỌC */}
       {courseId && (
-        <div className="w-full p-6 rounded-lg bg-gradient-to-b from-[#FAF8FF] to-white border-2 border-blue-100 shadow-xs flex flex-col gap-6">
+        <div className="w-full p-6 rounded-lg bg-gradient-to-b from-slate-50 to-white border-2 border-blue-100 shadow-xs flex flex-col gap-6">
           <div>
             <div className="flex items-center gap-2">
               <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs">
@@ -672,14 +690,14 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                 QUẢN LÝ BÀI KIỂM TRA CẤP KHÓA HỌC
               </h3>
             </div>
-            <p className="text-xs text-gray-500 font-medium mt-1">
+            <p className="text-xs text-slate-500 font-medium mt-1">
               Quản lý các bài kiểm tra Đánh giá năng lực tổng quát và bài kiểm tra Cuối khóa học. Chỉ bài thi được chọn chính mới được hiển thị cho học viên.
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
             {/* Sub-section A: 🏆 Kiểm tra tổng quát */}
-            <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col justify-between gap-4 h-full">
+            <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between gap-4 h-full">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2 min-h-[58px]">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <div className="min-w-0">
@@ -729,7 +747,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                     </button>
                   </div>
                 ) : (
-                  <div className="p-4 rounded-lg border border-slate-200 bg-white shadow-sm flex flex-col justify-between gap-4 h-full">
+                  <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between gap-4 h-full">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <FileQuestion className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
@@ -773,7 +791,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                         <button
                           type="button"
                           onClick={() => handleDetachQuiz(activeGeneralQuiz.id)}
-                          className="p-1 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
+                          className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
                           title="Gỡ khỏi khóa học"
                         >
                           <TrashIcon size={14} />
@@ -786,7 +804,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
             </div>
 
             {/* Sub-section B: 🏁 Kiểm tra cuối khóa học */}
-            <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col justify-between gap-4 h-full">
+            <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between gap-4 h-full">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2 min-h-[58px]">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <div className="min-w-0">
@@ -836,7 +854,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                     </button>
                   </div>
                 ) : (
-                  <div className="p-4 rounded-lg border border-slate-200 bg-white shadow-sm flex flex-col justify-between gap-4 h-full">
+                  <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between gap-4 h-full">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <FileQuestion className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
@@ -880,7 +898,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                         <button
                           type="button"
                           onClick={() => handleDetachQuiz(activeFinalQuiz.id)}
-                          className="p-1 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
+                          className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
                           title="Gỡ khỏi khóa học"
                         >
                           <TrashIcon size={14} />
@@ -912,7 +930,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
               <button
                 type="button"
                 onClick={toggleCollapseAll}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
                 title="Thu gọn hoặc mở rộng tất cả các chuyên đề"
               >
                 <span className="inline-flex items-center gap-1">
@@ -947,7 +965,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                 + Tạo Chuyên Đề Đầu Tiên
               </button>
             }
-            className="bg-white border border-dashed border-gray-300 shadow-sm p-14 rounded-lg"
+            className="bg-white border border-dashed border-slate-300 shadow-sm p-14 rounded-xl"
           />
         ) : (
           <div className="flex flex-col gap-5">
@@ -955,18 +973,18 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
               const isCollapsed = Boolean(collapsedModules[chap.id]);
 
               return (
-                <div key={chap.id} className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
+                <div key={chap.id} className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
                   {/* Chapter Header */}
-                  <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-100 pb-3.5 gap-3">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3.5 gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       {/* Collapse / Expand Toggle Button */}
                       <button
                         type="button"
                         onClick={() => toggleModuleCollapse(chap.id)}
-                        className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all cursor-pointer flex items-center justify-center shrink-0"
+                        className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer flex items-center justify-center shrink-0"
                         title={isCollapsed ? "Mở rộng chuyên đề" : "Thu gọn chuyên đề"}
                       >
-                        <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${isCollapsed ? "-rotate-90 text-gray-500" : "rotate-0 text-blue-500"}`} aria-hidden />
+                        <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${isCollapsed ? "-rotate-90 text-slate-500" : "rotate-0 text-blue-500"}`} aria-hidden />
                       </button>
 
                       <span className="w-8 h-8 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
@@ -979,7 +997,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                           value={chap.title}
                           onChange={(e) => handleLocalModuleTitleChange(chap.id, e.target.value)}
                           onBlur={(e) => handleSaveModuleTitleOnBlur(chap.id, e.target.value)}
-                          className="w-full text-sm font-bold text-slate-900 bg-transparent focus:outline-none focus:border-b-2 focus:border-[#3B82F6] transition-colors truncate"
+                          className="w-full text-sm font-bold text-slate-900 bg-transparent focus:outline-none focus:border-b-2 focus:border-blue-500 transition-colors truncate"
                           placeholder="Tên chuyên đề..."
                         />
 
@@ -1030,7 +1048,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                       <button
                         type="button"
                         onClick={() => handleDeleteChapter(chap.id)}
-                        className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 rounded-lg transition-all cursor-pointer flex items-center justify-center shrink-0"
+                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 rounded-lg transition-all cursor-pointer flex items-center justify-center shrink-0"
                         title="Xóa chuyên đề"
                       >
                         <TrashIcon size={16} />
@@ -1068,9 +1086,9 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                   )}
 
                   {/* AI Co-Creator Quick Action Tag */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 text-[11px] font-bold text-gray-400 gap-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 text-[11px] font-bold text-slate-400 gap-1">
                     <span className="flex items-center gap-1 text-blue-500">
-                      ⚡ AI Generator: Tạo bộ câu hỏi trắc nghiệm tự động theo ngữ cảnh bài học của chuyên đề này.
+                      <Zap className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />AI Generator: Tạo bộ câu hỏi trắc nghiệm tự động theo ngữ cảnh bài học của chuyên đề này.
                     </span>
                     <span>Tổng {chap.lessons.length} bài học &amp; bài thi</span>
                   </div>

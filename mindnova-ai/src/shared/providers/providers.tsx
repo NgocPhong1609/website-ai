@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ConfirmDialogProvider } from "@/src/shared/components/ui/ConfirmDialog";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -36,7 +37,9 @@ export default function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <ConfirmDialogProvider>
+        {children}
+      </ConfirmDialogProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

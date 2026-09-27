@@ -3,7 +3,7 @@
 import React, { useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
-import { ImageIcon, XIcon } from "./icons";
+import { LucideImage, X } from "lucide-react";
 
 interface ThumbnailUploaderProps {
  preview: string | null;
@@ -52,14 +52,14 @@ export function ThumbnailUploader({
  fill
  className="object-cover"
  />
- <div className="absolute inset-0 bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+ <div className="absolute inset-0 bg-slate-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
  <button
  type="button"
  onClick={onRemove}
  aria-label="Xóa ảnh bìa"
  className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-rose-600 hover:bg-rose-50 transition-all cursor-pointer shadow-sm"
  >
- <XIcon size={15} />
+ <X size={15} />
  </button>
  </div>
  </div>
@@ -81,22 +81,22 @@ export function ThumbnailUploader({
  className={twMerge(
  "w-full aspect-[4/3] rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-2.5 transition-all duration-200 cursor-pointer",
  isDragging
- ? "border-[#3B82F6] bg-blue-50/50 scale-[1.01]"
- : "border-gray-300 bg-slate-50/60 hover:border-[#2563EB] hover:bg-blue-50/20 shadow-sm"
+ ? "border-blue-500 bg-blue-50/50 scale-[1.01]"
+ : "border-slate-300 bg-slate-50/60 hover:border-blue-600 hover:bg-blue-50/20 shadow-sm"
  )}
  >
  <div
  className={twMerge(
  "w-11 h-11 rounded-lg flex items-center justify-center transition-all duration-200",
- isDragging ? "text-blue-500" : "text-gray-400"
+ isDragging ? "text-blue-500" : "text-slate-400"
  )}
  >
- <ImageIcon size={26} />
+ <LucideImage size={26} />
  </div>
 
  <div className="flex flex-col items-center gap-0.5 text-center">
  <p className="text-xs font-bold text-blue-500">Tải ảnh bìa (4:3)</p>
- <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+ <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
  JPG, PNG hoặc WEBP (Tối đa 5MB)
  </p>
  </div>

@@ -6,6 +6,8 @@ import { useInstructorPricing } from "@/src/hooks/instructor/useInstructorPricin
 import { useCreateCourseStore } from "../stores/createCourseStore";
 import { CouponSection } from "@/src/features/instructor/pricing/components/CouponSection";
 import { useCommissionTiers } from "../api";
+import { AlertTriangle, CheckCircle2, Zap } from "lucide-react";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 export interface Step3SettingsPriceProps {
  courseId?: string;
@@ -70,7 +72,7 @@ export function Step3SettingsPrice({
  return (
  <div className="w-full flex flex-col gap-6 animate-fadeIn">
  {/* Top Title Banner */}
- <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm">
+ <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm">
  <h3 className="text-base font-semibold text-slate-900">Cấu hình Giá bán &amp; Doanh thu</h3>
  <p className="text-xs text-slate-500 mt-1">
  Thiết lập khoảng giá tiêu chuẩn cho khóa học (100,000–100,000,000 VNĐ), lên lịch chương trình ưu đãi khuyến mãi và dự toán thu nhập thực tế theo thời gian thực.
@@ -84,13 +86,13 @@ export function Step3SettingsPrice({
  <div className="lg:col-span-7 flex flex-col gap-5">
  
  {/* Free vs Paid Toggle */}
- <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
+ <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
  <div>
  <h4 className="text-sm font-semibold text-slate-900">Hình Thức Phát Hành Khóa Học</h4>
  <p className="text-xs text-slate-500">Lựa chọn giữa miễn phí cống hiến cho cộng đồng hoặc thu phí chuyên nghiệp.</p>
  </div>
- <div className="flex items-center gap-1 p-1 rounded-lg bg-gray-100 border border-slate-200 w-fit shrink-0">
+ <div className="flex items-center gap-1 p-1 rounded-lg bg-slate-100 border border-slate-200 w-fit shrink-0">
  <button
  type="button"
  onClick={() => setIsFree(false)}
@@ -115,13 +117,13 @@ export function Step3SettingsPrice({
  </div>
 
  {!isFree && (
- <div className="pt-4 border-t border-gray-100 flex flex-col gap-4 animate-fadeIn">
+ <div className="pt-4 border-t border-slate-100 flex flex-col gap-4 animate-fadeIn">
  <div>
  <label htmlFor="course-price-input" className="block text-sm font-semibold text-slate-900 mb-1.5">
  Giá Bán Niêm Yết (100,000 – 100,000,000 VNĐ)
  </label>
  <div className="relative rounded-lg shadow-sm">
- <span className="absolute left-3.5 top-3 text-base font-semibold text-gray-400">đ</span>
+ <span className="absolute left-3.5 top-3 text-base font-semibold text-slate-400">đ</span>
  <input
  id="course-price-input"
  type="number"
@@ -143,13 +145,18 @@ export function Step3SettingsPrice({
 
  {validationError && (
  <p className="text-xs font-bold text-rose-600 bg-rose-50 p-3 rounded-lg border border-rose-200 flex items-center gap-2">
- ️ {validationError}
+ <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden /> {validationError}
  </p>
  )}
 
  <div className="flex flex-col gap-2 pt-1">
  <label className="text-sm font-semibold text-slate-900">Cấp Độ Hợp Tác Giảng Viên:</label>
- {commissionTiers.isLoading && <p role="status" className="text-xs text-gray-500">Đang tải cấu hình hoa hồng...</p>}
+ {commissionTiers.isLoading && (
+ <div role="status" aria-busy="true" aria-label="Đang tải cấu hình hoa hồng" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+ <Skeleton className="h-20 rounded-xl" />
+ <Skeleton className="h-20 rounded-xl" />
+ </div>
+ )}
  {commissionTiers.isError && <p role="alert" className="text-xs font-bold text-rose-600">Không thể tải tỷ lệ hoa hồng. Bạn vẫn có thể giữ lựa chọn cấp hợp tác và thử lại sau.</p>}
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
  {(tierDefinitions.length > 0 ? tierDefinitions : [{ tier: "standard" }, { tier: "exclusive" }]).map((definition) => (
@@ -160,8 +167,8 @@ export function Step3SettingsPrice({
  className={twMerge(
  "p-3.5 rounded-lg border text-left transition-all cursor-pointer",
  tier === definition.tier
- ? "border-[#3B82F6] bg-blue-50/50 shadow-sm"
- : "border-slate-200 bg-white hover:border-gray-300"
+ ? "border-blue-500 bg-blue-50/50 shadow-sm"
+ : "border-slate-200 bg-white hover:border-slate-300"
  )}
  >
  <p className="text-xs font-semibold text-slate-900">{"label" in definition ? definition.label : definition.tier}</p>
@@ -180,23 +187,23 @@ export function Step3SettingsPrice({
 
  {/* Promotional Discount Scheduler */}
  {!isFree && (
- <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col gap-4 animate-fadeIn">
+ <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col gap-4 animate-fadeIn">
  <div className="flex items-center justify-between">
  <div>
- <h4 className="text-sm font-semibold text-slate-900"> Lên Lịch Giảm Giá &amp; Khuyến Mãi Flash Sale</h4>
+ <h4 className="text-sm font-semibold text-slate-900"><Zap className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Lên Lịch Giảm Giá &amp; Khuyến Mãi Flash Sale</h4>
  <p className="text-xs text-slate-500 mt-0.5">Tăng tỷ lệ chuyển đổi học viên bằng các đợt giảm giá ngắn hạn hấp dẫn.</p>
  </div>
  <input
  type="checkbox"
  checked={discount.isEnabled}
  onChange={(e) => toggleDiscount(e.target.checked)}
- className="w-5 h-5 rounded-md text-blue-500 focus:ring-[#3B82F6] border-gray-300 cursor-pointer"
+ className="w-5 h-5 rounded-md text-blue-500 focus:ring-blue-500 border-slate-300 cursor-pointer"
  aria-label="Kích hoạt giảm giá"
  />
  </div>
 
  {discount.isEnabled && (
- <div className="pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-3 animate-fadeIn">
+ <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-3 animate-fadeIn">
  <div>
  <label htmlFor="discount-price-input" className="block text-sm font-semibold text-slate-900 mb-1">Giá Khuyến Mãi (VNĐ)</label>
  <input
@@ -206,7 +213,7 @@ export function Step3SettingsPrice({
  max={basePrice}
  value={discount.discountPrice}
  onChange={(e) => updateDiscount("discountPrice", parseFloat(e.target.value) || 100000)}
- className="w-full px-3.5 py-2 rounded-lg border border-slate-200 font-bold font-mono text-xs text-slate-900 focus:outline-none focus:border-[#0F172A] bg-slate-50/50"
+ className="w-full px-3.5 py-2 rounded-lg border border-slate-200 font-bold font-mono text-xs text-slate-900 focus:outline-none focus:border-slate-900 bg-slate-50/50"
  />
  </div>
  <div>
@@ -216,7 +223,7 @@ export function Step3SettingsPrice({
  type="date"
  value={discount.startDate}
  onChange={(e) => updateDiscount("startDate", e.target.value)}
- className="w-full px-3.5 py-2 rounded-lg border border-slate-200 font-bold text-xs text-gray-700 focus:outline-none bg-slate-50/50"
+ className="w-full px-3.5 py-2 rounded-lg border border-slate-200 font-bold text-xs text-slate-700 focus:outline-none bg-slate-50/50"
  />
  </div>
  <div>
@@ -226,7 +233,7 @@ export function Step3SettingsPrice({
  type="date"
  value={discount.endDate}
  onChange={(e) => updateDiscount("endDate", e.target.value)}
- className="w-full px-3.5 py-2 rounded-lg border border-slate-200 font-bold text-xs text-gray-700 focus:outline-none bg-slate-50/50"
+ className="w-full px-3.5 py-2 rounded-lg border border-slate-200 font-bold text-xs text-slate-700 focus:outline-none bg-slate-50/50"
  />
  </div>
  </div>
@@ -239,17 +246,17 @@ export function Step3SettingsPrice({
  <div className="lg:col-span-5 flex flex-col gap-5 sticky top-20">
  
  {/* Dynamic Revenue Calculator Panel */}
- <div className="p-6 rounded-lg bg-blue-500 text-white border-[#3B82F6] shadow-sm flex flex-col gap-5">
+ <div className="p-6 rounded-lg bg-blue-500 text-white border-blue-500 shadow-sm flex flex-col gap-5">
  <div className="flex items-center gap-3 border-b border-white/10 pb-4">
  
  <div>
  <h4 className="text-sm font-semibold text-white">Bảng Dự Toán Doanh Thu AI</h4>
- <p className="text-xs text-[#F8FAFC] mt-0.5">Phân tích dòng tiền lợi nhuận sau chiết khấu</p>
+ <p className="text-xs text-slate-50 mt-0.5">Phân tích dòng tiền lợi nhuận sau chiết khấu</p>
  </div>
  </div>
 
  <div className="flex flex-col gap-3 font-mono text-xs">
- <div className="flex items-center justify-between text-[#F8FAFC]">
+ <div className="flex items-center justify-between text-slate-50">
  <span>Giá Bán Niêm Yết (Áp dụng):</span>
  <span className="font-semibold text-white text-sm">{revenue.listPrice.toLocaleString('vi-VN')} VNĐ</span>
  </div>
@@ -264,7 +271,7 @@ export function Step3SettingsPrice({
               <span>Tỷ lệ phân chia Giảng viên:</span>
               <span className="font-semibold text-white text-sm">{revenue.instructorPercent == null ? "—" : `${revenue.instructorPercent}%`}</span>
             </div>
- <div className="flex items-center justify-between text-sm font-bold text-[#F8FAFC]">
+ <div className="flex items-center justify-between text-sm font-bold text-slate-50">
  <span>Thu Nhập Ròng Tích Lũy:</span>
  <span>{revenue.instructorEarnings.toLocaleString('vi-VN')} VNĐ / học viên</span>
  </div>
@@ -276,14 +283,14 @@ export function Step3SettingsPrice({
  </div>
 
  {/* Quick Preview Badge & Save Action */}
- <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
+ <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
  <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Danh Sách Tiêu Chuẩn Phê Duyệt</h5>
  <div className="flex flex-col gap-2">
  <div className="flex items-center gap-2 text-xs font-semibold text-slate-900">
- <span> Giá niêm yết tuân thủ khung tiêu chuẩn 100,000–100,000,000 VNĐ</span>
+ <span><CheckCircle2 className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Giá niêm yết tuân thủ khung tiêu chuẩn 100,000–100,000,000 VNĐ</span>
  </div>
  <div className="flex items-center gap-2 text-xs font-semibold text-blue-500">
- <span> Lịch trình khuyến mãi được đồng bộ hóa thời gian AI</span>
+ <span><CheckCircle2 className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Lịch trình khuyến mãi được đồng bộ hóa thời gian AI</span>
  </div>
  </div>
  </div>
