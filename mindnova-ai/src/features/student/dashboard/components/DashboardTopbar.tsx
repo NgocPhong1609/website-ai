@@ -10,7 +10,8 @@ import { twMerge } from "tailwind-merge";
 import { NotificationModal } from "./NotificationModal";
 import { useChatGlobalUnread } from "@/src/hooks/useChatGlobalUnread";
 import { NoDataAvailable } from "@/src/shared/components/ui";
-import { BellOff } from "lucide-react";
+import { BellOff, Menu } from "lucide-react";
+import { toggleMobileSidebar } from "@/src/features/student/layout/components/mobileSidebar";
 
 function BellIcon() {
  return (
@@ -116,13 +117,21 @@ export function DashboardTopbar() {
 
  return (
  <>
- <header className="sticky top-0 z-50 h-18 shrink-0 flex items-center justify-end gap-4 px-6 lg:px-8 bg-[#F8FAFC]/95 backdrop-blur-sm border-b border-[#E2E8F0] transition-all duration-200">
- <div className="flex items-center gap-3">
+ <header className="sticky top-0 z-30 h-18 shrink-0 flex items-center justify-between md:justify-end gap-4 px-4 sm:px-6 lg:px-8 bg-[#F8FAFC]/95 backdrop-blur-sm border-b border-[#E2E8F0] transition-all duration-200">
+ <button
+ type="button"
+ onClick={toggleMobileSidebar}
+ aria-label="Mở menu"
+ className="md:hidden w-10 h-10 rounded-lg flex items-center justify-center text-slate-600 bg-white border border-[#e2e8f0] hover:bg-slate-50"
+ >
+ <Menu size={20} aria-hidden />
+ </button>
+ <div className="flex items-center gap-2 sm:gap-3">
  <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-[#e2e8f0] shadow-sm">
  {/* Chat Button */}
  <a
  href="/messages"
- aria-label="Messages"
+ aria-label="Tin nhắn"
  className="group/chat relative w-9 h-9 rounded-md flex items-center justify-center text-slate-500 hover:text-[#2563eb] hover:bg-[#f8fafc] transition-all duration-200 focus:outline-none"
  >
  <div className="group-hover/chat:scale-105 transition-transform duration-200">
@@ -298,18 +307,18 @@ export function DashboardTopbar() {
  />
  </button>
  ) : isMounted && !isLoggedIn ? (
- <div className="flex items-center gap-3 relative z-[9999] pointer-events-auto">
+ <div className="flex items-center gap-1 sm:gap-3">
  <Link
  href="/login"
  onClick={clearAuthCookies}
- className="px-4 py-2 text-sm font-semibold text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] rounded-lg transition-all relative z-[9999]"
+ className="px-3 sm:px-4 py-2 text-sm font-semibold whitespace-nowrap text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] rounded-lg transition-all"
  >
  Đăng nhập
  </Link>
  <Link
  href="/login?mode=register"
  onClick={clearAuthCookies}
- className="px-4 py-2 text-sm font-semibold text-white bg-[#0F172A] hover:bg-[#1C1D23] rounded-lg transition-all shadow-sm relative z-[9999]"
+ className="px-3 sm:px-4 py-2 text-sm font-semibold whitespace-nowrap text-white bg-[#3B82F6] hover:bg-[#2563EB] rounded-lg transition-colors shadow-sm"
  >
  Đăng ký
  </Link>
