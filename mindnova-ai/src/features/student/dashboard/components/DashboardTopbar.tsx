@@ -22,14 +22,7 @@ function BellIcon() {
  );
 }
 
-function SettingsIcon() {
- return (
- <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
- <circle cx="12" cy="12" r="3" />
- <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
- </svg>
- );
-}
+
 
 export function DashboardTopbar() {
  const router = useRouter();
@@ -127,7 +120,7 @@ export function DashboardTopbar() {
  <Menu size={20} aria-hidden />
  </button>
  <div className="flex items-center gap-2 sm:gap-3">
- <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 shadow-sm">
+ <div className="flex items-center gap-1 sm:gap-2">
  {/* Chat Button */}
  <a
  href="/messages"
@@ -258,17 +251,6 @@ export function DashboardTopbar() {
  </div>
  )}
  </div>
-
- {/* Settings */}
- <button
- type="button"
- aria-label="Settings"
- className="group/settings w-9 h-9 rounded-md flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition-all duration-200 focus:outline-none"
- >
- <div className="group-hover/settings:rotate-30 transition-transform duration-300">
- <SettingsIcon />
- </div>
- </button>
  </div>
 
  <span className="w-px h-6 bg-slate-200 hidden sm:block" />

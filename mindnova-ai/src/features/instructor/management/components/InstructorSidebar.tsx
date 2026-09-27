@@ -41,108 +41,7 @@ function CreateCourseCTA() {
  );
 }
 
-function SidebarUserProfile({ isCollapsed }: { isCollapsed: boolean }) {
- const [user, setUser] = React.useState<any>(null);
- const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
- const dropdownRef = React.useRef<HTMLDivElement>(null);
 
- const loadUser = React.useCallback(() => {
- try {
- const userInfoRaw = window.localStorage.getItem("userInfo");
- if (userInfoRaw) {
- setUser(JSON.parse(userInfoRaw));
- }
- } catch (e) {
- console.error("Error parsing user info", e);
- }
- }, []);
-
- React.useEffect(() => {
- loadUser();
- window.addEventListener("user:updated", loadUser);
- window.addEventListener("storage", loadUser);
- return () => {
- window.removeEventListener("user:updated", loadUser);
- window.removeEventListener("storage", loadUser);
- };
- }, [loadUser]);
-
- React.useEffect(() => {
- const handleClickOutside = (event: MouseEvent) => {
- if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
- setIsDropdownOpen(false);
- }
- };
- document.addEventListener("mousedown", handleClickOutside);
- return () => document.removeEventListener("mousedown", handleClickOutside);
- }, []);
-
- const handleLogout = async () => {
- try {
- await axiosClient.post("/api/logout");
- } catch (error) {
- console.error("Logout API failed", error);
- } finally {
- window.localStorage.removeItem("accessToken");
- window.localStorage.removeItem("userInfo");
- document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
- document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
- window.location.replace("/login");
- }
- };
-
- const getInitial = (name: string) => {
- if (!name) return "U";
- return name.charAt(0).toUpperCase();
- };
-
- const name = user?.name || "Teacher";
- const avatarUrl = user?.avatar_url || user?.avatar || user?.profile_image || null;
- const initial = getInitial(name);
-
- return (
- <div className={twMerge("relative flex py-2", isCollapsed ? "flex-col gap-3 items-center" : "items-center gap-3 px-2")} ref={dropdownRef}>
- <button 
- onClick={() => setIsDropdownOpen(!isDropdownOpen)}
- className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold shadow-sm shrink-0 border border-blue-100 overflow-hidden hover:ring-2 hover:ring-blue-200 transition-all focus:outline-none"
- >
- {avatarUrl ? (
- <img src={avatarUrl} alt={name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerText = initial; }} />
- ) : (
- initial
- )}
- </button>
-
- {isDropdownOpen && (
- <div className={twMerge(
- "absolute z-50 bg-white border border-slate-200 rounded-lg shadow-lg py-1 min-w-[160px] overflow-hidden",
- isCollapsed ? "left-full ml-2 bottom-0" : "bottom-full mb-2 left-2"
- )}>
- <Link
- href="/instructor/profile"
- onClick={() => setIsDropdownOpen(false)}
- className="block px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors"
- >
- Thông tin tài khoản
- </Link>
- <button
- onClick={handleLogout}
- className="w-full text-left px-4 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
- >
- Đăng xuất
- </button>
- </div>
- )}
-
- {!isCollapsed && (
- <Link href="/instructor/profile" className="flex items-center gap-1 min-w-0 leading-tight group cursor-pointer">
- <span className="text-sm font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors">{name}</span>
- {Boolean(user?.is_verified) && <VerifiedTeacherBadge isVerified={true} size="xs" />}
- </Link>
- )}
- </div>
- );
-}
 
 interface NavItem {
  label: string;
@@ -249,13 +148,16 @@ export function InstructorSidebar() {
     <div className="fixed inset-0 z-40 bg-slate-900/40 md:hidden" aria-hidden onClick={() => setIsMobileOpen(false)} />
   )}
   <aside className={twMerge(
-    "shrink-0 h-full flex flex-col bg-white border-r border-slate-200 z-50 transition-all duration-300", 
-    "fixed inset-y-0 left-0 md:static md:z-auto",
+    "shrink-0 h-screen flex flex-col bg-white border-r border-slate-200 transition-all duration-300 group/sidebar", 
+    "fixed inset-y-0 left-0 z-50 w-64 md:static md:z-auto",
     isMobileOpen ? "translate-x-0 shadow-xl" : "-translate-x-full md:translate-x-0",
-    isCollapsed ? "md:w-[80px] w-[234px]" : "w-[234px]"
+    isCollapsed ? "md:w-[72px]" : "md:w-56"
   )}>
- {/* Brand */}
- <div className={twMerge("h-16 shrink-0 border-b border-slate-200 flex items-center justify-center", isCollapsed ? "px-2" : "px-4")}>
+ {/* Brand & Toggle */}
+ <div className={twMerge(
+ "py-[18px] border-b border-slate-200 flex items-center transition-all",
+ isCollapsed ? "px-2 flex-col justify-center gap-4" : "px-4 justify-between"
+ )}>
  <Link href="/instructor/courses" className="flex items-center gap-3 group" aria-label="MindNova AI — Instructor">
  <LogoMark />
  {!isCollapsed && (
@@ -269,6 +171,13 @@ export function InstructorSidebar() {
  </div>
  )}
  </Link>
+ <button
+ onClick={() => setIsCollapsed(!isCollapsed)}
+ className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all cursor-pointer shrink-0"
+ aria-label={isCollapsed ? "Mở rộng thanh bên" : "Thu gọn thanh bên"}
+ >
+ <Menu className="w-[18px] h-[18px] text-slate-500 group-hover:text-slate-900 transition-colors" strokeWidth={2.5} aria-hidden />
+ </button>
  </div>
 
  {/* Main nav */}
@@ -299,25 +208,28 @@ export function InstructorSidebar() {
  )}
  </div>
 
- <div className={twMerge("py-3 border-t border-slate-200 flex flex-col gap-3", isCollapsed ? "px-2" : "px-3")}>
- <SidebarUserProfile isCollapsed={isCollapsed} />
+ <div className={twMerge("py-5 border-t border-slate-200 flex flex-col gap-3", isCollapsed ? "px-2 items-center" : "px-4")}>
+ <div className="flex flex-col gap-0.5 w-full">
  <button
- onClick={() => setIsCollapsed(!isCollapsed)}
- className={twMerge("flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors border border-slate-200 rounded-lg hover:bg-slate-50 group", isCollapsed ? "justify-center" : "justify-between w-full")}
- >
- {isCollapsed ? (
- <Menu className="h-4 w-4 text-slate-400 group-hover:text-slate-900 transition-colors" strokeWidth={2.5} aria-hidden />
- ) : (
- <>
- <div className="flex items-center gap-2.5">
- <Menu className="h-4 w-4 text-slate-400 group-hover:text-slate-900 transition-colors" strokeWidth={2.5} aria-hidden />
- <span>Thu gọn</span>
- </div>
- <span className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-xs font-semibold tracking-wide text-slate-400 group-hover:text-slate-500 group-hover:border-slate-300 transition-colors">Ctrl+B</span>
- </>
+ type="button"
+ onClick={async () => {
+ try { await axiosClient.post("/api/logout"); } catch {}
+ window.localStorage.clear();
+ document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+ document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+ window.location.assign("/login");
+ }}
+ title={isCollapsed ? "Đăng xuất" : undefined}
+ className={twMerge(
+ "flex items-center rounded-lg text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all duration-150 shrink-0 cursor-pointer",
+ isCollapsed ? "justify-center w-10 h-10 mx-auto" : "gap-2.5 px-3 py-2 text-sm w-full text-left"
  )}
+ >
+ <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+ {!isCollapsed && <span>Đăng xuất</span>}
  </button>
-  </div>
+ </div>
+ </div>
   </aside>
   </>
  );

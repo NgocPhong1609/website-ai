@@ -24,6 +24,15 @@ export function FloatingAiChat() {
   const pathname = usePathname();
   const [isOpen, setIsOpenState] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const userInfoRaw = window.localStorage.getItem("userInfo");
+      if (userInfoRaw) setUser(JSON.parse(userInfoRaw));
+    } catch (e) {}
+  }, []);
 
   const setIsOpen = (open: boolean) => {
     setIsOpenState(open);
@@ -432,7 +441,7 @@ export function FloatingAiChat() {
               <div>
                 <div className="flex items-center gap-1.5">
                   <h3 className="text-xs font-bold text-slate-900 tracking-tight">
-                    Nova AI Co-Pilot
+                    Nova AI
                   </h3>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" title="Online" />
                 </div>
@@ -479,11 +488,8 @@ export function FloatingAiChat() {
                   </div>
                 ) : (
                   <div className="w-6.5 h-6.5 rounded-full overflow-hidden shrink-0 mt-0.5 border border-slate-200 shadow-2xs">
-                    <Image
-                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"
-                      width={26}
-                      height={26}
-                      sizes="26px"
+                    <img
+                      src={user?.avatar_url || user?.avatar || user?.profile_image || "https://ui-avatars.com/api/?name=User&background=eff6ff&color=2563eb"}
                       alt="You"
                       className="object-cover w-full h-full"
                     />

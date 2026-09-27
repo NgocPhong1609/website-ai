@@ -19,7 +19,7 @@ export default function WelcomeContainer() {
 
   return (
     <OnboardingShell className="justify-center">
-      <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+      <div className="grid items-center gap-10 lg:grid-cols-[1.25fr_1fr] lg:gap-12 xl:gap-16">
         <div>
           <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
             <Sparkles className="h-3.5 w-3.5" aria-hidden />
@@ -59,14 +59,14 @@ export default function WelcomeContainer() {
             )}
           </div>
 
-          <ul className="mt-10 grid gap-3 sm:grid-cols-3">
+          <ul className="mt-10 grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
             {WELCOME_HIGHLIGHTS.map(({ icon: Icon, title, description }) => (
-              <li key={title} className="rounded-xl border border-slate-200 bg-white p-4">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                  <Icon className="h-4 w-4" aria-hidden />
+              <li key={title} className="flex flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                  <Icon className="h-5 w-5" aria-hidden />
                 </span>
-                <p className="mt-3 text-sm font-semibold text-slate-900">{title}</p>
-                <p className="mt-0.5 text-xs text-slate-500">{description}</p>
+                <p className="mt-4 text-[13px] sm:text-sm font-bold text-slate-900 leading-snug">{title}</p>
+                <p className="mt-1.5 text-xs text-slate-500 leading-relaxed">{description}</p>
               </li>
             ))}
           </ul>
