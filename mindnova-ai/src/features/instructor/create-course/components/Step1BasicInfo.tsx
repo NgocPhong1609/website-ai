@@ -53,10 +53,10 @@ function DifficultyToggle({ value, onChange }: DifficultyToggleProps) {
  aria-pressed={value === key}
  onClick={() => onChange(key)}
  className={twMerge(
- "px-4 py-2.5 rounded-lg text-xs font-bold border transition-all cursor-pointer",
+ "px-4 py-2 rounded-lg text-sm font-medium border transition-all cursor-pointer",
  value === key
- ? "border-[#3B82F6] bg-blue-500 text-white shadow-sm"
- : "border-slate-200 bg-white text-slate-500 hover:border-gray-300 hover:text-slate-900 hover:bg-slate-50/70"
+ ? "border-blue-500 bg-blue-50 text-blue-700 shadow-sm"
+ : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
  )}
  >
  {label}
@@ -106,8 +106,8 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  <div className="flex flex-col gap-6 animate-fadeIn">
  <div className="flex items-center justify-between border-b border-slate-200 pb-4 bg-white p-5 rounded-lg shadow-sm">
  <div>
- <h2 className="text-base font-bold text-slate-900">Thông tin cơ bản khóa học</h2>
- <p className="text-xs text-slate-500 mt-0.5">Cập nhật tiêu đề và mô tả chính hiển thị trên danh mục học viện MindNova.</p>
+ <h2 className="text-base font-semibold text-slate-900">Thông tin cơ bản khóa học</h2>
+ <p className="text-sm text-slate-500 mt-0.5">Cập nhật tiêu đề và mô tả chính hiển thị trên danh mục học viện MindNova.</p>
  </div>
  </div>
 
@@ -117,8 +117,8 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  {/* Left column: Thumbnail + AI tip */}
  <div className="flex flex-col gap-4">
  <div>
- <p className="text-xs font-bold text-slate-900 uppercase tracking-wider">Ảnh bìa khóa học</p>
- <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+ <label className="text-sm font-semibold text-slate-900">Ảnh bìa khóa học</label>
+ <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
  Tải lên hình ảnh đại diện tỷ lệ 4:3 hấp dẫn để thu hút học viên trên sàn MindNova.
  </p>
  </div>
@@ -135,7 +135,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  {/* Course title */}
  <div className="flex flex-col gap-1.5">
  <div className="flex items-center justify-between">
- <label htmlFor="course-title" className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+ <label htmlFor="course-title" className="text-sm font-semibold text-slate-900">
  Tên khóa học <span className="text-rose-500">*</span>
  </label>
  <CharCount current={data.title.length} max={MAX_TITLE_LENGTH} />
@@ -147,14 +147,14 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  maxLength={MAX_TITLE_LENGTH}
  placeholder="Ví dụ: Lập trình Trí tuệ Nhân tạo AI Mastery với LLM & RAG 2026..."
  onChange={(e) => onChange("title", e.target.value)}
- className="w-full px-4 py-2.5 rounded-lg text-xs font-bold text-slate-900 placeholder:text-gray-400 placeholder:font-normal bg-slate-50/50 border border-slate-200 focus:outline-none focus:border-[#3B82F6] focus:bg-white transition-all shadow-sm"
+ className="w-full px-4 py-2.5 rounded-lg text-sm text-slate-900 placeholder:text-gray-400 bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm"
  />
  </div>
 
  {/* Description */}
  <div className="flex flex-col gap-1.5">
  <div className="flex items-center justify-between">
- <label htmlFor="course-description" className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+ <label htmlFor="course-description" className="text-sm font-semibold text-slate-900">
  Mô tả ngắn <span className="text-rose-500">*</span>
  </label>
  <CharCount current={data.description.length} max={MAX_DESCRIPTION_LENGTH} />
@@ -166,7 +166,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  rows={4}
  placeholder="Nhập tóm tắt khóa học giúp học viên nhanh chóng nắm bắt được giá trị kiến thức, cơ hội việc làm và mục tiêu đạt được sau tốt nghiệp..."
  onChange={(e) => onChange("description", e.target.value)}
- className="w-full px-4 py-3 rounded-lg text-xs font-medium text-slate-900 placeholder:text-gray-400 placeholder:font-normal bg-slate-50/50 border border-slate-200 focus:outline-none focus:border-[#3B82F6] focus:bg-white transition-all resize-none leading-relaxed shadow-sm"
+ className="w-full px-4 py-3 rounded-lg text-sm text-slate-900 placeholder:text-gray-400 bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none leading-relaxed shadow-sm"
  />
  </div>
 
@@ -174,7 +174,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start pt-1">
  {/* Field select */}
  <div className="flex flex-col gap-1.5">
- <label htmlFor="course-field" className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+ <label htmlFor="course-field" className="text-sm font-semibold text-slate-900">
  Lĩnh vực Chuyên môn
  </label>
  <div className="relative">
@@ -182,8 +182,8 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  id="course-field"
  type="button"
  onClick={() => setOpen((v) => !v)}
- className={`w-full appearance-none px-4 py-2.5 pr-10 rounded-lg text-xs bg-slate-50/50 border border-slate-200 focus:outline-none focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 focus:bg-white transition-all cursor-pointer shadow-sm text-left ${
- !selectedName ? "text-gray-400 font-normal" : "text-slate-900 font-bold"
+ className={`w-full appearance-none px-4 py-2.5 pr-10 rounded-lg text-sm bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all cursor-pointer shadow-sm text-left ${
+ !selectedName ? "text-gray-400" : "text-slate-900"
  }`}
  >
  {categoriesLoading ? "Đang tải danh mục..." : selectedName || "-- Chọn lĩnh vực --"}
@@ -253,14 +253,14 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  value={data.otherName}
  onChange={(e) => onChange("otherName", e.target.value)}
  placeholder="Nhập lĩnh vực khác..."
- className="mt-2 w-full px-4 py-2.5 rounded-lg text-xs font-medium text-slate-900 placeholder:text-gray-400 bg-slate-50/50 border border-slate-200 focus:outline-none focus:border-[#3B82F6] focus:bg-white"
+ className="mt-2 w-full px-4 py-2.5 rounded-lg text-sm text-slate-900 placeholder:text-gray-400 bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
  />
  )}
  </div>
 
  {/* Difficulty */}
  <div className="flex flex-col gap-1.5">
- <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">Trình độ Khóa học</span>
+ <label className="text-sm font-semibold text-slate-900">Trình độ Khóa học</label>
  <DifficultyToggle
  value={data.difficulty}
  onChange={(v) => onChange("difficulty", v)}
