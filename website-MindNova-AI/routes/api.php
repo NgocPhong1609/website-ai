@@ -440,3 +440,35 @@ Route::get('/dev/wipe-enrollments/{email}', function ($email) {
         'message' => 'Wiped enrollments for ' . $email
     ]);
 });
+
+Route::get('/dev/seed-focus-areas/{email}', function ($email) {
+    $user = \App\Models\User::where('email', $email)->first();
+    if (!$user) return response()->json(['error' => 'User not found']);
+    
+    $course = \App\Models\Course::first();
+    if (!$course) return response()->json(['error' => 'No course found to attach topics']);
+    
+    \Illuminate\Support\Facades\DB::table('knowledge_topics')->updateOrInsert(
+        ['name' => 'Cấu trúc dữ liệu Tree'],
+        ['course_id' => $course->id, 'description' => 'Tìm hiểu về Tree']
+    );
+    \Illuminate\Support\Facades\DB::table('knowledge_topics')->updateOrInsert(
+        ['name' => 'React Custom Hooks'],
+        ['course_id' => $course->id, 'description' => 'Custom Hooks trong React']
+    );
+    $topic1 = \Illuminate\Support\Facades\DB::table('knowledge_topics')->where('name', 'Cấu trúc dữ liệu Tree')->first();
+    $topic2 = \Illuminate\Support\Facades\DB::table('knowledge_topics')->where('name', 'React Custom Hooks')->first();
+    
+    \Illuminate\Support\Facades\DB::table('user_topic_performance')->updateOrInsert(
+        ['user_id' => $user->id, 'topic_id' => $topic1->id],
+        ['total_answered' => 10, 'total_correct' => 3, 'accuracy_percentage' => 30]
+    );
+    \Illuminate\Support\Facades\DB::table('user_topic_performance')->updateOrInsert(
+        ['user_id' => $user->id, 'topic_id' => $topic2->id],
+        ['total_answered' => 20, 'total_correct' => 12, 'accuracy_percentage' => 60]
+    );
+    
+    return response()->json([
+        'message' => 'Seeded mock focus areas for ' . $email
+    ]);
+});
