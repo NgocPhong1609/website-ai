@@ -14,6 +14,7 @@ import { CourseEditTabs, EditCourseTab } from "./CourseEditTabs";
 import { CourseHealthCard } from "./CourseHealthCard";
 import { Step2CourseStructure } from "./Step2CourseStructure";
 import type { CourseBasicInfo, DifficultyLevel } from "../types";
+import { Skeleton } from "@/src/shared/components/ui";
 import {
  SaveIcon,
  EyeIcon,
@@ -76,7 +77,44 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  }, [course]);
 
  if (isLoading) {
- return <div className="p-8 text-center text-slate-500 font-medium">Đang tải dữ liệu...</div>;
+ return (
+ <div className="min-h-screen bg-slate-50 flex flex-col font-sans pb-16">
+ <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 pt-3 pb-2 shadow-sm">
+ <div className="max-w-6xl mx-auto flex flex-col gap-2">
+ <div className="flex flex-wrap items-center justify-between gap-3">
+ <div className="flex items-center gap-3">
+ <Skeleton className="w-10 h-10 rounded-lg" />
+ <div>
+ <Skeleton className="h-3 w-40 mb-1" />
+ <Skeleton className="h-5 w-64" />
+ </div>
+ </div>
+ <div className="flex items-center gap-2.5">
+ <Skeleton className="w-24 h-9 rounded-lg" />
+ <Skeleton className="w-32 h-9 rounded-lg" />
+ </div>
+ </div>
+ <div className="flex gap-4 mt-2">
+ <Skeleton className="w-24 h-8" />
+ <Skeleton className="w-24 h-8" />
+ <Skeleton className="w-24 h-8" />
+ </div>
+ </div>
+ </header>
+ <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-6 flex flex-col gap-6">
+ <Skeleton className="w-full h-24 rounded-lg" />
+ <div className="grid grid-cols-1 md:grid-cols-[1fr_350px] gap-6">
+ <div className="flex flex-col gap-5">
+ <Skeleton className="w-full h-12 rounded-lg" />
+ <Skeleton className="w-full h-32 rounded-lg" />
+ </div>
+ <div className="flex flex-col gap-4">
+ <Skeleton className="w-full h-48 rounded-lg" />
+ </div>
+ </div>
+ </main>
+ </div>
+ );
  }
 
  if (!course) {
@@ -160,7 +198,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  const isPending = isUpdating || isUploading || isDeleting || isUpdatingStatus || isUpdatingPrice || isSubmittingReview;
 
  return (
- <div className="min-h-screen bg-[#F4F4F8] flex flex-col font-sans pb-16">
+ <div className="min-h-screen bg-slate-50 flex flex-col font-sans pb-16">
  {/* ── HEADER CẬP NHẬT ─────────────────────────────────────────────────── */}
  <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 pt-3 pb-2 shadow-sm">
  <div className="max-w-6xl mx-auto flex flex-col gap-2">
@@ -233,7 +271,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  disabled={isPending}
  className={twMerge(
  "flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold text-white transition-all shadow-sm cursor-pointer",
- saveSuccess ? "text-slate-900 hover:bg-[#0F172A]" : "bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400"
+ saveSuccess ? "bg-emerald-500 hover:bg-emerald-600" : "bg-blue-500 hover:bg-blue-600 disabled:bg-slate-400"
  )}
  >
  {isUpdating || isUploading || isUpdatingPrice ? (
@@ -301,7 +339,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <span className="text-[12px] text-slate-500 block mt-0.5">Tự động sinh mã chứng nhận khi học viên đạt trên 80% tiến độ bài giảng</span>
  </div>
  </div>
- <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-[#3B82F6] cursor-pointer" />
+ <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500 cursor-pointer" />
  </div>
 
  <div className="flex items-center justify-between p-4 rounded-lg border border-gray-100 bg-slate-50/50">
@@ -312,11 +350,11 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <span className="text-[12px] text-slate-500 block mt-0.5">Cho phép học viên đặt câu hỏi Hỏi-Đáp bên dưới từng bài video</span>
  </div>
  </div>
- <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-[#3B82F6] cursor-pointer" />
+ <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500 cursor-pointer" />
  </div>
 
  <div className="mt-4 pt-6 border-t border-rose-50 flex flex-col gap-4">
- <h3 className="text-[12px] font-bold uppercase tracking-wider text-[#2563EB] flex items-center gap-1.5">
+ <h3 className="text-[12px] font-bold uppercase tracking-wider text-rose-600 flex items-center gap-1.5">
  <TrashIcon size={14} />
  <span>Khu Vực Nguy Hiểm (Danger Zone)</span>
  </h3>
@@ -331,7 +369,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  type="button"
  onClick={handleDelete}
  disabled={isPending || isDeleting}
- className="px-5 py-2.5 rounded-lg bg-[#2563EB] hover:bg-rose-700 text-white font-semibold text-[13px] shadow-sm transition-all shrink-0 cursor-pointer disabled:bg-rose-300 disabled:cursor-not-allowed"
+ className="px-5 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold text-[13px] shadow-sm transition-all shrink-0 cursor-pointer disabled:bg-rose-300 disabled:cursor-not-allowed"
  >
  {isDeleting ? "Đang xóa..." : "Xóa bài giảng"}
  </button>
