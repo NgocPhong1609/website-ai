@@ -175,6 +175,7 @@ test('student course detail includes attachment metadata for article lessons', f
     $lesson = createStudentAccessLesson($teacher);
     publishAttachmentCourse($lesson->course, $teacher);
     publishAttachmentLesson($lesson, $teacher);
+    $lesson->update(['gemini_file_uri' => 'https://generativelanguage.googleapis.com/v1beta/files/test-video']);
     $lesson->attachments()->create([
         'uploaded_by' => $teacher->id,
         'display_name' => 'Workbook',
@@ -205,4 +206,6 @@ test('student course detail includes attachment metadata for article lessons', f
             'extension' => 'xlsx',
             'size_bytes' => 1024,
         ]);
+    expect($detail['modules'][0]['lessons'][0]['gemini_file_uri'])
+        ->toBe('https://generativelanguage.googleapis.com/v1beta/files/test-video');
 });

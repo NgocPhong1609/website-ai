@@ -45,6 +45,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (isAuthRoute && request.nextUrl.searchParams.get('sessionExpired') === '1') {
+    return NextResponse.next();
+  }
+
   // 2. Authenticated users visiting Auth routes (/login, /register):
   if (isAuthRoute) {
     if (isAdminRole) return NextResponse.redirect(new URL('/admin', request.url));

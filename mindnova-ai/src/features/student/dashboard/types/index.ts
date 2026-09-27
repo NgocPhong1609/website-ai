@@ -72,6 +72,7 @@ export interface DailyGoal {
 
 export interface DashboardOverview {
  error?: string;
+ session_expired?: boolean;
  user: UserProfileSummary | null;
  welcome_message?: string;
  ai_badge_text?: string;

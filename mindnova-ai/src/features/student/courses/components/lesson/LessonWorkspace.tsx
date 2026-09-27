@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback, Suspense } from "react";
-import { CheckCircle2, MessageSquare, Eye, GraduationCap, X, Check, Lock, ChevronsUpDown, ArrowLeft, ChevronRight, Sparkles, Pencil, Trash2 } from "lucide-react";
+import { CheckCircle2, MessageSquare, Eye, GraduationCap, X, Check, Lock, ChevronsUpDown, ArrowLeft, ChevronRight, Sparkles, Pencil, Trash2, Bot, AlertTriangle, BookOpen } from "lucide-react";
 import { Skeleton, SkeletonList } from "@/src/shared/components/ui/Skeleton";
 import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { LessonStatusIcon, lessonDisplayTitle } from "../LessonStatusIcon";
@@ -15,10 +15,12 @@ import { CustomVideoPlayer } from "./CustomVideoPlayer";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 import { NoDataAvailable } from "@/src/shared/components/ui";
 import toast from "react-hot-toast";
+
 import type { LessonData, ModuleData } from "./types";
 import { getLessonTypeLabel, getLessonTypeColor } from "./lessonTypeLabels";
 import { ArticleRenderer } from "./ArticleRenderer";
 import { QuizRenderer } from "./QuizRenderer";
+import { AiNovaTab } from "./AiNovaTab";
 
 export type { LessonData } from "./types";
 
@@ -63,6 +65,7 @@ function LessonWorkspaceContent() {
         durationSeconds: l.duration_seconds || 300,
         completed: l.status === "completed",
         videoUrl: l.video_url || l.videoUrl || "",
+        geminiFileUri: l.gemini_file_uri || null,
         hasUploadedVideo: Boolean(l.has_uploaded_video || l.video_url || l.videoUrl),
         content: l.content || "",
         quiz_id: l.quiz_id || l.quizId || null,
@@ -73,248 +76,285 @@ function LessonWorkspaceContent() {
     }));
   }, [apiDetail, previewDetail.data, isPreview]);
 
- const hasInitialized = useRef(false);
- useEffect(() => {
- if (curriculum.length > 0 && !hasInitialized.current) {
- const initialExpanded: Record<string, boolean> = {};
- curriculum.forEach((mod) => {
- initialExpanded[mod.id] = true;
- });
- setExpandedModules(initialExpanded);
+  const hasInitialized = useRef(false);
+  useEffect(() => {
+    if (curriculum.length > 0 && !hasInitialized.current) {
+      const initialExpanded: Record<string, boolean> = {};
+      curriculum.forEach((mod) => {
+        initialExpanded[mod.id] = true;
+      });
+      setExpandedModules(initialExpanded);
 
- const allL = curriculum.flatMap((m) => m.lessons);
- if (initialLessonParam) {
- const match = allL.find((l) => l.id === initialLessonParam || l.id.endsWith(initialLessonParam));
- if (match) setActiveLessonId(match.id);
- } else {
- const firstIncomplete = allL.find((l) => !l.completed);
- setActiveLessonId(firstIncomplete ? firstIncomplete.id : allL[0]?.id || "");
- }
- hasInitialized.current = true;
- }
- }, [curriculum, initialLessonParam]);
+      const allL = curriculum.flatMap((m) => m.lessons);
+      if (initialLessonParam) {
+        const match = allL.find((l) => l.id === initialLessonParam || l.id.endsWith(initialLessonParam));
+        if (match) setActiveLessonId(match.id);
+      } else {
+        const firstIncomplete = allL.find((l) => !l.completed);
+        setActiveLessonId(firstIncomplete ? firstIncomplete.id : allL[0]?.id || "");
+      }
+      hasInitialized.current = true;
+    }
+  }, [curriculum, initialLessonParam]);
 
- const allLessons = React.useMemo(() => curriculum.flatMap((m) => m.lessons), [curriculum]);
+  const allLessons = React.useMemo(() => curriculum.flatMap((m) => m.lessons), [curriculum]);
 
- const activeLesson: LessonData | undefined = React.useMemo(
- () => allLessons.find((l) => l.id === activeLessonId) || allLessons[0],
- [allLessons, activeLessonId]
- );
+  const activeLesson: LessonData | undefined = React.useMemo(
+    () => allLessons.find((l) => l.id === activeLessonId) || allLessons[0],
+    [allLessons, activeLessonId]
+  );
 
- // Tab & comment states
- const [activeTab, setActiveTab] = useState<"content" | "ai_tips" | "discussion">("content");
- const { data: apiDiscussions, isLoading: isDiscussionsLoading } = useGetDiscussions(isPreview ? "" : activeLessonId);
- const { mutate: submitDiscussion, isPending: isSubmittingDiscussion } = useCreateDiscussion();
- const { mutate: updateDiscussion, isPending: isUpdatingDiscussion } = useUpdateDiscussion();
- const { mutate: deleteDiscussion, isPending: isDeletingDiscussion } = useDeleteDiscussion();
- const [newCommentText, setNewCommentText] = useState("");
- const [editingDiscussionId, setEditingDiscussionId] = useState<string | number | null>(null);
- const [editDiscussionText, setEditDiscussionText] = useState("");
+  // Tab & comment states
+  const [activeTab, setActiveTab] = useState<"content" | "ai_tips" | "discussion">("content");
+  const { data: apiDiscussions, isLoading: isDiscussionsLoading } = useGetDiscussions(isPreview ? "" : activeLessonId);
+  const { mutate: submitDiscussion, isPending: isSubmittingDiscussion } = useCreateDiscussion();
+  const { mutate: updateDiscussion, isPending: isUpdatingDiscussion } = useUpdateDiscussion();
+  const { mutate: deleteDiscussion, isPending: isDeletingDiscussion } = useDeleteDiscussion();
+  const [newCommentText, setNewCommentText] = useState("");
+  const [editingDiscussionId, setEditingDiscussionId] = useState<string | number | null>(null);
+  const [editDiscussionText, setEditDiscussionText] = useState("");
 
- const toggleModule = (modId: string) => {
- setExpandedModules((prev) => ({ ...prev, [modId]: !prev[modId] }));
- };
+  const toggleModule = (modId: string) => {
+    setExpandedModules((prev) => ({ ...prev, [modId]: !prev[modId] }));
+  };
 
- // Progress
- const totalLessonCount = allLessons.length;
- const completedCount = allLessons.filter((l) => l.completed).length;
- const computedProgressPercentage = Math.round((completedCount / (totalLessonCount || 1)) * 100);
+  // Progress
+  const totalLessonCount = allLessons.length;
+  const completedCount = allLessons.filter((l) => l.completed).length;
+  const computedProgressPercentage = Math.round((completedCount / (totalLessonCount || 1)) * 100);
 
- const handleSelectLesson = (lessonId: string) => {
- setActiveLessonId(lessonId);
- setActiveTab("content");
- };
+  const handleSelectLesson = (lessonId: string) => {
+    setActiveLessonId(lessonId);
+    setActiveTab("content");
+  };
 
- // Record the server-side start time whenever a lesson is opened (completion is validated against it).
- const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
- useEffect(() => {
- if (isPreview || !activeLesson?.id || activeLesson.completed) return;
- startLesson(activeLesson.id).catch(() => {});
- return () => {
- if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
- };
- }, [activeLesson?.id, activeLesson?.completed, isPreview]);
+  // Record the server-side start time whenever a lesson is opened (completion is validated against it).
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (isPreview || !activeLesson?.id || activeLesson.completed) return;
+    startLesson(activeLesson.id).catch(() => {});
+    return () => {
+      if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+    };
+  }, [activeLesson?.id, activeLesson?.completed, isPreview]);
 
- // Handle lesson completion
- const handleLessonComplete = useCallback(async () => {
- if (isPreview || !activeLesson || activeLesson.completed) return;
+  // Handle lesson completion
+  const handleLessonComplete = useCallback(async () => {
+    if (isPreview || !activeLesson || activeLesson.completed) return;
 
- const payload: { playback_position?: number; time_spent_seconds?: number } = {};
- if (activeLesson.type === 'video') {
- payload.playback_position = activeLesson.durationSeconds; // Video reached end
- } else if (activeLesson.type === 'article') {
- payload.time_spent_seconds = Math.ceil(activeLesson.durationSeconds * 1 / 3);
- }
- // For quiz, the backend auto-completes via quiz submit
+    const payload: { playback_position?: number; time_spent_seconds?: number } = {};
+    if (activeLesson.type === 'video') {
+      payload.playback_position = activeLesson.durationSeconds; // Video reached end
+    } else if (activeLesson.type === 'article') {
+      payload.time_spent_seconds = Math.ceil(activeLesson.durationSeconds * 1 / 3);
+    }
+    // For quiz, the backend auto-completes via quiz submit
 
- try {
- const response = await completeLesson(activeLesson.id, payload);
+    try {
+      const response = await completeLesson(activeLesson.id, payload);
 
- // Instant UI Update: Modify the TanStack Query Cache directly!
- queryClient.setQueryData(["student", "courses", "detail", String(parsedCourseId)], (oldData: CourseDetailData | undefined) => {
- if (!oldData) return oldData;
- return {
- ...oldData,
- modules: oldData.modules.map(mod => ({
- ...mod,
- lessons: mod.lessons.map(les => ({
- ...les,
- status: les.id.toString() === activeLesson.id ? 'completed' : les.status
- }))
- })),
- progress_card: oldData.progress_card ? {
- ...oldData.progress_card,
- progress_percentage: response.progress_percentage,
- completed_lessons_count: response.completed_lessons_count,
- total_lessons_count: response.total_lessons_count,
- } : undefined
- };
- });
+      // Instant UI Update: Modify the TanStack Query Cache directly!
+      queryClient.setQueryData(["student", "courses", "detail", String(parsedCourseId)], (oldData: CourseDetailData | undefined) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          modules: oldData.modules.map(mod => ({
+            ...mod,
+            lessons: mod.lessons.map(les => ({
+              ...les,
+              status: les.id.toString() === activeLesson.id ? 'completed' : les.status
+            }))
+          })),
+          progress_card: oldData.progress_card ? {
+            ...oldData.progress_card,
+            progress_percentage: response.progress_percentage,
+            completed_lessons_count: response.completed_lessons_count,
+            total_lessons_count: response.total_lessons_count,
+          } : undefined
+        };
+      });
 
- // Background refetch to guarantee synchronization
- invalidateCourseDetail(parsedCourseId);
- } catch (err: any) {
- // The server measures real study time; if it is not enough yet, retry once it is.
- const remaining = Number(err?.response?.data?.errors?.remaining_seconds);
- if (err?.response?.status === 422 && remaining > 0) {
- if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
- retryTimerRef.current = setTimeout(() => { void handleLessonCompleteRef.current?.(); }, (remaining + 1) * 1000);
- return;
- }
- console.warn("Completion API error:", err);
- }
- }, [activeLesson, invalidateCourseDetail, parsedCourseId, isPreview, queryClient]);
- const handleLessonCompleteRef = useRef(handleLessonComplete);
- useEffect(() => { handleLessonCompleteRef.current = handleLessonComplete; }, [handleLessonComplete]);
+      // Background refetch to guarantee synchronization
+      invalidateCourseDetail(parsedCourseId);
+    } catch (err: any) {
+      // The server measures real study time; if it is not enough yet, retry once it is.
+      const remaining = Number(err?.response?.data?.errors?.remaining_seconds);
+      if (err?.response?.status === 422 && remaining > 0) {
+        if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = setTimeout(() => { void handleLessonCompleteRef.current?.(); }, (remaining + 1) * 1000);
+        return;
+      }
+      console.warn("Completion API error:", err);
+    }
+  }, [activeLesson, invalidateCourseDetail, parsedCourseId, isPreview, queryClient]);
+  const handleLessonCompleteRef = useRef(handleLessonComplete);
+  useEffect(() => { handleLessonCompleteRef.current = handleLessonComplete; }, [handleLessonComplete]);
 
- // Post comment
- const [confirmDeleteId, setConfirmDeleteId] = useState<string | number | null>(null);
+  // Post comment
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | number | null>(null);
 
- const handlePostComment = (e: React.FormEvent) => {
- e.preventDefault();
- if (isPreview || !newCommentText.trim() || isSubmittingDiscussion) return;
- submitDiscussion(
- { lessonId: activeLessonId, content: newCommentText.trim() },
- {
- onSuccess: () => {
- setNewCommentText("");
- toast.success("Gửi thảo luận thành công!");
- }
- }
- );
- };
+  const handlePostComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isPreview || !newCommentText.trim() || isSubmittingDiscussion) return;
+    submitDiscussion(
+      { lessonId: activeLessonId, content: newCommentText.trim() },
+      {
+        onSuccess: () => {
+          setNewCommentText("");
+          toast.success("Gửi thảo luận thành công!");
+        }
+      }
+    );
+  };
 
- const handleEditDiscussion = (discussionId: string | number, content: string) => {
- setEditingDiscussionId(discussionId);
- setEditDiscussionText(content);
- };
+  const handleEditDiscussion = (discussionId: string | number, content: string) => {
+    setEditingDiscussionId(discussionId);
+    setEditDiscussionText(content);
+  };
 
- const handleEditDiscussionSubmit = (e: React.FormEvent, discussionId: string | number) => {
- e.preventDefault();
- if (!editDiscussionText.trim()) return;
+  const handleEditDiscussionSubmit = (e: React.FormEvent, discussionId: string | number) => {
+    e.preventDefault();
+    if (!editDiscussionText.trim()) return;
 
- updateDiscussion(
- { lessonId: activeLessonId, discussionId, content: editDiscussionText.trim() },
- {
- onSuccess: () => {
- setEditingDiscussionId(null);
- toast.success("Cập nhật thảo luận thành công!");
- }
- }
- );
- };
+    updateDiscussion(
+      { lessonId: activeLessonId, discussionId, content: editDiscussionText.trim() },
+      {
+        onSuccess: () => {
+          setEditingDiscussionId(null);
+          toast.success("Cập nhật thảo luận thành công!");
+        }
+      }
+    );
+  };
 
- const handleDeleteDiscussion = (discussionId: string | number) => {
- setConfirmDeleteId(discussionId);
- };
+  const handleDeleteDiscussion = (discussionId: string | number) => {
+    setConfirmDeleteId(discussionId);
+  };
 
- const confirmDelete = () => {
- if (!confirmDeleteId) return;
- deleteDiscussion(
- { lessonId: activeLessonId, discussionId: confirmDeleteId },
- { onSuccess: () => { toast.success("Xóa thảo luận thành công!"); } }
- );
- setConfirmDeleteId(null);
- };
+  const confirmDelete = () => {
+    if (!confirmDeleteId) return;
+    deleteDiscussion(
+      { lessonId: activeLessonId, discussionId: confirmDeleteId },
+      { onSuccess: () => { toast.success("Xóa thảo luận thành công!"); } }
+    );
+    setConfirmDeleteId(null);
+  };
 
- // Navigation
- const currentIndex = allLessons.findIndex((l) => l.id === activeLessonId);
- const hasPrevious = currentIndex > 0;
- const hasNext = currentIndex < allLessons.length - 1;
+  // Navigation
+  const currentIndex = allLessons.findIndex((l) => l.id === activeLessonId);
+  const hasPrevious = currentIndex > 0;
+  const hasNext = currentIndex < allLessons.length - 1;
 
- const handleGoPrevious = () => {
- if (hasPrevious) handleSelectLesson(allLessons[currentIndex - 1].id);
- };
- const handleGoNext = () => {
- if (hasNext) handleSelectLesson(allLessons[currentIndex + 1].id);
- };
+  const handleGoPrevious = () => {
+    if (hasPrevious) handleSelectLesson(allLessons[currentIndex - 1].id);
+  };
+  const handleGoNext = () => {
+    if (hasNext) handleSelectLesson(allLessons[currentIndex + 1].id);
+  };
 
- if (!parsedCourseId || parsedCourseId <= 0 || (error && (error as any).response?.status === 404)) {
- return (
- <div className="w-full h-screen flex flex-col items-center justify-center bg-blue-50/50 p-6">
- <div className="bg-white p-8 rounded-xl shadow-sm max-w-md w-full text-center border border-blue-100">
- <h2 className="text-xl font-bold text-slate-900 mb-2">Không tìm thấy khóa học</h2>
- <p className="text-sm text-slate-500 mb-6">Vui lòng chọn một khóa học để bắt đầu học.</p>
- <a href="/courses" className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-all shadow-sm">
- Xem danh sách khóa học
- </a>
- </div>
- </div>
- );
- }
+  if (!parsedCourseId || parsedCourseId <= 0 || (error && (error as any).response?.status === 404)) {
+    return (
+      <div className="w-full h-screen flex flex-col items-center justify-center bg-blue-50/50 p-6">
+        <div className="bg-white p-8 rounded-xl shadow-sm max-w-md w-full text-center border border-blue-100">
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Không tìm thấy khóa học</h2>
+          <p className="text-sm text-slate-500 mb-6">Vui lòng chọn một khóa học để bắt đầu học.</p>
+          <a href="/courses" className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-all shadow-sm">
+            Xem danh sách khóa học
+          </a>
+        </div>
+      </div>
+    );
+  }
 
- // Lesson material is only for enrolled learners (the API also strips it for everyone else).
- if (!isPreview && apiDetail && apiDetail.header_info?.is_enrolled === false) {
- return (
- <div className="w-full min-h-[70vh] flex flex-col items-center justify-center p-6">
- <div className="bg-white p-8 rounded-xl shadow-sm max-w-md w-full text-center border border-slate-200">
- <div className="mx-auto mb-4 w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center">
- <Lock size={22} aria-hidden />
- </div>
- <h2 className="text-lg font-bold text-slate-900 mb-2">Bạn chưa đăng ký khóa học này</h2>
- <p className="text-sm text-slate-500 mb-6">Đăng ký khóa học để xem bài giảng, tài liệu và làm bài kiểm tra.</p>
- <Link href={`/courses/detail?courseId=${parsedCourseId}`} className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors shadow-sm">
- Xem thông tin khóa học
- </Link>
- </div>
- </div>
- );
- }
+  // Lesson material is only for enrolled learners (the API also strips it for everyone else).
+  if (!isPreview && apiDetail && apiDetail.header_info?.is_enrolled === false) {
+    return (
+      <div className="w-full min-h-[70vh] flex flex-col items-center justify-center p-6">
+        <div className="bg-white p-8 rounded-xl shadow-sm max-w-md w-full text-center border border-slate-200">
+          <div className="mx-auto mb-4 w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center">
+            <Lock size={22} aria-hidden />
+          </div>
+          <h2 className="text-lg font-bold text-slate-900 mb-2">Bạn chưa đăng ký khóa học này</h2>
+          <p className="text-sm text-slate-500 mb-6">Đăng ký khóa học để xem bài giảng, tài liệu và làm bài kiểm tra.</p>
+          <Link href={`/courses/detail?courseId=${parsedCourseId}`} className="inline-flex items-center justify-center w-full px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors shadow-sm">
+            Xem thông tin khóa học
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
- if (isPreview && (error || (!isLoading && !activeLesson))) {
- const status = (error as any)?.response?.status;
- const message = status === 403 ? "Bạn không có quyền xem trước khóa học này."
- : error ? "Không thể tải bản xem trước. Vui lòng thử lại."
- : "Khóa học chưa có bài học để xem trước.";
- return (
- <div className="w-full min-h-screen flex flex-col items-center justify-center gap-4 bg-blue-50/50 p-6">
- <p role="alert" className="font-semibold text-slate-700">{message}</p>
- <Link href={`/instructor/courses/${parsedCourseId}/edit`} className="text-blue-600 underline">Quay lại chỉnh sửa khóa học</Link>
- </div>
- );
- }
+  if (isPreview && (error || (!isLoading && !activeLesson))) {
+    const status = (error as any)?.response?.status;
+    const message = status === 403 ? "Bạn không có quyền xem trước khóa học này."
+      : error ? "Không thể tải bản xem trước. Vui lòng thử lại."
+      : "Khóa học chưa có bài học để xem trước.";
+    return (
+      <div className="w-full min-h-screen flex flex-col items-center justify-center gap-4 bg-blue-50/50 p-6">
+        <p role="alert" className="font-semibold text-slate-700">{message}</p>
+        <Link href={`/instructor/courses/${parsedCourseId}/edit`} className="text-blue-600 underline">Quay lại chỉnh sửa khóa học</Link>
+      </div>
+    );
+  }
 
- if (isLoading || !activeLesson) {
- return (
- <div role="status" aria-busy="true" aria-label="Đang tải bài học" className="w-full min-h-screen bg-slate-50/50">
- <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
- <div className="space-y-2"><Skeleton className="h-3 w-40" /><Skeleton className="h-5 w-64" /></div>
- <Skeleton className="h-2 w-40 rounded-full" />
- </div>
- <div className="max-w-[1400px] mx-auto p-6 flex flex-col lg:flex-row gap-8">
- <div className="flex-1 space-y-6">
- <Skeleton className="aspect-video w-full rounded-xl" />
- <Skeleton className="h-12 w-full rounded-xl" />
- <Skeleton className="h-40 w-full rounded-xl" />
- </div>
- <div className="w-full lg:w-[340px] space-y-4">
- <Skeleton className="h-24 w-full rounded-xl" />
- {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" />)}
- </div>
- </div>
- </div>
- );
- }
+  if (isLoading || !activeLesson) {
+    return (
+      <div role="status" aria-busy="true" aria-label="Đang tải bài học" className="w-full min-h-screen bg-slate-50/50">
+        <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+          <div className="space-y-2"><Skeleton className="h-3 w-40" /><Skeleton className="h-5 w-64" /></div>
+          <Skeleton className="h-2 w-40 rounded-full" />
+        </div>
+        <div className="max-w-[1400px] mx-auto p-6 flex flex-col lg:flex-row gap-8">
+          <div className="flex-1 space-y-6">
+            <Skeleton className="aspect-video w-full rounded-xl" />
+            <Skeleton className="h-12 w-full rounded-xl" />
+            <Skeleton className="h-40 w-full rounded-xl" />
+          </div>
+          <div className="w-full lg:w-[340px] space-y-4">
+            <Skeleton className="h-24 w-full rounded-xl" />
+            {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" />)}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full h-screen flex flex-col items-center justify-center bg-[#F8FAFC] p-6">
+        <div className="bg-white p-8 rounded-3xl shadow-sm max-w-md w-full text-center border border-[#E2E8F0]">
+          <AlertTriangle className="mx-auto text-amber-500 mb-4" size={32} aria-hidden />
+          <h2 className="text-xl font-bold text-[#0F172A] mb-2">Không thể tải dữ liệu bài học</h2>
+          <p className="text-sm text-[#64748B] mb-6">Vui lòng kiểm tra kết nối và thử tải lại trang.</p>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold transition-all shadow-sm"
+          >
+            Tải lại trang
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!activeLesson) {
+    return (
+      <div className="w-full h-screen flex flex-col items-center justify-center bg-[#F8FAFC] p-6">
+        <div className="bg-white p-8 rounded-3xl shadow-sm max-w-md w-full text-center border border-[#E2E8F0]">
+          <BookOpen className="mx-auto text-[#3B82F6] mb-4" size={32} aria-hidden />
+          <h2 className="text-xl font-bold text-[#0F172A] mb-2">Khóa học chưa có bài học</h2>
+          <p className="text-sm text-[#64748B] mb-6">Giảng viên chưa cập nhật nội dung cho khóa học này.</p>
+          <Link
+            href={`/courses/detail?courseId=${parsedCourseId}`}
+            className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold transition-all shadow-sm"
+          >
+            Quay lại chi tiết khóa học
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50/50 relative font-sans">
@@ -487,18 +527,21 @@ function LessonWorkspaceContent() {
         </div>
       )}
 
-      {/* Tab 2: AI Tips */}
+      {/* Tab 2: Cố vấn AI Nova */}
       {activeTab === "ai_tips" && (
-        <div className="flex flex-col gap-5 animate-fadeIn">
-          <div className="p-5 rounded-xl bg-gradient-to-br from-blue-50 to-sky-50 border border-blue-100 flex items-start gap-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-              <Sparkles size={22} />
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900 text-sm mb-1">Phân tích chuyên sâu từ MindNova</h3>
-              <p className="text-[13px] text-slate-600 leading-relaxed">Các lưu ý chuyên môn được đúc kết từ thực tiễn. Tính năng đang trong quá trình thử nghiệm và sớm ra mắt.</p>
-            </div>
-          </div>
+        <div className="flex flex-col gap-5 animate-fadeIn mt-2">
+           {activeLesson.type === 'video' && activeLesson.videoUrl ? (
+              <AiNovaTab 
+                videoId={activeLesson.id} 
+                videoUrl={activeLesson.videoUrl} 
+                geminiFileUri={activeLesson.geminiFileUri} // 🟢 TRUYỀN XUỐNG COMPONENT CHAT
+              />
+           ) : (
+              <div className="p-8 text-center text-slate-500 bg-slate-50 rounded-2xl border border-slate-200">
+                  <Bot className="mx-auto mb-3 text-slate-400" size={32} />
+                  <p className="text-sm font-medium">Cố vấn AI Nova hiện chỉ hỗ trợ phân tích và giải đáp cho các bài học định dạng Video.</p>
+              </div>
+           )}
         </div>
       )}
 
@@ -629,8 +672,8 @@ function LessonWorkspaceContent() {
   </div>
  </main>
 
-  {/* ─── Right Column (4 cols): Sidebar ─── */}
-  <aside className="lg:col-span-4 w-full flex flex-col gap-6 sticky top-24 max-h-[calc(100vh-100px)] overflow-y-auto pr-1">
+ {/* ─── Right Column (4 cols): Sidebar ─── */}
+ <aside className="lg:col-span-4 w-full flex flex-col gap-6 sticky top-24 max-h-[calc(100vh-100px)] overflow-y-auto pr-1">
 
     {/* Progress Header */}
     <div className="bg-white rounded-xl border border-slate-200/60 shadow-sm p-6 flex flex-col gap-4 shrink-0">
@@ -775,11 +818,11 @@ function LessonWorkspaceContent() {
         );
       })}
     </div>
-  </aside>
+ </aside>
  </div>
 
-  {/* ─── Bottom Toolbar ─── */}
-  <footer className="w-full bg-white border-t border-slate-200 px-4 md:px-8 py-3.5 mt-auto sticky bottom-0 z-40 shadow-[0_-4px_20px_rgb(0,0,0,0.02)]">
+ {/* ─── Bottom Toolbar ─── */}
+ <footer className="w-full bg-white border-t border-slate-200 px-4 md:px-8 py-3.5 mt-auto sticky bottom-0 z-40 shadow-[0_-4px_20px_rgb(0,0,0,0.02)]">
     <div className="max-w-[1400px] mx-auto w-full flex items-center justify-center">
       {/* Navigation Buttons - Centered & Evenly Spaced */}
       <div className="w-full flex items-center justify-center gap-3 flex-wrap">
@@ -817,10 +860,10 @@ function LessonWorkspaceContent() {
         </button>
       </div>
     </div>
-  </footer>
+ </footer>
 
-  {/* ─── Confirm Delete Dialog ─── */}
-  {confirmDeleteId !== null && (
+ {/* ─── Confirm Delete Dialog ─── */}
+ {confirmDeleteId !== null && (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-xl border border-slate-200 p-6 max-w-sm w-full mx-4 flex flex-col gap-4">
         <div className="flex items-center gap-3">
@@ -848,10 +891,10 @@ function LessonWorkspaceContent() {
         </div>
       </div>
     </div>
-  )}
+ )}
 
-  </div>
-  );
+ </div>
+ );
 }
 
 // ─── Exported Master Component ────────────────────────────────────────────────

@@ -177,9 +177,34 @@ class AiTutorTest extends TestCase
             ->assertExactJson(['message' => 'AI Tutor hiện không khả dụng. Vui lòng thử lại sau.']);
         $this->assertStringNotContainsString('private-', $response->getContent());
         $this->assertStringNotContainsString('course-primary-key', $response->getContent());
-        $this->assertSame(1, AiDailyQuotaUsage::sole()->used);
+        $this->assertSame(0, AiDailyQuotaUsage::sole()->used);
         $this->assertSame(['user'], AiTutorMessage::pluck('sender')->all());
         $this->assertSame(3, AiUsageLog::count());
         Http::assertSentCount(3);
+    }
+
+    public function test_video_tutor_does_not_fall_back_to_text_only_provider_when_gemini_rejects_video(): void
+    {
+        $student = User::factory()->create(['role' => 'student', 'email_verified_at' => now()]);
+        $lesson = CourseAiTutorServiceTest::enrolledLesson($student);
+        $lesson->update(['gemini_file_uri' => 'https://generativelanguage.googleapis.com/v1beta/files/test-video']);
+        config(['services.backup_ai.api_key' => 'course-backup-key']);
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response(['error' => ['status' => 'PERMISSION_DENIED']], 403),
+            'api.groq.com/*' => Http::response([
+                'choices' => [['message' => ['content' => 'Text-only answer that must not be used']]],
+            ]),
+        ]);
+
+        $response = $this->actingAs($student, 'sanctum')->postJson('/api/student/ai-tutor/chat', [
+            'message' => 'Tóm tắt video này',
+            'lesson_id' => $lesson->id,
+        ]);
+
+        $response->assertStatus(503)
+            ->assertExactJson(['message' => (new \App\Exceptions\AiVideoUnavailableException)->getMessage()]);
+        $this->assertSame(0, AiDailyQuotaUsage::sole()->used);
+        $this->assertSame(['failed'], AiUsageLog::pluck('status')->all());
+        Http::assertSentCount(1);
     }
 }

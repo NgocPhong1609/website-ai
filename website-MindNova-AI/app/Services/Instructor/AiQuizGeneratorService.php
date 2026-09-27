@@ -196,7 +196,8 @@ YÊU CẦU BẮT BUỘC KHÔNG ĐƯỢC VI PHẠM:
                 'deadline' => $deadline,
                 'max_retries' => 1,
                 'user_id' => $instructor->id,
-                'feature' => 'ai_quiz_generator'
+                'feature' => 'ai_quiz_generator',
+                'fallback_on_error' => true,
             ]);
 
             Log::info("[QUIZ_GEN STEP 5] AI Response Received", [

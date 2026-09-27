@@ -77,6 +77,7 @@ class LessonResource extends JsonResource
             'type' => $this->type,
             'content' => $this->content,
             'video_url' => $this->video_url,
+            'gemini_file_uri' => $this->gemini_file_uri, // 🟢 THÊM DÒNG NÀY VÀO ĐÂY
             'signed_url' => $this->getSignedUrl(),
             'duration_seconds' => $this->duration_seconds,
             'order' => $this->order,

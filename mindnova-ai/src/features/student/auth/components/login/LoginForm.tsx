@@ -38,6 +38,15 @@ export function LoginForm({ onFlipToRegister }: LoginFormProps) {
 
  // Tự động đồng bộ token & chuyển hướng nếu đã đăng nhập
  useEffect(() => {
+ const isExpiredSession = new URLSearchParams(window.location.search).get("sessionExpired") === "1";
+ if (isExpiredSession) {
+ window.localStorage.removeItem("accessToken");
+ window.localStorage.removeItem("userInfo");
+ document.cookie = "accessToken=; path=/; max-age=0; samesite=lax";
+ document.cookie = "userRole=; path=/; max-age=0; samesite=lax";
+ return;
+ }
+
  const token = window.localStorage.getItem("accessToken");
  const userInfoRaw = window.localStorage.getItem("userInfo");
 

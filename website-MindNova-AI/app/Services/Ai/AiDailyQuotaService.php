@@ -73,4 +73,17 @@ class AiDailyQuotaService
             }
         }
     }
+
+    /** Return a reserved request when all configured AI providers fail. */
+    public function release(User $user, string $feature = 'ai_tutor'): void
+    {
+        $usageDate = CarbonImmutable::now(config('app.timezone'))->toDateString();
+
+        AiDailyQuotaUsage::query()
+            ->where('user_id', $user->id)
+            ->where('feature', $feature)
+            ->whereDate('usage_date', $usageDate)
+            ->where('used', '>', 0)
+            ->decrement('used');
+    }
 }

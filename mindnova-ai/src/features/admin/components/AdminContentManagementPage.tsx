@@ -38,6 +38,24 @@ type CourseListResponse = {
  };
 };
 
+type ReviewSubmission = {
+ id: number;
+ course?: { id?: number; title?: string | null } | null;
+ instructor?: { name?: string | null; email?: string | null } | null;
+ status: "pending" | "under_review" | "needs_fixes" | "approved" | "rejected";
+ submitted_at?: string | null;
+ reviewed_at?: string | null;
+ is_stale?: boolean;
+ metadata?: { total_lessons?: number; version_number?: number } | null;
+};
+
+type ReviewQueueResponse = {
+ data?: {
+  submissions?: ReviewSubmission[] | { data?: ReviewSubmission[] };
+  counts?: Record<string, number>;
+ };
+};
+
 type ResourceRow = {
  id: number;
  title: string;
@@ -70,6 +88,8 @@ export function AdminContentManagementPage() {
  const [page, setPage] = useState(1);
  const [courseMeta, setCourseMeta] = useState({ current_page: 1, last_page: 1, per_page: 20, total: 0 });
  const [courseSummary, setCourseSummary] = useState({ total: 0, pending_review: 0 });
+ const [reviewSubmissions, setReviewSubmissions] = useState<ReviewSubmission[]>([]);
+ const [reviewCounts, setReviewCounts] = useState<Record<string, number>>({});
  const [resourceForm, setResourceForm] = useState({ title: "", type: "ebook", url: "", description: "" });
  const courseRequestIdRef = useRef(0);
 
@@ -122,6 +142,20 @@ export function AdminContentManagementPage() {
  }
  }, []);
 
+ const loadReviewQueue = useCallback(async () => {
+  try {
+   const response = await adminApi<ReviewQueueResponse>("/admin/reviews?per_page=50");
+   const submissionsPayload = response.data?.submissions;
+   const submissions = Array.isArray(submissionsPayload)
+    ? submissionsPayload
+    : submissionsPayload?.data;
+   setReviewSubmissions(Array.isArray(submissions) ? submissions : []);
+   setReviewCounts(response.data?.counts ?? {});
+  } catch (error) {
+   setMessage(error instanceof Error ? error.message : "Không thể tải hàng đợi kiểm duyệt nội dung.");
+  }
+ }, []);
+
  useEffect(() => {
  void loadCourses();
  }, [loadCourses]);
@@ -131,14 +165,41 @@ export function AdminContentManagementPage() {
  }, [loadAncillaryData]);
 
  useEffect(() => {
+  void loadReviewQueue();
+ }, [loadReviewQueue]);
+
+ useEffect(() => {
  const handleRefresh = () => {
  void loadCourses();
  void loadAncillaryData();
+ void loadReviewQueue();
  };
 
  window.addEventListener("admin:refresh-data", handleRefresh);
  return () => window.removeEventListener("admin:refresh-data", handleRefresh);
- }, [loadAncillaryData, loadCourses]);
+ }, [loadAncillaryData, loadCourses, loadReviewQueue]);
+
+ const reviewSubmission = async (submissionId: number, action: "start" | "approve" | "request-fixes" | "reject") => {
+  const feedback = action === "request-fixes" || action === "reject"
+   ? window.prompt(action === "reject" ? "Nhập lý do từ chối:" : "Nhập nội dung cần giáo viên sửa:")?.trim()
+   : undefined;
+
+  if ((action === "request-fixes" || action === "reject") && !feedback) return;
+
+  setPendingAction(`review-${action}-${submissionId}`);
+  try {
+   await adminApi(`/admin/reviews/${submissionId}/${action}`, {
+    method: action === "start" ? "PATCH" : "PATCH",
+    ...(feedback ? { body: JSON.stringify({ feedback }) } : {}),
+   });
+   setMessage(action === "approve" ? "Đã duyệt và xuất bản phiên bản nội dung." : "Đã cập nhật trạng thái kiểm duyệt.");
+   await Promise.all([loadReviewQueue(), latestLoadCoursesRef.current()]);
+  } catch (error) {
+   setMessage(error instanceof Error ? error.message : "Thao tác kiểm duyệt thất bại.");
+  } finally {
+   setPendingAction(null);
+  }
+ };
 
  const applySearch = (event: FormEvent<HTMLFormElement>) => {
  event.preventDefault();
@@ -269,8 +330,53 @@ export function AdminContentManagementPage() {
 
  <section className="grid gap-4 md:grid-cols-3">
  <SmallCard label="Tổng khóa học" value={courseSummary.total} />
- <SmallCard label="Chờ duyệt" value={courseSummary.pending_review} />
+ <SmallCard label="Chờ duyệt nội dung" value={(reviewCounts.pending ?? 0) + (reviewCounts.under_review ?? 0)} />
  <SmallCard label="Kho tài liệu mẫu" value={resources.length} />
+ </section>
+
+ <section className="rounded-2xl border border-amber-200 bg-amber-50/60 p-4">
+ <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+  <div>
+   <h2 className="text-lg font-semibold text-slate-900 [font-family:var(--font-admin-head)]">Hàng đợi duyệt nội dung</h2>
+   <p className="mt-1 text-xs text-slate-600">Đây là nơi duyệt phiên bản khóa học do giáo viên gửi. Chỉ bản được duyệt mới hiển thị cho học sinh.</p>
+  </div>
+  <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-amber-800 shadow-sm">
+   {reviewCounts.pending ?? 0} chờ xử lý
+  </span>
+ </div>
+ <div className="overflow-x-auto rounded-xl border border-amber-200 bg-white">
+  <table className="min-w-full text-sm">
+   <thead className="bg-amber-50 text-slate-600">
+    <tr>
+     <th className="px-3 py-2 text-left">Khóa học</th>
+     <th className="px-3 py-2 text-left">Giảng viên</th>
+     <th className="px-3 py-2 text-left">Phiên bản</th>
+     <th className="px-3 py-2 text-left">Trạng thái</th>
+     <th className="px-3 py-2 text-left">Thao tác</th>
+    </tr>
+   </thead>
+   <tbody>
+    {reviewSubmissions.filter((submission) => ["pending", "under_review", "needs_fixes"].includes(submission.status)).length === 0 ? (
+     <tr><td colSpan={5} className="px-3 py-5 text-center text-sm text-slate-500">Không có bản gửi nội dung đang chờ duyệt.</td></tr>
+    ) : reviewSubmissions.filter((submission) => ["pending", "under_review", "needs_fixes"].includes(submission.status)).map((submission) => (
+     <tr key={submission.id} className="border-t border-slate-100">
+      <td className="px-3 py-2 font-medium text-slate-900">{submission.course?.title || "-"}</td>
+      <td className="px-3 py-2 text-slate-700">{submission.instructor?.name || "-"}</td>
+      <td className="px-3 py-2 text-slate-600">v{submission.metadata?.version_number ?? "-"}</td>
+      <td className="px-3 py-2"><span className={`rounded-full px-2 py-1 text-xs font-semibold ${reviewStatusClassName(submission.status)}`}>{reviewStatusLabel(submission.status)}</span></td>
+      <td className="px-3 py-2">
+       <div className="flex flex-wrap gap-2">
+        {submission.status === "pending" && <button type="button" onClick={() => void reviewSubmission(submission.id, "start")} disabled={pendingAction !== null} className="rounded-lg bg-slate-900 px-2 py-1 text-xs font-semibold text-white disabled:opacity-50">Bắt đầu duyệt</button>}
+        {(submission.status === "pending" || submission.status === "under_review") && <button type="button" onClick={() => void reviewSubmission(submission.id, "approve")} disabled={pendingAction !== null} className="rounded-lg bg-emerald-600 px-2 py-1 text-xs font-semibold text-white disabled:opacity-50">Duyệt xuất bản</button>}
+        {(submission.status === "pending" || submission.status === "under_review") && <button type="button" onClick={() => void reviewSubmission(submission.id, "request-fixes")} disabled={pendingAction !== null} className="rounded-lg bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800 disabled:opacity-50">Yêu cầu sửa</button>}
+        {(submission.status === "pending" || submission.status === "under_review") && <button type="button" onClick={() => void reviewSubmission(submission.id, "reject")} disabled={pendingAction !== null} className="rounded-lg bg-rose-100 px-2 py-1 text-xs font-semibold text-rose-800 disabled:opacity-50">Từ chối</button>}
+       </div>
+      </td>
+     </tr>
+    ))}
+   </tbody>
+  </table>
+ </div>
  </section>
 
  <section className="rounded-2xl border-[#E2E8F0]/80 bg-white/95 p-4">
@@ -535,6 +641,22 @@ function statusClassName(status: string): string {
  if (status === "archived") return "bg-amber-100 text-amber-800";
  if (status === "pending_review") return "bg-blue-100 text-blue-800";
  if (status === "draft") return "bg-slate-100 text-slate-700";
+ return "bg-slate-100 text-slate-700";
+}
+
+function reviewStatusLabel(status: ReviewSubmission["status"]): string {
+ if (status === "pending") return "Chờ duyệt";
+ if (status === "under_review") return "Đang kiểm tra";
+ if (status === "needs_fixes") return "Cần sửa";
+ if (status === "approved") return "Đã duyệt";
+ return "Bị từ chối";
+}
+
+function reviewStatusClassName(status: ReviewSubmission["status"]): string {
+ if (status === "approved") return "bg-emerald-100 text-emerald-800";
+ if (status === "rejected") return "bg-rose-100 text-rose-800";
+ if (status === "needs_fixes") return "bg-amber-100 text-amber-800";
+ if (status === "under_review") return "bg-blue-100 text-blue-800";
  return "bg-slate-100 text-slate-700";
 }
 

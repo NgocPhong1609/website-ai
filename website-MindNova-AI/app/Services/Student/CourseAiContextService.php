@@ -31,6 +31,7 @@ final class CourseAiContextService
      *     lesson_id: int,
      *     lesson_title: string,
      *     lesson_content: string,
+     *     gemini_file_uri: string|null,
      *     attachments: array<int, array{display_name: string, mime_type: string|null}>
      * }
      */
@@ -62,6 +63,7 @@ final class CourseAiContextService
                 0,
                 self::LESSON_CONTENT_LIMIT,
             ),
+            'gemini_file_uri' => $lesson->gemini_file_uri,
             // Lesson attachment rows are mutable and are not part of ContentVersion snapshots.
             'attachments' => [],
         ];

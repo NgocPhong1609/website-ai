@@ -11,14 +11,14 @@ class CourseHealthService
     public function evaluate(Course $course): array
     {
         $course->loadMissing(
-            'modules.lessons.media', 
+            'modules.lessons.media',
             'modules.lessons.quiz.questions.answers',
             'quizAttachments.quiz.questions'
         );
         $issues = [];
 
         $this->require($issues, filled($course->title) && mb_strlen(trim($course->title)) >= 3, 'course.title', 'Khóa học cần có tiêu đề tối thiểu 3 ký tự.');
-        $this->require($issues, filled($course->description) && mb_strlen(trim(strip_tags($course->description))) >= 30, 'course.description', 'Khóa học cần có mô tả tối thiểu 30 ký tự.');
+        $this->warning($issues, 'course.description', 'Khóa học nên có mô tả tối thiểu 30 ký tự để học viên hiểu rõ nội dung.');
         $this->require($issues, filled($course->thumbnail), 'course.thumbnail', 'Khóa học cần có ảnh bìa.');
         $this->require($issues, (float) $course->price >= 0, 'course.price', 'Giá khóa học không hợp lệ.');
 

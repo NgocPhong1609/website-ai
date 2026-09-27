@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Student;
 
 use App\Exceptions\AiQuotaExceededException;
 use App\Exceptions\AiTutorInputRejectedException;
+use App\Exceptions\AiVideoUnavailableException;
 use App\Exceptions\CourseAiContextException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\AiChatRequest;
@@ -40,6 +41,8 @@ class AiTutorController extends Controller
                 'message' => $exception->getMessage(),
                 'meta' => $exception->quota(),
             ], 429);
+        } catch (AiVideoUnavailableException $exception) {
+            return response()->json(['message' => $exception->getMessage()], 503);
         } catch (\Throwable) {
             return response()->json([
                 'message' => 'AI Tutor hiện không khả dụng. Vui lòng thử lại sau.',

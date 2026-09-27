@@ -108,6 +108,21 @@ class AiDailyQuotaServiceTest extends TestCase
         $this->assertDatabaseCount('ai_daily_quota_usages', 1);
     }
 
+    public function test_failed_provider_reservation_can_be_released_without_underflow(): void
+    {
+        $user = User::factory()->create();
+        $service = app(AiDailyQuotaService::class);
+
+        $service->reserve($user);
+        $service->reserve($user);
+        $service->release($user);
+        $this->assertSame(1, AiDailyQuotaUsage::sole()->used);
+
+        $service->release($user);
+        $service->release($user);
+        $this->assertSame(0, AiDailyQuotaUsage::sole()->used);
+    }
+
     public function test_legacy_limits_are_honored_and_users_and_features_are_independent(): void
     {
         AdminSetting::create(['key' => 'ai.quotas', 'value' => ['student_daily_questions' => '7']]);

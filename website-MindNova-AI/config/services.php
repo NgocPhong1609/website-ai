@@ -62,9 +62,9 @@ return [
     ],
 
     'backup_ai' => [
-        'provider' => env('BACKUP_AI_PROVIDER', 'openai'),
+        'provider' => env('BACKUP_AI_PROVIDER', 'groq'),
         'api_key' => env('BACKUP_AI_API_KEY'),
-        'model' => env('BACKUP_AI_MODEL', 'llama-3-70b-8192'),
+        'model' => env('BACKUP_AI_MODEL', 'openai/gpt-oss-120b'),
     ],
 
     'momo' => [

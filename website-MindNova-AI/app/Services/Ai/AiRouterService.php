@@ -3,6 +3,7 @@
 namespace App\Services\Ai;
 
 use App\Contracts\ConfiguredAiProviderInterface;
+use App\Exceptions\AiVideoUnavailableException;
 use App\Exceptions\AiTransientException;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -61,10 +62,16 @@ class AiRouterService
             ];
 
         } catch (AiTransientException $e) {
+            if (! empty($options['video_file_uri'])) {
+                throw new AiVideoUnavailableException;
+            }
             Log::warning("[AI Router] Primary provider unavailable ({$this->primaryProvider->getProviderName()})", ['request_id' => $requestId]);
             Log::warning("[AI Router] Switching to Backup AI provider ({$this->backupProvider->getProviderName()})");
         } catch (Exception $e) {
-            if (! ($options['skip_unconfigured_providers'] ?? false)) {
+            if (! empty($options['video_file_uri'])) {
+                throw new AiVideoUnavailableException;
+            }
+            if (! ($options['skip_unconfigured_providers'] ?? false) && ! ($options['fallback_on_error'] ?? false)) {
                 throw $e;
             }
 
