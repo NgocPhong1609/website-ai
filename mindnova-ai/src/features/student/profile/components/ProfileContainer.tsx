@@ -32,14 +32,14 @@ export default function ProfileContainer() {
     return (
       <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col gap-6 animate-pulse">
         {/* Hero Banner Skeleton */}
-        <section className="rounded-xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
+        <section className="rounded-lg bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="space-y-3 flex-1">
               <div className="h-8 w-64 bg-slate-200 rounded-lg"></div>
               <div className="h-4 w-full max-w-md bg-slate-200 rounded mt-2"></div>
               <div className="h-4 w-3/4 max-w-sm bg-slate-200 rounded"></div>
             </div>
-            <div className="shrink-0 flex items-center gap-5 bg-slate-50 rounded-xl p-4 border border-slate-200 min-w-[280px]">
+            <div className="shrink-0 flex items-center gap-5 bg-slate-50 rounded-lg p-4 border border-slate-200 min-w-[280px]">
               <div className="w-14 h-14 bg-slate-200 rounded-full shrink-0"></div>
               <div className="space-y-2 flex-1">
                 <div className="h-5 w-32 bg-slate-200 rounded"></div>
@@ -52,7 +52,7 @@ export default function ProfileContainer() {
         {/* Main Layout Skeleton */}
         <div className="flex flex-col lg:flex-row items-start gap-6 flex-1 min-h-0">
           {/* Sidebar Skeleton */}
-          <div className="w-full lg:w-72 shrink-0 bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-6">
+          <div className="w-full lg:w-72 shrink-0 bg-white border border-slate-200 rounded-lg p-5 shadow-sm space-y-6">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-slate-200 rounded-full shrink-0"></div>
               <div className="space-y-2 flex-1">
@@ -63,13 +63,13 @@ export default function ProfileContainer() {
             <div className="h-px bg-slate-200 w-full"></div>
             <div className="space-y-3">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-10 w-full bg-slate-200 rounded-xl"></div>
+                <div key={i} className="h-10 w-full bg-slate-200 rounded-lg"></div>
               ))}
             </div>
           </div>
 
           {/* Active Panel Skeleton */}
-          <div className="flex-1 min-w-0 w-full rounded-xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm space-y-8">
+          <div className="flex-1 min-w-0 w-full rounded-lg bg-white border border-slate-200 p-6 sm:p-8 shadow-sm space-y-8">
             <div className="space-y-3">
               <div className="h-6 w-48 bg-slate-200 rounded-md"></div>
               <div className="h-4 w-full max-w-md bg-slate-200 rounded"></div>
@@ -79,16 +79,16 @@ export default function ProfileContainer() {
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="space-y-2">
                   <div className="h-4 w-24 bg-slate-200 rounded"></div>
-                  <div className="h-10 w-full bg-slate-200 rounded-xl"></div>
+                  <div className="h-10 w-full bg-slate-200 rounded-lg"></div>
                 </div>
               ))}
             </div>
             <div className="space-y-2 mt-4">
               <div className="h-4 w-24 bg-slate-200 rounded"></div>
-              <div className="h-24 w-full bg-slate-200 rounded-xl"></div>
+              <div className="h-24 w-full bg-slate-200 rounded-lg"></div>
             </div>
             <div className="pt-4 flex justify-end">
-              <div className="h-10 w-32 bg-slate-200 rounded-xl"></div>
+              <div className="h-10 w-32 bg-slate-200 rounded-lg"></div>
             </div>
           </div>
         </div>
@@ -99,7 +99,7 @@ export default function ProfileContainer() {
   if (isError || !profile) {
     return (
       <div className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-full flex flex-col items-center justify-center text-center gap-4">
-        <div className="w-14 h-14 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100">
+        <div className="w-14 h-14 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100">
           <Shield className="w-6 h-6" />
         </div>
         <h3 className="text-lg font-bold text-slate-900">Không thể tải thông tin</h3>
@@ -109,7 +109,7 @@ export default function ProfileContainer() {
         <button
           type="button"
           onClick={() => refetch()}
-          className="mt-1 px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors cursor-pointer shadow-sm"
+          className="mt-1 px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors cursor-pointer shadow-sm"
         >
           Thử lại
         </button>
@@ -127,7 +127,7 @@ export default function ProfileContainer() {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
           <div className="space-y-4 max-w-xl">
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900 leading-tight flex items-center gap-3">
-              <span className="bg-[#eff6ff] text-[#2563eb] p-2.5 rounded-xl shadow-xs border border-[#2563eb]/10">
+              <span className="bg-[#eff6ff] text-[#2563eb] p-2.5 rounded-lg shadow-xs border border-[#2563eb]/10">
                  <Sparkles size={28} />
               </span>
               Hồ sơ của bạn
@@ -139,7 +139,7 @@ export default function ProfileContainer() {
           </div>
 
           {/* Mastery/Completion Card */}
-          <div className="shrink-0 flex items-center gap-5 bg-white/80 backdrop-blur-md rounded-xl p-5 border border-[#EAEAF4] shadow-sm min-w-[300px] transition-all hover:shadow-md hover:border-[#2563eb]/20 cursor-default">
+          <div className="shrink-0 flex items-center gap-5 bg-white/80 backdrop-blur-md rounded-lg p-5 border border-[#EAEAF4] shadow-sm min-w-[300px] transition-all hover:shadow-md hover:border-[#2563eb]/20 cursor-default">
             <div className="relative w-16 h-16 shrink-0">
               <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
                 <circle cx="32" cy="32" r="28" fill="none" stroke="#F1F5F9" strokeWidth="5" />

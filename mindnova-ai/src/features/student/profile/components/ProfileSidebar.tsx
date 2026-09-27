@@ -43,7 +43,7 @@ function ProfileAvatar({ name, avatarUrl, onClick, isLoading }: ProfileAvatarPro
   return (
     <div className="relative mx-auto w-24 h-24 group cursor-pointer" onClick={onClick}>
       <div className="w-full h-full rounded-[24px] bg-white border border-[#EAEAF4] shadow-sm p-1.5 transition-all duration-300 group-hover:shadow-md group-hover:border-[#3b82f6]/40 group-">
-        <div className="w-full h-full rounded-xl bg-[#F8FAFC] flex items-center justify-center relative overflow-hidden">
+        <div className="w-full h-full rounded-lg bg-[#F8FAFC] flex items-center justify-center relative overflow-hidden">
           {avatarUrl ? (
             <img
               src={avatarUrl}
@@ -97,7 +97,7 @@ function TabButton({ id, label, isActive, onClick }: TabButtonProps) {
       type="button"
       onClick={onClick}
       className={twMerge(
-        "group relative w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer outline-none border",
+        "group relative w-full flex items-center justify-between px-4 py-3.5 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer outline-none border",
         isActive
           ? "bg-[#eff6ff] text-[#1d4ed8] shadow-xs border-[#3b82f6]/20 font-semibold"
           : "bg-white text-slate-500 border-transparent hover:bg-[#F8FAFC] hover:text-slate-900 hover:border-[#EAEAF4]"
@@ -106,7 +106,7 @@ function TabButton({ id, label, isActive, onClick }: TabButtonProps) {
       <div className="flex items-center gap-3.5">
         <span
           className={twMerge(
-            "flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-300 shrink-0",
+            "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300 shrink-0",
             isActive
               ? "bg-gradient-to-br from-[#3b82f6] to-[#1d4ed8] text-white shadow-md shadow-blue-500/20 scale-110"
               : "bg-[#F1F5F9] text-slate-500 group-hover:bg-white group-hover:text-[#3b82f6] group-hover:shadow-md"
