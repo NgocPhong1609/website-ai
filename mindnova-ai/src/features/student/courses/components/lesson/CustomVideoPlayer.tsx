@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, Loader2, AlertTriangle } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import { fetchVideoUrl } from "../../api";
-import type { LessonData } from "./LessonWorkspace";
+import type { LessonData } from "./types";
 import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 function Rewind10Icon({ className = "w-5 h-5" }: { className?: string }) {
