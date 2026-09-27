@@ -429,7 +429,9 @@ if (app()->environment('local', 'testing')) {
     });
 }
 
-Route::get('/dev/wipe-enrollments/{email}', function ($email) {
+Route::get('/dev/wipe-enrollments', function (\Illuminate\Http\Request $request) {
+    $email = $request->query('email');
+    if (!$email) return response()->json(['error' => 'Missing email parameter']);
     $user = \App\Models\User::where('email', $email)->first();
     if (!$user) return response()->json(['error' => 'User not found']);
     
@@ -441,7 +443,9 @@ Route::get('/dev/wipe-enrollments/{email}', function ($email) {
     ]);
 });
 
-Route::get('/dev/seed-focus-areas/{email}', function ($email) {
+Route::get('/dev/seed-focus-areas', function (\Illuminate\Http\Request $request) {
+    $email = $request->query('email');
+    if (!$email) return response()->json(['error' => 'Missing email parameter']);
     $user = \App\Models\User::where('email', $email)->first();
     if (!$user) return response()->json(['error' => 'User not found']);
     
