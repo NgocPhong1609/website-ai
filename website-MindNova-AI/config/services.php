@@ -46,7 +46,9 @@ return [
     // AI trả lời câu hỏi / hỗ trợ học sinh (chat)
     'groq' => [
         'key' => env('GROQ_API_KEY'),
-        'model' => env('GROQ_MODEL', 'llama-3-70b-8192'),
+        'model' => env('GROQ_MODEL', 'openai/gpt-oss-120b'),
+        // Tried in order when the primary model fails (e.g. decommissioned). Comma-separated.
+        'fallback_models' => array_values(array_filter(array_map('trim', explode(',', env('GROQ_FALLBACK_MODELS', 'openai/gpt-oss-20b,qwen/qwen3.8-27b'))))),
     ],
 
     // The existing tutor stream uses the OpenAI-compatible chat endpoint.
@@ -64,7 +66,7 @@ return [
     'backup_ai' => [
         'provider' => env('BACKUP_AI_PROVIDER', 'openai'),
         'api_key' => env('BACKUP_AI_API_KEY'),
-        'model' => env('BACKUP_AI_MODEL', 'llama-3-70b-8192'),
+        'model' => env('BACKUP_AI_MODEL', 'openai/gpt-oss-20b'),
     ],
 
     'momo' => [

@@ -39,7 +39,7 @@ class AiQuizGeneratorController extends Controller
             'custom_prompt' => 'nullable|string|max:1000',
         ]);
 
-        $groqKey = env('GROQ_API_KEY');
+        $groqKey = config('services.groq.key');
 
         if (!$groqKey) {
             return response()->json(['message' => 'Chưa cấu hình GROQ_API_KEY trong file .env'], 500);
@@ -89,13 +89,13 @@ PROMPT;
             . (!empty($validated['custom_prompt']) ? "- Yêu cầu thêm: " . $validated['custom_prompt'] . "\n" : "");
 
         // Priority static model selection (avoids wasteful extra cURL request per user call)
-        $primaryModel = env('GROQ_MODEL', 'llama-3-70b-8192');
+        $primaryModel = config('services.groq.model');
         
         // Try to fetch active models dynamically from Groq API
         $dynamicModels = $this->fetchAvailableGroqModels($groqKey);
 
         // Build available models: env first, then dynamic models, then fallback stable Groq models
-        $fallbackModels = ['llama3-70b-8192', 'llama3-8b-8192', 'mixtral-8x7b-32768', 'gemma2-9b-it'];
+        $fallbackModels = config('services.groq.fallback_models', []);
         $availableModels = array_merge([$primaryModel], $dynamicModels, $fallbackModels);
         
         // Deduplicate

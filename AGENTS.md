@@ -150,7 +150,7 @@ Pattern: Request → middleware → Controller → Service → Model. Không có
 - FE login/register: `src/features/student/auth/`
 - FE onboarding: `src/features/student/onboarding/` — welcome → goal → skills → topics (chủ đề theo mục tiêu, tối đa 5 + thời gian/ngày) → generating → plan. Store Zustand persist `sessionStorage` (`mindnova_onboarding`, hydrate thủ công); `useStepGuard` đẩy về câu hỏi chưa trả lời. Đổi câu trả lời xóa plan cũ.
 - BE onboarding: `OnboardingController@store` → `OnboardingPlanService` (Groq, fallback tiếng Việt khi AI lỗi, `source: ai|fallback`). Response `data.{profile, learning_path[].{phase,title,description,duration,lessons[],courses[]}}`; lưu `users.onboarding_data` (`goal`, `currentLevel`, `timeAvailable`, `topics`, `ai_plan`) + `is_onboarded`. `DashboardService`/`StudyPlanService` đọc `ai_plan.learning_path` — giữ shape. Khóa học gợi ý chỉ lấy course published + không bị admin ẩn.
-- `GROQ_MODEL` phải là model còn hỗ trợ (`llama3-70b-8192` đã bị Groq ngừng → mọi tính năng Groq rơi về fallback).
+- `GROQ_MODEL` (mặc định `openai/gpt-oss-120b`) phải là model Groq còn hỗ trợ; `llama3-*`, `mixtral-*`, `gemma2-*` đã bị ngừng → tính năng Groq rơi về fallback/lỗi. `GROQ_FALLBACK_MODELS` (CSV) cho student AI quiz. Đọc qua `config('services.groq.*')`, không gọi `env()` trong code (hỏng khi `config:cache`).
 - Register nhận `role` `student|teacher`. Form FE hiện **cố định `student`**.
 - Register/Google gắn role qua `roles` + `role_user` (`Role::idFor`), không ghi cột `users.role`.
 - Login từ chối `is_locked`.
