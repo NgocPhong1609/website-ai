@@ -9,7 +9,7 @@ interface AiSuggestionCardProps {
 
 export function AiSuggestionCard({ suggestion = AI_SUGGESTION }: AiSuggestionCardProps) {
  return (
- <div className="group relative overflow-hidden rounded-xl bg-white border border-slate-100 p-5 hover:border-blue-500 hover:shadow-md transition-all duration-300 w-full focus:outline-none focus:border-blue-500">
+ <div className="group relative overflow-hidden rounded-xl bg-white border border-slate-200 p-5 hover:border-blue-500 hover:shadow-md transition-all duration-300 w-full focus:outline-none focus:border-blue-500">
  <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
  <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-blue-500 text-white flex items-center justify-center shrink-0 shadow-sm">
  <Sparkles size={20} />

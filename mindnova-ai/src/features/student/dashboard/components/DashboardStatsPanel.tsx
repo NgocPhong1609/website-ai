@@ -14,7 +14,7 @@ function OverallProgressCard({ data }: { data: OverallProgress }) {
  return (
  <Link 
  href="/progress" 
- className="h-full group bg-white rounded-xl p-5 border border-slate-100 hover:border-blue-500 hover:shadow-md transition-all duration-300 flex flex-col justify-between gap-4 text-decoration-none focus:outline-none focus:border-blue-500"
+ className="group bg-white rounded-xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-md transition-all duration-300 flex flex-col justify-between h-full focus:outline-none focus:border-blue-500 text-decoration-none"
  >
  <div className="space-y-3">
  <div className="flex items-center justify-between">
@@ -102,7 +102,7 @@ function FocusAreasCard({ areas }: { areas: FocusAreaType[] }) {
  const displayAreas = areas.slice(0, 2);
 
  return (
- <div className="h-full bg-white rounded-xl p-5 border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-300 flex flex-col gap-4">
+ <div className="group bg-white rounded-xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-md transition-all duration-300 flex flex-col justify-between h-full">
  <div>
  <div className="flex items-center justify-between mb-2">
  <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">

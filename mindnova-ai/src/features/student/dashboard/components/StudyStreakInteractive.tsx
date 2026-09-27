@@ -141,7 +141,7 @@ export function StudyStreakInteractive({
     <>
       <div 
         onClick={() => setShowModal(true)}
-        className="group cursor-pointer bg-white rounded-xl p-5 border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-500 transition-all duration-300 flex flex-col justify-between gap-4 h-full focus:outline-none focus:border-blue-500"
+        className="group cursor-pointer bg-white rounded-xl p-5 border border-slate-200 hover:border-blue-500 hover:shadow-md transition-all duration-300 flex flex-col justify-between h-full focus:outline-none focus:border-blue-500"
       >
         <div className="space-y-3">
           <div className="flex items-center justify-between">
