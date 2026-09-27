@@ -62,6 +62,15 @@ export function QuizStartContent() {
     fetchMyHistory();
   }, []);
 
+  // Dashboard "Luyện quiz" links here with ?topic= to prefill the AI generator.
+  useEffect(() => {
+    const presetTopic = new URLSearchParams(window.location.search).get("topic")?.trim();
+    if (presetTopic) {
+      setTopic(presetTopic.slice(0, 255));
+      setActiveTab("ai_generator");
+    }
+  }, []);
+
   const practiceModules = data?.modules_list ?? [];
   const currentMod = practiceModules.find((m) => String(m.id) === String(selectedModId)) || practiceModules[0];
 

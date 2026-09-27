@@ -6,8 +6,9 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 import { axiosClient } from "@/src/shared/lib/axios";
+import { MOBILE_SIDEBAR_EVENT } from "@/src/features/student/layout/components/mobileSidebar";
 
-import { Menu, Plus, BookOpen, DollarSign, FileQuestion, MessageSquare, Users, type LucideIcon } from "lucide-react";
+import { Menu, Plus, BookOpen, DollarSign, FileQuestion, MessageSquare, Users, UserRound, type LucideIcon } from "lucide-react";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
 
 function LogoMark() {
@@ -136,7 +137,7 @@ function SidebarUserProfile({ isCollapsed }: { isCollapsed: boolean }) {
  {!isCollapsed && (
  <Link href="/instructor/profile" className="flex items-center gap-1 min-w-0 leading-tight group cursor-pointer">
  <span className="text-sm font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors">{name}</span>
- {user?.is_verified && <VerifiedTeacherBadge isVerified={true} size="xs" />}
+ {Boolean(user?.is_verified) && <VerifiedTeacherBadge isVerified={true} size="xs" />}
  </Link>
  )}
  </div>
@@ -193,7 +194,17 @@ function SidebarNavItem({ label, href, activePatterns, Icon, isCollapsed }: NavI
 }
 
 export function InstructorSidebar() {
+ const pathname = usePathname();
  const [isCollapsed, setIsCollapsed] = React.useState(false);
+ const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+
+ React.useEffect(() => {
+   const toggle = () => setIsMobileOpen((open) => !open);
+   window.addEventListener(MOBILE_SIDEBAR_EVENT, toggle);
+   return () => window.removeEventListener(MOBILE_SIDEBAR_EVENT, toggle);
+ }, []);
+ 
+ React.useEffect(() => { setIsMobileOpen(false); }, [pathname]);
 
  React.useEffect(() => {
  const handleKeyDown = (e: KeyboardEvent) => {
@@ -208,25 +219,41 @@ export function InstructorSidebar() {
  }, []);
 
  const INSTRUCTOR_NAV: NavItem[] = [
- { label: "Quản lý Khóa học", href: "/instructor/courses", Icon: BookOpen },
- { 
- label: "Tạo bài Kiểm tra", 
- href: "/instructor/quiz-generator", 
- activePatterns: ["/instructor/quiz-generator"], 
- Icon: FileQuestion 
- },
- { 
- label: "Thảo luận & Hỏi đáp", 
- href: "/instructor/discussions", 
- activePatterns: ["/instructor/discussions", "/instructor/messages", "/instructor/chat", "/chat"],
- Icon: MessageSquare 
- },
- { label: "Quản lý Học viên", href: "/instructor/students", activePatterns: ["/instructor/analytics"], Icon: Users },
- { label: "Quản lý Doanh thu", href: "/instructor/revenue", Icon: DollarSign },
+  { label: "Quản lý Khóa học", href: "/instructor/courses", Icon: BookOpen },
+  { 
+    label: "Tạo bài Kiểm tra", 
+    href: "/instructor/quiz-generator", 
+    activePatterns: ["/instructor/quiz-generator"], 
+    Icon: FileQuestion 
+  },
+  { 
+    label: "Thảo luận & Hỏi đáp", 
+    href: "/instructor/discussions", 
+    activePatterns: ["/instructor/discussions"],
+    Icon: MessageSquare 
+  },
+  { 
+    label: "Tin nhắn", 
+    href: "/instructor/messages", 
+    activePatterns: ["/instructor/messages", "/instructor/chat", "/chat"],
+    Icon: MessageSquare 
+  },
+  { label: "Quản lý Học viên", href: "/instructor/students", activePatterns: ["/instructor/analytics"], Icon: Users },
+  { label: "Quản lý Doanh thu", href: "/instructor/revenue", Icon: DollarSign },
+  { label: "Hồ sơ & xác minh", href: "/instructor/profile", Icon: UserRound },
  ];
 
  return (
- <aside className={twMerge("shrink-0 h-full flex flex-col bg-white border-r border-slate-200 z-50 transition-all duration-300", isCollapsed ? "w-[80px]" : "w-[234px]")}>
+  <>
+  {isMobileOpen && (
+    <div className="fixed inset-0 z-40 bg-slate-900/40 md:hidden" aria-hidden onClick={() => setIsMobileOpen(false)} />
+  )}
+  <aside className={twMerge(
+    "shrink-0 h-full flex flex-col bg-white border-r border-slate-200 z-50 transition-all duration-300", 
+    "fixed inset-y-0 left-0 md:static md:z-auto",
+    isMobileOpen ? "translate-x-0 shadow-xl" : "-translate-x-full md:translate-x-0",
+    isCollapsed ? "md:w-[80px] w-[234px]" : "w-[234px]"
+  )}>
  {/* Brand */}
  <div className={twMerge("h-16 shrink-0 border-b border-slate-200 flex items-center justify-center", isCollapsed ? "px-2" : "px-4")}>
  <Link href="/instructor/courses" className="flex items-center gap-3 group" aria-label="MindNova AI — Instructor">
@@ -290,7 +317,8 @@ export function InstructorSidebar() {
  </>
  )}
  </button>
- </div>
- </aside>
+  </div>
+  </aside>
+  </>
  );
 }

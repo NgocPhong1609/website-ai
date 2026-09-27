@@ -2,92 +2,101 @@
 
 namespace App\Services\Student;
 
-use App\Models\Course;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Throwable;
 
 class AiLessonService
 {
+    private const ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
+
+    public function __construct(private readonly OnboardingPlanService $planService)
+    {
+    }
+
     /**
-     * Analyze lesson and recommend courses using AI.
+     * Explain one lesson of the learning path and recommend published courses for it.
+     *
+     * @return array{overview: string, key_takeaways: array<int, string>, recommended_courses: array<int, array<string, mixed>>, source: string}
      */
     public function analyzeLesson(string $lessonTitle, string $goal): array
     {
-        $prompt = "You are an expert AI curriculum analyst. A student is studying for '{$goal}' and looking specifically at the lesson titled '{$lessonTitle}'.
-        You MUST generate a completely custom, highly specific breakdown for THIS exact lesson. Do not use generic templates.
-        Return ONLY valid JSON format with no markdown, no backticks:
-        {
-          \"overview\": \"Write a unique 2-sentence overview specifically explaining what concepts, techniques, or theories are mastered in '{$lessonTitle}'.\",
-          \"key_takeaways\": [
-            \"First specific learning outcome of {$lessonTitle}\",
-            \"Second practical skill gained from {$lessonTitle}\",
-            \"Third technical implementation detail of {$lessonTitle}\"
-          ],
-          \"suggested_course_keywords\": [\"keyword1\", \"keyword2\"]
-        }";
+        $analysis = $this->requestAnalysis($lessonTitle, $goal);
+        $keywords = array_merge($analysis['keywords'] ?? [], [$lessonTitle]);
+
+        return [
+            'overview' => $analysis['overview'] ?? "Bài \"{$lessonTitle}\" giúp bạn xây dựng kiến thức cần thiết cho mục tiêu {$goal}. Hãy học kỹ phần lý thuyết rồi thực hành ngay để ghi nhớ lâu hơn.",
+            'key_takeaways' => $analysis['key_takeaways'] ?? [
+                "Hiểu các khái niệm cốt lõi của {$lessonTitle}",
+                'Áp dụng kiến thức vào bài tập thực hành',
+                'Biết cách tự kiểm tra và khắc phục lỗi thường gặp',
+            ],
+            'recommended_courses' => $this->planService->matchCourses($keywords),
+            'source' => $analysis ? 'ai' : 'fallback',
+        ];
+    }
+
+    /**
+     * @return array{overview: string, key_takeaways: array<int, string>, keywords: array<int, string>}|null
+     */
+    private function requestAnalysis(string $lessonTitle, string $goal): ?array
+    {
+        $apiKey = config('services.groq.key');
+        if (blank($apiKey)) {
+            return null;
+        }
+
+        $prompt = <<<PROMPT
+Học viên đang theo mục tiêu "{$goal}" và muốn tìm hiểu bài học "{$lessonTitle}".
+Viết bằng tiếng Việt (giữ nguyên tên công nghệ). Chỉ trả về JSON:
+{
+  "overview": "2 câu giải thích bài học này dạy gì và vì sao quan trọng với mục tiêu",
+  "key_takeaways": ["3 kết quả học tập cụ thể"],
+  "keywords": ["2-3 từ khóa ngắn để tìm khóa học liên quan"]
+}
+PROMPT;
 
         try {
-            $response = Http::withToken(env('GROQ_API_KEY'))
-                ->post('https://api.groq.com/openai/v1/chat/completions', [
-                    'model' => env('GROQ_MODEL', 'llama-3-70b-8192'),
+            $response = Http::withToken($apiKey)
+                ->timeout(20)
+                ->post(self::ENDPOINT, [
+                    'model' => config('services.groq.model'),
                     'messages' => [
-                        ['role' => 'system', 'content' => 'Return only raw JSON.'],
-                        ['role' => 'user', 'content' => $prompt]
+                        ['role' => 'system', 'content' => 'Bạn là chuyên gia phân tích giáo trình. Chỉ trả về JSON hợp lệ.'],
+                        ['role' => 'user', 'content' => $prompt],
                     ],
-                    'temperature' => 0.95, // Đẩy độ sáng tạo lên cao nhất để không bị lặp text
+                    'temperature' => 0.4,
+                    'response_format' => ['type' => 'json_object'],
                 ]);
 
-            $aiContent = $response->json('choices.0.message.content');
-            $cleanJson = trim(str_replace(['```json', '```'], '', $aiContent));
-            $aiData = json_decode($cleanJson, true);
+            if ($response->failed()) {
+                Log::warning('Analyze lesson: AI request failed', ['status' => $response->status()]);
 
-            // LỌC KHÓA HỌC LIÊN QUAN CHẶT CHẼ TỪ DATABASE
-            $keywords = $aiData['suggested_course_keywords'] ?? [$lessonTitle];
-            $query = Course::with('teacher');
-
-            foreach ($keywords as $kw) {
-                $query->orWhere('title', 'like', '%' . $kw . '%');
+                return null;
             }
 
-            $matchedCourses = $query->take(3)->get();
+            $data = json_decode((string) $response->json('choices.0.message.content'), true);
+            $overview = is_array($data) ? trim((string) ($data['overview'] ?? '')) : '';
+            $takeaways = array_values(array_filter(array_map(
+                fn ($item) => is_string($item) ? Str::limit(trim($item), 200) : '',
+                Arr::wrap($data['key_takeaways'] ?? []),
+            )));
 
-            // Nếu database chưa khớp được từ khóa thì lấy ngẫu nhiên 3 khóa học chất lượng khác nhau
-            if ($matchedCourses->isEmpty()) {
-                $matchedCourses = Course::with('teacher')->inRandomOrder()->take(3)->get();
-            }
-
-            $coursesList = [];
-            foreach ($matchedCourses as $index => $course) {
-                $coursesList[] = [
-                    'title' => $course->title,
-                    'instructor' => $course->teacher ? $course->teacher->name : "Expert Instructor",
-                    'rating' => "4." . rand(7, 9) . " (" . rand(600, 1400) . " students)",
-                    'price' => "$" . number_format($course->price, 2),
-                    'badge' => $index === 0 ? "Best Match" : "Related Course"
-                ];
-            }
-
-            $aiData['recommended_courses'] = $coursesList;
-
-            return $aiData;
-
-        } catch (\Exception $e) {
-            $fallbackCourses = Course::with('teacher')->take(2)->get();
-            $coursesList = [];
-            foreach ($fallbackCourses as $c) {
-                $coursesList[] = [
-                    'title' => $c->title,
-                    'instructor' => $c->teacher ? $c->teacher->name : "Instructor",
-                    'rating' => "4.8 (950 students)",
-                    'price' => "$" . number_format($c->price, 2),
-                    'badge' => "Recommended"
-                ];
+            if ($overview === '' || ! $takeaways) {
+                return null;
             }
 
             return [
-                'overview' => "Master the core concepts of {$lessonTitle} to accelerate your progress toward {$goal}.",
-                'key_takeaways' => ["Understanding fundamental principles of " . $lessonTitle, "Hands-on configuration and workflow", "Best practices and implementation"],
-                'recommended_courses' => $coursesList
+                'overview' => Str::limit($overview, 600),
+                'key_takeaways' => array_slice($takeaways, 0, 5),
+                'keywords' => array_values(array_filter(Arr::wrap($data['keywords'] ?? []), 'is_string')),
             ];
+        } catch (Throwable $e) {
+            Log::warning('Analyze lesson: AI error', ['message' => $e->getMessage()]);
+
+            return null;
         }
     }
 }

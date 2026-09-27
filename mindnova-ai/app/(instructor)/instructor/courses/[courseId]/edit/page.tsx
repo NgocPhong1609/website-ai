@@ -2,7 +2,7 @@ import { EditCourseContainer } from "@/src/features/instructor/create-course/com
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
- title: "Chỉnh sửa khóa học — MindNova AI",
+ title: "Chỉnh sửa khóa học",
  description: "Cập nhật thông tin chi tiết cho khóa học của bạn.",
 };
 

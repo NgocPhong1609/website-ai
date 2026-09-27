@@ -39,11 +39,7 @@ function createAttachmentLesson(User $teacher): Lesson
 
 function createAttachmentTeacher(): User
 {
-    $role = Role::firstOrCreate(['name' => 'teacher']);
-    $teacher = User::factory()->create();
-    $teacher->roles()->attach($role);
-
-    return $teacher;
+    return teacher();
 }
 
 test('lesson attachment metadata is persisted and cascades with its lesson', function () {

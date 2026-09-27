@@ -1,166 +1,118 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Button, ArrowRightIcon } from "@shared/components/ui";
-import { useOnboardingStore } from "@/src/features/student/onboarding/stores/onboardingStore";
-import { AiProjectionCard } from "./AiProjectionCard";
-
-// ─── Static Icons ─────────────────────────────────────────────────────────────
-
-function SparkleIcon() {
- return (
- <></>
- );
-}
-
-function ShieldCheckIcon() {
- return (
- <></>
- );
-}
-
-// ─── Hook ─────────────────────────────────────────────────────────────────────
-
-function useTimeSelection() {
- const router = useRouter();
- const [selectedTime, setSelectedTime] = useState<string>("");
- const selectTimeAvailable = useOnboardingStore((s) => s.selectTimeAvailable);
-
- const timeOptions = [
- "1-2 tiếng/ngày",
- "2-4 tiếng/ngày",
- "Full time (4+ tiếng/ngày)"
- ];
-
- const toggleTime = useCallback((time: string) => {
- setSelectedTime(time);
- }, []);
-
- const handleGenerate = useCallback(() => {
- if (selectedTime) {
- selectTimeAvailable(selectedTime);
- router.push("/onboarding/generating");
- }
- }, [selectedTime, selectTimeAvailable, router]);
-
- return {
- selectedTime,
- canGenerate: !!selectedTime,
- toggleTime,
- handleGenerate,
- timeOptions
- };
-}
-
-// ─── Step Badge ───────────────────────────────────────────────────────────────
-
-function StepBadge() {
- return (
- <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200">
- <SparkleIcon />
- <span className="text-xs font-semibold text-blue-500 tracking-wide">
- Bước 3/4 — Cá nhân hóa
- </span>
- </div>
- );
-}
-
-// ─── Main Component ───────────────────────────────────────────────────────────
+import { Check } from "lucide-react";
+import { twMerge } from "tailwind-merge";
+import { MAX_TOPICS, ONBOARDING_TIMES } from "../../constants";
+import { useOnboardingSummary, useStepGuard } from "../../hooks";
+import { useOnboardingStore } from "../../stores/onboardingStore";
+import { OnboardingShell } from "../shared/OnboardingShell";
+import { OptionCard, StepActions, StepIntro, StepSkeleton } from "../shared/StepParts";
 
 export default function TopicsContainer() {
- const {
- selectedTime,
- canGenerate,
- toggleTime,
- handleGenerate,
- timeOptions
- } = useTimeSelection();
+  const router = useRouter();
+  const ready = useStepGuard("topics");
+  const { goal } = useOnboardingSummary();
+  const topics = useOnboardingStore((s) => s.topics);
+  const timeId = useOnboardingStore((s) => s.timeId);
+  const toggleTopic = useOnboardingStore((s) => s.toggleTopic);
+  const selectTime = useOnboardingStore((s) => s.selectTime);
 
- return (
- <div className="w-full flex flex-col items-center gap-8 px-6 py-12">
- {/* Step badge */}
- <StepBadge />
+  if (!ready || !goal) {
+    return (
+      <OnboardingShell step="topics">
+        <StepSkeleton cards={4} />
+      </OnboardingShell>
+    );
+  }
 
- {/* Header */}
- <div className="flex flex-col items-center gap-3 text-center max-w-2xl">
- <h1 className="text-4xl font-bold text-slate-900 leading-tight tracking-tight">
- Bạn có bao nhiêu{" "}
- <span className="text-transparent bg-clip-text bg-blue-500 ">
- thời gian rảnh
- </span> mỗi ngày?
- </h1>
- <p className="text-[15px] text-slate-500 leading-relaxed max-w-lg">
- Chọn thời gian phù hợp để AI tính toán khối lượng bài học tối ưu cho bạn.
- </p>
- </div>
+  const limitReached = topics.length >= MAX_TOPICS;
 
- {/* Content: topics grid + AI sidebar */}
- <div className="flex items-start gap-5 w-full max-w-4xl">
- 
- <div className="flex-1 bg-white border border-slate-200 rounded-3xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col gap-4">
- <div className="flex items-center gap-2 mb-2">
- <div className="w-1.5 h-1.5 rounded-full bg-slate-50" />
- <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Thời gian rảnh</h3>
- </div>
+  return (
+    <OnboardingShell step="topics">
+      <StepIntro
+        eyebrow="Bước 3/3"
+        title="Bạn muốn tập trung vào đâu?"
+        description="Chọn chủ đề quan tâm và thời gian học mỗi ngày để AI sắp xếp khối lượng bài học vừa sức."
+      />
 
- <div className="flex flex-col gap-3 min-h-[120px] content-start">
- {timeOptions.map((time) => {
- const isSelected = selectedTime === time;
- return (
- <button
- key={time}
- type="button"
- onClick={() => toggleTime(time)}
- className={`px-4 py-3.5 flex items-center justify-between gap-2 rounded-xl text-sm font-semibold transition-all border ${
- isSelected
- ? "bg-slate-50 text-blue-500 border-slate-200 shadow-sm"
- : "bg-white text-slate-900 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
- }`}
- >
- <span>{time}</span>
- {isSelected && <span className="text-blue-500"></span>}
- </button>
- );
- })}
- </div>
- </div>
+      <div className="grid items-start gap-6 lg:grid-cols-[1.4fr_1fr]">
+        <fieldset className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
+          <legend className="sr-only">Chủ đề quan tâm</legend>
+          <div className="mb-4 flex items-baseline justify-between gap-3">
+            <h2 className="font-semibold text-slate-900">
+              Chủ đề quan tâm <span className="font-normal text-slate-500">(không bắt buộc)</span>
+            </h2>
+            <span className="shrink-0 text-sm text-slate-500" aria-live="polite">
+              {topics.length}/{MAX_TOPICS}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {goal.topics.map((topic) => {
+              const checked = topics.includes(topic);
+              const disabled = limitReached && !checked;
+              return (
+                <label
+                  key={topic}
+                  className={twMerge(
+                    "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium transition-colors",
+                    "has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-blue-500 has-[input:focus-visible]:ring-offset-1",
+                    checked
+                      ? "border-blue-600 bg-blue-600 text-white"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:text-blue-700",
+                    disabled && "cursor-not-allowed opacity-50 hover:border-slate-200 hover:text-slate-700",
+                  )}
+                >
+                  <input
+                    type="checkbox"
+                    name="topics"
+                    value={topic}
+                    checked={checked}
+                    disabled={disabled}
+                    onChange={() => toggleTopic(topic)}
+                    className="sr-only"
+                  />
+                  {checked && <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden />}
+                  {topic}
+                </label>
+              );
+            })}
+          </div>
+          <p className="mt-4 text-sm text-slate-500">
+            {limitReached
+              ? `Bạn đã chọn tối đa ${MAX_TOPICS} chủ đề. Bỏ chọn một chủ đề để đổi.`
+              : "Bỏ trống nếu bạn muốn AI tự đề xuất chủ đề theo mục tiêu."}
+          </p>
+        </fieldset>
 
- {/* KHU VỰC PHẢI: Giữ nguyên Card tĩnh */}
- <AiProjectionCard selectedCount={selectedTime ? 1 : 0} />
- </div>
+        <fieldset className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
+          <legend className="sr-only">Thời gian học mỗi ngày</legend>
+          <h2 className="mb-4 font-semibold text-slate-900">Thời gian học mỗi ngày</h2>
+          <div className="flex flex-col gap-2.5">
+            {ONBOARDING_TIMES.map((time) => (
+              <OptionCard
+                key={time.id}
+                name="time"
+                value={time.id}
+                checked={timeId === time.id}
+                title={time.title}
+                description={time.description}
+                icon={time.icon}
+                layout="inline"
+                onChange={() => selectTime(time.id)}
+              />
+            ))}
+          </div>
+        </fieldset>
+      </div>
 
- {/* CTA */}
- <div className="flex flex-col items-center gap-3">
- <Button
- onClick={handleGenerate}
- disabled={!canGenerate}
- size="unstyled"
- variant="unstyled"
- className={[
- "relative px-12 py-3.5 rounded-xl text-sm font-semibold text-white",
- " bg-blue-500 ",
- "shadow-[0_4px_20px_rgba(59, 130, 246,0.4)]",
- "hover:shadow-[0_6px_28px_rgba(59, 130, 246,0.55)] hover:-translate-y-0.5",
- "active:translate-y-0 active:shadow-[0_2px_12px_rgba(59, 130, 246,0.3)]",
- "transition-all duration-200 ease-out",
- "disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none",
- ].join(" ")}
- rightIcon={<ArrowRightIcon />}
- >
- Tạo lộ trình học tập
- </Button>
-
- <p className="flex items-center gap-1.5 text-[11px] text-slate-400">
- <ShieldCheckIcon />
- <span>
- Data-driven pathing based on{" "}
- <span className="text-blue-500 font-medium">
- 50,000+ career trajectories
- </span>
- </span>
- </p>
- </div>
- </div>
- );
+      <StepActions
+        backHref="/onboarding/skills"
+        continueLabel="Tạo lộ trình"
+        canContinue={timeId !== null}
+        hint={timeId ? undefined : "Chọn thời gian học mỗi ngày để tạo lộ trình"}
+        onContinue={() => router.push("/onboarding/generating")}
+      />
+    </OnboardingShell>
+  );
 }

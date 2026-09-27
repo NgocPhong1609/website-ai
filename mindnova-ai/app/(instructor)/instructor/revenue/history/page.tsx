@@ -2,7 +2,7 @@ import { TransactionHistoryContainer } from "@features/instructor/revenue";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
- title: "Lịch sử Giao dịch — MindNova AI",
+ title: "Lịch sử Giao dịch",
  description: "Theo dõi và quản lý mọi dòng tiền từ hoạt động giảng dạy.",
 };
 

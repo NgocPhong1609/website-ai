@@ -8,11 +8,13 @@ use App\Models\User;
 use App\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Concerns\CreatesUsersWithRoles;
 use Tests\TestCase;
 
 class InstructorPermissionTest extends TestCase
 {
     use RefreshDatabase;
+    use CreatesUsersWithRoles;
 
     protected $teacher1;
     protected $teacher2;
@@ -21,18 +23,10 @@ class InstructorPermissionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
-        $roleTeacher = Role::firstOrCreate(['name' => 'teacher']);
-        $roleStudent = Role::firstOrCreate(['name' => 'student']);
 
-        $this->teacher1 = User::factory()->create();
-        $this->teacher1->roles()->attach($roleTeacher);
-
-        $this->teacher2 = User::factory()->create();
-        $this->teacher2->roles()->attach($roleTeacher);
-
-        $this->student = User::factory()->create();
-        $this->student->roles()->attach($roleStudent);
+        $this->teacher1 = $this->createTeacher();
+        $this->teacher2 = $this->createTeacher();
+        $this->student = $this->createStudent();
     }
 
     public function test_student_cannot_access_instructor_routes()

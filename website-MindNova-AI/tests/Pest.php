@@ -44,7 +44,33 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Create a test user with the "teacher" role.
+ *
+ * @param  array<string, mixed>  $attributes
+ */
+function teacher(array $attributes = []): \App\Models\User
 {
-    // ..
+    return \App\Models\User::factory()->create(array_merge(['role' => 'teacher'], $attributes));
 }
+
+/**
+ * Create a test user with the "student" role.
+ *
+ * @param  array<string, mixed>  $attributes
+ */
+function student(array $attributes = []): \App\Models\User
+{
+    return \App\Models\User::factory()->create(array_merge(['role' => 'student'], $attributes));
+}
+
+/**
+ * Create a test user with the "admin" role.
+ *
+ * @param  array<string, mixed>  $attributes
+ */
+function admin(array $attributes = []): \App\Models\User
+{
+    return \App\Models\User::factory()->create(array_merge(['role' => 'admin'], $attributes));
+}
+

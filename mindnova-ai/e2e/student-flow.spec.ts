@@ -6,7 +6,7 @@ test.describe.serial("student learning flow", () => {
     // Sign-up sends new learners to onboarding first.
     await registerStudent(page);
     await expect(page).toHaveURL(/\/onboarding/);
-    await expect(page.getByRole("button", { name: "Bắt đầu" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Bắt đầu" })).toBeVisible();
 
     // A brand-new learner sees honest empty states, not sample data.
     await page.goto("/");

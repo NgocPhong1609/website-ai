@@ -17,12 +17,8 @@ beforeEach(function () {
         'filesystems.disks.r2.bucket' => 'test-bucket',
         'filesystems.disks.r2.endpoint' => 'https://example.test',
     ]);
-    $teacherRole = Role::firstOrCreate(['name' => 'teacher']);
-    $this->teacher = User::factory()->create();
-    $this->teacher->roles()->attach($teacherRole);
-    $studentRole = Role::firstOrCreate(['name' => 'student']);
-    $this->student = User::factory()->create();
-    $this->student->roles()->attach($studentRole);
+    $this->teacher = teacher();
+    $this->student = student();
 
     $this->uploadMedia = function (User $user, string $purpose, string $name = 'image.png') {
         return $this->actingAs($user)->postJson('/api/instructor/quiz-media', [
@@ -231,8 +227,7 @@ test('store promotes only temporary media owned by the instructor', function () 
 
 test('store rejects foreign stale and arbitrary managed keys', function () {
     Storage::fake('r2');
-    $otherTeacher = User::factory()->create();
-    $otherTeacher->roles()->attach(Role::firstWhere('name', 'teacher'));
+    $otherTeacher = teacher();
     $foreign = ($this->uploadMedia)($otherTeacher, 'thumbnail');
 
     foreach ([$foreign['r2_key'], "temp/quiz-media/{$this->teacher->id}/missing.png", 'arbitrary/image.png'] as $key) {

@@ -1,81 +1,54 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useOnboarding } from "@/src/features/student/onboarding/hooks/useOnboarding";
-import { ONBOARDING_GOALS } from "@/src/features/student/onboarding/constants";
-import { Button, ArrowRightIcon } from "@shared/components/ui";
-import GoalCard from "./GoalCard";
+import { ONBOARDING_GOALS } from "../../constants";
+import { useOnboardingHydration } from "../../hooks";
+import { useOnboardingStore } from "../../stores/onboardingStore";
+import { OnboardingShell } from "../shared/OnboardingShell";
+import { OptionCard, StepActions, StepIntro, StepSkeleton } from "../shared/StepParts";
 
 export default function GoalContainer() {
- const router = useRouter();
- const [selectedId, setSelectedId] = useState<number | null>(null);
- const { selectGoal } = useOnboarding();
+  const router = useRouter();
+  const hydrated = useOnboardingHydration();
+  const goalId = useOnboardingStore((s) => s.goalId);
+  const selectGoal = useOnboardingStore((s) => s.selectGoal);
 
- const handleSelect = (id: number, goalTitle: string) => {
- setSelectedId(id);
- selectGoal(goalTitle);
- };
-
- return (
- <div className="w-full flex flex-col items-center gap-8 px-6 py-12">
- {/* Header */}
- <div className="w-3xl flex flex-col items-center justify-center gap-4">
- <div className="w-[151.5px] px-3 py-1 flex justify-center items-center gap-3 rounded-full bg-sky-300/10 border border-sky-300/20">
- <Image
- src="/icons/gemini2.svg"
- width={16.5}
- height={16.5}
- alt=""
- aria-hidden="true"
- />
- <span className="text-[14px] font-semibold text-[#00687A]">
- MINDNOVA AI
- </span>
- </div>
- <h1 className="text-[48px] font-bold text-slate-900">
- Mục tiêu học tập của bạn là gì?
- </h1>
- <p className="text-lg text-slate-900">
- Chọn một mục tiêu chính để MindNova AI cá nhân hóa trải nghiệm cho bạn.
- </p>
- </div>
-
- {/* Goal Cards Grid */}
- <div className="max-w-5xl w-full grid grid-cols-3 gap-6">
- {ONBOARDING_GOALS.map((goal) => (
- <GoalCard
- key={goal.id}
- icon={goal.icon}
- title={goal.title}
- description={goal.description}
- isActive={selectedId === goal.id}
- onClick={() => handleSelect(goal.id, goal.title)}
- />
- ))}
- </div>
-
- {/* Continue CTA */}
- <div className="w-full flex flex-col items-center justify-center gap-4 mt-8">
- <Button
- variant="unstyled"
- size="unstyled"
- disabled={selectedId === null}
- onClick={() => router.push("/onboarding/skills")}
- className={`py-[21.6px] px-[57.6px] rounded-lg transition-colors text-[14.4px] ${
- selectedId !== null
- ? "bg-blue-500 text-white shadow-md hover:bg-blue-600"
- : "bg-slate-200 text-slate-900/40 cursor-not-allowed"
- }`}
- rightIcon={<ArrowRightIcon />}
- >
- Continue
- </Button>
- <span className="text-[14px] text-slate-900">
- Bạn có thể đổi mục tiêu bất cứ lúc nào trong phần cài đặt.
- </span>
- </div>
- </div>
- );
+  return (
+    <OnboardingShell step="goal">
+      {!hydrated ? (
+        <StepSkeleton cards={6} />
+      ) : (
+        <>
+          <StepIntro
+            eyebrow="Bước 1/3"
+            title="Mục tiêu học tập của bạn là gì?"
+            description="Chọn một mục tiêu chính. Bạn có thể tạo lại lộ trình với mục tiêu khác bất cứ lúc nào."
+          />
+          <fieldset>
+            <legend className="sr-only">Mục tiêu học tập</legend>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {ONBOARDING_GOALS.map((goal) => (
+                <OptionCard
+                  key={goal.id}
+                  name="goal"
+                  value={goal.id}
+                  checked={goalId === goal.id}
+                  title={goal.title}
+                  description={goal.description}
+                  icon={goal.icon}
+                  onChange={() => selectGoal(goal.id)}
+                />
+              ))}
+            </div>
+          </fieldset>
+          <StepActions
+            backHref="/onboarding"
+            canContinue={goalId !== null}
+            hint={goalId ? undefined : "Chọn một mục tiêu để tiếp tục"}
+            onContinue={() => router.push("/onboarding/skills")}
+          />
+        </>
+      )}
+    </OnboardingShell>
+  );
 }

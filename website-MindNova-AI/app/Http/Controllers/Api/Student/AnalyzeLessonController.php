@@ -27,7 +27,7 @@ class AnalyzeLessonController extends Controller
         if (empty($lessonTitle) || empty($goal)) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'lesson_title and goal are required'
+                'message' => 'Vui lòng chọn bài học cần phân tích.'
             ], 422);
         }
 

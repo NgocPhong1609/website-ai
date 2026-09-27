@@ -7,6 +7,7 @@ import { twMerge } from "tailwind-merge";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { ArrowRight, Bell, Menu, MessageSquare, X } from "lucide-react";
 import { useChatGlobalUnread } from "@/src/hooks/useChatGlobalUnread";
+import { toggleMobileSidebar } from "@/src/features/student/layout/components/mobileSidebar";
 
 function UserAvatar() {
  const [user, setUser] = useState<any>(null);
@@ -215,10 +216,14 @@ export function InstructorTopbar() {
  <header className="h-16 shrink-0 flex items-center justify-between px-6 bg-white border-b border-slate-200 relative z-40">
  {/* Brand & Context */}
  <div className="flex items-center gap-3">
- {/* Placeholder for sidebar open button if needed on mobile, removed SidebarOpenButton to avoid missing module error */}
- <button type="button" className="md:hidden w-9 h-9 rounded-lg flex items-center justify-center border border-slate-200 bg-slate-50 text-slate-500">
- <Menu className="h-5 w-5" aria-hidden />
- </button>
+  {/* Hamburger for mobile */}
+  <button 
+    type="button" 
+    onClick={toggleMobileSidebar}
+    className="md:hidden w-9 h-9 rounded-lg flex items-center justify-center border border-slate-200 bg-slate-50 text-slate-500 hover:text-blue-600 transition-colors"
+  >
+  <Menu className="h-5 w-5" aria-hidden />
+  </button>
  <Link
  href="/instructor"
  className="text-lg font-bold text-slate-900 tracking-tight hover:text-blue-600 transition-colors shrink-0 flex items-center gap-2"

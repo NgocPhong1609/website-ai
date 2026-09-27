@@ -50,6 +50,7 @@ use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardControll
 
 // Nhóm Instructor (Giáo viên)
 use App\Http\Controllers\Api\Instructor\CourseController;
+use App\Http\Controllers\Api\Instructor\CourseWizardController;
 use App\Http\Controllers\Api\Instructor\CourseModuleController;
 use App\Http\Controllers\Api\Instructor\LessonController;
 use App\Http\Controllers\Api\Instructor\MediaController;
@@ -99,9 +100,9 @@ Route::prefix('student')->group(function () {
     Route::get('/courses/available', [StudentCourseController::class, 'getAvailableCourses']);
     Route::get('/courses/detail/{id?}', [StudentCourseController::class, 'detail']);
     Route::get('/courses/{course}/reviews', [StudentReviewController::class, 'index']);
-    Route::post('/onboarding', [OnboardingController::class, 'store']);
+    Route::post('/onboarding', [OnboardingController::class, 'store'])->middleware('throttle:10,1');
     Route::get('/available-topics', [OnboardingController::class, 'getAvailableTopics']);
-    Route::post('/analyze-lesson', [AnalyzeLessonController::class, 'analyze']);
+    Route::post('/analyze-lesson', [AnalyzeLessonController::class, 'analyze'])->middleware('throttle:20,1');
     Route::post('/courses/{courseId}/self-assessment/generate', [SelfAssessmentController::class, 'generate']);
     Route::post('/self-assessment/submit', [SelfAssessmentController::class, 'submit']);
 });
@@ -229,6 +230,7 @@ Route::middleware(['auth:sanctum', 'role:teacher'])->prefix('instructor')->group
     Route::post('categories', [InstructorCategoryController::class, 'store']);
 
     // Khóa học
+    Route::post('courses/wizard', [CourseWizardController::class, 'store']);
     Route::apiResource('courses', CourseController::class);
     Route::post('courses/{course}/thumbnail', [CourseController::class, 'uploadThumbnail']);
     Route::patch('courses/{course}/status', [CourseController::class, 'updateStatus']);
@@ -428,52 +430,53 @@ if (app()->environment('local', 'testing')) {
         Route::post('/dev/orders/{orderId}/complete', [OrderController::class, 'devCompleteOrder']);
         Route::post('/dev/orders/{orderId}/refund', [OrderController::class, 'devRefundOrder']);
     });
+
+    // Demo helpers: never reachable outside local/testing (they mutate data by email, unauthenticated).
+    Route::get('/dev/wipe-enrollments', function (\Illuminate\Http\Request $request) {
+        $email = $request->query('email');
+        if (!$email) return response()->json(['error' => 'Missing email parameter']);
+        $user = \App\Models\User::where('email', $email)->first();
+        if (!$user) return response()->json(['error' => 'User not found']);
+    
+        // Xóa enrollments
+        \Illuminate\Support\Facades\DB::table('enrollments')->where('user_id', $user->id)->delete();
+    
+        return response()->json([
+            'message' => 'Wiped enrollments for ' . $email
+        ]);
+    });
+
+    Route::get('/dev/seed-focus-areas', function (\Illuminate\Http\Request $request) {
+        $email = $request->query('email');
+        if (!$email) return response()->json(['error' => 'Missing email parameter']);
+        $user = \App\Models\User::where('email', $email)->first();
+        if (!$user) return response()->json(['error' => 'User not found']);
+    
+        $course = \App\Models\Course::first();
+        if (!$course) return response()->json(['error' => 'No course found to attach topics']);
+    
+        \Illuminate\Support\Facades\DB::table('knowledge_topics')->updateOrInsert(
+            ['name' => 'Cấu trúc dữ liệu Tree'],
+            ['course_id' => $course->id, 'description' => 'Tìm hiểu về Tree']
+        );
+        \Illuminate\Support\Facades\DB::table('knowledge_topics')->updateOrInsert(
+            ['name' => 'React Custom Hooks'],
+            ['course_id' => $course->id, 'description' => 'Custom Hooks trong React']
+        );
+        $topic1 = \Illuminate\Support\Facades\DB::table('knowledge_topics')->where('name', 'Cấu trúc dữ liệu Tree')->first();
+        $topic2 = \Illuminate\Support\Facades\DB::table('knowledge_topics')->where('name', 'React Custom Hooks')->first();
+    
+        \Illuminate\Support\Facades\DB::table('user_topic_performance')->updateOrInsert(
+            ['user_id' => $user->id, 'topic_id' => $topic1->id],
+            ['total_answered' => 10, 'total_correct' => 3, 'accuracy_percentage' => 30]
+        );
+        \Illuminate\Support\Facades\DB::table('user_topic_performance')->updateOrInsert(
+            ['user_id' => $user->id, 'topic_id' => $topic2->id],
+            ['total_answered' => 20, 'total_correct' => 12, 'accuracy_percentage' => 60]
+        );
+    
+        return response()->json([
+            'message' => 'Seeded mock focus areas for ' . $email
+        ]);
+    });
 }
-
-Route::get('/dev/wipe-enrollments', function (\Illuminate\Http\Request $request) {
-    $email = $request->query('email');
-    if (!$email) return response()->json(['error' => 'Missing email parameter']);
-    $user = \App\Models\User::where('email', $email)->first();
-    if (!$user) return response()->json(['error' => 'User not found']);
-    
-    // Xóa enrollments
-    \Illuminate\Support\Facades\DB::table('enrollments')->where('user_id', $user->id)->delete();
-    
-    return response()->json([
-        'message' => 'Wiped enrollments for ' . $email
-    ]);
-});
-
-Route::get('/dev/seed-focus-areas', function (\Illuminate\Http\Request $request) {
-    $email = $request->query('email');
-    if (!$email) return response()->json(['error' => 'Missing email parameter']);
-    $user = \App\Models\User::where('email', $email)->first();
-    if (!$user) return response()->json(['error' => 'User not found']);
-    
-    $course = \App\Models\Course::first();
-    if (!$course) return response()->json(['error' => 'No course found to attach topics']);
-    
-    \Illuminate\Support\Facades\DB::table('knowledge_topics')->updateOrInsert(
-        ['name' => 'Cấu trúc dữ liệu Tree'],
-        ['course_id' => $course->id, 'description' => 'Tìm hiểu về Tree']
-    );
-    \Illuminate\Support\Facades\DB::table('knowledge_topics')->updateOrInsert(
-        ['name' => 'React Custom Hooks'],
-        ['course_id' => $course->id, 'description' => 'Custom Hooks trong React']
-    );
-    $topic1 = \Illuminate\Support\Facades\DB::table('knowledge_topics')->where('name', 'Cấu trúc dữ liệu Tree')->first();
-    $topic2 = \Illuminate\Support\Facades\DB::table('knowledge_topics')->where('name', 'React Custom Hooks')->first();
-    
-    \Illuminate\Support\Facades\DB::table('user_topic_performance')->updateOrInsert(
-        ['user_id' => $user->id, 'topic_id' => $topic1->id],
-        ['total_answered' => 10, 'total_correct' => 3, 'accuracy_percentage' => 30]
-    );
-    \Illuminate\Support\Facades\DB::table('user_topic_performance')->updateOrInsert(
-        ['user_id' => $user->id, 'topic_id' => $topic2->id],
-        ['total_answered' => 20, 'total_correct' => 12, 'accuracy_percentage' => 60]
-    );
-    
-    return response()->json([
-        'message' => 'Seeded mock focus areas for ' . $email
-    ]);
-});

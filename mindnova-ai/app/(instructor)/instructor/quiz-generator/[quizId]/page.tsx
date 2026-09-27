@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { QuizDetailContainer } from "@/src/features/instructor/quiz-generator/components/QuizDetailContainer";
 
 export const metadata: Metadata = {
-  title: "Chi tiết bài kiểm tra — MindNova AI Instructor",
+  title: "Chi tiết Bài kiểm tra",
   description: "Xem và chỉnh sửa điểm các câu hỏi trong bài kiểm tra.",
 };
 

@@ -73,7 +73,7 @@ const ACTION_STYLES: Record<FocusActionKind, string> = {
 };
 
 function FocusAreaRow({ area }: { area: FocusAreaType }) {
- const targetHref = area.action === "review" ? "/practice" : "/practice/quiz";
+ const targetHref = `/practice?topic=${encodeURIComponent(area.topic)}`;
 
  return (
  <div className="group/row flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-blue-500">

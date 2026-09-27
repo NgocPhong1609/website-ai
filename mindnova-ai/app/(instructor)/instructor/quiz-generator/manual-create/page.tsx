@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { QuizManualWizard } from "@/src/features/instructor/quiz-generator/components/QuizManualWizard";
 
 export const metadata: Metadata = {
-  title: "Tạo Bài Kiểm Tra Thủ Công | MindNova AI",
+  title: "Tạo Bài Kiểm Tra Thủ Công",
   description: "Trình tạo bài kiểm tra thủ công cho giảng viên.",
 };
 

@@ -69,4 +69,44 @@ class Quiz extends Model
     {
         return $this->hasMany(QuizCourseAttachment::class);
     }
+
+    /**
+     * Check if the quiz is owned by the given user — either directly
+     * via instructor_id, or indirectly because the quiz is attached
+     * to (or placed inside a lesson of) one of the user's courses.
+     *
+     * This mirrors the same ownership logic used by
+     * QuizService::getInstructorQuizzes().
+     */
+    public function isOwnedBy(User $user): bool
+    {
+        if ((int) $this->instructor_id === (int) $user->id) {
+            return true;
+        }
+
+        $courseIds = \App\Models\Course::where('teacher_id', $user->id)->pluck('id');
+
+        if ($courseIds->isEmpty()) {
+            return false;
+        }
+
+        // Quiz attached to one of the instructor's courses
+        if ($this->attachments()->whereIn('course_id', $courseIds)->exists()) {
+            return true;
+        }
+
+        // Quiz inside a lesson that belongs to one of the instructor's courses
+        if ($this->lesson_id) {
+            $lesson = $this->lesson;
+            if ($lesson) {
+                $lessonCourseId = $lesson->course_id
+                    ?? optional($lesson->module)->course_id;
+                if ($lessonCourseId && $courseIds->contains($lessonCourseId)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

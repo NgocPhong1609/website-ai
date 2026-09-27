@@ -31,7 +31,7 @@ const INITIAL_COURSE_INFO: CourseBasicInfo = {
  categoryName: "",
  otherName: "",
  difficulty: "beginner",
- thumbnailFile: null,
+ thumbnailMediaId: null,
  thumbnailPreview: null,
 };
 
@@ -45,12 +45,12 @@ const INITIAL_SETTINGS: Step3Data = {
 };
 
 // ─── Serialization ────────────────────────────────────────────────────────────
-// thumbnailFile (File object) cannot be serialized, so we exclude it.
-// pendingVideos (Map<string, File>) also cannot be serialized.
+// pendingVideos (Map<string, File>) cannot be serialized.
 
 interface SerializableState {
+ idempotencyKey: string;
  step: StepKey;
- courseInfo: Omit<CourseBasicInfo, "thumbnailFile">;
+ courseInfo: CourseBasicInfo;
  modules: DraftModule[];
  settings: Step3Data;
 }
@@ -58,14 +58,17 @@ interface SerializableState {
 function saveToSession(state: ICreateCourseState): void {
  try {
  const serializable: SerializableState = {
+ idempotencyKey: state.idempotencyKey,
  step: state.step,
  courseInfo: {
  title: state.courseInfo.title,
  description: state.courseInfo.description,
  field: state.courseInfo.field,
  categoryId: state.courseInfo.categoryId,
+ categoryName: state.courseInfo.categoryName,
  otherName: state.courseInfo.otherName,
  difficulty: state.courseInfo.difficulty,
+ thumbnailMediaId: state.courseInfo.thumbnailMediaId,
  thumbnailPreview: state.courseInfo.thumbnailPreview,
  },
  modules: state.modules,
@@ -83,12 +86,13 @@ function loadFromSession(): Partial<ICreateCourseState> | null {
  if (!raw) return null;
  const parsed: SerializableState = JSON.parse(raw);
  return {
+ idempotencyKey: parsed.idempotencyKey || uid(),
  step: parsed.step,
  courseInfo: {
  ...INITIAL_COURSE_INFO,
  ...parsed.courseInfo,
- thumbnailFile: null, // Cannot restore File from session
- thumbnailPreview: null, // Clear preview as well since we need the File object to upload
+ thumbnailMediaId: parsed.courseInfo.thumbnailMediaId || null,
+ thumbnailPreview: parsed.courseInfo.thumbnailPreview || null,
  },
  modules: parsed.modules,
  settings: parsed.settings,
@@ -110,10 +114,14 @@ function clearSession(): void {
 
 interface ICreateCourseState {
  // State
+ idempotencyKey: string;
  step: StepKey;
  courseInfo: CourseBasicInfo;
  modules: DraftModule[];
  settings: Step3Data;
+
+ // Store internal
+ regenerateIdempotencyKey: () => void;
 
  // Step navigation
  setStep: (step: StepKey) => void;
@@ -151,13 +159,22 @@ interface ICreateCourseState {
  hydrate: () => void;
 }
 
+// ─── Helper ───────────────────────────────────────────────────────────────────
+const generateKey = () => Math.random().toString(36).substring(2) + Date.now().toString(36);
+
 // ─── Store ────────────────────────────────────────────────────────────────────
 
 export const useCreateCourseStore = create<ICreateCourseState>((set, get) => ({
+ idempotencyKey: generateKey(),
  step: 1,
  courseInfo: { ...INITIAL_COURSE_INFO },
  modules: [],
  settings: { ...INITIAL_SETTINGS },
+
+ regenerateIdempotencyKey: () => {
+ set({ idempotencyKey: uid() });
+ saveToSession(get());
+ },
 
  // ── Step navigation ─────────────────────────────────────────────────────────
 

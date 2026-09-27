@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { QuizListContainer, QuizListSkeleton } from "@/src/features/instructor/quiz-generator/components/QuizListContainer";
 
 export const metadata: Metadata = {
-  title: "Bài kiểm tra — MindNova AI Instructor",
+  title: "Quản lý Bài kiểm tra",
   description: "Quản lý các bài kiểm tra trắc nghiệm và tự luận của bạn.",
 };
 

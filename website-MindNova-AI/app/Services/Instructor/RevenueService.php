@@ -56,7 +56,7 @@ class RevenueService
 
         // Month Net Revenue
         $currentMonthRevenue = (float) RevenueAllocation::where('instructor_id', $instructor->id)
-            ->whereIn('status', ['PENDING', 'AVAILABLE'])
+            ->where('status', '!=', 'REFUNDED')
             ->whereBetween('created_at', [$startOfMonth, $now])
             ->sum('instructor_amount');
         $currentMonthRevenue += (float) $this->legacyTransactions($instructor->id)
@@ -65,7 +65,7 @@ class RevenueService
             ->sum('amount');
 
         $lastMonthRevenue = (float) RevenueAllocation::where('instructor_id', $instructor->id)
-            ->whereIn('status', ['PENDING', 'AVAILABLE'])
+            ->where('status', '!=', 'REFUNDED')
             ->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
             ->sum('instructor_amount');
         $lastMonthRevenue += (float) $this->legacyTransactions($instructor->id)
@@ -104,7 +104,7 @@ class RevenueService
         for ($i = 6; $i >= 0; $i--) {
             $date = $now->copy()->subDays($i);
             $dailyRevenue = (float) RevenueAllocation::where('instructor_id', $instructor->id)
-                ->whereIn('status', ['PENDING', 'AVAILABLE'])
+                ->where('status', '!=', 'REFUNDED')
                 ->whereDate('created_at', $date->toDateString())
                 ->sum('instructor_amount');
 
@@ -268,20 +268,72 @@ class RevenueService
     public function getSalesReport(User $instructor, int $days = 7): array
     {
         $now = Carbon::now();
-        $chartData = [];
+        $startDate = $now->copy()->subDays($days - 1)->startOfDay();
+        $endDate = $now->copy()->endOfDay();
 
+        $previousStartDate = $now->copy()->subDays(($days * 2) - 1)->startOfDay();
+        $previousEndDate = $now->copy()->subDays($days)->endOfDay();
+
+        // 1. Total Sales (Revenue)
+        $totalSales = (float) RevenueAllocation::where('instructor_id', $instructor->id)
+            ->where('status', '!=', 'REFUNDED')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('instructor_amount');
+        
+        $totalSales += (float) $this->legacyTransactions($instructor->id)
+            ->where('type', 'revenue')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('amount');
+
+        $prevSales = (float) RevenueAllocation::where('instructor_id', $instructor->id)
+            ->where('status', '!=', 'REFUNDED')
+            ->whereBetween('created_at', [$previousStartDate, $previousEndDate])
+            ->sum('instructor_amount');
+            
+        $prevSales += (float) $this->legacyTransactions($instructor->id)
+            ->where('type', 'revenue')
+            ->whereBetween('created_at', [$previousStartDate, $previousEndDate])
+            ->sum('amount');
+
+        $salesGrowth = $prevSales > 0 ? (($totalSales - $prevSales) / $prevSales) * 100 : 0;
+
+        // 2. Total Enrollments (Order Items for the instructor's courses)
+        $totalEnrollments = RevenueAllocation::where('instructor_id', $instructor->id)
+            ->where('status', '!=', 'REFUNDED')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->count();
+            
+        $prevEnrollments = RevenueAllocation::where('instructor_id', $instructor->id)
+            ->where('status', '!=', 'REFUNDED')
+            ->whereBetween('created_at', [$previousStartDate, $previousEndDate])
+            ->count();
+
+        $enrollmentsGrowth = $prevEnrollments > 0 ? (($totalEnrollments - $prevEnrollments) / $prevEnrollments) * 100 : 0;
+
+        // Chart Data
+        $chartData = [];
         for ($i = $days - 1; $i >= 0; $i--) {
             $date = $now->copy()->subDays($i);
 
             $dayRevenue = (float) RevenueAllocation::where('instructor_id', $instructor->id)
-                ->whereIn('status', ['PENDING', 'AVAILABLE'])
+                ->where('status', '!=', 'REFUNDED')
                 ->whereDate('created_at', $date->toDateString())
                 ->sum('instructor_amount');
+                
+            $dayRevenue += (float) $this->legacyTransactions($instructor->id)
+                ->where('type', 'revenue')
+                ->whereDate('created_at', $date->toDateString())
+                ->sum('amount');
 
             $dayRefund = (float) RevenueAllocation::where('instructor_id', $instructor->id)
                 ->where('status', 'REFUNDED')
                 ->whereDate('created_at', $date->toDateString())
                 ->sum('instructor_amount');
+                
+            $dayRefund += (float) $this->legacyTransactions($instructor->id)
+                ->where('type', 'refund')
+                ->whereDate('created_at', $date->toDateString())
+                ->sum('amount');
 
             $chartData[] = [
                 'date' => $date->format('Y-m-d'),
@@ -291,6 +343,17 @@ class RevenueService
             ];
         }
 
-        return $chartData;
+        return [
+            'total_sales' => $totalSales,
+            'sales_growth' => round($salesGrowth, 1),
+            'total_enrollments' => $totalEnrollments,
+            'enrollments_growth' => round($enrollmentsGrowth, 1),
+            'total_views' => 0, // Placeholder
+            'views_growth' => 0, // Placeholder
+            'avg_conversion_rate' => 0, // Placeholder
+            'conversion_growth' => 0, // Placeholder
+            'chart_data' => $chartData,
+        ];
     }
+}
 }

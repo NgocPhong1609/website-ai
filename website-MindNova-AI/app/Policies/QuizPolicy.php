@@ -14,7 +14,7 @@ class QuizPolicy
 
     public function view(User $user, Quiz $quiz): bool
     {
-        return (int) $user->id === (int) $quiz->instructor_id || $user->isAdmin();
+        return $quiz->isOwnedBy($user) || $user->isAdmin();
     }
 
     public function create(User $user): bool
@@ -24,16 +24,16 @@ class QuizPolicy
 
     public function update(User $user, Quiz $quiz): bool
     {
-        return (int) $user->id === (int) $quiz->instructor_id || $user->isAdmin();
+        return $quiz->isOwnedBy($user) || $user->isAdmin();
     }
 
     public function delete(User $user, Quiz $quiz): bool
     {
-        return (int) $user->id === (int) $quiz->instructor_id || $user->isAdmin();
+        return $quiz->isOwnedBy($user) || $user->isAdmin();
     }
 
     public function attach(User $user, Quiz $quiz): bool
     {
-        return (int) $user->id === (int) $quiz->instructor_id || $user->isAdmin();
+        return $quiz->isOwnedBy($user) || $user->isAdmin();
     }
 }

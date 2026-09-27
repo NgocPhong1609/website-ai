@@ -1,7 +1,7 @@
 export type FocusActionKind = "review" | "practice";
 
 export interface FocusArea {
- id: number;
+ id: number | string;
  topic: string;
  accuracy: number;
  action: FocusActionKind;

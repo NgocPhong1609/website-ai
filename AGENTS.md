@@ -148,7 +148,9 @@ Pattern: Request → middleware → Controller → Service → Model. Không có
 
 - BE: `app/Http/Controllers/Api/Auth/AuthController.php`
 - FE login/register: `src/features/student/auth/`
-- FE onboarding: `src/features/student/onboarding/` + store Zustand
+- FE onboarding: `src/features/student/onboarding/` — welcome → goal → skills → topics (chủ đề theo mục tiêu, tối đa 5 + thời gian/ngày) → generating → plan. Store Zustand persist `sessionStorage` (`mindnova_onboarding`, hydrate thủ công); `useStepGuard` đẩy về câu hỏi chưa trả lời. Đổi câu trả lời xóa plan cũ.
+- BE onboarding: `OnboardingController@store` → `OnboardingPlanService` (Groq, fallback tiếng Việt khi AI lỗi, `source: ai|fallback`). Response `data.{profile, learning_path[].{phase,title,description,duration,lessons[],courses[]}}`; lưu `users.onboarding_data` (`goal`, `currentLevel`, `timeAvailable`, `topics`, `ai_plan`) + `is_onboarded`. `DashboardService`/`StudyPlanService` đọc `ai_plan.learning_path` — giữ shape. Khóa học gợi ý chỉ lấy course published + không bị admin ẩn.
+- `GROQ_MODEL` (mặc định `openai/gpt-oss-120b`) phải là model Groq còn hỗ trợ; `llama3-*`, `mixtral-*`, `gemma2-*` đã bị ngừng → tính năng Groq rơi về fallback/lỗi. `GROQ_FALLBACK_MODELS` (CSV) cho student AI quiz. Đọc qua `config('services.groq.*')`, không gọi `env()` trong code (hỏng khi `config:cache`).
 - Register nhận `role` `student|teacher`. Form FE hiện **cố định `student`**.
 - Register/Google gắn role qua `roles` + `role_user` (`Role::idFor`), không ghi cột `users.role`.
 - Login từ chối `is_locked`.
@@ -159,7 +161,7 @@ Pattern: Request → middleware → Controller → Service → Model. Không có
 
 | Feature | FE | BE |
 |---|---|---|
-| Dashboard | `features/student/dashboard/` | `Student\DashboardController` + `DashboardService` |
+| Dashboard | `features/student/dashboard/` | `Student\DashboardController` + `DashboardService`; "Trọng tâm AI" = `FocusAreaService` (quiz AI đã nộp theo topic + `user_quiz_attempts` theo quiz, < 80%, yếu nhất trước) → link `/practice?topic=` |
 | Explore catalog | `features/student/explore/` | `GET /api/student/courses/available` |
 | Course detail / lesson | `features/student/courses/` | `Student\CourseController`, `LessonController` |
 | Quiz / practice | `features/student/quiz/` | `StudentQuizController`, `AiQuizGeneratorController`, `PracticeService` |
@@ -271,7 +273,7 @@ Chi tiết đầy đủ: `website-MindNova-AI/routes/api.php`. Dưới đây là
 
 ### Student routes **không** `auth:sanctum` trong `api.php` hiện tại
 
-`/api/student/study-plan`, practice/progress/history overview, courses available/detail, course reviews GET, study-plan chat (throttle 10/1), onboarding, available-topics, analyze-lesson, self-assessment, **toàn bộ** `/api/student/practice/generate-ai-quiz` + history/submit/delete.
+`/api/student/study-plan`, practice/progress/history overview, courses available/detail, course reviews GET, study-plan chat (throttle 10/1), onboarding (throttle 10/1), available-topics, analyze-lesson (throttle 20/1), self-assessment, **toàn bộ** `/api/student/practice/generate-ai-quiz` + history/submit/delete.
 
 Đây là điểm dễ regression bảo mật. Student AI quiz fallback `userId = 201` nếu không có auth (`AiQuizGeneratorController`).
 
@@ -336,7 +338,7 @@ Prefix `/api/admin`.
 
 ### Local/testing only
 
-`POST /api/dev/orders/{orderId}/complete|refund` — Sanctum. FE checkout dev có thể gọi complete.
+`POST /api/dev/orders/{orderId}/complete|refund` — Sanctum. FE checkout dev có thể gọi complete. `GET /api/dev/wipe-enrollments|seed-focus-areas?email=` — không auth, chỉ đăng ký khi `local|testing`; **không** đưa ra ngoài khối guard.
 
 ### Web (Blade)
 

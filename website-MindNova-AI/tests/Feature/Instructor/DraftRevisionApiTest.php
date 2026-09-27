@@ -6,11 +6,13 @@ use App\Models\Course;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\CreatesUsersWithRoles;
 use Tests\TestCase;
 
 class DraftRevisionApiTest extends TestCase
 {
     use RefreshDatabase;
+    use CreatesUsersWithRoles;
 
     private User $teacher;
     private User $otherTeacher;
@@ -20,11 +22,8 @@ class DraftRevisionApiTest extends TestCase
     {
         parent::setUp();
 
-        $teacherRole = Role::create(['name' => 'teacher', 'display_name' => 'Teacher']);
-        $this->teacher = User::factory()->create();
-        $this->teacher->roles()->attach($teacherRole);
-        $this->otherTeacher = User::factory()->create();
-        $this->otherTeacher->roles()->attach($teacherRole);
+        $this->teacher = $this->createTeacher();
+        $this->otherTeacher = $this->createTeacher();
 
         $this->course = Course::create([
             'teacher_id' => $this->teacher->id,

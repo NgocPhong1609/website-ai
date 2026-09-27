@@ -25,6 +25,22 @@ class StudentAnalyticsController extends Controller
     {
         $teacherId = auth()->id();
 
+        // Check if there is any enrollment for this teacher's courses
+        $hasEnrollments = Enrollment::whereHas('course', function ($q) use ($teacherId) {
+            $q->where('teacher_id', $teacherId);
+        })->exists();
+
+        if (!$hasEnrollments) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'total_learning_hours' => null,
+                    'total_certificates' => null,
+                    'new_students' => []
+                ]
+            ]);
+        }
+
         // 1. Total Learning Time (Sum of duration_seconds of completed lessons by students in teacher's courses)
         $totalLearningSeconds = LessonCompletion::whereHas('lesson.module.course', function ($q) use ($teacherId) {
             $q->where('teacher_id', $teacherId);
@@ -85,28 +101,51 @@ class StudentAnalyticsController extends Controller
             $q->where('teacher_id', $teacherId);
         })->pluck('user_id')->unique();
 
-        // Count activities grouped by date
+        if ($studentIds->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'data' => [] // empty array so FE shows empty state
+            ]);
+        }
+
+        // We count interactions: Lesson completions, Activity logs
+        // The previous code only checked ActivityLog. Let's combine with LessonCompletion and QuizAttempts if needed,
+        // or just ActivityLog if that's what we want.
+        // Let's use ActivityLog + LessonCompletion for a more accurate "interaction" count.
+        
         $activities = ActivityLog::whereIn('user_id', $studentIds)
             ->where('created_at', '>=', $startDate)
             ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
             ->groupBy('date')
-            ->orderBy('date')
-            ->get()
-            ->keyBy('date');
+            ->pluck('total', 'date');
+
+        $completions = LessonCompletion::whereIn('user_id', $studentIds)
+            ->where('completed_at', '>=', $startDate)
+            ->select(DB::raw('DATE(completed_at) as date'), DB::raw('count(*) as total'))
+            ->groupBy('date')
+            ->pluck('total', 'date');
 
         $chartData = [];
+        $hasData = false;
         for ($i = 0; $i < $days; $i++) {
-            $date = Carbon::now()->subDays($days - 1 - $i)->format('Y-m-d');
+            $dateObj = Carbon::now()->subDays($days - 1 - $i);
+            $date = $dateObj->format('Y-m-d');
+            $count = ($activities[$date] ?? 0) + ($completions[$date] ?? 0);
+            
+            if ($count > 0) {
+                $hasData = true;
+            }
+
             $chartData[] = [
                 'date' => $date,
-                'dayLabel' => Carbon::parse($date)->locale('vi')->isoFormat('D/M'),
-                'interactions' => isset($activities[$date]) ? $activities[$date]->total : 0
+                'dayLabel' => $dateObj->locale('vi')->isoFormat('D/M'),
+                'interactions' => $count
             ];
         }
 
         return response()->json([
             'success' => true,
-            'data' => $chartData
+            'data' => $hasData ? $chartData : []
         ]);
     }
 
