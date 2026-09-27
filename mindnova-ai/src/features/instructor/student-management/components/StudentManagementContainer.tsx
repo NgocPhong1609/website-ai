@@ -11,7 +11,7 @@ import { Download, Sparkles, Loader2 } from "lucide-react";
 
 function StudentNavigationTabs({ active }: { active: "students" | "analytics" }) {
   return (
-    <div className="flex items-center gap-2 p-1.5 bg-white rounded-lg border border-slate-200 shadow-sm w-fit">
+    <div className="flex items-center gap-2 p-1.5 bg-white rounded-xl border border-slate-200 shadow-sm w-fit">
       <Link
         href="/instructor/students"
         className={twMerge(

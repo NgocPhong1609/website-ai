@@ -518,7 +518,7 @@ export function QuizEditor({ value, onChange, quizId, courseId }: QuizEditorProp
       {/* Questions List */}
       <div className="flex flex-col gap-4 max-h-[550px] overflow-y-auto pr-1">
         {filteredQuestions.length === 0 ? (
-          <div className="p-10 text-center rounded-lg bg-white border border-slate-200 text-slate-500 font-medium text-xs">
+          <div className="p-10 text-center rounded-xl bg-white border border-slate-200 text-slate-500 font-medium text-xs">
             {isLoading ? '' : 'Chưa có câu hỏi nào. Nhấn "+ Trắc nghiệm" hoặc "+ Tự luận" ở trên để thêm.'}
           </div>
         ) : (

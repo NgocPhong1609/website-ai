@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { GeneratedQuestion } from "../types/quizGenerator.types";
 import { QuizImageField } from "./QuizImageField";
+import { Check, CheckCircle2, Pencil, Save } from "lucide-react";
 
 interface QuestionCardEssayProps {
  question: GeneratedQuestion;
@@ -75,16 +76,16 @@ export function QuestionCardEssay({
  return (
  <div
  className={`p-6 rounded-lg bg-white border-2 transition-all duration-200 shadow-sm flex flex-col gap-4 ${
- isApproved ? "text-blue-500/50 bg-sky-50/10 shadow-[0_4px_20px_rgba(168,85,247,0.05)]" : "border-slate-200"
+ isApproved ? "border-emerald-300 bg-emerald-50/20" : "border-slate-200"
  }`}
  >
  {/* Top Header */}
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
- <span className="w-7 h-7 rounded-lg bg-sky-50 text-blue-500 font-bold text-xs flex items-center justify-center border-slate-200">
+ <span className="w-7 h-7 rounded-lg bg-sky-50 text-blue-500 font-bold text-xs flex items-center justify-center border border-slate-200">
  #{index + 1}
  </span>
- <span className="text-[11px] font-bold uppercase px-2.5 py-1 rounded-lg bg-slate-50 text-blue-500 border-slate-200">
+ <span className="text-[11px] font-bold uppercase px-2.5 py-1 rounded-lg bg-slate-50 text-blue-500 border border-slate-200">
  Tự luận (Essay)
  </span>
  <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 border">
@@ -105,23 +106,23 @@ export function QuestionCardEssay({
  disabled={isApproved}
  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
  isApproved
- ? "text-blue-500 text-white cursor-default"
- : "bg-sky-50 hover:bg-blue-600 text-blue-500 hover:text-white border-slate-200"
+ ? "bg-emerald-600 text-white cursor-default"
+ : "bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-200"
  }`}
  >
- {isApproved ? "Approved " : " Approve"}
+ {isApproved ? <><CheckCircle2 className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Approved</> : <><Check className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Approve</>}
  </button>
  <button
  type="button"
  onClick={() => (isEditing ? handleSaveEdit() : setIsEditing(true))}
- className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-500 hover:text-white border-slate-200 text-xs font-semibold transition-all cursor-pointer"
+ className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-500 hover:text-white border border-slate-200 text-xs font-semibold transition-all cursor-pointer"
  >
- {isEditing ? " Lưu sửa" : " Chỉnh sửa"}
+ {isEditing ? <><Save className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Lưu sửa</> : <><Pencil className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Chỉnh sửa</>}
  </button>
  <button
  type="button"
  onClick={() => onRegenerate(question.id)}
- className="px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-blue-600 text-blue-500 hover:text-white border-slate-200 text-xs font-semibold transition-all cursor-pointer"
+ className="px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-blue-600 text-blue-500 hover:text-white border border-slate-200 text-xs font-semibold transition-all cursor-pointer"
  title="Sinh lại riêng câu này bằng AI"
  >
  Sinh lại
@@ -162,7 +163,7 @@ export function QuestionCardEssay({
  value={draftSampleAnswer}
  onChange={(e) => setDraftSampleAnswer(e.target.value)}
  rows={3}
- className="w-full p-3 rounded-lg border-slate-200 bg-sky-50/40 text-xs font-medium text-blue-500 focus:outline-none"
+ className="w-full p-3 rounded-lg border border-slate-200 bg-sky-50/40 text-xs font-medium text-blue-500 focus:outline-none"
  />
  </div>
 
@@ -193,7 +194,7 @@ export function QuestionCardEssay({
  const val = parseFloat(e.target.value);
  setDraftPoints(isNaN(val) || val < 0 ? 0 : val);
  }}
- className="w-full p-2.5 rounded-lg border-slate-200 text-xs font-bold text-blue-500 focus:outline-none focus:border-blue-500"
+ className="w-full p-2.5 rounded-lg border border-slate-200 text-xs font-bold text-blue-500 focus:outline-none focus:border-blue-500"
  />
  </div>
  </div>
@@ -205,7 +206,7 @@ export function QuestionCardEssay({
  {question.image_url && <img src={question.image_url} alt={`Ảnh câu hỏi ${index + 1}`} className="max-h-64 rounded-lg border object-contain" />}
 
  {sampleAnswerStr && (
- <div className="p-4 rounded-lg bg-sky-50/60 border-slate-200 flex flex-col gap-1 text-xs">
+ <div className="p-4 rounded-lg bg-sky-50/60 border border-slate-200 flex flex-col gap-1 text-xs">
  <span className="font-semibold text-blue-500 flex items-center gap-1">
  Đáp án tham khảo mẫu:
  </span>

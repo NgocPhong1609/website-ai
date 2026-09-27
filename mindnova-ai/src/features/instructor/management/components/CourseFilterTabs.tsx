@@ -36,7 +36,7 @@ export function CourseFilterTabs({ counts, onFilterChange }: CourseFilterTabsPro
  <div
  role="tablist"
  aria-label="Lọc khóa học"
- className="flex items-center gap-1.5 bg-white border border-slate-200 p-1.5 rounded-lg shadow-sm shrink-0"
+ className="flex items-center gap-1.5 bg-white border border-slate-200 p-1.5 rounded-xl shadow-sm shrink-0"
  >
  {TABS.map(({ key, label }) => {
  const count = counts[key] || 0;

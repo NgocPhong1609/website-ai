@@ -175,7 +175,7 @@ export function StudentTable({
  <div className="w-full flex flex-col gap-5 animate-fadeIn">
 
  {/* Filter Toolbar */}
- <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+ <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
  <input
  id="search-student"
  type="search"
@@ -198,7 +198,7 @@ export function StudentTable({
  </div>
 
  {/* Main Table Grid */}
- <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+ <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
  <div className="overflow-x-auto">
  <table className="w-full text-left border-collapse min-w-[640px]">
  <thead>
@@ -246,7 +246,7 @@ export function StudentTable({
  </div>
  </td>
  <td className="px-6 py-4">
- <span className="text-xs font-semibold text-blue-500 bg-blue-50 px-2.5 py-1 rounded-lg border-slate-200 whitespace-nowrap">
+ <span className="text-xs font-semibold text-blue-500 bg-blue-50 px-2.5 py-1 rounded-lg border border-slate-200 whitespace-nowrap">
  {st.course.title}
  </span>
  </td>
@@ -259,7 +259,7 @@ export function StudentTable({
  <span className={twMerge("font-mono text-xs font-bold px-2.5 py-1 rounded-lg border shadow-sm whitespace-nowrap shrink-0", st.average_score >= 80 ? "text-emerald-700 bg-emerald-50 border-emerald-200" : (st.average_score !== null ? "text-amber-700 bg-amber-50 border-amber-200" : "text-slate-500 bg-slate-50 border-slate-200"))}>
  {st.average_score !== null ? `${st.average_score}/100` : "Chưa có"}
  </span>
- <span className="px-2 py-0.5 rounded-md bg-sky-50 text-blue-500 border-slate-200 text-[10px] font-bold font-mono whitespace-nowrap shrink-0">
+ <span className="px-2 py-0.5 rounded-md bg-sky-50 text-blue-500 border border-slate-200 text-[10px] font-bold font-mono whitespace-nowrap shrink-0">
  {st.total_credits ? `${st.total_credits} tín` : "0 tín"}
  </span>
  </div>

@@ -20,7 +20,7 @@ import { Skeleton } from "@/src/shared/components/ui";
 
 import { OTHER_CATEGORY_VALUE } from "../constants";
 import { useProposeCategory } from "../api";
-import { ArrowLeft, Check, Eye, Save, Trash2, Award, MessageSquare } from "lucide-react";
+import { ArrowLeft, Check, Eye, Save, Trash2, Award, MessageSquare, Loader2 } from "lucide-react";
 
 export function EditCourseContainer({ courseId }: { courseId: string }) {
  const router = useRouter();
@@ -285,7 +285,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  )}
  >
  {isUpdating || isUploading || isUpdatingPrice ? (
- <span> Đang lưu...</span>
+ <span><Loader2 className="inline h-4 w-4 mr-1.5 align-text-bottom animate-spin" aria-hidden />Đang lưu...</span>
  ) : saveSuccess ? (
  <>
  <Check size={14} />
@@ -335,7 +335,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  )}
 
  {activeTab === "advanced" && (
- <div className="bg-white p-6 rounded-lg border border-slate-100 shadow-sm flex flex-col gap-2">
+ <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-2">
  <div className="flex flex-col gap-1 mb-2">
  <h2 className="text-[17px] font-bold text-slate-900">Cấu hình Quyền học tập</h2>
  <p className="text-[13px] text-slate-500">Quản lý cấp chứng chỉ tự động và khóa bình luận diễn đàn.</p>

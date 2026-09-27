@@ -38,7 +38,7 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
  </div>
 
  <div className="flex flex-col gap-6">
- <div className="bg-blue-50/50 p-6 rounded-lg border-slate-200 flex flex-col justify-center h-full shadow-sm">
+ <div className="bg-blue-50/50 p-6 rounded-lg border border-slate-200 flex flex-col justify-center h-full shadow-sm">
  
  <h2 className="text-3xl font-bold text-blue-950 mb-1">
  {metricsLoading ? "..." : metrics.total_learning_hours} Giờ
@@ -46,7 +46,7 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
  <p className="text-xs font-bold text-blue-500/60 uppercase tracking-wider">Tổng Thời Gian Học Tập</p>
  </div>
 
- <div className="bg-emerald-50/50 p-6 rounded-lg border-slate-200 flex flex-col justify-center h-full shadow-sm">
+ <div className="bg-emerald-50/50 p-6 rounded-lg border border-slate-200 flex flex-col justify-center h-full shadow-sm">
  
  <h2 className="text-3xl font-bold text-emerald-950 mb-1">
  {metricsLoading ? "..." : metrics.total_certificates} Chứng Chỉ
@@ -57,7 +57,7 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
  </div>
 
  {/* Bottom Section: New Students List */}
- <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+ <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
  <div className="p-5 border-b border-slate-100 flex items-center justify-between">
  <div>
  <h3 className="text-base font-bold text-slate-900">Danh Sách Học Viên Mới Gia Nhập</h3>
@@ -103,7 +103,7 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
  <tr key={`${st.id}-${index}`} className="hover:bg-slate-50/50 transition-colors cursor-pointer group" onClick={() => onSelectStudent(st.id)}>
  <td className="px-5 py-4">
  <div className="flex items-center gap-3">
- <div className="w-10 h-10 rounded-full bg-blue-500 text-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">
+ <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">
  {st.name.substring(0, 2).toUpperCase()}
  </div>
  <div>
@@ -114,7 +114,7 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
  </td>
  <td className="px-5 py-4">
  {st.status === 'ĐANG HOẠT ĐỘNG' ? (
- <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-50 text-slate-900 border-slate-200">
+ <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-50 text-slate-900 border border-slate-200">
  
  ĐANG HOẠT ĐỘNG
  </span>

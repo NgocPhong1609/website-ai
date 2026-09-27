@@ -157,7 +157,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  : "border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
  )}
  >
- <p className="text-sm font-semibold"> Nắm vững Học thuật Toàn diện</p>
+ <p className="text-sm font-semibold">Nắm vững Học thuật Toàn diện</p>
  <p className="text-xs font-medium text-slate-500 mt-1">
  Đi sâu vào lý thuyết, nghiên cứu các tình huống thực tế và phân tích kiến thức chuyên sâu.
  </p>
@@ -186,7 +186,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  ) : (
  <div className="flex flex-col gap-4">
  <div className="flex items-center justify-between">
- <span className="text-xs font-semibold text-slate-900 px-3 py-1 bg-emerald-50 rounded-lg border-slate-200">
+ <span className="text-xs font-semibold text-slate-900 px-3 py-1 bg-emerald-50 rounded-lg border border-slate-200">
  Đã tạo Đề cương bằng AI
  </span>
  <button
@@ -278,7 +278,7 @@ export function AIOutlineModal({ isOpen, onClose, onApply }: AIOutlineModalProps
  onClick={handleGenerate}
  className="px-6 py-2.5 bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-md hover:opacity-95 transition-all flex items-center gap-2"
  >
- <span> Tạo Đề cương</span>
+ <span><Sparkles className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Tạo Đề cương</span>
  </button>
  ) : (
  <div className="flex items-center gap-3">

@@ -7,7 +7,7 @@ import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBad
 import { VerificationRequestModal } from "./VerificationRequestModal";
 import { EditCertificateModal } from "./EditCertificateModal";
 import { writeStoredUser } from "@/src/shared/lib/userStorage";
-import { Lock, Camera } from "lucide-react";
+import { Lock, Camera, BadgeCheck, Clock, XCircle, Globe, EyeOff, GraduationCap } from "lucide-react";
 import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 export function TeacherProfileContainer() {
@@ -157,7 +157,7 @@ export function TeacherProfileContainer() {
  return (
  <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
  {/* Header Profile Banner */}
- <div className="relative rounded-lg border border-slate-200/80 bg-white p-6 md:p-8 shadow-sm overflow-hidden">
+ <div className="relative rounded-xl border border-slate-200/80 bg-white p-6 md:p-8 shadow-sm overflow-hidden">
  <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -z-0 pointer-events-none" />
 
  <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
@@ -200,8 +200,8 @@ export function TeacherProfileContainer() {
  <p className="text-sm font-semibold text-slate-500">{profileData?.email}</p>
 
  <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-1">
- <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-500 border-slate-200 uppercase tracking-wide">
- ‍ Giảng viên
+ <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wide">
+ <GraduationCap className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Giảng viên
  </span>
  <span
  className={`px-3 py-1 rounded-full text-xs font-bold border uppercase tracking-wide ${
@@ -215,11 +215,11 @@ export function TeacherProfileContainer() {
  }`}
  >
  {isVerified
- ? " Đã xác minh tích xanh"
+ ? <><BadgeCheck className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Đã xác minh tích xanh</>
  : status === "pending"
- ? " Đang chờ duyệt"
+ ? <><Clock className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Đang chờ duyệt</>
  : status === "rejected"
- ? " Bị từ chối"
+ ? <><XCircle className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Bị từ chối</>
  : "Chưa xác minh"}
  </span>
  </div>
@@ -245,14 +245,14 @@ export function TeacherProfileContainer() {
  {/* Left Column: Verification Card & Certificates */}
  <div className="lg:col-span-1 space-y-6">
  {/* Card: Verification Status */}
- <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+ <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
  <div className="flex items-center gap-2">
  
  <h2 className="text-base font-bold text-slate-900">Xác minh chuyên môn</h2>
  </div>
 
  {isVerified ? (
- <div className="p-4 rounded-lg bg-emerald-50/70 border-slate-200 space-y-2">
+ <div className="p-4 rounded-lg bg-emerald-50/70 border border-slate-200 space-y-2">
  <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
  <VerifiedTeacherBadge isVerified={true} size="sm" showTooltip={false} />
  <span>Đã được MindNova xác minh</span>
@@ -269,7 +269,7 @@ export function TeacherProfileContainer() {
  ) : status === "pending" ? (
  <div className="p-4 rounded-lg bg-amber-50/70 border border-amber-200 space-y-2">
  <div className="flex items-center gap-2 text-amber-800 font-bold text-sm">
- <span> Đang chờ xét duyệt</span>
+ <span><Clock className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Đang chờ xét duyệt</span>
  </div>
  <p className="text-xs text-amber-700 font-semibold leading-relaxed">
  Hồ sơ và bằng cấp của bạn đang được Ban quản trị MindNova AI kiểm tra. Kết quả sẽ được cập nhật sớm nhất.
@@ -284,7 +284,7 @@ export function TeacherProfileContainer() {
  ) : status === "rejected" || status === "revoked" ? (
  <div className="p-4 rounded-lg bg-rose-50/70 border border-rose-200 space-y-3">
  <div className="flex items-center gap-2 text-rose-800 font-bold text-sm">
- <span> Yêu cầu chưa được chấp thuận</span>
+ <span><XCircle className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Yêu cầu chưa được chấp thuận</span>
  </div>
  <p className="text-xs text-rose-700 font-semibold leading-relaxed">
  Lý do: {profileData?.teacher_verification_note || requestInfo?.rejection_reason || "Hồ sơ chưa đủ minh chứng hợp lệ."}
@@ -297,7 +297,7 @@ export function TeacherProfileContainer() {
  </button>
  </div>
  ) : (
- <div className="p-4 rounded-lg bg-blue-50/50 border-slate-200 space-y-3">
+ <div className="p-4 rounded-lg bg-blue-50/50 border border-slate-200 space-y-3">
  <p className="text-xs text-slate-500 font-semibold leading-relaxed">
  Tài khoản của bạn chưa được xác minh. Nộp bằng cấp/chứng chỉ để Admin kiểm tra và cấp tích xanh xác minh uy tín.
  </p>
@@ -312,7 +312,7 @@ export function TeacherProfileContainer() {
  </div>
 
  {/* Card: Certificate List */}
- <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+ <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
  <div className="flex items-center justify-between">
  <h2 className="text-base font-bold text-slate-900">Bằng cấp & Chứng chỉ</h2>
  <button
@@ -381,7 +381,7 @@ export function TeacherProfileContainer() {
  )}
 
  <div className="flex items-center justify-between pt-1 border-t border-slate-200/50 text-[11px] text-slate-400">
- <span>{cert.is_public ? " Hiển thị Public" : " Riêng tư"}</span>
+ <span className="flex items-center">{cert.is_public ? <><Globe className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Hiển thị Public</> : <><EyeOff className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Riêng tư</>}</span>
   <div className="flex items-center gap-3">
   {cert.verification_status === "approved" ? (
     <span
@@ -420,7 +420,7 @@ export function TeacherProfileContainer() {
  {/* Right Column: Edit Profile Form & Courses */}
  <div className="lg:col-span-2 space-y-6">
  {/* Edit Profile Form */}
- <div className="rounded-lg border border-slate-200 bg-white p-6 md:p-8 shadow-sm space-y-6">
+ <div className="rounded-xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm space-y-6">
  <div className="border-b border-slate-100 pb-4">
  <h2 className="text-lg font-bold text-slate-900">Chỉnh sửa thông tin cá nhân</h2>
  <p className="text-xs font-semibold text-slate-500">
@@ -522,7 +522,7 @@ export function TeacherProfileContainer() {
  </div>
 
  {/* Teacher's Courses */}
- <div className="rounded-lg border border-slate-200 bg-white p-6 md:p-8 shadow-sm space-y-4">
+ <div className="rounded-xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm space-y-4">
  <h2 className="text-lg font-bold text-slate-900">Danh sách Khóa học giảng dạy</h2>
  {profileData?.courses?.length > 0 ? (
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

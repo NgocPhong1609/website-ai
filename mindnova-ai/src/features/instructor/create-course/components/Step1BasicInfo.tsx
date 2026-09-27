@@ -105,7 +105,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
 
  return (
  <div className="flex flex-col gap-6 animate-fadeIn">
- <div className="flex items-center justify-between border-b border-slate-200 pb-4 bg-white p-5 rounded-lg shadow-sm">
+ <div className="flex items-center justify-between border-b border-slate-200 pb-4 bg-white p-5 rounded-xl shadow-sm">
  <div>
  <h2 className="text-base font-semibold text-slate-900">Thông tin cơ bản khóa học</h2>
  <p className="text-sm text-slate-500 mt-0.5">Cập nhật tiêu đề và mô tả chính hiển thị trên danh mục học viện MindNova.</p>
@@ -132,7 +132,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  </div>
 
  {/* Right column: Text fields */}
- <div className="flex flex-col gap-5 bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
+ <div className="flex flex-col gap-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
  {/* Course title */}
  <div className="flex flex-col gap-1.5">
  <div className="flex items-center justify-between">

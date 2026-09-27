@@ -15,7 +15,7 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
  };
 
  return (
- <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col gap-6 w-full h-full">
+ <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-6 w-full h-full">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
  <div>
  <h3 className="text-base font-bold text-slate-900">Biểu Đồ Tương Tác Học Tập</h3>

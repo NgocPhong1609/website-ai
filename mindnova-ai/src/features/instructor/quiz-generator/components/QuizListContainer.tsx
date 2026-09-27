@@ -395,7 +395,7 @@ export function QuizListContainer() {
           <select
             value={positionFilter}
             onChange={(e) => setPositionFilter(e.target.value)}
-            className="p-2.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-sm truncate"
+            className="p-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-sm truncate"
           >
             <option value="all">Tất cả Vị trí Quiz</option>
             <option value="capability_assessment">Kiểm tra tổng quát</option>
@@ -408,7 +408,7 @@ export function QuizListContainer() {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value as any)}
-            className="p-2.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-sm"
+            className="p-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-sm"
           >
             <option value="all">Tất cả nguồn (AI / Manual)</option>
             <option value="ai">AI Quiz</option>
@@ -422,7 +422,7 @@ export function QuizListContainer() {
               setCourseFilter(e.target.value);
               setModuleFilter("all");
             }}
-            className="p-2.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-sm truncate"
+            className="p-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-sm truncate"
           >
             <option value="all">Tất cả khóa học</option>
             {coursesList.map((c) => (
@@ -436,7 +436,7 @@ export function QuizListContainer() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="p-2.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-sm"
+            className="p-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-sm"
           >
             <option value="newest">Mới nhất</option>
             <option value="oldest">Cũ nhất</option>

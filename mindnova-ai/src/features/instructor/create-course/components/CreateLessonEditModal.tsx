@@ -364,7 +364,7 @@ export function CreateLessonEditModal({ lesson, onSave, onClose, courseId }: Cre
                   />
                 ) : (
                   (!videoUrl || isUploadingVideo) && (
-                    <div className="w-full p-9 rounded-lg border-2 border-dashed border-slate-300 bg-white hover:bg-blue-50/30 hover:border-blue-600 transition-all flex flex-col items-center justify-center text-center group shadow-sm relative mt-1">
+                    <div className="w-full p-9 rounded-xl border-2 border-dashed border-slate-300 bg-white hover:bg-blue-50/30 hover:border-blue-600 transition-all flex flex-col items-center justify-center text-center group shadow-sm relative mt-1">
                       <input type="file" accept="video/mp4,video/quicktime,.mp4,.mov" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed" onChange={handleVideoFileUpload} disabled={isUploadingVideo} />
                       <div className="text-blue-500 group-hover:scale-110 transition-transform mb-2">
                         <Video className="h-8 w-8" aria-hidden />

@@ -31,7 +31,7 @@ export function CourseEditTabs({ activeTab, onChangeTab }: CourseEditTabsProps) 
  ] as const;
 
  return (
- <div className="w-full bg-white border border-slate-200 p-1.5 rounded-lg flex items-center gap-1.5 overflow-x-auto hide-scrollbar shadow-sm mt-1 mb-1">
+ <div className="w-full bg-white border border-slate-200 p-1.5 rounded-xl flex items-center gap-1.5 overflow-x-auto hide-scrollbar shadow-sm mt-1 mb-1">
  {tabs.map((tab) => {
  const isActive = activeTab === tab.id;
  return (

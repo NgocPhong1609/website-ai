@@ -313,7 +313,7 @@ export function CouponSection({ courseId }: { courseId?: string } = {}) {
             </div>
           )}
           {error && (
-            <div className="p-4 text-xs font-bold text-blue-500 text-center bg-blue-50">{error}</div>
+            <div className="p-4 text-xs font-bold text-rose-600 text-center bg-rose-50">{error}</div>
           )}
           <table className="w-full text-left border-collapse">
             <thead>

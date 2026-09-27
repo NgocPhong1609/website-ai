@@ -110,7 +110,7 @@ export function CourseCard({ course }: CourseCardProps) {
   return (
     <article
       aria-label={`Khóa học: ${course.title}`}
-      className="group relative flex flex-col rounded-lg bg-white border border-slate-200 overflow-hidden hover:border-slate-300 hover:shadow-md transition-all duration-200 shadow-sm h-full"
+      className="group relative flex flex-col rounded-xl bg-white border border-slate-200 overflow-hidden hover:border-slate-300 hover:shadow-md transition-all duration-200 shadow-sm h-full"
     >
       <div className="relative">
         <CourseThumbnail title={course.title} thumbnail={course.thumbnail} />

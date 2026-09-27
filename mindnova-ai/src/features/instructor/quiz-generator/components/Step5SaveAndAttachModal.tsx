@@ -179,7 +179,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md animate-fadeIn">
-      <div className="bg-white rounded-lg border border-slate-200 shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col gap-6 p-8">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col gap-6 p-8">
         {/* Header */}
         <div className="flex items-center gap-4 border-b border-slate-100 pb-5">
           <div className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-bold border border-emerald-100">

@@ -7,7 +7,7 @@ import { Step2ConfigForm } from "./Step2ConfigForm";
 import { Step3GeneratingState } from "./Step3GeneratingState";
 import { Step4ReviewEditor } from "./Step4ReviewEditor";
 import { Step5SaveAndAttachModal } from "./Step5SaveAndAttachModal";
-import { Sparkles, AlertTriangle, X } from "lucide-react";
+import { Sparkles, AlertTriangle, X, RefreshCw } from "lucide-react";
 
 interface QuizGeneratorWizardProps {
   onSuccessComplete?: (savedQuiz?: any) => void;
@@ -59,7 +59,7 @@ export function QuizGeneratorWizard({
     <div className={`max-w-5xl mx-auto flex flex-col gap-6 ${embeddedMode ? "p-2" : "p-4 md:p-8"}`}>
       {/* Wizard Header Progress Bar */}
       {!embeddedMode && (
-        <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm flex flex-col gap-4">
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-blue-500 text-white flex items-center justify-center shadow-md">
@@ -135,7 +135,7 @@ export function QuizGeneratorWizard({
                       disabled={isGenerating}
                       className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[11px] font-semibold shadow-sm transition-all cursor-pointer flex items-center gap-1 disabled:opacity-50"
                     >
-                      <span> Thử lại</span>
+                      <span><RefreshCw className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Thử lại</span>
                     </button>
                   </div>
                 )}

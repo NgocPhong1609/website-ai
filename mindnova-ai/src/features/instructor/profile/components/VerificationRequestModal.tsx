@@ -221,7 +221,7 @@ export function VerificationRequestModal({
  </div>
 
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
- <div className="p-3 rounded-lg bg-blue-50/50 border-slate-200">
+ <div className="p-3 rounded-lg bg-blue-50/50 border border-slate-200">
  <label className="block text-[11px] font-semibold uppercase text-blue-500 mb-0.5">
  Ảnh Bằng cấp (Public)
  </label>

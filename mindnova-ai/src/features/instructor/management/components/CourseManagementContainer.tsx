@@ -93,7 +93,7 @@ function CourseManagementContent() {
         </div>
 
         {/* ── Search & Sort Bar ────────────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
           {/* Search Box */}
           <div className="relative flex-1 max-w-md">
             <span className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-slate-500">
@@ -145,7 +145,7 @@ function CourseManagementContent() {
             {isLoading ? (
               <>
                 {[...Array(6)].map((_, i) => (
-                <div key={i} className="flex flex-col bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm h-full min-h-[300px]">
+                <div key={i} className="flex flex-col bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm h-full min-h-[300px]">
                   <Skeleton className="h-40 w-full rounded-none" />
                   <div className="p-4 flex flex-col flex-1 gap-3">
                     <Skeleton className="h-5 w-3/4" />

@@ -5,12 +5,12 @@ import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { useQuery } from "@tanstack/react-query";
 import { getTransactions, getRevenueOverview } from "../api";
-import { BookOpen, Calendar, ChevronDown, ChevronLeft, ChevronRight, Landmark, Sparkles, TrendingUp, Wallet } from "lucide-react";
+import { BookOpen, Calendar, ChevronDown, ChevronLeft, ChevronRight, Landmark, Sparkles, TrendingUp, Wallet, BarChart3, History, LayoutDashboard } from "lucide-react";
 import { SkeletonTable } from "@/src/shared/components/ui/Skeleton";
 
 function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
  return (
- <div className="flex items-center gap-2 p-1.5 bg-white rounded-lg border border-slate-200 shadow-sm w-fit">
+ <div className="flex items-center gap-2 p-1.5 bg-white rounded-xl border border-slate-200 shadow-sm w-fit">
  <Link
  href="/instructor/revenue"
  className={twMerge(
@@ -20,7 +20,7 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
- <span> Tổng quan Doanh thu</span>
+ <span><LayoutDashboard className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Tổng quan Doanh thu</span>
  </Link>
 
  <Link
@@ -32,7 +32,7 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
- <span> Báo cáo Bán hàng</span>
+ <span><BarChart3 className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Báo cáo Bán hàng</span>
  </Link>
 
  <Link
@@ -44,7 +44,7 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
- <span> Lịch sử Giao dịch</span>
+ <span><History className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Lịch sử Giao dịch</span>
  </Link>
  </div>
  );
@@ -91,7 +91,7 @@ function Filters({
 
  return (
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
- <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg p-1 shadow-sm overflow-x-auto">
+ <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 shadow-sm overflow-x-auto">
  {tabs.map((tab) => (
  <button
  key={tab.id}
@@ -249,7 +249,7 @@ function TransactionTable({
 
  if (isError || !data) {
  return (
- <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-12 flex flex-col items-center justify-center text-rose-500">
+ <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-12 flex flex-col items-center justify-center text-rose-500">
  <p className="font-bold">Đã có lỗi xảy ra khi tải dữ liệu giao dịch.</p>
  </div>
  );
@@ -259,7 +259,7 @@ function TransactionTable({
  const meta = data;
 
  return (
- <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col overflow-hidden">
+ <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
  <div className="overflow-x-auto">
  <table className="w-full text-left border-collapse min-w-[750px]">
  <thead>
@@ -353,8 +353,8 @@ function BottomCards() {
 
  return (
  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
- <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm flex items-center gap-4">
- <div className="w-12 h-12 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 border-slate-200">
+ <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4">
+ <div className="w-12 h-12 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 border border-slate-200">
  <Landmark size={22} />
  </div>
  <div>
@@ -363,8 +363,8 @@ function BottomCards() {
  </div>
  </div>
 
- <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm flex items-center gap-4">
- <div className="w-12 h-12 rounded-lg bg-emerald-50 text-slate-900 flex items-center justify-center shrink-0 border-slate-200">
+ <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex items-center gap-4">
+ <div className="w-12 h-12 rounded-lg bg-emerald-50 text-slate-900 flex items-center justify-center shrink-0 border border-slate-200">
  <TrendingUp size={22} />
  </div>
  <div>
@@ -373,7 +373,7 @@ function BottomCards() {
  </div>
  </div>
 
- <div className="bg-blue-50/50 rounded-lg border-slate-200 p-5 flex items-center justify-between gap-3 shadow-sm">
+ <div className="bg-blue-50/50 rounded-lg border border-slate-200 p-5 flex items-center justify-between gap-3 shadow-sm">
  <div>
  <span className="text-sm font-bold text-blue-500 block">Yêu Cầu Rút Tiền Hoa Hồng</span>
  <span className="text-xs text-blue-500/80 font-medium mt-0.5 block">Hệ thống thanh toán nhanh 24/7</span>

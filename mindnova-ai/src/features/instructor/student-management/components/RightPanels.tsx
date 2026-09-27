@@ -27,7 +27,7 @@ function DiscussionPanel({ courseId }: { courseId?: string }) {
  const unreadCount = discussions.filter((d: any) => d.status === 'open' && !d.is_resolved).length;
 
  return (
- <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
+ <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
  <div className="flex items-center justify-between p-4 border-b border-slate-100">
  <span className="text-xs font-bold text-slate-900 tracking-wider uppercase">
  Thảo luận mới nhất
@@ -96,7 +96,7 @@ function AIAnnouncementPanel({ onOpenModal }: { onOpenModal: (topic?: string) =>
  const [activeTag, setActiveTag] = useState<string | null>(null);
 
  return (
- <div className="rounded-lg border-slate-200 bg-blue-50/20 shadow-sm overflow-hidden">
+ <div className="rounded-lg border border-slate-200 bg-blue-50/20 shadow-sm overflow-hidden">
  <div className="p-4 border-b border-slate-200 text-slate-900 flex items-center gap-2 bg-blue-50/50">
  <span className="text-blue-500"><Sparkles size={16} /></span>
  <span className="text-xs font-bold text-blue-500 tracking-wide uppercase">Trợ lý Thông báo AI</span>
@@ -183,7 +183,7 @@ function ProgressStatsPanel({ courseId }: { courseId?: string }) {
  });
 
  return (
- <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
+ <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
  <div className="p-4 border-b border-slate-100">
  <span className="text-xs font-bold text-slate-900 tracking-wider uppercase">
  Thống Kê Tổng Quan Khóa Học
@@ -206,7 +206,7 @@ function ProgressStatsPanel({ courseId }: { courseId?: string }) {
  <StatBar label="Tỷ lệ rớt chứng chỉ dự kiến" value={`${data?.at_risk_rate || 0}%`} percent={data?.at_risk_rate || 0} color="red" />
  <StatBar label="Học viên tích cực (Tuần qua)" value={`${data?.active_students || 0}`} percent={data?.total_students ? (data.active_students / data.total_students) * 100 : 0} color="purple" />
 
- <div className="rounded-lg bg-emerald-50/80 border-slate-200 p-3.5 flex items-start gap-2.5 mt-2">
+ <div className="rounded-lg bg-emerald-50/80 border border-slate-200 p-3.5 flex items-start gap-2.5 mt-2">
  <span className="text-slate-900 mt-0.5 shrink-0"><TrendingUp size={16} /></span>
  <div className="flex flex-col gap-0.5">
  <span className="text-[11px] font-bold text-slate-900 uppercase tracking-wider">Gợi ý Tối ưu AI</span>

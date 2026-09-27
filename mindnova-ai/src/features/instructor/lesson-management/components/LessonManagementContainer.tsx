@@ -182,7 +182,7 @@ interface ChapterCardProps {
 
 function ChapterCard({ chapter, onToggle, onAddLesson, onEditLesson, onDeleteLesson, onEdit, onDelete, onGenerateQuiz }: ChapterCardProps) {
  return (
- <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
+ <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
  {/* Chapter header */}
  <div className="flex items-center gap-3 px-4 py-3 bg-white hover:bg-slate-50/50 transition-colors">
  {/* Drag handle */}
@@ -516,7 +516,7 @@ function ChapterModal({ isOpen, editingChapter, onSave, onClose }: ChapterModalP
  )}
  />
  {titleError && (
- <p className="text-[12px] text-blue-500 font-medium">{titleError}</p>
+ <p className="text-[12px] text-rose-600 font-medium">{titleError}</p>
  )}
  </div>
 
@@ -740,7 +740,7 @@ export function LessonManagementContainer({ courseId }: { courseId: string }) {
  ))}
 
  {filteredChapters.length === 0 && (
- <div className="flex items-center justify-center py-20 text-xs font-bold text-slate-400 bg-white rounded-lg border border-slate-200 shadow-sm">
+ <div className="flex items-center justify-center py-20 text-xs font-bold text-slate-400 bg-white rounded-xl border border-slate-200 shadow-sm">
  Không có bài giảng nào phù hợp với bộ lọc này.
  </div>
  )}

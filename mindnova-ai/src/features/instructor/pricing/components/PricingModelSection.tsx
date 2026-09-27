@@ -231,7 +231,7 @@ function FlashSaleInputs({
  type="checkbox"
  checked={isFlashSale}
  onChange={(e) => setIsFlashSale(e.target.checked)}
- className="w-4 h-4 text-blue-500 rounded border-slate-200 focus:ring-blue-500"
+ className="w-4 h-4 text-blue-500 rounded border border-slate-200 focus:ring-blue-500"
  />
  </div>
  <p className="text-[11px] text-slate-500 mt-[-8px]">Tăng tỷ lệ chuyển đổi học viên bằng các đợt giảm giá ngắn hạn hấp dẫn.</p>
@@ -296,7 +296,7 @@ export function PricingModelSection({
  return (
  <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-4">
  {/* Left: main card */}
- <div className="rounded-lg border border-slate-200 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] p-5 flex flex-col gap-5">
+ <div className="rounded-xl border border-slate-200 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] p-5 flex flex-col gap-5">
  {/* Header */}
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
@@ -345,7 +345,7 @@ export function PricingModelSection({
  )}
 
  {model === "free" && (
- <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-emerald-50 border-slate-200">
+ <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-emerald-50 border border-slate-200">
  <Check size={13} />
  <p className="text-[12px] text-slate-900 font-medium">
  Khóa học sẽ hiển thị miễn phí — không cần cấu hình giá.

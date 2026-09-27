@@ -32,7 +32,7 @@ export function Step2ConfigForm({
   const essayPercent = total > 0 ? Math.round((essay / total) * 100) : 0;
 
   return (
-    <div className="p-8 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
@@ -198,7 +198,7 @@ export function Step2ConfigForm({
 
             {/* MCQ & Essay Inputs */}
             <div className="grid grid-cols-2 gap-3 pt-2">
-              <div className="p-3.5 rounded-lg bg-white border border-blue-100 shadow-sm flex flex-col gap-1.5">
+              <div className="p-3.5 rounded-xl bg-white border border-blue-100 shadow-sm flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-blue-500 uppercase tracking-wider">Số câu trắc nghiệm</label>
                 <input
                   type="number"
@@ -210,7 +210,7 @@ export function Step2ConfigForm({
                 />
               </div>
 
-              <div className="p-3.5 rounded-lg bg-white border border-blue-100 shadow-sm flex flex-col gap-1.5">
+              <div className="p-3.5 rounded-xl bg-white border border-blue-100 shadow-sm flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold text-sky-700 uppercase tracking-wider">Số câu tự luận</label>
                 <input
                   type="number"

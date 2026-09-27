@@ -54,7 +54,7 @@ export function ManualConfigForm({
   const isFormValid = config.title.trim().length > 0 && config.time_limit_minutes > 0;
 
   return (
-    <div className="p-8 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header */}
       <div className="flex items-start gap-4 border-b border-slate-100 pb-5">
         <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-2xl font-bold text-blue-500 border border-blue-100">

@@ -278,7 +278,7 @@ export function InstructorTopbar() {
 
  {/* Interactive Alert Dropdown */}
  {isAlertOpen && (
- <div className="absolute right-0 top-12 w-80 sm:w-96 rounded-lg bg-white border border-slate-200 shadow-lg p-5 flex flex-col gap-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+ <div className="absolute right-0 top-12 w-80 sm:w-96 rounded-xl bg-white border border-slate-200 shadow-lg p-5 flex flex-col gap-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
  
  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
  <div>

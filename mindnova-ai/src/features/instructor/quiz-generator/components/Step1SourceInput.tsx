@@ -124,7 +124,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
   }
 
   return (
-    <div className="p-8 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
@@ -183,7 +183,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
               {filteredCourses.map((course) => (
                 <div
                   key={course.id}
-                  className="p-5 rounded-lg border-2 border-slate-200 hover:border-blue-600/50 bg-white transition-all duration-200 flex flex-col justify-between gap-4 shadow-sm hover:shadow-md group"
+                  className="p-5 rounded-xl border-2 border-slate-200 hover:border-blue-600/50 bg-white transition-all duration-200 flex flex-col justify-between gap-4 shadow-sm hover:shadow-md group"
                 >
                   <div className="flex items-start gap-3.5">
                     <div className="w-11 h-11 rounded-lg bg-blue-50 text-blue-500 border border-blue-100 flex items-center justify-center text-xl shrink-0 font-bold group-hover:scale-105 transition-transform">
@@ -275,7 +275,7 @@ export function Step1SourceInput({ config, onChangeConfig, onNext }: Step1Source
           </div>
 
           {/* Selected Course Modules & Lessons Preview Card */}
-          <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col gap-3">
+          <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-xs font-bold text-slate-900">

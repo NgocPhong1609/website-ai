@@ -48,7 +48,7 @@ export function QuizManualWizard({
     <div className={`max-w-5xl mx-auto flex flex-col gap-6 ${embeddedMode ? "p-2" : "p-4 md:p-8"}`}>
       {/* Wizard Header Progress Bar */}
       {!embeddedMode && (
-        <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm flex flex-col gap-4">
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-md">

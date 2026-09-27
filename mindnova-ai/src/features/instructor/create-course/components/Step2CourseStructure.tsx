@@ -697,7 +697,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
             {/* Sub-section A: 🏆 Kiểm tra tổng quát */}
-            <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col justify-between gap-4 h-full">
+            <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between gap-4 h-full">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2 min-h-[58px]">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <div className="min-w-0">
@@ -747,7 +747,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                     </button>
                   </div>
                 ) : (
-                  <div className="p-4 rounded-lg border border-slate-200 bg-white shadow-sm flex flex-col justify-between gap-4 h-full">
+                  <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between gap-4 h-full">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <FileQuestion className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
@@ -804,7 +804,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
             </div>
 
             {/* Sub-section B: 🏁 Kiểm tra cuối khóa học */}
-            <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col justify-between gap-4 h-full">
+            <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between gap-4 h-full">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2 min-h-[58px]">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <div className="min-w-0">
@@ -854,7 +854,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                     </button>
                   </div>
                 ) : (
-                  <div className="p-4 rounded-lg border border-slate-200 bg-white shadow-sm flex flex-col justify-between gap-4 h-full">
+                  <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between gap-4 h-full">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <FileQuestion className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
@@ -965,7 +965,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                 + Tạo Chuyên Đề Đầu Tiên
               </button>
             }
-            className="bg-white border border-dashed border-slate-300 shadow-sm p-14 rounded-lg"
+            className="bg-white border border-dashed border-slate-300 shadow-sm p-14 rounded-xl"
           />
         ) : (
           <div className="flex flex-col gap-5">
@@ -973,7 +973,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
               const isCollapsed = Boolean(collapsedModules[chap.id]);
 
               return (
-                <div key={chap.id} className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
+                <div key={chap.id} className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
                   {/* Chapter Header */}
                   <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3.5 gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">

@@ -76,12 +76,12 @@ export function Step4ReviewEditor({
   };
 
   return (
-    <div className="p-8 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 bg-blue-50 text-blue-500 text-xs font-bold rounded-lg border-slate-200 uppercase tracking-wider">
+            <span className="px-3 py-1 bg-blue-50 text-blue-500 text-xs font-bold rounded-lg border border-slate-200 uppercase tracking-wider">
               Bước 4 / 5
             </span>
             <h2 className="text-xl font-bold text-slate-900">Review &amp; Hiệu Chỉnh Đề Kiểm Tra</h2>
@@ -93,7 +93,7 @@ export function Step4ReviewEditor({
 
         {/* Realtime Summary Badge */}
         <div className="flex items-center gap-3">
-          <div className="px-3 py-2 rounded-lg bg-blue-50 border-slate-200 flex items-center gap-2 text-xs font-bold text-blue-500">
+          <div className="px-3 py-2 rounded-lg bg-blue-50 border border-slate-200 flex items-center gap-2 text-xs font-bold text-blue-500">
             <span><Target className="inline h-4 w-4 mr-1 align-text-bottom" aria-hidden />Đã duyệt:</span>
             <span className="font-semibold text-sm">{approvedCount}/{questions.length}</span>
           </div>
@@ -168,7 +168,7 @@ export function Step4ReviewEditor({
       {/* Score Validation Banner */}
       <div>
         {isValidTotal ? (
-          <div className="p-4 rounded-lg bg-emerald-50 border-slate-200 text-slate-900 text-xs font-bold flex items-center justify-between shadow-sm">
+          <div className="p-4 rounded-lg bg-emerald-50 border border-slate-200 text-slate-900 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
               <PartyPopper className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm hợp lệ: <strong>10 / 10</strong>. Bài kiểm tra đã sẵn sàng để xuất bản.</span>

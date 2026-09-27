@@ -6,7 +6,7 @@ import { useInstructorPricing } from "@/src/hooks/instructor/useInstructorPricin
 import { useCreateCourseStore } from "../stores/createCourseStore";
 import { CouponSection } from "@/src/features/instructor/pricing/components/CouponSection";
 import { useCommissionTiers } from "../api";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Zap } from "lucide-react";
 import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 export interface Step3SettingsPriceProps {
@@ -72,7 +72,7 @@ export function Step3SettingsPrice({
  return (
  <div className="w-full flex flex-col gap-6 animate-fadeIn">
  {/* Top Title Banner */}
- <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm">
+ <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm">
  <h3 className="text-base font-semibold text-slate-900">Cấu hình Giá bán &amp; Doanh thu</h3>
  <p className="text-xs text-slate-500 mt-1">
  Thiết lập khoảng giá tiêu chuẩn cho khóa học (100,000–100,000,000 VNĐ), lên lịch chương trình ưu đãi khuyến mãi và dự toán thu nhập thực tế theo thời gian thực.
@@ -86,7 +86,7 @@ export function Step3SettingsPrice({
  <div className="lg:col-span-7 flex flex-col gap-5">
  
  {/* Free vs Paid Toggle */}
- <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
+ <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
  <div>
  <h4 className="text-sm font-semibold text-slate-900">Hình Thức Phát Hành Khóa Học</h4>
@@ -187,10 +187,10 @@ export function Step3SettingsPrice({
 
  {/* Promotional Discount Scheduler */}
  {!isFree && (
- <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col gap-4 animate-fadeIn">
+ <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col gap-4 animate-fadeIn">
  <div className="flex items-center justify-between">
  <div>
- <h4 className="text-sm font-semibold text-slate-900"> Lên Lịch Giảm Giá &amp; Khuyến Mãi Flash Sale</h4>
+ <h4 className="text-sm font-semibold text-slate-900"><Zap className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Lên Lịch Giảm Giá &amp; Khuyến Mãi Flash Sale</h4>
  <p className="text-xs text-slate-500 mt-0.5">Tăng tỷ lệ chuyển đổi học viên bằng các đợt giảm giá ngắn hạn hấp dẫn.</p>
  </div>
  <input
@@ -283,14 +283,14 @@ export function Step3SettingsPrice({
  </div>
 
  {/* Quick Preview Badge & Save Action */}
- <div className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
+ <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
  <h5 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Danh Sách Tiêu Chuẩn Phê Duyệt</h5>
  <div className="flex flex-col gap-2">
  <div className="flex items-center gap-2 text-xs font-semibold text-slate-900">
- <span> Giá niêm yết tuân thủ khung tiêu chuẩn 100,000–100,000,000 VNĐ</span>
+ <span><CheckCircle2 className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Giá niêm yết tuân thủ khung tiêu chuẩn 100,000–100,000,000 VNĐ</span>
  </div>
  <div className="flex items-center gap-2 text-xs font-semibold text-blue-500">
- <span> Lịch trình khuyến mãi được đồng bộ hóa thời gian AI</span>
+ <span><CheckCircle2 className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Lịch trình khuyến mãi được đồng bộ hóa thời gian AI</span>
  </div>
  </div>
  </div>

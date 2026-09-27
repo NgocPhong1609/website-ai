@@ -7,12 +7,12 @@ import { useQuery } from "@tanstack/react-query";
 import { getSalesReport } from "../api";
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Calendar, Download, TrendingUp, BarChart3, AlertTriangle } from "lucide-react";
+import { Calendar, Download, TrendingUp, BarChart3, AlertTriangle, History, LayoutDashboard } from "lucide-react";
 import { Skeleton, SkeletonStatGrid, SkeletonTable } from "@/src/shared/components/ui/Skeleton";
 
 function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
  return (
- <div className="flex items-center gap-2 p-1.5 bg-white rounded-lg border border-slate-200 shadow-sm w-fit">
+ <div className="flex items-center gap-2 p-1.5 bg-white rounded-xl border border-slate-200 shadow-sm w-fit">
  <Link
  href="/instructor/revenue"
  className={twMerge(
@@ -22,7 +22,7 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
- <span> Tổng quan Doanh thu</span>
+ <span><LayoutDashboard className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Tổng quan Doanh thu</span>
  </Link>
 
  <Link
@@ -34,7 +34,7 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
- <span> Báo cáo Bán hàng</span>
+ <span><BarChart3 className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Báo cáo Bán hàng</span>
  </Link>
 
  <Link
@@ -46,7 +46,7 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
- <span> Lịch sử Giao dịch</span>
+ <span><History className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Lịch sử Giao dịch</span>
  </Link>
  </div>
  );
@@ -102,7 +102,7 @@ function StatCards({ overview }: { overview: any }) {
  return (
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
  {stats.map((s, i) => (
- <div key={i} className="bg-white rounded-lg p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
+ <div key={i} className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
  <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">{s.label}</span>
  <div className="flex items-end justify-between mt-2">
  <span className="text-xl font-bold text-slate-900 leading-tight">{s.val}</span>
@@ -132,7 +132,7 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  };
 
  return (
- <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 flex flex-col gap-6">
+ <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col gap-6">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
  <div>
  <h3 className="text-base font-bold text-slate-900">Biểu Đồ Tương Quan Doanh Thu vs Hoàn Tiền</h3>
@@ -253,13 +253,13 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
 
 function CoursePerformanceTable({ courses }: { courses: any[] }) {
  return (
- <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col overflow-hidden">
+ <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border-b border-slate-100 gap-2">
  <div>
  <h3 className="text-sm font-bold text-slate-900">Hiệu Năng Từng Khóa Học</h3>
  <p className="text-xs text-slate-500">Dữ liệu phân bổ lượt xem và tỷ lệ chốt đơn theo từng khóa học của bạn.</p>
  </div>
- <span className="text-xs font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-lg border-slate-200">
+ <span className="text-xs font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-lg border border-slate-200">
  Cập nhật theo thời gian thực
  </span>
  </div>

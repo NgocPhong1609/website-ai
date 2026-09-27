@@ -15,7 +15,7 @@ import { useCreateCourse, useUploadCourseThumbnail, useUpdateCoursePrice, useUpd
 import { useCreateModule, useCreateLesson, useCreateQuiz } from "../../lesson-management/api";
 import { useCreateCourseStore } from "../stores/createCourseStore";
 import { OTHER_CATEGORY_VALUE } from "../constants";
-import { ArrowLeft, ArrowRight, BookOpen, Check, Eye, Save, Settings, Sparkles, Tag, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Check, Eye, Save, Settings, Sparkles, Tag, Trash2, X } from "lucide-react";
 
 export function CreateCourseContainer() {
  const mode = "create"; // Currently creating course
@@ -329,9 +329,9 @@ export function CreateCourseContainer() {
  <main className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-8 flex flex-col gap-6">
  
  {publishError && (
- <div className="p-4 rounded-lg bg-blue-50 border border-blue-100 text-blue-700 text-sm font-medium flex items-center justify-between">
+ <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium flex items-center justify-between">
  <span>{publishError}</span>
- <button type="button" onClick={() => setPublishError(null)} className="text-blue-500 hover:text-blue-700 ml-3"></button>
+ <button type="button" onClick={() => setPublishError(null)} aria-label="Đóng thông báo lỗi" className="text-rose-500 hover:text-rose-700 ml-3"><X className="h-4 w-4" aria-hidden /></button>
  </div>
  )}
 
@@ -357,7 +357,7 @@ export function CreateCourseContainer() {
  )}
 
  {/* Wizard Navigation Footer */}
- <div className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-between bg-white p-5 rounded-lg shadow-sm">
+ <div className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-between bg-white p-5 rounded-xl shadow-sm">
  <button
  type="button"
  onClick={handleBack}

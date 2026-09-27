@@ -48,9 +48,9 @@ export function AIInsightsTab() {
 
  if (error) {
  return (
- <div className="p-8 text-center rounded-lg bg-blue-50 border border-blue-100">
- <p className="text-sm font-bold text-blue-600 mb-4">{error}</p>
- <button onClick={refetch} className="px-4 py-2 bg-blue-500 text-white rounded-lg text-xs font-bold shadow-md">Thử lại</button>
+ <div className="p-8 text-center rounded-xl bg-rose-50 border border-rose-200">
+ <p className="text-sm font-bold text-rose-700 mb-4">{error}</p>
+ <button onClick={refetch} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm">Thử lại</button>
  </div>
  );
  }
@@ -111,7 +111,7 @@ export function AIInsightsTab() {
 
  {/* Insights List Grid */}
  {filtered.length === 0 ? (
- <div className="p-14 text-center rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col items-center gap-2 text-slate-500">
+ <div className="p-14 text-center rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col items-center gap-2 text-slate-500">
  <CheckCircle2 className="h-10 w-10 text-emerald-500" aria-hidden />
  <p className="text-sm font-bold text-slate-900">Tất cả các điểm nghẽn bài học đều đã được giải quyết!</p>
  <p className="text-xs max-w-md">Các chỉ số tương tác bài giảng của bạn đang ở tình trạng tối ưu hóa xuất sắc.</p>

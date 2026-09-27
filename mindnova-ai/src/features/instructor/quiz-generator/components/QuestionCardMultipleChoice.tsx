@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { GeneratedQuestion, SelectionType } from "../types/quizGenerator.types";
 import { QuizImageField } from "./QuizImageField";
+import { Check, CheckCircle2, Pencil, Save, Lightbulb } from "lucide-react";
 
 interface QuestionCardMultipleChoiceProps {
  question: GeneratedQuestion;
@@ -89,16 +90,16 @@ export function QuestionCardMultipleChoice({
  return (
  <div
  className={`p-6 rounded-lg bg-white border-2 transition-all duration-200 shadow-sm flex flex-col gap-4 ${
- isApproved ? "text-slate-900/50 bg-emerald-50/10 shadow-[0_4px_20px_rgba(16,185,129,0.05)]" : "border-slate-200"
+ isApproved ? "border-emerald-300 bg-emerald-50/20" : "border-slate-200"
  }`}
  >
  {/* Top Header */}
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-2">
- <span className="w-7 h-7 rounded-lg bg-blue-50 text-blue-500 font-bold text-xs flex items-center justify-center border-slate-200">
+ <span className="w-7 h-7 rounded-lg bg-blue-50 text-blue-500 font-bold text-xs flex items-center justify-center border border-slate-200">
  #{index + 1}
  </span>
- <span className="text-[11px] font-bold uppercase px-2.5 py-1 rounded-lg bg-slate-50/80 text-blue-500 border-slate-200">
+ <span className="text-[11px] font-bold uppercase px-2.5 py-1 rounded-lg bg-slate-50/80 text-blue-500 border border-slate-200">
  Trắc nghiệm (MCQ)
  </span>
  <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 border">
@@ -119,23 +120,23 @@ export function QuestionCardMultipleChoice({
  disabled={isApproved}
  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
  isApproved
- ? "text-slate-900 text-white cursor-default"
- : "bg-emerald-50 hover:bg-slate-900 text-slate-900 hover:text-white border-slate-200"
+ ? "bg-emerald-600 text-white cursor-default"
+ : "bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-200"
  }`}
  >
- {isApproved ? "Approved " : " Approve"}
+ {isApproved ? <><CheckCircle2 className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Approved</> : <><Check className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Approve</>}
  </button>
  <button
  type="button"
  onClick={() => (isEditing ? handleSaveEdit() : setIsEditing(true))}
- className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-500 hover:text-white border-slate-200 text-xs font-semibold transition-all cursor-pointer"
+ className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-500 hover:text-white border border-slate-200 text-xs font-semibold transition-all cursor-pointer"
  >
- {isEditing ? " Lưu sửa" : " Chỉnh sửa"}
+ {isEditing ? <><Save className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Lưu sửa</> : <><Pencil className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Chỉnh sửa</>}
  </button>
  <button
  type="button"
  onClick={() => onRegenerate(question.id)}
- className="px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-blue-600 text-blue-500 hover:text-white border-slate-200 text-xs font-semibold transition-all cursor-pointer"
+ className="px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-blue-600 text-blue-500 hover:text-white border border-slate-200 text-xs font-semibold transition-all cursor-pointer"
  title="Sinh lại riêng câu này bằng AI"
  >
  Sinh lại
@@ -283,22 +284,22 @@ export function QuestionCardMultipleChoice({
  >
  <span
  className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
- isCorrect ? "text-slate-900 text-white" : "bg-slate-200 text-slate-500"
+ isCorrect ? "bg-emerald-600 text-white" : "bg-slate-200 text-slate-500"
  }`}
  >
  {String.fromCharCode(65 + oIdx)}
  </span>
  <span>{opt}</span>
  {question.answer_images?.[oIdx]?.url && <img src={question.answer_images[oIdx].url!} alt={`Ảnh đáp án ${String.fromCharCode(65 + oIdx)}`} className="h-16 w-20 rounded-lg object-contain" />}
- {isCorrect && <span className="ml-auto text-slate-900 font-semibold text-xs"> Đáp án đúng</span>}
+ {isCorrect && <span className="ml-auto text-emerald-700 font-semibold text-xs"><CheckCircle2 className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Đáp án đúng</span>}
  </div>
  );
  })}
  </div>
 
  {question.explanation && (
- <div className="p-3 rounded-lg bg-blue-50/60 border-slate-200 text-xs text-blue-500 font-medium leading-relaxed">
- <strong className="text-blue-500 font-semibold"> Giải thích từ AI:</strong> {question.explanation}
+ <div className="p-3 rounded-lg bg-blue-50/60 border border-slate-200 text-xs text-blue-500 font-medium leading-relaxed">
+ <strong className="text-blue-500 font-semibold"><Lightbulb className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Giải thích từ AI:</strong> {question.explanation}
  </div>
  )}
 

@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge";
 import { axiosClient } from "@/src/shared/lib/axios";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { VerifiedTeacherBadge } from "@/src/shared/components/VerifiedTeacherBadge";
-import { CheckCircle2, Check } from "lucide-react";
+import { CheckCircle2, Check, Pin, PinOff } from "lucide-react";
 import { SkeletonList } from "@/src/shared/components/ui/Skeleton";
 
 // ─── Types ────────────────────────────────────────────────────────
@@ -205,7 +205,7 @@ export function DiscussionReplyContainer() {
  {loading ? (
  <SkeletonList items={4} />
  ) : filteredThreads.length === 0 ? (
- <div className="p-16 text-center rounded-lg bg-white border border-slate-200 flex flex-col items-center gap-2 text-slate-400">
+ <div className="p-16 text-center rounded-xl bg-white border border-slate-200 flex flex-col items-center gap-2 text-slate-400">
  <CheckCircle2 className="h-10 w-10 text-emerald-500" aria-hidden />
  <p className="text-sm font-bold text-slate-900">Tuyệt vời! Tất cả thảo luận đã được trả lời!</p>
  <p className="text-xs">Không có thảo luận nào cần bạn chú ý ở bộ lọc hiện tại.</p>
@@ -213,12 +213,12 @@ export function DiscussionReplyContainer() {
  ) : (
  <div className="flex flex-col gap-6">
  {filteredThreads.map((thread: any) => (
- <div key={thread.id} className="p-6 rounded-lg bg-white border border-slate-200 shadow-xs flex flex-col gap-5">
+ <div key={thread.id} className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs flex flex-col gap-5">
  
  {/* Thread Top Info */}
  <div className="flex items-start justify-between gap-4">
  <div className="flex items-center gap-3.5">
- <div className="w-11 h-11 rounded-lg bg-blue-500 text-blue-500 text-white font-bold text-sm flex items-center justify-center shadow-sm">
+ <div className="w-11 h-11 rounded-lg bg-blue-600 text-white font-bold text-sm flex items-center justify-center shadow-sm">
  {thread.studentName.slice(0, 2).toUpperCase()}
  </div>
  <div>
@@ -249,7 +249,7 @@ export function DiscussionReplyContainer() {
 
  {/* Previous Reply Display */}
  {thread.replyText && (
- <div className="p-5 rounded-lg from-emerald-50/60 to-teal-50/20 border-slate-200 text-xs font-medium text-slate-800 flex flex-col gap-2">
+ <div className="p-5 rounded-lg from-emerald-50/60 to-teal-50/20 border border-slate-200 text-xs font-medium text-slate-800 flex flex-col gap-2">
  <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
  
  <span>Phản hồi của giảng viên:</span>
@@ -268,7 +268,7 @@ export function DiscussionReplyContainer() {
  onClick={() => togglePin(thread.id)}
  className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-all cursor-pointer"
  >
- {thread.isPinned ? "Bỏ ghim bình luận" : " Ghim bình luận"}
+ {thread.isPinned ? <><PinOff className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Bỏ ghim bình luận</> : <><Pin className="inline h-3.5 w-3.5 mr-1 align-text-bottom" aria-hidden />Ghim bình luận</>}
  </button>
  <button
  type="button"

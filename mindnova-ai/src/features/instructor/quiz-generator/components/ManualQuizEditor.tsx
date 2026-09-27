@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { GeneratedQuestion } from "../types/quizGenerator.types";
 import { QuestionCardMultipleChoice } from "./QuestionCardMultipleChoice";
 import { QuestionCardEssay } from "./QuestionCardEssay";
-import { AlertTriangle, ArrowLeft, CheckCircle2, Sparkles, Loader2, Save } from "lucide-react";
+import { AlertTriangle, ArrowLeft, CheckCircle2, Sparkles, Loader2, Save, ListChecks, Scale } from "lucide-react";
 
 interface ManualQuizEditorProps {
   questions: GeneratedQuestion[];
@@ -46,12 +46,12 @@ export function ManualQuizEditor({
   const dummyRegenerate = (id: string) => {};
 
   return (
-    <div className="p-8 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
+    <div className="p-8 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 bg-blue-50 text-blue-500 text-xs font-bold rounded-lg border-slate-200 uppercase tracking-wider">
+            <span className="px-3 py-1 bg-blue-50 text-blue-500 text-xs font-bold rounded-lg border border-slate-200 uppercase tracking-wider">
               Bước 2 / 3
             </span>
             <h2 className="text-xl font-bold text-slate-900">Biên Soạn Câu Hỏi</h2>
@@ -63,8 +63,8 @@ export function ManualQuizEditor({
 
         {/* Realtime Summary Badge */}
         <div className="flex items-center gap-3">
-          <div className="px-3 py-2 rounded-lg bg-blue-50 border-slate-200 flex items-center gap-2 text-xs font-bold text-blue-500">
-            <span> Tổng câu:</span>
+          <div className="px-3 py-2 rounded-lg bg-blue-50 border border-slate-200 flex items-center gap-2 text-xs font-bold text-blue-500">
+            <span><ListChecks className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Tổng câu:</span>
             <span className="font-semibold text-sm">{questions.length}</span>
           </div>
           <div
@@ -74,7 +74,7 @@ export function ManualQuizEditor({
                 : "bg-amber-50 border-amber-200 text-amber-800"
             }`}
           >
-            <span> Tổng điểm hiện tại:</span>
+            <span><Scale className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />Tổng điểm hiện tại:</span>
             <span className="font-bold text-sm">{totalPoints} / 10</span>
           </div>
         </div>
@@ -83,7 +83,7 @@ export function ManualQuizEditor({
       {/* Score Validation Banner */}
       <div>
         {isValidTotal ? (
-          <div className="p-4 rounded-lg bg-emerald-50 border-slate-200 text-slate-900 text-xs font-bold flex items-center justify-between shadow-sm">
+          <div className="p-4 rounded-lg bg-emerald-50 border border-slate-200 text-slate-900 text-xs font-bold flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
               <span>Tổng điểm hợp lệ: <strong>10 / 10</strong>. Bài kiểm tra đã sẵn sàng để xuất bản.</span>
