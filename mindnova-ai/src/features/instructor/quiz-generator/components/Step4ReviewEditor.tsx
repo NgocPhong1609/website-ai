@@ -77,7 +77,7 @@ export function Step4ReviewEditor({
   return (
     <div className="p-8 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col gap-6 animate-fadeIn">
       {/* Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 bg-blue-50 text-blue-500 text-xs font-bold rounded-lg border-slate-200 uppercase tracking-wider">
@@ -122,7 +122,7 @@ export function Step4ReviewEditor({
                 {config.description}
               </p>
             )}
-            <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-bold text-[#475569]">
+            <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-bold text-slate-600">
               <span className="rounded-lg border border-blue-100 bg-white px-2.5 py-1.5">
                 {config.time_limit_minutes} phút
               </span>
@@ -153,7 +153,7 @@ export function Step4ReviewEditor({
               disabled={isSaving}
               aria-invalid={!isPassingScoreValid}
               aria-describedby={!isPassingScoreValid ? "passing-score-error" : undefined}
-              className="w-24 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-right text-sm font-bold text-slate-900 outline-none transition focus:border-[#3B82F6] focus:ring-2 focus:ring-blue-100"
+              className="w-24 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-right text-sm font-bold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
             {!isPassingScoreValid && (
               <span id="passing-score-error" role="alert" className="max-w-48 text-[11px] font-semibold leading-relaxed text-rose-700">
@@ -172,7 +172,7 @@ export function Step4ReviewEditor({
               <span className="text-base">🎉</span>
               <span>Tổng điểm hợp lệ: <strong>10 / 10</strong>. Bài kiểm tra đã sẵn sàng để xuất bản.</span>
             </div>
-            <span className="px-2.5 py-1 bg-[#0F172A] text-white text-[10px] font-bold uppercase rounded-lg">Standard 10.0</span>
+            <span className="px-2.5 py-1 bg-slate-900 text-white text-[10px] font-bold uppercase rounded-lg">Standard 10.0</span>
           </div>
         ) : isLess ? (
           <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex items-center justify-between shadow-sm">
@@ -194,7 +194,7 @@ export function Step4ReviewEditor({
       </div>
 
       {/* Control Bar: Filters & Actions */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-lg bg-[#EFF6FF] border border-blue-50">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-lg bg-blue-50 border border-blue-50">
         {/* Filter Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
           <button
@@ -203,7 +203,7 @@ export function Step4ReviewEditor({
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               filterType === "all"
                 ? "bg-blue-500 text-white shadow-md"
-                : "bg-white text-slate-500 hover:bg-gray-100 border border-slate-200"
+                : "bg-white text-slate-500 hover:bg-slate-100 border border-slate-200"
             }`}
           >
             Tất cả ({questions.length})
@@ -214,7 +214,7 @@ export function Step4ReviewEditor({
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               filterType === "multiple_choice"
                 ? "bg-blue-500 text-white shadow-md"
-                : "bg-white text-slate-500 hover:bg-gray-100 border border-slate-200"
+                : "bg-white text-slate-500 hover:bg-slate-100 border border-slate-200"
             }`}
           >
             Trắc nghiệm ({mcQuestions.length})
@@ -225,7 +225,7 @@ export function Step4ReviewEditor({
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               filterType === "essay"
                 ? "text-blue-500 text-white shadow-md"
-                : "bg-white text-slate-500 hover:bg-gray-100 border border-slate-200"
+                : "bg-white text-slate-500 hover:bg-slate-100 border border-slate-200"
             }`}
           >
             Tự luận ({essayQuestions.length})
@@ -279,11 +279,11 @@ export function Step4ReviewEditor({
       </div>
 
       {/* Footer Navigation & Save Buttons */}
-      <div className="flex flex-col justify-between gap-4 border-t border-gray-100 pt-4 mt-2 sm:flex-row sm:items-start">
+      <div className="flex flex-col justify-between gap-4 border-t border-slate-100 pt-4 mt-2 sm:flex-row sm:items-start">
         <button
           type="button"
           onClick={onBack}
-          className="px-6 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs transition-all cursor-pointer"
+          className="px-6 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-all cursor-pointer"
         >
           🠔 Sửa cấu hình
         </button>
@@ -308,7 +308,7 @@ export function Step4ReviewEditor({
             type="button"
             onClick={() => onSave("draft")}
             disabled={isSaving || !isValidTotal || !isPassingScoreValid || !isReviewConfirmed}
-            className="px-6 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-6 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isSaving ? "Đang lưu..." : "💾 Lưu Nháp"}
           </button>

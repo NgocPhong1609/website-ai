@@ -62,8 +62,8 @@ export function QuizManualWizard({
 
             <div className="flex items-center gap-2 font-mono text-xs font-bold">
               <span className="text-blue-600">Bước {step}</span>
-              <span className="text-gray-300">/</span>
-              <span className="text-gray-400">3</span>
+              <span className="text-slate-300">/</span>
+              <span className="text-slate-400">3</span>
             </div>
           </div>
 
@@ -85,12 +85,12 @@ export function QuizManualWizard({
                         ? "bg-blue-600"
                         : isDone
                         ? "text-slate-900"
-                        : "bg-gray-200"
+                        : "bg-slate-200"
                     }`}
                   />
                   <span
                     className={`text-[10px] font-semibold truncate ${
-                      isActive ? "text-blue-600" : isDone ? "text-slate-900" : "text-gray-400"
+                      isActive ? "text-blue-600" : isDone ? "text-slate-900" : "text-slate-400"
                     }`}
                   >
                     {s.num}. {s.name}
@@ -110,7 +110,7 @@ export function QuizManualWizard({
               <span className="text-base">⚠️</span>
               <div className="flex flex-col gap-1">
                 <span className="font-semibold text-rose-900">Không thể thực hiện tác vụ</span>
-                <span className="text-gray-700 font-medium">{error}</span>
+                <span className="text-slate-700 font-medium">{error}</span>
               </div>
             </div>
             <button type="button" onClick={clearError} className="text-rose-400 hover:text-rose-700 font-bold cursor-pointer text-sm">

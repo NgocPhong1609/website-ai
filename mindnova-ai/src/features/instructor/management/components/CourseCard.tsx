@@ -7,10 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
 import type { Course } from "../types";
-import {
-  BookOpenIcon,
-  ClockIcon,
-} from "./icons";
+import { BookOpen, Clock } from "lucide-react";
 
 function StatusBadge({ status }: { status: Course["status"] | string }) {
   const isPublished = status === "published" || status === "approved";
@@ -45,13 +42,13 @@ function StatusBadge({ status }: { status: Course["status"] | string }) {
 
 function PriceBadge({ course }: { course: Course }) {
   return (
-    <div className="absolute bottom-3 right-3 px-2.5 py-1.5 rounded-lg text-[13px] font-bold z-10 shadow-sm bg-gray-900/80 text-white backdrop-blur-md flex items-center gap-2 border border-white/20">
+    <div className="absolute bottom-3 right-3 px-2.5 py-1.5 rounded-lg text-[13px] font-bold z-10 shadow-sm bg-slate-900/80 text-white backdrop-blur-md flex items-center gap-2 border border-white/20">
       {!course.price || course.price === 0 ? (
         <span className="text-slate-900">Miễn phí</span>
       ) : course.currentPrice && course.currentPrice < course.price ? (
         <>
           <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.currentPrice)}</span>
-          <span className="text-[11px] text-gray-300 line-through font-medium">
+          <span className="text-[11px] text-slate-300 line-through font-medium">
             {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)}
           </span>
         </>
@@ -64,7 +61,7 @@ function PriceBadge({ course }: { course: Course }) {
 
 function CourseThumbnail({ title, thumbnail }: Pick<Course, "title" | "thumbnail">) {
   return (
-    <div className="relative w-full aspect-[16/9] bg-gray-100 overflow-hidden border-b border-gray-100">
+    <div className="relative w-full aspect-[16/9] bg-slate-100 overflow-hidden border-b border-slate-100">
       {thumbnail && (
         <Image
           src={thumbnail}
@@ -80,13 +77,13 @@ function CourseThumbnail({ title, thumbnail }: Pick<Course, "title" | "thumbnail
 
 function CourseActionButtons({ courseId }: { courseId: string }) {
   return (
-    <div className="grid grid-cols-1 gap-2 p-3.5 mt-auto border-t border-gray-100 bg-slate-50/50">
+    <div className="grid grid-cols-1 gap-2 p-3.5 mt-auto border-t border-slate-100 bg-slate-50/50">
       <Link
         href={`/instructor/courses/${courseId}/edit`}
-        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold text-slate-900 bg-white border border-slate-200 hover:bg-slate-50 hover:text-[#2563EB] active:scale-98 transition-all duration-150 cursor-pointer shadow-sm"
+        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold text-slate-900 bg-white border border-slate-200 hover:bg-slate-50 hover:text-blue-600 active:scale-98 transition-all duration-150 cursor-pointer shadow-sm"
       >
         <span className="text-blue-500">
-          <BookOpenIcon />
+          <BookOpen size={14} />
         </span>
         <span>Chi tiết</span>
       </Link>
@@ -113,7 +110,7 @@ export function CourseCard({ course }: CourseCardProps) {
   return (
     <article
       aria-label={`Khóa học: ${course.title}`}
-      className="group relative flex flex-col rounded-lg bg-white border border-slate-200 overflow-hidden hover:border-gray-300 hover:shadow-md transition-all duration-200 shadow-sm h-full"
+      className="group relative flex flex-col rounded-lg bg-white border border-slate-200 overflow-hidden hover:border-slate-300 hover:shadow-md transition-all duration-200 shadow-sm h-full"
     >
       <div className="relative">
         <CourseThumbnail title={course.title} thumbnail={course.thumbnail} />
@@ -122,11 +119,11 @@ export function CourseCard({ course }: CourseCardProps) {
       </div>
 
       <div className="p-5 flex flex-col gap-2 flex-1">
-        <h3 className="text-[16px] font-bold text-slate-900 line-clamp-2 group-hover:text-[#2563EB] transition-colors duration-150 leading-snug">
+        <h3 className="text-[16px] font-bold text-slate-900 line-clamp-2 group-hover:text-blue-600 transition-colors duration-150 leading-snug">
           {course.title}
         </h3>
         <p className="flex items-center gap-1.5 text-[13px] text-slate-500 font-medium mt-auto">
-          <span className="text-gray-400"><ClockIcon /></span>
+          <span className="text-slate-400"><Clock size={14} /></span>
           <span>{formatDuration(course.durationHours)} &bull; {course.totalLessons} bài học</span>
         </p>
 

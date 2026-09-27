@@ -1,8 +1,8 @@
 import React from "react";
 import { twMerge } from "tailwind-merge";
-import { CheckIcon } from "./icons";
 import type { StepKey } from "../types";
 import { STEPS } from "../constants";
+import { Check } from "lucide-react";
 
 interface StepIndicatorProps {
  currentStep: StepKey;
@@ -27,10 +27,10 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
  ? "bg-blue-500 text-white shadow-sm"
  : isActive
  ? "bg-blue-500 text-white ring-4 ring-blue-100 shadow-sm"
- : "bg-gray-200 text-slate-500"
+ : "bg-slate-200 text-slate-500"
  )}
  >
- {isDone ? <CheckIcon size={14} /> : step.id}
+ {isDone ? <Check size={14} /> : step.id}
  </div>
 
  <span
@@ -40,7 +40,7 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
  ? "text-slate-900 font-semibold"
  : isDone
  ? "text-blue-500 font-bold"
- : "text-gray-400 font-medium"
+ : "text-slate-400 font-medium"
  )}
  >
  {step.label}
@@ -48,7 +48,7 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
  </div>
 
  {!isLast && (
- <div className="flex-1 h-[2px] mx-2 mb-5 rounded-full overflow-hidden bg-gray-200">
+ <div className="flex-1 h-[2px] mx-2 mb-5 rounded-full overflow-hidden bg-slate-200">
  <div
  className="h-full bg-blue-500 transition-all duration-500 ease-out"
  style={{ width: isDone ? "100%" : "0%" }}

@@ -134,7 +134,7 @@ export function SelectCourseLevelQuizModal({
                   className={`p-4 rounded-lg border-2 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                     isActive
                       ? "border-emerald-500 bg-emerald-50/40 shadow-sm"
-                      : "border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50/20"
+                      : "border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20"
                   }`}
                 >
                   <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -183,7 +183,7 @@ export function SelectCourseLevelQuizModal({
                         type="button"
                         disabled={isLoadingThis}
                         onClick={() => handleSelect(quiz.id)}
-                        className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white text-xs font-semibold rounded-lg shadow-sm transition-all cursor-pointer flex items-center gap-1"
+                        className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white text-xs font-semibold rounded-lg shadow-sm transition-all cursor-pointer flex items-center gap-1"
                       >
                         {isLoadingThis ? (
                           <span>⏳ Đang xử lý...</span>

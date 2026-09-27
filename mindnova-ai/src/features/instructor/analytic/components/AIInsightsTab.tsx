@@ -40,8 +40,8 @@ export function AIInsightsTab() {
 
  if (error) {
  return (
- <div className="p-8 text-center rounded-lg bg-[#EFF6FF] border border-[#DBEAFE]">
- <p className="text-sm font-bold text-[#2563EB] mb-4">{error}</p>
+ <div className="p-8 text-center rounded-lg bg-blue-50 border border-blue-100">
+ <p className="text-sm font-bold text-blue-600 mb-4">{error}</p>
  <button onClick={refetch} className="px-4 py-2 bg-blue-500 text-white rounded-lg text-xs font-bold shadow-md">Thử lại</button>
  </div>
  );
@@ -50,17 +50,17 @@ export function AIInsightsTab() {
  return (
  <div className="w-full flex flex-col gap-5 animate-fadeIn">
  {/* Header Summary Box */}
- <div className="p-6 rounded-lg bg-blue-500 text-white border-[#3B82F6] shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+ <div className="p-6 rounded-lg bg-blue-500 text-white border-blue-500 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
  <div className="flex items-center gap-4">
  
  <div>
  <div className="flex flex-wrap items-center gap-2">
  <h3 className="text-base font-bold text-white">Đề Xuất Cải Tiến Nội Dung AI Chuyên Sâu</h3>
- <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#0F172A]/30 text-white border-slate-200/40">
+ <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-slate-900/30 text-white border-slate-200/40">
  Live Behavioral Telemetry
  </span>
  </div>
- <p className="text-xs text-[#F8FAFC] max-w-xl mt-1">
+ <p className="text-xs text-slate-50 max-w-xl mt-1">
  Hệ thống trí tuệ nhân tạo liên tục giám sát tỷ lệ rời bài, tần suất tua lại và kết quả kiểm tra để phát hiện và cảnh báo điểm nghẽn cổ chai của học viên.
  </p>
  </div>
@@ -129,7 +129,7 @@ export function AIInsightsTab() {
  "px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border",
  item.type === "warning" && "bg-amber-50 text-amber-800 border-amber-200",
  item.type === "suggestion" && "bg-emerald-50 text-emerald-700",
- item.type === "trend" && "bg-purple-50 text-blue-500"
+ item.type === "trend" && "bg-sky-50 text-blue-500"
  )}
  >
  {item.type.toUpperCase()}
@@ -145,7 +145,7 @@ export function AIInsightsTab() {
  {item.metrics && Object.keys(item.metrics).length > 0 && (
  <div className="flex items-center gap-3 pl-1 mt-1">
  {Object.entries(item.metrics).map(([k, v]) => (
- <div key={k} className="text-xs bg-gray-100 rounded px-2 py-1 border border-slate-200 text-gray-700">
+ <div key={k} className="text-xs bg-slate-100 rounded px-2 py-1 border border-slate-200 text-slate-700">
  <span className="font-semibold">{k}:</span> {v}
  </div>
  ))}
@@ -179,7 +179,7 @@ export function AIInsightsTab() {
  <button
  type="button"
  onClick={() => resolveItem(item.id)}
- className="flex-1 md:flex-none px-4 py-2 rounded-lg bg-gray-100 hover:bg-emerald-50 text-gray-700 hover:bg-[#0F172A] font-bold text-xs transition-all border border-slate-200 hover:bg-slate-50 cursor-pointer"
+ className="flex-1 md:flex-none px-4 py-2 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:bg-slate-900 font-bold text-xs transition-all border border-slate-200 hover:bg-slate-50 cursor-pointer"
  >
  Đánh Dấu Đã Cải Tiến
  </button>

@@ -3,7 +3,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { ThumbnailUploader } from "./ThumbnailUploader";
-import { ChevronDownIcon } from "./icons";
 import {
  OTHER_CATEGORY_VALUE,
  MAX_TITLE_LENGTH,
@@ -11,6 +10,7 @@ import {
 } from "../constants";
 import { useInstructorCategories } from "../api";
 import type { CourseBasicInfo, DifficultyLevel } from "../types";
+import { ChevronDown } from "lucide-react";
 
 interface CharCountProps {
  current: number;
@@ -23,7 +23,7 @@ function CharCount({ current, max }: CharCountProps) {
  <span
  className={twMerge(
  "text-xs font-mono transition-colors duration-150",
- isNearLimit ? "text-amber-600 font-bold" : "text-gray-400 font-medium",
+ isNearLimit ? "text-amber-600 font-bold" : "text-slate-400 font-medium",
  current >= max && "text-rose-600 font-bold"
  )}
  >
@@ -147,7 +147,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  maxLength={MAX_TITLE_LENGTH}
  placeholder="Ví dụ: Lập trình Trí tuệ Nhân tạo AI Mastery với LLM & RAG 2026..."
  onChange={(e) => onChange("title", e.target.value)}
- className="w-full px-4 py-2.5 rounded-lg text-sm text-slate-900 placeholder:text-gray-400 bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm"
+ className="w-full px-4 py-2.5 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm"
  />
  </div>
 
@@ -166,7 +166,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  rows={4}
  placeholder="Nhập tóm tắt khóa học giúp học viên nhanh chóng nắm bắt được giá trị kiến thức, cơ hội việc làm và mục tiêu đạt được sau tốt nghiệp..."
  onChange={(e) => onChange("description", e.target.value)}
- className="w-full px-4 py-3 rounded-lg text-sm text-slate-900 placeholder:text-gray-400 bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none leading-relaxed shadow-sm"
+ className="w-full px-4 py-3 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none leading-relaxed shadow-sm"
  />
  </div>
 
@@ -183,13 +183,13 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  type="button"
  onClick={() => setOpen((v) => !v)}
  className={`w-full appearance-none px-4 py-2.5 pr-10 rounded-lg text-sm bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all cursor-pointer shadow-sm text-left ${
- !selectedName ? "text-gray-400" : "text-slate-900"
+ !selectedName ? "text-slate-400" : "text-slate-900"
  }`}
  >
  {categoriesLoading ? "Đang tải danh mục..." : selectedName || "-- Chọn lĩnh vực --"}
  </button>
  <div className="pointer-events-none absolute inset-y-0 right-3.5 flex items-center text-slate-500">
- <ChevronDownIcon size={14} />
+ <ChevronDown size={14} />
  </div>
  {open && (
  <div className="absolute z-50 mt-1 w-full rounded-lg border border-slate-200 bg-white shadow-lg">
@@ -213,7 +213,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  <li key={c.id}>
  <button
  type="button"
- className="w-full px-3 py-2 text-left text-xs font-semibold text-slate-900 hover:bg-[#EFF6FF]"
+ className="w-full px-3 py-2 text-left text-xs font-semibold text-slate-900 hover:bg-blue-50"
  onClick={() => {
  onChange("categoryId", Number(c.id));
  onChange("categoryName", c.name);
@@ -233,7 +233,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  <li className="border-t border-slate-200">
  <button
  type="button"
- className="w-full px-3 py-2 text-left text-xs font-bold text-blue-500 hover:bg-[#EFF6FF]"
+ className="w-full px-3 py-2 text-left text-xs font-bold text-blue-500 hover:bg-blue-50"
  onClick={() => {
  onChange("categoryId", null);
  onChange("field", OTHER_CATEGORY_VALUE);
@@ -253,7 +253,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
  value={data.otherName}
  onChange={(e) => onChange("otherName", e.target.value)}
  placeholder="Nhập lĩnh vực khác..."
- className="mt-2 w-full px-4 py-2.5 rounded-lg text-sm text-slate-900 placeholder:text-gray-400 bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+ className="mt-2 w-full px-4 py-2.5 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 bg-white border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
  />
  )}
  </div>

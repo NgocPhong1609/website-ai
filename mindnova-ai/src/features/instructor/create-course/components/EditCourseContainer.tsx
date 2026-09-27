@@ -17,16 +17,10 @@ import { CourseHealthCard } from "./CourseHealthCard";
 import { Step2CourseStructure } from "./Step2CourseStructure";
 import type { CourseBasicInfo, DifficultyLevel } from "../types";
 import { Skeleton } from "@/src/shared/components/ui";
-import {
- SaveIcon,
- EyeIcon,
- TrashIcon,
- ArrowLeftIcon,
- CheckIcon,
-} from "./icons";
 
 import { OTHER_CATEGORY_VALUE } from "../constants";
 import { useProposeCategory } from "../api";
+import { ArrowLeft, Check, Eye, Save, Trash2 } from "lucide-react";
 
 export function EditCourseContainer({ courseId }: { courseId: string }) {
  const router = useRouter();
@@ -224,13 +218,13 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <div className="flex items-center gap-3">
  <Link
  href="/instructor/courses"
- className="w-10 h-10 rounded-lg bg-slate-50 hover:bg-gray-100 text-gray-700 flex items-center justify-center transition-colors shadow-sm border border-gray-100"
+ className="w-10 h-10 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-colors shadow-sm border border-slate-100"
  >
- <ArrowLeftIcon size={18} />
+ <ArrowLeft size={18} />
  </Link>
  <div>
  <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs font-bold text-slate-500 mb-0.5">
- <Link href="/instructor/courses" className="hover:text-gray-800 transition-colors">
+ <Link href="/instructor/courses" className="hover:text-slate-800 transition-colors">
  Khóa học của tôi
  </Link>
  <span>/</span>
@@ -254,9 +248,9 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <Link
  href={`/courses/lesson?course_id=${courseId}&preview=true`}
  target="_blank"
- className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold text-gray-700 bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
+ className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
  >
- <EyeIcon size={14} />
+ <Eye size={14} />
  <span className="hidden sm:inline">Xem trước</span>
  </Link>
 
@@ -265,7 +259,7 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  type="button"
  onClick={handleSubmitReview}
  disabled={isPending}
- className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold text-white bg-blue-500 hover:bg-blue-600 transition-all shadow-sm disabled:bg-gray-400"
+ className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold text-white bg-blue-500 hover:bg-blue-600 transition-all shadow-sm disabled:bg-slate-400"
  >
  <span className="hidden sm:inline">Gửi xét duyệt</span>
  </button>
@@ -294,12 +288,12 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <span> Đang lưu...</span>
  ) : saveSuccess ? (
  <>
- <CheckIcon size={14} />
+ <Check size={14} />
  <span>Đã lưu thay đổi</span>
  </>
  ) : (
  <>
- <SaveIcon size={14} />
+ <Save size={14} />
  <span>Lưu & Cập nhật</span>
  </>
  )}
@@ -341,13 +335,13 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  )}
 
  {activeTab === "advanced" && (
- <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm flex flex-col gap-2">
+ <div className="bg-white p-6 rounded-lg border border-slate-100 shadow-sm flex flex-col gap-2">
  <div className="flex flex-col gap-1 mb-2">
  <h2 className="text-[17px] font-bold text-slate-900">Cấu hình Quyền học tập</h2>
  <p className="text-[13px] text-slate-500">Quản lý cấp chứng chỉ tự động và khóa bình luận diễn đàn.</p>
  </div>
 
- <div className="flex items-center justify-between p-4 rounded-lg border border-gray-100 bg-slate-50/50">
+ <div className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-slate-50/50">
  <div className="flex items-center gap-3">
  <span className="text-xl"></span>
  <div>
@@ -355,10 +349,10 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <span className="text-[12px] text-slate-500 block mt-0.5">Tự động sinh mã chứng nhận khi học viên đạt trên 80% tiến độ bài giảng</span>
  </div>
  </div>
- <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500 cursor-pointer" />
+ <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500 cursor-pointer" />
  </div>
 
- <div className="flex items-center justify-between p-4 rounded-lg border border-gray-100 bg-slate-50/50">
+ <div className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-slate-50/50">
  <div className="flex items-center gap-3">
  <span className="text-xl"></span>
  <div>
@@ -366,12 +360,12 @@ export function EditCourseContainer({ courseId }: { courseId: string }) {
  <span className="text-[12px] text-slate-500 block mt-0.5">Cho phép học viên đặt câu hỏi Hỏi-Đáp bên dưới từng bài video</span>
  </div>
  </div>
- <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500 cursor-pointer" />
+ <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500 cursor-pointer" />
  </div>
 
  <div className="mt-4 pt-6 border-t border-rose-50 flex flex-col gap-4">
  <h3 className="text-[12px] font-bold uppercase tracking-wider text-rose-600 flex items-center gap-1.5">
- <TrashIcon size={14} />
+ <Trash2 size={14} />
  <span>Khu Vực Nguy Hiểm (Danger Zone)</span>
  </h3>
  <div className="p-4 rounded-lg bg-rose-50/50 border border-rose-100 flex flex-col sm:flex-row items-center justify-between gap-4">

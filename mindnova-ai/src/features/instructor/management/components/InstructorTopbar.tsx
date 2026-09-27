@@ -5,28 +5,8 @@ import Link from "next/link";
 import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { twMerge } from "tailwind-merge";
 import { axiosClient } from "@/src/shared/lib/axios";
-import { BellIcon } from "./icons";
+import { ArrowRight, Bell, Menu, MessageSquare, X } from "lucide-react";
 import { useChatGlobalUnread } from "@/src/hooks/useChatGlobalUnread";
-
-const NAV_SVG = {
- viewBox: "0 0 24 24",
- fill: "none" as const,
- stroke: "currentColor" as const,
- strokeWidth: 1.8,
- strokeLinecap: "round" as const,
- strokeLinejoin: "round" as const,
- "aria-hidden": true as const,
-};
-
-function HelpIcon() {
- return (
- <svg {...NAV_SVG} width={18} height={18}>
- <circle cx="12" cy="12" r="10" />
- <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
- <line x1="12" y1="17" x2="12.01" y2="17" />
- </svg>
- );
-}
 
 function UserAvatar() {
  const [user, setUser] = useState<any>(null);
@@ -101,13 +81,13 @@ function UserAvatar() {
  <Link
  href="/instructor/profile"
  onClick={() => setIsDropdownOpen(false)}
- className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-slate-50 hover:text-[#2563EB] transition-colors"
+ className="block px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors"
  >
  Thông tin tài khoản
  </Link>
  <button
  onClick={handleLogout}
- className="w-full text-left px-4 py-2 text-sm font-semibold text-[#2563EB] hover:bg-[#EFF6FF] transition-colors"
+ className="w-full text-left px-4 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
  >
  Đăng xuất
  </button>
@@ -135,7 +115,7 @@ const INITIAL_ALERTS: AlertItem[] = [
  desc: "3 học viên đặt câu hỏi trong 'UI/UX Design Masterclass' đang chờ phản hồi từ bạn.",
  type: "urgent",
  timestamp: "10 phút trước",
- actionText: "Mở Hòm thư Hỏi đáp ",
+ actionText: "Mở Hòm thư Hỏi đáp",
  actionHref: "/instructor/discussions",
  read: false,
  },
@@ -145,7 +125,7 @@ const INITIAL_ALERTS: AlertItem[] = [
  desc: "15,400,000đ từ doanh thu học phí đã hoàn tất thời gian bảo lưu 30 ngày và chuyển vào Số dư Khả dụng.",
  type: "info",
  timestamp: "2 giờ trước",
- actionText: "Xem Doanh thu ",
+ actionText: "Xem Doanh thu",
  actionHref: "/instructor/revenue",
  read: false,
  },
@@ -199,7 +179,7 @@ export function InstructorTopbar() {
  desc: `${total} học viên đặt câu hỏi đang chờ phản hồi từ bạn.`,
  type: "urgent",
  timestamp: "Vừa cập nhật",
- actionText: "Mở Hòm thư Hỏi đáp ",
+ actionText: "Mở Hòm thư Hỏi đáp",
  actionHref: "/instructor/discussions?filter=needs_attention",
  read: false,
  },
@@ -232,19 +212,19 @@ export function InstructorTopbar() {
  };
 
  return (
- <header className="h-16 shrink-0 flex items-center justify-between px-6 bg-white border-b border-slate-200 relative z-40 shadow-sm">
+ <header className="h-16 shrink-0 flex items-center justify-between px-6 bg-white border-b border-slate-200 relative z-40">
  {/* Brand & Context */}
  <div className="flex items-center gap-3">
  {/* Placeholder for sidebar open button if needed on mobile, removed SidebarOpenButton to avoid missing module error */}
  <button type="button" className="md:hidden w-9 h-9 rounded-lg flex items-center justify-center border border-slate-200 bg-slate-50 text-slate-500">
- <svg viewBox="0 0 24 24" width={20} height={20} stroke="currentColor" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+ <Menu className="h-5 w-5" aria-hidden />
  </button>
  <Link
  href="/instructor"
- className="text-lg font-bold text-slate-900 tracking-tight hover:text-[#2563EB] transition-colors shrink-0 flex items-center gap-2"
+ className="text-lg font-bold text-slate-900 tracking-tight hover:text-blue-600 transition-colors shrink-0 flex items-center gap-2"
  >
  <span>MindNova Instructor</span>
- <span className="text-[10px] font-semibold bg-slate-50 text-blue-500 px-2.5 py-0.5 rounded-full border-slate-200">
+ <span className="text-[10px] font-semibold bg-blue-50 text-blue-600 px-2.5 py-0.5 rounded-full border border-blue-100">
  PRO
  </span>
  </Link>
@@ -257,7 +237,7 @@ export function InstructorTopbar() {
  {unansweredDiscussionsCount > 0 && (
  <Link
  href="/instructor/discussions?filter=needs_attention"
- className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-50 text-slate-900 border border-slate-200 hover:bg-slate-50 hover:text-[#2563EB] hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer text-decoration-none"
+ className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-50 text-slate-900 border border-slate-200 hover:bg-slate-50 hover:text-blue-600 hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer text-decoration-none"
  >
  <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0 animate-pulse" />
  <span>{unansweredDiscussionsCount} thảo luận mới</span>
@@ -267,11 +247,9 @@ export function InstructorTopbar() {
  {/* Chat Button */}
  <Link
  href="/instructor/messages"
- className="relative w-9 h-9 rounded-lg flex items-center justify-center border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-50 hover:text-[#2563EB] hover:bg-slate-50 transition-all cursor-pointer"
+ className="relative w-9 h-9 rounded-lg flex items-center justify-center border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition-all cursor-pointer"
  >
- <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
- </svg>
+ <MessageSquare className="h-[18px] w-[18px]" aria-hidden />
  {chatUnreadCount > 0 && (
  <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center border-2 border-white px-0.5 animate-pulse">
  {chatUnreadCount}
@@ -287,10 +265,10 @@ export function InstructorTopbar() {
  onClick={() => setIsAlertOpen((p) => !p)}
  className={twMerge(
  "relative w-9 h-9 rounded-lg flex items-center justify-center border border-slate-200 transition-all cursor-pointer",
- isAlertOpen ? "bg-blue-500 text-white border-[#3B82F6] shadow-sm" : "bg-slate-50 text-slate-500 hover:bg-slate-50 hover:text-[#2563EB] hover:bg-slate-50"
+ isAlertOpen ? "bg-blue-50 text-blue-600 border-blue-100" : "bg-white text-slate-500 hover:bg-slate-50 hover:text-blue-600"
  )}
  >
- <BellIcon />
+ <Bell className="h-[18px] w-[18px]" aria-hidden />
  {unreadCount > 0 && (
  <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center border-2 border-white px-0.5">
  {unreadCount}
@@ -302,7 +280,7 @@ export function InstructorTopbar() {
  {isAlertOpen && (
  <div className="absolute right-0 top-12 w-80 sm:w-96 rounded-lg bg-white border border-slate-200 shadow-lg p-5 flex flex-col gap-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
  
- <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+ <div className="flex items-center justify-between pb-3 border-b border-slate-100">
  <div>
  <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
  <span>Thông báo Giảng viên</span>
@@ -338,21 +316,23 @@ export function InstructorTopbar() {
  e.stopPropagation();
  dismissAlert(item.id);
  }}
- className="text-slate-500 hover:text-[#2563EB] font-bold text-xs px-1 cursor-pointer relative z-10"
+ aria-label="Ẩn thông báo"
+ className="text-slate-400 hover:text-slate-700 p-0.5 rounded cursor-pointer relative z-10"
  >
- 
+ <X className="h-3.5 w-3.5" aria-hidden />
  </button>
  </div>
  
  <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
  
  <div className="flex items-center justify-between pt-1">
- <span className="text-[10px] font-bold text-gray-400">{item.timestamp}</span>
+ <span className="text-[10px] font-bold text-slate-400">{item.timestamp}</span>
  {item.actionText && item.actionHref && (
  <span
  className="text-[11px] font-bold text-blue-500 flex items-center gap-1 group-hover:underline"
  >
  {item.actionText}
+ <ArrowRight className="h-3 w-3" aria-hidden />
  </span>
  )}
  </div>
@@ -366,7 +346,7 @@ export function InstructorTopbar() {
  onClick={() => setIsAlertOpen(false)}
  className={twMerge(
  "group p-3.5 rounded-lg border transition-all flex flex-col gap-1.5 relative block",
- !item.read ? "bg-[#EFF6FF] text-slate-900 shadow-sm hover:bg-[#DBEAFE]" : "bg-white border-gray-100 opacity-70 hover:opacity-100"
+ !item.read ? "bg-blue-50 text-slate-900 shadow-sm hover:bg-blue-100" : "bg-white border-slate-100 opacity-70 hover:opacity-100"
  )}
  >
  {content}
@@ -376,7 +356,7 @@ export function InstructorTopbar() {
  key={item.id}
  className={twMerge(
  "p-3.5 rounded-lg border transition-all flex flex-col gap-1.5 relative",
- !item.read ? "bg-[#EFF6FF] text-slate-900 shadow-sm" : "bg-white border-gray-100 opacity-70"
+ !item.read ? "bg-blue-50 text-slate-900 shadow-sm" : "bg-white border-slate-100 opacity-70"
  )}
  >
  {content}
@@ -386,7 +366,7 @@ export function InstructorTopbar() {
  )}
  </div>
 
- <div className="pt-2 border-t border-gray-100 flex items-center justify-end">
+ <div className="pt-2 border-t border-slate-100 flex items-center justify-end">
  <button
  type="button"
  onClick={() => setIsAlertOpen(false)}

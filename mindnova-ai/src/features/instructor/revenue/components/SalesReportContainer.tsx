@@ -5,14 +5,9 @@ import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { useQuery } from "@tanstack/react-query";
 import { getSalesReport } from "../api";
-import {
- CalendarIcon,
- DownloadIcon,
- TrendUpIcon,
- TrendRightIcon,
-} from "./icons";
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { Calendar, Download, TrendingUp } from "lucide-react";
 
 function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "history" }) {
  return (
@@ -23,7 +18,7 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  "px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer",
  active === "overview"
  ? "bg-blue-500 text-white shadow-sm"
- : "text-slate-500 hover:bg-gray-100 hover:text-slate-900"
+ : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
  <span> Tổng quan Doanh thu</span>
@@ -35,7 +30,7 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  "px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer",
  active === "report"
  ? "bg-blue-500 text-white shadow-sm"
- : "text-slate-500 hover:bg-gray-100 hover:text-slate-900"
+ : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
  <span> Báo cáo Bán hàng</span>
@@ -47,7 +42,7 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  "px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer",
  active === "history"
  ? "bg-blue-500 text-white shadow-sm"
- : "text-slate-500 hover:bg-gray-100 hover:text-slate-900"
+ : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
  <span> Lịch sử Giao dịch</span>
@@ -66,16 +61,16 @@ function DatePickerHeader() {
  </p>
  </div>
  <div className="flex items-center gap-2.5 flex-wrap">
- <div className="flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-200 bg-white text-xs font-bold text-gray-700 shadow-sm">
- <CalendarIcon />
+ <div className="flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-700 shadow-sm">
+ <Calendar size={14} />
  <span>Tháng hiện tại</span>
  </div>
- <button type="button" className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-xs font-bold text-gray-700 bg-white hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
- <DownloadIcon />
+ <button type="button" className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm cursor-pointer">
+ <Download size={14} />
  <span>Xuất CSV</span>
  </button>
  <button type="button" className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 shadow-sm transition-all cursor-pointer">
- <DownloadIcon />
+ <Download size={14} />
  <span>Xuất Báo cáo PDF</span>
  </button>
  </div>
@@ -114,7 +109,7 @@ function StatCards({ overview }: { overview: any }) {
  {s.diff}
  </span>
  </div>
- <div className="w-full h-1.5 bg-gray-100 rounded-full mt-3 overflow-hidden">
+ <div className="w-full h-1.5 bg-slate-100 rounded-full mt-3 overflow-hidden">
  <div className={twMerge("h-full rounded-full transition-all duration-500", s.color)} style={{ width: `${s.width}%` }} />
  </div>
  </div>
@@ -147,11 +142,11 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  <div className="flex items-center gap-4">
  <div className="flex items-center gap-1.5">
  <div className="w-3 h-3 rounded-full bg-blue-500" />
- <span className="text-xs font-bold text-gray-700">Doanh thu bán mới</span>
+ <span className="text-xs font-bold text-slate-700">Doanh thu bán mới</span>
  </div>
  <div className="flex items-center gap-1.5">
  <div className="w-3 h-3 rounded-full bg-rose-500" />
- <span className="text-xs font-bold text-gray-700">Hoàn tiền</span>
+ <span className="text-xs font-bold text-slate-700">Hoàn tiền</span>
  </div>
  </div>
  
@@ -159,7 +154,7 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  <div className="relative">
  <button 
  onClick={() => setIsOpen(!isOpen)}
- className="flex items-center justify-between w-[130px] bg-white border border-slate-200 text-gray-700 text-xs font-bold rounded-lg px-4 py-2 hover:bg-slate-50 focus:outline-none focus:border-[#3B82F6] cursor-pointer shadow-sm transition-colors"
+ className="flex items-center justify-between w-[130px] bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-lg px-4 py-2 hover:bg-slate-50 focus:outline-none focus:border-blue-500 cursor-pointer shadow-sm transition-colors"
  >
  <span>{getRangeText(timeRange)}</span>
  <></>
@@ -168,7 +163,7 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  {isOpen && (
  <>
  <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)}></div>
- <div className="absolute right-0 mt-2 w-[130px] bg-white border border-gray-100 rounded-lg shadow-lg z-20 overflow-hidden py-1">
+ <div className="absolute right-0 mt-2 w-[130px] bg-white border border-slate-100 rounded-lg shadow-lg z-20 overflow-hidden py-1">
  {[7, 14, 30].map(val => (
  <button
  key={val}
@@ -178,7 +173,7 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  }}
  className={twMerge(
  "w-full text-left px-4 py-2 text-xs font-bold cursor-pointer transition-colors",
- timeRange === val ? "bg-blue-50 text-blue-500" : "text-gray-700 hover:bg-slate-50"
+ timeRange === val ? "bg-blue-50 text-blue-500" : "text-slate-700 hover:bg-slate-50"
  )}
  >
  {getRangeText(val)}
@@ -193,7 +188,7 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  </div>
 
  {/* Visual Line Chart */}
- <div className="h-[250px] w-full pt-4 border-t border-gray-100 mt-4">
+ <div className="h-[250px] w-full pt-4 border-t border-slate-100 mt-4">
  {chartData && chartData.length > 0 ? (
  <ResponsiveContainer width="100%" height="100%">
  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
@@ -244,10 +239,10 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
  </AreaChart>
  </ResponsiveContainer>
  ) : (
- <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+ <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
  <span className="text-4xl mb-3 opacity-50 grayscale"></span>
  <span className="text-sm font-bold text-slate-500">Chưa có dữ liệu báo cáo</span>
- <span className="text-xs font-medium text-gray-400 mt-1">Sẽ hiển thị khi có phát sinh doanh thu/hoàn tiền</span>
+ <span className="text-xs font-medium text-slate-400 mt-1">Sẽ hiển thị khi có phát sinh doanh thu/hoàn tiền</span>
  </div>
  )}
  </div>
@@ -258,7 +253,7 @@ function RevenueVsRefundsChart({ chartData, timeRange, setTimeRange }: { chartDa
 function CoursePerformanceTable({ courses }: { courses: any[] }) {
  return (
  <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col overflow-hidden">
- <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border-b border-gray-100 gap-2">
+ <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border-b border-slate-100 gap-2">
  <div>
  <h3 className="text-sm font-bold text-slate-900">Hiệu Năng Từng Khóa Học</h3>
  <p className="text-xs text-slate-500">Dữ liệu phân bổ lượt xem và tỷ lệ chốt đơn theo từng khóa học của bạn.</p>
@@ -280,7 +275,7 @@ function CoursePerformanceTable({ courses }: { courses: any[] }) {
  <th className="px-6 py-3.5">Doanh Thu Tổng</th>
  </tr>
  </thead>
- <tbody className="divide-y divide-gray-100 text-xs font-medium">
+ <tbody className="divide-y divide-slate-100 text-xs font-medium">
  {courses?.length > 0 ? courses.map((c, i) => (
  <tr key={c.course_id} className="hover:bg-slate-50/80 transition-colors">
  <td className="px-6 py-4">
@@ -291,13 +286,13 @@ function CoursePerformanceTable({ courses }: { courses: any[] }) {
  </div>
  </div>
  </td>
- <td className="px-6 py-4 font-bold text-gray-700">{c.price.toLocaleString('vi-VN')}đ</td>
- <td className="px-6 py-4 font-bold text-gray-700">{c.views}</td>
+ <td className="px-6 py-4 font-bold text-slate-700">{c.price.toLocaleString('vi-VN')}đ</td>
+ <td className="px-6 py-4 font-bold text-slate-700">{c.views}</td>
  <td className="px-6 py-4 font-semibold text-blue-500">{c.enrollments}</td>
  <td className="px-6 py-4">
  <div className="flex items-center gap-2.5">
  <span className="font-semibold text-slate-900 w-12">{c.conversion_rate}%</span>
- <div className="w-16 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+ <div className="w-16 h-1.5 rounded-full bg-slate-100 overflow-hidden">
  <div className="h-full rounded-full bg-blue-500" style={{ width: `${Math.min(100, c.conversion_rate * 5)}%` }} />
  </div>
  </div>
@@ -306,7 +301,7 @@ function CoursePerformanceTable({ courses }: { courses: any[] }) {
  </tr>
  )) : (
  <tr>
- <td colSpan={6} className="px-6 py-12 text-center text-gray-400 font-bold">
+ <td colSpan={6} className="px-6 py-12 text-center text-slate-400 font-bold">
  Chưa có dữ liệu bán hàng.
  </td>
  </tr>
@@ -329,7 +324,7 @@ export function SalesReportContainer() {
 
  if (isLoading) {
  return (
- <div className="flex flex-col min-h-screen bg-[#F4F4F8] font-sans items-center justify-center">
+ <div className="flex flex-col min-h-screen bg-slate-50 font-sans items-center justify-center">
  
  <p className="text-slate-500 font-bold text-sm">Đang tải báo cáo bán hàng...</p>
  </div>
@@ -338,14 +333,14 @@ export function SalesReportContainer() {
 
  if (isError || !data) {
  return (
- <div className="flex flex-col min-h-screen bg-[#F4F4F8] font-sans items-center justify-center">
+ <div className="flex flex-col min-h-screen bg-slate-50 font-sans items-center justify-center">
  <p className="text-rose-500 font-bold">Đã có lỗi xảy ra khi tải dữ liệu báo cáo.</p>
  </div>
  );
  }
 
  return (
- <div className="flex flex-col min-h-screen bg-[#F4F4F8] font-sans">
+ <div className="flex flex-col min-h-screen bg-slate-50 font-sans">
  <main className="flex-1 overflow-y-auto">
  <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col gap-6 pb-16">
  <RevenueNavigationTabs active="report" />

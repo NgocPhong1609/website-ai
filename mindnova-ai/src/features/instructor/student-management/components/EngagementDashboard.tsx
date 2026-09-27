@@ -56,12 +56,12 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
 
  {/* Bottom Section: New Students List */}
  <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
- <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+ <div className="p-5 border-b border-slate-100 flex items-center justify-between">
  <div>
  <h3 className="text-base font-bold text-slate-900">Danh Sách Học Viên Mới Gia Nhập</h3>
  <p className="text-xs text-slate-500 mt-1">Theo dõi hồ sơ và tiến độ chi tiết của học viên mới ghi danh trong 30 ngày qua.</p>
  </div>
- <button className="text-sm font-bold text-blue-500 hover:text-[#2563EB] transition-colors cursor-pointer">
+ <button className="text-sm font-bold text-blue-500 hover:text-blue-600 transition-colors cursor-pointer">
  Xem Toàn Bộ Học Viên &rarr;
  </button>
  </div>
@@ -70,22 +70,22 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
  <table className="w-full text-left border-collapse">
  <thead>
  <tr className="bg-slate-50/50">
- <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-1/3">Học viên ghi danh</th>
- <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Trạng thái tương tác</th>
- <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Khóa học gia nhập</th>
- <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Ngày</th>
+ <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider w-1/3">Học viên ghi danh</th>
+ <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Trạng thái tương tác</th>
+ <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Khóa học gia nhập</th>
+ <th className="px-5 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Ngày</th>
  </tr>
  </thead>
- <tbody className="divide-y divide-gray-100">
+ <tbody className="divide-y divide-slate-100">
  {metricsLoading ? (
- <tr><td colSpan={4} className="p-8 text-center text-gray-400 text-sm">Đang tải dữ liệu...</td></tr>
+ <tr><td colSpan={4} className="p-8 text-center text-slate-400 text-sm">Đang tải dữ liệu...</td></tr>
  ) : metrics.new_students.length === 0 ? (
  <tr>
- <td colSpan={4} className="p-12 text-center text-gray-400">
+ <td colSpan={4} className="p-12 text-center text-slate-400">
  <div className="flex flex-col items-center justify-center">
  <span className="text-4xl mb-3 opacity-50 grayscale">‍</span>
  <span className="text-sm font-bold text-slate-500">Chưa có học viên mới nào</span>
- <span className="text-xs font-medium text-gray-400 mt-1">Học viên ghi danh trong 30 ngày qua sẽ xuất hiện ở đây</span>
+ <span className="text-xs font-medium text-slate-400 mt-1">Học viên ghi danh trong 30 ngày qua sẽ xuất hiện ở đây</span>
  </div>
  </td>
  </tr>
@@ -117,7 +117,7 @@ export function EngagementDashboard({ onSelectStudent }: { onSelectStudent: (id:
  )}
  </td>
  <td className="px-5 py-4">
- <p className="text-xs font-bold text-gray-700">{st.course_name}</p>
+ <p className="text-xs font-bold text-slate-700">{st.course_name}</p>
  </td>
  <td className="px-5 py-4 text-right">
  <p className="text-xs text-slate-500 font-medium">{st.enrolled_at}</p>

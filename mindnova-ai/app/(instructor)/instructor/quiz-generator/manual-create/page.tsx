@@ -9,13 +9,13 @@ export const metadata: Metadata = {
 
 export default function ManualQuizCreatePage() {
   return (
-    <div className="min-h-screen bg-[#FDFBF7]">
-      <div className="py-6 border-b border-gray-200 bg-white">
+    <div className="min-h-full">
+      <div className="py-6 border-b border-slate-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-2xl font-bold text-slate-900">
             Tạo Bài Kiểm Tra Thủ Công
           </h1>
-          <p className="mt-1 text-sm font-medium text-gray-500">
+          <p className="mt-1 text-sm font-medium text-slate-500">
             Tự biên soạn câu hỏi và đáp án cho bài kiểm tra của bạn.
           </p>
         </div>

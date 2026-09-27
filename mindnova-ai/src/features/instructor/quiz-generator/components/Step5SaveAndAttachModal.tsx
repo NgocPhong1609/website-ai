@@ -179,7 +179,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md animate-fadeIn">
       <div className="bg-white rounded-lg border border-slate-200 shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col gap-6 p-8">
         {/* Header */}
-        <div className="flex items-center gap-4 border-b border-gray-100 pb-5">
+        <div className="flex items-center gap-4 border-b border-slate-100 pb-5">
           <div className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-bold border border-emerald-100">
             🎯
           </div>
@@ -223,12 +223,12 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
           <div className="flex flex-col gap-5">
             {/* Step 1: Course Selection */}
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
                 1. Khóa Học Gắn Kết
               </label>
 
               {isLoadingCourses ? (
-                <div className="p-3.5 rounded-lg bg-gray-50 border border-gray-200 text-xs font-bold text-gray-400 animate-pulse">
+                <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-bold text-slate-400 animate-pulse">
                   Đang nạp danh sách khóa học...
                 </div>
               ) : courses.length === 0 ? (
@@ -267,7 +267,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
                   <select
                     value={selectedCourseId || ""}
                     onChange={(e) => handleCourseChange(Number(e.target.value))}
-                    className="w-full p-3.5 rounded-lg border-2 border-slate-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-[#3B82F6] shadow-sm cursor-pointer"
+                    className="w-full p-3.5 rounded-lg border-2 border-slate-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500 shadow-sm cursor-pointer"
                   >
                     <option value="" disabled>-- Bắt buộc chọn khóa học để gắn bài kiểm tra --</option>
                     {courses.map((c) => (
@@ -279,7 +279,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
 
                   {selectedCourseId && (
                     <div className="flex items-center justify-between px-2 text-[11px]">
-                      <span className="font-semibold text-gray-500">
+                      <span className="font-semibold text-slate-500">
                         {isLoadingCourseDetails ? (
                           <span className="text-blue-600 font-bold animate-pulse">⏳ Đang nạp Modules & Lessons...</span>
                         ) : (
@@ -297,7 +297,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
 
             {/* Step 2: Position Selector */}
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
                 2. Chọn vị trí xuất hiện bài kiểm tra trong khóa học
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -311,8 +311,8 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
                     onClick={() => handlePositionChange(pos.key as any)}
                     className={`p-3.5 rounded-lg border text-xs font-semibold flex flex-col items-center gap-1.5 transition-all cursor-pointer text-center ${
                       position === pos.key
-                        ? "border-[#3B82F6] bg-blue-50 text-blue-500 shadow-xs ring-1 ring-[#3B82F6]/30"
-                        : "border-slate-200 text-slate-500 hover:border-gray-300 bg-white"
+                        ? "border-blue-500 bg-blue-50 text-blue-500 shadow-xs ring-1 ring-blue-500/30"
+                        : "border-slate-200 text-slate-500 hover:border-slate-300 bg-white"
                     }`}
                   >
                     <span className="text-xl">{pos.icon}</span>
@@ -325,11 +325,11 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
         )}
 
         {/* Modal Footer Actions */}
-        <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-2">
+        <div className="flex items-center justify-between border-t border-slate-100 pt-4 mt-2">
           <button
             type="button"
             onClick={() => router.push(selectedCourseId ? `/instructor/quiz-generator?course_id=${selectedCourseId}` : "/instructor/quiz-generator")}
-            className="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-all cursor-pointer"
+            className="px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
           >
             Quay Về Danh Sách Quiz
           </button>

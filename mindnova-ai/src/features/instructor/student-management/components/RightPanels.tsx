@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
-import { SparklesIcon, TrendUpIcon, PlusIcon } from "./icons";
 
 import { useQuery } from "@tanstack/react-query";
 import { getLatestDiscussions, getAnalytics } from "../api";
+import { Plus, Sparkles, TrendingUp } from "lucide-react";
 
 function DiscussionAvatar({ initials, color }: { initials: string; color: string }) {
  return (
@@ -27,7 +27,7 @@ function DiscussionPanel({ courseId }: { courseId?: string }) {
 
  return (
  <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
- <div className="flex items-center justify-between p-4 border-b border-gray-100">
+ <div className="flex items-center justify-between p-4 border-b border-slate-100">
  <span className="text-xs font-bold text-slate-900 tracking-wider uppercase">
  Thảo luận mới nhất
  </span>
@@ -36,13 +36,13 @@ function DiscussionPanel({ courseId }: { courseId?: string }) {
  </span>
  </div>
 
- <div className="divide-y divide-gray-100 min-h-[100px]">
+ <div className="divide-y divide-slate-100 min-h-[100px]">
  {isLoading ? (
  <div className="flex items-center justify-center p-6">
  
  </div>
  ) : discussions.length === 0 ? (
- <div className="p-4 text-center text-xs text-gray-400 font-bold">Chưa có thảo luận nào.</div>
+ <div className="p-4 text-center text-xs text-slate-400 font-bold">Chưa có thảo luận nào.</div>
  ) : (
  discussions.map((d: any) => {
  const initials = d.student?.name ? d.student.name.split(" ").map((n: string) => n[0]).join("").substring(0, 2).toUpperCase() : "HV";
@@ -57,7 +57,7 @@ function DiscussionPanel({ courseId }: { courseId?: string }) {
  <div className="flex-1 min-w-0">
  <div className="flex items-center justify-between gap-1">
  <span className="text-xs font-semibold text-slate-900 truncate">{d.student?.name || "Học viên"}</span>
- <span className="text-[10px] text-gray-400 font-medium shrink-0">
+ <span className="text-[10px] text-slate-400 font-medium shrink-0">
  {new Date(d.created_at).toLocaleDateString('vi-VN')}
  </span>
  </div>
@@ -71,7 +71,7 @@ function DiscussionPanel({ courseId }: { courseId?: string }) {
  )}
  </div>
 
- <div className="p-3.5 border-t border-gray-100 text-center bg-slate-50/50">
+ <div className="p-3.5 border-t border-slate-100 text-center bg-slate-50/50">
  <Link href="/instructor/discussions" className="text-xs font-bold text-blue-500 hover:underline block w-full">
  Xem tất cả thảo luận học viên 
  </Link>
@@ -89,7 +89,7 @@ function AIAnnouncementPanel({ onOpenModal }: { onOpenModal: (topic?: string) =>
  return (
  <div className="rounded-lg border-slate-200 bg-blue-50/20 shadow-sm overflow-hidden">
  <div className="p-4 border-b border-slate-200 text-slate-900 flex items-center gap-2 bg-blue-50/50">
- <span className="text-blue-500"><SparklesIcon size={16} /></span>
+ <span className="text-blue-500"><Sparkles size={16} /></span>
  <span className="text-xs font-bold text-blue-500 tracking-wide uppercase">Trợ lý Thông báo AI</span>
  </div>
 
@@ -103,7 +103,7 @@ function AIAnnouncementPanel({ onOpenModal }: { onOpenModal: (topic?: string) =>
  onChange={(e) => setTopic(e.target.value)}
  placeholder="Nhập ý chính hoặc chủ đề cần phát đi..."
  rows={3}
- className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-900 placeholder:text-gray-400 focus:outline-none focus:border-[#3B82F6] resize-none shadow-sm"
+ className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 resize-none shadow-sm"
  />
 
  <div className="flex items-center gap-1.5 flex-wrap">
@@ -115,7 +115,7 @@ function AIAnnouncementPanel({ onOpenModal }: { onOpenModal: (topic?: string) =>
  className={twMerge(
  "px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all cursor-pointer",
  activeTag === tag
- ? "bg-blue-500 text-white border-[#3B82F6]"
+ ? "bg-blue-500 text-white border-blue-500"
  : "border-slate-200 text-slate-500 bg-white hover:bg-blue-600 hover:bg-blue-600"
  )}
  >
@@ -130,7 +130,7 @@ function AIAnnouncementPanel({ onOpenModal }: { onOpenModal: (topic?: string) =>
  onClick={() => onOpenModal(activeTag || topic)}
  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 shadow-sm transition-all cursor-pointer mt-1"
  >
- <PlusIcon size={14} />
+ <Plus size={14} />
  <span>Tạo Thông Báo Bằng AI Ngay</span>
  </button>
  </div>
@@ -160,7 +160,7 @@ function StatBar({ label, value, percent, color }: StatBarProps) {
  {value}
  </span>
  </div>
- <div className="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+ <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
  <div className={twMerge("h-full rounded-full transition-all duration-700", barColor)} style={{ width: `${percent}%` }} />
  </div>
  </div>
@@ -175,7 +175,7 @@ function ProgressStatsPanel({ courseId }: { courseId?: string }) {
 
  return (
  <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
- <div className="p-4 border-b border-gray-100">
+ <div className="p-4 border-b border-slate-100">
  <span className="text-xs font-bold text-slate-900 tracking-wider uppercase">
  Thống Kê Tổng Quan Khóa Học
  </span>
@@ -193,7 +193,7 @@ function ProgressStatsPanel({ courseId }: { courseId?: string }) {
  <StatBar label="Học viên tích cực (Tuần qua)" value={`${data?.active_students || 0}`} percent={data?.total_students ? (data.active_students / data.total_students) * 100 : 0} color="purple" />
 
  <div className="rounded-lg bg-emerald-50/80 border-slate-200 p-3.5 flex items-start gap-2.5 mt-2">
- <span className="text-slate-900 mt-0.5 shrink-0"><TrendUpIcon size={16} /></span>
+ <span className="text-slate-900 mt-0.5 shrink-0"><TrendingUp size={16} /></span>
  <div className="flex flex-col gap-0.5">
  <span className="text-[11px] font-bold text-slate-900 uppercase tracking-wider">Gợi ý Tối ưu AI</span>
  <p className="text-xs text-slate-900 leading-relaxed font-medium">

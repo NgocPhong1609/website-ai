@@ -15,7 +15,7 @@ export default function InstructorLayout({
 }: Readonly<{ children: React.ReactNode }>) {
  return (
  <InstructorRoleGuard>
- <div className="flex h-screen overflow-hidden bg-[#F4F4F8]">
+ <div className="flex h-screen overflow-hidden bg-[#F7F7FB]">
  <InstructorSidebar />
  <div className="flex flex-col flex-1 overflow-hidden">
  <InstructorTopbar />

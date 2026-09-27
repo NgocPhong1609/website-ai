@@ -146,7 +146,7 @@ function LessonRow({
             e.stopPropagation();
             onDragStart && onDragStart(e, chapterId, lesson.id);
           }}
-          className="text-gray-300 group-hover:text-slate-500 cursor-grab active:cursor-grabbing transition-colors shrink-0 p-1 rounded hover:bg-gray-100"
+          className="text-slate-300 group-hover:text-slate-500 cursor-grab active:cursor-grabbing transition-colors shrink-0 p-1 rounded hover:bg-slate-100"
           title="Giữ và kéo để sắp xếp vị trí bài học"
         >
           <GripIcon size={16} />
@@ -234,7 +234,7 @@ function LessonRow({
               onDelete(chapterId, lesson.id);
             }
           }}
-          className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-transparent hover:border-rose-200 transition-all cursor-pointer flex items-center justify-center shrink-0"
+          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-transparent hover:border-rose-200 transition-all cursor-pointer flex items-center justify-center shrink-0"
           title={isQuiz ? "Gỡ bài thi khỏi khóa học" : "Xóa bài học"}
         >
           <TrashIcon size={15} />
@@ -683,7 +683,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
 
       {/* KHU VỰC 2 — QUẢN LÝ QUIZ CẤP KHÓA HỌC */}
       {courseId && (
-        <div className="w-full p-6 rounded-lg bg-gradient-to-b from-[#FAF8FF] to-white border-2 border-blue-100 shadow-xs flex flex-col gap-6">
+        <div className="w-full p-6 rounded-lg bg-gradient-to-b from-slate-50 to-white border-2 border-blue-100 shadow-xs flex flex-col gap-6">
           <div>
             <div className="flex items-center gap-2">
               <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs">
@@ -693,7 +693,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                 QUẢN LÝ BÀI KIỂM TRA CẤP KHÓA HỌC
               </h3>
             </div>
-            <p className="text-xs text-gray-500 font-medium mt-1">
+            <p className="text-xs text-slate-500 font-medium mt-1">
               Quản lý các bài kiểm tra Đánh giá năng lực tổng quát và bài kiểm tra Cuối khóa học. Chỉ bài thi được chọn chính mới được hiển thị cho học viên.
             </p>
           </div>
@@ -794,7 +794,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                         <button
                           type="button"
                           onClick={() => handleDetachQuiz(activeGeneralQuiz.id)}
-                          className="p-1 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
+                          className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
                           title="Gỡ khỏi khóa học"
                         >
                           <TrashIcon size={14} />
@@ -901,7 +901,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                         <button
                           type="button"
                           onClick={() => handleDetachQuiz(activeFinalQuiz.id)}
-                          className="p-1 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
+                          className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
                           title="Gỡ khỏi khóa học"
                         >
                           <TrashIcon size={14} />
@@ -933,7 +933,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
               <button
                 type="button"
                 onClick={toggleCollapseAll}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
                 title="Thu gọn hoặc mở rộng tất cả các chuyên đề"
               >
                 <span className="inline-flex items-center gap-1">
@@ -968,7 +968,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                 + Tạo Chuyên Đề Đầu Tiên
               </button>
             }
-            className="bg-white border border-dashed border-gray-300 shadow-sm p-14 rounded-lg"
+            className="bg-white border border-dashed border-slate-300 shadow-sm p-14 rounded-lg"
           />
         ) : (
           <div className="flex flex-col gap-5">
@@ -978,16 +978,16 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
               return (
                 <div key={chap.id} className="p-5 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
                   {/* Chapter Header */}
-                  <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-100 pb-3.5 gap-3">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3.5 gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       {/* Collapse / Expand Toggle Button */}
                       <button
                         type="button"
                         onClick={() => toggleModuleCollapse(chap.id)}
-                        className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all cursor-pointer flex items-center justify-center shrink-0"
+                        className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer flex items-center justify-center shrink-0"
                         title={isCollapsed ? "Mở rộng chuyên đề" : "Thu gọn chuyên đề"}
                       >
-                        <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${isCollapsed ? "-rotate-90 text-gray-500" : "rotate-0 text-blue-500"}`} aria-hidden />
+                        <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${isCollapsed ? "-rotate-90 text-slate-500" : "rotate-0 text-blue-500"}`} aria-hidden />
                       </button>
 
                       <span className="w-8 h-8 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
@@ -1000,7 +1000,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                           value={chap.title}
                           onChange={(e) => handleLocalModuleTitleChange(chap.id, e.target.value)}
                           onBlur={(e) => handleSaveModuleTitleOnBlur(chap.id, e.target.value)}
-                          className="w-full text-sm font-bold text-slate-900 bg-transparent focus:outline-none focus:border-b-2 focus:border-[#3B82F6] transition-colors truncate"
+                          className="w-full text-sm font-bold text-slate-900 bg-transparent focus:outline-none focus:border-b-2 focus:border-blue-500 transition-colors truncate"
                           placeholder="Tên chuyên đề..."
                         />
 
@@ -1051,7 +1051,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                       <button
                         type="button"
                         onClick={() => handleDeleteChapter(chap.id)}
-                        className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 rounded-lg transition-all cursor-pointer flex items-center justify-center shrink-0"
+                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 rounded-lg transition-all cursor-pointer flex items-center justify-center shrink-0"
                         title="Xóa chuyên đề"
                       >
                         <TrashIcon size={16} />
@@ -1089,7 +1089,7 @@ export function Step2CourseStructure({ courseId }: { courseId?: string }) {
                   )}
 
                   {/* AI Co-Creator Quick Action Tag */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 text-[11px] font-bold text-gray-400 gap-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 text-[11px] font-bold text-slate-400 gap-1">
                     <span className="flex items-center gap-1 text-blue-500">
                       ⚡ AI Generator: Tạo bộ câu hỏi trắc nghiệm tự động theo ngữ cảnh bài học của chuyên đề này.
                     </span>

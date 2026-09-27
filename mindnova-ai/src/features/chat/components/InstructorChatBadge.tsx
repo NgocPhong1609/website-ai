@@ -16,7 +16,7 @@ export function InstructorChatBadge({ role }: InstructorChatBadgeProps) {
   return (
     <span
       aria-label="Giảng viên"
-      className="inline-flex shrink-0 items-center rounded-full border border-indigo-200 bg-indigo-50 px-1.5 py-0.5 text-[9px] font-semibold leading-none text-indigo-700"
+      className="inline-flex shrink-0 items-center rounded-full border border-sky-200 bg-sky-50 px-1.5 py-0.5 text-[9px] font-semibold leading-none text-sky-700"
     >
       Giảng viên
     </span>

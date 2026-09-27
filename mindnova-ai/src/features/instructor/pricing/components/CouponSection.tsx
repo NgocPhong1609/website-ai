@@ -4,9 +4,9 @@ import { getErrorMessage } from "@/src/shared/lib/user-error";
 import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { NoData } from "@/src/shared/components/ui/NoData";
-import { GiftIcon, PlusCircleIcon, TrashIcon } from "./icons";
 import { useCoupons, Coupon } from "../hooks/useCoupons";
 import { Loader } from "@/src/shared/components/ui/Loader";
+import { Gift, PlusCircle, Trash2 } from "lucide-react";
 
 // ------------------------------------------------------------------------------------------------
 // StatusBadge
@@ -22,8 +22,8 @@ function StatusBadge({ status }: { status: "active" | "disabled" | "expired" }) 
   }
   if (status === "expired") {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold text-slate-500 bg-[#E2E8F0] border border-slate-200">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#64748B]" />
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold text-slate-500 bg-slate-200 border border-slate-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-500" />
         Đã hết hạn
       </span>
     );
@@ -104,32 +104,32 @@ function CreateCouponDialog({
       <div className="fixed inset-0 z-40 bg-black/25 backdrop-blur-[2px]" onClick={onClose} aria-hidden />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div className="pointer-events-auto w-full max-w-[460px] bg-white rounded-lg border border-slate-200 shadow-[0_20px_60px_rgba(70,72,212,0.15)] overflow-hidden">
-          <div className="flex items-center gap-3 px-5 py-4 border-b border-[#F0F0F8]">
-            <div className="w-8 h-8 rounded-lg bg-[#EFF6FF] text-blue-500 flex items-center justify-center">
-              <GiftIcon size={15} />
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center">
+              <Gift size={15} />
             </div>
             <div className="flex-1">
               <h3 className="text-[14px] font-bold text-slate-900">Tạo mã giảm giá</h3>
               <p className="text-[11px] text-slate-500">Tạo mã ưu đãi và thiết lập thời hạn khuyến mãi</p>
             </div>
-            <button type="button" onClick={onClose} className="w-7 h-7 rounded-lg text-slate-500 hover:bg-[#E2E8F0] hover:text-slate-900 flex items-center justify-center cursor-pointer">✕</button>
+            <button type="button" onClick={onClose} className="w-7 h-7 rounded-lg text-slate-500 hover:bg-slate-200 hover:text-slate-900 flex items-center justify-center cursor-pointer">✕</button>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-5 py-5 max-h-[85vh] overflow-y-auto">
             {/* Mã Code */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-[12px] font-semibold text-[#475569]">Mã code</label>
-              <input type="text" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="VD: SUMMER2025" required className="h-10 px-3 rounded-lg border border-[#DDDDF0] bg-[#FAFAFE] text-sm font-mono text-slate-900 focus:border-slate-200 focus:ring-2 focus:ring-[#3B82F6]/15 outline-none uppercase" />
+              <label className="text-[12px] font-semibold text-slate-600">Mã code</label>
+              <input type="text" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="VD: SUMMER2025" required className="h-10 px-3 rounded-lg border border-slate-200 bg-slate-50 text-sm font-mono text-slate-900 focus:border-slate-200 focus:ring-2 focus:ring-blue-500/15 outline-none uppercase" />
             </div>
 
             {/* Phạm vi áp dụng */}
             <div className="flex flex-col gap-1.5">
-              <span className="text-[12px] font-semibold text-[#475569]">Phạm vi áp dụng</span>
+              <span className="text-[12px] font-semibold text-slate-600">Phạm vi áp dụng</span>
               <div className="flex flex-col gap-2">
                 {currentCourseId && (
                   <label className={twMerge(
                     "flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-all text-xs font-semibold",
-                    scope === "this_course" ? "border-[#3B82F6] bg-slate-50 text-blue-500" : "border-slate-200 text-[#475569]"
+                    scope === "this_course" ? "border-blue-500 bg-slate-50 text-blue-500" : "border-slate-200 text-slate-600"
                   )}>
                     <input
                       type="radio"
@@ -143,7 +143,7 @@ function CreateCouponDialog({
                 )}
                 <label className={twMerge(
                   "flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-all text-xs font-semibold",
-                  scope === "all_courses" ? "border-[#3B82F6] bg-slate-50 text-blue-500" : "border-slate-200 text-[#475569]"
+                  scope === "all_courses" ? "border-blue-500 bg-slate-50 text-blue-500" : "border-slate-200 text-slate-600"
                 )}>
                   <input
                     type="radio"
@@ -159,7 +159,7 @@ function CreateCouponDialog({
 
             {/* Loại giảm giá */}
             <div className="flex flex-col gap-1.5">
-              <span className="text-[12px] font-semibold text-[#475569]">Loại giảm giá</span>
+              <span className="text-[12px] font-semibold text-slate-600">Loại giảm giá</span>
               <div className="grid grid-cols-2 gap-2">
                 {(["percent", "fixed"] as const).map((t) => (
                   <button key={t} type="button" onClick={() => setType(t)} className={twMerge("py-2 rounded-lg border text-[12px] font-semibold cursor-pointer", type === t ? "border-slate-200 bg-slate-50 text-blue-500" : "border-slate-200 text-slate-500")}>
@@ -172,19 +172,19 @@ function CreateCouponDialog({
             {/* Giá trị & Số lượng */}
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[12px] font-semibold text-[#475569]">Giá trị giảm</label>
-                <div className="flex rounded-lg border border-[#DDDDF0] bg-[#FAFAFE] overflow-hidden focus-within:border-slate-200 focus-within:ring-2 focus-within:ring-[#3B82F6]/15">
+                <label className="text-[12px] font-semibold text-slate-600">Giá trị giảm</label>
+                <div className="flex rounded-lg border border-slate-200 bg-slate-50 overflow-hidden focus-within:border-slate-200 focus-within:ring-2 focus-within:ring-blue-500/15">
                   <input type="number" value={value} onChange={(e) => setValue(e.target.value)} required min="0" placeholder={type === "percent" ? "VD: 100" : "VD: 50000"} className="flex-1 h-10 px-3 text-sm text-slate-900 bg-transparent outline-none" />
                 </div>
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[12px] font-semibold text-[#475569]">Số lượng tối đa</label>
-                <input type="number" value={total} onChange={(e) => setTotal(e.target.value)} min="1" className="h-10 px-3 rounded-lg border border-[#DDDDF0] bg-[#FAFAFE] text-sm text-slate-900 focus:border-slate-200 outline-none" />
+                <label className="text-[12px] font-semibold text-slate-600">Số lượng tối đa</label>
+                <input type="number" value={total} onChange={(e) => setTotal(e.target.value)} min="1" className="h-10 px-3 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-900 focus:border-slate-200 outline-none" />
               </div>
             </div>
 
             {/* Hạn sử dụng chương trình (Bắt đầu & Kết thúc) */}
-            <div className="flex flex-col gap-1.5 border-t border-[#F0F0F8] pt-3">
+            <div className="flex flex-col gap-1.5 border-t border-slate-100 pt-3">
               <span className="text-[12px] font-bold text-slate-900">📅 Thời gian áp dụng chương trình</span>
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
@@ -193,7 +193,7 @@ function CreateCouponDialog({
                     type="date"
                     value={startsAt}
                     onChange={(e) => setStartsAt(e.target.value)}
-                    className="h-10 px-2.5 rounded-lg border border-[#DDDDF0] bg-[#FAFAFE] text-xs text-slate-900 outline-none"
+                    className="h-10 px-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs text-slate-900 outline-none"
                   />
                 </div>
                 <div className="flex flex-col gap-1">
@@ -202,14 +202,14 @@ function CreateCouponDialog({
                     type="date"
                     value={expiresAt}
                     onChange={(e) => setExpiresAt(e.target.value)}
-                    className="h-10 px-2.5 rounded-lg border border-[#DDDDF0] bg-[#FAFAFE] text-xs text-slate-900 outline-none"
+                    className="h-10 px-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs text-slate-900 outline-none"
                   />
                 </div>
               </div>
             </div>
 
             <div className="flex gap-2 pt-2">
-              <button type="button" onClick={onClose} disabled={isSubmitting} className="flex-1 h-10 rounded-lg border border-slate-200 text-sm text-slate-500 hover:bg-[#E2E8F0] cursor-pointer">Hủy</button>
+              <button type="button" onClick={onClose} disabled={isSubmitting} className="flex-1 h-10 rounded-lg border border-slate-200 text-sm text-slate-500 hover:bg-slate-200 cursor-pointer">Hủy</button>
               <button type="submit" disabled={isSubmitting} className="flex-1 h-10 rounded-lg bg-blue-500 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(70,72,212,0.35)] disabled:opacity-50 cursor-pointer">
                 {isSubmitting ? "Đang tạo..." : "Tạo mã"}
               </button>
@@ -242,11 +242,11 @@ function CouponRow({ coupon, onDelete, onToggleStatus }: { coupon: Coupon; onDel
   }
 
   return (
-    <tr className="group hover:bg-[#FAFAFE] transition-colors duration-100">
+    <tr className="group hover:bg-slate-50 transition-colors duration-100">
       <td className="px-4 py-3 text-left">
-        <span className="font-mono text-[13px] font-bold text-blue-500 bg-[#EFF6FF] px-2 py-0.5 rounded-md">{coupon.code}</span>
+        <span className="font-mono text-[13px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-md">{coupon.code}</span>
       </td>
-      <td className="px-4 py-3 text-[12px] text-[#475569]">{coupon.type === "percent" ? "Phần trăm (%)" : "Cố định (VNĐ)"}</td>
+      <td className="px-4 py-3 text-[12px] text-slate-600">{coupon.type === "percent" ? "Phần trăm (%)" : "Cố định (VNĐ)"}</td>
       <td className="px-4 py-3 text-[13px] font-semibold text-slate-900">{formattedValue}</td>
       <td className="px-4 py-3 text-[12px]">
         {coupon.course_id ? (
@@ -262,7 +262,7 @@ function CouponRow({ coupon, onDelete, onToggleStatus }: { coupon: Coupon; onDel
       <td className="px-4 py-3 text-[11px] font-medium text-slate-600">
         {timeText}
       </td>
-      <td className="px-4 py-3 text-[12px] text-[#475569]">
+      <td className="px-4 py-3 text-[12px] text-slate-600">
         <span className="font-semibold text-slate-900">{coupon.used_count}</span>
         <span className="text-slate-500">/{coupon.max_uses || '∞'}</span>
       </td>
@@ -272,8 +272,8 @@ function CouponRow({ coupon, onDelete, onToggleStatus }: { coupon: Coupon; onDel
           <button type="button" onClick={() => onToggleStatus(coupon.id, coupon.status === 'active' ? 'disabled' : 'active')} className="px-2 py-1 text-[10px] font-bold rounded-lg text-blue-500 bg-blue-50 hover:bg-slate-50 transition-colors cursor-pointer">
             {coupon.status === 'active' ? 'Tắt' : 'Bật'}
           </button>
-          <button type="button" aria-label={`Xóa mã ${coupon.code}`} onClick={() => { if(confirm('Xác nhận xóa?')) onDelete(coupon.id); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#2563EB] hover:bg-[#EFF6FF] transition-all duration-150 cursor-pointer">
-            <TrashIcon size={13} />
+          <button type="button" aria-label={`Xóa mã ${coupon.code}`} onClick={() => { if(confirm('Xác nhận xóa?')) onDelete(coupon.id); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-150 cursor-pointer">
+            <Trash2 size={13} />
           </button>
         </div>
       </td>
@@ -292,16 +292,16 @@ export function CouponSection({ courseId }: { courseId?: string } = {}) {
     <>
       <div className="rounded-lg border border-slate-200 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden min-h-[200px]">
         {/* Header */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-[#F0F0F8]">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2 flex-1">
-            <span className="w-6 h-6 rounded-md bg-[#EFF6FF] text-blue-500 flex items-center justify-center"><GiftIcon size={14} /></span>
+            <span className="w-6 h-6 rounded-md bg-blue-50 text-blue-500 flex items-center justify-center"><Gift size={14} /></span>
             <div>
               <p className="text-[14px] font-bold text-slate-900">Quản lý mã giảm giá</p>
               <p className="text-[11px] text-slate-500">Tạo mã ưu đãi để thúc đẩy doanh số bán hàng trong các dịp đặc biệt.</p>
             </div>
           </div>
-          <button type="button" onClick={() => setShowDialog(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-[12px] font-semibold text-blue-500 bg-[#EFF6FF] border border-[#DBEAFE] hover:bg-[#DBEAFE] hover:text-[#1D4ED8] transition-all duration-200 cursor-pointer">
-            <PlusCircleIcon size={13} /> Tạo mã mới
+          <button type="button" onClick={() => setShowDialog(true)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-[12px] font-semibold text-blue-500 bg-blue-50 border border-blue-100 hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 cursor-pointer">
+            <PlusCircle size={13} /> Tạo mã mới
           </button>
         </div>
 
@@ -313,17 +313,17 @@ export function CouponSection({ courseId }: { courseId?: string } = {}) {
             </div>
           )}
           {error && (
-            <div className="p-4 text-xs font-bold text-blue-500 text-center bg-[#EFF6FF]">{error}</div>
+            <div className="p-4 text-xs font-bold text-blue-500 text-center bg-blue-50">{error}</div>
           )}
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#FAFAFE] border-b border-[#F0F0F8]">
+              <tr className="bg-slate-50 border-b border-slate-100">
                 {["Mã Code", "Loại Giảm", "Giá Trị", "Phạm Vi", "Thời Gian Áp Dụng", "Số Lượng", "Trạng Thái", "Thao Tác"].map((col) => (
                   <th key={col} className="px-4 py-2.5 text-[11px] font-bold text-slate-500 tracking-wide uppercase whitespace-nowrap">{col}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E2E8F0]">
+            <tbody className="divide-y divide-slate-200">
               {coupons.map((c) => (
                 <CouponRow key={c.id} coupon={c} onDelete={deleteCoupon} onToggleStatus={toggleStatus} />
               ))}

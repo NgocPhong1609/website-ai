@@ -41,7 +41,7 @@ export function Step3GeneratingState() {
  </div>
 
  <div className="w-full max-w-md flex flex-col gap-3">
- <div className="p-4 rounded-lg bg-[#FAF8FF] border-slate-200 flex items-center gap-3">
+ <div className="p-4 rounded-lg bg-slate-50 border-slate-200 flex items-center gap-3">
  <Loader size="sm" />
  <span className="text-xs font-semibold text-blue-500 animate-pulse">
  {steps[currentProgressStep]}
@@ -54,7 +54,7 @@ export function Step3GeneratingState() {
  <div
  key={idx}
  className={`h-2 flex-1 mx-1 rounded-full transition-all duration-500 ${
- idx <= currentProgressStep ? "bg-blue-500" : "bg-gray-200"
+ idx <= currentProgressStep ? "bg-blue-500" : "bg-slate-200"
  }`}
  />
  ))}

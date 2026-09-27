@@ -144,7 +144,7 @@ export function TeacherProfileContainer() {
  <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
  {/* Avatar Upload */}
  <div className="relative group">
- <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100 flex items-center justify-center text-3xl font-bold text-blue-500">
+ <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-slate-100 flex items-center justify-center text-3xl font-bold text-blue-500">
  {profileData?.avatar_url ? (
  <img
  src={profileData.avatar_url}
@@ -191,7 +191,7 @@ export function TeacherProfileContainer() {
  ? "bg-amber-50 text-amber-700 border-amber-200"
  : status === "rejected"
  ? "bg-rose-50 text-rose-700 border-rose-200"
- : "bg-gray-100 text-slate-500 border-slate-200"
+ : "bg-slate-100 text-slate-500 border-slate-200"
  }`}
  >
  {isVerified
@@ -283,7 +283,7 @@ export function TeacherProfileContainer() {
  </p>
  <button
  onClick={() => setIsModalOpen(true)}
- className="w-full py-2.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs shadow-md shadow-[#3B82F6]/20 transition-all"
+ className="w-full py-2.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs shadow-md shadow-blue-500/20 transition-all"
  >
  Yêu cầu cấp tích xanh 
  </button>
@@ -308,7 +308,7 @@ export function TeacherProfileContainer() {
  {profileData.certificates.map((cert: any) => (
  <div
  key={cert.id}
- className="p-3.5 rounded-lg border border-gray-100 bg-slate-50/60 space-y-2 relative group"
+ className="p-3.5 rounded-lg border border-slate-100 bg-slate-50/60 space-y-2 relative group"
  >
  <div className="flex items-start justify-between gap-2">
  <div>
@@ -339,7 +339,7 @@ export function TeacherProfileContainer() {
  href={cert.certificate_image}
  target="_blank"
  rel="noreferrer"
- className="block mt-2 rounded-lg overflow-hidden border border-slate-200 h-24 bg-gray-100"
+ className="block mt-2 rounded-lg overflow-hidden border border-slate-200 h-24 bg-slate-100"
  >
  <img
  src={cert.certificate_image}
@@ -360,13 +360,13 @@ export function TeacherProfileContainer() {
  </a>
  )}
 
- <div className="flex items-center justify-between pt-1 border-t border-slate-200/50 text-[11px] text-gray-400">
+ <div className="flex items-center justify-between pt-1 border-t border-slate-200/50 text-[11px] text-slate-400">
  <span>{cert.is_public ? " Hiển thị Public" : " Riêng tư"}</span>
   <div className="flex items-center gap-3">
   {cert.verification_status === "approved" ? (
     <span
       title="Bằng cấp đã được Admin xác minh không thể sửa"
-      className="text-gray-400 font-bold text-[11px] cursor-not-allowed select-none flex items-center gap-1"
+      className="text-slate-400 font-bold text-[11px] cursor-not-allowed select-none flex items-center gap-1"
     >
       🔒 Đã xác minh
     </span>
@@ -392,7 +392,7 @@ export function TeacherProfileContainer() {
  ))}
  </div>
  ) : (
- <p className="text-xs text-gray-400 italic">Chưa có bằng cấp nào được thêm.</p>
+ <p className="text-xs text-slate-400 italic">Chưa có bằng cấp nào được thêm.</p>
  )}
  </div>
  </div>
@@ -401,7 +401,7 @@ export function TeacherProfileContainer() {
  <div className="lg:col-span-2 space-y-6">
  {/* Edit Profile Form */}
  <div className="rounded-lg border border-slate-200 bg-white p-6 md:p-8 shadow-sm space-y-6">
- <div className="border-b border-gray-100 pb-4">
+ <div className="border-b border-slate-100 pb-4">
  <h2 className="text-lg font-bold text-slate-900">Chỉnh sửa thông tin cá nhân</h2>
  <p className="text-xs font-semibold text-slate-500">
  Thông tin được hiển thị cho học viên trên trang cá nhân của bạn.
@@ -411,7 +411,7 @@ export function TeacherProfileContainer() {
  <form onSubmit={handleProfileSave} className="space-y-4">
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  <div>
- <label className="block text-xs font-semibold uppercase text-gray-700 mb-1">
+ <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
  Họ và Tên
  </label>
  <input
@@ -419,26 +419,26 @@ export function TeacherProfileContainer() {
  required
  value={form.name}
  onChange={(e) => setForm({ ...form, name: e.target.value })}
- className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+ className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
  />
  </div>
 
  <div>
- <label className="block text-xs font-semibold uppercase text-gray-700 mb-1">
+ <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
  Số điện thoại
  </label>
  <input
  type="text"
  value={form.phone}
  onChange={(e) => setForm({ ...form, phone: e.target.value })}
- className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+ className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
  />
  </div>
  </div>
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  <div>
- <label className="block text-xs font-semibold uppercase text-gray-700 mb-1">
+ <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
  Chuyên môn chính
  </label>
  <input
@@ -446,12 +446,12 @@ export function TeacherProfileContainer() {
  placeholder="VD: Lập trình Fullstack, AI, IELTS..."
  value={form.expertise}
  onChange={(e) => setForm({ ...form, expertise: e.target.value })}
- className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+ className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
  />
  </div>
 
  <div>
- <label className="block text-xs font-semibold uppercase text-gray-700 mb-1">
+ <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
  Kinh nghiệm làm việc
  </label>
  <input
@@ -459,25 +459,25 @@ export function TeacherProfileContainer() {
  placeholder="VD: 5+ năm giảng dạy tại ĐH Bách Khoa"
  value={form.experience}
  onChange={(e) => setForm({ ...form, experience: e.target.value })}
- className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+ className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
  />
  </div>
  </div>
 
  <div>
- <label className="block text-xs font-semibold uppercase text-gray-700 mb-1">
+ <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
  Địa chỉ
  </label>
  <input
  type="text"
  value={form.address}
  onChange={(e) => setForm({ ...form, address: e.target.value })}
- className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+ className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
  />
  </div>
 
  <div>
- <label className="block text-xs font-semibold uppercase text-gray-700 mb-1">
+ <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
  Giới thiệu ngắn (Bio)
  </label>
  <textarea
@@ -485,7 +485,7 @@ export function TeacherProfileContainer() {
  placeholder="Giới thiệu bản thân, phong cách giảng dạy và định hướng học tập cho học viên..."
  value={form.bio}
  onChange={(e) => setForm({ ...form, bio: e.target.value })}
- className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+ className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
  />
  </div>
 
@@ -493,7 +493,7 @@ export function TeacherProfileContainer() {
  <button
  type="submit"
  disabled={isSaving}
- className="px-6 py-2.5 rounded-lg text-xs font-bold text-white bg-blue-500 hover:bg-blue-600 shadow-md shadow-[#3B82F6]/30 transition-all disabled:opacity-50"
+ className="px-6 py-2.5 rounded-lg text-xs font-bold text-white bg-blue-500 hover:bg-blue-600 shadow-md shadow-blue-500/30 transition-all disabled:opacity-50"
  >
  {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
  </button>
@@ -509,9 +509,9 @@ export function TeacherProfileContainer() {
  {profileData.courses.map((course: any) => (
  <div
  key={course.id}
- className="p-4 rounded-lg border border-gray-100 bg-slate-50 flex items-center gap-3"
+ className="p-4 rounded-lg border border-slate-100 bg-slate-50 flex items-center gap-3"
  >
- <div className="w-14 h-14 rounded-lg bg-gray-200 shrink-0 overflow-hidden">
+ <div className="w-14 h-14 rounded-lg bg-slate-200 shrink-0 overflow-hidden">
  {course.thumbnail && (
  <img
  src={course.thumbnail}
@@ -532,7 +532,7 @@ export function TeacherProfileContainer() {
  ))}
  </div>
  ) : (
- <p className="text-xs text-gray-400 italic">Chưa có khóa học nào.</p>
+ <p className="text-xs text-slate-400 italic">Chưa có khóa học nào.</p>
  )}
  </div>
  </div>

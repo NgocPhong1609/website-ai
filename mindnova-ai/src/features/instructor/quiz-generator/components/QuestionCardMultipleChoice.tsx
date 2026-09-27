@@ -101,7 +101,7 @@ export function QuestionCardMultipleChoice({
  <span className="text-[11px] font-bold uppercase px-2.5 py-1 rounded-lg bg-slate-50/80 text-blue-500 border-slate-200">
  Trắc nghiệm (MCQ)
  </span>
- <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-gray-100 text-slate-500 border">
+ <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 border">
  {question.difficulty}
  </span>
  {isApproved && (
@@ -120,7 +120,7 @@ export function QuestionCardMultipleChoice({
  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
  isApproved
  ? "text-slate-900 text-white cursor-default"
- : "bg-emerald-50 hover:bg-[#0F172A] text-slate-900 hover:text-white border-slate-200"
+ : "bg-emerald-50 hover:bg-slate-900 text-slate-900 hover:text-white border-slate-200"
  }`}
  >
  {isApproved ? "Approved " : " Approve"}
@@ -135,7 +135,7 @@ export function QuestionCardMultipleChoice({
  <button
  type="button"
  onClick={() => onRegenerate(question.id)}
- className="px-3 py-1.5 rounded-lg bg-purple-50 hover:bg-blue-600 text-blue-500 hover:text-white border-slate-200 text-xs font-semibold transition-all cursor-pointer"
+ className="px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-blue-600 text-blue-500 hover:text-white border-slate-200 text-xs font-semibold transition-all cursor-pointer"
  title="Sinh lại riêng câu này bằng AI"
  >
  Sinh lại
@@ -143,7 +143,7 @@ export function QuestionCardMultipleChoice({
  <button
  type="button"
  onClick={() => onDelete(question.id)}
- className="px-3 py-1.5 rounded-lg bg-[#EFF6FF] hover:bg-blue-600 text-[#2563EB] hover:text-white border border-[#DBEAFE] text-xs font-semibold transition-all cursor-pointer"
+ className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white border border-blue-100 text-xs font-semibold transition-all cursor-pointer"
  >
  Xóa
  </button>
@@ -154,7 +154,7 @@ export function QuestionCardMultipleChoice({
  {isEditing ? (
  <div className="flex flex-col gap-4 pt-2">
  <fieldset className="flex flex-wrap items-center gap-4 rounded-lg border border-slate-200 p-3">
- <legend className="px-1 text-xs font-bold text-gray-700">Số đáp án đúng</legend>
+ <legend className="px-1 text-xs font-bold text-slate-700">Số đáp án đúng</legend>
  <label className="flex items-center gap-2 text-xs font-semibold">
  <input
  type="radio"
@@ -178,12 +178,12 @@ export function QuestionCardMultipleChoice({
  {validationError && <p className="text-xs font-semibold text-red-600">{validationError}</p>}
 
  <div>
- <label className="block text-xs font-bold text-gray-700 mb-1">Nội dung câu hỏi</label>
+ <label className="block text-xs font-bold text-slate-700 mb-1">Nội dung câu hỏi</label>
  <textarea
  value={draftQ}
  onChange={(e) => setDraftQ(e.target.value)}
  rows={2}
- className="w-full p-3 rounded-lg border-[#3B82F6] font-bold text-sm text-gray-800 focus:outline-none"
+ className="w-full p-3 rounded-lg border-blue-500 font-bold text-sm text-slate-800 focus:outline-none"
  />
  </div>
 
@@ -195,7 +195,7 @@ export function QuestionCardMultipleChoice({
  />
 
  <div className="flex flex-col gap-2">
- <label className="block text-xs font-bold text-gray-700">
+ <label className="block text-xs font-bold text-slate-700">
  Các đáp án ({draftSelectionType === "multiple_choice" ? "chọn ít nhất 2 đáp án đúng" : "chọn 1 đáp án đúng"})
  </label>
  {draftOptions.map((opt, oIdx) => (
@@ -218,7 +218,7 @@ export function QuestionCardMultipleChoice({
  setDraftOptions(newOpts);
  }}
  className={`w-full p-2.5 rounded-lg border text-xs font-medium ${
- draftCorrectIndices.includes(oIdx) ? "text-slate-900 bg-emerald-50/50 font-bold border-[#3B82F6]" : "border-slate-200"
+ draftCorrectIndices.includes(oIdx) ? "text-slate-900 bg-emerald-50/50 font-bold border-blue-500" : "border-slate-200"
  }`}
  />
  <div className="w-full">
@@ -235,7 +235,7 @@ export function QuestionCardMultipleChoice({
 
  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
  <div className="md:col-span-2">
- <label className="block text-xs font-bold text-gray-700 mb-1">Giải thích đáp án</label>
+ <label className="block text-xs font-bold text-slate-700 mb-1">Giải thích đáp án</label>
  <input
  type="text"
  value={draftExplanation}
@@ -244,7 +244,7 @@ export function QuestionCardMultipleChoice({
  />
  </div>
  <div>
- <label className="block text-xs font-bold text-gray-700 mb-1">Điểm tối đa (max_score)</label>
+ <label className="block text-xs font-bold text-slate-700 mb-1">Điểm tối đa (max_score)</label>
  <input
  type="number"
  step="0.25"
@@ -254,7 +254,7 @@ export function QuestionCardMultipleChoice({
  const val = parseFloat(e.target.value);
  setDraftPoints(isNaN(val) || val < 0 ? 0 : val);
  }}
- className="w-full p-2.5 rounded-lg border border-slate-200 text-xs font-bold focus:border-[#3B82F6] focus:outline-none"
+ className="w-full p-2.5 rounded-lg border border-slate-200 text-xs font-bold focus:border-blue-500 focus:outline-none"
  />
  </div>
  </div>
@@ -278,12 +278,12 @@ export function QuestionCardMultipleChoice({
  className={`p-3 rounded-lg border flex items-center gap-3 text-xs font-semibold ${
  isCorrect
  ? "text-slate-900 bg-emerald-50 text-slate-900 font-bold shadow-xs"
- : "border-slate-200 bg-slate-50 text-gray-700"
+ : "border-slate-200 bg-slate-50 text-slate-700"
  }`}
  >
  <span
  className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
- isCorrect ? "text-slate-900 text-white" : "bg-gray-200 text-slate-500"
+ isCorrect ? "text-slate-900 text-white" : "bg-slate-200 text-slate-500"
  }`}
  >
  {String.fromCharCode(65 + oIdx)}
@@ -302,7 +302,7 @@ export function QuestionCardMultipleChoice({
  </div>
  )}
 
- <div className="flex items-center justify-between text-[11px] font-semibold text-gray-400 border-t border-gray-100 pt-2 mt-1">
+ <div className="flex items-center justify-between text-[11px] font-semibold text-slate-400 border-t border-slate-100 pt-2 mt-1">
  <span>Thang điểm: {question.points} điểm</span>
  <span>Trạng thái: {question.reviewStatus}</span>
  </div>

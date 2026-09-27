@@ -203,7 +203,7 @@ export default function QuizDetailPage() {
  return (
  <div className="max-w-5xl mx-auto py-24 flex flex-col items-center justify-center gap-3">
  <Loader size="lg" />
- <span className="text-xs font-bold text-gray-500">Đang tải chi tiết bài kiểm tra...</span>
+ <span className="text-xs font-bold text-slate-500">Đang tải chi tiết bài kiểm tra...</span>
  </div>
  );
  }
@@ -215,7 +215,7 @@ export default function QuizDetailPage() {
  ️
  </div>
  <h2 className="text-lg font-bold text-slate-900">{errorMsg || "Không tìm thấy đề kiểm tra"}</h2>
- <p className="text-xs text-gray-500 font-medium">
+ <p className="text-xs text-slate-500 font-medium">
  Đề kiểm tra có thể đã bị xóa hoặc bạn không có quyền truy cập.
  </p>
  <Link
@@ -237,7 +237,7 @@ export default function QuizDetailPage() {
  <div className="flex items-center justify-between">
  <Link
  href="/instructor/quiz-generator"
- className="px-4 py-2 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-blue-600 hover:text-[#2563EB] transition-all shadow-xs flex items-center gap-1.5"
+ className="px-4 py-2 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-blue-600 hover:text-blue-600 transition-all shadow-xs flex items-center gap-1.5"
  >
  <span>←</span>
  <span>Quay lại danh sách</span>
@@ -259,7 +259,7 @@ export default function QuizDetailPage() {
  type="button"
  onClick={handleCancelEdit}
  disabled={isSavingPoints}
- className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-all cursor-pointer"
+ className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all cursor-pointer"
  >
  Hủy
  </button>
@@ -267,7 +267,7 @@ export default function QuizDetailPage() {
  type="button"
  onClick={handleSavePoints}
  disabled={!isValidTotal || isSavingPoints}
- className="px-5 py-2 rounded-lg bg-[#0F172A] hover:bg-[#0F172A] text-white text-xs font-bold shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+ className="px-5 py-2 rounded-lg bg-slate-900 hover:bg-slate-900 text-white text-xs font-bold shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
  >
  {isSavingPoints ? (
  <span>⏳ Đang lưu...</span>
@@ -315,11 +315,11 @@ export default function QuizDetailPage() {
  onChange={(image) => setQuiz((current: any) => ({ ...current, thumbnail_url: image.url, thumbnail_r2_key: image.r2_key }))}
  />
  )}
- <div className="p-8 rounded-lg bg-gradient-to-r from-[#1E233E] via-[#2B2D62] to-[#121626] text-white flex flex-col gap-5 shadow-xl border border-white/10 relative overflow-hidden">
+ <div className="p-8 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white flex flex-col gap-5 shadow-xl border border-white/10 relative overflow-hidden">
  {quiz.thumbnail_url && <img src={quiz.thumbnail_url} alt={`Ảnh đại diện ${quiz.title}`} className="h-44 w-full rounded-lg bg-white/10 object-cover" />}
  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
  <div className="flex items-center gap-2 flex-wrap">
- <span className="px-3 py-1 bg-blue-500/30 text-[#F8FAFC] border-[#3B82F6]/30 text-[10px] font-bold rounded-lg uppercase tracking-wider">
+ <span className="px-3 py-1 bg-blue-500/30 text-slate-50 border-blue-500/30 text-[10px] font-bold rounded-lg uppercase tracking-wider">
  {quiz.source_type === "course"
  ? " Khóa học"
  : quiz.source_type === "content"
@@ -328,12 +328,12 @@ export default function QuizDetailPage() {
  </span>
 
  {attachedCourseName ? (
- <span className="px-3 py-1 bg-[#0F172A]/20 text-[#F8FAFC] border-[#0F172A]/30 text-[10px] font-bold rounded-lg flex items-center gap-1.5">
+ <span className="px-3 py-1 bg-slate-900/20 text-slate-50 border-slate-900/30 text-[10px] font-bold rounded-lg flex items-center gap-1.5">
  <span></span>
  <span>Khóa: <strong className="font-semibold">{attachedCourseName}</strong></span>
  </span>
  ) : (
- <span className="px-3 py-1 bg-white/10 text-gray-300 border border-white/20 text-[10px] font-bold rounded-lg flex items-center gap-1.5">
+ <span className="px-3 py-1 bg-white/10 text-slate-300 border border-white/20 text-[10px] font-bold rounded-lg flex items-center gap-1.5">
  <span></span>
  <span>Chưa gắn vào khóa học</span>
  </span>
@@ -350,7 +350,7 @@ export default function QuizDetailPage() {
  </span>
  </div>
 
- <span className="text-xs text-[#F8FAFC] font-semibold">
+ <span className="text-xs text-slate-50 font-semibold">
  Ngày tạo: {new Date(quiz.created_at || Date.now()).toLocaleDateString("vi-VN")}
  </span>
  </div>
@@ -358,7 +358,7 @@ export default function QuizDetailPage() {
  <div className="flex flex-col gap-2">
  <h1 className="text-2xl font-bold text-white">{quiz.title}</h1>
  {quiz.description && (
- <p className="text-xs text-[#F8FAFC]/90 font-medium leading-relaxed max-w-3xl">
+ <p className="text-xs text-slate-50/90 font-medium leading-relaxed max-w-3xl">
  {quiz.description}
  </p>
  )}
@@ -373,21 +373,21 @@ export default function QuizDetailPage() {
 
  <div className="p-3 rounded-lg bg-white/5 border border-white/10 flex flex-col">
  <span className="text-[10px] text-blue-500 font-bold uppercase">Cấu trúc câu hỏi</span>
- <span className="text-xs font-semibold text-[#F8FAFC] mt-1">
+ <span className="text-xs font-semibold text-slate-50 mt-1">
  {mcqQuestions.length} trắc nghiệm • {essayQuestions.length} tự luận
  </span>
  </div>
 
  <div className="p-3 rounded-lg bg-white/5 border border-white/10 flex flex-col">
  <span className="text-[10px] text-blue-500 font-bold uppercase">Độ khó &amp; Thời gian</span>
- <span className="text-xs font-semibold text-[#F8FAFC] mt-1 uppercase">
+ <span className="text-xs font-semibold text-slate-50 mt-1 uppercase">
  {quiz.difficulty || "mixed"} • {quiz.time_limit_minutes || 15} phút
  </span>
  </div>
 
  <div className="p-3 rounded-lg bg-white/5 border border-white/10 flex flex-col">
  <span className="text-[10px] text-blue-500 font-bold uppercase">Tổng điểm chuẩn</span>
- <span className={`text-xs font-semibold mt-1 ${isValidTotal ? "text-[#F8FAFC]" : "text-amber-300"}`}>
+ <span className={`text-xs font-semibold mt-1 ${isValidTotal ? "text-slate-50" : "text-amber-300"}`}>
  {totalScore} / 10 điểm
  </span>
  </div>
@@ -402,7 +402,7 @@ export default function QuizDetailPage() {
  <span className="text-base"></span>
  <span>Tổng điểm hợp lệ: <strong>10 / 10</strong>. Bài kiểm tra đạt chuẩn quy định 10 điểm.</span>
  </div>
- <span className="px-2.5 py-1 bg-[#0F172A] text-white text-[10px] font-bold uppercase rounded-lg">Standard 10.0</span>
+ <span className="px-2.5 py-1 bg-slate-900 text-white text-[10px] font-bold uppercase rounded-lg">Standard 10.0</span>
  </div>
  ) : isLess ? (
  <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex items-center justify-between shadow-sm">
@@ -460,7 +460,7 @@ export default function QuizDetailPage() {
  <span className="px-3 py-1 rounded-lg bg-blue-50 text-blue-500 text-xs font-semibold border-slate-200">
  Trắc nghiệm: {mcqQuestions.length}
  </span>
- <span className="px-3 py-1 rounded-lg bg-purple-50 text-blue-500 text-xs font-semibold border-slate-200">
+ <span className="px-3 py-1 rounded-lg bg-sky-50 text-blue-500 text-xs font-semibold border-slate-200">
  Tự luận: {essayQuestions.length}
  </span>
  </div>
@@ -476,7 +476,7 @@ export default function QuizDetailPage() {
  <div
  key={q.id || idx}
  className={`p-6 md:p-8 rounded-lg bg-white border-2 transition-all duration-200 shadow-xs flex flex-col gap-4 relative ${
- isEditMode ? "text-blue-500 bg-blue-50/10" : "border-[#EAEAF4]"
+ isEditMode ? "text-blue-500 bg-blue-50/10" : "border-slate-200"
  }`}
  >
  {/* Question Header */}
@@ -489,12 +489,12 @@ export default function QuizDetailPage() {
  className={`px-2.5 py-0.5 text-[11px] font-bold rounded-lg border uppercase ${
  isMcq
  ? "bg-blue-50 text-blue-500"
- : "bg-purple-50 text-blue-500"
+ : "bg-sky-50 text-blue-500"
  }`}
  >
  {isMcq ? "Trắc nghiệm" : "Tự luận"}
  </span>
- <span className="px-2.5 py-0.5 bg-gray-100 text-gray-700 text-[11px] font-semibold rounded-lg uppercase">
+ <span className="px-2.5 py-0.5 bg-slate-100 text-slate-700 text-[11px] font-semibold rounded-lg uppercase">
  Độ khó: {q.difficulty || "medium"}
  </span>
  </div>
@@ -509,9 +509,9 @@ export default function QuizDetailPage() {
  min="0"
  value={currentPoint}
  onChange={(e) => handleUpdateQuestionPoint(idx, parseFloat(e.target.value))}
- className="w-24 p-2 rounded-lg bg-white border-[#3B82F6] text-xs font-bold text-slate-900 focus:outline-none focus:border-[#3B82F6] text-center"
+ className="w-24 p-2 rounded-lg bg-white border-blue-500 text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500 text-center"
  />
- <span className="text-xs font-bold text-gray-500">đ</span>
+ <span className="text-xs font-bold text-slate-500">đ</span>
  </div>
  ) : (
  <span className="text-xs font-bold text-slate-900 bg-emerald-50 px-3.5 py-1.5 rounded-lg border-slate-200 shadow-sm">
@@ -564,7 +564,7 @@ export default function QuizDetailPage() {
  className={`p-3.5 rounded-lg border-2 flex items-center justify-between text-xs font-bold transition-all ${
  opt.isCorrect
  ? "bg-emerald-50/70 text-slate-900 text-emerald-950 shadow-xs"
- : "bg-gray-50 border-gray-200 text-gray-700"
+ : "bg-slate-50 border-slate-200 text-slate-700"
  }`}
  >
  <div className="flex items-center gap-3">
@@ -572,7 +572,7 @@ export default function QuizDetailPage() {
  className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs ${
  opt.isCorrect
  ? "text-slate-900 text-white"
- : "bg-gray-200 text-gray-700"
+ : "bg-slate-200 text-slate-700"
  }`}
  >
  {letter}
@@ -581,7 +581,7 @@ export default function QuizDetailPage() {
  {opt.imageUrl && <img src={opt.imageUrl} alt={`Ảnh đáp án ${letter}`} className="h-14 w-20 rounded-lg object-contain" />}
  </div>
  {opt.isCorrect && (
- <span className="px-2.5 py-0.5 rounded-lg bg-[#0F172A] text-white text-[10px] font-bold uppercase">
+ <span className="px-2.5 py-0.5 rounded-lg bg-slate-900 text-white text-[10px] font-bold uppercase">
  Đáp án đúng
  </span>
  )}
@@ -606,7 +606,7 @@ export default function QuizDetailPage() {
  <span className="font-semibold text-blue-500 uppercase tracking-wider text-[10px]">
  Giải thích chi tiết (Rationale):
  </span>
- <p className="font-medium text-gray-800 leading-relaxed">{q.explanation}</p>
+ <p className="font-medium text-slate-800 leading-relaxed">{q.explanation}</p>
  </div>
  )}
 
@@ -614,11 +614,11 @@ export default function QuizDetailPage() {
  {!isMcq && (
  <div className="flex flex-col gap-3 mt-2">
  {q.sample_answer && (
- <div className="p-4 rounded-lg bg-purple-50/50 border-slate-200 text-xs flex flex-col gap-1">
+ <div className="p-4 rounded-lg bg-sky-50/50 border-slate-200 text-xs flex flex-col gap-1">
  <span className="font-semibold text-blue-500 uppercase tracking-wider text-[10px]">
  Gợi ý / Đáp án tham khảo mẫu:
  </span>
- <p className="font-medium text-gray-800 leading-relaxed whitespace-pre-line">
+ <p className="font-medium text-slate-800 leading-relaxed whitespace-pre-line">
  {q.sample_answer}
  </p>
  </div>
@@ -671,7 +671,7 @@ export default function QuizDetailPage() {
  type="button"
  onClick={handleCancelEdit}
  disabled={isSavingPoints}
- className="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs transition-all cursor-pointer"
+ className="px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-all cursor-pointer"
  >
  Hủy
  </button>
@@ -679,7 +679,7 @@ export default function QuizDetailPage() {
  type="button"
  onClick={handleSavePoints}
  disabled={!isValidTotal || isSavingPoints}
- className="px-6 py-2.5 rounded-lg bg-[#0F172A] hover:bg-[#0F172A] text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+ className="px-6 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-900 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
  >
  {isSavingPoints ? (
  <span>⏳ Đang lưu điểm...</span>
@@ -697,18 +697,18 @@ export default function QuizDetailPage() {
  {/* Delete Confirmation Modal */}
  {showDeleteModal && (
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
- <div className="bg-white rounded-lg p-6 md:p-8 max-w-md w-full shadow-2xl border border-gray-100 flex flex-col gap-5">
+ <div className="bg-white rounded-lg p-6 md:p-8 max-w-md w-full shadow-2xl border border-slate-100 flex flex-col gap-5">
  <div className="flex items-center gap-3 text-rose-600">
  <div className="w-10 h-10 rounded-lg bg-rose-100 flex items-center justify-center text-xl font-bold">
  ️
  </div>
  <div>
  <h3 className="text-base font-bold text-slate-900">Xác nhận xóa đề kiểm tra</h3>
- <p className="text-xs text-gray-500 font-medium">Hành động này không thể hoàn tác.</p>
+ <p className="text-xs text-slate-500 font-medium">Hành động này không thể hoàn tác.</p>
  </div>
  </div>
 
- <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 text-xs flex flex-col gap-1.5">
+ <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs flex flex-col gap-1.5">
  <span className="font-semibold text-slate-900">Bạn có chắc muốn xóa đề kiểm tra này?</span>
  <span className="font-bold text-blue-500">Đề: {quiz.title}</span>
  </div>
@@ -737,7 +737,7 @@ export default function QuizDetailPage() {
  setDeleteError(null);
  }}
  disabled={isDeleting}
- className="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs transition-all cursor-pointer"
+ className="px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-all cursor-pointer"
  >
  Hủy
  </button>

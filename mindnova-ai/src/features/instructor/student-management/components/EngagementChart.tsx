@@ -25,7 +25,7 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
  <div className="relative">
  <button 
  onClick={() => setIsOpen(!isOpen)}
- className="flex items-center justify-between w-[130px] bg-white border border-slate-200 text-gray-700 text-xs font-bold rounded-lg px-4 py-2 hover:bg-slate-50 focus:outline-none focus:border-[#3B82F6] cursor-pointer shadow-sm transition-colors"
+ className="flex items-center justify-between w-[130px] bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-lg px-4 py-2 hover:bg-slate-50 focus:outline-none focus:border-blue-500 cursor-pointer shadow-sm transition-colors"
  >
  <span>{getRangeText(timeRange)}</span>
  <></>
@@ -34,7 +34,7 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
  {isOpen && (
  <>
  <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)}></div>
- <div className="absolute right-0 mt-2 w-[130px] bg-white border border-gray-100 rounded-lg shadow-lg z-20 overflow-hidden py-1">
+ <div className="absolute right-0 mt-2 w-[130px] bg-white border border-slate-100 rounded-lg shadow-lg z-20 overflow-hidden py-1">
  {[7, 14, 30].map(val => (
  <button
  key={val}
@@ -44,7 +44,7 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
  }}
  className={twMerge(
  "w-full text-left px-4 py-2 text-xs font-bold cursor-pointer transition-colors",
- timeRange === val ? "bg-blue-50 text-blue-500" : "text-gray-700 hover:bg-slate-50"
+ timeRange === val ? "bg-blue-50 text-blue-500" : "text-slate-700 hover:bg-slate-50"
  )}
  >
  {getRangeText(val)}
@@ -97,7 +97,7 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
  </AreaChart>
  </ResponsiveContainer>
  ) : (
- <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+ <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
  <></>
  <p className="text-sm font-semibold">Chưa có dữ liệu tương tác</p>
  </div>

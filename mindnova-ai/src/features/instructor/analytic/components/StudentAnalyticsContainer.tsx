@@ -18,7 +18,7 @@ function StudentNavigationTabs({ active }: { active: "students" | "analytics" })
  "px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer",
  active === "students"
  ? "bg-blue-500 text-white shadow-sm"
- : "text-slate-500 hover:bg-gray-100 hover:text-slate-900"
+ : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
  <span> Danh sách &amp; Chăm sóc Học viên</span>
@@ -30,7 +30,7 @@ function StudentNavigationTabs({ active }: { active: "students" | "analytics" })
  "px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer",
  active === "analytics"
  ? "bg-blue-500 text-white shadow-sm"
- : "text-slate-500 hover:bg-gray-100 hover:text-slate-900"
+ : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
  )}
  >
  <span> Phân tích Tương tác &amp; AI Insights</span>
@@ -46,7 +46,7 @@ export function StudentAnalyticsContainer() {
  const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
 
  return (
- <div className="flex flex-col min-h-screen bg-[#F4F4F8] font-sans">
+ <div className="flex flex-col min-h-screen bg-slate-50 font-sans">
  <div className="flex flex-1 overflow-hidden">
  <main className="flex-1 overflow-y-auto">
  <div className="max-w-[1600px] w-full mx-auto px-6 lg:px-12 py-6 flex flex-col gap-6 pb-16">

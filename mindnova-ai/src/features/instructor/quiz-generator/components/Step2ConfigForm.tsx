@@ -68,36 +68,36 @@ export function Step2ConfigForm({
           )}
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">Tên bài kiểm tra <span className="text-rose-500">*</span></label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Tên bài kiểm tra <span className="text-rose-500">*</span></label>
             <input
               type="text"
               value={config.title}
               onChange={(e) => onChangeConfig({ title: e.target.value })}
-              className="w-full p-3.5 rounded-lg border border-slate-200 bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
+              className="w-full p-3.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
               placeholder="VD: Kiểm tra Hệ nhị phân & Máy tính"
             />
           </div>
 
           {embeddedMode && config.source_type !== "course" && (
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Chủ đề hoặc Yêu cầu AI sinh câu hỏi</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Chủ đề hoặc Yêu cầu AI sinh câu hỏi</label>
               <input
                 type="text"
                 value={config.topic || ""}
                 onChange={(e) => onChangeConfig({ topic: e.target.value })}
-                className="w-full p-3.5 rounded-lg border border-slate-200 bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
+                className="w-full p-3.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
                 placeholder="VD: Kiến thức bài học, HTML/CSS căn bản, React Hooks..."
               />
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">Mô tả ngắn</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Mô tả ngắn</label>
             <textarea
               value={config.description}
               onChange={(e) => onChangeConfig({ description: e.target.value })}
               rows={3}
-              className="w-full p-3.5 rounded-lg border border-slate-200 bg-[#FAF8FF] text-xs font-medium text-gray-800 focus:outline-none focus:border-[#3B82F6]"
+              className="w-full p-3.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-medium text-slate-800 focus:outline-none focus:border-blue-500"
               placeholder="Mô tả mục tiêu của bài kiểm tra..."
             />
           </div>
@@ -111,7 +111,7 @@ export function Step2ConfigForm({
 
           {/* Difficulty Selector */}
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1.5">Độ khó câu hỏi</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">Độ khó câu hỏi</label>
             <div className="grid grid-cols-4 gap-2">
               {[
                 { key: "easy", label: "Dễ", icon: "🟢" },
@@ -125,8 +125,8 @@ export function Step2ConfigForm({
                   onClick={() => onChangeConfig({ difficulty: diff.key as DifficultyType })}
                   className={`p-2.5 rounded-lg border text-xs font-semibold flex flex-col items-center gap-1 transition-all ${
                     config.difficulty === diff.key
-                      ? "border-[#3B82F6] bg-blue-50 text-blue-500 shadow-xs"
-                      : "border-slate-200 text-slate-500 hover:border-gray-300"
+                      ? "border-blue-500 bg-blue-50 text-blue-500 shadow-xs"
+                      : "border-slate-200 text-slate-500 hover:border-slate-300"
                   }`}
                 >
                   <span className="text-sm">{diff.icon}</span>
@@ -138,32 +138,32 @@ export function Step2ConfigForm({
 
           <div className="grid grid-cols-2 gap-3 pt-1">
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Thời gian làm bài (Phút)</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Thời gian làm bài (Phút)</label>
               <input
                 type="number"
                 min={0}
                 max={180}
                 value={config.time_limit_minutes}
                 onChange={(e) => onChangeConfig({ time_limit_minutes: parseInt(e.target.value) || 0 })}
-                className="w-full p-3 rounded-lg border border-slate-200 bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
+                className="w-full p-3 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">Điểm đạt (%)</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Điểm đạt (%)</label>
               <input
                 type="number"
                 min={0}
                 max={100}
                 value={config.passing_score}
                 onChange={(e) => onChangeConfig({ passing_score: parseInt(e.target.value) || 70 })}
-                className="w-full p-3 rounded-lg border border-slate-200 bg-[#FAF8FF] text-xs font-bold text-gray-800 focus:outline-none focus:border-[#3B82F6]"
+                className="w-full p-3 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
               />
             </div>
           </div>
         </div>
 
         {/* Right Column: Question Counts Breakdown Widget */}
-        <div className="p-6 rounded-lg bg-[#F5F4FE] border border-blue-100 text-slate-900 flex flex-col justify-between shadow-xs">
+        <div className="p-6 rounded-lg bg-slate-50 border border-blue-100 text-slate-900 flex flex-col justify-between shadow-xs">
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
@@ -177,7 +177,7 @@ export function Step2ConfigForm({
             {/* Total Questions Slider */}
             <div>
               <div className="flex justify-between text-xs font-bold mb-1">
-                <span className="text-gray-700">Tổng số câu hỏi mong muốn</span>
+                <span className="text-slate-700">Tổng số câu hỏi mong muốn</span>
                 <span className="text-blue-500 font-bold">{total} câu</span>
               </div>
               <input
@@ -191,7 +191,7 @@ export function Step2ConfigForm({
                   const newEssay = newTotal - newMc;
                   onChangeConfig({ total_questions: newTotal, multiple_choice_count: newMc, essay_count: newEssay });
                 }}
-                className="w-full accent-[#3B82F6] cursor-pointer h-2 bg-blue-100 rounded-lg"
+                className="w-full accent-blue-500 cursor-pointer h-2 bg-blue-100 rounded-lg"
               />
             </div>
 
@@ -205,19 +205,19 @@ export function Step2ConfigForm({
                   max={total}
                   value={mc}
                   onChange={(e) => onChangeConfig({ multiple_choice_count: parseInt(e.target.value) || 0 })}
-                  className="w-full p-2.5 rounded-lg bg-[#FAF9FF] border border-blue-100 text-slate-900 font-bold text-sm focus:outline-none focus:border-[#3B82F6] focus:bg-white"
+                  className="w-full p-2.5 rounded-lg bg-slate-50 border border-blue-100 text-slate-900 font-bold text-sm focus:outline-none focus:border-blue-500 focus:bg-white"
                 />
               </div>
 
               <div className="p-3.5 rounded-lg bg-white border border-blue-100 shadow-sm flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-purple-700 uppercase tracking-wider">Số câu tự luận</label>
+                <label className="text-[11px] font-bold text-sky-700 uppercase tracking-wider">Số câu tự luận</label>
                 <input
                   type="number"
                   min={0}
                   max={total}
                   value={essay}
                   onChange={(e) => onChangeConfig({ essay_count: parseInt(e.target.value) || 0 })}
-                  className="w-full p-2.5 rounded-lg bg-[#FAF9FF] border border-blue-100 text-slate-900 font-bold text-sm focus:outline-none focus:border-[#3B82F6] focus:bg-white"
+                  className="w-full p-2.5 rounded-lg bg-slate-50 border border-blue-100 text-slate-900 font-bold text-sm focus:outline-none focus:border-blue-500 focus:bg-white"
                 />
               </div>
             </div>
@@ -226,7 +226,7 @@ export function Step2ConfigForm({
             <div className="mt-2 flex flex-col gap-2">
               <div className="flex justify-between text-[11px] font-bold">
                 <span className="text-blue-700">Trắc nghiệm: {mc} ({mcPercent}%)</span>
-                <span className="text-purple-700">Tự luận: {essay} ({essayPercent}%)</span>
+                <span className="text-sky-700">Tự luận: {essay} ({essayPercent}%)</span>
               </div>
               <div className="w-full h-3 rounded-full bg-blue-100 overflow-hidden flex border border-blue-200">
                 <div
@@ -235,7 +235,7 @@ export function Step2ConfigForm({
                 />
                 <div
                   style={{ width: `${essayPercent}%` }}
-                  className="h-full bg-purple-600 transition-all duration-300"
+                  className="h-full bg-sky-600 transition-all duration-300"
                 />
               </div>
             </div>
@@ -259,13 +259,13 @@ export function Step2ConfigForm({
       </div>
 
       {/* Footer Navigation */}
-      <div className={`flex items-center border-t border-gray-100 pt-4 mt-2 ${embeddedMode ? "justify-end" : "justify-between"}`}>
+      <div className={`flex items-center border-t border-slate-100 pt-4 mt-2 ${embeddedMode ? "justify-end" : "justify-between"}`}>
         {!embeddedMode && (
           <button
             type="button"
             onClick={onBack}
             disabled={isGenerating}
-            className="px-6 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs transition-all cursor-pointer disabled:opacity-50"
+            className="px-6 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-all cursor-pointer disabled:opacity-50"
           >
             🠔 Quay lại
           </button>
