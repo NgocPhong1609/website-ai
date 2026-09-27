@@ -67,22 +67,7 @@ class DashboardController extends Controller
             $weeklyActivity[$key] = in_array($date, $checkedInDates, true);
         }
         
-        $focusAreas = \Illuminate\Support\Facades\DB::table('user_topic_performance')
-            ->join('knowledge_topics', 'user_topic_performance.topic_id', '=', 'knowledge_topics.id')
-            ->where('user_topic_performance.user_id', $user->id)
-            ->orderBy('user_topic_performance.accuracy_percentage', 'asc')
-            ->select('knowledge_topics.id', 'knowledge_topics.name', 'user_topic_performance.accuracy_percentage')
-            ->take(2)
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'topic' => $item->name,
-                    'accuracy' => $item->accuracy_percentage,
-                    'action' => $item->accuracy_percentage < 50 ? 'review' : 'practice',
-                ];
-            })
-            ->toArray();
+        $focusAreas = app(\App\Services\Student\FocusAreaService::class)->forUser($user->id);
 
         return response()->json([
             'success' => true,

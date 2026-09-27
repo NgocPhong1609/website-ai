@@ -161,7 +161,7 @@ Pattern: Request → middleware → Controller → Service → Model. Không có
 
 | Feature | FE | BE |
 |---|---|---|
-| Dashboard | `features/student/dashboard/` | `Student\DashboardController` + `DashboardService` |
+| Dashboard | `features/student/dashboard/` | `Student\DashboardController` + `DashboardService`; "Trọng tâm AI" = `FocusAreaService` (quiz AI đã nộp theo topic + `user_quiz_attempts` theo quiz, < 80%, yếu nhất trước) → link `/practice?topic=` |
 | Explore catalog | `features/student/explore/` | `GET /api/student/courses/available` |
 | Course detail / lesson | `features/student/courses/` | `Student\CourseController`, `LessonController` |
 | Quiz / practice | `features/student/quiz/` | `StudentQuizController`, `AiQuizGeneratorController`, `PracticeService` |
@@ -338,7 +338,7 @@ Prefix `/api/admin`.
 
 ### Local/testing only
 
-`POST /api/dev/orders/{orderId}/complete|refund` — Sanctum. FE checkout dev có thể gọi complete.
+`POST /api/dev/orders/{orderId}/complete|refund` — Sanctum. FE checkout dev có thể gọi complete. `GET /api/dev/wipe-enrollments|seed-focus-areas?email=` — không auth, chỉ đăng ký khi `local|testing`; **không** đưa ra ngoài khối guard.
 
 ### Web (Blade)
 
