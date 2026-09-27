@@ -12,25 +12,25 @@ export type ProgressStatus = "Hoàn tất" | "Đang học" | "Chưa bắt đầu
 
 function ProgressBadge({ progress, status }: { progress: number; status: ProgressStatus | string }) {
  let bar = "bg-gray-400";
- let text = "text-[#64748B]";
+ let text = "text-slate-500";
  let label = status;
- let bg = "bg-[#F8FAFC] border-[#E2E8F0]";
+ let bg = "bg-slate-50 border-slate-200";
 
  if (status === "Hoàn tất" || status === "completed") {
  bar = "bg-[#10B981]"; text = "text-[#047857]"; bg = "bg-emerald-50 border-emerald-200"; label = "Hoàn tất";
  } else if (status === "Đang học" || status === "in-progress") {
- bar = "bg-[#3B82F6]"; text = "text-[#2563EB]"; bg = "bg-blue-50 border-[#DBEAFE]"; label = "Đang học";
+ bar = "bg-blue-500"; text = "text-[#2563EB]"; bg = "bg-blue-50 border-[#DBEAFE]"; label = "Đang học";
  } else if (status === "Nguy cơ trễ" || status === "at-risk") {
  bar = "bg-rose-500"; text = "text-rose-600"; bg = "bg-rose-50 border-rose-200"; label = "Nguy cơ trễ";
  } else if (status === "Chưa bắt đầu") {
- bar = "bg-gray-400"; text = "text-[#64748B]"; bg = "bg-[#F8FAFC] border-[#E2E8F0]"; label = "Chưa bắt đầu";
+ bar = "bg-gray-400"; text = "text-slate-500"; bg = "bg-slate-50 border-slate-200"; label = "Chưa bắt đầu";
  }
 
  return (
  <div className="flex flex-col gap-1.5 min-w-[95px]">
  <div className="flex items-center justify-between gap-2">
- <span className={twMerge("text-xs font-black font-mono", text)}>{progress}%</span>
- <span className={twMerge("text-[10px] font-extrabold px-2 py-0.5 rounded-md leading-none border", text, bg)}>
+ <span className={twMerge("text-xs font-bold font-mono", text)}>{progress}%</span>
+ <span className={twMerge("text-[10px] font-semibold px-2 py-0.5 rounded-md leading-none border", text, bg)}>
  {label}
  </span>
  </div>
@@ -43,11 +43,11 @@ function ProgressBadge({ progress, status }: { progress: number; status: Progres
 
 function Avatar({ name, avatarUrl }: { name: string; avatarUrl?: string }) {
  if (avatarUrl) {
- return <img src={avatarUrl} alt={name} className="w-9 h-9 rounded-xl shadow-2xs object-cover shrink-0" />;
+ return <img src={avatarUrl} alt={name} className="w-9 h-9 rounded-lg shadow-sm object-cover shrink-0" />;
  }
  const initials = name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
  return (
- <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#EFF6FF] text-[#2563EB] text-xs font-black shrink-0 shadow-2xs">
+ <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-[#EFF6FF] text-[#2563EB] text-xs font-bold shrink-0 shadow-sm">
  {initials}
  </div>
  );
@@ -86,8 +86,8 @@ function CustomSelect({
  type="button"
  onClick={() => setIsOpen(!isOpen)}
  className={twMerge(
- "w-full flex items-center justify-between px-3.5 py-2 rounded-xl border bg-white text-xs font-bold text-[#0F172A] cursor-pointer shadow-2xs transition-all",
- isOpen ? "border-[#3B82F6] ring-2 ring-[#3B82F6]/15" : "border-[#E2E8F0] hover:bg-[#F8FAFC]"
+ "w-full flex items-center justify-between px-3.5 py-2 rounded-lg border bg-white text-xs font-bold text-slate-900 cursor-pointer shadow-sm transition-all",
+ isOpen ? "border-[#3B82F6] ring-2 ring-[#3B82F6]/15" : "border-slate-200 hover:bg-slate-50"
  )}
  >
  <span className="truncate">{selectedOption.name}</span>
@@ -95,7 +95,7 @@ function CustomSelect({
  </button>
 
  {isOpen && (
- <div className="absolute z-50 top-full mt-1.5 w-full bg-white border border-gray-100 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] overflow-hidden py-1 animate-fadeIn">
+ <div className="absolute z-50 top-full mt-1.5 w-full bg-white border border-gray-100 rounded-lg shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] overflow-hidden py-1 animate-fadeIn">
  {options.map((opt) => (
  <button
  key={opt.id}
@@ -107,8 +107,8 @@ function CustomSelect({
  className={twMerge(
  "w-full text-left px-3.5 py-2.5 text-xs font-semibold transition-colors cursor-pointer",
  value === opt.id
- ? "bg-blue-50/70 text-[#3B82F6]"
- : "text-gray-700 hover:bg-[#F8FAFC] hover:text-[#0F172A]"
+ ? "bg-blue-50/70 text-blue-500"
+ : "text-gray-700 hover:bg-slate-50 hover:text-slate-900"
  )}
  >
  {opt.name}
@@ -175,14 +175,14 @@ export function StudentTable({
  <div className="w-full flex flex-col gap-5 animate-fadeIn">
 
  {/* Filter Toolbar */}
- <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#E2E8F0] shadow-2xs">
+ <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
  <input
  id="search-student"
  type="search"
  placeholder=" Tìm theo họ tên hoặc email..."
  value={searchTerm}
  onChange={(e) => setSearchTerm(e.target.value)}
- className="w-full sm:w-72 px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6] bg-[#F8FAFC]/50"
+ className="w-full sm:w-72 px-3.5 py-2 rounded-lg border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-[#3B82F6] bg-slate-50/50"
  />
 
  <div className="flex items-center gap-1.5 flex-wrap w-full sm:w-auto relative z-10">
@@ -198,11 +198,11 @@ export function StudentTable({
  </div>
 
  {/* Main Table Grid */}
- <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-2xs overflow-hidden">
+ <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
  <div className="overflow-x-auto">
  <table className="w-full text-left border-collapse min-w-[640px]">
  <thead>
- <tr className="border-b border-[#E2E8F0] bg-[#F8FAFC]/70 text-[11px] font-black text-[#64748B] uppercase tracking-wider">
+ <tr className="border-b border-slate-200 bg-slate-50/70 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
  {COLS.map((col) => (
  <th key={col} className="px-4 py-3.5 whitespace-normal break-words">
  {col}
@@ -232,18 +232,18 @@ export function StudentTable({
  </tr>
  ) : (
  data.data.map((st: any) => (
- <tr key={st.enrollment_id} onClick={() => setSelectedStudent(st)} className="hover:bg-[#F8FAFC]/80 transition-colors cursor-pointer">
+ <tr key={st.enrollment_id} onClick={() => setSelectedStudent(st)} className="hover:bg-slate-50/80 transition-colors cursor-pointer">
  <td className="px-6 py-4">
  <div className="flex items-center gap-3">
  <Avatar name={st.name} avatarUrl={st.avatar_url} />
  <div className="min-w-0">
- <p className="font-extrabold text-[#0F172A] truncate">{st.name}</p>
+ <p className="font-semibold text-slate-900 truncate">{st.name}</p>
  <p className="text-[11px] font-medium text-gray-400 truncate">{st.email}</p>
  </div>
  </div>
  </td>
  <td className="px-6 py-4">
- <span className="text-xs font-extrabold text-[#3B82F6] bg-blue-50 px-2.5 py-1 rounded-lg border-[#E2E8F0] whitespace-nowrap">
+ <span className="text-xs font-semibold text-blue-500 bg-blue-50 px-2.5 py-1 rounded-lg border-slate-200 whitespace-nowrap">
  {st.course.title}
  </span>
  </td>
@@ -253,10 +253,10 @@ export function StudentTable({
  <td className="px-6 py-4">
  <div className="flex flex-col gap-1.5 items-start">
  <div className="flex items-center gap-2 whitespace-nowrap">
- <span className={twMerge("font-mono text-xs font-black px-2.5 py-1 rounded-lg border shadow-2xs whitespace-nowrap shrink-0", st.average_score >= 80 ? "text-[#047857] bg-emerald-50 border-emerald-200" : (st.average_score !== null ? "text-amber-700 bg-amber-50 border-amber-200" : "text-[#64748B] bg-[#F8FAFC] border-[#E2E8F0]"))}>
+ <span className={twMerge("font-mono text-xs font-bold px-2.5 py-1 rounded-lg border shadow-sm whitespace-nowrap shrink-0", st.average_score >= 80 ? "text-[#047857] bg-emerald-50 border-emerald-200" : (st.average_score !== null ? "text-amber-700 bg-amber-50 border-amber-200" : "text-slate-500 bg-slate-50 border-slate-200"))}>
  {st.average_score !== null ? `${st.average_score}/100` : "Chưa có"}
  </span>
- <span className="px-2 py-0.5 rounded-md bg-purple-50 text-[#3B82F6] border-[#E2E8F0] text-[10px] font-black font-mono whitespace-nowrap shrink-0">
+ <span className="px-2 py-0.5 rounded-md bg-purple-50 text-blue-500 border-slate-200 text-[10px] font-bold font-mono whitespace-nowrap shrink-0">
  {st.total_credits ? `${st.total_credits} tín` : "0 tín"}
  </span>
  </div>
@@ -265,10 +265,10 @@ export function StudentTable({
  {Array.isArray(st.quiz_scores) && st.quiz_scores.length > 0 && (
  <div className="flex flex-col gap-1 mt-0.5 w-full">
  {st.quiz_scores.map((q: any) => (
- <div key={q.quiz_id} className="flex items-center gap-1.5 text-[10px] font-semibold text-[#64748B] whitespace-nowrap">
+ <div key={q.quiz_id} className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-500 whitespace-nowrap">
  <span className="truncate max-w-[130px] shrink-1" title={q.title}>{q.title}:</span>
- <span className="font-mono font-bold text-[#0F172A] shrink-0">{q.score}/100</span>
- <span className={`px-1.5 py-0.5 rounded font-black text-[9px] whitespace-nowrap shrink-0 ${q.type === 'capability_assessment' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-amber-100 text-amber-800 border border-amber-200'}`}>
+ <span className="font-mono font-bold text-slate-900 shrink-0">{q.score}/100</span>
+ <span className={`px-1.5 py-0.5 rounded font-bold text-[9px] whitespace-nowrap shrink-0 ${q.type === 'capability_assessment' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-amber-100 text-amber-800 border border-amber-200'}`}>
  {q.credits} tín
  </span>
  </div>
@@ -277,7 +277,7 @@ export function StudentTable({
  )}
  </div>
  </td>
- <td className="px-4 py-4 text-xs font-bold text-[#64748B] whitespace-nowrap">
+ <td className="px-4 py-4 text-xs font-bold text-slate-500 whitespace-nowrap">
  {st.enrolled_at ? new Date(st.enrolled_at).toLocaleDateString("vi-VN") : "N/A"}
  </td>
  </tr>
@@ -289,16 +289,16 @@ export function StudentTable({
 
  {/* Pagination Controls */}
  {data && data.meta && (
- <div className="p-4 px-6 bg-[#F8FAFC]/60 border-t border-gray-100 flex items-center justify-between">
- <span className="text-xs font-bold text-[#64748B]">
- Hiển thị trang <strong className="text-[#0F172A] font-extrabold">{data.meta.current_page}</strong> trên <strong className="text-[#0F172A] font-extrabold">{data.meta.last_page}</strong> ({data.meta.total} học viên khớp)
+ <div className="p-4 px-6 bg-slate-50/60 border-t border-gray-100 flex items-center justify-between">
+ <span className="text-xs font-bold text-slate-500">
+ Hiển thị trang <strong className="text-slate-900 font-semibold">{data.meta.current_page}</strong> trên <strong className="text-slate-900 font-semibold">{data.meta.last_page}</strong> ({data.meta.total} học viên khớp)
  </span>
  <div className="flex items-center gap-1.5">
  <button
  type="button"
  onClick={() => setPage(Math.max(1, page - 1))}
  disabled={page === 1}
- className="p-2 rounded-lg border border-[#E2E8F0] text-[#64748B] bg-white hover:bg-[#F8FAFC] disabled:opacity-40 transition-all cursor-pointer disabled:cursor-not-allowed"
+ className="p-2 rounded-lg border border-slate-200 text-slate-500 bg-white hover:bg-slate-50 disabled:opacity-40 transition-all cursor-pointer disabled:cursor-not-allowed"
  >
  <ChevronLeftIcon size={16} />
  </button>
@@ -306,7 +306,7 @@ export function StudentTable({
  type="button"
  onClick={() => setPage(Math.min(data.meta.last_page, page + 1))}
  disabled={page >= data.meta.last_page}
- className="p-2 rounded-lg border border-[#E2E8F0] text-[#64748B] bg-white hover:bg-[#F8FAFC] disabled:opacity-40 transition-all cursor-pointer disabled:cursor-not-allowed"
+ className="p-2 rounded-lg border border-slate-200 text-slate-500 bg-white hover:bg-slate-50 disabled:opacity-40 transition-all cursor-pointer disabled:cursor-not-allowed"
  >
  <ChevronRightIcon size={16} />
  </button>

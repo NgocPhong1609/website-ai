@@ -71,8 +71,8 @@ function SuggestionChip({
  className={twMerge(
  "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30",
  active
- ? "border-[#E2E8F0] bg-[#EFF6FF] text-[#3B82F6]"
- : "border-[#E2E8F0] text-[#64748B] bg-white hover:border-[#DBEAFE] hover:text-[#2563EB]",
+ ? "border-slate-200 bg-[#EFF6FF] text-blue-500"
+ : "border-slate-200 text-slate-500 bg-white hover:border-[#DBEAFE] hover:text-[#2563EB]",
  )}
  >
  <span>{icon}</span>
@@ -93,14 +93,14 @@ function EditorToolbar({ onFormat }: { onFormat: (cmd: string) => void }) {
  ];
 
  return (
- <div className="flex items-center gap-0.5 px-2 py-1.5 bg-[#F8F8FD] border-b border-[#E2E8F0]">
+ <div className="flex items-center gap-0.5 px-2 py-1.5 bg-[#F8F8FD] border-b border-slate-200">
  {tools.map(({ icon, cmd, label }) => (
  <button
  key={cmd}
  type="button"
  aria-label={label}
  onMouseDown={(e) => { e.preventDefault(); onFormat(cmd); }}
- className="w-7 h-7 rounded-md flex items-center justify-center text-[#64748B] hover:text-[#2563EB] hover:bg-[#EFF6FF] transition-all duration-150 focus:outline-none"
+ className="w-7 h-7 rounded-md flex items-center justify-center text-slate-500 hover:text-[#2563EB] hover:bg-[#EFF6FF] transition-all duration-150 focus:outline-none"
  >
  {icon}
  </button>
@@ -156,7 +156,7 @@ function DraftPreview({
  type="button"
  aria-label="Tạo lại"
  onClick={onRefresh}
- className="w-7 h-7 rounded-lg flex items-center justify-center text-[#64748B] hover:text-[#2563EB] hover:bg-[#EFF6FF] transition-all duration-150"
+ className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#2563EB] hover:bg-[#EFF6FF] transition-all duration-150"
  >
  <RefreshIcon />
  </button>
@@ -164,7 +164,7 @@ function DraftPreview({
  type="button"
  aria-label="Sao chép"
  onClick={onCopy}
- className="w-7 h-7 rounded-lg flex items-center justify-center text-[#64748B] hover:text-[#2563EB] hover:bg-[#EFF6FF] transition-all duration-150"
+ className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#2563EB] hover:bg-[#EFF6FF] transition-all duration-150"
  >
  <CopyIcon />
  </button>
@@ -172,7 +172,7 @@ function DraftPreview({
  </div>
 
  {/* Editor */}
- <div className="flex-1 flex flex-col rounded-xl border border-[#DDDDF0] bg-white overflow-hidden focus-within:border-[#E2E8F0] focus-within:ring-2 focus-within:ring-[#3B82F6]/15 transition-all duration-150">
+ <div className="flex-1 flex flex-col rounded-lg border border-[#DDDDF0] bg-white overflow-hidden focus-within:border-slate-200 focus-within:ring-2 focus-within:ring-[#3B82F6]/15 transition-all duration-150">
  <EditorToolbar onFormat={handleFormat} />
  <div
  ref={editorRef}
@@ -198,7 +198,7 @@ function GeneratingShimmer() {
  style={{ width: `${w}%`, animationDelay: `${i * 100}ms` }}
  />
  ))}
- <div className="flex items-center gap-2 mt-2 text-[12px] text-[#3B82F6] font-semibold animate-pulse">
+ <div className="flex items-center gap-2 mt-2 text-[12px] text-blue-500 font-semibold animate-pulse">
  <SparklesIcon size={12} />
  AI đang soạn thảo...
  </div>
@@ -281,7 +281,7 @@ function LeftPanel({
  onChange={(e) => setTopic(e.target.value)}
  placeholder="Nhập chủ đề hoặc ý chính..."
  rows={5}
- className="w-full px-3 py-2.5 rounded-xl border border-[#DDDDF0] bg-[#FAFAFE] text-[13px] text-[#0F172A] placeholder:text-[#C4C4D8] focus:outline-none focus:border-[#E2E8F0] focus:ring-2 focus:ring-[#3B82F6]/15 transition-all duration-150 resize-none leading-relaxed"
+ className="w-full px-3 py-2.5 rounded-lg border border-[#DDDDF0] bg-[#FAFAFE] text-[13px] text-slate-900 placeholder:text-[#C4C4D8] focus:outline-none focus:border-slate-200 focus:ring-2 focus:ring-[#3B82F6]/15 transition-all duration-150 resize-none leading-relaxed"
  />
  </div>
 
@@ -310,7 +310,7 @@ function LeftPanel({
  id="btn-generate-draft"
  onClick={onGenerate}
  disabled={isGenerating}
- className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-[13px] font-semibold text-white bg-[#3B82F6] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:pointer-events-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/40"
+ className="flex items-center justify-center gap-2 w-full py-3 rounded-lg text-[13px] font-semibold text-white bg-blue-500 shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:pointer-events-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/40"
  >
  {isGenerating ? (
  <>
@@ -437,18 +437,18 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
  role="dialog"
  aria-modal
  aria-label="Tạo thông báo mới bằng AI"
- className="pointer-events-auto w-full max-w-[740px] bg-white rounded-2xl border border-[#E2E8F0] shadow-[0_24px_80px_rgba(70,72,212,0.18)] overflow-hidden"
+ className="pointer-events-auto w-full max-w-[740px] bg-white rounded-lg border border-slate-200 shadow-[0_24px_80px_rgba(70,72,212,0.18)] overflow-hidden"
  >
  {/* Modal header */}
  <div className="flex items-start gap-3 px-6 py-5 border-b border-[#F0F0F8]">
- <div className="w-10 h-10 rounded-xl bg-[#3B82F6] flex items-center justify-center text-white shadow-[0_4px_14px_rgba(59,130,246,0.4)] shrink-0">
+ <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center text-white shadow-[0_4px_14px_rgba(59,130,246,0.4)] shrink-0">
  <SparklesIcon size={17} />
  </div>
  <div className="flex-1">
- <h2 className="text-[16px] font-extrabold text-[#0F172A] tracking-tight">
+ <h2 className="text-[16px] font-semibold text-slate-900 tracking-tight">
  Tạo thông báo mới
  </h2>
- <p className="text-[12px] text-[#64748B] mt-0.5">
+ <p className="text-[12px] text-slate-500 mt-0.5">
  Sử dụng AI để soạn thảo thông báo chuyên nghiệp trong giây lát.
  </p>
  </div>
@@ -456,7 +456,7 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
  type="button"
  onClick={onClose}
  aria-label="Đóng"
- className="w-8 h-8 rounded-xl flex items-center justify-center text-[#64748B] hover:text-[#0F172A] hover:bg-[#E2E8F0] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#EAEAF4] shrink-0"
+ className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-[#E2E8F0] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#EAEAF4] shrink-0"
  >
  <XIcon />
  </button>
@@ -489,8 +489,8 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
  <div className="flex items-center justify-between mb-2">
  <span className="text-[12px] font-semibold text-[#475569]">Dự thảo được tạo:</span>
  </div>
- <div className="flex-1 rounded-xl border border-[#DDDDF0] bg-white overflow-hidden">
- <div className="px-3 py-2 bg-[#F8F8FD] border-b border-[#E2E8F0] flex gap-1">
+ <div className="flex-1 rounded-lg border border-[#DDDDF0] bg-white overflow-hidden">
+ <div className="px-3 py-2 bg-[#F8F8FD] border-b border-slate-200 flex gap-1">
  {[...Array(5)].map((_, i) => (
  <div key={i} className="w-5 h-4 rounded bg-[#EAEAF4]" />
  ))}
@@ -505,11 +505,11 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
  onCopy={handleCopy}
  />
  ) : (
- <div className="flex-1 flex flex-col items-center justify-center gap-3 text-[#C4C4D8] border-2 border-dashed border-[#E2E8F0] rounded-xl">
+ <div className="flex-1 flex flex-col items-center justify-center gap-3 text-[#C4C4D8] border-2 border-dashed border-slate-200 rounded-lg">
  <span className="text-4xl"></span>
  <p className="text-[12px] font-semibold text-center">
  Nhập chủ đề và nhấn{" "}
- <span className="text-[#3B82F6]">&quot;Tạo dự thảo bằng AI&quot;</span>
+ <span className="text-blue-500">&quot;Tạo dự thảo bằng AI&quot;</span>
  <br />để xem kết quả ở đây.
  </p>
  </div>
@@ -520,19 +520,19 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
  {/* Modal footer */}
  <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#F0F0F8]">
  {copied && (
- <span className="text-[11px] text-[#0F172A] font-semibold mr-auto">
+ <span className="text-[11px] text-slate-900 font-semibold mr-auto">
  Đã sao chép vào clipboard!
  </span>
  )}
  {saved && (
- <span className="text-[11px] text-[#3B82F6] font-semibold mr-auto animate-pulse">
+ <span className="text-[11px] text-blue-500 font-semibold mr-auto animate-pulse">
  Đã lưu nháp!
  </span>
  )}
  <button
  type="button"
  onClick={handleSaveDraft}
- className="px-5 py-2.5 text-sm font-semibold text-[#64748B] hover:text-[#0F172A] transition-colors duration-150 focus:outline-none"
+ className="px-5 py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors duration-150 focus:outline-none"
  >
  Lưu nháp
  </button>
@@ -541,7 +541,7 @@ export function AINotificationModal({ isOpen, onClose, initialTopic = "" }: AINo
  id="btn-send-notification-modal"
  onClick={handleSend}
  disabled={!draft || isGenerating || isSending || courseIds.length === 0}
- className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#3B82F6] shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/40"
+ className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-500 shadow-[0_4px_14px_rgba(70,72,212,0.35)] hover:shadow-[0_6px_20px_rgba(70,72,212,0.5)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/40"
  >
  {isSending ? (
  <>

@@ -11,14 +11,14 @@ import { StudentDetailSidebar } from "../../student-management/components/Studen
 
 function StudentNavigationTabs({ active }: { active: "students" | "analytics" }) {
  return (
- <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-[#E2E8F0] shadow-2xs w-fit">
+ <div className="flex items-center gap-2 p-1.5 bg-white rounded-lg border border-slate-200 shadow-sm w-fit">
  <Link
  href="/instructor/students"
  className={twMerge(
- "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
+ "px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer",
  active === "students"
- ? "bg-[#3B82F6] text-white shadow-sm"
- : "text-[#64748B] hover:bg-gray-100 hover:text-[#0F172A]"
+ ? "bg-blue-500 text-white shadow-sm"
+ : "text-slate-500 hover:bg-gray-100 hover:text-slate-900"
  )}
  >
  <span> Danh sách &amp; Chăm sóc Học viên</span>
@@ -27,10 +27,10 @@ function StudentNavigationTabs({ active }: { active: "students" | "analytics" })
  <Link
  href="/instructor/analytics"
  className={twMerge(
- "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
+ "px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer",
  active === "analytics"
- ? "bg-[#3B82F6] text-white shadow-sm"
- : "text-[#64748B] hover:bg-gray-100 hover:text-[#0F172A]"
+ ? "bg-blue-500 text-white shadow-sm"
+ : "text-slate-500 hover:bg-gray-100 hover:text-slate-900"
  )}
  >
  <span> Phân tích Tương tác &amp; AI Insights</span>
@@ -53,21 +53,21 @@ export function StudentAnalyticsContainer() {
  <StudentNavigationTabs active="analytics" />
 
  {/* Header & Tab Toggle */}
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E2E8F0] pb-5">
+ <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
  <div>
- <h1 className="text-xl font-black text-[#0F172A] tracking-tight">Quản lý &amp; Phân tích Học viên</h1>
- <p className="text-xs text-[#64748B] mt-1">
+ <h1 className="text-xl font-bold text-slate-900 tracking-tight">Quản lý &amp; Phân tích Học viên</h1>
+ <p className="text-xs text-slate-500 mt-1">
  Kiểm soát mức độ tương tác, lộ trình tiếp thu kiến thức và chẩn đoán các điểm nghẽn bài học với AI.
  </p>
  </div>
 
- <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs">
+ <div className="flex items-center gap-1.5 p-1 rounded-lg bg-white border border-slate-200 shadow-sm">
  <button
  type="button"
  onClick={() => setActiveTab("analytics")}
  className={twMerge(
- "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer",
- activeTab === "analytics" ? "bg-[#3B82F6] text-white shadow-2xs" : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]"
+ "px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+ activeTab === "analytics" ? "bg-blue-500 text-white shadow-sm" : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
  )}
  >
  Báo cáo Tương tác &amp; Tiến độ
@@ -76,8 +76,8 @@ export function StudentAnalyticsContainer() {
  type="button"
  onClick={() => setActiveTab("ai_insights")}
  className={twMerge(
- "px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5",
- activeTab === "ai_insights" ? "bg-[#3B82F6] text-white shadow-2xs" : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]"
+ "px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5",
+ activeTab === "ai_insights" ? "bg-blue-500 text-white shadow-sm" : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
  )}
  >
  <span>Phân tích AI Chuyên sâu</span>

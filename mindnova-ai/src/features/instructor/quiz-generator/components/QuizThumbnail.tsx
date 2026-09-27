@@ -13,7 +13,7 @@ export function QuizThumbnail({ title, src }: { title: string; src?: string | nu
         event.currentTarget.onerror = null;
         event.currentTarget.src = FALLBACK_THUMBNAIL;
       }}
-      className="aspect-square w-28 shrink-0 rounded-xl border border-[#EAEAF4] bg-[#F8FAFC] object-cover sm:w-32"
+      className="aspect-square w-28 shrink-0 rounded-lg border border-[#EAEAF4] bg-slate-50 object-cover sm:w-32"
     />
   );
 }

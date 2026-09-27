@@ -256,7 +256,7 @@ export default function InstructorQuizListPage() {
     <div className="max-w-6xl mx-auto flex flex-col gap-8 p-6 md:p-8 animate-fadeIn">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center justify-between shadow-sm animate-fadeIn">
+        <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center justify-between shadow-sm animate-fadeIn">
           <div className="flex items-center gap-2">
             <span>✅</span>
             <span>{toastMessage}</span>
@@ -264,7 +264,7 @@ export default function InstructorQuizListPage() {
           <button
             type="button"
             onClick={() => setToastMessage(null)}
-            className="text-emerald-700 hover:text-emerald-950 font-black cursor-pointer"
+            className="text-emerald-700 hover:text-emerald-950 font-bold cursor-pointer"
           >
             ✕
           </button>
@@ -272,17 +272,17 @@ export default function InstructorQuizListPage() {
       )}
 
       {/* Top Banner */}
-      <div className="p-8 rounded-xl bg-white text-gray-900 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm border border-gray-200">
+      <div className="p-8 rounded-lg bg-white text-gray-900 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm border border-gray-200">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3">
-            <span className="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#3B82F6] to-[#F368E0] flex items-center justify-center text-2xl font-black shadow-md text-white">
+            <span className="w-12 h-12 rounded-lg bg-gradient-to-tr from-[#3B82F6] to-[#F368E0] flex items-center justify-center text-2xl font-bold shadow-md text-white">
               🪄
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-black text-gray-900">Trợ Lý Tạo Bài Kiểm Tra AI</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Trợ Lý Tạo Bài Kiểm Tra AI</h1>
                 {courseIdNum && (
-                  <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-mono font-black">
+                  <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-mono font-bold">
                     Course #{courseIdNum}
                   </span>
                 )}
@@ -295,7 +295,7 @@ export default function InstructorQuizListPage() {
 
           {courseIdNum && (
             <div className="mt-2 flex items-center gap-2">
-              <span className="px-3 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-extrabold border border-blue-200 flex items-center gap-1.5">
+              <span className="px-3 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-200 flex items-center gap-1.5">
                 <span>🎓</span>
                 <span>Khóa học: {courseTitle || `ID #${courseIdNum}`}</span>
               </span>
@@ -312,13 +312,13 @@ export default function InstructorQuizListPage() {
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
             href={createAiUrl}
-            className="px-6 py-3.5 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-black text-xs rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all text-center flex items-center justify-center gap-2"
+            className="px-6 py-3.5 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-all text-center flex items-center justify-center gap-2"
           >
             <span>✨ Tạo bằng AI</span>
           </Link>
           <Link
             href={createManualUrl}
-            className="px-6 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-black text-xs rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all text-center flex items-center justify-center gap-2 border border-gray-200"
+            className="px-6 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-lg shadow-sm hover:shadow-md hover:scale-105 transition-all text-center flex items-center justify-center gap-2 border border-gray-200"
           >
             <span>📝 Tạo thủ công</span>
           </Link>
@@ -326,19 +326,19 @@ export default function InstructorQuizListPage() {
       </div>
 
       {/* Filter Controls & Search Section */}
-      <div className="bg-white rounded-xl p-6 border border-[#EAEAF4] shadow-sm flex flex-col gap-5">
+      <div className="bg-white rounded-lg p-6 border border-[#EAEAF4] shadow-sm flex flex-col gap-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
-          <h2 className="text-base font-black text-[#0F172A] flex items-center gap-2">
+          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
             <span>📋</span>
             <span>Danh Sách Tất Cả Bài Kiểm Tra Của Bạn</span>
           </h2>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs font-extrabold text-[#3B82F6] bg-blue-50 border border-blue-100 px-3 py-1 rounded-xl">
+            <span className="text-xs font-semibold text-blue-500 bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg">
               Tổng số: {quizzes.length} bài
             </span>
             {hasActiveFilters && (
-              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl">
+              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-lg">
                 Hiển thị: {filteredQuizzes.length} bài
               </span>
             )}
@@ -355,7 +355,7 @@ export default function InstructorQuizListPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm theo tên Quiz, Khóa học..."
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 bg-[#FAF8FF] text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6] transition-all"
+              className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-gray-200 bg-[#FAF8FF] text-xs font-bold text-slate-900 focus:outline-none focus:border-[#3B82F6] transition-all"
             />
           </div>
 
@@ -363,7 +363,7 @@ export default function InstructorQuizListPage() {
           <select
             value={positionFilter}
             onChange={(e) => setPositionFilter(e.target.value)}
-            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6] shadow-2xs truncate"
+            className="p-2.5 rounded-lg border border-gray-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-[#3B82F6] shadow-sm truncate"
           >
             <option value="all">Tất cả Vị trí Quiz</option>
             <option value="capability_assessment">🏆 Kiểm tra tổng quát</option>
@@ -376,7 +376,7 @@ export default function InstructorQuizListPage() {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value as any)}
-            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6] shadow-2xs"
+            className="p-2.5 rounded-lg border border-gray-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-[#3B82F6] shadow-sm"
           >
             <option value="all">Tất cả nguồn (AI / Manual)</option>
             <option value="ai">🤖 AI Quiz</option>
@@ -390,7 +390,7 @@ export default function InstructorQuizListPage() {
               setCourseFilter(e.target.value);
               setModuleFilter("all");
             }}
-            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6] shadow-2xs truncate"
+            className="p-2.5 rounded-lg border border-gray-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-[#3B82F6] shadow-sm truncate"
           >
             <option value="all">Tất cả khóa học</option>
             {coursesList.map((c) => (
@@ -404,7 +404,7 @@ export default function InstructorQuizListPage() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6] shadow-2xs"
+            className="p-2.5 rounded-lg border border-gray-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-[#3B82F6] shadow-sm"
           >
             <option value="newest">Mới nhất</option>
             <option value="oldest">Cũ nhất</option>
@@ -419,7 +419,7 @@ export default function InstructorQuizListPage() {
             <button
               type="button"
               onClick={handleResetFilters}
-              className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-extrabold rounded-xl border border-rose-200 transition-all cursor-pointer flex items-center gap-1"
+              className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold rounded-lg border border-rose-200 transition-all cursor-pointer flex items-center gap-1"
             >
               <span>✕ Xóa bộ lọc</span>
             </button>
@@ -434,10 +434,10 @@ export default function InstructorQuizListPage() {
           </div>
         ) : quizzes.length === 0 ? (
           /* Empty State 1: Instructor has 0 quizzes total */
-          <div className="py-16 text-center rounded-xl bg-gray-50 border border-gray-200 flex flex-col items-center justify-center gap-4 text-gray-500">
+          <div className="py-16 text-center rounded-lg bg-gray-50 border border-gray-200 flex flex-col items-center justify-center gap-4 text-gray-500">
             <span className="text-5xl">📋</span>
             <div className="flex flex-col gap-1 max-w-md">
-              <p className="text-sm font-extrabold text-[#0F172A]">Chưa có đề kiểm tra nào.</p>
+              <p className="text-sm font-semibold text-slate-900">Chưa có đề kiểm tra nào.</p>
               <p className="text-xs font-medium text-gray-500">
                 Hãy sử dụng bộ tạo bài kiểm tra AI hoặc tạo thủ công để xây dựng bộ đề đầu tiên cho học viên.
               </p>
@@ -445,13 +445,13 @@ export default function InstructorQuizListPage() {
             <div className="flex items-center gap-3 mt-2">
               <Link
                 href={createAiUrl}
-                className="px-6 py-3 bg-[#3B82F6] hover:bg-[#2563EB] text-white text-xs font-black rounded-2xl shadow-md transition-all flex items-center gap-2"
+                className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold rounded-lg shadow-md transition-all flex items-center gap-2"
               >
                 <span>✨ Tạo Quiz bằng AI</span>
               </Link>
               <Link
                 href={createManualUrl}
-                className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-extrabold rounded-2xl transition-all flex items-center gap-2"
+                className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded-lg transition-all flex items-center gap-2"
               >
                 <span>✍️ Tạo Quiz thủ công</span>
               </Link>
@@ -459,10 +459,10 @@ export default function InstructorQuizListPage() {
           </div>
         ) : filteredQuizzes.length === 0 ? (
           /* Empty State 2: Active filters returned 0 results */
-          <div className="py-16 text-center rounded-xl bg-amber-50/50 border border-amber-200 flex flex-col items-center justify-center gap-3 text-amber-900">
+          <div className="py-16 text-center rounded-lg bg-amber-50/50 border border-amber-200 flex flex-col items-center justify-center gap-3 text-amber-900">
             <span className="text-4xl">🔍</span>
             <div className="flex flex-col gap-1">
-              <p className="text-sm font-extrabold">Không tìm thấy Quiz nào phù hợp với bộ lọc.</p>
+              <p className="text-sm font-semibold">Không tìm thấy Quiz nào phù hợp với bộ lọc.</p>
               <p className="text-xs font-medium text-amber-700">
                 Vui lòng điều chỉnh hoặc xóa bộ lọc tìm kiếm để xem các đề kiểm tra khác.
               </p>
@@ -470,7 +470,7 @@ export default function InstructorQuizListPage() {
             <button
               type="button"
               onClick={handleResetFilters}
-              className="mt-2 px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold rounded-xl shadow-2xs transition-all cursor-pointer"
+              className="mt-2 px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg shadow-sm transition-all cursor-pointer"
             >
               ✕ Xóa bộ lọc tìm kiếm
             </button>
@@ -488,7 +488,7 @@ export default function InstructorQuizListPage() {
                 return (
                   <div
                     key={q.id}
-                    className="p-4 rounded-xl bg-white border border-[#EAEAF4] hover:border-emerald-500/50 shadow-2xs hover:shadow-md transition-all flex items-start gap-4 group"
+                    className="p-4 rounded-lg bg-white border border-[#EAEAF4] hover:border-emerald-500/50 shadow-sm hover:shadow-md transition-all flex items-start gap-4 group"
                   >
                     <QuizThumbnail title={q.title} src={q.thumbnail_url} />
                     <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 self-stretch">
@@ -496,7 +496,7 @@ export default function InstructorQuizListPage() {
                       {/* Badges Row */}
                       <div className="flex items-center gap-2 flex-wrap">
                         {/* Position Badge */}
-                        <span className="text-[11px] font-black uppercase px-2.5 py-1 rounded-lg border flex items-center gap-1 bg-amber-50 text-amber-950 border-amber-200">
+                        <span className="text-[11px] font-bold uppercase px-2.5 py-1 rounded-lg border flex items-center gap-1 bg-amber-50 text-amber-950 border-amber-200">
                           {qPos === "capability_assessment" || q.type === "capability_assessment" ? (
                             <><span>🏆</span><span>Kiểm tra tổng quát</span></>
                           ) : qPos === "end_of_course" ? (
@@ -510,7 +510,7 @@ export default function InstructorQuizListPage() {
 
                         {/* Source Type Badge */}
                         <span
-                          className={`text-[11px] font-black uppercase px-2.5 py-1 rounded-lg border flex items-center gap-1 ${
+                          className={`text-[11px] font-bold uppercase px-2.5 py-1 rounded-lg border flex items-center gap-1 ${
                             isManual
                               ? "bg-purple-50 text-purple-800 border-purple-200"
                               : "bg-emerald-50 text-emerald-800 border-emerald-200"
@@ -522,7 +522,7 @@ export default function InstructorQuizListPage() {
 
                         {/* Active Badge */}
                         {isActive && (
-                          <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-600 text-white shadow-2xs">
+                          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-emerald-600 text-white shadow-sm">
                             ✓ Đang sử dụng
                           </span>
                         )}
@@ -540,7 +540,7 @@ export default function InstructorQuizListPage() {
 
                       {/* Quiz Title & Module info */}
                       <div>
-                        <h3 className="text-base font-extrabold text-[#0F172A] group-hover:text-emerald-700 transition-colors line-clamp-1">
+                        <h3 className="text-base font-semibold text-slate-900 group-hover:text-emerald-700 transition-colors line-clamp-1">
                           {q.title}
                         </h3>
                         {attachedModuleTitle && (
@@ -568,7 +568,7 @@ export default function InstructorQuizListPage() {
                         <button
                           type="button"
                           onClick={() => setEditingQuiz(q)}
-                          className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-[11px] font-black rounded-xl transition-all border border-emerald-300 flex items-center gap-1 shadow-2xs cursor-pointer"
+                          className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-[11px] font-bold rounded-lg transition-all border border-emerald-300 flex items-center gap-1 shadow-sm cursor-pointer"
                           title="Xem & Chỉnh sửa Quiz"
                         >
                           <span>👁 Xem &amp; Sửa</span>
@@ -580,7 +580,7 @@ export default function InstructorQuizListPage() {
                             setQuizToDelete(q);
                             setDeleteError(null);
                           }}
-                          className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl border border-transparent hover:border-rose-200 transition-all cursor-pointer"
+                          className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-transparent hover:border-rose-200 transition-all cursor-pointer"
                           title="Xóa đề kiểm tra"
                         >
                           <span className="text-sm">🗑</span>
@@ -606,7 +606,7 @@ export default function InstructorQuizListPage() {
                     type="button"
                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
-                    className="px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-extrabold text-gray-700 hover:bg-gray-50 transition-all disabled:opacity-40 disabled:hover:bg-white cursor-pointer disabled:cursor-not-allowed shadow-2xs"
+                    className="px-3.5 py-2 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-all disabled:opacity-40 disabled:hover:bg-white cursor-pointer disabled:cursor-not-allowed shadow-sm"
                   >
                     ⬅️ Trang trước
                   </button>
@@ -617,9 +617,9 @@ export default function InstructorQuizListPage() {
                         key={pageNum}
                         type="button"
                         onClick={() => setCurrentPage(pageNum)}
-                        className={`w-8 h-8 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                        className={`w-8 h-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                           currentPage === pageNum
-                            ? "bg-[#3B82F6] text-white shadow-xs"
+                            ? "bg-blue-500 text-white shadow-xs"
                             : "bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200"
                         }`}
                       >
@@ -632,7 +632,7 @@ export default function InstructorQuizListPage() {
                     type="button"
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
-                    className="px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-extrabold text-gray-700 hover:bg-gray-50 transition-all disabled:opacity-40 disabled:hover:bg-white cursor-pointer disabled:cursor-not-allowed shadow-2xs"
+                    className="px-3.5 py-2 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-all disabled:opacity-40 disabled:hover:bg-white cursor-pointer disabled:cursor-not-allowed shadow-sm"
                   >
                     Trang sau ➡️
                   </button>
@@ -664,20 +664,20 @@ export default function InstructorQuizListPage() {
       {/* Delete Confirmation Modal */}
       {quizToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl border border-gray-100 flex flex-col gap-5">
+          <div className="bg-white rounded-lg p-6 md:p-8 max-w-md w-full shadow-2xl border border-gray-100 flex flex-col gap-5">
             <div className="flex items-center gap-3 text-rose-600">
-              <div className="w-10 h-10 rounded-2xl bg-rose-100 flex items-center justify-center text-xl font-bold">
+              <div className="w-10 h-10 rounded-lg bg-rose-100 flex items-center justify-center text-xl font-bold">
                 ⚠️
               </div>
               <div>
-                <h3 className="text-base font-black text-[#0F172A]">Xác nhận xóa đề kiểm tra</h3>
+                <h3 className="text-base font-bold text-slate-900">Xác nhận xóa đề kiểm tra</h3>
                 <p className="text-xs text-gray-500 font-medium">Hành động này không thể hoàn tác.</p>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-xs flex flex-col gap-1.5">
-              <span className="font-extrabold text-[#0F172A]">Bạn có chắc muốn xóa đề kiểm tra này?</span>
-              <span className="font-bold text-[#3B82F6]">Đề: {quizToDelete.title}</span>
+            <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 text-xs flex flex-col gap-1.5">
+              <span className="font-semibold text-slate-900">Bạn có chắc muốn xóa đề kiểm tra này?</span>
+              <span className="font-bold text-blue-500">Đề: {quizToDelete.title}</span>
               {quizToDelete.attachments && quizToDelete.attachments.length > 0 && (
                 <span className="text-[11px] text-amber-700 font-medium">
                   ⚠️ Bài kiểm tra này hiện đang được gắn vào một hoặc nhiều khóa học.
@@ -686,14 +686,14 @@ export default function InstructorQuizListPage() {
             </div>
 
             {deleteError && (
-              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold space-y-2">
+              <div className="p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold space-y-2">
                 <div>⚠️ {deleteError}</div>
                 {deleteError.includes("gắn vào khóa học") && (
                   <button
                     type="button"
                     onClick={() => handleDeleteConfirm(true)}
                     disabled={isDeleting}
-                    className="mt-2 w-full py-2.5 px-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="mt-2 w-full py-2.5 px-3 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <span>🗑 Gỡ khỏi khóa học &amp; Xóa ngay</span>
                   </button>
@@ -709,7 +709,7 @@ export default function InstructorQuizListPage() {
                   setDeleteError(null);
                 }}
                 disabled={isDeleting}
-                className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold text-xs transition-all cursor-pointer"
+                className="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs transition-all cursor-pointer"
               >
                 Hủy
               </button>
@@ -717,7 +717,7 @@ export default function InstructorQuizListPage() {
                 type="button"
                 onClick={() => handleDeleteConfirm()}
                 disabled={isDeleting}
-                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                className="px-5 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {isDeleting ? (
                   <span>⏳ Đang xóa...</span>

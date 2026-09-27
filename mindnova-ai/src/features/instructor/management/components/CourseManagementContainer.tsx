@@ -79,12 +79,12 @@ function CourseManagementContent() {
     <div className="min-h-screen bg-[#F4F4F8] font-sans">
       <div className="max-w-[1200px] w-full mx-auto p-6 lg:p-8 flex flex-col gap-8 pb-20 animate-fadeIn">
         {/* ── Page Header & Filter Tabs ───────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#E2E8F0] pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-6">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-black text-[#0F172A] tracking-tight">
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">
               Quản lý khóa học
             </h1>
-            <p className="mt-1.5 text-xs text-[#64748B] font-medium max-w-xl leading-relaxed">
+            <p className="mt-1.5 text-xs text-slate-500 font-medium max-w-xl leading-relaxed">
               Theo dõi, phân tích và tối ưu hóa hệ thống tài liệu giáo dục của bạn với sự hỗ trợ của trí tuệ nhân tạo MindNova AI.
             </p>
           </div>
@@ -93,10 +93,10 @@ function CourseManagementContent() {
         </div>
 
         {/* ── Search & Sort Bar ────────────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#E2E8F0] shadow-2xs">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
           {/* Search Box */}
           <div className="relative flex-1 max-w-md">
-            <span className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-[#64748B]">
+            <span className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-slate-500">
               <SearchIcon />
             </span>
             <input
@@ -107,7 +107,7 @@ function CourseManagementContent() {
                 setSearchQuery(e.target.value);
                 setPage(1);
               }}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs font-semibold text-[#0F172A] placeholder:text-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] transition-all"
+              className="w-full pl-10 pr-9 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#3B82F6] transition-all"
             />
             {searchQuery && (
               <button
@@ -122,13 +122,13 @@ function CourseManagementContent() {
 
           {/* Sort Selector */}
           <div className="flex items-center gap-2 self-end sm:self-auto">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-[#64748B] shrink-0">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 shrink-0">
               Sắp xếp:
             </span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs font-bold text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#3B82F6] cursor-pointer"
+              className="px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#3B82F6] cursor-pointer"
             >
               <option value="newest">Mới nhất</option>
               <option value="oldest">Cũ nhất</option>
@@ -147,7 +147,7 @@ function CourseManagementContent() {
                 <Loader size="md" />
               </div>
             ) : isError ? (
-              <div className="col-span-full py-12 flex items-center justify-center text-[#3B82F6]">
+              <div className="col-span-full py-12 flex items-center justify-center text-blue-500">
                 Lỗi khi tải danh sách khóa học
               </div>
             ) : allItems.length === 1 && allItems[0] === "CREATE_CARD" ? (

@@ -22,12 +22,12 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
  <div
  aria-current={isActive ? "step" : undefined}
  className={twMerge(
- "w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all duration-300",
+ "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300",
  isDone
- ? "bg-[#3B82F6] text-white shadow-2xs"
+ ? "bg-blue-500 text-white shadow-sm"
  : isActive
- ? "bg-[#3B82F6] text-white ring-4 ring-blue-100 shadow-sm"
- : "bg-gray-200 text-[#64748B]"
+ ? "bg-blue-500 text-white ring-4 ring-blue-100 shadow-sm"
+ : "bg-gray-200 text-slate-500"
  )}
  >
  {isDone ? <CheckIcon size={14} /> : step.id}
@@ -37,9 +37,9 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
  className={twMerge(
  "text-[11px] transition-colors duration-200 text-center",
  isActive
- ? "text-[#0F172A] font-extrabold"
+ ? "text-slate-900 font-semibold"
  : isDone
- ? "text-[#3B82F6] font-bold"
+ ? "text-blue-500 font-bold"
  : "text-gray-400 font-medium"
  )}
  >
@@ -50,7 +50,7 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
  {!isLast && (
  <div className="flex-1 h-[2px] mx-2 mb-5 rounded-full overflow-hidden bg-gray-200">
  <div
- className="h-full bg-[#3B82F6] transition-all duration-500 ease-out"
+ className="h-full bg-blue-500 transition-all duration-500 ease-out"
  style={{ width: isDone ? "100%" : "0%" }}
  />
  </div>

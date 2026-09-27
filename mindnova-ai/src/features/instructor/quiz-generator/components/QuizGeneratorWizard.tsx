@@ -59,20 +59,20 @@ export function QuizGeneratorWizard({
     <div className={`max-w-5xl mx-auto flex flex-col gap-6 ${embeddedMode ? "p-2" : "p-4 md:p-8"}`}>
       {/* Wizard Header Progress Bar */}
       {!embeddedMode && (
-        <div className="bg-white rounded-3xl p-6 border border-[#E2E8F0] shadow-sm flex flex-col gap-4">
+        <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#3B82F6] text-white flex items-center justify-center shadow-md">
+              <div className="w-10 h-10 rounded-lg bg-blue-500 text-white flex items-center justify-center shadow-md">
                 <Sparkles className="h-5 w-5" aria-hidden />
               </div>
               <div>
-                <h1 className="text-lg font-black text-[#0F172A]">Trợ Lý Tạo Bài Kiểm Tra AI</h1>
-                <p className="text-xs text-[#64748B] font-semibold">Tạo bài kiểm tra trắc nghiệm &amp; tự luận bằng AI</p>
+                <h1 className="text-lg font-bold text-slate-900">Trợ Lý Tạo Bài Kiểm Tra AI</h1>
+                <p className="text-xs text-slate-500 font-semibold">Tạo bài kiểm tra trắc nghiệm &amp; tự luận bằng AI</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 font-mono text-xs font-black">
-              <span className="text-[#3B82F6]">Bước {step}</span>
+            <div className="flex items-center gap-2 font-mono text-xs font-bold">
+              <span className="text-blue-500">Bước {step}</span>
               <span className="text-gray-300">/</span>
               <span className="text-gray-400">5</span>
             </div>
@@ -95,15 +95,15 @@ export function QuizGeneratorWizard({
                   <div
                     className={`h-1.5 rounded-full transition-all duration-300 ${
                       isActive
-                        ? "bg-[#3B82F6]"
+                        ? "bg-blue-500"
                         : isDone
                         ? "bg-[#0F172A]"
                         : "bg-gray-200"
                     }`}
                   />
                   <span
-                    className={`text-[10px] font-extrabold truncate ${
-                      isActive ? "text-[#3B82F6]" : isDone ? "text-[#0F172A]" : "text-gray-400"
+                    className={`text-[10px] font-semibold truncate ${
+                      isActive ? "text-blue-500" : isDone ? "text-slate-900" : "text-gray-400"
                     }`}
                   >
                     {s.num}. {s.name}
@@ -117,12 +117,12 @@ export function QuizGeneratorWizard({
 
       {/* Error Alert Banner */}
       {error && (
-        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex flex-col gap-2 shadow-xs animate-fadeIn">
+        <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex flex-col gap-2 shadow-xs animate-fadeIn">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-2">
               <span className="text-base">⚠️</span>
               <div className="flex flex-col gap-1">
-                <span className="font-extrabold text-rose-900">Không thể tạo đề kiểm tra</span>
+                <span className="font-semibold text-rose-900">Không thể tạo đề kiểm tra</span>
                 <span className="text-gray-700 font-medium">{error}</span>
                 {errorInfo?.errorCode && (
                   <div className="mt-1.5 flex items-center gap-2 flex-wrap">
@@ -133,7 +133,7 @@ export function QuizGeneratorWizard({
                         handleGenerate();
                       }}
                       disabled={isGenerating}
-                      className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[11px] font-extrabold shadow-2xs transition-all cursor-pointer flex items-center gap-1 disabled:opacity-50"
+                      className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[11px] font-semibold shadow-sm transition-all cursor-pointer flex items-center gap-1 disabled:opacity-50"
                     >
                       <span> Thử lại</span>
                     </button>
@@ -141,7 +141,7 @@ export function QuizGeneratorWizard({
                 )}
               </div>
             </div>
-            <button type="button" onClick={clearError} className="text-rose-400 hover:text-rose-700 font-black cursor-pointer text-sm">
+            <button type="button" onClick={clearError} className="text-rose-400 hover:text-rose-700 font-bold cursor-pointer text-sm">
               ✕
             </button>
           </div>

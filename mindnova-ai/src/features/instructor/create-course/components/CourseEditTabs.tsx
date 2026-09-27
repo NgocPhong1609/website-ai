@@ -36,7 +36,7 @@ export function CourseEditTabs({ activeTab, onChangeTab }: CourseEditTabsProps) 
  ] as const;
 
  return (
- <div className="w-full bg-white border border-gray-100 p-1.5 rounded-2xl flex items-center gap-1.5 overflow-x-auto hide-scrollbar shadow-sm mt-1 mb-1">
+ <div className="w-full bg-white border border-gray-100 p-1.5 rounded-lg flex items-center gap-1.5 overflow-x-auto hide-scrollbar shadow-sm mt-1 mb-1">
  {tabs.map((tab) => {
  const isActive = activeTab === tab.id;
  return (
@@ -45,10 +45,10 @@ export function CourseEditTabs({ activeTab, onChangeTab }: CourseEditTabsProps) 
  type="button"
  onClick={() => onChangeTab(tab.id as EditCourseTab)}
  className={twMerge(
- "flex-1 flex justify-center items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap",
+ "flex-1 flex justify-center items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap",
  isActive
- ? "bg-[#3B82F6] text-white shadow-sm"
- : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]"
+ ? "bg-blue-500 text-white shadow-sm"
+ : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
  )}
  >
  <span className={twMerge(isActive ? "text-white" : "text-gray-400")}>

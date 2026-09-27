@@ -177,23 +177,23 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md animate-fadeIn">
-      <div className="bg-white rounded-3xl border border-[#E2E8F0] shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col gap-6 p-8">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col gap-6 p-8">
         {/* Header */}
         <div className="flex items-center gap-4 border-b border-gray-100 pb-5">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-black border border-emerald-100">
+          <div className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-bold border border-emerald-100">
             🎯
           </div>
           <div>
             <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Lưu Thành Công</span>
-            <h2 className="text-xl font-black text-[#0F172A]">{quiz.title}</h2>
-            <p className="text-xs text-[#64748B] font-medium mt-0.5">
+            <h2 className="text-xl font-bold text-slate-900">{quiz.title}</h2>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
               {attachedModuleTitle ? `Đề kiểm tra đã được lưu và đặt ở cuối chương: ${attachedModuleTitle}.` : "Đề kiểm tra đã được lưu vào thư viện. Vui lòng chọn Khóa học và Vị trí xuất hiện bên dưới."}
             </p>
           </div>
         </div>
 
         {errorInfo && (
-          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 flex items-start justify-between gap-3 animate-fadeIn">
+          <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-900 flex items-start justify-between gap-3 animate-fadeIn">
             <div className="flex items-start gap-3">
               <span className="text-xl">⚠️</span>
               <div>
@@ -212,9 +212,9 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
         )}
 
         {attachedSuccess ? (
-          <div className="p-6 rounded-2xl bg-emerald-50 border border-emerald-200 flex flex-col items-center justify-center text-center gap-3 animate-fadeIn">
+          <div className="p-6 rounded-lg bg-emerald-50 border border-emerald-200 flex flex-col items-center justify-center text-center gap-3 animate-fadeIn">
             <span className="text-4xl">🎉</span>
-            <h3 className="text-base font-extrabold text-emerald-900">Đã Gắn Bài Kiểm Tra Vào Khóa Học Thành Công!</h3>
+            <h3 className="text-base font-semibold text-emerald-900">Đã Gắn Bài Kiểm Tra Vào Khóa Học Thành Công!</h3>
             <p className="text-xs font-medium text-emerald-700">
               Học viên trong khóa học "{courseTitle}" hiện có thể tham gia làm bài kiểm tra theo đúng vị trí bạn đã thiết lập.
             </p>
@@ -228,31 +228,31 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
               </label>
 
               {isLoadingCourses ? (
-                <div className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs font-bold text-gray-400 animate-pulse">
+                <div className="p-3.5 rounded-lg bg-gray-50 border border-gray-200 text-xs font-bold text-gray-400 animate-pulse">
                   Đang nạp danh sách khóa học...
                 </div>
               ) : courses.length === 0 ? (
-                <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex flex-col gap-1">
+                <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex flex-col gap-1">
                   <span>⚠️ Bạn chưa có khóa học nào trong tài khoản.</span>
                   <span className="text-[11px] font-medium text-amber-700">
                     Hãy tạo khóa học trước khi gắn bài kiểm tra.
                   </span>
                 </div>
               ) : initialCourseId ? (
-                <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-100 flex items-center justify-between">
+                <div className="p-4 rounded-lg bg-blue-50/70 border border-blue-100 flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-black text-[#3B82F6] uppercase tracking-wider">
+                      <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">
                         Khóa học được chọn
                       </span>
-                      <span className="px-2 py-0.5 bg-white text-[#3B82F6] font-black text-[10px] rounded-md border border-blue-100 shadow-sm">
+                      <span className="px-2 py-0.5 bg-white text-blue-500 font-bold text-[10px] rounded-md border border-blue-100 shadow-sm">
                         Cố định từ bước tạo
                       </span>
                     </div>
-                    <h3 className="text-sm font-black text-[#0F172A] mt-0.5">{courseTitle}</h3>
+                    <h3 className="text-sm font-bold text-slate-900 mt-0.5">{courseTitle}</h3>
                   </div>
                   <div className="text-right flex flex-col items-end">
-                    <span className="text-xs font-mono font-extrabold text-[#3B82F6] block">
+                    <span className="text-xs font-mono font-semibold text-blue-500 block">
                       ID: #{selectedCourseId}
                     </span>
                     {isLoadingCourseDetails ? (
@@ -267,7 +267,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
                   <select
                     value={selectedCourseId || ""}
                     onChange={(e) => handleCourseChange(Number(e.target.value))}
-                    className="w-full p-3.5 rounded-2xl border-2 border-[#E2E8F0] bg-white text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#3B82F6] shadow-sm cursor-pointer"
+                    className="w-full p-3.5 rounded-lg border-2 border-slate-200 bg-white text-xs font-bold text-slate-900 focus:outline-none focus:border-[#3B82F6] shadow-sm cursor-pointer"
                   >
                     <option value="" disabled>-- Bắt buộc chọn khóa học để gắn bài kiểm tra --</option>
                     {courses.map((c) => (
@@ -288,7 +288,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
                           </span>
                         )}
                       </span>
-                      <span className="font-mono font-bold text-[#3B82F6]">ID: #{selectedCourseId}</span>
+                      <span className="font-mono font-bold text-blue-500">ID: #{selectedCourseId}</span>
                     </div>
                   )}
                 </div>
@@ -309,10 +309,10 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
                     key={pos.key}
                     type="button"
                     onClick={() => handlePositionChange(pos.key as any)}
-                    className={`p-3.5 rounded-xl border text-xs font-extrabold flex flex-col items-center gap-1.5 transition-all cursor-pointer text-center ${
+                    className={`p-3.5 rounded-lg border text-xs font-semibold flex flex-col items-center gap-1.5 transition-all cursor-pointer text-center ${
                       position === pos.key
-                        ? "border-[#3B82F6] bg-blue-50 text-[#3B82F6] shadow-xs ring-1 ring-[#3B82F6]/30"
-                        : "border-[#E2E8F0] text-[#64748B] hover:border-gray-300 bg-white"
+                        ? "border-[#3B82F6] bg-blue-50 text-blue-500 shadow-xs ring-1 ring-[#3B82F6]/30"
+                        : "border-slate-200 text-slate-500 hover:border-gray-300 bg-white"
                     }`}
                   >
                     <span className="text-xl">{pos.icon}</span>
@@ -329,7 +329,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
           <button
             type="button"
             onClick={() => router.push(selectedCourseId ? `/instructor/quiz-generator?course_id=${selectedCourseId}` : "/instructor/quiz-generator")}
-            className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-extrabold transition-all cursor-pointer"
+            className="px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-all cursor-pointer"
           >
             Quay Về Danh Sách Quiz
           </button>
@@ -338,7 +338,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
             <button
               type="button"
               onClick={() => router.push(`/instructor/courses/${selectedCourseId}/edit`)}
-              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl shadow-lg transition-all cursor-pointer flex items-center gap-2"
+              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-lg transition-all cursor-pointer flex items-center gap-2"
             >
               <span>🚀 Xem Trong Quản Lý Khóa Học</span>
             </button>
@@ -347,7 +347,7 @@ export function Step5SaveAndAttachModal({ quiz, onClose, onSuccessComplete, atta
               type="button"
               onClick={handleAttach}
               disabled={isAttaching || !isPositionValid()}
-              className="px-6 py-2.5 bg-[#3B82F6] hover:bg-[#2563EB] text-white text-xs font-black rounded-xl shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+              className="px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold rounded-lg shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
             >
               <span>{isAttaching ? "Đang gắn..." : "Gắn Bài Kiểm Tra Vào Khóa Học"}</span>
             </button>

@@ -97,11 +97,11 @@ function UserAvatar() {
  </button>
 
  {isDropdownOpen && (
- <div className="absolute right-0 mt-2 w-48 bg-white border border-[#E2E8F0] rounded-xl shadow-lg py-1 z-50">
+ <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-50">
  <Link
  href="/instructor/profile"
  onClick={() => setIsDropdownOpen(false)}
- className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-[#F8FAFC] hover:text-[#2563EB] transition-colors"
+ className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-slate-50 hover:text-[#2563EB] transition-colors"
  >
  Thông tin tài khoản
  </Link>
@@ -232,19 +232,19 @@ export function InstructorTopbar() {
  };
 
  return (
- <header className="h-16 shrink-0 flex items-center justify-between px-6 bg-white border-b border-[#E2E8F0] relative z-40 shadow-2xs">
+ <header className="h-16 shrink-0 flex items-center justify-between px-6 bg-white border-b border-slate-200 relative z-40 shadow-sm">
  {/* Brand & Context */}
  <div className="flex items-center gap-3">
  {/* Placeholder for sidebar open button if needed on mobile, removed SidebarOpenButton to avoid missing module error */}
- <button type="button" className="md:hidden w-9 h-9 rounded-xl flex items-center justify-center border border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B]">
+ <button type="button" className="md:hidden w-9 h-9 rounded-lg flex items-center justify-center border border-slate-200 bg-slate-50 text-slate-500">
  <svg viewBox="0 0 24 24" width={20} height={20} stroke="currentColor" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
  </button>
  <Link
  href="/instructor"
- className="text-lg font-black text-[#0F172A] tracking-tight hover:text-[#2563EB] transition-colors shrink-0 flex items-center gap-2"
+ className="text-lg font-bold text-slate-900 tracking-tight hover:text-[#2563EB] transition-colors shrink-0 flex items-center gap-2"
  >
  <span>MindNova Instructor</span>
- <span className="text-[10px] font-extrabold bg-[#F8FAFC] text-[#3B82F6] px-2.5 py-0.5 rounded-full border-[#E2E8F0]">
+ <span className="text-[10px] font-semibold bg-slate-50 text-blue-500 px-2.5 py-0.5 rounded-full border-slate-200">
  PRO
  </span>
  </Link>
@@ -257,7 +257,7 @@ export function InstructorTopbar() {
  {unansweredDiscussionsCount > 0 && (
  <Link
  href="/instructor/discussions?filter=needs_attention"
- className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#F8FAFC] text-[#0F172A] border border-[#E2E8F0] hover:bg-[#F8FAFC] hover:text-[#2563EB] hover:bg-[#F8FAFC] text-xs font-bold transition-all cursor-pointer text-decoration-none"
+ className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-50 text-slate-900 border border-slate-200 hover:bg-slate-50 hover:text-[#2563EB] hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer text-decoration-none"
  >
  <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0 animate-pulse" />
  <span>{unansweredDiscussionsCount} thảo luận mới</span>
@@ -267,13 +267,13 @@ export function InstructorTopbar() {
  {/* Chat Button */}
  <Link
  href="/instructor/messages"
- className="relative w-9 h-9 rounded-xl flex items-center justify-center border border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#2563EB] hover:bg-[#F8FAFC] transition-all cursor-pointer"
+ className="relative w-9 h-9 rounded-lg flex items-center justify-center border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-50 hover:text-[#2563EB] hover:bg-slate-50 transition-all cursor-pointer"
  >
  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
  </svg>
  {chatUnreadCount > 0 && (
- <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center border-2 border-white px-0.5 animate-pulse">
+ <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center border-2 border-white px-0.5 animate-pulse">
  {chatUnreadCount}
  </span>
  )}
@@ -286,13 +286,13 @@ export function InstructorTopbar() {
  aria-label="Toggle Alert Center"
  onClick={() => setIsAlertOpen((p) => !p)}
  className={twMerge(
- "relative w-9 h-9 rounded-xl flex items-center justify-center border border-[#E2E8F0] transition-all cursor-pointer",
- isAlertOpen ? "bg-[#3B82F6] text-white border-[#3B82F6] shadow-2xs" : "bg-[#F8FAFC] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#2563EB] hover:bg-[#F8FAFC]"
+ "relative w-9 h-9 rounded-lg flex items-center justify-center border border-slate-200 transition-all cursor-pointer",
+ isAlertOpen ? "bg-blue-500 text-white border-[#3B82F6] shadow-sm" : "bg-slate-50 text-slate-500 hover:bg-slate-50 hover:text-[#2563EB] hover:bg-slate-50"
  )}
  >
  <BellIcon />
  {unreadCount > 0 && (
- <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center border-2 border-white px-0.5">
+ <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center border-2 border-white px-0.5">
  {unreadCount}
  </span>
  )}
@@ -300,20 +300,20 @@ export function InstructorTopbar() {
 
  {/* Interactive Alert Dropdown */}
  {isAlertOpen && (
- <div className="absolute right-0 top-12 w-80 sm:w-96 rounded-2xl bg-white border border-[#E2E8F0] shadow-lg p-5 flex flex-col gap-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+ <div className="absolute right-0 top-12 w-80 sm:w-96 rounded-lg bg-white border border-slate-200 shadow-lg p-5 flex flex-col gap-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
  
  <div className="flex items-center justify-between pb-3 border-b border-gray-100">
  <div>
- <h3 className="text-sm font-extrabold text-[#0F172A] flex items-center gap-2">
+ <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
  <span>Thông báo Giảng viên</span>
  </h3>
- <p className="text-[11px] text-[#64748B] font-medium mt-0.5">Cập nhật thảo luận & doanh thu</p>
+ <p className="text-[11px] text-slate-500 font-medium mt-0.5">Cập nhật thảo luận & doanh thu</p>
  </div>
  {unreadCount > 0 && (
  <button
  type="button"
  onClick={markAllRead}
- className="text-xs font-bold text-[#3B82F6] hover:underline whitespace-nowrap cursor-pointer"
+ className="text-xs font-bold text-blue-500 hover:underline whitespace-nowrap cursor-pointer"
  >
  Đọc tất cả
  </button>
@@ -322,7 +322,7 @@ export function InstructorTopbar() {
 
  <div className="flex flex-col gap-2.5 max-h-[380px] overflow-y-auto pr-1">
  {alerts.length === 0 ? (
- <div className="py-8 text-center text-xs font-medium text-[#64748B]">
+ <div className="py-8 text-center text-xs font-medium text-slate-500">
  Bạn không có thông báo mới nào.
  </div>
  ) : (
@@ -330,7 +330,7 @@ export function InstructorTopbar() {
  const content = (
  <>
  <div className="flex items-start justify-between gap-2">
- <span className="text-xs font-bold text-[#0F172A] leading-snug">{item.title}</span>
+ <span className="text-xs font-bold text-slate-900 leading-snug">{item.title}</span>
  <button
  type="button"
  onClick={(e) => {
@@ -338,19 +338,19 @@ export function InstructorTopbar() {
  e.stopPropagation();
  dismissAlert(item.id);
  }}
- className="text-[#64748B] hover:text-[#2563EB] font-bold text-xs px-1 cursor-pointer relative z-10"
+ className="text-slate-500 hover:text-[#2563EB] font-bold text-xs px-1 cursor-pointer relative z-10"
  >
  
  </button>
  </div>
  
- <p className="text-xs text-[#64748B] leading-relaxed">{item.desc}</p>
+ <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
  
  <div className="flex items-center justify-between pt-1">
  <span className="text-[10px] font-bold text-gray-400">{item.timestamp}</span>
  {item.actionText && item.actionHref && (
  <span
- className="text-[11px] font-bold text-[#3B82F6] flex items-center gap-1 group-hover:underline"
+ className="text-[11px] font-bold text-blue-500 flex items-center gap-1 group-hover:underline"
  >
  {item.actionText}
  </span>
@@ -365,8 +365,8 @@ export function InstructorTopbar() {
  href={item.actionHref}
  onClick={() => setIsAlertOpen(false)}
  className={twMerge(
- "group p-3.5 rounded-xl border transition-all flex flex-col gap-1.5 relative block",
- !item.read ? "bg-[#EFF6FF] text-[#0F172A] shadow-2xs hover:bg-[#DBEAFE]" : "bg-white border-gray-100 opacity-70 hover:opacity-100"
+ "group p-3.5 rounded-lg border transition-all flex flex-col gap-1.5 relative block",
+ !item.read ? "bg-[#EFF6FF] text-slate-900 shadow-sm hover:bg-[#DBEAFE]" : "bg-white border-gray-100 opacity-70 hover:opacity-100"
  )}
  >
  {content}
@@ -375,8 +375,8 @@ export function InstructorTopbar() {
  <div
  key={item.id}
  className={twMerge(
- "p-3.5 rounded-xl border transition-all flex flex-col gap-1.5 relative",
- !item.read ? "bg-[#EFF6FF] text-[#0F172A] shadow-2xs" : "bg-white border-gray-100 opacity-70"
+ "p-3.5 rounded-lg border transition-all flex flex-col gap-1.5 relative",
+ !item.read ? "bg-[#EFF6FF] text-slate-900 shadow-sm" : "bg-white border-gray-100 opacity-70"
  )}
  >
  {content}
@@ -390,7 +390,7 @@ export function InstructorTopbar() {
  <button
  type="button"
  onClick={() => setIsAlertOpen(false)}
- className="text-xs font-bold text-[#64748B] hover:text-[#0F172A] cursor-pointer"
+ className="text-xs font-bold text-slate-500 hover:text-slate-900 cursor-pointer"
  >
  Đóng lại
  </button>

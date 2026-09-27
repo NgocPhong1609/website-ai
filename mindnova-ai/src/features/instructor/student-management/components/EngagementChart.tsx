@@ -15,17 +15,17 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
  };
 
  return (
- <div className="bg-white p-6 rounded-2xl border border-[#E2E8F0] shadow-2xs flex flex-col gap-6 w-full h-full">
+ <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col gap-6 w-full h-full">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
  <div>
- <h3 className="text-base font-black text-[#0F172A]">Biểu Đồ Tương Tác Học Tập</h3>
- <p className="text-xs text-[#64748B] mt-1">Tối ưu hóa tần suất hoạt động theo từng ngày trong tuần.</p>
+ <h3 className="text-base font-bold text-slate-900">Biểu Đồ Tương Tác Học Tập</h3>
+ <p className="text-xs text-slate-500 mt-1">Tối ưu hóa tần suất hoạt động theo từng ngày trong tuần.</p>
  </div>
  
  <div className="relative">
  <button 
  onClick={() => setIsOpen(!isOpen)}
- className="flex items-center justify-between w-[130px] bg-white border border-[#E2E8F0] text-gray-700 text-xs font-bold rounded-xl px-4 py-2 hover:bg-[#F8FAFC] focus:outline-none focus:border-[#3B82F6] cursor-pointer shadow-sm transition-colors"
+ className="flex items-center justify-between w-[130px] bg-white border border-slate-200 text-gray-700 text-xs font-bold rounded-lg px-4 py-2 hover:bg-slate-50 focus:outline-none focus:border-[#3B82F6] cursor-pointer shadow-sm transition-colors"
  >
  <span>{getRangeText(timeRange)}</span>
  <></>
@@ -34,7 +34,7 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
  {isOpen && (
  <>
  <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)}></div>
- <div className="absolute right-0 mt-2 w-[130px] bg-white border border-gray-100 rounded-xl shadow-lg z-20 overflow-hidden py-1">
+ <div className="absolute right-0 mt-2 w-[130px] bg-white border border-gray-100 rounded-lg shadow-lg z-20 overflow-hidden py-1">
  {[7, 14, 30].map(val => (
  <button
  key={val}
@@ -44,7 +44,7 @@ export function EngagementChart({ data, timeRange, setTimeRange }: { data: any[]
  }}
  className={twMerge(
  "w-full text-left px-4 py-2 text-xs font-bold cursor-pointer transition-colors",
- timeRange === val ? "bg-blue-50 text-[#3B82F6]" : "text-gray-700 hover:bg-[#F8FAFC]"
+ timeRange === val ? "bg-blue-50 text-blue-500" : "text-gray-700 hover:bg-slate-50"
  )}
  >
  {getRangeText(val)}

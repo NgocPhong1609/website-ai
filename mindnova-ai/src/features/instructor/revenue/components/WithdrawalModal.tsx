@@ -160,19 +160,19 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
-      <div className="relative w-full max-w-lg bg-white rounded-2xl border border-[#E2E8F0] shadow-xl flex flex-col overflow-hidden font-sans">
+      <div className="relative w-full max-w-lg bg-white rounded-lg border border-slate-200 shadow-xl flex flex-col overflow-hidden font-sans">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-5 bg-[#3B82F6] text-white">
+        <div className="flex items-center justify-between p-5 bg-blue-500 text-white">
           <div>
-            <h2 className="text-base font-black text-white">Yêu Cầu Rút Tiền Hoa Hồng</h2>
+            <h2 className="text-base font-bold text-white">Yêu Cầu Rút Tiền Hoa Hồng</h2>
             <p className="text-xs text-white/80">Hệ thống thanh toán tự động an toàn cho Giảng viên</p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Đóng cửa sổ"
-            className="w-8 h-8 rounded-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
             <XIcon size={18} />
           </button>
@@ -181,19 +181,19 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
         <div className="p-6 flex flex-col gap-5 overflow-y-auto max-h-[80vh]">
           
           {/* Balance Breakdown */}
-          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex flex-col justify-between">
+          <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-emerald-900 uppercase">Số dư khả dụng</span>
-              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">Sẵn sàng rút</span>
+              <span className="text-xs font-bold text-emerald-900 uppercase">Số dư khả dụng</span>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">Sẵn sàng rút</span>
             </div>
-            <span className="text-xl font-black text-emerald-700 mt-1.5">{availableBalance.toLocaleString('vi-VN')} VNĐ</span>
+            <span className="text-xl font-bold text-emerald-700 mt-1.5">{availableBalance.toLocaleString('vi-VN')} VNĐ</span>
           </div>
 
           {/* Amount Input */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-black text-gray-800 uppercase">Số tiền muốn rút</label>
-              <span className="text-[11px] font-bold text-[#64748B]">Tối thiểu: 50,000đ</span>
+              <label className="text-xs font-bold text-gray-800 uppercase">Số tiền muốn rút</label>
+              <span className="text-[11px] font-bold text-slate-500">Tối thiểu: 50,000đ</span>
             </div>
             <div className="relative flex items-center">
               <input
@@ -202,16 +202,16 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
                 onChange={handleAmountChange}
                 placeholder="Nhập số tiền (VD: 500.000)..."
                 className={twMerge(
-                  "w-full h-11 pl-4 pr-32 rounded-xl border font-bold text-base focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30 transition-all",
-                  isBelowMinimum || isExceedingAvailable ? "border-rose-400 bg-rose-50/20 text-rose-700" : "border-[#E2E8F0] bg-white text-[#0F172A] focus:border-[#3B82F6]"
+                  "w-full h-11 pl-4 pr-32 rounded-lg border font-bold text-base focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30 transition-all",
+                  isBelowMinimum || isExceedingAvailable ? "border-rose-400 bg-rose-50/20 text-rose-700" : "border-slate-200 bg-white text-slate-900 focus:border-[#3B82F6]"
                 )}
               />
               <div className="absolute right-2.5 flex items-center gap-1.5">
-                <span className="text-xs font-black text-gray-400">VNĐ</span>
+                <span className="text-xs font-bold text-gray-400">VNĐ</span>
                 <button
                   type="button"
                   onClick={() => setAmount(formatCurrency(availableBalance.toString()))}
-                  className="px-2.5 py-1 rounded-lg bg-blue-50 text-[#3B82F6] font-extrabold text-xs hover:bg-[#2563EB] hover:text-white transition-all cursor-pointer border border-[#E2E8F0]"
+                  className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-500 font-semibold text-xs hover:bg-blue-600 hover:text-white transition-all cursor-pointer border border-slate-200"
                 >
                   Tối đa
                 </button>
@@ -233,7 +233,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
           {/* Bank Account Management Section */}
           <div className="flex flex-col gap-2.5 pt-2 border-t border-gray-100">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-black text-gray-800 uppercase">Tài Khoản Nhận Tiền</label>
+              <label className="text-xs font-bold text-gray-800 uppercase">Tài Khoản Nhận Tiền</label>
               {hasValidBank && !isEditingBank && (
                 <button
                   type="button"
@@ -246,15 +246,15 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
             </div>
 
             {isLoadingPayout ? (
-              <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 text-xs font-medium text-gray-500 text-center">
+              <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 text-xs font-medium text-gray-500 text-center">
                 Đang tải thông tin tài khoản...
               </div>
             ) : isEditingBank || !hasValidBank ? (
-              <form onSubmit={handleSaveBankInfo} className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col gap-3">
+              <form onSubmit={handleSaveBankInfo} className="p-4 rounded-lg bg-slate-50 border border-slate-200 flex flex-col gap-3">
                 <p className="text-xs font-bold text-slate-700">Điền thông tin tài khoản ngân hàng / ví nhận tiền của bạn:</p>
                 
                 <div>
-                  <label className="block text-[11px] font-extrabold text-gray-600 mb-1">Tên Ngân hàng / Cổng nhận tiền *</label>
+                  <label className="block text-[11px] font-semibold text-gray-600 mb-1">Tên Ngân hàng / Cổng nhận tiền *</label>
                   <input
                     type="text"
                     list="bank-options"
@@ -271,7 +271,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-extrabold text-gray-600 mb-1">Số Tài Khoản / Email PayPal *</label>
+                  <label className="block text-[11px] font-semibold text-gray-600 mb-1">Số Tài Khoản / Email PayPal *</label>
                   <input
                     type="text"
                     value={accountNumber}
@@ -282,7 +282,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-extrabold text-gray-600 mb-1">Tên Chủ Tài Khoản (Người thụ hưởng) *</label>
+                  <label className="block text-[11px] font-semibold text-gray-600 mb-1">Tên Chủ Tài Khoản (Người thụ hưởng) *</label>
                   <input
                     type="text"
                     value={accountName}
@@ -305,25 +305,25 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
                   <button
                     type="submit"
                     disabled={saveBankMutation.isPending}
-                    className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-sm transition-all cursor-pointer disabled:opacity-50"
+                    className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition-all cursor-pointer disabled:opacity-50"
                   >
                     {saveBankMutation.isPending ? "Đang lưu..." : "Lưu tài khoản"}
                   </button>
                 </div>
               </form>
             ) : (
-              <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-200 flex items-center justify-between gap-3">
+              <div className="p-4 rounded-lg bg-blue-50/60 border border-blue-200 flex items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-black text-blue-950">{bankName}</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
+                    <span className="text-xs font-bold text-blue-950">{bankName}</span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">
                       Đã xác minh
                     </span>
                   </div>
                   <p className="text-xs font-bold text-gray-700 mt-1">
                     STK: <span className="font-mono">{accountNumber}</span>
                   </p>
-                  <p className="text-[11px] font-extrabold text-gray-500 uppercase mt-0.5">
+                  <p className="text-[11px] font-semibold text-gray-500 uppercase mt-0.5">
                     Chủ tk: {accountName}
                   </p>
                 </div>
@@ -332,7 +332,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
           </div>
 
           {statusMessage && (
-            <div className={twMerge("p-3.5 rounded-xl font-bold text-xs flex items-center justify-between shadow-sm", isErrorMsg ? "bg-rose-100 text-rose-700 border border-rose-300" : "bg-slate-900 text-white")}>
+            <div className={twMerge("p-3.5 rounded-lg font-bold text-xs flex items-center justify-between shadow-sm", isErrorMsg ? "bg-rose-100 text-rose-700 border border-rose-300" : "bg-slate-900 text-white")}>
               <span>{statusMessage}</span>
               {(withdrawMutation.isPending || saveBankMutation.isPending) && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
             </div>
@@ -343,7 +343,7 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
             type="button"
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-extrabold text-white bg-[#3B82F6] hover:bg-[#2563EB] active:scale-98 shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 active:scale-98 shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             <span>{withdrawMutation.isPending ? "Đang xử lý..." : "Xác Nhận & Gửi Yêu Cầu Rút Tiền"}</span>
             {!withdrawMutation.isPending && <ArrowRightIcon size={16} />}
@@ -351,8 +351,8 @@ export function WithdrawalModal({ isOpen, onClose, availableBalance, onSuccess }
         </div>
 
         {/* Footer */}
-        <div className="py-3 bg-[#F8FAFC] border-t border-gray-100 text-center">
-          <span className="text-xs font-medium text-[#64748B]">
+        <div className="py-3 bg-slate-50 border-t border-gray-100 text-center">
+          <span className="text-xs font-medium text-slate-500">
             Thời gian nhận tiền dự kiến qua hệ thống tự động: <strong className="text-gray-700 font-bold">1 - 3 ngày làm việc</strong>
           </span>
         </div>

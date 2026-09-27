@@ -48,18 +48,18 @@ export function CourseAiQuizModal({
         className="absolute inset-0"
         onClick={handleSafeClose}
       />
-      <div className="relative w-full max-w-5xl bg-[#FDFBF7] rounded-3xl shadow-2xl overflow-hidden my-6 border border-gray-200 max-h-[92vh] flex flex-col z-10">
+      <div className="relative w-full max-w-5xl bg-[#FDFBF7] rounded-lg shadow-2xl overflow-hidden my-6 border border-gray-200 max-h-[92vh] flex flex-col z-10">
         
         {/* Modal Header */}
         <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm ${
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-sm ${
               isGeneral ? "bg-amber-500 text-white" : "bg-blue-600 text-white"
             }`}>
               {position ? (isGeneral ? <Trophy className="h-5 w-5" aria-hidden /> : <Flag className="h-5 w-5" aria-hidden />) : <Bot className="h-5 w-5" aria-hidden />}
             </div>
             <div>
-              <h3 className="text-base font-black truncate">
+              <h3 className="text-base font-bold truncate">
                 {position
                   ? isGeneral
                     ? "TẠO BÀI KIỂM TRA TỔNG QUÁT TỰ ĐỘNG BẰNG AI"
@@ -77,7 +77,7 @@ export function CourseAiQuizModal({
           <button
             type="button"
             onClick={handleSafeClose}
-            className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-sm transition-all cursor-pointer"
+            className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-sm transition-all cursor-pointer"
             title="Đóng modal"
           >
             <X className="h-4 w-4" aria-hidden />
