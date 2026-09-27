@@ -57,7 +57,7 @@ function RevenueNavigationTabs({ active }: { active: "overview" | "report" | "hi
  );
 }
 
-function PageHeader({ onOpenWithdrawal, onToggleForecast }: { onOpenWithdrawal: () => void; onToggleForecast: () => void }) {
+function PageHeader({ onOpenWithdrawal }: { onOpenWithdrawal: () => void }) {
  return (
  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
  <div>
@@ -67,14 +67,7 @@ function PageHeader({ onOpenWithdrawal, onToggleForecast }: { onOpenWithdrawal: 
  </p>
  </div>
  <div className="flex items-center gap-2.5 flex-wrap">
- <button
- type="button"
- onClick={onToggleForecast}
- className="flex items-center gap-2 px-4 py-2.5 rounded-lg border-slate-200 text-xs font-semibold text-blue-500 bg-blue-50/80 hover:bg-slate-50 transition-all cursor-pointer shadow-sm"
- >
- <SparklesIcon size={15} />
- <span>Dự báo Thu nhập AI</span>
- </button>
+
  <button
  type="button"
  onClick={onOpenWithdrawal}
@@ -130,62 +123,7 @@ function StatCards({ data }: { data: any }) {
  );
 }
 
-function AIForecastSection({ onClose, forecast }: { onClose: () => void; forecast: any }) {
- return (
- <div className="p-6 rounded-lg bg-white border-slate-200 shadow-sm flex flex-col gap-5 animate-fadeIn">
- <div className="flex items-center justify-between border-b border-slate-200 text-slate-900 pb-4">
- <div className="flex items-center gap-3">
- 
- <div>
- <div className="flex items-center gap-2">
- <h3 className="text-sm font-bold text-slate-900">Dự Báo &amp; Tối Ưu Hóa Thu Nhập AI</h3>
- <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-50 text-blue-500">
- AI Predictive Engine
- </span>
- </div>
- <p className="text-xs text-slate-500 mt-0.5">
- Phóng tác đà tăng trưởng thu nhập dựa trên số lượng ghi danh thực tế và lưu lượng từ liên kết giới thiệu.
- </p>
- </div>
- </div>
- <button type="button" onClick={onClose} aria-label="Đóng bảng dự báo" className="text-gray-400 hover:text-gray-700 font-bold text-base p-1 cursor-pointer">
- 
- </button>
- </div>
 
- <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
- <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between">
- <span className="text-xs font-bold text-slate-500 uppercase">Thu Nhập Cuối Tháng Dự Kiến</span>
- <span className="text-xl font-bold text-blue-500 mt-1.5">{forecast?.expected_end_month?.toLocaleString('vi-VN')}đ</span>
- <span className="text-xs font-semibold text-slate-900 mt-1">▲ Dự kiến tăng trưởng +{forecast?.growth_prediction}% so với kỳ trước</span>
- </div>
- 
- <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between">
- <span className="text-xs font-bold text-slate-500 uppercase">Khóa Học Đứng Đầu Chuyển Đổi</span>
- <span className="text-base font-bold text-slate-900 truncate mt-1.5">{forecast?.top_course}</span>
- <span className="text-xs font-semibold text-slate-500 mt-1">Chiếm {forecast?.top_course_percentage}% doanh số từ nguồn liên kết chia sẻ</span>
- </div>
-
- <div className="p-4 rounded-lg bg-blue-50/60 border-slate-200 flex flex-col justify-between gap-3">
- <div>
- <span className="text-xs font-bold text-blue-500 uppercase flex items-center gap-1.5">
- <span> Đề xuất nhanh từ AI</span>
- </span>
- <p className="text-xs font-medium text-blue-950 mt-1 leading-relaxed">
- Khóa &ldquo;Machine Learning Basics&rdquo; đang giảm nhẹ 14% lượt xem. Khuyến nghị tạo ngay mã giảm giá 20% hoặc đẩy link giới thiệu.
- </p>
- </div>
- <Link
- href="/instructor"
- className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold transition-all text-center shadow-sm"
- >
- Tạo Mã Khuyến Mãi Ngay 
- </Link>
- </div>
- </div>
- </div>
- );
-}
 
 function RevenueChart({ chartData }: { chartData: any[] }) {
  const formattedData = chartData.map((d: any, index: number) => {
@@ -295,7 +233,6 @@ function RecentTransactions({ transactions }: { transactions: any[] }) {
 
 export function RevenueContainer() {
  const [isWithdrawalOpen, setIsWithdrawalOpen] = useState(false);
- const [showForecast, setShowForecast] = useState(true);
 
  const { data, isLoading, error, refetch } = useQuery({
  queryKey: ["revenue-overview"],
@@ -311,7 +248,6 @@ export function RevenueContainer() {
 
  <PageHeader
  onOpenWithdrawal={() => setIsWithdrawalOpen(true)}
- onToggleForecast={() => setShowForecast((prev) => !prev)}
  />
 
  {isLoading ? (
@@ -331,8 +267,7 @@ export function RevenueContainer() {
  <>
  <StatCards data={data} />
 
- {showForecast && <AIForecastSection forecast={data.ai_forecast} onClose={() => setShowForecast(false)} />}
- 
+
  <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
  <RevenueChart chartData={data.chart_data} />
  <RecentTransactions transactions={data.recent_transactions} />

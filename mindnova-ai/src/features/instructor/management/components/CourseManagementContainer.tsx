@@ -107,7 +107,7 @@ function CourseManagementContent() {
                 setSearchQuery(e.target.value);
                 setPage(1);
               }}
-              className="w-full pl-10 pr-9 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#3B82F6] transition-all"
+              className="w-full pl-10 pr-9 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
             />
             {searchQuery && (
               <button
@@ -128,7 +128,7 @@ function CourseManagementContent() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#3B82F6] cursor-pointer"
+              className="px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
             >
               <option value="newest">Mới nhất</option>
               <option value="oldest">Cũ nhất</option>
@@ -191,7 +191,7 @@ function CourseManagementContent() {
 
 export function CourseManagementContainer() {
   return (
-    <Suspense fallback={<div className="flex-1 bg-[#F4F4F8] min-h-screen" />}>
+    <Suspense fallback={<div className="flex-1 bg-slate-50 min-h-screen" />}>
       <CourseManagementContent />
     </Suspense>
   );
