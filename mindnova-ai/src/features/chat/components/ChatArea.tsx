@@ -3,10 +3,13 @@ import { Conversation, ChatMessage as ChatMessageType } from '../types';
 import { ChatHeader } from './ChatHeader';
 import { ChatMessageBubble } from './ChatMessageBubble';
 import { ChatInput } from './ChatInput';
-import { useRealtimeChat } from '../../../hooks/useRealtimeChat';
+import { useRealtimeChat, useRealtimeStatus } from '../../../hooks/useRealtimeChat';
 import { axiosClient } from '@/src/shared/lib/axios';
 import { MessageCircleMore } from "lucide-react";
 import { Skeleton } from "@/src/shared/components/ui/Skeleton";
+
+/** Refresh interval for the open conversation when realtime is unavailable. */
+const CHAT_POLL_INTERVAL_MS = 5000;
 
 interface ChatAreaProps {
  conversation: Conversation;
@@ -16,8 +19,11 @@ interface ChatAreaProps {
 }
 
 export const ChatArea: React.FC<ChatAreaProps> = ({ conversation, currentUserId, token, onUpdateLastMessage }) => {
- const { messages, addOptimisticMessage, replaceTempMessage, loadInitialMessages, recallMessageLocally } = useRealtimeChat(conversation.id, token);
+ const { messages, addOptimisticMessage, replaceTempMessage, loadInitialMessages, recallMessageLocally, mergeServerMessages } = useRealtimeChat(conversation.id, token);
+ const realtimeStatus = useRealtimeStatus();
  const [isLoading, setIsLoading] = useState(true);
+ const messagesRef = useRef(messages);
+ messagesRef.current = messages;
  const messagesEndRef = useRef<HTMLDivElement>(null);
 
  const scrollToBottom = (force: boolean = false) => {
@@ -60,6 +66,27 @@ export const ChatArea: React.FC<ChatAreaProps> = ({ conversation, currentUserId,
 
  fetchMessages();
  }, [conversation.id, token]);
+
+ // Without a live socket, poll the open conversation so new messages still appear.
+ useEffect(() => {
+ if (realtimeStatus === 'connected' || isLoading) return;
+ const timer = window.setInterval(async () => {
+ if (document.hidden) return;
+ try {
+ const res = await axiosClient.get(`/api/chat/conversations/${conversation.id}/messages`);
+ const serverMessages: any[] = res.data?.data || [];
+ const known = new Set(messagesRef.current.map((m) => m.id));
+ const hasNewFromOthers = serverMessages.some((m) => !known.has(m.id) && Number(m.sender_id) !== Number(currentUserId));
+ mergeServerMessages(serverMessages);
+ if (hasNewFromOthers) {
+ axiosClient.post(`/api/chat/conversations/${conversation.id}/read`).catch(() => {});
+ }
+ } catch {
+ // Keep the current messages; the next tick retries.
+ }
+ }, CHAT_POLL_INTERVAL_MS);
+ return () => window.clearInterval(timer);
+ }, [realtimeStatus, isLoading, conversation.id, currentUserId]);
 
  useEffect(() => {
  if (messages.length > 0 && onUpdateLastMessage) {

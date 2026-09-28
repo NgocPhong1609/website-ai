@@ -3,11 +3,8 @@ import type { NextConfig } from "next";
 import { backendApiUrl } from "./src/shared/lib/backend-url";
 
 const nextConfig: NextConfig = {
-  env: {
-    NEXT_PUBLIC_REVERB_HOST: process.env.NEXT_PUBLIC_REVERB_HOST || '127.0.0.1',
-    NEXT_PUBLIC_REVERB_PORT: process.env.NEXT_PUBLIC_REVERB_PORT || '8080',
-    NEXT_PUBLIC_REVERB_SCHEME: process.env.NEXT_PUBLIC_REVERB_SCHEME || 'http',
-  },
+  // Reverb settings come only from NEXT_PUBLIC_REVERB_* env; never default them to a
+  // loopback host here, or deployed builds would try to reach the visitor's machine.
   images: {
     remotePatterns: [
       {

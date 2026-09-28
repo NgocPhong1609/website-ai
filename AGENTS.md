@@ -473,10 +473,10 @@ Tables migrated nhưng **không có model**: `knowledge_topics`, `user_topic_per
 
 ### Websocket
 
-- FE Echo broadcaster `reverb`, auth `/api/broadcasting/auth`.
-- Env FE: `NEXT_PUBLIC_REVERB_APP_KEY|HOST|PORT|SCHEME` (default key `mindnova_chat_key`, host localhost, port 8080).
+- FE Echo broadcaster `reverb`, auth `/api/broadcasting/auth`. Toàn bộ khởi tạo nằm ở `src/shared/lib/realtime.ts` (`getEcho`, `resolveRealtimeConfig`, trạng thái `disabled|connecting|connected|unavailable`); hooks dùng `getEchoInstance`/`useRealtimeStatus` trong `src/hooks/useRealtimeChat.ts`.
+- Env FE: `NEXT_PUBLIC_REVERB_APP_KEY|HOST|PORT|SCHEME`. **Không có default**: thiếu key/host → realtime tắt. Host loopback chỉ dùng khi trang cũng chạy trên localhost. Socket lỗi (`unavailable`/`failed`/2 lỗi liên tiếp) → ngắt hẳn trong phiên trang. Khi không `connected`, chat tự poll: tin nhắn hội thoại đang mở 5s, sidebar 15s, badge unread 30s (bỏ qua khi tab ẩn). Không đặt default Reverb trong `next.config.ts`.
 - BE: package `laravel/reverb` + pusher-php-server; `BROADCAST_CONNECTION=log` trong `.env.example`; **thiếu `config/broadcasting.php`** (chỉ `.bak`). Channels `notifications.{id}` và `realtime-messages` **chưa** khai báo trong `channels.php`.
-- Echo client là singleton — đổi token sau login có thể cần reload.
+- Echo client là singleton theo token — token đổi thì tự tạo lại client.
 
 ### Third-party (tên env, không ghi giá trị)
 
@@ -502,7 +502,7 @@ Có `mindnova-ai/.env.example`. Cần:
 - `NEXT_PUBLIC_API_URL` — axios, rewrite, Echo, adminApi
 - `NEXT_PUBLIC_REVERB_*`, `NEXT_PUBLIC_ENABLE_PUSHER_LOGS`
 
-Rewrite và request server dùng `BACKEND_URL`; request browser dùng `NEXT_PUBLIC_API_URL` hoặc proxy cùng origin nếu để trống. `src/shared/lib/api-url.ts` chuẩn hóa đúng một `/api`. Reverb host/cổng/scheme đọc env, không bị `next.config.ts` ghi đè. Xem `docs/environment-urls.md`.
+Rewrite và request server dùng `BACKEND_URL`; request browser dùng `NEXT_PUBLIC_API_URL` hoặc proxy cùng origin nếu để trống. `src/shared/lib/api-url.ts` chuẩn hóa đúng một `/api`. Reverb host/cổng/scheme chỉ đọc env (không default, không bị `next.config.ts` ghi đè); thiếu env → chat chạy bằng polling. Xem `docs/environment-urls.md`.
 
 ### Commands
 

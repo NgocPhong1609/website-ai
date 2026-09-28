@@ -14,6 +14,7 @@ const realtime = vi.hoisted(() => ({
   replaceTempMessage: vi.fn(),
   loadInitialMessages: vi.fn(),
   recallMessageLocally: vi.fn(),
+  mergeServerMessages: vi.fn(),
 }));
 
 vi.mock('@/src/shared/lib/axios', () => ({
@@ -22,6 +23,7 @@ vi.mock('@/src/shared/lib/axios', () => ({
 
 vi.mock('@/src/hooks/useRealtimeChat', () => ({
   useRealtimeChat: () => realtime,
+  useRealtimeStatus: () => 'connected',
 }));
 
 const conversation: Conversation = {

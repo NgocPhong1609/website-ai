@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
 import { axiosClient } from '@/src/shared/lib/axios';
-import { getEchoInstance } from '@/src/hooks/useRealtimeChat';
+import { getEchoInstance, useRealtimeStatus } from '@/src/hooks/useRealtimeChat';
+
+/** Unread badge refresh interval when realtime is unavailable. */
+const UNREAD_POLL_INTERVAL_MS = 30000;
 
 export const useChatGlobalUnread = (token: string | null, userId: number | null) => {
     const [unreadCount, setUnreadCount] = useState<number>(0);
+    const realtimeStatus = useRealtimeStatus();
 
     // Initial fetch
     useEffect(() => {
@@ -23,20 +27,29 @@ export const useChatGlobalUnread = (token: string | null, userId: number | null)
         };
 
         fetchUnreadCount();
-        
+
+        // Without a live socket, refresh the badge periodically instead.
+        const timer = realtimeStatus === 'connected'
+            ? undefined
+            : window.setInterval(() => { if (!document.hidden) fetchUnreadCount(); }, UNREAD_POLL_INTERVAL_MS);
+
         // Setup listener for custom events from ChatLayout to decrement
         const handleReadEvent = () => {
             fetchUnreadCount();
         };
         window.addEventListener('chat-messages-read', handleReadEvent);
-        return () => window.removeEventListener('chat-messages-read', handleReadEvent);
-    }, [token]);
+        return () => {
+            window.removeEventListener('chat-messages-read', handleReadEvent);
+            if (timer) window.clearInterval(timer);
+        };
+    }, [token, realtimeStatus]);
 
     // WebSocket listener
     useEffect(() => {
         if (!token || !userId) return;
 
         const echo = getEchoInstance(token);
+        if (!echo) return;
         const channelName = `App.Models.User.${userId}`;
         
         const channel = echo.private(channelName);

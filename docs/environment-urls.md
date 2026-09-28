@@ -29,7 +29,10 @@ Mọi thao tác ghi vẫn dùng dữ liệu của backend Railway. Muốn dữ l
 Đặt `BACKEND_URL` tới backend thật. Để `NEXT_PUBLIC_API_URL` trống để dùng proxy hoặc đặt URL backend
 nếu cần gọi trực tiếp. Khi gọi trực tiếp, cấu hình CORS backend phải cho phép domain frontend.
 Cả hai biến chấp nhận URL gốc hoặc URL kết thúc `/api`; không thêm `/api` hai lần.
-Đặt các `NEXT_PUBLIC_REVERB_*` theo dịch vụ WebSocket thực tế; source không còn ghi đè bằng host Railway.
+Đặt các `NEXT_PUBLIC_REVERB_*` theo dịch vụ WebSocket thực tế; source không đặt giá trị mặc định nào.
+Nếu backend chưa chạy server Reverb, **để trống cả 4 biến**: frontend không mở WebSocket và chat tự làm mới định kỳ
+(tin nhắn 5 giây, danh sách hội thoại 15 giây, số chưa đọc 30 giây). Host `localhost`/`127.0.0.1` bị bỏ qua khi trang
+không chạy trên localhost. Nếu đã cấu hình nhưng server không kết nối được, frontend thử một lần rồi chuyển sang làm mới định kỳ.
 Khởi động lại dev server sau khi thay env; trên Vercel cần build/deploy lại để cập nhật biến public.
 
 ## Laravel / Railway

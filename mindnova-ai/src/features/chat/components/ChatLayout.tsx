@@ -3,8 +3,11 @@ import { Conversation } from '../types';
 import { ChatSidebar } from './ChatSidebar';
 import { ChatArea } from './ChatArea';
 import { axiosClient } from '@/src/shared/lib/axios';
-import { getEchoInstance } from '@/src/hooks/useRealtimeChat';
+import { getEchoInstance, useRealtimeStatus } from '@/src/hooks/useRealtimeChat';
 import { MessageCircleMore } from "lucide-react";
+
+/** Sidebar refresh interval when realtime is unavailable. */
+const SIDEBAR_POLL_INTERVAL_MS = 15000;
 
 interface ChatLayoutProps {
   token: string;
@@ -16,6 +19,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
   const [activeId, setActiveId] = useState<number | null>(null);
   const activeIdRef = React.useRef<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const realtimeStatus = useRealtimeStatus();
 
   const handleSelectConversation = (id: number) => {
     setActiveId(id);
@@ -76,6 +80,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
     if (!token || conversations.length === 0) return;
     
     const echo = getEchoInstance(token);
+    if (!echo) return;
     const listeners: { channel: any, callback: any }[] = [];
 
     conversations.forEach(conv => {
@@ -122,6 +127,22 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ token, currentUserId }) 
       });
     };
   }, [conversations.length, token, currentUserId]);
+
+  // Without a live socket, refresh the sidebar (last message + unread counts) periodically.
+  useEffect(() => {
+    if (!token || realtimeStatus === 'connected' || isLoading) return;
+    const timer = window.setInterval(async () => {
+      if (document.hidden) return;
+      try {
+        const res = await axiosClient.get('/api/chat/conversations');
+        const fresh: Conversation[] = res.data?.data || [];
+        setConversations(fresh.map((c) => (c.id === activeIdRef.current ? { ...c, unread_count: 0 } : c)));
+      } catch {
+        // Keep the current list; the next tick retries.
+      }
+    }, SIDEBAR_POLL_INTERVAL_MS);
+    return () => window.clearInterval(timer);
+  }, [token, realtimeStatus, isLoading]);
 
   useEffect(() => {
     return () => {
