@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import type { AiQuotaMeta } from "@/src/features/student/ai-study-plan/types";
 import { AiQuotaError, sendAiChatMessage } from "@/src/features/student/ai-study-plan/services/ai-chat.client-service";
 import { TypewriterText, renderFormattedText } from "./ChatTextRenderer";
+import { Avatar } from "@/src/shared/components/ui/Avatar";
 
 interface Message {
   id: string;
@@ -441,7 +442,7 @@ export function FloatingAiChat() {
               <div>
                 <div className="flex items-center gap-1.5">
                   <h3 className="text-xs font-bold text-slate-900 tracking-tight">
-                    Nova AI
+                    Trợ lý MindNova AI
                   </h3>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" title="Online" />
                 </div>
@@ -487,13 +488,11 @@ export function FloatingAiChat() {
                     N
                   </div>
                 ) : (
-                  <div className="w-6.5 h-6.5 rounded-full overflow-hidden shrink-0 mt-0.5 border border-slate-200 shadow-2xs">
-                    <img
-                      src={user?.avatar_url || user?.avatar || user?.profile_image || "https://ui-avatars.com/api/?name=User&background=eff6ff&color=2563eb"}
-                      alt="You"
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
+                  <Avatar
+                    src={user?.avatar_url || user?.avatar || user?.profile_image}
+                    fallback={user?.name || user?.full_name || "User"}
+                    className="w-6.5 h-6.5 text-[10px] shrink-0 mt-0.5 font-bold"
+                  />
                 )}
 
                 <div className={`flex flex-col gap-1 ${msg.sender === "user" ? "items-end" : ""}`}>
