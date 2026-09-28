@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Check, Clock } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { backendApiUrl } from "@/src/shared/lib/backend-url";
@@ -82,8 +83,8 @@ export default async function PaymentCallbackPage({ searchParams }: Props) {
  return (
  <div className="flex items-center justify-center min-h-[80vh] p-6">
  <div className="bg-white rounded-3xl border border-slate-200 shadow-sm max-w-md w-full p-8 text-center flex flex-col items-center">
- <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 text-4xl shadow-sm ${isSuccess ? "bg-[#D1FAE5] text-slate-900" : "bg-blue-50 text-blue-500"}`}>
- {isSuccess ? "" : ""}
+ <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 shadow-sm ${isSuccess ? "bg-[#D1FAE5] text-emerald-600" : "bg-blue-50 text-blue-500"}`}>
+ {isSuccess ? <Check className="w-10 h-10" /> : <Clock className="w-10 h-10" />}
  </div>
 
  <h1 className="text-2xl font-bold text-slate-900 mb-3">
