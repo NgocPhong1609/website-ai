@@ -5,7 +5,7 @@ import { Avatar } from "@/src/shared/components/ui/Avatar";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { jsPDF } from "jspdf";
-import { Bell, Check, ChevronDown, LogOut, Menu, RefreshCw, Search } from "lucide-react";
+import { Check, ChevronDown, LogOut, Menu, RefreshCw, Search } from "lucide-react";
 import { adminApi } from "@/src/features/admin/lib/admin-api";
 
 type ExportFormat = "json" | "doc" | "pdf";
@@ -280,15 +280,6 @@ export function AdminTopbar({ onOpenNav }: { onOpenNav?: () => void }) {
  >
  <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} aria-hidden />
  {isRefreshing ? "Đang làm mới..." : "Làm mới dữ liệu"}
- </button>
-
- <button
- type="button"
- aria-label="Notifications"
- className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 transition hover:border-[#3B82F6] hover:text-[#2563EB]"
- >
- <Bell className="h-5 w-5" aria-hidden />
- <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#3B82F6] ring-2 ring-white" />
  </button>
 
  <button
