@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Download, FileArchive, FileText, Link2, MessageCircle, Video, Sparkles } from "lucide-react";
+import { StudentRefundModal } from "../StudentRefundModal";
 import type { 
  CourseDetailProgressCard, 
  CourseDetailAIInsight, 
@@ -281,14 +282,29 @@ export interface CourseSidebarProps {
 }
 
 export function CourseSidebar({ progress, aiInsight, instructor, resources, isEnrolled, price, courseId }: CourseSidebarProps) {
- return (
- <aside className="w-full lg:w-[330px] xl:w-[360px] shrink-0 flex flex-col gap-6">
- {isEnrolled !== false ? (
- <>
- <ProgressCard progress={progress} />
- <AiInsightCard aiInsight={aiInsight} />
- </>
- ) : (
+  const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
+
+  return (
+    <aside className="w-full lg:w-[330px] xl:w-[360px] shrink-0 flex flex-col gap-6">
+      {isEnrolled !== false ? (
+        <>
+          <ProgressCard progress={progress} />
+          <AiInsightCard aiInsight={aiInsight} />
+          <button 
+             onClick={() => setIsRefundModalOpen(true)}
+             className="w-full py-2.5 rounded-lg text-xs font-semibold text-amber-600 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-colors cursor-pointer text-center"
+          >
+             Yêu cầu hoàn tiền
+          </button>
+          {courseId && (
+            <StudentRefundModal 
+               isOpen={isRefundModalOpen}
+               onClose={() => setIsRefundModalOpen(false)}
+               courseId={courseId}
+            />
+          )}
+        </>
+      ) : (
  <EnrollCard price={price} courseId={courseId} />
  )}
  <ResourcesCard resources={resources} />
